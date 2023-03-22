@@ -1,6 +1,6 @@
 unit DWDCPbase64;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .

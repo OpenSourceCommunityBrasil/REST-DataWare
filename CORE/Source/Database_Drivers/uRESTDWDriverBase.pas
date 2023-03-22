@@ -1,6 +1,6 @@
 ﻿unit uRESTDWDriverBase;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -198,7 +198,7 @@ Type
   vCompression         : Boolean;
   vEncoding            : TEncodeSelect;
   vCommitRecords       : Integer;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
    vDatabaseCharSet    : TDatabaseCharSet;
   {$ENDIF}
   vParamCreate         : Boolean;
@@ -403,7 +403,7 @@ Type
   Property EncodeStringsJSON   : Boolean              Read vEncodeStrings         Write vEncodeStrings;
   Property Encoding            : TEncodeSelect        Read vEncoding              Write vEncoding;
   Property ParamCreate         : Boolean              Read vParamCreate           Write vParamCreate;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Property DatabaseCharSet     : TDatabaseCharSet     Read vDatabaseCharSet       Write vDatabaseCharSet;
   {$ENDIF}
   Property CommitRecords       : Integer              Read vCommitRecords         Write vCommitRecords;
@@ -511,16 +511,6 @@ var
 begin
   if DWParams = nil then
     Exit;
-
-{
-  // firebird funciona
-  // mssql nao funciona
-  try
-    Self.Prepare;
-  except
-
-  end;
-}
 
   for I := 0 To DWParams.Count -1 do begin
     if Self.ParamCount > I then begin
@@ -903,11 +893,11 @@ Begin
     SQL.Clear;
     SQL.Add('SELECT LAST_INSERT_ID() ID');
     Open;
-    {$IF NOT DEFINED(FPC) AND (CompilerVersion < 22)}
+    {$IFNDEF DELPHIXEUP}
       Result := Fields[0].AsInteger;
     {$ELSE}
       Result := Fields[0].AsLargeInt;
-    {$IFEND}
+    {$ENDIF}
    End;
  Except
   Result := -1;
@@ -1261,15 +1251,11 @@ begin
 
               if MassiveReplyValue <> nil then  begin
                 if vParam.RESTDWDataTypeParam in [dwftLongWord,dwftLargeint] then
-                  {$IFNDEF FPC}
-                    {$IF CompilerVersion >= 21}
-                      vParam.AsLargeInt := StrToInt64(MassiveReplyValue.NewValue)
-                    {$ELSE}
-                      vParam.AsInteger := StrToInt64(MassiveReplyValue.NewValue)
-                    {$IFEND}
+                  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+                  vParam.AsLargeInt := StrToInt64(MassiveReplyValue.NewValue)
                   {$ELSE}
-                    vParam.AsLargeInt := StrToInt64(MassiveReplyValue.NewValue)
-                  {$ENDIF}
+                  vParam.AsInteger := StrToInt64(MassiveReplyValue.NewValue)
+                  {$IFEND}
                 else if vParam.DataType = ftSmallInt then
                   vParam.AsSmallInt := StrToInt(MassiveReplyValue.NewValue)
                 else
@@ -1644,7 +1630,7 @@ Var
     end;
   end;
 Begin
-  {$IFNDEF FPC} Inherited; {$ENDIF}
+  {$IFNDEF RESTDWLAZARUS} Inherited; {$ENDIF}
   Try
     Result := Nil;
     Error := False;
@@ -1671,7 +1657,7 @@ Begin
             Result := TJSONValue.Create;
           Result.Encoding := Encoding;
           Result.Encoded := EncodeStringsJSON;
-          {$IFDEF FPC}
+          {$IFDEF RESTDWLAZARUS}
           Result.DatabaseCharSet := DatabaseCharSet;
           {$ENDIF}
           Result.Utf8SpecialChars := True;
@@ -1685,7 +1671,7 @@ Begin
               If Result = Nil Then
                 Result := TJSONValue.Create;
               Result.Encoded := True;
-              {$IFDEF FPC}
+              {$IFDEF RESTDWLAZARUS}
               Result.DatabaseCharSet := DatabaseCharSet;
               {$ENDIF}
               Result.SetValue(GetPairJSONStr('NOK', MessageError));
@@ -1700,7 +1686,7 @@ Begin
           Result := TJSONValue.Create;
         Result.Encoding := Encoding;
         Result.Encoded := EncodeStringsJSON;
-        {$IFDEF FPC}
+        {$IFDEF RESTDWLAZARUS}
           Result.DatabaseCharSet := DatabaseCharSet;
         {$ENDIF}
         Result.SetValue('[' + vResultReflection + ']');
@@ -1834,7 +1820,7 @@ var
     end;
   end;
 begin
- {$IFNDEF FPC}inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}inherited;{$ENDIF}
   try
     Result := nil;
     Error := False;
@@ -2022,7 +2008,7 @@ var
     end;
   end;
 begin
-  {$IFNDEF FPC}inherited;{$ENDIF}
+  {$IFNDEF RESTDWLAZARUS}inherited;{$ENDIF}
   try
     Result := nil;
     Error := False;
@@ -2045,7 +2031,7 @@ begin
             Result := TJSONValue.Create;
           Result.Encoding := Encoding;
           Result.Encoded := EncodeStringsJSON;
-          {$IFDEF FPC}
+          {$IFDEF RESTDWLAZARUS}
             Result.DatabaseCharSet := DatabaseCharSet;
           {$ENDIF}
           Result.Utf8SpecialChars := True;
@@ -2059,7 +2045,7 @@ begin
               if Result = nil then
                 Result := TJSONValue.Create;
               Result.Encoded := True;
-              {$IFDEF FPC}
+              {$IFDEF RESTDWLAZARUS}
                 Result.DatabaseCharSet := DatabaseCharSet;
               {$ENDIF}
               Result.SetValue(GetPairJSONStr('NOK', MessageError));
@@ -2074,7 +2060,7 @@ begin
           Result := TJSONValue.Create;
         Result.Encoding := Encoding;
         Result.Encoded := EncodeStringsJSON;
-        {$IFDEF FPC}
+        {$IFDEF RESTDWLAZARUS}
           Result.DatabaseCharSet := DatabaseCharSet;
         {$ENDIF}
         Result.SetValue('[' + vResultReflection + ']');
@@ -2247,7 +2233,7 @@ var
   End;
  End;
 Begin
- {$IFNDEF FPC}inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}inherited;{$ENDIF}
   vResultReflection := '';
   Result := '';
   try
@@ -2386,7 +2372,7 @@ var
   end;
 
 begin
- {$IFNDEF FPC}inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}inherited;{$ENDIF}
   vResultReflection := '';
   Result := nil;
   try
@@ -2459,8 +2445,8 @@ Var
      vDWParams.Encoding := Encoding;
      Try
       vMassiveSQLMode := MassiveSQLMode(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[0].Value);
-      vSQL            := StringReplace(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF}), #$B, ' ', [rfReplaceAll]);
-      vParamsString   := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[2].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+      vSQL            := StringReplace(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[1].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), #$B, ' ', [rfReplaceAll]);
+      vParamsString   := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[2].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
       vBookmark       := TRESTDWJSONInterfaceObject(bJsonValueB).pairs[3].Value;
       vBinaryRequest  := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[4].Value);
 
@@ -2502,7 +2488,7 @@ Var
   End;
  End;
 Begin
-  {$IFNDEF FPC}Inherited;{$ENDIF}
+  {$IFNDEF RESTDWLAZARUS}Inherited;{$ENDIF}
   vResultReflection := '';
   Result     := Nil;
   Try
@@ -2546,7 +2532,7 @@ var
   vStateResource: boolean;
   aResult: TJSONValue;
 begin
- {$IFNDEF FPC}inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}inherited;{$ENDIF}
   Error := False;
   Result := '';
   aResult := TJSONValue.Create;
@@ -2665,7 +2651,7 @@ var
   aResult        : TJSONValue;
   vStateResource : Boolean;
 begin
-  {$IFNDEF FPC}Inherited;{$ENDIF}
+  {$IFNDEF RESTDWLAZARUS}Inherited;{$ENDIF}
   Error  := False;
   aResult := TJSONValue.Create;
   vTempQuery := getTable;
@@ -2686,7 +2672,7 @@ begin
 
     aResult.Encoded         := EncodeStringsJSON;
     aResult.Encoding        := Encoding;
-    {$IFDEF FPC}
+    {$IFDEF RESTDWLAZARUS}
       aResult.DatabaseCharSet := DatabaseCharSet;
     {$ENDIF}
     try
@@ -2735,7 +2721,7 @@ begin
 
         aResult.Encoded         := True;
         aResult.Encoding        := Encoding;
-        {$IFDEF FPC}
+        {$IFDEF RESTDWLAZARUS}
           aResult.DatabaseCharSet := DatabaseCharSet;
         {$ENDIF}
         aResult.SetValue(GetPairJSONStr('NOK', MessageError));
@@ -2759,7 +2745,7 @@ Var
  vStateResource  : Boolean;
  vTempStoredProc : TRESTDWDrvStoreProc;
 Begin
- {$IFNDEF FPC}Inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}Inherited;{$ENDIF}
   Error  := False;
 
   vStateResource := isConnected;
@@ -3655,7 +3641,7 @@ Var
  bJsonValue      : TRESTDWJSONInterfaceObject;
  vStream         : TMemoryStream;
 Begin
- {$IFNDEF FPC}Inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}Inherited;{$ENDIF}
  Error           := False;
  vBinaryEvent    := False;
  vMetaData       := False;
@@ -3674,7 +3660,7 @@ Begin
     bJsonArray  := bJsonValue.OpenArray(I);
     vTempQuery.Close;
     vTempQuery.SQL.Clear;
-    vTempQuery.SQL.Add(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+    vTempQuery.SQL.Add(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
     vBinaryEvent    := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[2].Value);
     vMetaData       := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[3].Value);
     vCompatibleMode := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[4].Value);
@@ -3682,7 +3668,7 @@ Begin
      Begin
       DWParams := TRESTDWParams.Create;
       Try
-       DWParams.FromJSON(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+       DWParams.FromJSON(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[1].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
        vTempQuery.ImportParams(DWParams);
       Finally
        DWParams.Free;
@@ -3783,7 +3769,7 @@ Var
  vBufferStream,
  vParamsStream   : TStream;
 Begin
- {$IFNDEF FPC}Inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}Inherited;{$ENDIF}
  Result          := Nil;
  Error           := False;
  BufferInStream  := TRESTDWBufferBase.Create;
@@ -3863,7 +3849,7 @@ constructor TRESTDWDriverBase.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   vEncodeStrings       := True;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
     vDatabaseCharSet   := csUndefined;
   {$ENDIF}
   vCommitRecords       := 100;
@@ -4478,14 +4464,10 @@ Begin
         End;
        If MassiveField.IsNull Then
         Continue;
-       If Query.FieldByName(MassiveField.FieldName).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
-                                                                 ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                                 ftString,    ftWideString,
-                                                                 ftMemo, ftFmtMemo {$IFNDEF FPC}
-                                                                         {$IF CompilerVersion > 21}
-                                                                                 , ftWideMemo
-                                                                          {$IFEND}
-                                                                         {$ENDIF}]    Then
+       If Query.FieldByName(MassiveField.FieldName).DataType
+          in [{$IFDEF DELPHIXEUP}ftFixedChar, ftFixedWideChar,{$ENDIF}
+              ftString, ftWideString, ftMemo, ftFmtMemo
+              {$IFDEF DELPHIXEUP}, ftWideMemo{$ENDIF}] Then
         Begin
          If (vTempValue <> Null) And (vTempValue <> '') And
             (Trim(vTempValue) <> 'null') Then
@@ -4508,7 +4490,9 @@ Begin
            Else
             Query.FieldByName(MassiveField.FieldName).Clear;
           End
-         Else If Query.FieldByName(MassiveField.FieldName).DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF} ftLargeint] Then
+         Else If Query.FieldByName(MassiveField.FieldName).DataType
+                 in [ftInteger, ftSmallInt, ftWord,
+                    {$IFDEF DELPHIXEUP}ftLongWord,{$ENDIF} ftLargeint] Then
           Begin
            If Lowercase(Query.FieldByName(MassiveField.FieldName).FieldName) = Lowercase(Massivedataset.SequenceField) Then
             Continue;
@@ -4517,17 +4501,14 @@ Begin
             Begin
              If vTempValue <> Null Then
               Begin
-               If Query.FieldByName(MassiveField.FieldName).DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+               If Query.FieldByName(MassiveField.FieldName).DataType
+                  in [{$IFDEF DELPHIXEUP}ftLongWord,{$ENDIF}ftLargeint] Then
                 Begin
-                 {$IFNDEF FPC}
-                  {$IF CompilerVersion > 21}
-                    Query.FieldByName(MassiveField.FieldName).AsLargeInt := StrToInt64(vTempValue);
+                  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+                  Query.FieldByName(MassiveField.FieldName).AsLargeInt := StrToInt64(vTempValue);
                   {$ELSE}
-                    Query.FieldByName(MassiveField.FieldName).AsInteger := StrToInt64(vTempValue);
+                  Query.FieldByName(MassiveField.FieldName).AsInteger := StrToInt64(vTempValue);
                   {$IFEND}
-                 {$ELSE}
-                   Query.FieldByName(MassiveField.FieldName).AsLargeInt := StrToInt64(vTempValue);
-                 {$ENDIF}
                 End
                Else
                 Query.FieldByName(MassiveField.FieldName).AsInteger  := StrToInt(vTempValue);
@@ -4596,11 +4577,6 @@ Begin
           Query.Fields[I].Value := A;
          If Not MassiveDataset.ReflectChanges Then
           Continue;
-//         Else
-//          Begin
-//           MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).Value := A;
-//           MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).FieldType := ovInteger;
-//          End;
         End
        Else If (MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).isNull) Or
                (MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).ReadOnly) Then
@@ -4692,14 +4668,10 @@ Begin
         End;
        If MassiveDataset.Fields.FieldByName(Query.Fields[I].FieldName).IsNull Then
         Continue;
-       If Query.Fields[I].DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
-                             ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                             ftString,    ftWideString,
-                             ftMemo, ftFmtMemo {$IFNDEF FPC}
-                                     {$IF CompilerVersion > 21}
-                                      , ftWideMemo
-                                     {$IFEND}
-                                    {$ENDIF}]    Then
+       If Query.Fields[I].DataType in [{$IFDEF DELPHIXEUP}ftFixedChar, ftFixedWideChar,{$ENDIF}
+                                       ftString, ftWideString, ftMemo, ftFmtMemo
+                                       {$IFDEF DELPHIXEUP}, ftWideMemo{$ENDIF}]
+                                       Then
         Begin
          If (vTempValue <> Null) And
             (Trim(vTempValue) <> 'null') Then
@@ -4722,7 +4694,9 @@ Begin
            Else
             Query.Fields[I].Clear;
           End
-         Else If Query.Fields[I].DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF} ftLargeint] Then
+         Else If Query.Fields[I].DataType in [ftInteger, ftSmallInt, ftWord,
+                                              {$IFDEF DELPHIXEUP}ftLongWord,{$ENDIF}
+                                              ftLargeint] Then
           Begin
            If Lowercase(Query.Fields[I].FieldName) = Lowercase(Massivedataset.SequenceField) Then
             Continue;
@@ -4731,15 +4705,14 @@ Begin
             Begin
              If vTempValue <> Null Then
               Begin
-               If Query.Fields[I].DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+               If Query.Fields[I].DataType in [{$IFDEF DELPHIXEUP}ftLongWord,{$ENDIF}
+                                               ftLargeint] Then
                 Begin
-                 {$IFNDEF FPC}
-                  {$IF CompilerVersion > 21}Query.Fields[I].AsLargeInt := StrToInt64(vTempValue)
-                  {$ELSE} Query.Fields[I].AsInteger                    := StrToInt64(vTempValue)
+                  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+                   Query.Fields[I].AsLargeInt := StrToInt64(vTempValue)
+                  {$ELSE}
+                   Query.Fields[I].AsInteger := StrToInt64(vTempValue)
                   {$IFEND}
-                 {$ELSE}
-                  Query.Fields[I].AsLargeInt := StrToInt64(vTempValue);
-                 {$ENDIF}
                 End
                Else
                 Query.Fields[I].AsInteger  := StrToInt(vTempValue);
@@ -4748,7 +4721,9 @@ Begin
            Else
             Query.Fields[I].Clear;
           End
-         Else If Query.Fields[I].DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion > 21}, ftSingle, ftExtended{$IFEND}{$ENDIF}] Then
+         Else If Query.Fields[I].DataType in [ftFloat, ftCurrency, ftBCD, ftFMTBcd
+                                              {$IFDEF DELPHIXEUP}, ftSingle, ftExtended{$ENDIF}]
+                                              Then
           Begin
            If (vTempValue <> Null) And
               (Trim(vTempValue) <> 'null') And
@@ -4834,7 +4809,8 @@ Begin
           vFieldChanged := MassiveField.Modified
         Else Begin
           Case vFieldType Of
-            ftDate, ftTime, ftDateTime, ftTimeStamp: Begin
+            ftDate, ftTime, ftDateTime, ftTimeStamp:
+              Begin
                 If (MassiveField.IsNull And Not(Query.Fields[I].IsNull)) Or
                    (Not(MassiveField.IsNull) And Query.Fields[I].IsNull) Then
                   vFieldChanged := True
@@ -4845,7 +4821,8 @@ Begin
                     vFieldChanged := Not(Query.Fields[I].IsNull);
                 End;
               End;
-            ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob: Begin
+            ftBytes, ftVarBytes, ftBlob, ftGraphic, ftOraBlob, ftOraClob:
+              Begin
                 vStringStream := TMemoryStream.Create;
                 Try
                   TBlobfield(Query.Fields[I]).SaveToStream(vStringStream);
@@ -4862,7 +4839,8 @@ Begin
 
         If vFieldChanged Then Begin
           Case vFieldType Of
-            ftDate, ftTime, ftDateTime, ftTimeStamp: Begin
+            ftDate, ftTime, ftDateTime, ftTimeStamp:
+              Begin
                 If (Not MassiveField.IsNull) Then Begin
                   If (Query.Fields[I].AsDateTime <> MassiveField.Value) Or
                      (MassiveField.Modified) Then Begin
@@ -4885,12 +4863,9 @@ Begin
                                       [MassiveField.FieldName, IntToStr(DateTimeToUnix(Query.Fields[I].AsDateTime))]);
                 End;
               End;
-              {$IFNDEF FPC}
-                {$IF CompilerVersion >= 21}
-                  ftSingle, ftExtended,
-                {$IFEND}
-              {$ENDIF}
-              ftFloat, ftCurrency, ftBCD, ftFMTBcd: Begin
+              {$IFDEF DELPHIXEUP}ftSingle, ftExtended,{$ENDIF}
+              ftFloat, ftCurrency, ftBCD, ftFMTBcd:
+              Begin
                 vStringFloat := Query.Fields[I].AsString;
                 If (MassiveField.Modified) Then
                   vStringFloat := BuildStringFloat(MassiveField.Value)
@@ -4915,10 +4890,10 @@ Begin
                     vTempValue := cNullvalue;
                 If vReflectionLine = '' Then
                   vReflectionLine := Format('{"%s":"%s"}',[MassiveField.FieldName,
-                                     EncodeStrings(vTempValue{$IFDEF FPC}, csUndefined{$ENDIF})])
+                                     EncodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})])
                 Else
                   vReflectionLine := vReflectionLine + Format(', {"%s":"%s"}',
-                                    [MassiveField.FieldName, EncodeStrings(vTempValue{$IFDEF FPC},csUndefined{$ENDIF})]);
+                                    [MassiveField.FieldName, EncodeStrings(vTempValue{$IFDEF RESTDWLAZARUS},csUndefined{$ENDIF})]);
               End
               Else Begin
                 vStringStream := TMemoryStream.Create;

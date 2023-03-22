@@ -1,7 +1,7 @@
 ﻿unit uRESTDWZeosDriver;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
-{$IFNDEF FPC}{$I ZComponent.inc}{$ENDIF}
+{$I ..\Includes\uRESTDW.inc}
+{$IFNDEF RESTDWLAZARUS}{$I ZComponent.inc}{$ENDIF}
 
 {
   REST Dataware .
@@ -28,7 +28,7 @@
 interface
 
 uses
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
     LResources,
   {$ENDIF}
 
@@ -219,7 +219,7 @@ var
 begin
   qry := TZQuery.Create(Self);
   qry.Connection := TZConnection(Connection);
-  {$IFNDEF FPC}
+  {$IFNDEF RESTDWLAZARUS}
    qry.AfterPost := zAfterPost;
   {$ELSE}
    qry.AfterPost := @zAfterPost;
@@ -604,7 +604,7 @@ begin
   end;
 end;
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
 initialization
 {$I ..\RESTDWLazarusDrivers.lrs}
 {$ENDIF}

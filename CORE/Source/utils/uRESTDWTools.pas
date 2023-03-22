@@ -1,6 +1,6 @@
 unit uRESTDWTools;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -64,12 +64,16 @@ Type
   CHAR32        = #32;
   LWS           = TAB + CHAR32;
 
- Function  EncryptSHA256          (Key, Text          : TRESTDWString;
-                                   Encrypt            : Boolean)                : String;
+ Function  EncryptSHA256          (Key, Text            : TRESTDWString;
+                                   Encrypt              : Boolean)         : String;
  Function  EncodeStrings          (Value                : String
-                                  {$IFDEF FPC};DatabaseCharSet             : TDatabaseCharSet{$ENDIF}) : String;
+                                  {$IFDEF RESTDWLAZARUS}
+                                  ;DatabaseCharSet      : TDatabaseCharSet
+                                  {$ENDIF}) : String;
  Function  DecodeStrings          (Value                : String
-                                  {$IFDEF FPC};DatabaseCharSet             : TDatabaseCharSet{$ENDIF}) : String;
+                                  {$IFDEF RESTDWLAZARUS}
+                                  ;DatabaseCharSet      : TDatabaseCharSet
+                                  {$ENDIF}) : String;
  Function  EncodeStream           (Value                : TStream)         : String;
  Function  DecodeStream           (Value                : String)          : TMemoryStream;
  Function  BytesToString          (Const bin            : TRESTDWBytes)    : String;Overload;
@@ -125,10 +129,10 @@ Type
                                    Const AFalse         : Integer)         : Integer;{$IFDEF USE_INLINE}Inline;{$ENDIF}overload;
  Function  iif                    (ATest                : Boolean;
                                    Const ATrue          : String;
-                                   Const AFalse         : String)                 : String; {$IFDEF USE_INLINE}Inline;{$ENDIF}Overload;
+                                   Const AFalse         : String)          : String; {$IFDEF USE_INLINE}Inline;{$ENDIF}Overload;
  Function  iif                    (ATest                : Boolean;
                                    Const ATrue          : Boolean;
-                                   Const AFalse         : Boolean)                : Boolean;{$IFDEF USE_INLINE}Inline;{$ENDIF}Overload;
+                                   Const AFalse         : Boolean)         : Boolean;{$IFDEF USE_INLINE}Inline;{$ENDIF}Overload;
  Function  CharRange              (Const AMin,
                                    AMax                 : Char)            : String;
  Function  CharIsInSet            (Const AString        : String;
@@ -356,12 +360,12 @@ Type
  Function  GetPairJSONInt         (Status               : Integer;
                                    MessageText          : String;
                                    Encoding             : TEncodeSelect = esUtf8) : String;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  Function  GetStringUnicode(Value : String) : String;
  Function  GetStringEncode (Value : String; DatabaseCharSet : TDatabaseCharSet) : String;
  Function  GetStringDecode (Value : String; DatabaseCharSet : TDatabaseCharSet) : String;
  {$ENDIF}
-Function  GetObjectName            (TypeObject         : TTypeObject)            : String;          Overload;
+ Function  GetObjectName            (TypeObject         : TTypeObject)            : String;          Overload;
  Function  GetDataModeName          (TypeObject         : TDataMode)              : String;          Overload;
  Function  GetDataModeName          (TypeObject         : String)                 : TDataMode;       Overload;
  Function  GetObjectName            (TypeObject         : String)                 : TTypeObject;     Overload;
@@ -381,8 +385,9 @@ Function  GetObjectName            (TypeObject         : TTypeObject)           
 // Function  BooleanToString          (aValue             : Boolean)                : String;
  Function  StringFloat              (aValue             : String)                 : String;
  Function  GenerateStringFromStream (Stream             : TStream
-                                    {$IFNDEF FPC}{$if CompilerVersion > 21};
-                                     AEncoding          : TEncoding{$IFEND}{$ENDIF}) : String;Overload;
+                                     {$IFDEF DELPHIXEUP};
+                                     AEncoding          : TEncoding
+                                     {$ENDIF}) : String; Overload;
  Function  FileToStr                (Const FileName     : String) : String;
  Procedure StrToFile                (Const FileName,
                                      SourceString       : String);
@@ -432,24 +437,10 @@ Function  GetObjectName            (TypeObject         : TTypeObject)           
                                      Const DynArray;
                                      Len                : Integer);
 
- {$IFDEF FPC}
-  Function RESTDWCharInSet                (C                  : DWChar;
-                                           Const CharSet      : TCharSet) : Boolean;Overload;
-  Function RESTDWCharInSet                (C                  : DWWideChar;
-                                           Const CharSet      : TCharSet) : Boolean;Overload;
- {$ELSE}
-  {$IFNDEF NEXTGEN}
-   Function RESTDWCharInSet               (C                  : DWChar;
-                                           Const CharSet      : TCharSet) : Boolean;Overload;
-   Function RESTDWCharInSet               (C                  : DWWideChar;
-                                           Const CharSet      : TCharSet) : Boolean;Overload;
-  {$ELSE}
-   Function RESTDWCharInSet               (C                  : Byte;
-                                           Const CharSet      : TCharSet) : Boolean;Overload;
-   Function RESTDWCharInSet               (C                  : DWChar;
-                                           Const CharSet      : TCharSet) : Boolean;Overload;
-  {$ENDIF}
- {$ENDIF}
+ Function RESTDWCharInSet           (C             : DWChar;
+                                     Const CharSet : TCharSet) : Boolean;Overload;
+ Function RESTDWCharInSet           (C             : DWWideChar;
+                                     Const CharSet : TCharSet) : Boolean;Overload;
  Procedure InitializeStrings;
 
 Implementation
@@ -465,7 +456,7 @@ var
   {$ELSE}
     {$IF Defined(DELPHIXE7UP)}
       LVarBounds : Array of Integer;
-    {$ELSEIF Defined(DELPHIXE6UP)}
+    {$ELSEIF Defined(DELPHIXE6UP) AND not Defined(DELPHIXE7UP)}
       LVarBounds : Array of NativeInt;
     {$ELSEIF Defined(DELPHIXE2UP)}
       LVarBounds : Array of Integer;
@@ -488,7 +479,7 @@ begin
   VarArrayLock(V);
   Try
    aVarData := PVarData(@V);
-   {$IFNDEF FPC}
+   {$IFNDEF RESTDWLAZARUS}
     Move(Pointer(DynArray)^, aVarData^.VArray.Data^, Len);
    {$ELSE}
     Move(Pointer(DynArray)^, aVarData^.VArray, Len);
@@ -499,51 +490,26 @@ begin
   End;
 End;
 
-{$IFDEF FPC}
- Function RESTDWCharInSet(C             : DWChar;
-                          Const CharSet : TCharSet) : Boolean;
- Begin
+Function RESTDWCharInSet(C             : DWChar;
+                         Const CharSet : TCharSet) : Boolean;
+Begin
   Result := C In CharSet;
- End;
- Function RESTDWCharInSet(C             : DWWideChar;
-                          Const CharSet : TCharSet): Boolean;
- Begin
-  Result := C In CharSet;
- End;
-{$ELSE}
- {$IFNDEF NEXTGEN}
-  Function RESTDWCharInSet(C             : DWChar;
-                           Const CharSet : TCharSet) : Boolean;
-  Begin
-   Result := C In CharSet;
-  End;
-  Function RESTDWCharInSet(C             : DWWideChar;
-                           Const CharSet : TCharSet): Boolean;
-  Begin
-   Result := DWChar(C) In CharSet;
-  End;
- {$ELSE}
-  Function RESTDWCharInSet(C             : Byte;
-                           Const CharSet : TCharSet) : Boolean;
-  Begin
-   Result := Char(C) In CharSet;
-  End;
-  Function RESTDWCharInSet(C             : DWChar;
-                           Const CharSet : TCharSet) : Boolean;
-  Begin
-   Result := C In CharSet;
-  End;
- {$ENDIF}
-{$ENDIF}
+End;
+
+Function RESTDWCharInSet(C             : DWWideChar;
+                         Const CharSet : TCharSet): Boolean;
+Begin
+  Result := DWChar(C) In CharSet;
+End;
 
 Function VarIsNullEmpty(const V: Variant): Boolean;
 Begin
- Result := VarIsNull(V) or VarIsEmpty(V);
+  Result := VarIsNull(V) or VarIsEmpty(V);
 End;
 
 Function VarIsNullEmptyBlank(const V: Variant): Boolean;
 Begin
- Result := VarIsNull(V) or VarIsEmpty(V) or (VarToStr(V) = '');
+  Result := VarIsNull(V) or VarIsEmpty(V) or (VarToStr(V) = '');
 End;
 
 Function RemoveLineBreaks(aText : string): string;//Gledston 03/12/2022
@@ -674,21 +640,21 @@ Begin
   ftGuid            : Result := dwftGuid;
   ftTimeStamp       : Result := dwftTimeStamp;
   ftFMTBcd          : Result := dwftFMTBcd;
-   {$IFDEF DELPHI2010UP} // Delphi 2010 acima
-    ftFixedWideChar   : Result := dwftFixedWideChar;
-    ftWideMemo        : Result := dwftWideMemo;
-    ftOraTimeStamp    : Result := dwftOraTimeStamp;
-    ftOraInterval     : Result := dwftOraInterval;
-    ftLongWord        : Result := dwftLongWord;
-    ftShortint        : Result := dwftShortint;
-    ftByte            : Result := dwftByte;
-    ftExtended        : Result := dwftExtended;
-    ftConnection      : Result := dwftConnection;
-    ftParams          : Result := dwftParams;
-    ftStream          : Result := dwftStream;
-    ftTimeStampOffset : Result := dwftTimeStampOffset;
-    ftObject          : Result := dwftObject;
-    ftSingle          : Result := dwftSingle;
+  {$IFDEF DELPHI2010UP} // Delphi 2010 acima
+   ftFixedWideChar   : Result := dwftFixedWideChar;
+   ftWideMemo        : Result := dwftWideMemo;
+   ftOraTimeStamp    : Result := dwftOraTimeStamp;
+   ftOraInterval     : Result := dwftOraInterval;
+   ftLongWord        : Result := dwftLongWord;
+   ftShortint        : Result := dwftShortint;
+   ftByte            : Result := dwftByte;
+   ftExtended        : Result := dwftExtended;
+   ftConnection      : Result := dwftConnection;
+   ftParams          : Result := dwftParams;
+   ftStream          : Result := dwftStream;
+   ftTimeStampOffset : Result := dwftTimeStampOffset;
+   ftObject          : Result := dwftObject;
+   ftSingle          : Result := dwftSingle;
   {$ENDIF}
  End;
 End;
@@ -737,7 +703,7 @@ Begin
   Inherited;
 End;
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
 Function  GetStringUnicode(Value : String) : String;
 Var
  Unicode,
@@ -824,7 +790,7 @@ Var
 Begin
  WSResult.STATUS      := IntToStr(Status);
  WSResult.MessageText := MessageText;
- Result               := Result2JSON(WSResult); //EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF FPC}, csUndefined{$ENDIF});
+ Result               := Result2JSON(WSResult); //EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
 End;
 
 Function GetPairJSONStr(Status,
@@ -835,7 +801,7 @@ Var
 Begin
  WSResult.STATUS      := Status;
  WSResult.MessageText := MessageText;
- Result               := Result2JSON(WSResult); //EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF FPC}, csUndefined{$ENDIF});
+ Result               := Result2JSON(WSResult); //EncodeStrings(TServerUtils.Result2JSON(WSResult){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
 End;
 
 Function BytesToInt16(Const AValue : TRESTDWBytes;
@@ -916,24 +882,24 @@ Begin
 End;
 
 Function MakeTempFilename(Const APath : TFileName = '') : TFileName;
-{$IFNDEF FPC}
+{$IFNDEF RESTDWLAZARUS}
 Var
  lPath,
  lExt: TFileName;
 {$ENDIF}
 Begin
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   Result := SysUtils.GetTempFileName(APath, 'restdw'); {Do not Localize}
  {$ELSE}
   lPath := APath;
-  lExt := {$IFDEF UNIX}''{$ELSE}'.tmp'{$ENDIF}; {Do not Localize}
-  {$IFDEF WINDOWS}
+  lExt := {$IFDEF RESTDWLINUX}''{$ELSE}'.tmp'{$ENDIF}; {Do not Localize}
+  {$IFDEF RESTDWWINDOWS}
   If lPath = '' Then
-   lPath := GTempPath;
+   GetTempPath(0, PWideChar(lPath));
   {$ELSE}
-   {$IFDEF HAS_IOUtils_TPath}
+   {$IFDEF RESTDWFMX}
     If lPath = '' Then
-     lPath := {$IFDEF VCL_XE2_OR_ABOVE}System.{$ENDIF}IOUtils.TPath.GetTempPath;
+     lPath := System.IOUtils.TPath.GetTempPath;
    {$ENDIF}
   {$ENDIF}
   Result := GetUniqueFilename(lPath, 'restdw', lExt);
@@ -943,7 +909,7 @@ End;
 Function CopyFileTo(Const Source,
                     Destination : TFileName): Boolean;
 Begin
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  Result := CopyFileTo(PChar(Source), PChar(Destination));
  {$ELSE}
   {$IFDEF RESTDWFMX}
@@ -963,7 +929,7 @@ Function GetUniqueFileName(Const APath,
                            APrefix,
                            AExt         : String) : String;
 Var
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  LPrefix: string;
  {$ELSE}
  LNamePart : Integer;
@@ -971,7 +937,7 @@ Var
  LFName    : String;
  {$ENDIF}
 Begin
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   LPrefix := APrefix;
   If LPrefix = '' Then
    LPrefix := 'restdw'; {Do not localize}
@@ -1242,17 +1208,13 @@ Var
 Begin
  LLength := restdwLength(AValue, ALength, AStartIndex);
  If LLength > 0 Then
-  Begin
-  {$IFDEF FPC}
+ Begin
+   {$IF Defined(RESTDWLAZARUS) OR not Defined(LINUXFMX)}
    SetString(Result, PAnsiChar(@AValue[AStartIndex]), LLength);
-  {$ELSE}
-   {$IFDEF LINUXFMX}
-    SetString(Result, PChar(@AValue[AStartIndex]), LLength);
-   {$ELSE}
-    SetString(Result, PAnsiChar(@AValue[AStartIndex]), LLength);
-   {$ENDIF}
-  {$ENDIF}
-  End
+   {$ELSEIF Defined(LINUXFMX)}
+   SetString(Result, PChar(@AValue[AStartIndex]), LLength);
+   {$IFEND}
+ End
  Else
   Result := '';
 End;
@@ -1760,16 +1722,12 @@ Begin
 // SetLength(Result, ASize * vSizeChar);
  SetLength(Result, ASize);
  If ASize > 0 Then
-  Begin
-  {$IFDEF FPC}
+ Begin
+   {$IF Defined(RESTDWLAZARUS) OR not Defined(RESTDWFMX)}
    Move(AnsiString(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
-  {$ELSE}
-   {$IFDEF LINUXFMX}
-    Move(Utf8String(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
-   {$ELSE}
-    Move(AnsiString(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
-   {$ENDIF}
-  {$ENDIF}
+   {$ELSEIF Defined(RESTDWFMX)}
+   Move(Utf8String(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
+   {$IFEND}
   End;
 End;
 
@@ -1981,7 +1939,7 @@ Begin
    If (LName <> '')   And
       ((LValue <> '') Or LQuoted) Then
     Begin
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       vObject := TObject(PtrUint(LQuoted));
      {$ELSE}
       vObject := TObject(LQuoted);
@@ -2507,7 +2465,7 @@ Begin
    Begin
     For I := 0 To LItems.Count -1 Do
      Begin
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       vValidate := Boolean(PtrUint(LItems.Objects[I]));
      {$ELSE}
       vValidate := Boolean(LItems.Objects[I]);
@@ -2935,33 +2893,22 @@ Begin
 End;
 
 Function HexToBookmark(Value : String) : TRESTDWBytes;
-{$IFDEF POSIX} //Android
-Var
- bytes: TRESTDWBytes;
-{$ENDIF}
 begin
- SetLength(Result, 0);
- If Trim(Value) = '' Then
-  Exit;
- SetLength(Result, Length(Value) div SizeOf(Char));
- {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
+  SetLength(Result, 0);
+  If Trim(Value) = '' Then
+    Exit;
+  SetLength(Result, Length(Value) div SizeOf(Char));
+  {$IF Defined(RESTDWMOBILE)} //Alterado para IOS Brito
   HexToBin(PWideChar(value), 0, TBytes(Result), 0, restdwLength(Result));
- {$ELSE}
-  {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
-   HexToBin(PWideChar(value), Result, restdwLength(Result));
+  {$ELSEIF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
+  HexToBin(PWideChar(value), Result, restdwLength(Result));
   {$ELSE}
-   HexToBin(PChar(Value), PAnsiChar(Result), restdwLength(Result));
-   //{$IF CompilerVersion > 21} // Delphi 2010 pra cima
-   // HexToBin(PChar(Value), Result, restdwLength(Result));
-   //{$ELSE}
-   // HexToBin(PChar(Value), @Result, restdwLength(Result));
-   //{$IFEND}
+  HexToBin(PChar(Value), PAnsiChar(Result), restdwLength(Result));
   {$IFEND}
- {$IFEND}
 End;
 
 Function BookmarkToHex(Value : TRESTDWBytes) : String;
-{$IFDEF POSIX}
+{$IFDEF RESTDWFMX}
 Var
  bytes: TBytes;
 {$ENDIF}
@@ -2970,19 +2917,13 @@ Begin
  If restdwLength(Value) > 0 Then
   Begin
    SetLength(Result, restdwLength(Value) * SizeOf(Char));
-   {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
+   {$IFDEF RESTDWFMX} //Alterado para IOS Brito
     SetLength(bytes, restdwLength(value) div 2);
     HexToBin(PwideChar(value), 0, bytes, 0, Length(bytes));
     Result := TEncoding.UTF8.GetString(bytes);
    {$ELSE}
-    {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
-     SetLength(bytes, restdwLength(value) div 2);
-     HexToBin(PwideChar(value), 0, bytes, 0, Length(bytes));
-     Result := TEncoding.UTF8.GetString(bytes);
-    {$ELSE}
      BinToHex(PAnsiChar(Value), PChar(Result), restdwLength(Value));
-    {$IFEND}
-   {$IFEND}
+   {$ENDIF}
   End;
 End;
 
@@ -3044,7 +2985,7 @@ Var
  End;
 Begin
  c      := #0;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  b      := #0;
  i      := 0;
  {$ENDIF}
@@ -3135,12 +3076,10 @@ Begin
   Result := ftBlob
  Else If vFieldType = Uppercase('ftMemo')            Then
   Result := ftMemo
-{$IFNDEF FPC}
- {$if CompilerVersion < 21} // delphi 7   compatibilidade enter Sever no XE e Client no D7
+{$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)} // delphi 7   compatibilidade enter Sever no XE e Client no D7
  Else If vFieldType = Uppercase('ftWideMemo')        Then
   Result := ftMemo
 {$IFEND}
-{$ENDIF}
  Else If vFieldType = Uppercase('ftGraphic')         Then
   Result := ftGraphic
  Else If vFieldType = Uppercase('ftFmtMemo')         Then
@@ -3156,15 +3095,11 @@ Begin
  Else If vFieldType = Uppercase('ftFixedChar')       Then
   Result := ftFixedChar
  Else If vFieldType = Uppercase('ftWideString')      Then
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21} // Delphi 2010 pra cima
-    Result := ftWideString
-   {$ELSE}
-    Result := ftString
-   {$IFEND}
-  {$ELSE}
+ {$IFDEF DELPHIXEUP}
+   Result := ftWideString
+ {$ELSE}
    Result := ftString
-  {$ENDIF}
+ {$ENDIF}
  Else If vFieldType = Uppercase('ftLargeint')        Then
   Result := ftLargeint
  Else If vFieldType = Uppercase('ftADT')             Then
@@ -3188,29 +3123,20 @@ Begin
  Else If vFieldType = Uppercase('ftGuid')            Then
   Result := ftGuid
  Else If vFieldType = Uppercase('ftTimeStamp')       Then
-  Begin
-  {$IFNDEF FPC}
-   Result := ftTimeStamp;
-  {$ELSE}
-   Result := ftDateTime;
-  {$ENDIF}
-  End
+ {$IFNDEF RESTDWLAZARUS}
+   Result := ftTimeStamp
+ {$ELSE}
+   Result := ftDateTime
+ {$ENDIF}
  Else If vFieldType = Uppercase('ftSingle')       Then
-  Begin
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21} // Delphi 2010 pra cima
-    Result := ftSingle;
-   {$ELSE}
-    Result := ftFloat;
-   {$IFEND}
-  {$ELSE}
-   Result := ftFloat;
-  {$ENDIF}
-  End
+ {$IFDEF DELPHIXEUP}
+   Result := ftSingle
+ {$ELSE}
+   Result := ftFloat
+ {$ENDIF}
  Else If vFieldType = Uppercase('ftFMTBcd')          Then
    Result := ftFloat
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21}
+  {$IFDEF DELPHIXEUP}
     Else If vFieldType = Uppercase('ftFixedWideChar')   Then
      Result := ftFixedWideChar
     Else If vFieldType = Uppercase('ftWideMemo')        Then
@@ -3237,7 +3163,6 @@ Begin
      Result := ftTimeStampOffset
     Else If vFieldType = Uppercase('ftObject')          Then
      Result := ftObject
-   {$IFEND}
   (* {$if CompilerVersion =15}
    Else If vFieldType = Uppercase('ftWideMemo')   Then
      Result := ftMemo
@@ -3270,30 +3195,23 @@ Begin
  SetLength(Result, 0);
  If AStr <> '' Then
   Begin
-   {$IFDEF FPC}
+   {$IF Defined(RESTDWLAZARUS) OR Defined(DELPHIXEUP)}
     If aUnicode Then
      Result := TRESTDWBytes(TEncoding.Utf8.GetBytes(Astr))
     Else
      Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
    {$ELSE}
-    {$IF CompilerVersion < 23}
      If aUnicode Then
-      Begin
+     Begin
        SetLength(Result, Length(AStr) * 2);
        Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
-      End
+     End
      Else
-      Begin
+     Begin
        SetLength(Result, Length(AStr) * 2);
        Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
-      End;
-    {$ELSE}
-     If aUnicode Then
-      Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr))
-     Else
-      Result :=  TRESTDWBytes(TEncoding.Utf8.GetBytes(Astr));
-    {$IFEND}
-   {$ENDIF}
+     End;
+   {$IFEND}
   End;
 End;
 
@@ -3302,16 +3220,12 @@ Begin
  SetLength(Result, 0);
  If AStr <> '' Then
   Begin
-   {$IFDEF FPC}
+   {$IF Defined(RESTDWLAZARUS) OR Defined(DELPHIXEUP)}
     Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
    {$ELSE}
-    {$IF CompilerVersion < 23}
      SetLength(Result, Length(AStr));
      Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
-    {$ELSE}
-     Result :=  TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
-    {$IFEND}
-   {$ENDIF}
+   {$IFEND}
   End;
 End;
 Function BytesToString(Const AValue      : TRESTDWBytes;
@@ -3333,19 +3247,16 @@ Begin
     LBytes := AValue
    Else
     LBytes := Copy(AValue, AStartIndex, LLength);
-  {$IFDEF FPC}
+  {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
    SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
-  {$ELSE}
-   {$IF CompilerVersion < 23}
+  {$ELSEIF Defined(DELPHIXEUP)}
     SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
-   {$ELSE}
     {$IFDEF MSWINDOWS}
      Result := TEncoding.ANSI.GetString(TBytes(LBytes));
     {$ELSE}
      Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(LBytes)));
     {$ENDIF}
    {$IFEND}
-  {$ENDIF}
   End;
 End;
 
@@ -3354,22 +3265,19 @@ Function BytesToString(Const bin : TRESTDWBytes;
 Var
  I       : Integer;
  aBytes  : TRESTDWBytes;
- {$IFNDEF FPC}
-  {$IF CompilerVersion > 21}
-   aResult : RawByteString;
-  {$IFEND}
+ {$IFDEF DELPHIXEUP}
+ aResult : RawByteString;
  {$ENDIF}
 Begin
  I := restdwLength(bin);
  If I > 0 Then
   Begin
-  {$IFDEF FPC}
+  {$IF Defined(RESTDWLAZARUS)}
    If aUnicode Then
     SetString(Result, PChar(bin), I)
    Else
     SetString(Result, PAnsiChar(bin), I);
-  {$ELSE}
-   {$IF CompilerVersion < 23}
+  {$ELSEIF not Defined(DELPHIXEUP)}
     If aUnicode Then
      SetString(Result, PWideChar(bin), I)
     Else
@@ -3381,18 +3289,16 @@ Begin
       SetLength(aResult, Length(bin));
       Move(aBytes[0], aResult[InitStrPos], Length(aBytes));
       Result := aResult;
-//      Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)))
      End
     Else
      Begin
-     {$IFDEF MSWINDOWS}
+     {$IFDEF RESTDWWINDOWS}
       Result := TEncoding.ANSI.GetString(TBytes(bin));
      {$ELSE}
       Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
      {$ENDIF}
      End;
    {$IFEND}
-  {$ENDIF}
   End;
 End;
 
@@ -3403,19 +3309,16 @@ Begin
  I := restdwLength(bin);
  If I > 0 Then
   Begin
-  {$IFDEF FPC}
+  {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
    SetString(Result, PAnsiChar(bin), I);
   {$ELSE}
-   {$IF CompilerVersion < 23}
     SetString(Result, PAnsiChar(bin), I);
-   {$ELSE}
-    {$IFDEF MSWINDOWS}
-     Result := TEncoding.ANSI.GetString(TBytes(bin));
+    {$IFDEF RESTDWWINDOWS}
+    Result := TEncoding.ANSI.GetString(TBytes(bin));
     {$ELSE}
-     Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
+    Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
     {$ENDIF}
-   {$IFEND}
-  {$ENDIF}
+  {$IFEND}
   End;
 End;
 
@@ -3433,7 +3336,7 @@ Begin
 End;
 
 Function EncodeStream (Value : TStream) : String;
- {$IFNDEF FPC}
+ {$IFNDEF RESTDWLAZARUS}
    Function EncodeBase64(AValue : TStream) : String;
    Var
     StreamDecoded : TMemoryStream;
@@ -3445,7 +3348,7 @@ Function EncodeStream (Value : TStream) : String;
      StreamDecoded.CopyFrom(AValue, AValue.Size);
      StreamDecoded.Position := 0;
      EncdDecd.EncodeStream(StreamDecoded, StreamEncoded);
-     Result := RemoveLineBreaks( StreamEncoded.DataString ); //Gledston 03/12/2022
+     Result := RemoveLineBreaks(StreamEncoded.DataString); //Gledston 03/12/2022
     Finally
      StreamEncoded.Free;
      StreamDecoded.Free;
@@ -3460,7 +3363,7 @@ Function EncodeStream (Value : TStream) : String;
    Try
     outstream.CopyFrom(AValue, AValue.Size);
     outstream.Position := 0;
-    Result := EncodeStrings(outstream.Datastring{$IFDEF FPC}, csUndefined{$ENDIF});
+    Result := EncodeStrings(outstream.Datastring, csUndefined);
    Finally
     FreeAndNil(outstream);
    End;
@@ -3473,6 +3376,7 @@ Begin
   Result := EncodeBase64(Value);
  Value.Position := 0;
 End;
+
 Function DecodeStream(Value : String) : TMemoryStream;
 Var
  vRESTDWBytes : TRESTDWBytes;
@@ -3487,33 +3391,29 @@ Begin
  Except
  End;
 End;
+
 Function Encode64(Const S : String) : String;
 Var
  sa : String;
-{$IFNDEF FPC}
-{$IF Defined(ANDROID) OR Defined(IOS)}
+{$IFDEF RESTDWMOBILE}
  ne : TBase64Encoding;
-{$IFEND}
 {$ENDIF}
 Begin
- {$IFDEF FPC}
-  Result := Base64Encode(S);
- {$ELSE}
-  {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
-   ne := TBase64Encoding.Create(-1, '');
-   Result := ne.Encode(S);
-   ne.Free;
+  {$IFDEF RESTDWMOBILE} //Alterado para IOS Brito
+  ne := TBase64Encoding.Create(-1, '');
+  Result := ne.Encode(S);
+  ne.Free;
   {$ELSE}
-   Result := Base64Encode(S);
-  {$IFEND}
- {$ENDIF}
+  Result := Base64Encode(S);
+  {$ENDIF}
 End;
+
 Function Decode64(const S: string): string;
 Var
  sa : String;
- {$IF Not(Defined(FPC)) AND (CompilerVersion > 27)}
+ {$IFDEF RESTDWMOBILE}
    ne: TBase64Encoding;
- {$IFEND}
+ {$ENDIF}
 Begin
  If (Trim(S) <> '')   And
     (Trim(S) <> '""') Then
@@ -3521,7 +3421,7 @@ Begin
    SA := S;
    If Pos(sLineBreak, SA) > 0 Then
     SA := StringReplace(SA, sLineBreak, '', [rfReplaceAll]);
-    {$IF Not(Defined(FPC)) AND (CompilerVersion > 27)}
+    {$IFDEF RESTDWMOBILE} //Alterado para IOS Brito
      ne     := TBase64Encoding.Create(-1, '');
      Try
       Result := ne.Decode(SA);
@@ -3530,24 +3430,25 @@ Begin
      End;
     {$ELSE}
      Result := BytesToString(Base64Decode(SA));
-   {$IFEND}
+   {$ENDIF}
   End;
 End;
-{$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
+
+{$IF Defined(RESTDWMOBILE)} //Alterado para IOS Brito
 Function DecodeBase64(Const Value : String) : String;
+{$ELSEIF (NOT Defined(RESTDWLAZARUS) AND Defined(RESTDWLINUX))} //Alteardo para Lazarus LINUX Brito
+Function  DecodeBase64 (Const Value : String)             : String;
 {$ELSE}
-{$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
-  Function  DecodeBase64 (Const Value : String)             : String;
-{$ELSE}
-  Function DecodeBase64(Const Value : String
-                       {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
+Function DecodeBase64(Const Value : String
+                      {$IFDEF RESTDWLAZARUS}
+                      ;DatabaseCharSet : TDatabaseCharSet
+                      {$ENDIF}) : String;
   {$IFEND}
-{$IFEND}
 Var
  vValue : String;
 Begin
  vValue := Decode64(Value);
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  Case DatabaseCharSet Of
    csWin1250    : vValue := CP1250ToUTF8(vValue);
    csWin1251    : vValue := CP1251ToUTF8(vValue);
@@ -3565,66 +3466,67 @@ Begin
  {$ENDIF}
  Result := vValue;
 End;
-{$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
+
+{$IF Defined(RESTDWMOBILE)}  //Alterado para IOS Brito
 Function EncodeBase64(Const Value : String) : String;
-{$ELSE}
-{$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
+{$ELSEIF (NOT Defined(RESTDWLAZARUS) AND Defined(RESTDWLINUX))} //Alterado para Lazarus LINUX Brito
 Function EncodeBase64(Const Value : String) : String;
 {$ELSE}
 Function EncodeBase64(Const Value : String
-                      {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
-{$IFEND}
+                      {$IFDEF RESTDWLAZARUS}
+                      ;DatabaseCharSet : TDatabaseCharSet
+                      {$ENDIF}) : String;
 {$IFEND}
 Var
  vValue : String;
- {$IFNDEF FPC}
-  {$IF CompilerVersion > 27}
-   Ne : TBase64Encoding;
-  {$IFEND}
+ {$IFDEF DELPHIXE6UP}
+ Ne : TBase64Encoding;
  {$ENDIF}
 Begin
- vValue := Value;
- {$IFDEF FPC}
- Case DatabaseCharSet Of
-   csWin1250    : vValue := CP1250ToUTF8(vValue);
-   csWin1251    : vValue := CP1251ToUTF8(vValue);
-   csWin1252    : vValue := CP1252ToUTF8(vValue);
-   csWin1253    : vValue := CP1253ToUTF8(vValue);
-   csWin1254    : vValue := CP1254ToUTF8(vValue);
-   csWin1255    : vValue := CP1255ToUTF8(vValue);
-   csWin1256    : vValue := CP1256ToUTF8(vValue);
-   csWin1257    : vValue := CP1257ToUTF8(vValue);
-   csWin1258    : vValue := CP1258ToUTF8(vValue);
-   csUTF8       : vValue := UTF8ToUTF8BOM(vValue);
-   csISO_8859_1 : vValue := ISO_8859_1ToUTF8(vValue);
-   csISO_8859_2 : vValue := ISO_8859_2ToUTF8(vValue);
- End;
- {$ENDIF}
- {$IFDEF FPC}
+  vValue := Value;
+  {$IFDEF RESTDWLAZARUS}
+  Case DatabaseCharSet Of
+    csWin1250    : vValue := CP1250ToUTF8(vValue);
+    csWin1251    : vValue := CP1251ToUTF8(vValue);
+    csWin1252    : vValue := CP1252ToUTF8(vValue);
+    csWin1253    : vValue := CP1253ToUTF8(vValue);
+    csWin1254    : vValue := CP1254ToUTF8(vValue);
+    csWin1255    : vValue := CP1255ToUTF8(vValue);
+    csWin1256    : vValue := CP1256ToUTF8(vValue);
+    csWin1257    : vValue := CP1257ToUTF8(vValue);
+    csWin1258    : vValue := CP1258ToUTF8(vValue);
+    csUTF8       : vValue := UTF8ToUTF8BOM(vValue);
+    csISO_8859_1 : vValue := ISO_8859_1ToUTF8(vValue);
+    csISO_8859_2 : vValue := ISO_8859_2ToUTF8(vValue);
+  End;
+  {$ENDIF}
+  {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXE6UP)}
   Result := Base64Encode(Value);
- {$ELSE}
-  {$IF CompilerVersion > 27}
-   Ne      := TBase64Encoding.Create(-1, '');
-   Try
-    Result := Ne.Encode(Value);
-   Finally
-    FreeAndNil(Ne);
-   End;
   {$ELSE}
-   Result := Base64Encode(Value);
-  {$IFEND}
- {$ENDIF}
+  Ne      := TBase64Encoding.Create(-1, '');
+  Try
+    Result := Ne.Encode(Value);
+  Finally
+    FreeAndNil(Ne);
+  End;
+ {$IFEND}
 End;
+
 Function EncodeStrings(Value : String
-                      {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
+                      {$IFDEF RESTDWLAZARUS}
+                      ;DatabaseCharSet : TDatabaseCharSet
+                      {$ENDIF}) : String;
 Begin
  Result := '';
  If Value = '' Then
   Exit;
- Result := EncodeBase64(Value{$IFDEF FPC}, DatabaseCharSet{$ENDIF});
+ Result := EncodeBase64(Value{$IFDEF RESTDWLAZARUS}, DatabaseCharSet{$ENDIF});
 End;
+
 Function DecodeStrings(Value : String
-                       {$IFDEF FPC};DatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
+                       {$IFDEF RESTDWLAZARUS}
+                       ;DatabaseCharSet : TDatabaseCharSet
+                       {$ENDIF}) : String;
 Var
  vTempValue : String;
 Begin
@@ -3633,19 +3535,18 @@ Begin
   Exit;
  vTempValue := StringReplace(Value, sLineBreak, '', [rfReplaceAll]);
  Try
- {$IFDEF FPC}
-  Result := DecodeBase64(vTempValue, DatabaseCharSet);
- {$ELSE}
-  {$IF Defined(ANDROID) OR Defined(IOS)} //Alterado para IOS Brito
-   Result := Decode64(vTempValue); //TIdencoderMIME.EncodeString(Value, nil);
-  {$ELSE}
+   {$IF Defined(RESTDWLAZARUS)}
+   Result := DecodeBase64(vTempValue, DatabaseCharSet);
+   {$ELSEIF Defined(RESTDWMOBILE)} //Alterado para IOS Brito
+   Result := Decode64(vTempValue);
+   {$ELSE}
    Result := DecodeBase64(vTempValue);
-  {$IFEND}
- {$ENDIF}
+   {$IFEND}
  Except
   Result := vTempValue;
  End;
 End;
+
 Function WrapText(Const ALine,
                   ABreakStr,
                   ABreakChars  : String;
@@ -3744,6 +3645,7 @@ Begin
   End;
  Result := Result + Copy(ALine, LLinePos, MaxInt);
 End;
+
 Function EncryptSHA256(Key, Text : TRESTDWString;
                        Encrypt   : Boolean) : String;
 Var
@@ -3926,7 +3828,7 @@ End;
 Procedure HexToPChar(HexString : String;
                      Var Data  : PChar);
 Var
- {$IFDEF POSIX} //Android}
+ {$IFDEF RESTDWFMX} //Android}
  bytes: TBytes;
  {$ENDIF}
  Stream : TMemoryStream;
@@ -3934,68 +3836,44 @@ Begin
  LimpaLixoHex(HexString);
  Stream := TMemoryStream.Create;
  Try
-  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
+   {$IF Defined(RESTDWFMX)} //Alteardo para IOS Brito
    SetLength(bytes, Length(HexString) div 2);
    HexToBin(PChar(HexString), 0, bytes, 0, Length(bytes));
    stream.WriteBuffer(bytes[0], length(bytes));
-  {$ELSE}
-    TMemoryStream(Stream).Size := Length(HexString) Div 2;
-    {$IFDEF FPC}
-    HexToBin(PChar(HexString), TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
-    {$ELSE}
-     {$IF CompilerVersion > 21} // Delphi 2010 pra cima
-     {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
-      SetLength(bytes, Length(HexString) div 2);
-      HexToBin(PChar(HexString), 0, bytes, 0, Length(bytes));
-      stream.WriteBuffer(bytes[0], length(bytes));
-     {$ELSE}
-      HexToBin(PWideChar (HexString),   TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
-     {$IFEND}
-     {$ELSE}
-      HexToBin(PChar (HexString),   TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
-     {$IFEND}
-    {$ENDIF}
-  {$IFEND}
-  Stream.Position := 0;
+   {$ELSEIF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
+   HexToBin(PChar(HexString), TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
+   {$ELSE}
+   TMemoryStream(Stream).Size := Length(HexString) Div 2;
+   HexToBin(PWideChar (HexString), TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
+   {$IFEND}
+   Stream.Position := 0;
  Finally
-  Stream.Read(Data, Stream.Size);
-  FreeAndNil(Stream);
+   Stream.Read(Data, Stream.Size);
+   FreeAndNil(Stream);
  End;
 End;
 
 Procedure HexToStream(Str    : String;
                       Stream : TStream);
-{$IFDEF POSIX} //Android}
+{$IFDEF RESTDWFMX} //Android}
 var bytes: TBytes;
 {$ENDIF}
 Begin
- LimpaLixoHex(Str);
- {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
+  LimpaLixoHex(Str);
+  {$IF Defined(RESTDWFMX)}
   SetLength(bytes, Length(str) div 2);
   HexToBin(PChar(str), 0, bytes, 0, Length(bytes));
   stream.WriteBuffer(bytes[0], length(bytes));
- {$ELSE}
-   TMemoryStream(Stream).Size := Length(Str) Div 2;
-   {$IFDEF FPC}
-   HexToBin(PChar(Str), TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
-   {$ELSE}
-    {$IF CompilerVersion > 21} // Delphi 2010 pra cima
-    {$IF (NOT Defined(FPC) AND Defined(LINUX))} //Alteardo para Lazarus LINUX Brito
-     SetLength(bytes, Length(str) div 2);
-     HexToBin(PChar(str), 0, bytes, 0, Length(bytes));
-     stream.WriteBuffer(bytes[0], length(bytes));
-    {$ELSE}
-     HexToBin(PWideChar (Str),   TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
-    {$IFEND}
-    {$ELSE}
-     HexToBin(PChar (Str),   TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
-    {$IFEND}
-   {$ENDIF}
- {$IFEND}
- Stream.Position := 0;
+  {$ELSEIF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
+  HexToBin(PChar(Str), TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
+  {$ELSE}
+  TMemoryStream(Stream).Size := Length(Str) Div 2;
+  HexToBin(PWideChar(Str), TMemoryStream(Stream).Memory, TMemoryStream(Stream).Size);
+  {$IFEND}
+  Stream.Position := 0;
 End;
 
-{$IF Defined(ANDROID) or Defined(LINUX) or Defined(IOS)}
+{$IFDEF RESTDWFMX}
 function abbintohexstring(stream: Tstream):string;
 var
   s: TStream;
@@ -4006,75 +3884,51 @@ begin
   s := stream;
   try
     s.Seek(int64(0), word(soFromBeginning));
-    for i:=1 to s.Size do
+    for i := 1 to s.Size do
     begin
       s.Read(b, 1);
       hex := IntToHex(b, 2);
       //.....
-      result:=result+hex;
+      result := result+hex;
     end;
   finally
     s.Free;
   end;
 end;
-{$IFend}
+{$ENDIF}
 
 Function PCharToHex(Data : PChar; Size : Integer; QQuoted : Boolean = True) : String;
 Var
- Stream : TMemoryStream;
-{$IFDEF POSIX} //Android}
- bytes, bytes2: TBytes;
-{$ENDIF}
+  Stream : TMemoryStream;
 Begin
  Stream := TMemoryStream.Create;
  Try
-  Stream.Write(Data, Size);
-  Stream.Position := 0;
- {$IFNDEF FPC}
-  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
+   Stream.Write(Data, Size);
+   Stream.Position := 0;
+   {$IF Defined(RESTDWFMX)}
    Result := abbintohexstring(stream);
-  {$ELSE}
-   {$IFDEF LINUX} // Android}
-    Result := abbintohexstring(stream); // BytesToString(bytes2);  // TEncoding.UTF8.GetString(bytes2);
    {$ELSE}
-    SetLength     (Result, Stream.Size * 2);
-    BinToHex      (TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
-   {$ENDIF}
-  {$IFEND}
- {$ELSE}
-  SetLength     (Result, Stream.Size * 2);
-  BinToHex      (TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
- {$ENDIF}
+   SetLength(Result, Stream.Size * 2);
+   BinToHex(TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
+   {$IFEND}
  Finally
-  FreeAndNil(Stream);
-  If QQuoted Then
-   Result := '"' + Result + '"';
+   FreeAndNil(Stream);
+   If QQuoted Then
+    Result := '"' + Result + '"';
  End;
 End;
 
 Function StreamToHex(Stream  : TStream; QQuoted : Boolean = True) : String;
-{$IFDEF POSIX} //Android}
-var bytes, bytes2: TBytes;
-{$ENDIF}
 Begin
- Stream.Position := 0;
- {$IFNDEF FPC}
-  {$IF Defined(ANDROID) or Defined(IOS)} //Alteardo para IOS Brito
-   Result := abbintohexstring(stream);
+  Stream.Position := 0;
+  {$IF Defined(RESTDWFMX)}
+  Result := abbintohexstring(stream);
   {$ELSE}
-   {$IFDEF LINUX} // Android}
-    Result := abbintohexstring(stream); // BytesToString(bytes2);  // TEncoding.UTF8.GetString(bytes2);
-   {$ELSE}
-    SetLength     (Result, Stream.Size * 2);
-    BinToHex      (TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
-   {$ENDIF}
+  SetLength(Result, Stream.Size * 2);
+  BinToHex(TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
   {$IFEND}
- {$ELSE}
-  SetLength     (Result, Stream.Size * 2);
-  BinToHex      (TMemoryStream(Stream).Memory, PChar(Result), Stream.Size);
- {$ENDIF}
- If QQuoted Then
-  Result := '"' + Result + '"';
+  If QQuoted Then
+    Result := '"' + Result + '"';
 End;
 
 Function FileToStr(Const FileName : String):string;
@@ -4129,17 +3983,17 @@ Begin
  Dest.Seek(0, soBeginning);
 End;
 
-Function GenerateStringFromStream(Stream : TStream{$IFNDEF FPC}{$if CompilerVersion > 21}; AEncoding: TEncoding{$IFEND}{$ENDIF}) : String;
+Function GenerateStringFromStream(Stream : TStream{$IFDEF DELPHIXEUP}; AEncoding: TEncoding{$ENDIF}) : String;
 Var
  StringStream : TStringStream;
 Begin
- StringStream := TStringStream.Create(''{$IFNDEF FPC}{$if CompilerVersion > 21}, AEncoding{$IFEND}{$ENDIF});
+ StringStream := TStringStream.Create(''{$IFDEF DELPHIXEUP}, AEncoding{$ENDIF});
  Try
   Stream.Position := 0;
   StringStream.CopyFrom(Stream, Stream.Size);
   Result                := StringStream.DataString;
  Finally
-  {$IFNDEF FPC}{$if CompilerVersion > 21}StringStream.Clear;{$IFEND}{$ENDIF}
+  {$IFDEF DELPHIXEUP}StringStream.Clear;{$ENDIF}
   StringStream.Free;
  End;
 End;
@@ -4221,23 +4075,21 @@ Begin
   ftGuid            : Result := ovGuid;
   ftTimeStamp       : Result := ovTimeStamp;
   ftFMTBcd          : Result := ovFMTBcd;
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21} // Delphi 2010 acima
-    ftFixedWideChar   : Result := ovFixedWideChar;
-    ftWideMemo        : Result := ovWideMemo;
-    ftOraTimeStamp    : Result := ovOraTimeStamp;
-    ftOraInterval     : Result := ovOraInterval;
-    ftLongWord        : Result := ovLongWord;
-    ftShortint        : Result := ovShortint;
-    ftByte            : Result := ovByte;
-    ftExtended        : Result := ovExtended;
-    ftConnection      : Result := ovConnection;
-    ftParams          : Result := ovParams;
-    ftStream          : Result := ovStream;
-    ftTimeStampOffset : Result := ovTimeStampOffset;
-    ftObject          : Result := ovObject;
-    ftSingle          : Result := ovSingle;
-   {$IFEND}
+  {$IFDEF DELPHIXEUP}
+  ftFixedWideChar   : Result := ovFixedWideChar;
+  ftWideMemo        : Result := ovWideMemo;
+  ftOraTimeStamp    : Result := ovOraTimeStamp;
+  ftOraInterval     : Result := ovOraInterval;
+  ftLongWord        : Result := ovLongWord;
+  ftShortint        : Result := ovShortint;
+  ftByte            : Result := ovByte;
+  ftExtended        : Result := ovExtended;
+  ftConnection      : Result := ovConnection;
+  ftParams          : Result := ovParams;
+  ftStream          : Result := ovStream;
+  ftTimeStampOffset : Result := ovTimeStampOffset;
+  ftObject          : Result := ovObject;
+  ftSingle          : Result := ovSingle;
   {$ENDIF}
  End;
 End;
@@ -4283,23 +4135,21 @@ Begin
   ovGuid            : Result := ftGuid;
   ovTimeStamp       : Result := ftTimeStamp;
   ovFMTBcd          : Result := ftFMTBcd;
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21} // Delphi 2010 acima
-    ovFixedWideChar   : Result := ftFixedWideChar;
-    ovWideMemo        : Result := ftWideMemo;
-    ovOraTimeStamp    : Result := ftOraTimeStamp;
-    ovOraInterval     : Result := ftOraInterval;
-    ovLongWord        : Result := ftLongWord;
-    ovShortint        : Result := ftShortint;
-    ovByte            : Result := ftByte;
-    ovExtended        : Result := ftExtended;
-    ovConnection      : Result := ftConnection;
-    ovParams          : Result := ftParams;
-    ovStream          : Result := ftStream;
-    ovTimeStampOffset : Result := ftTimeStampOffset;
-    ovObject          : Result := ftObject;
-    ovSingle          : Result := ftSingle;
-   {$IFEND}
+  {$IFDEF DELPHIXEUP}
+  ovFixedWideChar   : Result := ftFixedWideChar;
+  ovWideMemo        : Result := ftWideMemo;
+  ovOraTimeStamp    : Result := ftOraTimeStamp;
+  ovOraInterval     : Result := ftOraInterval;
+  ovLongWord        : Result := ftLongWord;
+  ovShortint        : Result := ftShortint;
+  ovByte            : Result := ftByte;
+  ovExtended        : Result := ftExtended;
+  ovConnection      : Result := ftConnection;
+  ovParams          : Result := ftParams;
+  ovStream          : Result := ftStream;
+  ovTimeStampOffset : Result := ftTimeStampOffset;
+  ovObject          : Result := ftObject;
+  ovSingle          : Result := ftSingle;
   {$ENDIF}
  End;
 End;
@@ -4680,16 +4530,11 @@ Begin
   ftDBaseOle        : Result := 'ftDBaseOle';
   ftTypedBinary     : Result := 'ftTypedBinary';
   ftCursor          : Result := 'ftCursor';
-  ftFixedChar       :
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21} // Delphi 2010 pra cima
-    Result := 'ftFixedChar';
-   {$ELSE}
-    Result := 'ftString';
-   {$IFEND}
+  {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
+  ftFixedChar       : Result := 'ftString';
   {$ELSE}
-   Result := 'ftString';
-  {$ENDIF}
+  ftFixedChar       : Result := 'ftFixedChar';
+  {$IFEND}
   ftWideString      : Result := 'ftString';
   ftLargeint        : Result := 'ftLargeint';
   ftADT             : Result := 'ftADT';
@@ -4704,26 +4549,25 @@ Begin
   ftGuid            : Result := 'ftGuid';
   ftTimeStamp       : Result := 'ftTimeStamp';
   ftFMTBcd          : Result := 'ftFMTBcd';
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21}
-    ftSingle          : Result := 'ftSingle';
-    ftWideMemo        : Result := 'ftWideMemo';
-    ftFixedWideChar   : Result := 'ftFixedWideChar';
-    ftOraTimeStamp    : Result := 'ftOraTimeStamp';
-    ftOraInterval     : Result := 'ftOraInterval';
-    ftLongWord        : Result := 'ftLongWord';
-    ftShortint        : Result := 'ftShortint';
-    ftExtended        : Result := 'ftFloat';
-    ftByte            : Result := 'ftByte';
-    ftConnection      : Result := 'ftConnection';
-    ftParams          : Result := 'ftParams';
-    ftStream          : Result := 'ftBlob';
-    ftTimeStampOffset : Result := 'ftTimeStamp';
-    ftObject          : Result := 'ftObject';
-   {$IFEND}
-  {$ELSE}
-   ftWideMemo         : Result := 'ftWideMemo';
-   ftFixedWideChar    : Result := 'ftFixedWideChar';
+  {$IFDEF RESTDWLAZARUS}
+  ftWideMemo         : Result := 'ftWideMemo';
+  ftFixedWideChar    : Result := 'ftFixedWideChar';
+  {$ENDIF}
+  {$IFDEF DELPHIXEUP}
+  ftSingle          : Result := 'ftSingle';
+  ftWideMemo        : Result := 'ftWideMemo';
+  ftFixedWideChar   : Result := 'ftFixedWideChar';
+  ftOraTimeStamp    : Result := 'ftOraTimeStamp';
+  ftOraInterval     : Result := 'ftOraInterval';
+  ftLongWord        : Result := 'ftLongWord';
+  ftShortint        : Result := 'ftShortint';
+  ftExtended        : Result := 'ftFloat';
+  ftByte            : Result := 'ftByte';
+  ftConnection      : Result := 'ftConnection';
+  ftParams          : Result := 'ftParams';
+  ftStream          : Result := 'ftBlob';
+  ftTimeStampOffset : Result := 'ftTimeStamp';
+  ftObject          : Result := 'ftObject';
   {$ENDIF}
  End;
 End;
@@ -4768,12 +4612,10 @@ Begin
   Result := ftBlob
  Else If vFieldType = Uppercase('ftMemo')            Then
   Result := ftMemo
-{$IFNDEF FPC}
- {$if CompilerVersion < 18} // delphi 7   compatibilidade enter Sever no XE e Client no D7
+{$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)}
  Else If vFieldType = Uppercase('ftWideMemo')        Then
   Result := ftMemo
 {$IFEND}
-{$ENDIF}
  Else If vFieldType = Uppercase('ftGraphic')         Then
   Result := ftGraphic
  Else If vFieldType = Uppercase('ftFmtMemo')         Then
@@ -4789,15 +4631,11 @@ Begin
  Else If vFieldType = Uppercase('ftFixedChar')       Then
   Result := ftFixedChar
  Else If vFieldType = Uppercase('ftWideString')      Then
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21} // Delphi 2010 pra cima
-    Result := ftWideString
-   {$ELSE}
-    Result := ftString
-   {$IFEND}
-  {$ELSE}
-   Result := ftString
-  {$ENDIF}
+ {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
+  Result := ftString
+ {$ELSE}
+  Result := ftWideString
+ {$IFEND}
  Else If vFieldType = Uppercase('ftLargeint')        Then
   Result := ftLargeint
  Else If vFieldType = Uppercase('ftADT')             Then
@@ -4822,7 +4660,7 @@ Begin
   Result := ftGuid
  Else If vFieldType = Uppercase('ftTimeStamp')       Then
   Begin
-  {$IFNDEF FPC}
+  {$IFNDEF RESTDWLAZARUS}
    Result := ftTimeStamp;
   {$ELSE}
    Result := ftDateTime;
@@ -4830,57 +4668,45 @@ Begin
   End
  Else If vFieldType = Uppercase('ftSingle')       Then
   Begin
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21} // Delphi 2010 pra cima
+    {$IFDEF DELPHIXEUP}
     Result := ftSingle;
-   {$ELSE}
+    {$ELSE}
     Result := ftFloat;
-   {$IFEND}
-  {$ELSE}
-   Result := ftFloat;
-  {$ENDIF}
+    {$ENDIF}
   End
  Else If vFieldType = Uppercase('ftFMTBcd')          Then
    Result := ftFMTBcd
-  {$IFNDEF FPC}
-   {$if CompilerVersion > 21}
-    Else If vFieldType = Uppercase('ftFixedWideChar')   Then
-     Result := ftFixedWideChar
-    Else If vFieldType = Uppercase('ftWideMemo')        Then
-     Result := ftWideMemo
-    Else If vFieldType = Uppercase('ftOraTimeStamp')    Then
-     Result := ftOraTimeStamp
-    Else If vFieldType = Uppercase('ftOraInterval')     Then
-     Result := ftOraInterval
-    Else If vFieldType = Uppercase('ftLongWord')        Then
-     Result := ftLongWord
-    Else If vFieldType = Uppercase('ftShortint')        Then
-     Result := ftShortint
-    Else If vFieldType = Uppercase('ftByte')            Then
-     Result := ftByte
-    Else If vFieldType = Uppercase('ftExtended')        Then
-     Result := ftExtended
-    Else If vFieldType = Uppercase('ftConnection')      Then
-     Result := ftConnection
-    Else If vFieldType = Uppercase('ftParams')          Then
-     Result := ftParams
-    Else If vFieldType = Uppercase('ftStream')          Then
-     Result := ftStream
-    Else If vFieldType = Uppercase('ftTimeStampOffset') Then
-     Result := ftTimeStampOffset
-    Else If vFieldType = Uppercase('ftObject')          Then
-     Result := ftObject
-   {$IFEND}
-  (* {$if CompilerVersion =15}
-   Else If vFieldType = Uppercase('ftWideMemo')   Then
-     Result := ftMemo
-   {$IFEND}
-   *)
+  {$IFDEF DELPHIXEUP}
+  Else If vFieldType = Uppercase('ftFixedWideChar')   Then
+    Result := ftFixedWideChar
+  Else If vFieldType = Uppercase('ftWideMemo')        Then
+    Result := ftWideMemo
+  Else If vFieldType = Uppercase('ftOraTimeStamp')    Then
+    Result := ftOraTimeStamp
+  Else If vFieldType = Uppercase('ftOraInterval')     Then
+    Result := ftOraInterval
+  Else If vFieldType = Uppercase('ftLongWord')        Then
+    Result := ftLongWord
+  Else If vFieldType = Uppercase('ftShortint')        Then
+    Result := ftShortint
+  Else If vFieldType = Uppercase('ftByte')            Then
+    Result := ftByte
+  Else If vFieldType = Uppercase('ftExtended')        Then
+    Result := ftExtended
+  Else If vFieldType = Uppercase('ftConnection')      Then
+    Result := ftConnection
+  Else If vFieldType = Uppercase('ftParams')          Then
+    Result := ftParams
+  Else If vFieldType = Uppercase('ftStream')          Then
+    Result := ftStream
+  Else If vFieldType = Uppercase('ftTimeStampOffset') Then
+    Result := ftTimeStampOffset
+  Else If vFieldType = Uppercase('ftObject')          Then
+    Result := ftObject
    {$ENDIF};
 End;
 
-{$IFNDEF FPC}
-{$if CompilerVersion > 22}
+{$IFDEF DELPHIXEUP}
 Function GetEncoding(Avalue  : TEncodeSelect) : TEncoding;
 Begin
  Result := TEncoding.utf8;
@@ -4890,20 +4716,15 @@ Begin
   esASCII : Result := TEncoding.ASCII;
  End;
 End;
-{$IFEND}
 {$ENDIF}
 
 Function BuildStringFloat(Value: String; DataModeD: TDataMode = dmDataware; FloatDecimalFormat : String = ''): String;
 Begin
- {$IFDEF FPC}
-  DecimalLocal := DecimalSeparator;
- {$ELSE}
-  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+  {$IFDEF DELPHIXEUP}
   DecimalLocal := FormatSettings.DecimalSeparator;
   {$ELSE}
   DecimalLocal := DecimalSeparator;
-  {$IFEND}
- {$ENDIF}
+  {$ENDIF}
  Case DataModeD Of
   dmDataware  : Result := StringReplace(Value, DecimalLocal, TDecimalChar, [rfReplaceall]);
   dmRAW       : Begin
@@ -4920,15 +4741,11 @@ End;
 
 Function BuildFloatString(Value : String) : String;
 Begin
- {$IFDEF FPC}
- DecimalLocal := DecimalSeparator;
- {$ELSE}
- {$if CompilerVersion > 21} // Delphi 2010 pra cima
- DecimalLocal := FormatSettings.DecimalSeparator;
- {$ELSE}
- DecimalLocal := DecimalSeparator;
- {$IFEND}
- {$ENDIF}
+  {$IFDEF DELPHIXEUP}
+  DecimalLocal := FormatSettings.DecimalSeparator;
+  {$ELSE}
+  DecimalLocal := DecimalSeparator;
+  {$ENDIF}
  Result := StringReplace(Value, TDecimalChar, DecimalLocal, [rfReplaceAll]);
 End;
 
@@ -4945,15 +4762,12 @@ Begin
 End;
 
 Procedure InitializeStrings;
-{$IFNDEF FPC}
- {$if CompilerVersion > 24} // Delphi 2010 pra cima
+{$IFDEF DELPHIXEUP}
  Var
   s : String;
- {$IFEND}
 {$ENDIF}
 Begin
- {$IFNDEF FPC}
-  {$if CompilerVersion > 24} // Delphi 2010 pra cima
+  {$IFDEF DELPHIXEUP}
    s := '0';
    If Low(s) = 0 Then
     Begin
@@ -4966,13 +4780,9 @@ Begin
      FinalStrPos := 0;
     End;
   {$ELSE}
-   InitStrPos  := 1;
-   FinalStrPos := 0;
-  {$IFEND}
- {$ELSE}
   InitStrPos  := 1;
   FinalStrPos := 0;
- {$ENDIF}
+  {$ENDIF}
 End;
 
 initialization

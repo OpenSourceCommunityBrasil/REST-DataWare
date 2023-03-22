@@ -1,6 +1,8 @@
-unit uRESTDWZPlainDriver;
+﻿unit uRESTDWZPlainDriver;
 
-{$IFNDEF FPC}
+{$I ..\..\Includes\uRESTDW.inc}
+
+{$IFNDEF RESTDWLAZARUS}
   {$I ZDbc.inc}
 {$ENDIF}
 

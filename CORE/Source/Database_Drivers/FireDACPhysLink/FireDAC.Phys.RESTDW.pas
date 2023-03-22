@@ -1,6 +1,6 @@
 ﻿unit FireDAC.Phys.RESTDW;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -34,9 +34,9 @@ uses
   FireDAC.Phys.RESTDWBase;
 
 type
-  {$IF CompilerVersion > 32}
+  {$IFDEF DELPHI10_3UP}
   [ComponentPlatformsAttribute(pfidWindows or pfidOSX or pfidLinux)]
-  {$IFEND}
+  {$ENDIF}
   TRESTDWFireDACPhysLink = class(TFDPhysRDWBaseDriverLink)
 
   end;
@@ -101,14 +101,14 @@ end;
 
 {-------------------------------------------------------------------------------}
 initialization
-  {$IF CompilerVersion > 31}
+  {$IFDEF DELPHI10_2UP}
   FDRegisterDriverClass(TFDPhysRDWDriver);
   {$ELSE}
   FDPhysManager().RegisterDriverClass(TFDPhysRDWDriver);
-  {$IFEND}
+  {$ENDIF}
 finalization
-  {$IF CompilerVersion > 31}
+  {$IFDEF DELPHI10_2UP}
   FDUnregisterDriverClass(TFDPhysRDWDriver);
-  {$IFEND}
+  {$ENDIF}
 
 end.

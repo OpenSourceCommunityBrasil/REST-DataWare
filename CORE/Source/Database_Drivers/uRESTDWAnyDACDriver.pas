@@ -1,6 +1,6 @@
 ﻿unit uRESTDWAnyDACDriver;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -27,9 +27,6 @@
 interface
 
 uses
-  {$IFDEF FPC}
-    LResources,
-  {$ENDIF}
   Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes, uADCompClient,
   uADCompDataSet, DB, uADStanStorage, uADStanIntf, uADDatSManager, 
   uADDAptIntf, uADDAptManager;

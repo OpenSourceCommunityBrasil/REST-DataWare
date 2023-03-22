@@ -29,7 +29,7 @@ Type
                                Var aArrayOf  : TArrayOf;
                                aElementClass : TClass);
    Class Procedure GetDynArrayElTypeInfo(TypeInfo    : PTypeInfo;
-                                         Var EltInfo : {$IFDEF FPC}PPTypeInfo{$ELSE}PTypeInfo{$ENDIF};
+                                         Var EltInfo : {$IFDEF RESTDWLAZARUS}PPTypeInfo{$ELSE}PTypeInfo{$ENDIF};
                                          Var Dims    : Integer);
   Public
    Class Function JSONtoObject(Json        : String;
@@ -87,7 +87,7 @@ Begin
    aPropInfo := GetPropInfo(Instance, Prop);
    If Assigned(aPropInfo) Then
     Begin
-     Case aPropInfo^.Proptype^{$IFNDEF FPC}^{$ENDIF}.Kind Of
+     Case aPropInfo^.Proptype^{$IFNDEF RESTDWLAZARUS}^{$ENDIF}.Kind Of
       tkinteger,
       tkInt64,
       tkFloat,
@@ -96,9 +96,7 @@ Begin
       tkLString,
       tkWString,
       tkString      : Result := GetStrProp(instance, aPropInfo);
-      tkclass       : Begin
-
-                      End;
+      tkclass       : ;
       tkSet         : ;
       tkRecord      : ;
       tkDynArray    : ;
@@ -109,9 +107,9 @@ Begin
          Result := GetEnumProp(instance, aPropInfo)
         Else
          Begin
-          With GettypeData(aPropInfo^.Proptype{$IFNDEF FPC}^{$ENDIF})^ Do
+          With GettypeData(aPropInfo^.Proptype{$IFNDEF RESTDWLAZARUS}^{$ENDIF})^ Do
            Begin
-            If Basetype{$IFNDEF FPC}^{$ENDIF} = typeinfo(Boolean) Then
+            If Basetype{$IFNDEF RESTDWLAZARUS}^{$ENDIF} = typeinfo(Boolean) Then
              Result := Boolean(GetordProp(instance, aPropInfo))
             Else
              Result := GetordProp(instance, aPropInfo);
@@ -136,7 +134,7 @@ Begin
    infoPropriedades := GetPropInfo(Instance, Prop);
    If Assigned(infoPropriedades) Then
     Begin
-     Case infoPropriedades^.Proptype^{$IFNDEF FPC}^{$ENDIF}.Kind Of
+     Case infoPropriedades^.Proptype^{$IFNDEF RESTDWLAZARUS}^{$ENDIF}.Kind Of
       tkinteger,
       tkChar,
       tkWChar,
@@ -201,7 +199,7 @@ Var
  fPropList    : PPropList;
  aBaseType,
  bTypeData    : PTypeInfo;
- aElementTypeInfo : {$IFDEF FPC}PPTypeInfo{$ELSE}PTypeInfo{$ENDIF};
+ aElementTypeInfo : {$IFDEF RESTDWLAZARUS}PPTypeInfo{$ELSE}PTypeInfo{$ENDIF};
  aPropertyInfo,
  aPropInfo    : PPropInfo;
  aEnumName,
@@ -235,7 +233,7 @@ Begin
        Begin
         If (Lowercase(bElementName) = Lowercase(aPropInfo^.Name)) Then
          Begin
-          Case aPropInfo^.Proptype^{$IFNDEF FPC}^{$ENDIF}.Kind Of
+          Case aPropInfo^.Proptype^{$IFNDEF RESTDWLAZARUS}^{$ENDIF}.Kind Of
            tkInteger,
            tkInt64,
            tkFloat,
@@ -256,19 +254,16 @@ Begin
                            End;
            tkLString,
            tkWString,
-           {$IFNDEF FPC}
-            {$IF CompilerVersion > 22} // Delphi 2010 pra cima
-             tkUString,
-            {$IFEND}
+           {$IFDEF RESTDWLAZARUS}
+             tkUString, tkAString,
            {$ELSE}
-           tkUString,
-           tkAString,
+           {$IF Defined(DELPHIXEUP)}tkUString,{$ELSE}tkAString,{$IFEND}
            {$ENDIF}
            tkString      : Begin  //Classes baseadas em Strings
                             SetStrProp(aArrayOf[X], aPropInfo, String(aElement.Value));
                            End;
            tkClass       : Begin
-                            aTypeData  := GetTypeData(aPropInfo^.Proptype{$IFNDEF FPC}^{$ENDIF});
+                            aTypeData  := GetTypeData(aPropInfo^.Proptype{$IFNDEF RESTDWLAZARUS}^{$ENDIF});
                             If Assigned(aTypeData) Then
                              Begin
                               aValue := aElement.Value;
@@ -285,7 +280,7 @@ Begin
                              End;
                            End;
            tkSet         : Begin
-                            bTypeData := GetTypeData(aPropInfo^.Proptype{$IFNDEF FPC}^{$ENDIF})^.CompType{$IFNDEF FPC}^{$ENDIF};
+                            bTypeData := GetTypeData(aPropInfo^.Proptype{$IFNDEF RESTDWLAZARUS}^{$ENDIF})^.CompType{$IFNDEF RESTDWLAZARUS}^{$ENDIF};
                             aBaseData := GetTypeData(bTypeData);
                             OrdValue  := GetOrdProp(aArrayOf[X], aPropertyInfo);
                             For X := aBaseData^.MinValue To aBaseData^.MaxValue do
@@ -303,10 +298,10 @@ Begin
            tkDynArray    : Begin
                             If Pointer(GetOrdProp(aObject, aPropInfo)) = Nil Then
                              Begin
-                              GetDynArrayElTypeInfo(aPropInfo^.PropType{$IFNDEF FPC}^{$ENDIF}, aElementTypeInfo, Dimensions);
-                              bClass := GetTypeData(aElementTypeInfo{$IFDEF FPC}^{$ENDIF})^.Classtype; //aArrayOf[Length(aArrayOf) -1].ClassType;
+                              GetDynArrayElTypeInfo(aPropInfo^.PropType{$IFNDEF RESTDWLAZARUS}^{$ENDIF}, aElementTypeInfo, Dimensions);
+                              bClass := GetTypeData(aElementTypeInfo{$IFDEF RESTDWLAZARUS}^{$ENDIF})^.Classtype; //aArrayOf[Length(aArrayOf) -1].ClassType;
                               JsonToArray(aElement, aArrayOf, bClass);
-                              {$IFDEF FPC}
+                              {$IFDEF RESTDWLAZARUS}
                               SetVariantProp(aArrayOf[X], aPropInfo, aArrayOf);
                               {$ELSE}
                               SetOrdProp(aArrayOf[X], aPropInfo, Integer(aArrayOf));
@@ -314,7 +309,7 @@ Begin
                              End;
                            End;
            tkArray       : ;
-           {$IFDEF FPC}
+           {$IFDEF RESTDWLAZARUS}
            tkBool        : Begin
                             vValue := aElement.Value;
                             SetOrdProp(aArrayOf[X], aPropInfo, Integer(vValue));
@@ -322,10 +317,10 @@ Begin
            {$ENDIF}
            tkEnumeration :
             Begin
-             With GettypeData(aPropInfo^.Proptype{$IFNDEF FPC}^{$ENDIF})^ Do
+             With GettypeData(aPropInfo^.Proptype{$IFNDEF RESTDWLAZARUS}^{$ENDIF})^ Do
               Begin
                vValue := aElement.Value;
-               If Basetype{$IFNDEF FPC}^{$ENDIF} = typeinfo(Boolean) Then
+               If Basetype{$IFNDEF RESTDWLAZARUS}^{$ENDIF} = typeinfo(Boolean) Then
                 SetOrdProp(aArrayOf[X], aPropInfo, Integer(vValue))
                Else
                 SetOrdProp(aArrayOf[X], aPropInfo, aElement.Value);
@@ -343,13 +338,13 @@ Begin
 End;
 
 Class Procedure TRESTDWJSONSerializer.GetDynArrayElTypeInfo(typeInfo : PTypeInfo; var
-                                                            EltInfo  : {$IFDEF FPC}PPTypeInfo{$ELSE}PTypeInfo{$ENDIF};
+                                                            EltInfo  : {$IFDEF RESTDWLAZARUS}PPTypeInfo{$ELSE}PTypeInfo{$ENDIF};
                                                             Var Dims : Integer);
 Var
  S           : String;
  P           : Pointer;
  ppInfo      : PPTypeInfo;
- Info        : {$IFDEF FPC}PPTypeInfo{$ELSE}PTypeInfo{$ENDIF};
+ Info        : {$IFDEF RESTDWLAZARUS}PPTypeInfo{$ELSE}PTypeInfo{$ENDIF};
  CleanupInfo : Boolean;
  Function ReadByte(Var P : Pointer) : Byte;
  Begin
@@ -359,25 +354,23 @@ Var
  Function ReadString(Var P : Pointer) : String;
  Var
   B: Byte;
-  {$IFDEF UNICODE}
-  {$IFDEF NEXTGEN}
+  {$IF Defined(UNICODE) or Defined(NEXTGEN)}
   AStr: TBytes;
-  {$ELSE !NEXTGEN}
+  {$ELSE}
   AStr: AnsiString;
-  {$ENDIF NEXTGEN}
-  {$ENDIF}
+  {$IFEND}
  Begin
   B := Byte(P^);
   {$IFDEF UNICODE}
   SetLength(AStr, B);
   P := Pointer(NativeInt(P)+1);
-  {$IFDEF NEXTGEN}
-  Move(P^, AStr[0], Integer(B));
-  Result := Tencoding.UTF8.GetString(AStr);
-  {$ELSE !NEXTGEN}
-  Move(P^, AStr[1], Integer(B));
-  Result := UTF8ToString(AStr);
-  {$ENDIF NEXTGEN}
+    {$IFDEF NEXTGEN}
+    Move(P^, AStr[0], Integer(B));
+    Result := Tencoding.UTF8.GetString(AStr);
+    {$ELSE !NEXTGEN}
+    Move(P^, AStr[1], Integer(B));
+    Result := UTF8ToString(AStr);
+    {$ENDIF NEXTGEN}
   {$ELSE}
   SetLength(Result, B);
   P := Pointer( NativeInt(P) + 1);
@@ -385,11 +378,13 @@ Var
   {$ENDIF}
   P := Pointer( NativeInt(P) + B );
  End;
+
  Function ReadLong(Var P : Pointer) : Integer;
  Begin
   Result := Integer(P^);
   P := Pointer( NativeInt(P) + 4);
  End;
+
  Function ReadPointer(var P: Pointer): Pointer;
  Begin
   Result := Pointer(P^);
@@ -406,20 +401,20 @@ Begin
  If (ppInfo <> Nil) Then
   Begin
    CleanupInfo := True;
-   Info := ppInfo{$IFNDEF FPC}^{$ENDIF};
-   If Info{$IFDEF FPC}^{$ENDIF}^.Kind = tkDynArray then
-    GetDynArrayElTypeInfo(Info{$IFDEF FPC}^{$ENDIF}, EltInfo, Dims);
+   Info := ppInfo{$IFNDEF RESTDWLAZARUS}^{$ENDIF};
+   If Info{$IFDEF RESTDWLAZARUS}^{$ENDIF}^.Kind = tkDynArray then
+    GetDynArrayElTypeInfo(Info{$IFDEF RESTDWLAZARUS}^{$ENDIF}, EltInfo, Dims);
   End;
  ReadLong(P);
  ppInfo := ReadPointer(P);
  If ppInfo <> Nil Then
   Begin
-   EltInfo := ppInfo{$IFNDEF FPC}^{$ENDIF};
+   EltInfo := ppInfo{$IFNDEF RESTDWLAZARUS}^{$ENDIF};
    If Not CleanupInfo Then
     Begin
      Info := EltInfo;
-     If Info{$IFDEF FPC}^^{$ENDIF}.Kind = tkDynArray Then
-      GetDynArrayElTypeInfo(Info{$IFDEF FPC}^{$ENDIF}, EltInfo, Dims);
+     If Info{$IFDEF RESTDWLAZARUS}^^{$ENDIF}.Kind = tkDynArray Then
+      GetDynArrayElTypeInfo(Info{$IFDEF RESTDWLAZARUS}^{$ENDIF}, EltInfo, Dims);
     End;
   End;
  Inc(Dims);
@@ -437,7 +432,7 @@ Var
  aTypeData    : PTypeData;
  bTypeData,
  aBaseType    : PTypeInfo;
- aElementTypeInfo : {$IFDEF FPC}PPTypeInfo{$ELSE}PTypeInfo{$ENDIF};
+ aElementTypeInfo : {$IFDEF RESTDWLAZARUS}PPTypeInfo{$ELSE}PTypeInfo{$ENDIF};
  aItemArray   : TBaseClass;
  A, I, X,
  aPropCount,
@@ -493,11 +488,11 @@ Begin
           bElementName := JSONObject.Elements[A].ElementName;
          If (Lowercase(bElementName) = Lowercase(aPropInfo^.Name)) Or
             ((Lowercase(bElementName) = '') And
-             (aPropInfo^.Proptype^{$IFNDEF FPC}^{$ENDIF}.Kind In [tkArray, tkDynArray, tkClass])) Then
+             (aPropInfo^.Proptype^{$IFNDEF RESTDWLAZARUS}^{$ENDIF}.Kind In [tkArray, tkDynArray, tkClass])) Then
           Begin
            If Assigned(aPropInfo) Then
             Begin
-             Case aPropInfo^.Proptype^{$IFNDEF FPC}^{$ENDIF}.Kind Of
+             Case aPropInfo^.Proptype^{$IFNDEF RESTDWLAZARUS}^{$ENDIF}.Kind Of
               tkInteger,
               tkInt64,
               tkFloat,
@@ -518,19 +513,16 @@ Begin
                               End;
               tkLString,
               tkWString,
-              {$IFNDEF FPC}
-               {$IF CompilerVersion > 22} // Delphi 2010 pra cima
-                tkUString,
-               {$IFEND}
+              {$IFDEF RESTDWLAZARUS}
+                tkUString, tkAString,
               {$ELSE}
-              tkUString,
-              tkAString,
+              {$IF Defined(DELPHIXEUP)}tkUString,{$ELSE}tkAString,{$IFEND}
               {$ENDIF}
               tkString      : Begin  //Classes baseadas em Strings
                                SetStrProp(TObject(Result), aPropInfo, String(JSONObject.Elements[A].Value));
                               End;
               tkClass       : Begin
-                               aTypeData  := GetTypeData(aPropInfo^.Proptype{$IFNDEF FPC}^{$ENDIF});
+                               aTypeData  := GetTypeData(aPropInfo^.Proptype{$IFNDEF RESTDWLAZARUS}^{$ENDIF});
                                If Assigned(aTypeData) Then
                                 Begin
                                  aValue := JSONObject.Elements[A].Value;
@@ -543,7 +535,7 @@ Begin
                                 End;
                               End;
               tkSet         : Begin
-                               bTypeData := GetTypeData(aPropInfo^.Proptype{$IFNDEF FPC}^{$ENDIF})^.CompType{$IFNDEF FPC}^{$ENDIF};
+                               bTypeData := GetTypeData(aPropInfo^.Proptype{$IFNDEF RESTDWLAZARUS}^{$ENDIF})^.CompType{$IFNDEF RESTDWLAZARUS}^{$ENDIF};
                                aBaseData := GetTypeData(bTypeData);
                                OrdValue  := GetOrdProp(TObject(Result), aPropertyInfo);
                                For X := aBaseData^.MinValue To aBaseData^.MaxValue do
@@ -559,20 +551,20 @@ Begin
                                SetVariantProp(TObject(Result), aPropInfo, vValue);
                               End;
               tkDynArray    : Begin
-                               GetDynArrayElTypeInfo(aPropInfo^.Proptype{$IFNDEF FPC}^{$ENDIF}, aElementTypeInfo, Dimensions);
-                               bClass := GetTypeData(aElementTypeInfo{$IFDEF FPC}^{$ENDIF})^.Classtype;
+                               GetDynArrayElTypeInfo(aPropInfo^.Proptype{$IFNDEF RESTDWLAZARUS}^{$ENDIF}, aElementTypeInfo, Dimensions);
+                               bClass := GetTypeData(aElementTypeInfo{$IFDEF RESTDWLAZARUS}^{$ENDIF})^.Classtype;
                                If Assigned(JSONArray) Then
                                 JsonToArray(JSONArray.Elements[A], aArrayOf, bClass)
                                Else
                                 JsonToArray(TRESTDWJSONBaseObjectClass (JSONObject), aArrayOf, aClass);
-                               {$IFDEF FPC}
+                               {$IFDEF RESTDWLAZARUS}
                                SetVariantProp(TObject(Result), aPropInfo, aArrayOf);
                                {$ELSE}
                                SetOrdProp(TObject(Result), aPropInfo, Integer(aArrayOf));
                                {$ENDIF}
                               End;
               tkArray       : ;
-              {$IFDEF FPC}
+              {$IFDEF RESTDWLAZARUS}
               tkBool        : Begin
                                vValue := JSONObject.Elements[A].Value;
                                SetOrdProp(TObject(Result), aPropInfo, Integer(vValue));
@@ -580,10 +572,10 @@ Begin
               {$ENDIF}
               tkEnumeration :
                Begin
-                With GettypeData(aPropInfo^.Proptype{$IFNDEF FPC}^{$ENDIF})^ Do
+                With GettypeData(aPropInfo^.Proptype{$IFNDEF RESTDWLAZARUS}^{$ENDIF})^ Do
                  Begin
                   vValue := JSONObject.Elements[A].Value;
-                  If Basetype{$IFNDEF FPC}^{$ENDIF} = typeinfo(Boolean) Then
+                  If Basetype{$IFNDEF RESTDWLAZARUS}^{$ENDIF} = typeinfo(Boolean) Then
                    SetOrdProp(TObject(Result), aPropInfo, Integer(vValue))
                   Else
                    SetOrdProp(TObject(Result), aPropInfo, JSONObject.Elements[A].Value);
@@ -608,13 +600,6 @@ Class Function TRESTDWJSONSerializer.ObjectToJSON(aClass : TBaseClass) : String;
 Begin
 
 End;
-
-{ TObjectArray }
-
-//Constructor TObjectArray.Create;
-//Begin
-// Inherited Create(TArrayItem);
-//End;
 
 Class Function TRESTDWJSONSerializer.ReadProperty(Instance : TPersistent;
                                                   PropInfo : PPropInfo) : TBaseClass;

@@ -83,7 +83,6 @@ contains
   uRESTDWDataUtils in '..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas',
   StringBuilderUnit in '..\..\Source\utils\StringBuilderUnit.pas',
   uRESTDWBase64 in '..\..\Source\utils\uRESTDWBase64.pas',
-  uRESTDWDynamic in '..\..\Source\utils\uRESTDWDynamic.pas',
   uRESTDWJSONObject in '..\..\Source\utils\uRESTDWJSONObject.pas',
   uRESTDWMassiveBuffer in '..\..\Source\utils\uRESTDWMassiveBuffer.pas',
   uRESTDWMD5 in '..\..\Source\utils\uRESTDWMD5.pas',
@@ -102,6 +101,7 @@ contains
   uRESTDWExprParser in '..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas',
   uRESTDWDriverBase in '..\..\Source\Database_Drivers\uRESTDWDriverBase.pas',
   uRESTDWTools in '..\..\Source\utils\uRESTDWTools.pas',
-  uRESTDWAuthenticators in '..\..\Source\Basic\Mechanics\uRESTDWAuthenticators.pas';
+  uRESTDWAuthenticators in '..\..\Source\Basic\Mechanics\uRESTDWAuthenticators.pas',
+  uRESTDWDynamic in '..\..\Source\utils\uRESTDWDynamic.pas';
 
 End.

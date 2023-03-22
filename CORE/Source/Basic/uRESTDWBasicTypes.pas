@@ -26,9 +26,9 @@ unit uRESTDWBasicTypes;
 Interface
 
 Uses
-  {$IFNDEF FPC}
-  {$if CompilerVersion < 24}DbTables,{$IFEND}
-  {$ENDIF}
+  {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXE3UP)}
+  DbTables,
+  {$IFEND}
   SysUtils,  Classes, Db, FMTBcd,
   uRESTDWAbout, uRESTDWMemoryDataset, uRESTDWConsts,
   uRESTDWProtoTypes, uRESTDWTools;
@@ -227,7 +227,7 @@ type
    vOnLoadStream,
    vBinaryLoadRequest                 : Boolean;
    vOnWriterProcess                   : TOnWriterProcess;
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
    vDatabaseCharSet                   : TDatabaseCharSet;
    Procedure SetDatabaseCharSet(Value : TDatabaseCharSet);
    Function  GetDatabaseCharSet : TDatabaseCharSet;
@@ -248,7 +248,7 @@ type
    Property    BinaryLoadRequest : Boolean       Read vBinaryLoadRequest;
    Property    OnLoadStream      : Boolean       Read vOnLoadStream       Write vOnLoadStream;
    Property    Componenttag      : String        Read vComponentTag;
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
    Property DatabaseCharSet      : TDatabaseCharSet Read GetDatabaseCharSet Write SetDatabaseCharSet;
    {$ENDIF}
   Published
@@ -506,17 +506,17 @@ Begin
                   '"username":"%s","password":"%s","dbPort":%d,'+
                   '"otherDetails":"%s","charset":"%s","databasetype":"%s","protocol":"%s",'+
                   '"driverID":"%s","datasource":"%s"}',
-                  [EncodeStrings(vDatabaseName{$IFDEF FPC}, csUndefined{$ENDIF}),
-                   EncodeStrings(vHostName{$IFDEF FPC}, csUndefined{$ENDIF}),
-                   EncodeStrings(vUsername{$IFDEF FPC}, csUndefined{$ENDIF}),
-                   EncodeStrings(vPassword{$IFDEF FPC}, csUndefined{$ENDIF}),
+                  [EncodeStrings(vDatabaseName{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                   EncodeStrings(vHostName{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                   EncodeStrings(vUsername{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                   EncodeStrings(vPassword{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
                    vdbPort,
-                   EncodeStrings(votherDetails{$IFDEF FPC}, csUndefined{$ENDIF}),
-                   EncodeStrings(vCharset{$IFDEF FPC}, csUndefined{$ENDIF}),
-                   EncodeStrings(GetDatabaseType(vDWDatabaseType){$IFDEF FPC}, csUndefined{$ENDIF}),
-                   EncodeStrings(vProtocol{$IFDEF FPC}, csUndefined{$ENDIF}),
-                   EncodeStrings(vDriverID{$IFDEF FPC}, csUndefined{$ENDIF}),
-                   EncodeStrings(vDataSource{$IFDEF FPC}, csUndefined{$ENDIF})]);
+                   EncodeStrings(votherDetails{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                   EncodeStrings(vCharset{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                   EncodeStrings(GetDatabaseType(vDWDatabaseType){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                   EncodeStrings(vProtocol{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                   EncodeStrings(vDriverID{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                   EncodeStrings(vDataSource{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
 End;
 
 Procedure TConnectionDefs.LoadFromJSON(Value : String);
@@ -527,20 +527,20 @@ Begin
  Try
   If bJsonValue.PairCount > 0 Then
    Begin
-    vDatabaseName   := DecodeStrings(bJsonValue.Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF});
-    vHostName       := DecodeStrings(bJsonValue.Pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF});
-    vUsername       := DecodeStrings(bJsonValue.Pairs[2].Value{$IFDEF FPC}, csUndefined{$ENDIF});
-    vPassword       := DecodeStrings(bJsonValue.Pairs[3].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+    vDatabaseName   := DecodeStrings(bJsonValue.Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+    vHostName       := DecodeStrings(bJsonValue.Pairs[1].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+    vUsername       := DecodeStrings(bJsonValue.Pairs[2].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+    vPassword       := DecodeStrings(bJsonValue.Pairs[3].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
     If bJsonValue.Pairs[4].Value <> '' Then
      vdbPort        := StrToInt(bJsonValue.Pairs[4].Value)
     Else
      vdbPort        := -1;
-    votherDetails   := DecodeStrings(bJsonValue.Pairs[5].Value{$IFDEF FPC}, csUndefined{$ENDIF});
-    vCharset        := DecodeStrings(bJsonValue.Pairs[6].Value{$IFDEF FPC}, csUndefined{$ENDIF});
-    vDWDatabaseType := GetDatabaseType(DecodeStrings(bJsonValue.Pairs[7].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-    vProtocol       := DecodeStrings(bJsonValue.Pairs[8].Value{$IFDEF FPC}, csUndefined{$ENDIF});
-    vDriverID       := DecodeStrings(bJsonValue.Pairs[9].Value{$IFDEF FPC}, csUndefined{$ENDIF});
-    vDataSource     := DecodeStrings(bJsonValue.Pairs[10].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+    votherDetails   := DecodeStrings(bJsonValue.Pairs[5].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+    vCharset        := DecodeStrings(bJsonValue.Pairs[6].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+    vDWDatabaseType := GetDatabaseType(DecodeStrings(bJsonValue.Pairs[7].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+    vProtocol       := DecodeStrings(bJsonValue.Pairs[8].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+    vDriverID       := DecodeStrings(bJsonValue.Pairs[9].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+    vDataSource     := DecodeStrings(bJsonValue.Pairs[10].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
    End;
  Finally
   FreeAndNil(bJsonValue);
@@ -598,7 +598,7 @@ Begin
  vBinaryCompatibleMode := True;
 End;
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
 Function  TRESTDWClientSQLBase.GetDatabaseCharSet : TDatabaseCharSet;
 Begin
  Result := vDatabaseCharSet;
@@ -619,7 +619,7 @@ End;
 
 Procedure TRESTDWClientSQLBase.SetComponentTAG;
 Begin
- vComponentTag := EncodeStrings(RandomString(10){$IFDEF FPC}, csUndefined{$ENDIF});
+ vComponentTag := EncodeStrings(RandomString(10){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
 End;
 
 Procedure TRESTDWClientSQLBase.ForceInternalCalc;
@@ -717,19 +717,16 @@ Begin
   Begin
    If Assigned(TList(Self).Items[Index]) Then
     Begin
-     {$IFDEF FPC}
-     FreeAndNil(TList(Self).Items[Index]^);
-     {$ELSE}
-      {$IF CompilerVersion > 33}
-       FreeAndNil(TRESTDWDataRoute(TList(Self).Items[Index]^));
+      {$IFDEF RESTDWLAZARUS}
+        FreeAndNil(TList(Self).Items[Index]^);
+        Dispose(PRESTDWDataRoute(TList(Self).Items[Index]));
       {$ELSE}
-       FreeAndNil(TList(Self).Items[Index]^);
-      {$IFEND}
-     {$ENDIF}
-     {$IFDEF FPC}
-      Dispose(PRESTDWDataRoute(TList(Self).Items[Index]));
-     {$ELSE}
-      Dispose(TList(Self).Items[Index]);
+        {$IFDEF DELPHI10_4UP}
+          FreeAndNil(TRESTDWDataRoute(TList(Self).Items[Index]^));
+        {$ELSE}
+          FreeAndNil(TList(Self).Items[Index]^);
+        {$ENDIF}
+        Dispose(TList(Self).Items[Index]);
      {$ENDIF}
     End;
    TList(Self).Delete(Index);
@@ -774,7 +771,7 @@ Begin
 End;
 
 Initialization
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
  RESTDWDecimalSeparator  := DecimalSeparator;
  RESTDWThousandSeparator := ThousandSeparator;
  RESTDWCurrencyDecimals  := CurrencyDecimals;
@@ -790,7 +787,7 @@ Initialization
  RESTDWLongDayNames      := TArrayWeek(LongDayNames);
  RESTDWCurrencyString    := CurrencyString;
 {$ELSE}
- {$IF CompilerVersion > 21} // Delphi 2010 pra cima
+ {$IFDEF DELPHIXEUP}
   RESTDWDecimalSeparator  := FormatSettings.DecimalSeparator;
   RESTDWThousandSeparator := FormatSettings.ThousandSeparator;
   RESTDWCurrencyDecimals  := FormatSettings.CurrencyDecimals;
@@ -820,7 +817,7 @@ Initialization
   RESTDWShortDayNames     := TArrayWeek(ShortDayNames);
   RESTDWLongDayNames      := TArrayWeek(LongDayNames);
   RESTDWCurrencyString    := CurrencyString;
- {$IFEND}
+ {$ENDIF}
 {$ENDIF}
 
 end.

@@ -1,6 +1,8 @@
-unit uRESTDWZAnalyser;
+﻿unit uRESTDWZAnalyser;
 
-{$IFNDEF FPC}
+{$I ..\..\Includes\uRESTDW.inc}
+
+{$IFNDEF RESTDWLAZARUS}
   {$I ZDbc.inc}
 {$ENDIF}
 

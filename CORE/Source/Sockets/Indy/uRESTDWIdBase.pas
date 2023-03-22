@@ -3145,6 +3145,8 @@ Var
  vResponseHeader : TStringList;
  mb              : TStringStream;
  vRedirect       : TRedirect;
+ tmpstr          : String;
+
  Procedure WriteError;
  Begin
   AResponseInfo.ResponseNo              := StatusCode;
@@ -3229,6 +3231,10 @@ Begin
   {$ENDIF}
   vAuthRealm   := AResponseInfo.AuthRealm;
   vContentType := ARequestInfo.ContentType;
+
+ // ARequestInfo.PostStream.Position:=0;
+ // tmpstr:= idglobal.readstringfromstream(ARequestInfo.PostStream,-1, IndyTextEncoding_UTF8);
+
   If CommandExec  (TComponent(AContext),
                    RemoveBackslashCommands(ARequestInfo.URI),
                    ARequestInfo.RawHTTPCommand,
@@ -3439,7 +3445,7 @@ Begin
     {$IF Not Defined(HAS_FMX)}
      AContext.Data := Nil; // not an Authorization attempt
     {$ELSE}
-     {$IFDEF HAS_UTF8}
+     {$IFDEF HAS_FMX}
       {$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND} := Nil;
      {$ELSE}
       AContext.DataObject := Nil;
@@ -3462,7 +3468,7 @@ Begin
       {$IF Not Defined(HAS_FMX)}
        AContext.Data  := vAuthValue;
       {$ELSE}
-       {$IFDEF HAS_UTF8}
+       {$IFDEF HAS_FMX}
         {$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND} := vAuthValue;
        {$ELSE}
         AContext.DataObject := vAuthValue;
@@ -3494,7 +3500,7 @@ Begin
       VHandled         := Authenticator is TRESTDWAuthToken;
      End;
    {$ELSE}
-    {$IFDEF HAS_UTF8}
+    {$IFDEF HAS_FMX}
     If (Lowercase(AAuthType) = Lowercase('bearer')) Or
        (Lowercase(AAuthType) = Lowercase('token'))  And
        ({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}  = Nil) Then

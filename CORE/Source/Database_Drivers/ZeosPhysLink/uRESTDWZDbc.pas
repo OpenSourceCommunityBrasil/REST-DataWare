@@ -1,6 +1,6 @@
-unit uRESTDWZDbc;
+﻿unit uRESTDWZDbc;
 
-{$I ..\..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 {$IFNDEF FPC}
   {$I ZDbc.inc}
 {$ELSE}
@@ -36,7 +36,8 @@ uses
   {$IFNDEF ZEOS80UP}ZURL,{$ENDIF}
   Classes, SysUtils,
   ZDbcIntfs, ZDbcLogging, ZTokenizer, ZPlainDriver, ZGenericSqlAnalyser,
-  ZCompatibility, uRESTDWZPlainDriver, ZDbcConnection, uRESTDWBasicDB;
+  ZCompatibility, ZDbcConnection,
+  uRESTDWZPlainDriver, uRESTDWBasicDB, uRESTDWConsts;
 
 type
   TZRESTDWDriver = class(TZAbstractDriver)
@@ -253,7 +254,7 @@ var
 begin
   vDatabase := GetDatabase;
   if vDatabase = nil then
-    raise Exception.Create('Error Message');
+    raise Exception.Create(cErrorDatabaseNotFound);
 
   vDatabase.Active := True;
   inherited;

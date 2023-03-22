@@ -1,6 +1,6 @@
 unit uRESTDWBuffer;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -58,7 +58,6 @@ Type
                       Const ALength   : Integer = -1); Overload;
   Procedure CompactHead(ACanShrink    : Boolean = True);
   Destructor Destroy; override;
-  Function   Extract         (AByteCount    : Integer = -1) : String;{$IFDEF HAS_DEPRECATED}Deprecated{$IFDEF HAS_DEPRECATED_MSG} 'Use ExtractToString()'{$ENDIF};{$ENDIF}
   Function   ExtractToString (AByteCount    : Integer = -1) : String;
   Procedure  ExtractToStream (Const AStream : TStream;
                               AByteCount    : Integer = -1;
@@ -158,11 +157,6 @@ Destructor TRESTDWBuffer.Destroy;
 Begin
  Clear;
  Inherited Destroy;
-End;
-
-Function TRESTDWBuffer.Extract(AByteCount: Integer = -1) : String;{$IFDEF USE_CLASSINLINE}Inline;{$ENDIF}
-Begin
- Result := ExtractToString(AByteCount);
 End;
 
 Function TRESTDWBuffer.ExtractToString(AByteCount: Integer = -1) : String;

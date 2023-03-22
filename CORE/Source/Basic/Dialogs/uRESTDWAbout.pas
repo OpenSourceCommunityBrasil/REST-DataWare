@@ -4,7 +4,7 @@ unit uRESTDWAbout;
 
 interface
 
-uses Classes, SysUtils, uRESTDWConsts{$IFDEF FPC}, lclversion{$ENDIF};
+uses Classes, SysUtils, uRESTDWConsts{$IFDEF RESTDWLAZARUS}, lclversion{$ENDIF};
 
 Type
  TRESTDWAboutInfo = (RESTDWAbout);
@@ -32,7 +32,7 @@ Implementation
 
 //uses {$IFNDEF RESTDWLAMW}uRESTDWAboutForm{$ENDIF};
 
-{$IFNDEF FPC}
+{$IFNDEF RESTDWLAZARUS}
 Function GetDelphiVersion : String;
 Begin
  Result := '';

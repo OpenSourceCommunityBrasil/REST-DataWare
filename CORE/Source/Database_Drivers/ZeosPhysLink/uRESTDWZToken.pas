@@ -1,7 +1,8 @@
-unit uRESTDWZToken;
+﻿unit uRESTDWZToken;
 
-{$I ..\..\..\Source\Includes\uRESTDW.inc}
-{$IFNDEF FPC}
+{$I ..\..\Includes\uRESTDW.inc}
+
+{$IFNDEF RESTDWLAZARUS}
   {$I ZDbc.inc}
 {$ENDIF}
 

@@ -1,6 +1,6 @@
 unit uRESTDWMimeTypes;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 interface
 

@@ -1,6 +1,4 @@
-unit FireDAC.Phys.RESTDWDef;
-
-{$I ..\Includes\uRESTDW.inc}
+﻿unit FireDAC.Phys.RESTDWDef;
 
 {
   REST Dataware .

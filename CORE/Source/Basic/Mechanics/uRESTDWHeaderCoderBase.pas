@@ -1,6 +1,6 @@
 unit uRESTDWHeaderCoderBase;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -65,7 +65,7 @@ Var
 implementation
 
 uses
-  {$IFDEF VCL_XE3_OR_ABOVE}
+  {$IFDEF DELPHIXE3UP}
   System.Types,
   {$ENDIF}
   uRESTDWConsts,

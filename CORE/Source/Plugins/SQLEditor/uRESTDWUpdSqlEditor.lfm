@@ -15,7 +15,7 @@ object FrmDWUpdSqlEditor: TFrmDWUpdSqlEditor
   OnCreate = FormCreate
   OnResize = FormResize
   Position = poScreenCenter
-  LCLVersion = '2.0.10.0'
+  LCLVersion = '2.2.4.0'
   object PnlSQL: TPanel
     Left = 5
     Height = 705
@@ -222,8 +222,8 @@ object FrmDWUpdSqlEditor: TFrmDWUpdSqlEditor
       object tsInsertSQL: TTabSheet
         BorderWidth = 5
         Caption = 'Insert'
-        ClientHeight = 679
-        ClientWidth = 852
+        ClientHeight = 0
+        ClientWidth = 0
         object mInsertSQL: TMemo
           Left = 0
           Height = 679

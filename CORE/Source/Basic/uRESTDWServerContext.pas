@@ -1,38 +1,29 @@
 unit uRESTDWServerContext;
 
+{$I ..\Includes\uRESTDW.inc}
+
 {
   REST Dataware .
-  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
- de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
   Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
- Membros do Grupo :
-
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
- Ivan Cesar                 - Admin - Administrador  do pacote.
- Joanan Mendonça Jr. (jlmj) - Admin - Administrador  do pacote.
- Giovani da Cruz            - Admin - Administrador  do pacote.
- Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Alexandre Souza            - Admin - Administrador do Grupo de Organização.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Mizael Rocha               - Member Tester and DEMO Developer.
- Flávio Motta               - Member Tester and DEMO Developer.
- Itamar Gaucho              - Member Tester and DEMO Developer.
- Ico Menezes                - Member Tester and DEMO Developer.
+ Maiores informações:
+ https://github.com/OpenSourceCommunityBrasil/REST-DataWare
 }
 
 
 interface
 
 Uses
-  {$IF Defined(HAS_FMX)}
+  {$IFDEF RESTDWFMX}
     System.JSON,
   {$ELSE}
     uRESTDWJSON,
-  {$IFEND}
+  {$ENDIF}
   SysUtils, Classes,
   uRESTDWJSONObject, uRESTDWConsts, uRESTDWParams, uRESTDWBasic,
   uRESTDWBasicTypes, uRESTDWTools, uRESTDWAbout;
@@ -489,7 +480,7 @@ begin
 end;
 }
 
-{$IFDEF Defined(HAS_FMX)}
+{$IFDEF RESTDWFMX}
 Procedure TRESTDWContextList.FromJSON(Value : String);
 Var
  bJsonOBJ,
@@ -554,15 +545,16 @@ Begin
  End;
 End;
 {$ELSE}
+
 Procedure TRESTDWContextList.FromJSON(Value : String);
 Var
  bJsonOBJ,
  bJsonOBJb,
- bJsonOBJc    : {$IFDEF Defined(HAS_FMX)}system.json.TJsonObject;
+ bJsonOBJc    : {$IFDEF RESTDWFMX}system.json.TJsonObject;
                 {$ELSE}       uRESTDWJSON.TJsonObject;{$ENDIF}
  bJsonArray,
  bJsonArrayB,
- bJsonArrayC  : {$IFDEF Defined(HAS_FMX)}system.json.TJsonArray;
+ bJsonArrayC  : {$IFDEF RESTDWFMX}system.json.TJsonArray;
                 {$ELSE}       uRESTDWJSON.TJsonArray;{$ENDIF}
  I, X, Y      : Integer;
  vDWEvent     : TRESTDWContext;
@@ -695,7 +687,7 @@ Begin
                            GetValueType(Items[I].vDWParams[A].ObjectValue),
                            Items[I].vDWParams[A].ParamName,
                            BooleanToString(Items[I].vDWParams[A].Encoded),
-                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF FPC}, csUndefined{$ENDIF})]);
+                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
      If vParamsLines = '' Then
       vParamsLines := vParamLine
      Else
@@ -708,15 +700,6 @@ Begin
   End;
  Result := Format('{"serverevents":[%s]}', [vEventsLines]);
 End;
-
-{
-Procedure TRESTDWServerContext.AfterConstruction;
-Begin
- Inherited;
- If Assigned(vOnCreate) Then
-  vOnCreate(Self);
-End;
-}
 
 Constructor TRESTDWServerContext.Create(AOwner : TComponent);
 Begin

@@ -1,6 +1,6 @@
 unit uRESTDWIdReg;
 
-{$I ..\..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -26,22 +26,18 @@ unit uRESTDWIdReg;
 interface
 
 uses
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
     LResources, LazFileUtils, FormEditingIntf, PropEdits, lazideintf,
     ProjectIntf, ComponentEditors, fpWeb,
   {$ELSE}
-    StrEdit, RTLConsts, Db, ColnEdit, DBReg, DesignIntf, DSDesign, ToolsApi,
-    DesignWindows, DesignEditors,
-    {$IFDEF COMPILER16_UP}UITypes,{$ENDIF}
-    {$IF CompilerVersion > 22}
-      ExptIntf,
-    {$ELSE}
-      Graphics, DbTables,
-    {$IFEND}
+    {$IFNDEF DELPHIXE2UP}
+      Graphics,
+      DbTables,
+    {$ENDIF}
+    DesignIntf, DesignEditors,
   {$ENDIF}
-  Classes, Variants, TypInfo, SysUtils,
-  uRESTDWIdBase;
+  Classes, uRESTDWIdBase;
 
 Type
   TPoolersList = Class(TStringProperty)
@@ -54,11 +50,6 @@ Type
 Procedure Register;
 
 Implementation
-
-{$IFDEF FPC}
-uses
-  utemplateproglaz;
-{$ENDIF}
 
 Function TPoolersList.GetAttributes: TPropertyAttributes;
 Begin
@@ -105,7 +96,7 @@ Begin
     TPoolersList);
 End;
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
 initialization
 {$I RESTDWIndySockets.lrs}
 {$ENDIF}

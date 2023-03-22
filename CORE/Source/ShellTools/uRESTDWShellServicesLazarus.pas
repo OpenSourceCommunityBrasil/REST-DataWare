@@ -27,9 +27,10 @@ unit uRESTDWShellServicesLazarus;
 interface
 
 Uses
-   SysUtils, Classes, Db, HTTPDefs, LConvEncoding, Variants, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWTools,
-   uRESTDWConsts;
+   SysUtils, Classes, Db, HTTPDefs, LConvEncoding, Variants,
+   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
+   uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass,
+   uRESTDWTools, uRESTDWConsts;
 
 Type
  TRESTDWShellService = Class(TRESTShellServicesBase)

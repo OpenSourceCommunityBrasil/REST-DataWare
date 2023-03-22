@@ -1,6 +1,6 @@
 unit uRESTDWDesignReg;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -26,26 +26,25 @@ unit uRESTDWDesignReg;
 interface
 
 uses
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
     LResources, LazFileUtils,  FormEditingIntf, PropEdits, lazideintf,
-    ProjectIntf, ComponentEditors, fpWeb,
+    ProjectIntf, ComponentEditors, fpWeb, TypInfo,
   {$ELSE}
-   Windows, StrEdit, RTLConsts, Db, DBReg, ToolsApi, DesignWindows,
-   DesignEditors, DSDesign, DesignIntf, ColnEdit,
-   {$IF CompilerVersion > 22}
-    vcl.Graphics,  ExptIntf,
+    Windows,
+   {$IFDEF DELPHIXE2UP}
+     vcl.Graphics,
    {$ELSE}
      Graphics, DbTables,
-   {$IFEND}
-   {$IFDEF COMPILER16_UP}UITypes,{$ENDIF}
+   {$ENDIF}
+  ToolsApi, DesignEditors, DSDesign, DesignIntf, ColnEdit,
   {$ENDIF}
-  Variants, TypInfo, SysUtils, Classes,
+  Db, SysUtils, Classes,
   uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWBasicDB,
   uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWMemoryDataset, uRESTDWBufferDb,
   uRESTDWAbout, uRESTDWDriverBase, uRESTDWAuthenticators;
 
-{$IFNDEF CLR}
+{$IFNDEF RESTDWDELPHINET}
 Const
  varUString  = Succ(Succ(varString)); { Variant type code }
 {$ENDIF}
@@ -53,14 +52,6 @@ Const
 Var
  EnabledAllTableDefs : Boolean = False;
  LoadAndStoreToForm  : Boolean = False;
-
-{$IFNDEF FPC} //TODO
-Type
- TDWDSDesigner = class(TDSDesigner)
-Public
- Function DoCreateField(const FieldName : {$IF CompilerVersion > 17}WideString{$ELSE}String{$IFEND}; Origin: String): TField; Override;
-End;
-{$ENDIF}
 
 Type
  TAddFields = Procedure (All: Boolean) of Object;
@@ -142,20 +133,18 @@ Type
   Procedure ExecuteVerb(Index : Integer); Override;
 End;
 
-{$IFNDEF FPC}
+{$IFNDEF RESTDWLAZARUS}
 Type
  TDSDesignerDW = Class(TDSDesigner)
  Private
  Public
-  {$if CompilerVersion > 17}
+  {$IFDEF DELPHI2006UP}
   Function  DoCreateField(const FieldName: WideString; Origin: string): TField; override;
   {$ELSE}
   Function  DoCreateField(const FieldName: String; Origin: string): TField; override;
-  {$IFEND}
-  {$IFNDEF FPC}
+  {$ENDIF}
   Function SupportsAggregates: Boolean; Override;
   Function SupportsInternalCalc: Boolean; Override;
-  {$ENDIF}
 End;
 
 Type
@@ -186,7 +175,7 @@ Public
 End;
 
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
 Type
  TRESTDWCGIApplicationDescriptor = Class(TProjectDescriptor)
  Public
@@ -224,7 +213,7 @@ Type
 
 Procedure Register;
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
 Resourcestring
   rsRESTDWCGIApplicati      = 'REST Dataware - CGI Application';
   rsRESTDWCGIApplicatiDesc  = 'REST Dataware - CGI Application%sA CGI (Common Gateway Interface) ' +
@@ -245,13 +234,12 @@ Var
 Implementation
 
 uses
-  {$IFDEF FPC} utemplateproglaz,{$ENDIF}
+  {$IFDEF RESTDWLAZARUS} utemplateproglaz,{$ENDIF}
    uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic, uRESTDWResponseTranslator,
    uRESTDWFieldSourceEditor, uRESTDWSqlEditor, uRESTDWUpdSqlEditor,
    uRESTDWJSONViewer;
 
-{$IFNDEF FPC}
-{$IFDEF  RTL240_UP}
+{$IFDEF DELPHIXE3UP}
 Var
  AboutBoxServices : IOTAAboutBoxServices = nil;
  AboutBoxIndex    : Integer = 0;
@@ -295,22 +283,14 @@ Begin
  End;
  bmp.Free;
 End;
-{$ENDIF}
 {$ELSE}
+
 Constructor TRESTDWCGIApplicationDescriptor.Create;
 Begin
  inherited Create;
  Flags := Flags - [pfMainUnitHasCreateFormStatements];
  Name  := 'REST Dataware - CGI Application';
 End;
-
-//Constructor TRESTDWCGIDatamodule.Create;
-//Begin
-// Inherited Create;
-// Name                    := 'RESTDWCGIWebModule';
-// ResourceClass           := Trestdwcgiwebmodule;
-// UseCreateFormStatements := True;
-//End;
 
 Constructor TRESTDWDatamodule.Create;
 Var
@@ -341,25 +321,12 @@ Begin
  Result := rsRESTDWDatamodule;
 End;
 
-//Function TRESTDWCGIDatamodule.GetLocalizedName : String;
-//Begin
-// Result := rsRESTDWCGIDatamodule;
-//End;
-
 Function TRESTDWDatamodule.GetInterfaceUsesSection : String;
 Begin
  Result  := Inherited GetInterfaceUsesSection;
  Result  := Result + ', SysTypes, uRESTDWBasicTypes, uRESTDWJSONObject,' + LineEnding;
  Result  := Result + '  uRESTDWParams, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWDatamodule';
 End;
-
-//Function TRESTDWCGIDatamodule.GetInterfaceUsesSection : String;
-//Begin
-// Result  := 'SysUtils, Classes';
-// If GetResourceType = rtLRS Then
-//  Result :=  Result+ ', LResources, ';
-// Result  := Result + ', uRESTDWBase, httpdefs, fpHTTP, fpWeb, dmdwcgiserver, unit2';
-//End;
 
 Function TRESTDWDatamodule.GetInterfaceSource(Const Filename, SourceName, ResourceName : String) : String;
 Const
@@ -378,23 +345,6 @@ Begin
                    + '  ' + ResourceName + ': T' + ResourceName + ';' + LE + LE;
 End;
 
-//Function TRESTDWCGIDatamodule.GetInterfaceSource(Const Filename, SourceName, ResourceName : String) : String;
-//Const
-// LE = LineEnding;
-//Begin
-// Result := 'Type'+ LE
-//         + '  T'+ResourceName+' = class(Trestdwcgiwebmodule)'+LE
-//         + '  Private'+LE
-//         + LE
-//         + '  Public'+LE
-//         + LE
-//         + ' End;'+LE
-//         + LE;
-// If DeclareClassVariable Then
-//  Result := Result + 'Var' + LE
-//                   + '  ' + ResourceName + ': T' + ResourceName + ';' + LE + LE;
-//End;
-
 Function TRESTDWCGIApplicationDescriptor.GetLocalizedDescription : String;
 Begin
  Result := Format(rsRESTDWCGIApplicatiDesc, [#13#13]);
@@ -404,11 +354,6 @@ Function TRESTDWDatamodule.GetLocalizedDescription : String;
 Begin
  Result := Format(rsRESTDWDatamoduleADa, [#13#13]);
 End;
-
-//Function TRESTDWCGIDatamodule.GetLocalizedDescription : String;
-//Begin
-// Result := Format(rsRESTDWCGIDatamoduleADa, [#13#13]);
-//End;
 
 Function TRESTDWCGIApplicationDescriptor.InitProject(AProject : TLazProject) : TModalResult;
 Var
@@ -440,22 +385,6 @@ Begin
  Result := Inherited GetImplementationSource(FileName, SourceName, ResourceName);
 End;
 
-//Function TRESTDWCGIDatamodule.GetImplementationSource(const Filename, SourceName, ResourceName : String) : String;
-//Var
-// ResourceFilename: String;
-//Begin
-// Case GetResourceType Of
-//  rtLRS :
-//   Begin
-//    ResourceFilename := TrimFilename(ExtractFilenameOnly(Filename) + DefaultResFileExt);
-//    Result           := 'Initialization' + LineEnding + '  {$I ' + ResourceFilename + '}' + LineEnding + LineEnding;
-//   End;
-//  rtRes : Result := '{$R *.lfm}' + LineEnding + LineEnding;
-//  Else    Result := '';
-// End;
-// Result := Result + 'Initialization' + LineEnding + ' RegisterHTTPModule('''', T' + ResourceName + ');' + LineEnding;
-//End;
-
 Function TRESTDWCGIApplicationDescriptor.CreateStartFiles(AProject : TLazProject): TModalResult;
 Begin
  //LazarusIDE.DoNewEditorFile(PDRESTDWCGIDatamodule, '', '',
@@ -466,40 +395,32 @@ Begin
 End;
 {$ENDIF}
 
-{$IFNDEF FPC}
+{$IFNDEF RESTDWLAZARUS}
 procedure TRESTDWClientSQLEditor.Edit;
 Begin
- {$IFNDEF FPC}
-  {$IF CompilerVersion > 21}
+  {$IFDEF DELPHIXEUP}
    TRESTDWClientSQL(Component).SetInDesignEvents(True);
-  {$IFEND}
- {$ENDIF}
+  {$ENDIF}
  Try
-  {$IFNDEF FPC}
-   {$IF CompilerVersion < 21}
+   {$IFNDEF DELPHIXEUP}
     TRESTDWClientSQL(Component).Close;
     TRESTDWClientSQL(Component).CreateDatasetFromList;
-   {$IFEND}
-  {$ENDIF}
+   {$ENDIF}
   ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
  Finally
-  {$IFNDEF FPC}
-   {$IF CompilerVersion > 21}
+   {$IFDEF DELPHIXEUP}
    TRESTDWClientSQL(Component).SetInDesignEvents(False);
-   {$IFEND}
-  {$ENDIF}
+   {$ENDIF}
  End;
 end;
 
 procedure TRESTDWClientSQLEditor.ExecuteVerb(Index: Integer);
  Procedure EditFields(DataSet: TDataSet);
  begin
-  {$IFNDEF FPC}
-   {$IF CompilerVersion < 21}
+   {$IFNDEF DELPHIXEUP}
     TRESTDWClientSQL(DataSet).Close;
     TRESTDWClientSQL(DataSet).CreateDatasetFromList;
-   {$IFEND}
-  {$ENDIF}
+   {$ENDIF}
   ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
  End;
 Begin
@@ -520,11 +441,11 @@ Begin
  Result := 1;
 End;
 
-{$if CompilerVersion > 17}
+{$IFDEF DELPHI2006UP}
 Function  TDSDesignerDW.DoCreateField(const FieldName: WideString; Origin: string): TField;
 {$ELSE}
 Function  TDSDesignerDW.DoCreateField(const FieldName: String; Origin: string): TField;
-{$IFEND}
+{$ENDIF}
 Var
   F: TField;
   I: Integer;
@@ -636,42 +557,8 @@ Begin
 end;
 
 Procedure TPoolersListCDF.GetValues(Proc : TGetStrProc);
-Var
- vLista : TStringList;
- I      : Integer;
 Begin
- //Provide a list of Poolers
- vLista := Nil;
-// If GetComponent(0) is TRESTDWConnectionServer Then
-//  Begin
-//   With GetComponent(0) as TRESTDWConnectionServer Do
-//    Begin
-//     vLista := TRESTDWConnectionServer(GetComponent(0)).PoolerList;
-//     Try
-//      If Assigned(vLista) Then
-//       For I := 0 To vLista.Count -1 Do
-//        Proc (vLista[I]);
-//     Finally
-//      If Assigned(vLista) Then
-//       FreeAndNil(vLista);
-//     End;
-//    End;
-//  End
-// Else If GetComponent(0) is TRESTDWConnectionParams Then
-//  Begin
-//   With GetComponent(0) as TRESTDWConnectionParams Do
-//    Begin
-//     vLista := TRESTDWConnectionParams(GetComponent(0)).PoolerList;
-//     Try
-//      If Assigned(vLista) Then
-//       For I := 0 To vLista.Count -1 Do
-//        Proc (vLista[I]);
-//     Finally
-//      If Assigned(vLista) Then
-//       FreeAndNil(vLista);
-//     End;
-//    End;
-//  End;
+
 End;
 
 Procedure TTableList.GetValues(Proc : TGetStrProc);
@@ -733,7 +620,7 @@ End;
 {Ico Testando }
 {Editor de Proriedades de Componente para mostrar o AboutDW}
 Type
- TDWAboutDialogProperty = class({$IFDEF FPC}TClassPropertyEditor{$ELSE}TPropertyEditor{$ENDIF})
+ TDWAboutDialogProperty = class({$IFDEF RESTDWLAZARUS}TClassPropertyEditor{$ELSE}TPropertyEditor{$ENDIF})
 Public
  Procedure Edit; override;
  Function  GetAttributes : TPropertyAttributes; Override;
@@ -758,7 +645,7 @@ End;
 procedure TRESTDWServerContextEditor.ExecuteVerb(Index: Integer);
 Begin
  Case Index of
-  0 : {$IFNDEF FPC}
+  0 : {$IFNDEF RESTDWLAZARUS}
        ShowCollectionEditor(Designer, Component, TRESTDWServerContext(Component).ContextList, 'ContextList');
       {$ELSE}
        TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWServerContext(Component).ContextList, Component, 'ContextList');
@@ -769,7 +656,7 @@ end;
 procedure TRESTDWContextRulesEditor.ExecuteVerb(Index: Integer);
 Begin
  Case Index of
-  0 : {$IFNDEF FPC}
+  0 : {$IFNDEF RESTDWLAZARUS}
        ShowCollectionEditor(Designer, Component, TRESTDWContextRules(Component).Items, 'Items');
       {$ELSE}
        TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWContextRules(Component).Items, Component, 'Items');
@@ -803,7 +690,7 @@ End;
 
 Procedure Register;
 Begin
- {$IFNDEF FPC}
+ {$IFNDEF RESTDWLAZARUS}
   RegisterNoIcon([TServerMethodDataModule]);
   RegisterCustomModule(TServerMethodDataModule, TCustomModule);
  {$ELSE}
@@ -824,7 +711,7 @@ Begin
                                                     TRESTDWStoredProcedure,    TRESTDWMassiveCache,  TRESTDWBatchMove]);
  RegisterComponents('REST Dataware - Authenticators', [TRESTDWAuthBasic,       TRESTDWAuthToken,     TRESTDWAuthOAuth]);
 // AddIDEMenu;//Menu do REST Debugger
- {$IFNDEF FPC}
+ {$IFNDEF RESTDWLAZARUS}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
 //  RegisterPackageWizard(TCustomMenuItemDW.Create);//Request Debbuger
  {$ELSE}
@@ -845,7 +732,7 @@ Begin
   RegisterPropertyEditor (TypeInfo(TRESTDWComponent), TRESTDWResponseTranslator, 'ClientREST', TRESTDWClientRESTList);
   RegisterComponentEditor(TRESTDWServerContext,       TComponentEditorClass(TRESTDWServerContextEditor));
   RegisterComponentEditor(TRESTDWContextRules,        TComponentEditorClass(TRESTDWContextRulesEditor));
- {$IFNDEF FPC}
+ {$IFNDEF RESTDWLAZARUS}
   RegisterComponentEditor(TRESTDWClientSQL,         TRESTDWClientSQLEditor);
   RegisterComponentEditor(TRESTDWServerContext,     TRESTDWServerContextEditor);
   RegisterComponentEditor(TRESTDWContextRules,      TRESTDWContextRulesEditor);
@@ -859,7 +746,7 @@ begin
  Inherited;
  Case Index of
   0 : Begin
-       {$IFNDEF FPC}
+       {$IFNDEF RESTDWLAZARUS}
         ShowCollectionEditor(Designer, Component, (Component as TRESTDWServerEvents).Events, 'Events');
        {$ELSE}
         TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWServerEvents(Component).Events, Component, 'Events');
@@ -885,7 +772,7 @@ Begin
  Inherited;
  Case Index of
    0 : Begin
-        {$IFNDEF FPC}
+        {$IFNDEF RESTDWLAZARUS}
          ShowCollectionEditor(Designer, Component, TRESTDWClientEvents(Component).Events, 'Events');
         {$ELSE}
          TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWClientEvents(Component).Events,Component, 'Events');
@@ -909,15 +796,6 @@ Function TRESTDWClientEventsEditor.GetVerbCount: Integer;
 Begin
  Result := 3;
 End;
-
-{$IFNDEF FPC}
-Function TDWDSDesigner.DoCreateField(Const FieldName : {$IF CompilerVersion > 17}WideString{$ELSE}String{$IFEND}; Origin: string): TField;
-Begin
-// TRESTDWMemtable(DataSet).DesignNotify(FieldName, 0);
- Result  := Inherited DoCreateField(FieldName, Origin);
-// TRESTDWMemtable(DataSet).DesignNotify(FieldName, 104);
-End;
-{$ENDIF}
 
 { TServerEventsList }
 
@@ -959,22 +837,8 @@ begin
 end;
 
 procedure TServerEventsListCV.GetValues(Proc: TGetStrProc);
-Var
- vLista : TStringList;
- I      : Integer;
 Begin
- //Provide a list of Poolers
- vLista := Nil;
-// With GetComponent(0) as TRESTDWConnectionServerCP Do
-//  Begin
-//   vLista := TRESTDWConnectionServerCP(GetComponent(0)).GetPoolerList;
-//   Try
-//    For I := 0 To vLista.Count -1 Do
-//     Proc (vLista[I]);
-//   Except
-//   End;
-//   FreeAndNil(vLista);
-//  End;
+
 End;
 
 procedure TServerEventsList.GetValues(Proc: TGetStrProc);
@@ -1083,10 +947,10 @@ Begin
   End;
 End;
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
  Procedure UnlistPublishedProperty (ComponentClass:TPersistentClass; const PropertyName:String);
  var
-   pi :PPropInfo;
+   pi : PPropInfo;
  begin
    pi := TypInfo.GetPropInfo (ComponentClass, PropertyName);
    if (pi <> nil) then
@@ -1105,7 +969,7 @@ Var
  Finded    : Boolean;
 Begin
 // COwner := FormEditor.FormDesigner.GetRoot;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  COwner := TComponent(GetComponent(0)).GetParentComponent;
  {$ELSE}
  COwner := Designer.GetRoot;
@@ -1165,14 +1029,12 @@ begin
 end;
 
 initialization
- {$IFNDEF FPC}
-  {$IFDEF  RTL240_UP}
+  {$IFDEF DELPHIXE3UP}
  	RegisterAboutBox;
-   AddSplash;
-  {$ENDIF}
+  AddSplash;
  {$ENDIF}
- {$IFDEF FPC}
-  {$I restdatawarecomponents.lrs}
+ {$IFDEF RESTDWLAZARUS}
+   {$I restdatawarecomponents.lrs}
  {$ENDIF}
  UnlistPublishedProperty(TRESTDWClientSQL,  'FieldDefs');
  UnlistPublishedProperty(TRESTDWClientSQL,  'Options');
@@ -1215,10 +1077,6 @@ initialization
  UnlistPublishedProperty(TRESTDWStoredProcedure, 'Adapter');
 
 Finalization
- {$IFNDEF FPC}
- {$IFDEF  RTL240_UP}
-	UnregisterAboutBox;
- {$ENDIF}
- {$ENDIF}
+ {$IFDEF DELPHIXE3UP}UnregisterAboutBox; {$ENDIF}
 
 end.
