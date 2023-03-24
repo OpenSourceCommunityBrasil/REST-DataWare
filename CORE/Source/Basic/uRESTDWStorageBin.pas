@@ -14,6 +14,7 @@
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+ Alberto Brito              - Admin - Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
@@ -38,7 +39,7 @@ type
   public
     procedure SaveRecordToStream(ADataset : TDataset; var AStream : TStream);
     procedure LoadRecordFromStream(ADataset : TDataset; AStream : TStream);
-    function  SaveRecordDWMemToStream(IDataset : IRESTDWMemTable; var AStream : TStream) : Longint;
+    function  SaveRecordDWMemToStream(IDataset : IRESTDWMemTable; var AStream : TStream) : integer;
     procedure LoadRecordDWMemFromStream(IDataset : IRESTDWMemTable; AStream : TStream);
   public
     procedure SaveDWMemToStream(IDataset : IRESTDWMemTable; var AStream : TStream); override;
@@ -58,10 +59,10 @@ procedure TRESTDWStorageBin.LoadDatasetFromStream(ADataset: TDataset; AStream: T
 var
   vFieldCount : integer;
   vFieldKind : TFieldKind;
-  vRecordCount : LongInt;
-  i : LongInt;
+  vRecordCount : Int64;
+  i : Int64;
   vInt : integer;
-  vString : ansistring;
+  vString : utf8string;
   vFieldType : Byte;
   vBoolean : boolean;
   vByte : byte;
@@ -127,7 +128,7 @@ begin
     end;
   end;
 
-  AStream.Read(vRecordCount,SizeOf(LongInt));
+  AStream.Read(vRecordCount,SizeOf(Int64));
   ADataset.Open;
 
   ADataset.DisableControls;
@@ -143,7 +144,7 @@ procedure TRESTDWStorageBin.LoadDWMemFromStream(IDataset: IRESTDWMemTable; AStre
 var
   ADataSet : TRESTDWMemTable;
   vFieldsCount : integer;
-  vRecordCount : LongInt;
+  vRecordCount : int64;
   i : LongInt;
   vInt : integer;
   vFieldKind : TFieldKind;
@@ -512,7 +513,7 @@ procedure TRESTDWStorageBin.LoadRecordFromStream(ADataset: TDataset; AStream: TS
 var
   vField        : TField;
   i : integer;
-  vString       : DWString;
+  vString       : RawByteString;
   vInt64        : Int64;
   vInt          : Integer;
   vDouble       : Double;
@@ -684,8 +685,8 @@ end;
 procedure TRESTDWStorageBin.SaveDatasetToStream(ADataset: TDataset; var AStream: TStream);
 var
   i : integer;
-  vRecordCount : Longint;
-  vString : ansistring;
+  vRecordCount : int64;
+  vString : utf8string;
   vInt : integer;
   vBoolean : boolean;
   vByte : byte;
@@ -740,7 +741,7 @@ begin
   end;
   i := AStream.Position;
   vRecordCount := 0;
-  AStream.WriteBuffer(vRecordCount,SizeOf(Longint));
+  AStream.WriteBuffer(vRecordCount,SizeOf(int64));
 
   if not ADataset.IsUniDirectional then
     vBookMark := ADataset.GetBookmark;
@@ -764,7 +765,7 @@ begin
   ADataset.FreeBookmark(vBookMark);
   ADataset.EnableControls;
   AStream.Position := i;
-  AStream.WriteBuffer(vRecordCount,SizeOf(Longint));
+  AStream.WriteBuffer(vRecordCount,SizeOf(int64));
   AStream.Position := 0;
 end;
 
@@ -772,7 +773,7 @@ procedure TRESTDWStorageBin.SaveDWMemToStream(IDataset: IRESTDWMemTable; var ASt
 var
   i : integer;
   ADataset : TRESTDWMemTable;
-  vRecordCount : Longint;
+  vRecordCount : int64;
   vString : ansistring;
   vInt : integer;
   vBoolean : boolean;
@@ -828,14 +829,14 @@ begin
   end;
   i := AStream.Position;
   vRecordCount := 0;
-  AStream.WriteBuffer(vRecordCount,SizeOf(Longint));
+  AStream.WriteBuffer(vRecordCount,SizeOf(int64));
   vRecordCount := SaveRecordDWMemToStream(IDataSet,AStream);
   AStream.Position := i;
-  AStream.WriteBuffer(vRecordCount,SizeOf(Longint));
+  AStream.WriteBuffer(vRecordCount,SizeOf(int64));
   AStream.Position := 0;
 end;
 
-function TRESTDWStorageBin.SaveRecordDWMemToStream(IDataset: IRESTDWMemTable; var AStream: TStream) : Longint;
+function TRESTDWStorageBin.SaveRecordDWMemToStream(IDataset: IRESTDWMemTable; var AStream: TStream) : Integer;
 var
   ADataSet : TRESTDWMemTable;
   i : Longint;
@@ -994,7 +995,7 @@ var
   i: integer;
   vDWFieldType : Byte;
   vBytes: TRESTDWBytes;
-  vString       : DWString;
+  vString       : Rawbytestring;
   vInt64        : Int64;
   vInt          : Integer;
   vDouble       : Double;

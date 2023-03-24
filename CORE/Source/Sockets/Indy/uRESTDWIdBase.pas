@@ -3447,7 +3447,7 @@ Var
     If (Encoding = esUtf8) Then //NativeResult Correções aqui
      Begin
       {$IF Defined(DELPHIXEUP)}
-      ResultJSON := PWidechar(InputValue);
+      ResultJSON := PWidechar(UTF8Decode(InputValue));
       {$ELSEIF Defined(RESTDWLAZARUS)}
       ResultJSON := GetStringDecode(InputValue, DatabaseCharSet);
       {$ELSE} // delphi velho

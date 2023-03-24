@@ -142,13 +142,13 @@ Function ZCompressStreamNew(Const S: String): TStream;
 Var
   Utf8Stream: TStream;
 Begin
-  Utf8Stream := TMemoryStream.Create;
+
   {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP) OR Defined(RESTDWWINDOWS)}
+  Utf8Stream := TMemoryStream.Create;
   Utf8Stream.Write(AnsiString(S)[1], Length(AnsiString(S)));
   {$ELSE}
    {$IF Defined(RESTDWLINUX)}
-   utf8stream.Seek(0, soFromBeginning);
-    utf8stream.Write(S[1], ByteLength(S));
+   Utf8Stream:= Tstringstream.Create(S, TEncoding.UTF8);
    {$ELSE}
   Utf8Stream.Write(S[1], Length(S));
   {$IFEND}

@@ -2131,9 +2131,10 @@ Begin
         If (ContentStringStream.Size > 0) And (boundary <> '') Then
          Begin
           Try
+           If Assigned(decoder) then
+            FreeAndNil(decoder);
            msgEnd           := False;
            Repeat
-//            If Not Assigned(decoder) Then
             decoder := TRESTDWMessageDecoderMIME.Create(nil);
             TRESTDWMessageDecoderMIME(decoder).MIMEBoundary := boundary;
             decoder.SourceStream := ContentStringStream;
@@ -2358,9 +2359,8 @@ Begin
                FreeAndNil(decoder);
                msgEnd := True
               End;
-
             End;
-           Until (Decoder = Nil) Or (msgEnd);
+           Until (decoder = Nil) Or (msgEnd);
           Finally
            If Assigned(decoder) then
             FreeAndNil(decoder);
@@ -3295,7 +3295,7 @@ Begin
                    End
                   Else
                    DWParams.ItemsString['MessageError'].AsString := '';
-                  DWParams.SaveToStream(ms, tdwpxt_OUT);
+                   DWParams.SaveToStream(ms, tdwpxt_OUT);
                   ZCompressStreamD(ms, ResultStream);
                  Finally
                   FreeAndNil(ms);
