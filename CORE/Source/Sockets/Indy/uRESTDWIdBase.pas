@@ -28,11 +28,8 @@ interface
 
 Uses
   {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
-  {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)}
-      SyncObjs, uRESTDWMassiveBuffer,
-  {$ELSEIF Defined(DELPHIXEUP)}
-      SyncObjs,
-  {$IFEND}
+  {$IFNDEF RESTDWLAZARUS}SyncObjs,{$ENDIF}
+  {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)}uRESTDWMassiveBuffer,{$IFEND}
   SysUtils, Classes, Db, Variants,
   uRESTDWBasic, uRESTDWBasicDB, uRESTDWComponentEvents, uRESTDWBasicTypes,
   uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
@@ -3198,7 +3195,7 @@ Begin
    If (Authenticator is TRESTDWAuthToken)  And
       (Pos('basic', Lowercase(vValueAuth)) = 0) Then
     Begin
-     vAuthValue       := TRESTDWAuthToken.Create;
+     vAuthValue       := TRESTDWAuthToken.Create(Self);
      vAuthValue.Token := vValueAuth;
      {$IF Defined(RESTDWFMX) AND not Defined(DELPHI10_4UP)}
      AContext.DataObject := vAuthValue;
@@ -3221,7 +3218,7 @@ Begin
      (Lowercase(AAuthType) = Lowercase('token'))  And
      (AContext.DataObject  = Nil) Then
   Begin
-    vAuthValue          := TRESTDWAuthToken.Create;
+    vAuthValue          := TRESTDWAuthToken.Create(Self);
     vAuthValue.Token    := AAuthType + ' ' + AAuthData;
     AContext.DataObject := vAuthValue;
     VHandled            := Authenticator is TRESTDWAuthToken;
@@ -3231,7 +3228,7 @@ Begin
      (Lowercase(AAuthType) = Lowercase('token'))  And
      (AContext.Data        = Nil) Then
    Begin
-    vAuthValue       := TRESTDWAuthToken.Create;
+    vAuthValue       := TRESTDWAuthToken.Create(Self);
     vAuthValue.Token := AAuthType + ' ' + AAuthData;
     AContext.Data    := vAuthValue;
     VHandled         := Authenticator is TRESTDWAuthToken;
