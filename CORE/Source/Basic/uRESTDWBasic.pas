@@ -33,31 +33,25 @@ Uses
  uRESTDWTools, uRESTDWConsts, uRESTDWMessageCoderMIME,
  uRESTDWZLib, uRESTDWMimeTypes, uRESTDWAbout, uRESTDWAuthenticators;
 
- type
+type
   TRedirect = Procedure(Url : String;
                      AResponse   : TObject) {$IFNDEF RESTDWLAZARUS}Of Object{$ENDIF};
 
-type
   TJvComponent = class(TRESTDWComponent)
   private
   published
   end;
 
- Type
   TServerMethodClass = Class(TComponent)
  End;
 
- Type
   TClassNull= Class(TComponent)
  End;
 
-Type
  TRESTDWClientIpVersions = (civIPv4, civIPv6);
 
-Type
  TRESTDWServerIpVersions = (sivIPv4, sivIPv6, sivBoth);
 
-Type
  TRESTDWServerIpVersionConfig = class(TPersistent)
  Private
   //IP version select
@@ -75,7 +69,6 @@ Type
   Property IPv6Address     : String                    Read vIPv6Address      Write vIPv6Address;
 end;
 
-Type
  TRESTDWConnectionServerCP = Class(TCollectionItem)
  Private
   vTransparentProxy     : TProxyConnectionInfo;
@@ -130,12 +123,10 @@ Type
   Property DataRoute             : String                        Read vDataRoute            Write vDataRoute;
 End;
 
-Type
  TOnFailOverExecute       = Procedure (ConnectionServer   : TRESTDWConnectionServerCP) Of Object;
  TOnFailOverError         = Procedure (ConnectionServer   : TRESTDWConnectionServerCP;
                                        MessageError       : String)                  Of Object;
 
-Type
  TFailOverConnections = Class(TRESTDWOwnedCollection)
  Private
   Function    GetOwner: TPersistent; override;
@@ -159,7 +150,6 @@ Type
   Property    ItemsByName[Index       : String ] : TRESTDWConnectionServerCP Read GetRecName Write PutRecName;
 End;
 
-Type
  TRESTClientPoolerBase = Class(TRESTDWComponent) //Novo Componente de Acesso a Requisições REST para o RESTDataware
  Protected
   //Variáveis, Procedures e  Funções Protegidas
@@ -296,8 +286,7 @@ Type
   Property ClientIpVersion         : TRESTDWClientIpVersions       Read vClientIpVersion         Write SetIpVersion default civIPv4;
  End;
 
- Type
-  TRESTDWServiceNotificationBase = Class(TRESTDWComponent)
+ TRESTDWServiceNotificationBase = Class(TRESTDWComponent)
   Private
    vLoginMessage                  : String;
    vMultiCORE,
@@ -377,14 +366,12 @@ Type
    Property OnConnectionRename    : TConnectionRename          Read vOnConnectionRename    Write vOnConnectionRename;
  End;
 
-Type
  TRESTDWSelfSignedBase = Class(TRESTDWComponent)
  Protected
  Private
  Public
 End;
 
-Type
  TRESTServiceBase = Class(TRESTDWComponent)
  Protected
  Private
@@ -651,11 +638,9 @@ Type
 End;
 
 //Heranças para Servidores Standalone
-Type
  TRESTServicePoolerBase   = Class(TRESTServiceBase)
 End;
 
-Type
  TRESTShellServicesBase   = Class(TRESTServiceBase)
  Private
   Procedure Loaded; Override;
@@ -673,7 +658,6 @@ Type
 End;
 
 //Heranças para Servidores CGI/Isapi
-Type
  TRESTServiceShareBase    = Class(TRESTServiceBase)
  Protected
   Property ServicePort;
@@ -2147,9 +2131,10 @@ Begin
         If (ContentStringStream.Size > 0) And (boundary <> '') Then
          Begin
           Try
+           If Assigned(decoder) then
+            FreeAndNil(decoder);
            msgEnd           := False;
            Repeat
-//            If Not Assigned(decoder) Then
             decoder := TRESTDWMessageDecoderMIME.Create(nil);
             TRESTDWMessageDecoderMIME(decoder).MIMEBoundary := boundary;
             decoder.SourceStream := ContentStringStream;
@@ -2374,9 +2359,8 @@ Begin
                FreeAndNil(decoder);
                msgEnd := True
               End;
-
             End;
-           Until (Decoder = Nil) Or (msgEnd);
+           Until (decoder = Nil) Or (msgEnd);
           Finally
            If Assigned(decoder) then
             FreeAndNil(decoder);
@@ -5839,6 +5823,8 @@ End;
 
 Destructor TRESTServiceBase.Destroy;
 Begin
+ if Assigned(vAuthenticator)         then
+   FreeAndNil(vAuthenticator);
  If Assigned(vAuthMessages)          Then
   FreeAndNil(vAuthMessages);
  If Assigned(vProxyOptions)          Then
