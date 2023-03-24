@@ -104,7 +104,7 @@ type
     FColumnIndex: integer;
     FEncodeStrs: Boolean;
     FFieldCount: integer;
-    FRecordCount: Longint;
+    FRecordCount: int64;
     FFieldTypes: array of integer;
     FInfoMetada: TStringList;
     procedure FetchRow(ATable: TFDDatSTable; AParentRow: TFDDatSRow);
@@ -519,7 +519,7 @@ begin
     begin
       if FStream.Position = 0 then
         readStreamFields;
-      FStream.Read(FRecordCount, SizeOf(Longint));
+      FStream.Read(FRecordCount, SizeOf(int64));
     end;
     for i := 1 to ARowsetSize do
     begin
@@ -742,7 +742,7 @@ end;
 
 function TFDPhysRDWCommand.readDataStream(col: integer): Variant;
 var
-  vString: DWString;
+  vString: utf8string;
   vInt64: Int64;
   vInt: integer;
   vByte: Byte;
@@ -757,6 +757,7 @@ var
   vTimeStampOffset: TSQLTimeStampOffset;
   {$ENDIF}
 begin
+
   Result := null;
   if col >= FFieldCount then
     Exit;
@@ -933,7 +934,7 @@ function TFDPhysRDWCommand.readFieldStream: TFDPhysDataColumnInfo;
 var
   fk: TFieldKind;
   j: integer;
-  s: ansistring;
+  s: utf8string;
   y: Byte;
   rft: Byte;
   ft: TFieldType;
