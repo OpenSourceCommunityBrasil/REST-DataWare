@@ -5970,7 +5970,7 @@ Var
  Var
   vNull, I : Integer;
   J, L     : DWInt64;
-  {$IFDEF DELPHI2009UP}
+  {$IFDEF DELPHIXEUP}
   S, W     : RawByteString;
   {$ELSE} // lazarus e delphi mofado
   S, W     : AnsiString;
@@ -6051,7 +6051,8 @@ Var
        ovAutoInc,
        ovSmallint,
        ovLongWord,
-       ovShortint : Begin
+       ovShortint,
+       ovLargeint : Begin
                      S := 'N';
                      If (aParam.IsEmpty Or aParam.IsNull) Then
                       S := TNullString;
@@ -6263,7 +6264,7 @@ Var
   For I := 0 To ParamsCount -1 Do
    Begin
     S := '';
-    Stream.Read(L, 8);
+    Stream.Read(L, sizeof(Dwint64));
     SetLength(S, L);
     Try
      If L <> 0 Then

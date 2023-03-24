@@ -3311,7 +3311,7 @@ Begin
                    End
                   Else
                    DWParams.ItemsString['MessageError'].AsString := '';
-                  DWParams.SaveToStream(ms, tdwpxt_OUT);
+                   DWParams.SaveToStream(ms, tdwpxt_OUT);
                   ZCompressStreamD(ms, ResultStream);
                  Finally
                   FreeAndNil(ms);

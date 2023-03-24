@@ -752,7 +752,7 @@ Begin
    {$IF CompilerVersion < 21}
     atempResponse := TStringStream.Create('');
    {$ELSE}
-    atempResponse := TStringStream.Create;
+    atempResponse := TStringStream.Create(''{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
    {$IFEND}
   {$ENDIF}
   If Not Assigned(AResponse) Then
@@ -763,7 +763,7 @@ Begin
      {$IF CompilerVersion < 21}
       tempResponse := TStringStream.Create('');
      {$ELSE}
-      tempResponse := TStringStream.Create;
+      tempResponse := TStringStream.Create(''{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
      {$IFEND}
     {$ENDIF}
    End;
@@ -3505,7 +3505,7 @@ Begin
        (Lowercase(AAuthType) = Lowercase('token'))  And
        ({$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}  = Nil) Then
      Begin
-      vAuthValue          := TRESTDWAuthToken.Create;
+      vAuthValue          := TRESTDWAuthToken.Create(Self);
       vAuthValue.Token    := AAuthType + ' ' + AAuthData;
       {$IF CompilerVersion > 33}AContext.Data{$ELSE}AContext.DataObject{$IFEND}       := vAuthValue;
       VHandled            := Authenticator is TRESTDWAuthToken;
@@ -3748,7 +3748,7 @@ Var
        ResultJSON := GetStringDecode(InputValue, DatabaseCharSet);
       {$ELSE}
        {$IF (CompilerVersion > 22)}
-        ResultJSON := PWidechar(InputValue); //PWidechar(UTF8Decode(InputValue));
+        ResultJSON := PWidechar(UTF8Decode(InputValue)); //PWidechar(InputValue);
        {$ELSE}
         ResultJSON := UTF8Decode(ResultJSON); //Correção para Delphi's Antigos de Charset.
        {$IFEND}
