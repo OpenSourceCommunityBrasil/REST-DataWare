@@ -87,7 +87,7 @@ Var
 Begin
   Result := False;
   Try
-    Utf8Stream :=TMemoryStream.Create;
+    Utf8Stream := TMemoryStream.Create;
     {$IF Defined(RESTDWLAZARUS) OR Defined(DELPHIXE4UP)}
     Utf8Stream.CopyFrom(S, S.Size);
     {$ELSE}
