@@ -145,7 +145,7 @@ var
   ADataSet : TRESTDWMemTable;
   vFieldsCount : integer;
   vRecordCount : int64;
-  i : LongInt;
+  i : int64;
   vInt : integer;
   vFieldKind : TFieldKind;
   vString : ansistring;
@@ -226,9 +226,9 @@ end;
 procedure TRESTDWStorageBin.LoadRecordDWMemFromStream(IDataset: IRESTDWMemTable; AStream: TStream);
 var
   ADataset  : TRESTDWMemTable;
-  i : Longint;
+  i : int64;
   j : integer;
-  vRecCount : Longint;
+  vRecCount : int64;
   vFieldCount : integer;
   vFieldSize : integer;
   vRec : TRESTDWRecord;
