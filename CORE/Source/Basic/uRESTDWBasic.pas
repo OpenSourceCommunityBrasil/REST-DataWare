@@ -373,7 +373,6 @@ End;
 End;
 
  TRESTServiceBase = Class(TRESTDWComponent)
- Protected
  Private
   {$IFDEF RESTDWLAZARUS}
    vCriticalSection    : TRTLCriticalSection;
@@ -414,9 +413,8 @@ End;
   vSSLVersions           : TRESTDWSSLVersions;
   vServerIpVersionConfig : TRESTDWServerIpVersionConfig;
   Procedure SetCORSCustomHeader (Value : TStringList);
-  Procedure SetDefaultPage  (Value     : TStringList);
-  Procedure SetServerMethod (Value     : TComponentClass);
-  Procedure SetAuthenticator(Value     : TRESTDWAuthenticatorBase);
+  Procedure SetDefaultPage (Value : TStringList);
+  Procedure SetServerMethod(Value                     : TComponentClass);
 //  Procedure Loaded; Override;
   Procedure GetTableNames            (ServerMethodsClass      : TComponent;
                                       Var Pooler              : String;
@@ -573,6 +571,9 @@ End;
                                       mark                    : String;
                                       RequestHeader           : TStringList;
                                       Var ErrorCode           : Integer) : Boolean;
+ Protected
+  procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+  procedure SetAuthenticator(const Value: TRESTDWAuthenticatorBase);
  Public
   Procedure EchoPooler               (ServerMethodsClass      : TComponent;
                                       AContext                : TComponent;
@@ -3457,13 +3458,14 @@ Begin
  vActive := Value;
 End;
 
-Procedure TRESTServiceBase.SetAuthenticator(Value: TRESTDWAuthenticatorBase);
-Begin
- If Value is TRESTDWAuthenticatorBase Then
-  vAuthenticator := Value
- Else
-  vAuthenticator := Nil;
-End;
+procedure TRESTServiceBase.SetAuthenticator(
+  const Value: TRESTDWAuthenticatorBase);
+begin
+  if Value <> vAuthenticator then
+    vAuthenticator := Value;
+  if vAuthenticator <> nil then
+    vAuthenticator.FreeNotification(Self);
+end;
 
 Procedure TRESTServiceBase.SetCORSCustomHeader (Value : TStringList);
 Var
@@ -4763,6 +4765,15 @@ Begin
   End;
 End;
 
+procedure TRESTServiceBase.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+ If (Operation  = opRemove)    And
+    (AComponent = vAuthenticator) Then
+  vAuthenticator := Nil;
+  inherited;
+end;
+
 Procedure TRESTServiceBase.ApplyUpdatesJSON(ServerMethodsClass : TComponent;
                                               Var Pooler         : String;
                                               Var DWParams       : TRESTDWParams;
@@ -5803,7 +5814,6 @@ End;
 Constructor TRESTServiceBase.Create(AOwner: TComponent);
 Begin
  Inherited;
- vAuthenticator                         := Nil;
  vAuthMessages                          := TRESTDWAuthMessages.Create;
  vProxyOptions                          := TProxyConnectionInfo.Create;
  vDefaultPage                           := TStringList.Create;
@@ -5827,6 +5837,7 @@ Begin
  FRootPath                              := '/';
  aDefaultUrl                            := '';
  vServiceTimeout                        := -1;
+ vAuthenticator := nil;
 
  vServerIpVersionConfig := TRESTDWServerIpVersionConfig.Create;
 End;
