@@ -440,7 +440,7 @@ end;
 function TFDPhysRDWCommand.InternalColInfoGet(var AColInfo
   : TFDPhysDataColumnInfo): Boolean;
 var
-  b: Boolean;
+  vBoolean : Boolean;
 begin
   if GetMetaInfoKind <> mkNone then
   begin
@@ -457,8 +457,8 @@ begin
     FStream.Position := 0;
     FStream.Read(FFieldCount, SizeOf(integer));
     SetLength(FFieldTypes, FFieldCount);
-    FStream.Read(b, SizeOf(Byte));
-    FEncodeStrs := b;
+    FStream.Read(vBoolean, SizeOf(vBoolean));
+    FEncodeStrs := vBoolean;
   end;
   if FColumnIndex >= FFieldCount then
   begin
@@ -667,6 +667,7 @@ begin
         vRESTDataBase.ExecuteCommand(vPoolermethod, vSQL, vParams, vError,
           vMessageError, vDataSetList, vRowsAffected, exec, (not exec),
           (not exec), False, vRESTDataBase.RESTClientPooler);
+
         FStream.Size := 0;
         if (vDataSetList <> nil) and (not vDataSetList.IsNull) then
           vDataSetList.SaveToStream(FStream);
@@ -757,14 +758,16 @@ var
   vTimeStampOffset: TSQLTimeStampOffset;
   {$ENDIF}
 begin
-
   Result := null;
   if col >= FFieldCount then
     Exit;
-  FStream.Read(vBoolean, SizeOf(Byte));
+
+  FStream.Read(vBoolean, SizeOf(vBoolean));
+
   // is null
   if vBoolean then
     Exit;
+
   // N - Bytes
   if (FFieldTypes[col] in [dwftFixedChar, dwftString]) then
   begin
@@ -932,14 +935,14 @@ end;
 
 function TFDPhysRDWCommand.readFieldStream: TFDPhysDataColumnInfo;
 var
-  fk: TFieldKind;
-  j: integer;
-  s: utf8string;
-  y: Byte;
-  rft: Byte;
-  ft: TFieldType;
-  fs: integer;
-  fp: integer;
+  vFieldKind : TFieldKind;
+  vInt : integer;
+  vString : utf8string;
+  vFieldType : TFieldType;
+  vFielSize: integer;
+  vFieldPrecision: integer;
+  vByte : Byte;
+
   datType: TFDDataType;
   datSize: LongWord;
   datPrec: integer;
@@ -949,41 +952,58 @@ var
 begin
   if FStream.Size = 0 then
     Exit;
+
   oFmtOpts := FOptions.FormatOptions;
-  FStream.Read(j, SizeOf(integer));
-  fk := TFieldKind(j);
-  FStream.Read(j, SizeOf(integer));
-  SetLength(s, j);
-  FStream.Read(s[InitStrPos], j);
-  Result.FSourceName := s;
-  Result.FOriginColName := s;
-  FStream.Read(rft, SizeOf(Byte));
-  ft := DWFieldTypeToFieldType(rft);
-  FFieldTypes[FColumnIndex] := rft;
-  FStream.Read(fs, SizeOf(integer));
-  FStream.Read(fp, SizeOf(integer));
-  FStream.Read(y, SizeOf(Byte));
-  oFmtOpts.FieldDef2ColumnDef(ft, fs, fp, 0, datType, datSize, datPrec,
-    datScale, datAttrs);
+
+  // field kind
+  FStream.Read(vByte, SizeOf(vByte));
+  vFieldKind := TFieldKind(vByte);
+
+  // field name
+  FStream.Read(vByte, SizeOf(vByte));
+  SetLength(vString, vByte);
+  FStream.Read(vString[InitStrPos], vByte);
+
+  Result.FSourceName := vString;
+  Result.FOriginColName := vString;
+
+  // field type
+  FStream.Read(vByte, SizeOf(vByte));
+  vFieldType := DWFieldTypeToFieldType(vByte);
+
+  FFieldTypes[FColumnIndex] := vByte;
+
+  // field size
+  FStream.Read(vFielSize, SizeOf(integer));
+
+  // field precision
+  FStream.Read(vFieldPrecision, SizeOf(integer));
+
+  oFmtOpts.FieldDef2ColumnDef(vFieldType, vFielSize, vFieldPrecision, 0,
+                              datType, datSize, datPrec,datScale, datAttrs);
   Result.FSourceID := FColumnIndex;
   Result.FSourceType := datType;
+
   if GetMetaInfoKind = mkNone then
   begin
     oFmtOpts.ResolveDataType(Result.FSourceName, Result.FSourceName, datType,
       datSize, datPrec, datScale, datType, datSize, True);
   end;
 
-  if y and 1 = 0 then
+  // required + provider flags
+  FStream.Read(vByte, SizeOf(Byte));
+
+  if vByte and 1 = 0 then
     datAttrs := datAttrs + [caAllowNull];
 
-  if (ft in [ftBlob, ftMemo, ftGraphic, ftWideMemo, ftOraBlob, ftOraClob]) then
+  if (vFieldType in [ftBlob, ftMemo, ftGraphic, ftWideMemo, ftOraBlob, ftOraClob]) then
     datAttrs := datAttrs + [caBlobData]
   else
     datAttrs := datAttrs + [caSearchable];
 
   datAttrs := datAttrs + [caBase];
 
-  if ft in [ftFixedChar, ftFixedWideChar] then
+  if vFieldType in [ftFixedChar, ftFixedWideChar] then
     datAttrs := datAttrs + [caFixedLen];
 
   Result.FType := datType;
@@ -991,18 +1011,18 @@ begin
   Result.FAttrs := datAttrs;
 
   Result.FLen := datSize;
-  if y and 2 > 0 then
+  if vByte and 2 > 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coInUpdate];
-  if y and 4 > 0 then
+  if vByte and 4 > 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coInWhere];
-  if y and 8 > 0 then
+  if vByte and 8 > 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coInKey];
-  if y and 32 > 0 then
+  if vByte and 32 > 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coAfterInsChanged];
-  if y and 64 > 0 then
+  if vByte and 64 > 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coAfterUpdChanged];
 
-  if y and 1 = 0 then
+  if vByte and 1 = 0 then
     Result.FForceAddOpts := Result.FForceAddOpts + [coAllowNull];
 
   Result.FForceRemOpts := [coReadOnly];
@@ -1017,8 +1037,10 @@ var
   i: integer;
 begin
   FStream.Position := 0;
+  // field count
   FStream.Read(FFieldCount, SizeOf(integer));
   SetLength(FFieldTypes, FFieldCount);
+  // encodestr
   FStream.Read(FEncodeStrs, SizeOf(Byte));
   for i := 0 to FFieldCount - 1 do
   begin

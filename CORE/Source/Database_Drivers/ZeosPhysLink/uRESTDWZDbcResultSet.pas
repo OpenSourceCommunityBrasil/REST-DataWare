@@ -59,7 +59,7 @@ type
     FEncodeStrs : boolean;
     FFieldCount : integer;
     FRecordPos : int64;
-    FRecordCount : LongInt;
+    FRecordCount : int64;
     FFieldTypes : array of byte;
     FVariantTable : array of array of Variant;
 
@@ -233,7 +233,7 @@ var
   vFieldKind : TFieldKind;
 
   vBoolean : boolean;
-  vString : ansistring;
+  vString : utf8string;
   vInt : integer;
   vInt64 : int64;
   vDWFielType : Byte;
@@ -245,9 +245,11 @@ begin
   LastRowNo := 0;
   ColumnsInfo.Clear;
 
+  // field count
   FStream.Read(FFieldCount,SizeOf(integer));
   SetLength(FFieldTypes,FFieldCount);
 
+  // encodestrs
   FStream.Read(vBoolean, Sizeof(vBoolean));
   FEncodeStrs := vBoolean;
 
@@ -255,12 +257,14 @@ begin
   while i < FFieldCount do begin
     ColumnInfo := TZColumnInfo.Create;
     with ColumnInfo do begin
-      FStream.Read(vInt,SizeOf(Integer));
-      vFieldKind := TFieldKind(vInt);
+      // field kind
+      FStream.Read(vByte,SizeOf(vByte));
+      vFieldKind := TFieldKind(vByte);
 
-      FStream.Read(vInt,SizeOf(Integer));
-      SetLength(vString,vInt);
-      FStream.Read(vString[InitStrPos],vInt);
+      // field name
+      FStream.Read(vByte,SizeOf(vByte));
+      SetLength(vString,vByte);
+      FStream.Read(vString[InitStrPos],vByte);
 
       ColumnName := vString;
       ColumnLabel := vString;
@@ -269,16 +273,20 @@ begin
 
       ReadOnly := False;
 
-      FStream.Read(vDWFielType,SizeOf(Byte));
+      // field type
+      FStream.Read(vDWFielType,SizeOf(vDWFielType));
       vFieldType := DWFieldTypeToFieldType(vDWFielType);
       FFieldTypes[i] := vDWFielType;
 
       ColumnType := ConvertDatasetToDbcType(vFieldType);
 
+      // field size
       FStream.Read(vFieldSize,SizeOf(Integer));
 
+      // field precision
       FStream.Read(vFieldPrecision,SizeOf(Integer));
 
+      // required + provider flags
       FStream.Read(vByte,SizeOf(Byte));
 
       if ColumnType in [stString, stAsciiStream] then begin
@@ -328,7 +336,8 @@ end;
 
 procedure TZRESTDWResultSet.streamToArray;
 var
-  i, j          : integer;
+  i             : int64;
+  j             : integer;
   vString       : DWString;
   vInt64        : Int64;
   vInt          : Integer;
