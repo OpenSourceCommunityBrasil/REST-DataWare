@@ -414,8 +414,9 @@ End;
   vSSLVersions           : TRESTDWSSLVersions;
   vServerIpVersionConfig : TRESTDWServerIpVersionConfig;
   Procedure SetCORSCustomHeader (Value : TStringList);
-  Procedure SetDefaultPage (Value : TStringList);
-  Procedure SetServerMethod(Value                     : TComponentClass);
+  Procedure SetDefaultPage  (Value     : TStringList);
+  Procedure SetServerMethod (Value     : TComponentClass);
+  Procedure SetAuthenticator(Value     : TRESTDWAuthenticatorBase);
 //  Procedure Loaded; Override;
   Procedure GetTableNames            (ServerMethodsClass      : TComponent;
                                       Var Pooler              : String;
@@ -610,7 +611,7 @@ End;
   Destructor  Destroy; Override;//Destroy a Classe
  Published
   Property Active                  : Boolean                       Read vActive                  Write SetActive;
-  Property Authenticator           : TRESTDWAuthenticatorBase      Read vAuthenticator           Write vAuthenticator;
+  Property Authenticator           : TRESTDWAuthenticatorBase      Read vAuthenticator           Write SetAuthenticator;
   Property AuthMessages            : TRESTDWAuthMessages           Read vAuthMessages            Write vAuthMessages;
   Property CORS                    : Boolean                       Read vCORS                    Write vCORS;
   Property CORS_CustomHeaders      : TStringList                   Read vCORSCustomHeaders       Write SetCORSCustomHeader;
@@ -3456,6 +3457,14 @@ Begin
  vActive := Value;
 End;
 
+Procedure TRESTServiceBase.SetAuthenticator(Value: TRESTDWAuthenticatorBase);
+Begin
+ If Value is TRESTDWAuthenticatorBase Then
+  vAuthenticator := Value
+ Else
+  vAuthenticator := Nil;
+End;
+
 Procedure TRESTServiceBase.SetCORSCustomHeader (Value : TStringList);
 Var
  I : Integer;
@@ -5794,6 +5803,7 @@ End;
 Constructor TRESTServiceBase.Create(AOwner: TComponent);
 Begin
  Inherited;
+ vAuthenticator                         := Nil;
  vAuthMessages                          := TRESTDWAuthMessages.Create;
  vProxyOptions                          := TProxyConnectionInfo.Create;
  vDefaultPage                           := TStringList.Create;
@@ -5823,8 +5833,6 @@ End;
 
 Destructor TRESTServiceBase.Destroy;
 Begin
- if Assigned(vAuthenticator)         then
-   FreeAndNil(vAuthenticator);
  If Assigned(vAuthMessages)          Then
   FreeAndNil(vAuthMessages);
  If Assigned(vProxyOptions)          Then
