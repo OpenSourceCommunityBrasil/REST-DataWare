@@ -59,7 +59,7 @@ procedure TRESTDWStorageBin.LoadDatasetFromStream(ADataset: TDataset; AStream: T
 var
   vFieldCount : integer;
   vFieldKind : TFieldKind;
-  vRecordCount : Int64;
+  vRecordCount, r : Int64;
   i : Integer;
   vInt : integer;
   vString : utf8string;
@@ -152,7 +152,7 @@ begin
   ADataset.Open;
 
   ADataset.DisableControls;
-  for i := 1 to vRecordCount do begin
+  for r := 1 to vRecordCount do begin
     ADataset.Append;
     LoadRecordFromStream(ADataset,AStream);
     ADataset.Post;
@@ -165,7 +165,7 @@ procedure TRESTDWStorageBin.LoadDWMemFromStream(IDataset: IRESTDWMemTable; AStre
 var
   ADataSet : TRESTDWMemTable;
   vFieldsCount : integer;
-  vRecordCount : int64;
+  vRecordCount, r : int64;
   i : Integer;
   vInt : integer;
   vFieldKind : TFieldKind;
@@ -269,7 +269,7 @@ var
   ADataset  : TRESTDWMemTable;
   i : Integer;
   j : integer;
-  vRecCount : int64;
+  vRecCount, r : int64;
   vFieldCount : integer;
   vFieldSize : integer;
   vRec : TRESTDWRecord;
@@ -306,7 +306,7 @@ begin
   vFieldCount := Length(FFieldNames);
   vFieldCount := vFieldCount - 1;
 
-  for i := 0 to vRecCount do begin
+  for r := 0 to vRecCount do begin
     GetMem(vBuf, IDataset.GetRecordSize);
     clearBuffer;
     vDecBuf := 0;
