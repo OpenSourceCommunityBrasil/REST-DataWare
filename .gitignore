@@ -103,3 +103,9 @@ __recovery/
 
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/
+CORE/Source/Sockets/Fhttp/DefineCompile.inc
+CORE/compiledlaz/uRESTDWUpdSqlEditor.lfm
+CORE/compiledlaz/uRESTDWSqlEditor.lfm
+CORE/compiledlaz/uRESTDWJSONViewer.lfm
+CORE/compiledlaz/uRESTDWFieldSourceEditor.lfm
+CORE/compiledlaz/uRESTDWDatamodule.lfm
