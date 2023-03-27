@@ -60,7 +60,7 @@ var
   vFieldCount : integer;
   vFieldKind : TFieldKind;
   vRecordCount : Int64;
-  i : Int64;
+  i : Integer;
   vInt : integer;
   vString : utf8string;
   vFieldType : Byte;
@@ -166,7 +166,7 @@ var
   ADataSet : TRESTDWMemTable;
   vFieldsCount : integer;
   vRecordCount : int64;
-  i : int64;
+  i : Integer;
   vInt : integer;
   vFieldKind : TFieldKind;
   vString : utf8string;
@@ -267,7 +267,7 @@ end;
 procedure TRESTDWStorageBin.LoadRecordDWMemFromStream(IDataset: IRESTDWMemTable; AStream: TStream);
 var
   ADataset  : TRESTDWMemTable;
-  i : int64;
+  i : Integer;
   j : integer;
   vRecCount : int64;
   vFieldCount : integer;

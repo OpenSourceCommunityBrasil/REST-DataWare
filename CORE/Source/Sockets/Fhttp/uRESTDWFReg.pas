@@ -97,7 +97,7 @@ End;
 
 Procedure Register;
 Begin
-//  RegisterComponents('REST Dataware - Service', [TRESTDWFhttpServicePooler, TRESTDWFhttpPoolerList]);
+  RegisterComponents('REST Dataware - Service', [TRESTDWFhttpServicePooler, TRESTDWFhttpPoolerList]);
   RegisterComponents('REST Dataware - Client',  [TRESTDWFhttpClientREST, TRESTDWFhttpClientPooler]);
   RegisterComponents('REST Dataware - DB', [TRESTDWFhttpDatabase]);
   RegisterPropertyEditor(TypeInfo(String), TRESTDWFhttpDatabase, 'PoolerName',TPoolersList);

@@ -12,13 +12,14 @@
         <OtherUnitFiles Value="..\..\..\..\Source\Sockets\Fhttp"/>
         <UnitOutputDirectory Value="..\..\..\..\compiledlaz"/>
       </SearchPaths>
+      <Linking>
+        <Debugging>
+          <DebugInfoType Value="dsDwarf3"/>
+        </Debugging>
+      </Linking>
     </CompilerOptions>
     <Version Major="2" Minor="1"/>
     <Files>
-      <Item>
-        <Filename Value="..\..\..\..\Source\Includes\uRESTDWPlataform.inc"/>
-        <Type Value="Include"/>
-      </Item>
       <Item>
         <Filename Value="..\..\..\..\Source\Sockets\Fhttp\uRESTDWFhttpBase.pas"/>
         <UnitName Value="uRESTDWFhttpBase"/>
