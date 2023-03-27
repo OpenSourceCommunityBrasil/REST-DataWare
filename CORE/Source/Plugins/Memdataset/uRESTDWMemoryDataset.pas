@@ -2217,9 +2217,10 @@ var
   vBuffer : TRESTDWBuffer;
   Accept : boolean;
 begin
-  vRec := GetRecordObj(FCurrentRecord);
+  // Eloy - correção até revisão da equipe MemTable
+  //vRec := GetRecordObj(FCurrentRecord);
   FRecords.Delete(FCurrentRecord);
-  vRec.Free;
+  //vRec.Free;
 
   if FCurrentRecord >= FRecords.Count then
     Dec(FCurrentRecord);
