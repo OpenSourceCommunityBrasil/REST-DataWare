@@ -9521,7 +9521,7 @@ Begin
  vAbortData            := AbortData;
  vOnThreadRequestError := OnThreadRequestError;
  {$IFNDEF RESTDWLAZARUS}
-  {$If DEFINED(RESTDWLINUXFMX)}
+  {$If DEFINED(RESTDWFMX)}
  Priority              := 1;
   {$ELSE}
   Priority              := tpLowest;
