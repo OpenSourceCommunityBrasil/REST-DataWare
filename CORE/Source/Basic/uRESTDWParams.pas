@@ -816,15 +816,21 @@ Begin
     Begin //TODO
      If Length(vTempString) > 0 Then
      Begin
-      {$IFDEF RESTDWLINUX}
-        //não Sei bem porque, mas aqui chega com encode uf8 duas vezes como se uf8encode(utf8encode(xxxxx))
-        vTempString := DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-        vTempString:= Tencoding.UTF8.Getstring(stringTobytes(Tencoding.UTF8.Getstring(stringTobytes(Vtempstring))));
-      {$ELSE}
-      vTempString := utf8tostring(rawbytestring(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})));
-      vTempString:= Tencoding.UTF8.Getstring(stringTobytes(Vtempstring));
-      {$ENDIF}
-
+//     If vEncoding = esUtf8 Then
+//     Begin
+//      {$IFDEF RESTDWLINUX}
+//        //não Sei bem porque, mas aqui chega com encode uf8 duas vezes como se uf8encode(utf8encode(xxxxx))
+//        vTempString := DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+//        vTempString:= Tencoding.UTF8.Getstring(stringTobytes(Tencoding.UTF8.Getstring(stringTobytes(Vtempstring))));
+//      {$ELSE}
+//      vTempString := utf8tostring(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+//      vTempString:= utf8tostring(Vtempstring);
+//      {$ENDIF}
+//     End
+//     else
+       vTempString:= Tencoding.UTF8.Getstring(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})));
+       If (vObjectValue In [ovWideString]) then
+        vTempString:= Tencoding.UTF8.Getstring(stringTobytes(vTempString));
      End;
     End;
   End
@@ -5366,10 +5372,13 @@ Begin
   Begin
    If (Encode) And Not(vBinary) Then
     Begin
-     If vEncoding = esUtf8 Then
-      WriteValue(EncodeStrings(utf8encode(aValue){$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
-     Else
-      WriteValue(EncodeStrings(aValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
+
+
+
+//     If vEncoding = esUtf8 Then
+//      WriteValue(EncodeStrings(aValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
+//     Else
+     WriteValue(EncodeStrings(aValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
     End
    Else
     WriteValue(aValue);
@@ -5530,7 +5539,7 @@ Begin
   SetValue(GetStringFromBoolean(Param.AsBoolean), False);
  vObjectValue := FieldTypeToObjectValue(Param.DataType);
  vParamName   := Param.Name;
- vEncoded     := vObjectValue in [ovString, ovGuid, ovWideString, ovBlob, ovStream, ovGraphic, ovOraBlob, ovOraClob];
+ vEncoded     := vObjectValue in [ovwidememo,ovString, ovGuid, ovWideString, ovBlob, ovStream, ovGraphic, ovOraBlob, ovOraClob];
  vJSONValue.vObjectValue := vObjectValue;
 End;
 
