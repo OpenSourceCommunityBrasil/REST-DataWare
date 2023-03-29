@@ -340,6 +340,7 @@ Begin
         ServerParamValue('Database',  AConnectionDefs.DatabaseName);
         ServerParamValue('User_Name', AConnectionDefs.Username);
         ServerParamValue('Password',  AConnectionDefs.Password);
+        ServerParamValue('CharacterSet',  AConnectionDefs.Charset);
         ServerParamValue('Protocol',  Uppercase(AConnectionDefs.Protocol));
       end;
       dbtInterbase  : begin
