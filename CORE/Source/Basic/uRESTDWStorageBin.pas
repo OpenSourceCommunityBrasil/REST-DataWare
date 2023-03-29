@@ -196,7 +196,7 @@ begin
 
   for i := 0 to vFieldsCount-1 do begin
     // field kind
-    AStream.Read(vByte,SizeOf(Integer));
+    AStream.Read(vByte,SizeOf(vByte));
     vFieldKind := TFieldKind(vByte);
 
     vFieldDef := ADataSet.FieldDefs.AddFieldDef;
