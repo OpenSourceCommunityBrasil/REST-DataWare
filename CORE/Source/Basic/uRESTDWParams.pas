@@ -798,7 +798,7 @@ Begin
   End;
  If restdwLength(aValue) = 0 Then
   Exit;
- vTempString := BytesToString(aValue);
+ vTempString :=BytesToString(aValue);
  If Length(vTempString) > 0 Then
   Begin
    If vTempString[InitStrPos]          = '"' Then
@@ -815,7 +815,17 @@ Begin
    Else
     Begin //TODO
      If Length(vTempString) > 0 Then
-      vTempString := DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+     Begin
+      {$IFDEF RESTDWLINUX}
+        //não Sei bem porque, mas aqui chega com encode uf8 duas vezes como se uf8encode(utf8encode(xxxxx))
+        vTempString := DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        vTempString:= Tencoding.UTF8.Getstring(stringTobytes(Tencoding.UTF8.Getstring(stringTobytes(Vtempstring))));
+      {$ELSE}
+      vTempString := utf8tostring(rawbytestring(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})));
+      vTempString:= Tencoding.UTF8.Getstring(stringTobytes(Vtempstring));
+      {$ENDIF}
+
+     End;
     End;
   End
  Else
