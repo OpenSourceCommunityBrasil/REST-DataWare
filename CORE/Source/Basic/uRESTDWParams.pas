@@ -786,6 +786,9 @@ Begin
  Inherited;
 End;
 
+
+//Aqui vai ler os Parametros, tem que estar syncronizado com o escrita dos parametros
+//Alterado por ABrito
 Function TJSONValue.GetValue(CanConvert : Boolean = True) : Variant;
 Var
  vTempString : String;
@@ -816,24 +819,15 @@ Begin
     Begin //TODO
      If Length(vTempString) > 0 Then
      Begin
-//     If vEncoding = esUtf8 Then
-//     Begin
-//      {$IFDEF RESTDWLINUX}
-//        //não Sei bem porque, mas aqui chega com encode uf8 duas vezes como se uf8encode(utf8encode(xxxxx))
-//        vTempString := DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-//        vTempString:= Tencoding.UTF8.Getstring(stringTobytes(Tencoding.UTF8.Getstring(stringTobytes(Vtempstring))));
-//      {$ELSE}
-//      vTempString := utf8tostring(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
-//      vTempString:= utf8tostring(Vtempstring);
-//      {$ENDIF}
-//     End
-//     else
        vTempString:= Tencoding.UTF8.Getstring(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})));
        If (vObjectValue In [ovWideString, ovWidememo, ovMemo]) then
        try
          vTempString:=DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-         vTempString:= utf8tostring(vTempString);
-       // vTempString:= Tencoding.UTF8.Getstring(stringtobytes(vTempString));
+         {$IFDEF RESTDWLINUX}
+           vTempString:= Tencoding.UTF8.Getstring(stringtobytes(vTempString));
+         {$ELSE}
+           vTempString:= utf8tostring(vTempString);
+         {$ENDIF}
        except
         //
        end;
@@ -5485,6 +5479,9 @@ Begin
  SaveToStream(TStream(Stream));
 End;
 
+
+//Aqui Le os parametros tem que estar syncronizado com a escria dos parametros
+//Alterado por Abrito
 Procedure TJSONParam.LoadFromParam(Param : TParam);
 Var
  MemoryStream : TMemoryStream;
