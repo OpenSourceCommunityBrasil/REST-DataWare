@@ -3736,7 +3736,7 @@ Var
  If Params <> Nil Then
    For I := 0 To Params.Count -1 Do
     Begin
-     If Params[I].DataType = ftUnknown then
+     If (Params[I].DataType = ftUnknown) then
       Params[I].DataType := ftString;
     End;
  End;
