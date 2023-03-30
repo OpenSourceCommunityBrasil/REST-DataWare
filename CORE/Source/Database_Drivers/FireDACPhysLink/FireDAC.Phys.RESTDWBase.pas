@@ -635,7 +635,7 @@ var
         DataType := AFDParams[i].DataType;
         ParamType := AFDParams[i].ParamType;
         Size := AFDParams[i].Size;
-        Value := AFDParams[i].Value;
+        Value := Rawbytestring(AFDParams[i].Value);
       end;
     end;
   end;
@@ -891,8 +891,8 @@ begin
       try
         vStringStream.CopyFrom(FStream, vInt64);
         vStringStream.Position := 0;
-        // Result := TEncoding.Unicode.GetString(vStringStream.Bytes);
-        Result := vStringStream.DataString;
+        Result := TEncoding.UTF8.GetString(vStringStream.Bytes);
+        //Result := vStringStream.DataString;
         if Pos(#0, Result) > 0 then
           Result := StringReplace(Result, #0, '', [rfReplaceAll]);
       finally
