@@ -635,7 +635,7 @@ var
         DataType := AFDParams[i].DataType;
         ParamType := AFDParams[i].ParamType;
         Size := AFDParams[i].Size;
-        Value := Rawbytestring(AFDParams[i].Value);
+        Value := AFDParams[i].Value;
       end;
     end;
   end;

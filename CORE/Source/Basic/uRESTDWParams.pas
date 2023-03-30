@@ -829,7 +829,7 @@ Begin
 //     End
 //     else
        vTempString:= Tencoding.UTF8.Getstring(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})));
-       If (vObjectValue In [ovWideString]) then
+       If (vObjectValue In [ovWideString, ovWidememo, ovMemo]) then
         vTempString:= Tencoding.UTF8.Getstring(stringTobytes(vTempString));
      End;
     End;
@@ -5498,8 +5498,8 @@ Begin
                             {$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
                             ftFmtMemo, ftFixedChar] Then
   Begin
-   vEncoded := Not (Param.DataType in [{$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
-                                       ftMemo, ftFmtMemo]);
+   //vEncoded := Not (Param.DataType in [{$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
+   //                                    ftMemo, ftFmtMemo]);
    SetValue(Param.AsString, vEncoded);
    vEncoded := True;
   End
