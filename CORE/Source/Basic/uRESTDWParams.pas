@@ -5504,7 +5504,7 @@ Begin
    //vEncoded := Not (Param.DataType in [{$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
    //                                    ftMemo, ftFmtMemo]);
    if (Param.DataType in [{$IFDEF DELPHIXEUP}ftWideString{$ENDIF}]) then
-    SetValue(EncodeStrings(Param.AsString){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
+    SetValue(EncodeStrings(Param.AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
    else
    SetValue(Param.AsString, vEncoded);
    vEncoded := True;
