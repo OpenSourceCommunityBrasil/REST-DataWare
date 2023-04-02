@@ -821,15 +821,13 @@ Begin
      Begin
        vTempString:= Tencoding.UTF8.Getstring(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})));
        If (vObjectValue In [ovWideString, ovWidememo, ovMemo]) then
-       try
+       Begin
          vTempString:=DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
          {$IFDEF RESTDWLINUX}
            vTempString:= Tencoding.UTF8.Getstring(stringtobytes(vTempString));
          {$ELSE}
            vTempString:= utf8tostring(vTempString);
          {$ENDIF}
-       except
-        //
        end;
      End;
     End;
@@ -5372,9 +5370,6 @@ Begin
   Begin
    If (Encode) And Not(vBinary) Then
     Begin
-
-
-
 //     If vEncoding = esUtf8 Then
 //      WriteValue(EncodeStrings(aValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
 //     Else
