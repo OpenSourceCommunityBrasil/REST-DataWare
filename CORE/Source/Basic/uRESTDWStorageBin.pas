@@ -1105,8 +1105,8 @@ Begin
     vDWFieldType := FieldTypeToDWFieldType(ADataset.Fields[i].DataType);
     // N - Bytes
     if (vDWFieldType in [dwftFixedChar,dwftWideString,
-                         dwftFixedWideChar, dwftWideMemo,dwftFmtMemo,
-                         dwftMemo]) then begin
+                         dwftFixedWideChar, dwftWideMemo,dwftFmtMemo
+                         ]) then begin
       vWideString := ADataset.Fields[i].AsString;
       if EncodeStrs then
         vWideString := EncodeStrings(vWideString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
@@ -1116,7 +1116,7 @@ Begin
         AStream.Write(vWideString[InitStrPos], vInt64);
     end
      // N - Bytes
-   else if (vDWFieldType in [dwftString]) then
+   else if (vDWFieldType in [dwftString, dwftMemo]) then
    begin
       vString := ADataset.Fields[i].AsString;
       if EncodeStrs then
