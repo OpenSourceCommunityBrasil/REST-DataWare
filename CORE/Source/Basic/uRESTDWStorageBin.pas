@@ -29,7 +29,8 @@ interface
 
 uses
   {$IFNDEF RESTDWLAZARUS}SqlTimSt, {$ENDIF}
-  Classes, SysUtils, uRESTDWMemoryDataset, FmtBcd, DB, Variants, uRESTDWConsts;
+  Classes, SysUtils, uRESTDWMemoryDataset, FmtBcd, DB, Variants, uRESTDWConsts,
+  uRESTDWTools;
 
 type
   TRESTDWStorageBin = Class(TRESTDWStorageBase)
@@ -51,7 +52,7 @@ type
 implementation
 
 uses
-  uRESTDWProtoTypes, uRESTDWBufferBase, uRESTDWTools;
+  uRESTDWProtoTypes, uRESTDWBufferBase;
 
 { TRESTDWStorageBin }
 
@@ -352,6 +353,7 @@ begin
               vString := GetStringEncode(vString, csUndefined);
             {$ELSE}
               AStream.Read(vString[InitStrPos], vInt64);
+//              vString:= utf8decode(rawbytestring(vString));
               if EncodeStrs then
                 vString := DecodeStrings(vString);
             {$ENDIF}
@@ -1077,7 +1079,8 @@ var
   i: integer;
   vDWFieldType : Byte;
   vBytes: TRESTDWBytes;
-  vString       : utf8string;
+  vString       : RAWbytestring;
+  vWideString   : Utf8string;
   vInt64        : Int64;
   vInt          : Integer;
   vDouble       : Double;
@@ -1101,9 +1104,20 @@ Begin
 
     vDWFieldType := FieldTypeToDWFieldType(ADataset.Fields[i].DataType);
     // N - Bytes
-    if (vDWFieldType in [dwftFixedChar,dwftWideString,dwftString,
-                         dwftFixedWideChar, dwftWideMemo,dwftFmtMemo,
-                         dwftMemo]) then begin
+    if (vDWFieldType in [dwftFixedChar,dwftWideString,
+                         dwftFixedWideChar, dwftWideMemo,dwftFmtMemo
+                         ]) then begin
+      vWideString := ADataset.Fields[i].AsString;
+      if EncodeStrs then
+        vWideString := EncodeStrings(vWideString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      vInt64 := Length(vWideString);
+      AStream.Write(vInt64, SizeOf(vInt64));
+      if vInt64 <> 0 then
+        AStream.Write(vWideString[InitStrPos], vInt64);
+    end
+     // N - Bytes
+   else if (vDWFieldType in [dwftString, dwftMemo]) then
+   begin
       vString := ADataset.Fields[i].AsString;
       if EncodeStrs then
         vString := EncodeStrings(vString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
