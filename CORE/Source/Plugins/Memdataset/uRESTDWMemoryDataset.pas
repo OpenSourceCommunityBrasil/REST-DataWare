@@ -2004,13 +2004,14 @@ end;
 
 destructor TRESTDWMemTable.Destroy;
 begin
+  if Self.Active then
+    Self.Close;
+
   if FFilterParser <> nil then
     FreeAndNil(FFilterParser);
 
   FreeIndexList;
   SetState(dsInactive);
-
-  //  DataEvent(deDataSetChange, 0);
 
   EmptyTable;
   FreeAndNil(FRecords);

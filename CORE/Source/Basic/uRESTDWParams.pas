@@ -786,6 +786,9 @@ Begin
  Inherited;
 End;
 
+
+//Aqui vai ler os Parametros, tem que estar syncronizado com o escrita dos parametros
+//Alterado por ABrito
 Function TJSONValue.GetValue(CanConvert : Boolean = True) : Variant;
 Var
  vTempString : String;
@@ -798,7 +801,7 @@ Begin
   End;
  If restdwLength(aValue) = 0 Then
   Exit;
- vTempString := BytesToString(aValue);
+ vTempString :=BytesToString(aValue);
  If Length(vTempString) > 0 Then
   Begin
    If vTempString[InitStrPos]          = '"' Then
@@ -815,7 +818,18 @@ Begin
    Else
     Begin //TODO
      If Length(vTempString) > 0 Then
-      vTempString := DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+     Begin
+       vTempString:= Tencoding.UTF8.Getstring(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})));
+       If (vObjectValue In [ovWideString, ovWidememo, ovMemo]) then
+       Begin
+         vTempString:=DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+         {$IFDEF RESTDWLINUX}
+           vTempString:= Tencoding.UTF8.Getstring(stringtobytes(vTempString));
+         {$ELSE}
+           vTempString:= utf8tostring(vTempString);
+         {$ENDIF}
+       end;
+     End;
     End;
   End
  Else
@@ -5356,10 +5370,10 @@ Begin
   Begin
    If (Encode) And Not(vBinary) Then
     Begin
-     If vEncoding = esUtf8 Then
-      WriteValue(EncodeStrings(utf8encode(aValue){$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
-     Else
-      WriteValue(EncodeStrings(aValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
+//     If vEncoding = esUtf8 Then
+//      WriteValue(EncodeStrings(aValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
+//     Else
+     WriteValue(EncodeStrings(aValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
     End
    Else
     WriteValue(aValue);
@@ -5460,6 +5474,9 @@ Begin
  SaveToStream(TStream(Stream));
 End;
 
+
+//Aqui Le os parametros tem que estar syncronizado com a escria dos parametros
+//Alterado por Abrito
 Procedure TJSONParam.LoadFromParam(Param : TParam);
 Var
  MemoryStream : TMemoryStream;
@@ -5479,8 +5496,11 @@ Begin
                             {$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
                             ftFmtMemo, ftFixedChar] Then
   Begin
-   vEncoded := Not (Param.DataType in [{$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
-                                       ftMemo, ftFmtMemo]);
+   //vEncoded := Not (Param.DataType in [{$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
+   //                                    ftMemo, ftFmtMemo]);
+   if (Param.DataType in [{$IFDEF DELPHIXEUP}ftWideString{$ENDIF}]) then
+    SetValue(EncodeStrings(Param.AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
+   else
    SetValue(Param.AsString, vEncoded);
    vEncoded := True;
   End
@@ -5520,7 +5540,7 @@ Begin
   SetValue(GetStringFromBoolean(Param.AsBoolean), False);
  vObjectValue := FieldTypeToObjectValue(Param.DataType);
  vParamName   := Param.Name;
- vEncoded     := vObjectValue in [ovString, ovGuid, ovWideString, ovBlob, ovStream, ovGraphic, ovOraBlob, ovOraClob];
+ vEncoded     := vObjectValue in [ovwidememo,ovString, ovGuid, ovWideString, ovBlob, ovStream, ovGraphic, ovOraBlob, ovOraClob];
  vJSONValue.vObjectValue := vObjectValue;
 End;
 

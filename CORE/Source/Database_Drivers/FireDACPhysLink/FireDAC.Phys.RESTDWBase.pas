@@ -891,8 +891,8 @@ begin
       try
         vStringStream.CopyFrom(FStream, vInt64);
         vStringStream.Position := 0;
-        // Result := TEncoding.Unicode.GetString(vStringStream.Bytes);
-        Result := vStringStream.DataString;
+        Result := TEncoding.UTF8.GetString(vStringStream.Bytes);
+        //Result := vStringStream.DataString;
         if Pos(#0, Result) > 0 then
           Result := StringReplace(Result, #0, '', [rfReplaceAll]);
       finally
