@@ -2972,10 +2972,10 @@ Begin
  Try
    {$IF Defined(RESTDWFMX) AND not Defined(DELPHI10_4UP)}
    If Assigned(AContext.DataObject) Then
-     vToken       := TRESTDWAuthOptionTokenClient(AContext.DataObject).token;
+     vToken       := TRESTDWAuthToken(AContext.DataObject).token;
    {$ELSE}
    If Assigned(AContext.Data) Then
-     vToken       := TRESTDWAuthOptionTokenClient(AContext.Data).token;
+     vToken       := TRESTDWAuthToken(AContext.Data).token;
    {$IFEND}
   vAuthRealm   := AResponseInfo.AuthRealm;
   vContentType := ARequestInfo.ContentType;
