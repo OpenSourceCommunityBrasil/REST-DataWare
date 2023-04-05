@@ -5394,8 +5394,13 @@ Begin
           Begin
            vResult := '';
            TRESTDWServerEvents(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
+           IF TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].NeedAuthorization then
+           Begin
            If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest) Then
             TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest(DWParams, vRejected, vErrorMessage, ErrorCode, RequestHeader);
+           end
+           else
+             Vrejected:= False;
            If Not vRejected Then
             Begin
              TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].CompareParams(DWParams);
