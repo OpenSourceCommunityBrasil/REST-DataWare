@@ -4077,10 +4077,13 @@ Var
              {$IFNDEF RESTDWLAZARUS}
              StringStream.Size := 0;
              {$ENDIF}
-            if Params.ItemsString['MessageError'].AsString = trim('') then
-             ResultData   := TReplyOK
-            else
-             ResultData := Params.ItemsString['MessageError'].AsString;
+             If not (Params.ItemsString['MessageError'] = Nil) Then
+             Begin
+              if Params.ItemsString['MessageError'].AsString = trim('') then
+               ResultData   := TReplyOK
+              else
+               ResultData := Params.ItemsString['MessageError'].AsString;
+             end;
            End
           Else
            Begin
