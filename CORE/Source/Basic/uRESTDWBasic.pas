@@ -4133,6 +4133,7 @@ Begin
        JSONParam.ObjectDirection := odOut;
        DWParams.Add(JSONParam);
       End;
+      DWParams.ItemsString['MessageError'].AsString :='';
 
      If ReturnEvent(BaseObject, vUrlMethod, vBaseUrl, vResult, DWParams, DataMode, ErrorCode, ContentType, Accesstag, RequestType, RequestHeader) Then
       Begin
