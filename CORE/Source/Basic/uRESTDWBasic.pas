@@ -4123,6 +4123,17 @@ Begin
       End;
      If PoolerName <> '' Then
       vBaseUrl := PoolerName;
+
+
+      //* Tive que adicionar porque o cliente espera este parametro
+      If DWParams.ItemsString['MessageError'] = Nil Then
+      Begin
+       JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+       JSONParam.ParamName       := 'MessageError';
+       JSONParam.ObjectDirection := odOut;
+       DWParams.Add(JSONParam);
+      End;
+
      If ReturnEvent(BaseObject, vUrlMethod, vBaseUrl, vResult, DWParams, DataMode, ErrorCode, ContentType, Accesstag, RequestType, RequestHeader) Then
       Begin
        JSONStr := vResult;
@@ -5436,6 +5447,7 @@ Begin
            end
            else
              Vrejected:= False;
+
            If Not vRejected Then
             Begin
              TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].CompareParams(DWParams);
