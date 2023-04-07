@@ -57,7 +57,7 @@ type
 
   TRESTDWIbDACQuery = class(TRESTDWDrvQuery)
   protected
-    procedure createSequencedField(seqname,field : string); override;
+    procedure CreateSequencedField(seqname,field : string); override;
   public
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
@@ -85,9 +85,10 @@ type
     FTransaction : TIbcTransaction;
   protected
     procedure setConnection(AValue: TComponent); override;
+
+  public
     function getConectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
-  public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
 

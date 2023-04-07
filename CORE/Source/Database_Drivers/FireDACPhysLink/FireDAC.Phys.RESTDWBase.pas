@@ -936,7 +936,6 @@ end;
 function TFDPhysRDWCommand.readFieldStream: TFDPhysDataColumnInfo;
 var
   vFieldKind : TFieldKind;
-  vInt : integer;
   vString : utf8string;
   vFieldType : TFieldType;
   vFielSize: integer;
