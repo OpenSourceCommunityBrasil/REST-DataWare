@@ -66,7 +66,7 @@ type
 
   TRESTDWFireDACQuery = class(TRESTDWDrvQuery)
   protected
-    procedure createSequencedField(seqname,field : string); override;
+    procedure CreateSequencedField(seqname,field : string); override;
   public
     procedure SaveToStream(stream : TStream); override;
     procedure ExecSQL; override;
@@ -91,12 +91,12 @@ type
 
   TRESTDWFireDACDriver = class(TRESTDWDriverBase)
   private
-    FConnTeste : TComponent;
     function isAutoCommit : boolean;
   protected
+
+  public
     function getConectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
-  public
     function getQuery : TRESTDWDrvQuery; override;
     function getQuery(AUnidir : boolean) : TRESTDWDrvQuery; override;
     function getTable : TRESTDWDrvTable; override;

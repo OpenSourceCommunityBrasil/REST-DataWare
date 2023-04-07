@@ -2003,6 +2003,7 @@ begin
 end;
 
 destructor TRESTDWMemTable.Destroy;
+var i: integer;
 begin
   if Self.Active then
     Self.Close;
@@ -2450,6 +2451,7 @@ begin
 
   FDataSet.FBlobs.Remove(FBlobField);
   ReAllocMem(FBlobField^.Buffer, NewSize);
+  FBlobField^.Size:= NewSize;
   FDataSet.FBlobs.Add(FBlobField);
   FModified := True;
 end;
