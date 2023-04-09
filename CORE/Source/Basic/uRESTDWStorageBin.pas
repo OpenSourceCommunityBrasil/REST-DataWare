@@ -456,13 +456,13 @@ begin
               if EncodeStrs then
                 vString := DecodeStrings(vString);
             {$ENDIF}
-            vInt64 := Length(Vstring) * SizeOf(WideChar);
+            vInt64 := Length(widestring(Vstring)) * SizeOf(WideChar);
             //vInt64 := vInt64 + 1;
             vBlobField :=  New(PRESTDWBlobField);
             FillChar(vBlobField^, SizeOf(TRESTDWBlobField), 0);
             vBlobField^.Size := vInt64;
             ReallocMem(vBlobField^.Buffer, vInt64);
-            Move(widestring(Vstring)[InitStrPos], vBlobField^.Buffer^, Length(widestring(Vstring)));
+            Move(widestring(Vstring)[InitStrPos], vBlobField^.Buffer^, vInt64);
 
             Move(vBlobField,vBuf^,SizeOf(Pointer));
             IDataset.AddBlobList(vBlobField);
