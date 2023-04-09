@@ -273,6 +273,7 @@ begin
         Username := AConnectionDefs.Username;
         Password := AConnectionDefs.Password;
         Port     := inttostr(AConnectionDefs.DBPort);
+        options.UseUnicode := True;
       end;
     end;
   end;

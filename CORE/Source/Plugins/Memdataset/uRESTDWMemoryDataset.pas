@@ -2451,7 +2451,6 @@ begin
 
   FDataSet.FBlobs.Remove(FBlobField);
   ReAllocMem(FBlobField^.Buffer, NewSize);
-  FBlobField^.Size:= NewSize;
   FDataSet.FBlobs.Add(FBlobField);
   FModified := True;
 end;
@@ -2485,6 +2484,7 @@ begin
   FreeMem(FBlobField^.Buffer, FBlobField^.Size);
   FBlobField^.Buffer := nil;
   FBlobField^.Size := 0;
+  FreeMem(FBlobField, SizeOf(TRESTDWBlobField));
   FBlobField := nil;
   FModified := True;
 end;
