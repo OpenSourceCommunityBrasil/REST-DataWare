@@ -257,7 +257,7 @@ Begin
      End;
     For I := 0 To vResponseHeader.Count -1 Do
      Begin
-       {$IFDEF DELPHI10_0UP}
+       {$IFDEF DELPHI10_1UP}
         AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
                                         vResponseHeader.Values[vResponseHeader.Names[I]]);
        {$ELSE}

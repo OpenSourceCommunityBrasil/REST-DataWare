@@ -2003,7 +2003,6 @@ begin
 end;
 
 destructor TRESTDWMemTable.Destroy;
-var i: integer;
 begin
   if Self.Active then
     Self.Close;
@@ -2615,10 +2614,10 @@ end;
 
 procedure TRESTDWStorageBase.SaveToFile(ADataset: TDataset; AFileName: String);
 var
-  vFileStream : TBufferedFileStream;
+  vFileStream : {$IFDEF DELPHI10_2UP}TBufferedFileStream{$ELSE}TFileStream{$ENDIF};
 begin
   try
-    vFileStream := TBufferedFileStream.Create(AFileName,fmCreate);
+    vFileStream := {$IFDEF DELPHI10_2UP}TBufferedFileStream{$ELSE}TFileStream{$ENDIF}.Create(AFileName,fmCreate);
     try
       SaveToStream(ADataset,TStream(vFileStream));
     except
