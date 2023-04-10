@@ -8,7 +8,7 @@ uses Classes, SysUtils, uRESTDWConsts{$IFDEF RESTDWLAZARUS}, lclversion{$ENDIF};
 
 Type
  TRESTDWAboutInfo = (RESTDWAbout);
- TRESTDWComponent       = Class(TComponent)
+ TRESTDWComponent = Class(TComponent)
  Private
   fsAbout : TRESTDWAboutInfo;
   Function GetVersionInfo : String;
