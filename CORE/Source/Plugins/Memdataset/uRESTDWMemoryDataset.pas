@@ -2003,6 +2003,7 @@ begin
 end;
 
 destructor TRESTDWMemTable.Destroy;
+var i: integer;
 begin
   if Self.Active then
     Self.Close;
@@ -2483,6 +2484,7 @@ begin
   FreeMem(FBlobField^.Buffer, FBlobField^.Size);
   FBlobField^.Buffer := nil;
   FBlobField^.Size := 0;
+  FreeMem(FBlobField, SizeOf(TRESTDWBlobField));
   FBlobField := nil;
   FModified := True;
 end;
