@@ -1,7 +1,7 @@
-package RESTDWIbDACDriver;
+package RESTDWIBDACDriver;
 
 {$R *.res}
-{$R 'RESTDWIbDACDriver.dcr'}
+{$R 'RESTDWIBDACDriver.dcr'}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -26,7 +26,7 @@ package RESTDWIbDACDriver;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'REST Dataware - Driver FireDAC'}
+{$DESCRIPTION 'REST Dataware - Driver IBDAC'}
 {$IMPLICITBUILD ON}
 
 requires
@@ -35,7 +35,7 @@ requires
   ibdac280;
 
 contains
-  uRESTDWIbDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWIbDACDriver.pas';
+  uRESTDWIBDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWIBDACDriver.pas';
 
 end.
 
