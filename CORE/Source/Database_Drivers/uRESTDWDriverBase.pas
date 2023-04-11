@@ -600,7 +600,7 @@ begin
               if (not DWParams[I].IsNull) then
               Begin
                 if vParam.RESTDWDataTypeParam in [dwftMemo] then
-                 vParam.Value := utf8tostring(DecodeStrings(DWParams[I].AsString))
+                 vParam.Value := utf8tostring(DecodeStrings(DWParams[I].AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
                 else
                  vParam.Value := utf8tostring(DWParams[I].AsString);
               End
