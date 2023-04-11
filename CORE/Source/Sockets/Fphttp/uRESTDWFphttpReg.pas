@@ -1,6 +1,6 @@
 unit uRESTDWFphttpReg;
 
-{$I ..\..\..\Source\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -26,6 +26,7 @@ unit uRESTDWFphttpReg;
 interface
 
 uses
+  LResources,
   Classes, DesignIntf, DesignEditors,
   uRESTDWFphttpBase;
 
@@ -33,7 +34,6 @@ Type
   TPoolersList = Class(TStringProperty)
   Public
     Function GetAttributes: TPropertyAttributes; Override;
-    Procedure GetValues(Proc: TGetStrProc); Override;
     Procedure Edit; Override;
   End;
 
@@ -45,23 +45,6 @@ Function TPoolersList.GetAttributes: TPropertyAttributes;
 Begin
   // editor, sorted list, multiple selection
   Result := [paValueList, paSortList];
-End;
-
-procedure TPoolersList.GetValues(Proc: TGetStrProc);
-Var
-  vLista: TStringList;
-  I: Integer;
-Begin
-  // Provide a list of Poolers
-  // With GetComponent(0) as TRESTDWIcsDatabase Do
-  // Begin
-  // Try
-  // vLista := TRESTDWIcsDatabase(GetComponent(0)).PoolerList;
-  // For I := 0 To vLista.Count - 1 Do
-  // Proc(vLista[I]);
-  // Except
-  // End;
-  // End;
 End;
 
 Procedure TPoolersList.Edit;
@@ -82,7 +65,6 @@ Begin
 End;
 
 initialization
-
-Finalization
+{$I RESTDWfpHttpSockets.lrs}
 
 end.
