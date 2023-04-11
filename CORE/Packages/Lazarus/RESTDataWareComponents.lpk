@@ -32,7 +32,7 @@
     <Description Value="The proposal was fulfilled. REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database. Today, being able to write data to a bank via WebService is too complex for simple operations, making scheduling of simple screens time-consuming. With REST Dataware, you no longer have to worry about creating SQL Insertion, Deletion, Read, and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as you did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer. Have fun."/>
     <License Value="GPL- 3.0"/>
     <Version Major="2" Minor="1"/>
-    <Files Count="81">
+    <Files Count="82">
       <Item1>
         <Filename Value="RESTDataWareComponents.lrs"/>
         <Type Value="LRS"/>
@@ -358,6 +358,10 @@
         <Filename Value="..\..\Source\Basic\Mechanics\uRESTDWAuthenticators.pas"/>
         <UnitName Value="uRESTDWAuthenticators"/>
       </Item81>
+      <Item82>
+        <Filename Value="..\..\Source\Basic\uRESTDWStorageBin.pas"/>
+        <UnitName Value="uRESTDWStorageBin"/>
+      </Item82>
     </Files>
     <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="3">

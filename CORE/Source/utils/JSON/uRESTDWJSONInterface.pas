@@ -331,6 +331,7 @@ Var
   {$ENDIF}
 Begin
   result.isnull := False;
+  result.Value  :=  'null';
   If vJSONObject = Nil Then
   Begin
     result.isnull := True;
@@ -480,6 +481,7 @@ Var
   {$ENDIF}
 Begin
   result.isnull := False;
+  result.Value  :=  'null';
   If vJSONObject = Nil Then
   Begin
     result.isnull := True;

@@ -2614,10 +2614,11 @@ end;
 
 procedure TRESTDWStorageBase.SaveToFile(ADataset: TDataset; AFileName: String);
 var
-  vFileStream : TBufferedFileStream;
+  // TODO -o Analisar TBufferedFileStream
+  vFileStream : TFileStream;
 begin
   try
-    vFileStream := TBufferedFileStream.Create(AFileName,fmCreate);
+    vFileStream := TFileStream.Create(AFileName,fmCreate);
     try
       SaveToStream(ADataset,TStream(vFileStream));
     except

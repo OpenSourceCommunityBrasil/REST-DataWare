@@ -40,7 +40,6 @@ Uses
 
 Implementation
 
-
 {$IF Defined(RESTDWLAZARUS) or not Defined(DELPHIXE6UP)}
   Type
    TPacket = Packed Record

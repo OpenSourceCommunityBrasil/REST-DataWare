@@ -819,7 +819,7 @@ Begin
     Begin //TODO
      If Length(vTempString) > 0 Then
      Begin
-       vTempString:= Tencoding.UTF8.Getstring(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})));
+       vTempString:= Tencoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))));
        If (vObjectValue In [ovWideString, ovWidememo, ovMemo]) then
        Begin
          vTempString:=DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
