@@ -153,10 +153,12 @@ begin
   ADataset.Open;
 
   ADataset.DisableControls;
-  for r := 1 to vRecordCount do begin
+  While r <=  vRecordCount do //Anderson
+  begin
     ADataset.Append;
     LoadRecordFromStream(ADataset,AStream);
     ADataset.Post;
+    inc(r);
   end;
 
   ADataset.EnableControls;
@@ -307,7 +309,7 @@ begin
   vFieldCount := Length(FFieldNames);
   vFieldCount := vFieldCount - 1;
 
-  for r := 0 to vRecCount do begin
+  while r <= vRecCount do begin        //Anderson
     GetMem(vBuf, IDataset.GetRecordSize);
     clearBuffer;
     vDecBuf := 0;
@@ -545,6 +547,7 @@ begin
     vRec.Buffer := vBuf;
     Freemem(vBuf);
     IDataset.AddNewRecord(vRec);
+    inc(r);
   end;
 end;
 
