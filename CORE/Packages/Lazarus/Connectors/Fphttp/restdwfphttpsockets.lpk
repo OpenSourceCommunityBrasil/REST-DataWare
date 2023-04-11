@@ -9,9 +9,8 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\..\..\..\Source\Includes"/>
-        <OtherUnitFiles Value="..\..\..\..\Source\Sockets\Fphttp;..\..\..\..\Source\Basic"/>
-        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)\"/>
-        <SrcPath Value="..\..\..\..\Source"/>
+        <OtherUnitFiles Value="..\..\..\..\Source;..\..\..\..\Source\Sockets\Fphttp;..\..\..\..\Source\Basic"/>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Linking>
         <Debugging>
@@ -22,12 +21,12 @@
     <Files>
       <Item>
         <Filename Value="..\..\..\..\Source\Sockets\Fphttp\uRESTDWFphttpBase.pas"/>
-        <UnitName Value="uRESTDWIcsBase"/>
+        <UnitName Value="uRESTDWFphttpBase"/>
       </Item>
       <Item>
         <Filename Value="..\..\..\..\Source\Sockets\Fphttp\uRESTDWFphttpReg.pas"/>
         <HasRegisterProc Value="True"/>
-        <UnitName Value="uRESTDWIcsReg"/>
+        <UnitName Value="uRESTDWFphttpReg"/>
       </Item>
       <Item>
         <Filename Value="..\..\..\..\Source\Includes\uRESTDW.inc"/>
