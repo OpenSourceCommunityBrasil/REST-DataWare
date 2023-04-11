@@ -1,4 +1,4 @@
-﻿unit uRESTDWIbDACDriver;
+﻿unit uRESTDWIBDACDriver;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -28,9 +28,6 @@
 interface
 
 uses
-  {$IFDEF RESTDWLAZARUS}
-    LResources,
-  {$ENDIF}
   Classes, SysUtils, DB,
   DBAccess, IBC,  MemDS,
   uRESTDWDriverBase, uRESTDWBasicTypes,
@@ -38,24 +35,24 @@ uses
   uRESTDWProtoTypes;
 
 type
-  TRESTDWIbDACTable = class(TRESTDWDrvTable)
+  TRESTDWIBDACTable = class(TRESTDWDrvTable)
   public
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
     procedure SaveToStream(stream : TStream); override;
     procedure FetchAll; override;
   end;
 
-  { TRESTDWIbDACStoreProc }
+  { TRESTDWIBDACStoreProc }
 
-  TRESTDWIbDACStoreProc = class(TRESTDWDrvStoreProc)
+  TRESTDWIBDACStoreProc = class(TRESTDWDrvStoreProc)
   public
     procedure ExecProc; override;
     procedure Prepare; override;
   end;
 
-  { TRESTDWIbDACQuery }
+  { TRESTDWIBDACQuery }
 
-  TRESTDWIbDACQuery = class(TRESTDWDrvQuery)
+  TRESTDWIBDACQuery = class(TRESTDWDrvQuery)
   protected
     procedure CreateSequencedField(seqname,field : string); override;
   public
@@ -78,9 +75,9 @@ type
     procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
   end;
 
-  { TRESTDWIbDACDriver }
+  { TRESTDWIBDACDriver }
 
-  TRESTDWIbDACDriver = class(TRESTDWDriverBase)
+  TRESTDWIBDACDriver = class(TRESTDWDriverBase)
   private
     FTransaction : TIbcTransaction;
   protected
@@ -115,12 +112,12 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('REST Dataware - Drivers', [TRESTDWIbDACDriver]);
+  RegisterComponents('REST Dataware - Drivers', [TRESTDWIBDACDriver]);
 end;
 
-{ TRESTDWIbDACStoreProc }
+{ TRESTDWIBDACStoreProc }
 
-procedure TRESTDWIbDACStoreProc.ExecProc;
+procedure TRESTDWIBDACStoreProc.ExecProc;
 var
   qry : TIbcStoredProc;
 begin
@@ -129,7 +126,7 @@ begin
   qry.ExecProc;
 end;
 
-procedure TRESTDWIbDACStoreProc.Prepare;
+procedure TRESTDWIBDACStoreProc.Prepare;
 var
   qry : TIbcStoredProc;
 begin
@@ -138,15 +135,15 @@ begin
   qry.Prepare;
 end;
 
- { TRESTDWIbDACDriver }
+ { TRESTDWIBDACDriver }
 
-function TRESTDWIbDACDriver.getConectionType : TRESTDWDatabaseType;
+function TRESTDWIBDACDriver.getConectionType : TRESTDWDatabaseType;
 begin
   // somente Firebird
   Result := dbtFirebird;
 end;
 
-function TRESTDWIbDACDriver.getQuery : TRESTDWDrvQuery;
+function TRESTDWIBDACDriver.getQuery : TRESTDWDrvQuery;
 var
   qry : TIbcQuery;
 begin
@@ -156,10 +153,10 @@ begin
   qry.Options.TrimFixedChar     := StrsTrim;
   qry.Transaction               := FTransaction;
 
-  Result := TRESTDWIbDACQuery.Create(qry);
+  Result := TRESTDWIBDACQuery.Create(qry);
 end;
 
-function TRESTDWIbDACDriver.getTable : TRESTDWDrvTable;
+function TRESTDWIBDACDriver.getTable : TRESTDWDrvTable;
 var
   qry : TIbcTable;
 begin
@@ -169,10 +166,10 @@ begin
   qry.Options.TrimFixedChar     := StrsTrim;
   qry.Transaction               := FTransaction;
 
-  Result := TRESTDWIbDACTable.Create(qry);
+  Result := TRESTDWIBDACTable.Create(qry);
 end;
 
-function TRESTDWIbDACDriver.getStoreProc : TRESTDWDrvStoreProc;
+function TRESTDWIBDACDriver.getStoreProc : TRESTDWDrvStoreProc;
 var
   qry : TIbcStoredProc;
 begin
@@ -182,37 +179,37 @@ begin
   qry.Options.TrimFixedChar     := StrsTrim;
   qry.Transaction               := FTransaction;
 
-  Result := TRESTDWIbDACStoreProc.Create(qry);
+  Result := TRESTDWIBDACStoreProc.Create(qry);
 end;
 
-procedure TRESTDWIbDACDriver.Connect;
+procedure TRESTDWIBDACDriver.Connect;
 begin
   inherited Connect;
   if Assigned(Connection) then
     TIbcConnection(Connection).Open;
 end;
 
-destructor TRESTDWIbDACDriver.Destroy;
+destructor TRESTDWIBDACDriver.Destroy;
 begin
 
   inherited;
 end;
 
-procedure TRESTDWIbDACDriver.Disconect;
+procedure TRESTDWIBDACDriver.Disconect;
 begin
   inherited Disconect;
   if Assigned(Connection) then
     TIbcConnection(Connection).Close;
 end;
 
-function TRESTDWIbDACDriver.isConnected : boolean;
+function TRESTDWIBDACDriver.isConnected : boolean;
 begin
   Result:=inherited isConnected;
   if Assigned(Connection) then
     Result := TIbcConnection(Connection).Connected;
 end;
 
-procedure TRESTDWIbDACDriver.setConnection(AValue: TComponent);
+procedure TRESTDWIBDACDriver.setConnection(AValue: TComponent);
 begin
   inherited;
   if not Assigned(FTransaction) then
@@ -221,47 +218,47 @@ begin
   TIbcConnection(AValue).DefaultTransaction := FTransaction;
 end;
 
-function TRESTDWIbDACDriver.connInTransaction : boolean;
+function TRESTDWIBDACDriver.connInTransaction : boolean;
 begin
   Result:=inherited connInTransaction;
   if Assigned(Connection) then
     Result := TIbcConnection(Connection).InTransaction;
 end;
 
-procedure TRESTDWIbDACDriver.connStartTransaction;
+procedure TRESTDWIBDACDriver.connStartTransaction;
 begin
   inherited connStartTransaction;
   if Assigned(Connection) then
     TIbcConnection(Connection).StartTransaction;
 end;
 
-procedure TRESTDWIbDACDriver.connRollback;
+procedure TRESTDWIBDACDriver.connRollback;
 begin
   inherited connRollback;
   if Assigned(Connection) then
     TIbcConnection(Connection).Rollback;
 end;
 
-function TRESTDWIbDACDriver.compConnIsValid(comp: TComponent): boolean;
+function TRESTDWIBDACDriver.compConnIsValid(comp: TComponent): boolean;
 begin
   Result := comp.InheritsFrom(TIBCConnection);
 end;
 
-procedure TRESTDWIbDACDriver.connCommit;
+procedure TRESTDWIBDACDriver.connCommit;
 begin
   inherited connCommit;
   if Assigned(Connection) then
     TIbcConnection(Connection).Commit;
 end;
 
-constructor TRESTDWIbDACDriver.Create(AOwner: TComponent);
+constructor TRESTDWIBDACDriver.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FTransaction := TIbcTransaction.Create(Self);
   FTransaction.DefaultConnection := TIbcConnection(Connection);
 end;
 
-class procedure TRESTDWIbDACDriver.CreateConnection(const AConnectionDefs : TConnectionDefs;
+class procedure TRESTDWIBDACDriver.CreateConnection(const AConnectionDefs : TConnectionDefs;
                                                     var AConnection : TComponent);
 begin
   inherited CreateConnection(AConnectionDefs, AConnection);
@@ -279,9 +276,9 @@ begin
   end;
 end;
 
-{ TRESTDWIbDACQuery }
+{ TRESTDWIBDACQuery }
 
-procedure TRESTDWIbDACQuery.createSequencedField(seqname, field : string);
+procedure TRESTDWIBDACQuery.createSequencedField(seqname, field : string);
 var
   qry : TIbcQuery;
   fd : TField;
@@ -294,7 +291,7 @@ begin
   end;
 end;
 
-procedure TRESTDWIbDACQuery.ExecSQL;
+procedure TRESTDWIBDACQuery.ExecSQL;
 var
   qry : TIbcQuery;
 begin
@@ -303,7 +300,7 @@ begin
   qry.ExecSQL;
 end;
 
-procedure TRESTDWIbDACQuery.FetchAll;
+procedure TRESTDWIBDACQuery.FetchAll;
 var
   qry : TIbcQuery;
 begin
@@ -311,7 +308,7 @@ begin
   qry.FetchingAll;
 end;
 
-procedure TRESTDWIbDACQuery.LoadFromStreamParam(IParam: integer;
+procedure TRESTDWIBDACQuery.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);
 var
   qry : TIbcQuery;
@@ -320,7 +317,7 @@ begin
   qry.Params[IParam].LoadFromStream(stream,blobtype);
 end;
 
-procedure TRESTDWIbDACQuery.Prepare;
+procedure TRESTDWIBDACQuery.Prepare;
 var
   qry : TIbcQuery;
 begin
@@ -329,7 +326,7 @@ begin
   qry.Prepare;
 end;
 
-function TRESTDWIbDACQuery.RowsAffected : Int64;
+function TRESTDWIBDACQuery.RowsAffected : Int64;
 var
   qry : TIbcQuery;
 begin
@@ -337,7 +334,7 @@ begin
   Result := qry.RowsAffected;
 end;
 
-function TRESTDWIbDACQuery.ParamCount : Integer;
+function TRESTDWIBDACQuery.ParamCount : Integer;
 var
   qry : TIbcQuery;
 begin
@@ -345,7 +342,7 @@ begin
   Result := qry.ParamCount;
 end;
 
-function TRESTDWIbDACQuery.getParamDataType(IParam : integer) : TFieldType;
+function TRESTDWIBDACQuery.getParamDataType(IParam : integer) : TFieldType;
 var
   qry : TIbcQuery;
 begin
@@ -353,7 +350,7 @@ begin
   Result := qry.Params[IParam].DataType;
 end;
 
-function TRESTDWIbDACQuery.getParamName(IParam : integer) : string;
+function TRESTDWIBDACQuery.getParamName(IParam : integer) : string;
 var
   qry : TIbcQuery;
 begin
@@ -361,7 +358,7 @@ begin
   Result := qry.Params[IParam].Name;
 end;
 
-function TRESTDWIbDACQuery.getParamSize(IParam : integer) : integer;
+function TRESTDWIBDACQuery.getParamSize(IParam : integer) : integer;
 var
   qry : TIbcQuery;
 begin
@@ -369,7 +366,7 @@ begin
   Result := qry.Params[IParam].Size;
 end;
 
-function TRESTDWIbDACQuery.getParamValue(IParam : integer) : variant;
+function TRESTDWIBDACQuery.getParamValue(IParam : integer) : variant;
 var
   qry : TIbcQuery;
 begin
@@ -377,7 +374,7 @@ begin
   Result := qry.Params[IParam].Value;
 end;
 
-procedure TRESTDWIbDACQuery.setParamDataType(IParam : integer; AValue : TFieldType);
+procedure TRESTDWIBDACQuery.setParamDataType(IParam : integer; AValue : TFieldType);
 var
   qry : TIbcQuery;
 begin
@@ -385,7 +382,7 @@ begin
   qry.Params[IParam].DataType := AValue;
 end;
 
-procedure TRESTDWIbDACQuery.setParamValue(IParam : integer; AValue : variant);
+procedure TRESTDWIBDACQuery.setParamValue(IParam : integer; AValue : variant);
 var
   qry : TIbcQuery;
 begin
@@ -393,7 +390,7 @@ begin
   qry.Params[IParam].Value := AValue;
 end;
 
-procedure TRESTDWIbDACQuery.SaveToStream(stream: TStream);
+procedure TRESTDWIBDACQuery.SaveToStream(stream: TStream);
 var
   vDWMemtable : TRESTDWMemtable;
   qry : TIbcQuery;
@@ -410,9 +407,9 @@ begin
   end;
 end;
 
-{ TRESTDWIbDACTable }
+{ TRESTDWIBDACTable }
 
-procedure TRESTDWIbDACTable.FetchAll;
+procedure TRESTDWIBDACTable.FetchAll;
 var
   qry : TIbcTable;
 begin
@@ -420,7 +417,7 @@ begin
   qry.FetchingAll;
 end;
 
-procedure TRESTDWIbDACTable.LoadFromStreamParam(IParam: integer;
+procedure TRESTDWIBDACTable.LoadFromStreamParam(IParam: integer;
   stream: TStream; blobtype: TBlobType);
 var
   qry : TIbcTable;
@@ -429,7 +426,7 @@ begin
   qry.Params[IParam].LoadFromStream(stream,blobtype);
 end;
 
-procedure TRESTDWIbDACTable.SaveToStream(stream: TStream);
+procedure TRESTDWIBDACTable.SaveToStream(stream: TStream);
 var
   vDWMemtable : TRESTDWMemtable;
   qry : TIbcTable;
@@ -445,11 +442,6 @@ begin
     FreeAndNil(vDWMemtable);
   end;
 end;
-
-{$IFDEF RESTDWLAZARUS}
-initialization
-{$I ..\RESTDWLazarusDrivers.lrs}
-{$ENDIF}
 
 end.
 
