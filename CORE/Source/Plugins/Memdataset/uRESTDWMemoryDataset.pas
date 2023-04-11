@@ -2003,7 +2003,6 @@ begin
 end;
 
 destructor TRESTDWMemTable.Destroy;
-var i: integer;
 begin
   if Self.Active then
     Self.Close;
