@@ -26,8 +26,7 @@ unit uRESTDWFphttpReg;
 interface
 
 uses
-  Classes, DesignIntf, DesignEditors,
-  uRESTDWFphttpBase;
+  Classes, PropEdits, uRESTDWFphttpBase;
 
 Type
   TPoolersList = Class(TStringProperty)
