@@ -58,13 +58,13 @@ type
 
   TRESTDWAuthenticatorBase = class(TRESTDWComponent)
   private
-    vAuthMessages: TRESTDWAuthMessages;
+    FAuthMessages: TRESTDWAuthMessages;
   public
     constructor Create;
     destructor Destroy; override;
   published
-    Property AuthMessages: TRESTDWAuthMessages Read vAuthMessages
-      Write vAuthMessages;
+    Property AuthMessages: TRESTDWAuthMessages Read FAuthMessages
+      Write FAuthMessages;
 
   end;
 
@@ -74,6 +74,7 @@ type
     FUserName: String;
   public
     constructor Create;
+    destructor Destroy; override;
   published
     property UserName: String read FUserName write FUserName;
     property Password: String read FPassword write FPassword;
@@ -143,6 +144,7 @@ type
     FExpiresIn: TDateTime;
   public
     constructor Create;
+    destructor Destroy; override;
   published
     property TokenType: TRESTDWAuthOptionTypes read FTokenType write FTokenType;
     property AutoBuildHex: Boolean read FAutoBuildHex write FAutoBuildHex;
@@ -191,9 +193,14 @@ end;
 constructor TRESTDWAuthBasic.Create;
 begin
   inherited;
-
   FUserName := cDefaultBasicAuthUser;
   FPassword := cDefaultBasicAuthPassword;
+end;
+
+destructor TRESTDWAuthBasic.Destroy;
+begin
+
+  inherited;
 end;
 
 { TRESTDWAuthToken }
@@ -556,17 +563,23 @@ begin
   FTokenType := rdwOATBasic;
 end;
 
+destructor TRESTDWAuthOAuth.Destroy;
+begin
+
+  inherited;
+end;
+
 { TRESTDWAuthenticatorBase }
 
 constructor TRESTDWAuthenticatorBase.Create;
 begin
-  vAuthMessages := TRESTDWAuthMessages.Create;
+  FAuthMessages := TRESTDWAuthMessages.Create;
 end;
 
 destructor TRESTDWAuthenticatorBase.Destroy;
 begin
-  If Assigned(vAuthMessages) Then
-    FreeAndNil(vAuthMessages);
+  If Assigned(FAuthMessages) Then
+    FreeAndNil(FAuthMessages);
   inherited;
 end;
 

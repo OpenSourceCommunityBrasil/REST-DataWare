@@ -28,6 +28,9 @@
 interface
 
 uses
+  {$IFDEF RESTDWLAZARUS}
+    LResources,
+  {$ENDIF}
   Classes, SysUtils, DB,
   DBAccess, IBC,  MemDS,
   uRESTDWDriverBase, uRESTDWBasicTypes,
@@ -442,6 +445,11 @@ begin
     FreeAndNil(vDWMemtable);
   end;
 end;
+
+{$IFDEF RESTDWLAZARUS}
+initialization
+{$I ..\RESTDWLazarusDrivers.lrs}
+{$ENDIF}
 
 end.
 
