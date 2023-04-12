@@ -229,65 +229,6 @@ Var
   If URL = '' Then
    URL := '/';
  End;
- Procedure BuildCORS(Routes : TRESTDWRoutes);
- Var
-  vStrAcceptedRoutes : String;
- Begin
-  vStrAcceptedRoutes := '';
-  If Assigned(CORS_CustomHeaders) Then
-   Begin
-    CORS_CustomHeaders.Clear;
-    If crAll In Routes Then
-     CORS_CustomHeaders.Add('Access-Control-Allow-Methods=GET, POST, PATCH, PUT, DELETE, OPTIONS')
-    Else
-     Begin
-      If crGet in Routes Then
-       Begin
-        If vStrAcceptedRoutes <> '' Then
-         vStrAcceptedRoutes := vStrAcceptedRoutes + ', GET'
-        Else
-         vStrAcceptedRoutes := 'GET';
-       End;
-      If crPost in Routes Then
-       Begin
-        If vStrAcceptedRoutes <> '' Then
-         vStrAcceptedRoutes := vStrAcceptedRoutes + ', POST'
-        Else
-         vStrAcceptedRoutes := 'POST';
-       End;
-      If crPut in Routes Then
-       Begin
-        If vStrAcceptedRoutes <> '' Then
-         vStrAcceptedRoutes := vStrAcceptedRoutes + ', PUT'
-        Else
-         vStrAcceptedRoutes := 'PUT';
-       End;
-      If crPatch in Routes Then
-       Begin
-        If vStrAcceptedRoutes <> '' Then
-         vStrAcceptedRoutes := vStrAcceptedRoutes + ', PATCH'
-        Else
-         vStrAcceptedRoutes := 'PATCH';
-       End;
-      If crDelete in Routes Then
-       Begin
-        If vStrAcceptedRoutes <> '' Then
-         vStrAcceptedRoutes := vStrAcceptedRoutes + ', DELETE'
-        Else
-         vStrAcceptedRoutes := 'DELETE';
-       End;
-      If crOption in Routes Then
-       Begin
-        If vStrAcceptedRoutes <> '' Then
-         vStrAcceptedRoutes := vStrAcceptedRoutes + ', OPTION'
-        Else
-         vStrAcceptedRoutes := 'OPTION';
-       End;
-      If vStrAcceptedRoutes <> '' Then
-       CORS_CustomHeaders.Add('Access-Control-Allow-Methods=' + vStrAcceptedRoutes);
-     End;
-   End;
- End;
 Begin
  Result   := False;
  If Length(URL) = 0 Then
@@ -317,7 +258,7 @@ Begin
          vTempURL       := vTempRoute;
          vTempParamsURI := '';
          vParamMethods  := TRESTDWServerEvents(Components[I]).Events[A].Params;
-         BuildCORS(TRESTDWServerEvents(Components[I]).Events[A].Routes);
+         BuildCORS(TRESTDWServerEvents(Components[I]).Events[A].Routes, CORS_CustomHeaders);
          Break;
         End
        Else If SameText(vTempRoute + '/', Copy(vTempValue + '/', InitStrPos, Length(vTempRoute + '/') - FinalStrPos)) Then
@@ -326,7 +267,7 @@ Begin
          vTempURL       := vTempRoute;
          vTempParamsURI := Copy(vTempValue, Length(vTempRoute) + 2, Length(vTempValue));
          vParamMethods  := TRESTDWServerEvents(Components[I]).Events[A].Params;
-         BuildCORS(TRESTDWServerEvents(Components[I]).Events[A].Routes);
+         BuildCORS(TRESTDWServerEvents(Components[I]).Events[A].Routes, CORS_CustomHeaders);
         End;
       End;
     End
@@ -342,7 +283,7 @@ Begin
          vTempURL       := vTempRoute;
          vTempParamsURI := '';
          vParamMethods  := TRESTDWServerContext(Components[I]).ContextList[A].Params;
-         BuildCORS(TRESTDWServerContext(Components[I]).ContextList[A].Routes);
+         BuildCORS(TRESTDWServerContext(Components[I]).ContextList[A].Routes, CORS_CustomHeaders);
          Break;
         End
        Else If SameText(vTempRoute+'/', Copy(vTempValue+'/', 1, Length(vTempRoute+'/'))) Then
@@ -351,7 +292,7 @@ Begin
          vTempURL       := vTempRoute;
          vTempParamsURI := Copy(vTempValue, Length(vTempRoute) + 2, Length(vTempValue));
          vParamMethods  := TRESTDWServerContext(Components[I]).ContextList[A].Params;
-         BuildCORS(TRESTDWServerContext(Components[I]).ContextList[A].Routes);
+         BuildCORS(TRESTDWServerContext(Components[I]).ContextList[A].Routes, CORS_CustomHeaders);
         End;
       End;
      End;

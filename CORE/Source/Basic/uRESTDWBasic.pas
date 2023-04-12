@@ -1525,6 +1525,7 @@ Var
  RequestType         : TRequestType;
  vRequestHeader,
  vDecoderHeaderList  : TStringList;
+ PCustomHeaders      : ^TStrings;
  vTempContext        : TRESTDWContext;
  vTempEvent          : TRESTDWEvent;
  Function ExcludeTag(Value : String) : String;
@@ -2899,6 +2900,8 @@ Begin
                If (RequestTypeToRoute(RequestType) In TRESTDWAuthToken(vAuthenticator).GetTokenRoutes) Or
                   (crAll in TRESTDWAuthToken(vAuthenticator).GetTokenRoutes) Then
                 Begin
+                 PCustomHeaders := @ResponseHeaders;
+                 BuildCORS(TRESTDWAuthToken(vAuthenticator).GetTokenRoutes, TStrings(PCustomHeaders^));
                  If Assigned(TServerMethodDatamodule(vTempServerMethods).OnGetToken) Then
                   Begin
                    vTokenValidate := True;
@@ -3014,7 +3017,6 @@ Begin
             End{$ENDREGION}
            Else If vAuthenticator is TRESTDWAuthOAuth Then
             raise Exception.Create(cErrorOAuthNotImplenented);
-
            vErrorCode            := 200;
            vErrorMessage         := '';
           End;
