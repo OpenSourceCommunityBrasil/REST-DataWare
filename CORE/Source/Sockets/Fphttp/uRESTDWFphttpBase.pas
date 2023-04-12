@@ -38,9 +38,10 @@ Uses
 
 Type
 
-  THttpGetFlag         = (hgSendDoc, hgSendStream, hgWillSendMySelf,
-                       hg404, hg403, hg401, hg400, hgAcceptData,
-                       hgSendDirList, hg501);
+  THttpGetFlag = (hgSendDoc, hgSendStream, hgWillSendMySelf,
+                  hg404, hg403, hg401, hg400, hgAcceptData,
+                  hgSendDirList, hg501);
+
   TPoolerHttpConnection = class(TRequest)
   protected
     vRawData: AnsiString;
@@ -63,13 +64,16 @@ Type
   TOnServerStopped = Procedure(Sender: TObject) Of Object;
   TOnClientConnect = Procedure(Sender: TPoolerHttpConnection; Error: Word) Of Object;
   TOnClientDisconnect = Procedure(Sender: TPoolerHttpConnection; Error: Word) Of Object;
-  TOnDocumentReady = Procedure(Sender: TPoolerHttpConnection; Var Flags: THttpGetFlag)
-    Of Object;
+  TOnDocumentReady = Procedure(Sender: TPoolerHttpConnection; Var Flags: THttpGetFlag) Of Object;
   TOnAnswered = Procedure(Sender: TPoolerHttpConnection) Of Object;
   //TOnTimeout = Procedure(Sender: TPoolerHttpConnection; Reason: TTimeoutReason) of Object;
   TOnBlackListBlock = Procedure(IP, Port: string) Of Object;
   TOnBruteForceBlock = Procedure(IP, Port: string) Of Object;
   TOnServerStatusCheckBlock = Procedure(IP, Port: string) Of Object;
+
+  TOnRequest = Procedure(Sender: TObject;
+                          var ARequest: TFPHTTPConnectionRequest;
+                          var AResponse: TFPHTTPConnectionResponse) Of Object;
   {
   TIcsSelfAssignedCert = class(TPersistent)
   private
@@ -140,10 +144,13 @@ Type
   end;
   }
 
+  { TRESTDWFphttpServicePooler }
+
   TRESTDWFphttpServicePooler = Class(TRESTServicePoolerBase)
   Private
     // Events
     vOnException: TOnException;
+    vOnRequest : TOnRequest;
    {  vOnServerStarted: TOnServerStarted;
     vOnServerStopped: TOnServerStopped;
     vOnClientConnect: TOnClientConnect;
@@ -211,6 +218,7 @@ Type
     Procedure SetActive(Value: boolean); Override;
     Procedure EchoPooler(ServerMethodsClass: TComponent; AContext: TComponent;
       Var Pooler, MyIP: String; AccessTag: String; Var InvalidTag: boolean); Override;
+
   //  procedure onClientTimeout(Sender: TObject; Reason: TTimeoutReason);
   //  procedure onClientConnectServer(Sender: TObject; Client: TObject; Error: Word);
   //  procedure onClientDisconnectServer(Sender: TObject; Client: TObject; Error: Word);
@@ -259,16 +267,12 @@ Type
 
     // HTTP Params
     Property MaxClients: Integer Read vMaxClients Write vMaxClients default 0;
-    Property RequestTimeout: Integer Read vServiceTimeout Write vServiceTimeout
-      default 60000; // Connection TimeOut in Milliseconds
-    Property BuffSizeBytes: Integer Read vBuffSizeBytes Write vBuffSizeBytes
-      default 262144; // 256kb Default
-    Property BandWidthLimitBytes: Cardinal Read vBandWidthLimitBytes
-      Write vBandWidthLimitBytes default 0;
-    Property BandWidthSamplingSec: Cardinal Read vBandWidthSampleSec
-      Write vBandWidthSampleSec default 1;
+  {  Property RequestTimeout: Integer Read vServiceTimeout Write vServiceTimeout default 60000; // Connection TimeOut in Milliseconds
+    Property BuffSizeBytes: Integer Read vBuffSizeBytes Write vBuffSizeBytes default 262144; // 256kb Default
+    Property BandWidthLimitBytes: Cardinal Read vBandWidthLimitBytes Write vBandWidthLimitBytes default 0;
+    Property BandWidthSamplingSec: Cardinal Read vBandWidthSampleSec Write vBandWidthSampleSec default 1;
     Property ListenBacklog: Integer Read vListenBacklog Write vListenBacklog default 50;
-
+  }
     // Secutiry
    { procedure SetvIpBlackList(Lines: TStrings);
     Property IpBlackList: TStrings Read vIpBlackList Write SetvIpBlackList;
@@ -573,11 +577,13 @@ begin
   end;
 end;
   }
-Constructor TRESTDWFphttpServicePooler.Create(AOwner: TComponent);
+constructor TRESTDWFphttpServicePooler.Create(AOwner: TComponent);
 Begin
   Inherited Create(AOwner);
 
   HttpAppSrv := TFPHttpServer.Create(nil);
+  HttpAppSrv.Port:= ServicePort;
+  HttpAppSrv.OnRequest:= onRequest;
 
   {
   If Assigned(HttpAppSrv.SSLContext) Then
@@ -697,7 +703,7 @@ begin
     vOnClientDisconnect(Remote, Error);
 end;
  }
-Destructor TRESTDWFphttpServicePooler.Destroy;
+destructor TRESTDWFphttpServicePooler.Destroy;
 Begin
   Try
     If Active Then
@@ -734,8 +740,9 @@ Begin
   Inherited Destroy;
 End;
 
-Procedure TRESTDWFphttpServicePooler.EchoPooler(ServerMethodsClass, AContext: TComponent;
-  Var Pooler, MyIP: String; AccessTag: String; Var InvalidTag: boolean);
+procedure TRESTDWFphttpServicePooler.EchoPooler(ServerMethodsClass: TComponent;
+  AContext: TComponent; var Pooler, MyIP: String; AccessTag: String;
+  var InvalidTag: boolean);
 Var
   Remote: THTTPHeader;
   i: Integer;
@@ -794,6 +801,7 @@ Begin
   If MyIP = '' Then
     Raise Exception.Create(cInvalidPoolerName);
 End;
+
  {
 procedure TRESTDWIcsServicePooler.onPostedDataServer(Sender: TObject; ErrCode: Word);
 var
@@ -969,7 +977,7 @@ begin
   end;
 End;
   }
-Procedure TRESTDWFphttpServicePooler.SetActive(Value: boolean);
+procedure TRESTDWFphttpServicePooler.SetActive(Value: boolean);
 var
   x: Integer;
 Begin
@@ -979,7 +987,7 @@ Begin
       if not(Assigned(ServerMethodClass)) and (Self.GetDataRouteCount = 0) then
         raise Exception.Create(cServerMethodClassNotAssigned);
 
-      HttpAppSrv.Active:= True;
+       HttpAppSrv.Active:= True;
       {If Not HttpAppSrv.ListenAllOK Then
       Begin
         SetHttpServerParams;
@@ -1491,7 +1499,7 @@ Var
   End;
 
 begin
- // inherited;
+  //inherited;
 
   try
     try
