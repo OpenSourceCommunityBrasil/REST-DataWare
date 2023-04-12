@@ -439,10 +439,73 @@ Function GetTokenType   (Value      : String) : TRESTDWTokenType;
 Function CountExpression(Value      : String;
                          Expression : Char)   : Integer;
 Function GetSecretsValue(Value      : String) : String;
+Procedure BuildCORS(Routes                 : TRESTDWRoutes;
+                    Var CORS_CustomHeaders : TStrings);
 
 implementation
 
 Uses uRESTDWJSONInterface;
+
+Procedure BuildCORS(Routes                 : TRESTDWRoutes;
+                    Var CORS_CustomHeaders : TStrings);
+Var
+ vStrAcceptedRoutes : String;
+Begin
+ vStrAcceptedRoutes := '';
+ If Assigned(CORS_CustomHeaders) Then
+  Begin
+//   CORS_CustomHeaders.Clear;
+   If crAll In Routes Then
+    CORS_CustomHeaders.Add('Access-Control-Allow-Methods=GET, POST, PATCH, PUT, DELETE, OPTIONS')
+   Else
+    Begin
+     If crGet in Routes Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', GET'
+       Else
+        vStrAcceptedRoutes := 'GET';
+      End;
+     If crPost in Routes Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', POST'
+       Else
+        vStrAcceptedRoutes := 'POST';
+      End;
+     If crPut in Routes Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', PUT'
+       Else
+        vStrAcceptedRoutes := 'PUT';
+      End;
+     If crPatch in Routes Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', PATCH'
+       Else
+        vStrAcceptedRoutes := 'PATCH';
+      End;
+     If crDelete in Routes Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', DELETE'
+       Else
+        vStrAcceptedRoutes := 'DELETE';
+      End;
+     If crOption in Routes Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', OPTION'
+       Else
+        vStrAcceptedRoutes := 'OPTION';
+      End;
+     If vStrAcceptedRoutes <> '' Then
+      CORS_CustomHeaders.Add('Access-Control-Allow-Methods=' + vStrAcceptedRoutes);
+    End;
+  End;
+End;
 
 Function URLDecode(Const s : String) : String;
 Var
