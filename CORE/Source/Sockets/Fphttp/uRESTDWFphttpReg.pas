@@ -1,4 +1,4 @@
-unit uRESTDWFReg;
+unit uRESTDWFphttpReg;
 
 {$I ..\..\..\Source\Includes\uRESTDW.inc}
 {
@@ -26,22 +26,7 @@ unit uRESTDWFReg;
 interface
 
 uses
-  {$IFDEF FPC}
-    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
-    LResources, LazFileUtils, FormEditingIntf, PropEdits, lazideintf,
-    ProjectIntf, ComponentEditors, fpWeb, fphttp,
-  {$ELSE}
-    StrEdit, RTLConsts, Db, ColnEdit, DBReg, DesignIntf, DSDesign, ToolsApi,
-    DesignWindows, DesignEditors,
-    {$IFDEF COMPILER16_UP}UITypes,{$ENDIF}
-    {$IF CompilerVersion > 22}
-      ExptIntf,
-    {$ELSE}
-      Graphics, DbTables,
-    {$IFEND}
-  {$ENDIF}
-  Classes, Variants, TypInfo, SysUtils,
-  uRESTDWFhttpBase;
+  Classes, PropEdits, uRESTDWFphttpBase;
 
 Type
   TPoolersList = Class(TStringProperty)
@@ -55,15 +40,27 @@ Procedure Register;
 
 Implementation
 
-{$IFDEF FPC}
-uses
-  utemplateproglaz;
-{$ENDIF}
-
 Function TPoolersList.GetAttributes: TPropertyAttributes;
 Begin
   // editor, sorted list, multiple selection
   Result := [paValueList, paSortList];
+End;
+
+procedure TPoolersList.GetValues(Proc: TGetStrProc);
+Var
+  vLista: TStringList;
+  I: Integer;
+Begin
+  // Provide a list of Poolers
+  // With GetComponent(0) as TRESTDWIcsDatabase Do
+  // Begin
+  // Try
+  // vLista := TRESTDWIcsDatabase(GetComponent(0)).PoolerList;
+  // For I := 0 To vLista.Count - 1 Do
+  // Proc(vLista[I]);
+  // Except
+  // End;
+  // End;
 End;
 
 Procedure TPoolersList.Edit;
@@ -78,34 +75,13 @@ Begin
   End;
 end;
 
-Procedure TPoolersList.GetValues(Proc: TGetStrProc);
-Var
-  vLista: TStringList;
-  I: Integer;
-Begin
-  // Provide a list of Poolers
-  With GetComponent(0) as TRESTDWFhttpDatabase Do
-  Begin
-    Try
-      vLista := TRESTDWFhttpDatabase(GetComponent(0)).PoolerList;
-      For I := 0 To vLista.Count - 1 Do
-        Proc(vLista[I]);
-    Except
-    End;
-  End;
-End;
-
 Procedure Register;
 Begin
-  RegisterComponents('REST Dataware - Service', [TRESTDWFhttpServicePooler, TRESTDWFhttpPoolerList]);
-  RegisterComponents('REST Dataware - Client',  [TRESTDWFhttpClientREST, TRESTDWFhttpClientPooler]);
-  RegisterComponents('REST Dataware - DB', [TRESTDWFhttpDatabase]);
-  RegisterPropertyEditor(TypeInfo(String), TRESTDWFhttpDatabase, 'PoolerName',TPoolersList);
+  RegisterComponents('REST Dataware - Service', [TRESTDWFphttpServicePooler]);
 End;
 
-{$IFDEF FPC}
 initialization
-{$I RESTDWFhttpSockets.lrs}
-{$ENDIF}
+
+Finalization
 
 end.

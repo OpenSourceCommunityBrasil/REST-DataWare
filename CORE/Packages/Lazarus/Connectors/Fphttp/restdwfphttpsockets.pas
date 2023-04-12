@@ -2,21 +2,21 @@
   This source is only used to compile and install the package.
  }
 
-unit RESTDWFhttpSockets;
+unit RESTDWFphttpSockets;
 
 {$warn 5023 off : no warning about unused units}
 interface
 
 uses
-  uRESTDWFhttpBase, uRESTDWFReg, LazarusPackageIntf;
+  uRESTDWFphttpBase, uRESTDWFphttpReg, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
-  RegisterUnit('uRESTDWFReg', @uRESTDWFReg.Register);
+  RegisterUnit('uRESTDWFphttpReg', @uRESTDWFphttpReg.Register);
 end;
 
 initialization
-  RegisterPackage('RESTDWFhttpSockets', @Register);
+  RegisterPackage('RESTDWFphttpSockets', @Register);
 end.

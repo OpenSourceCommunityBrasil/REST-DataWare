@@ -153,10 +153,12 @@ begin
   ADataset.Open;
 
   ADataset.DisableControls;
-  for r := 1 to vRecordCount do begin
+  While r <=  vRecordCount do //Anderson
+  begin
     ADataset.Append;
     LoadRecordFromStream(ADataset,AStream);
     ADataset.Post;
+    inc(r);
   end;
 
   ADataset.EnableControls;
@@ -307,7 +309,7 @@ begin
   vFieldCount := Length(FFieldNames);
   vFieldCount := vFieldCount - 1;
 
-  for r := 0 to vRecCount do begin
+  while r <= vRecCount do begin        //Anderson
     GetMem(vBuf, IDataset.GetRecordSize);
     clearBuffer;
     vDecBuf := 0;
@@ -456,13 +458,14 @@ begin
               if EncodeStrs then
                 vString := DecodeStrings(vString);
             {$ENDIF}
-            vInt64 := Length(vString) * SizeOf(WideChar);
-            vInt64 := vInt64 + 1;
-            vBlobField := New(PRESTDWBlobField);
+            vInt64 := Length(widestring(Vstring)) * SizeOf(WideChar);
+            //vInt64 := vInt64 + 1;
+            vBlobField :=  New(PRESTDWBlobField);
             FillChar(vBlobField^, SizeOf(TRESTDWBlobField), 0);
             vBlobField^.Size := vInt64;
-            ReAllocMem(vBlobField^.Buffer, vInt64);
-            Move(WideString(vString)[InitStrPos], vBlobField^.Buffer^, vInt64);
+            ReallocMem(vBlobField^.Buffer, vInt64);
+            Move(widestring(Vstring)[InitStrPos], vBlobField^.Buffer^, vInt64);
+
             Move(vBlobField,vBuf^,SizeOf(Pointer));
             IDataset.AddBlobList(vBlobField);
           end;
@@ -490,6 +493,7 @@ begin
             vBlobField^.Size := vInt64;
             ReAllocMem(vBlobField^.Buffer, vInt64);
             Move(vString[InitStrPos], vBlobField^.Buffer^, vInt64);
+
             Move(vBlobField,vBuf^,SizeOf(Pointer));
             IDataset.AddBlobList(vBlobField);
           end;
@@ -543,6 +547,7 @@ begin
     vRec.Buffer := vBuf;
     Freemem(vBuf);
     IDataset.AddNewRecord(vRec);
+    inc(r);
   end;
 end;
 

@@ -819,7 +819,7 @@ Begin
     Begin //TODO
      If Length(vTempString) > 0 Then
      Begin
-       vTempString:= Tencoding.UTF8.Getstring(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})));
+       vTempString:= Tencoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))));
        If (vObjectValue In [ovWideString, ovWidememo, ovMemo]) then
        Begin
          vTempString:=DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
@@ -6088,7 +6088,7 @@ Var
                        If TObjectValue(T) = ovLargeint Then
                         Stream.Write(J, Sizeof(DWInt64))
                        Else
-                        Stream.Write(J, Sizeof(DWInteger));
+                        Stream.Write(J, Sizeof(DWInt64));
                       End;
                     End;
        ovByte     : Begin
@@ -6371,7 +6371,7 @@ Var
                           End
                          Else
                           Begin
-                           Stream.Read(J, Sizeof(DWInteger));
+                           Stream.Read(J, Sizeof(DWInt64));
                            vItem.AsInteger := J;
                           End;
                         End;

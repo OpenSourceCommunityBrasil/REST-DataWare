@@ -2,15 +2,15 @@
 <CONFIG>
   <Package Version="5">
     <PathDelim Value="\"/>
-    <Name Value="RESTDWFhttpSockets"/>
+    <Name Value="RESTDWFphttpSockets"/>
     <Type Value="RunAndDesignTime"/>
     <CompilerOptions>
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\..\..\..\Source\Includes"/>
-        <OtherUnitFiles Value="..\..\..\..\Source\Sockets\Fhttp"/>
-        <UnitOutputDirectory Value="..\..\..\..\compiledlaz"/>
+        <OtherUnitFiles Value="..\..\..\..\Source;..\..\..\..\Source\Sockets\Fphttp;..\..\..\..\Source\Basic"/>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Linking>
         <Debugging>
@@ -18,26 +18,28 @@
         </Debugging>
       </Linking>
     </CompilerOptions>
-    <Version Major="2" Minor="1"/>
     <Files>
       <Item>
-        <Filename Value="..\..\..\..\Source\Sockets\Fhttp\uRESTDWFhttpBase.pas"/>
-        <UnitName Value="uRESTDWFhttpBase"/>
+        <Filename Value="..\..\..\..\Source\Sockets\Fphttp\uRESTDWFphttpBase.pas"/>
+        <UnitName Value="uRESTDWFphttpBase"/>
       </Item>
       <Item>
-        <Filename Value="..\..\..\..\Source\Sockets\Fhttp\uRESTDWFReg.pas"/>
+        <Filename Value="..\..\..\..\Source\Sockets\Fphttp\uRESTDWFphttpReg.pas"/>
         <HasRegisterProc Value="True"/>
-        <UnitName Value="uRESTDWFReg"/>
+        <UnitName Value="uRESTDWFphttpReg"/>
       </Item>
       <Item>
-        <Filename Value="RESTDWfhttpSockets.lrs"/>
-        <Type Value="LRS"/>
+        <Filename Value="..\..\..\..\Source\Includes\uRESTDW.inc"/>
+        <Type Value="Include"/>
       </Item>
     </Files>
     <RequiredPkgs>
       <Item>
-        <PackageName Value="RESTDataWareComponents"/>
+        <PackageName Value="restdatawarecomponents"/>
         <MinVersion Major="2" Valid="True"/>
+      </Item>
+      <Item>
+        <PackageName Value="weblaz"/>
       </Item>
       <Item>
         <PackageName Value="FCL"/>

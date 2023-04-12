@@ -744,6 +744,7 @@ end;
 function TFDPhysRDWCommand.readDataStream(col: integer): Variant;
 var
   vString: utf8string;
+  vRawByteString: RawbyteString;
   vInt64: Int64;
   vInt: integer;
   vByte: Byte;
@@ -769,18 +770,18 @@ begin
     Exit;
 
   // N - Bytes
-  if (FFieldTypes[col] in [dwftFixedChar, dwftString]) then
+  if (FFieldTypes[col] in [dwftFixedChar, dwftString, dwftMemo]) then
   begin
     FStream.Read(vInt64, SizeOf(vInt64));
-    vString := '';
+    vRawByteString := '';
     if vInt64 > 0 then
     begin
-      SetLength(vString, vInt64);
-      FStream.Read(vString[InitStrPos], vInt64);
-      if FEncodeStrs then
-        vString := DecodeStrings(vString);
+      SetLength(vRawByteString, vInt64);
+      FStream.Read(vRawByteString[InitStrPos], vInt64);
+      if (FEncodeStrs)then
+        vRawByteString := DecodeStrings(vRawByteString)
     end;
-    Result := vString;
+    Result := vRawByteString;
     if Pos(#0, Result) > 0 then
       Result := StringReplace(Result, #0, '', [rfReplaceAll]);
   end
@@ -882,7 +883,7 @@ begin
     Result := vCurrency;
   end
   // N Bytes - Wide Memos
-  else if (FFieldTypes[col] in [dwftMemo, dwftWideMemo, dwftFmtMemo]) then
+  else if (FFieldTypes[col] in [ dwftWideMemo, dwftFmtMemo]) then
   begin
     FStream.Read(vInt64, SizeOf(vInt64));
     if vInt64 > 0 then
@@ -936,7 +937,6 @@ end;
 function TFDPhysRDWCommand.readFieldStream: TFDPhysDataColumnInfo;
 var
   vFieldKind : TFieldKind;
-  vInt : integer;
   vString : utf8string;
   vFieldType : TFieldType;
   vFielSize: integer;

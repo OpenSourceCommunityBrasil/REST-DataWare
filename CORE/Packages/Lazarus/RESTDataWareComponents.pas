@@ -28,7 +28,7 @@ uses
   uRESTDWJSONInterface, uRESTDWSerialize, uRESTDWMimeTypes, uRESTDWAbout, 
   uRESTDWZlib, uRESTDWMemoryDataset, uRESTDWDesignReg, uRESTDWProtoTypes, 
   uRESTDWSelfSigned, uRESTDWExprParser, uRESTDWAuthenticators, 
-  LazarusPackageIntf;
+  uRESTDWStorageBin, LazarusPackageIntf;
 
 implementation
 

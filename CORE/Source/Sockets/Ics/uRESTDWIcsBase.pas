@@ -901,7 +901,7 @@ begin
 
         if vBruteForceProtection.BruteForceAllow(Pooler.PeerAddr) then
         begin
-          if Self.AuthMessages.AuthDialog then
+          if Self.Authenticator <> nil then
             Pooler.Answer401
           else
             Pooler.Answer403;

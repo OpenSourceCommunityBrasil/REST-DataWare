@@ -378,15 +378,7 @@ End;
    vCriticalSection    : TRTLCriticalSection;
    vDatabaseCharSet    : TDatabaseCharSet;
   {$ELSE}
-   {$IFDEF DELPHIXEUP}
-    {$IF NOT Defined(RESTDWWINDOWS) AND not Defined(RESTDWLINUXFMX)}
-     vCriticalSection : TRTLCriticalSection;
-    {$ELSE}
-     vCriticalSection : TCriticalSection;
-    {$IFEND}
-   {$ELSE}
     vCriticalSection : TCriticalSection;
-   {$ENDIF}
   {$ENDIF}
   vBeforeUseCriptKey   : TBeforeUseCriptKey;
   vCORSCustomHeaders,
@@ -397,7 +389,7 @@ End;
   vCORS,
   vActive                : Boolean;
   vAuthenticator         : TRESTDWAuthenticatorBase;
-  vAuthMessages          : TRESTDWAuthMessages;
+//  vAuthMessages          : TRESTDWAuthMessages;
   vProxyOptions          : TProxyConnectionInfo;
   vServiceTimeout,
   vServicePort           : Integer;
@@ -613,7 +605,7 @@ End;
  Published
   Property Active                  : Boolean                       Read vActive                  Write SetActive;
   Property Authenticator           : TRESTDWAuthenticatorBase      Read vAuthenticator           Write SetAuthenticator;
-  Property AuthMessages            : TRESTDWAuthMessages           Read vAuthMessages            Write vAuthMessages;
+//  Property AuthMessages            : TRESTDWAuthMessages           Read vAuthMessages            Write vAuthMessages;
   Property CORS                    : Boolean                       Read vCORS                    Write vCORS;
   Property CORS_CustomHeaders      : TStringList                   Read vCORSCustomHeaders       Write SetCORSCustomHeader;
   Property DefaultPage             : TStringList                   Read vDefaultPage             Write SetDefaultPage;
@@ -2815,25 +2807,14 @@ Begin
          TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
          If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
           Begin
-           {$IFNDEF RESTDWLAZARUS}
-            {$IFDEF DELPHIXEUP}
-             {$IF not Defined(RESTDWWINDOWS) AND not Defined(RESTDWLINUXFMX)}
-              InitializeCriticalSection(vCriticalSection);
-              EnterCriticalSection(vCriticalSection);
-             {$ELSE}
-              If Not Assigned(vCriticalSection) Then
-               vCriticalSection := TCriticalSection.Create;
-              vCriticalSection.Acquire;
-             {$IFEND}
-            {$ELSE}
-             If Not Assigned(vCriticalSection)  Then
-              vCriticalSection := TCriticalSection.Create;
-             vCriticalSection.Acquire;
-            {$ENDIF}
-           {$ELSE}
+            {$IFDEF RESTDWLAZARUS}
             InitCriticalSection(vCriticalSection);
             EnterCriticalSection(vCriticalSection);
-           {$ENDIF}
+            {$ELSE}
+            If Not Assigned(vCriticalSection) Then
+              vCriticalSection := TCriticalSection.Create;
+            vCriticalSection.Acquire;
+            {$ENDIF}
           End;
          TServerMethodDatamodule(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
          If vAuthenticator <> Nil Then
@@ -2905,7 +2886,7 @@ Begin
                  If Assigned(TServerMethodDatamodule(vTempServerMethods).OnGetToken) Then
                   Begin
                    vTokenValidate := True;
-                   vAuthTokenParam := TRESTDWAuthToken.Create(Self);
+                   vAuthTokenParam := TRESTDWAuthToken.Create;
                    vAuthTokenParam.Assign(TRESTDWAuthToken(vAuthenticator));
                   {$IFNDEF FPC}
                    If Trim(Token) <> '' Then
@@ -2969,7 +2950,7 @@ Begin
                 vNeedAuthorization := vTempEvent.NeedAuthorization;
                If vNeedAuthorization Then
                 Begin
-                 vAuthTokenParam := TRESTDWAuthToken.Create(Self);
+                 vAuthTokenParam := TRESTDWAuthToken.Create;
                  vAuthTokenParam.Assign(TRESTDWAuthToken(vAuthenticator));
                  If DWParams.ItemsString[TRESTDWAuthToken(vAuthenticator).Key] <> Nil Then
                   vToken         := DWParams.ItemsString[TRESTDWAuthToken(vAuthenticator).Key].AsString
@@ -3166,32 +3147,16 @@ Begin
          Begin
           If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
            Begin
-            {$IFNDEF RESTDWLAZARUS}
-             {$IFDEF DELPHIXEUP}
-              {$IF not Defined(RESTDWWINDOWS) AND not Defined(RESTDWLINUXFMX)}
-               If Assigned(vCriticalSection) Then
-                Begin
-                 LeaveCriticalSection(vCriticalSection);
-                 DeleteCriticalSection(vCriticalSection);
-                End;
-              {$ELSE}
-               If Assigned(vCriticalSection) Then
-                Begin
-                 vCriticalSection.Release;
-//                 FreeAndNil(vCriticalSection);
-                End;
-              {$IFEND}
-             {$ELSE}
-              If Assigned(vCriticalSection) Then
-               Begin
-                vCriticalSection.Release;
-                FreeAndNil(vCriticalSection);
-               End;
-             {$ENDIF}
-            {$ELSE}
+             {$IFDEF RESTDWLAZARUS}
              LeaveCriticalSection(vCriticalSection);
              DoneCriticalSection(vCriticalSection);
-            {$ENDIF}
+             {$ELSE}
+              If Assigned(vCriticalSection) Then
+              Begin
+                vCriticalSection.Release;
+                FreeAndNil(vCriticalSection);
+              End;
+             {$ENDIF}
            End;
           Try
            vTempServerMethods.free;
@@ -4125,6 +4090,18 @@ Begin
       End;
      If PoolerName <> '' Then
       vBaseUrl := PoolerName;
+
+
+      //* Tive que adicionar porque o cliente espera este parametro
+      If DWParams.ItemsString['MessageError'] = Nil Then
+      Begin
+       JSONParam                 := TJSONParam.Create(DWParams.Encoding);
+       JSONParam.ParamName       := 'MessageError';
+       JSONParam.ObjectDirection := odOut;
+       DWParams.Add(JSONParam);
+      End;
+      DWParams.ItemsString['MessageError'].AsString :='';
+
      If ReturnEvent(BaseObject, vUrlMethod, vBaseUrl, vResult, DWParams, DataMode, ErrorCode, ContentType, Accesstag, RequestType, RequestHeader) Then
       Begin
        JSONStr := vResult;
@@ -5431,8 +5408,14 @@ Begin
           Begin
            vResult := '';
            TRESTDWServerEvents(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
+           IF TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].NeedAuthorization then
+           Begin
            If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest) Then
             TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest(DWParams, vRejected, vErrorMessage, ErrorCode, RequestHeader);
+           end
+           else
+             Vrejected:= False;
+
            If Not vRejected Then
             Begin
              TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].CompareParams(DWParams);
@@ -5816,7 +5799,7 @@ End;
 Constructor TRESTServiceBase.Create(AOwner: TComponent);
 Begin
  Inherited;
- vAuthMessages                          := TRESTDWAuthMessages.Create;
+// vAuthMessages                          := TRESTDWAuthMessages.Create;
  vProxyOptions                          := TProxyConnectionInfo.Create;
  vDefaultPage                           := TStringList.Create;
  vCORSCustomHeaders                     := TStringList.Create;
@@ -5846,8 +5829,8 @@ End;
 
 Destructor TRESTServiceBase.Destroy;
 Begin
- If Assigned(vAuthMessages)          Then
-  FreeAndNil(vAuthMessages);
+// If Assigned(vAuthMessages)          Then
+//  FreeAndNil(vAuthMessages);
  If Assigned(vProxyOptions)          Then
   FreeAndNil(vProxyOptions);
  If Assigned(vCripto)                Then

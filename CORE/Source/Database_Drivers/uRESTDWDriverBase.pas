@@ -589,9 +589,21 @@ begin
             end;
           end
           else if vParam.RESTDWDataTypeParam in [dwftFixedChar, dwftFixedWideChar,
-                  dwftString, dwftWideString, dwftMemo, dwftFmtMemo, dwftWideMemo] then begin
+                   dwftWideString, dwftWideMemo] then begin
               if (not DWParams[I].IsNull) then
                vParam.Value := DWParams[I].AsString
+              Else
+               vParam.Clear;
+          end
+          else if vParam.RESTDWDataTypeParam in [dwftString, dwftMemo,
+                    dwftFmtMemo] then begin
+              if (not DWParams[I].IsNull) then
+              Begin
+                if vParam.RESTDWDataTypeParam in [dwftMemo] then
+                 vParam.Value := utf8tostring(DecodeStrings(DWParams[I].AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
+                else
+                 vParam.Value := utf8tostring(DWParams[I].AsString);
+              End
               Else
                vParam.Clear;
           end
