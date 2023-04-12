@@ -354,7 +354,8 @@ var
   {$ENDIF}
 begin
   SetLength(FVariantTable,FRecordCount);
-  for i := 0 to FRecordCount-1 do begin
+  i := 0;
+  while i <= FRecordCount-1 do begin
     SetLength(FVariantTable[i],FFieldCount);
     for j := 0 to FFieldCount-1 do begin
       FStream.Read(vBoolean,SizeOf(vBoolean));
