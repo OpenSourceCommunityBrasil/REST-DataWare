@@ -3001,6 +3001,10 @@ Var
            Begin
             vTempValue    := Format('"%s"', [EncodeStrings(MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})])
            End
+          Else If vMassiveFields.Items[I-1].vFieldType in [ovDate, ovTime, ovDateTime, ovTimeStamp] Then
+           Begin
+             vTempValue    := Format('"%d"', [DateTimeToUnix(StrToDateTime(MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.AsString))])
+           End
           Else
            vTempValue    := Format('"%s"', [MassiveLineBuff.vMassiveValues.Items[I].vJSONValue.AsString])
          End;
