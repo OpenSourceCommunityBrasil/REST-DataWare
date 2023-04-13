@@ -38,7 +38,11 @@ Uses
 
 Type
 
-  TPoolerHttpConnection = class(THTTPHeader)
+  THttpGetFlag = (hgSendDoc, hgSendStream, hgWillSendMySelf,
+                  hg404, hg403, hg401, hg400, hgAcceptData,
+                  hgSendDirList, hg501);
+
+  TPoolerHttpConnection = class(TRequest)
   protected
     vRawData: AnsiString;
     vRawDataLen: Integer;
@@ -47,12 +51,12 @@ Type
     vDestroyCS: TCriticalSection;
     vProcessDocumentThread: TThread;
   public
-    function GetTrafficInBytes: Int64;
-    function GetTrafficOutBytes: Int64;
+    //function GetTrafficInBytes: Int64;
+    //function GetTrafficOutBytes: Int64;
     procedure ProcessDocument(Sender: TObject; BodyStream: TStream; Flag: THttpGetFlag; ServicePooler: TRESTServicePoolerBase);
     procedure onDestroyingHttpConnection(Sender: TObject);
     destructor Destroy; override;
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); overload;
   end;
 
   TOnException = Procedure(Sender: TPoolerHttpConnection; Error: String) Of Object;
@@ -60,13 +64,16 @@ Type
   TOnServerStopped = Procedure(Sender: TObject) Of Object;
   TOnClientConnect = Procedure(Sender: TPoolerHttpConnection; Error: Word) Of Object;
   TOnClientDisconnect = Procedure(Sender: TPoolerHttpConnection; Error: Word) Of Object;
-  TOnDocumentReady = Procedure(Sender: TPoolerHttpConnection; Var Flags: THttpGetFlag)
-    Of Object;
+  TOnDocumentReady = Procedure(Sender: TPoolerHttpConnection; Var Flags: THttpGetFlag) Of Object;
   TOnAnswered = Procedure(Sender: TPoolerHttpConnection) Of Object;
-  TOnTimeout = Procedure(Sender: TPoolerHttpConnection; Reason: TTimeoutReason) of Object;
+  //TOnTimeout = Procedure(Sender: TPoolerHttpConnection; Reason: TTimeoutReason) of Object;
   TOnBlackListBlock = Procedure(IP, Port: string) Of Object;
   TOnBruteForceBlock = Procedure(IP, Port: string) Of Object;
   TOnServerStatusCheckBlock = Procedure(IP, Port: string) Of Object;
+
+  TOnRequest = Procedure(Sender: TObject;
+                          var ARequest: TFPHTTPConnectionRequest;
+                          var AResponse: TFPHTTPConnectionResponse) Of Object;
   {
   TIcsSelfAssignedCert = class(TPersistent)
   private
@@ -136,11 +143,14 @@ Type
       write vBruteForceExpirationMin default 30; // Blocked IP expiration time in minutes
   end;
   }
-  TOnException = Procedure(Sender: EHTTPServer; Error: String) Of Object;
+
+  { TRESTDWFphttpServicePooler }
+
   TRESTDWFphttpServicePooler = Class(TRESTServicePoolerBase)
   Private
     // Events
     vOnException: TOnException;
+    vOnRequest : TOnRequest;
    {  vOnServerStarted: TOnServerStarted;
     vOnServerStopped: TOnServerStopped;
     vOnClientConnect: TOnClientConnect;
@@ -198,19 +208,20 @@ Type
       StatusCode: Integer; ContentType, Header: String);
    }
     // Prepare procedures
-    procedure SetHttpServerSSL;
-    procedure SetHttpServerParams;
-    procedure SetSocketServerParams;
+    //procedure SetHttpServerSSL;
+    //procedure SetHttpServerParams;
+    //procedure SetSocketServerParams;
    // procedure SetHttpConnectionParams(Remote: TPoolerHttpConnection);
 
     // Misc Procedures
-    Function ClientCount: Integer;
+    //Function ClientCount: Integer;
     Procedure SetActive(Value: boolean); Override;
     Procedure EchoPooler(ServerMethodsClass: TComponent; AContext: TComponent;
       Var Pooler, MyIP: String; AccessTag: String; Var InvalidTag: boolean); Override;
+
   //  procedure onClientTimeout(Sender: TObject; Reason: TTimeoutReason);
-    procedure onClientConnectServer(Sender: TObject; Client: TObject; Error: Word);
-    procedure onClientDisconnectServer(Sender: TObject; Client: TObject; Error: Word);
+  //  procedure onClientConnectServer(Sender: TObject; Client: TObject; Error: Word);
+  //  procedure onClientDisconnectServer(Sender: TObject; Client: TObject; Error: Word);
 
   Published
     // Events
@@ -256,16 +267,12 @@ Type
 
     // HTTP Params
     Property MaxClients: Integer Read vMaxClients Write vMaxClients default 0;
-    Property RequestTimeout: Integer Read vServiceTimeout Write vServiceTimeout
-      default 60000; // Connection TimeOut in Milliseconds
-    Property BuffSizeBytes: Integer Read vBuffSizeBytes Write vBuffSizeBytes
-      default 262144; // 256kb Default
-    Property BandWidthLimitBytes: Cardinal Read vBandWidthLimitBytes
-      Write vBandWidthLimitBytes default 0;
-    Property BandWidthSamplingSec: Cardinal Read vBandWidthSampleSec
-      Write vBandWidthSampleSec default 1;
+  {  Property RequestTimeout: Integer Read vServiceTimeout Write vServiceTimeout default 60000; // Connection TimeOut in Milliseconds
+    Property BuffSizeBytes: Integer Read vBuffSizeBytes Write vBuffSizeBytes default 262144; // 256kb Default
+    Property BandWidthLimitBytes: Cardinal Read vBandWidthLimitBytes Write vBandWidthLimitBytes default 0;
+    Property BandWidthSamplingSec: Cardinal Read vBandWidthSampleSec Write vBandWidthSampleSec default 1;
     Property ListenBacklog: Integer Read vListenBacklog Write vListenBacklog default 50;
-
+  }
     // Secutiry
    { procedure SetvIpBlackList(Lines: TStrings);
     Property IpBlackList: TStrings Read vIpBlackList Write SetvIpBlackList;
@@ -279,14 +286,15 @@ Type
     vRemote: TPoolerHttpConnection;
     vBodyStream: TStream;
     vFlag: THttpGetFlag;
-    vICSService: TRESTDWIcsServicePooler;
+    vICSService: TRESTDWFphttpServicePooler;
+
   protected
     procedure Execute; override;
   public
     property Remote: TPoolerHttpConnection read vRemote write vRemote;
     property BodyStream: TStream read vBodyStream write vBodyStream;
     property Flag: THttpGetFlag read vFlag write vFlag;
-    property ICSService: TRESTDWIcsServicePooler read vICSService write vICSService;
+    property ICSService: TRESTDWFphttpServicePooler read vICSService write vICSService;
     constructor Create;
     destructor Destroy; override;
   end;
@@ -569,11 +577,13 @@ begin
   end;
 end;
   }
-Constructor TRESTDWFphttpServicePooler.Create(AOwner: TComponent);
+constructor TRESTDWFphttpServicePooler.Create(AOwner: TComponent);
 Begin
   Inherited Create(AOwner);
 
   HttpAppSrv := TFPHttpServer.Create(nil);
+  HttpAppSrv.Port:= ServicePort;
+  HttpAppSrv.OnRequest:= onRequest;
 
   {
   If Assigned(HttpAppSrv.SSLContext) Then
@@ -693,7 +703,7 @@ begin
     vOnClientDisconnect(Remote, Error);
 end;
  }
-Destructor TRESTDWFphttpServicePooler.Destroy;
+destructor TRESTDWFphttpServicePooler.Destroy;
 Begin
   Try
     If Active Then
@@ -730,8 +740,9 @@ Begin
   Inherited Destroy;
 End;
 
-Procedure TRESTDWFphttpServicePooler.EchoPooler(ServerMethodsClass, AContext: TComponent;
-  Var Pooler, MyIP: String; AccessTag: String; Var InvalidTag: boolean);
+procedure TRESTDWFphttpServicePooler.EchoPooler(ServerMethodsClass: TComponent;
+  AContext: TComponent; var Pooler, MyIP: String; AccessTag: String;
+  var InvalidTag: boolean);
 Var
   Remote: THTTPHeader;
   i: Integer;
@@ -790,6 +801,7 @@ Begin
   If MyIP = '' Then
     Raise Exception.Create(cInvalidPoolerName);
 End;
+
  {
 procedure TRESTDWIcsServicePooler.onPostedDataServer(Sender: TObject; ErrCode: Word);
 var
@@ -965,7 +977,7 @@ begin
   end;
 End;
   }
-Procedure TRESTDWFphttpServicePooler.SetActive(Value: boolean);
+procedure TRESTDWFphttpServicePooler.SetActive(Value: boolean);
 var
   x: Integer;
 Begin
@@ -975,7 +987,7 @@ Begin
       if not(Assigned(ServerMethodClass)) and (Self.GetDataRouteCount = 0) then
         raise Exception.Create(cServerMethodClassNotAssigned);
 
-      HttpAppSrv.Active:= True;
+       HttpAppSrv.Active:= True;
       {If Not HttpAppSrv.ListenAllOK Then
       Begin
         SetHttpServerParams;
@@ -1018,13 +1030,13 @@ End;
 
 constructor TPoolerHttpConnection.Create(AOwner: TComponent);
 begin
-  DocStream := nil;
+  //DocStream := nil;
 
   vProcessDocumentThread := nil;
 
   vDestroyCS := nil;
 
-  Inherited Create(AOwner);
+  Inherited Create();
 
   vDestroyCS := TCriticalSection.Create;
 
@@ -1038,7 +1050,7 @@ begin
 
   vBytesOut := 0;
 
-  OnDestroying := onDestroyingHttpConnection;
+ // OnDestroying := onDestroyingHttpConnection;
 end;
 
 destructor TPoolerHttpConnection.Destroy;
@@ -1053,12 +1065,12 @@ begin
   vBytesIn := 0;
 
   vBytesOut := 0;
-
+  {
   if Assigned(DocStream) then
   begin
     DocStream.Free;
     DocStream := nil;
-  end;
+  end;    }
 
   inherited Destroy;
 
@@ -1093,7 +1105,7 @@ procedure TPoolerHttpConnection.ProcessDocument(Sender: TObject; BodyStream: TSt
   Flag: THttpGetFlag; ServicePooler: TRESTServicePoolerBase);
 var
   Remote: TPoolerHttpConnection;
-  ICSService: TRESTDWIcsServicePooler;
+  ICSService: TRESTDWFphttpServicePooler;
   ProcessDocumentThreadT: TProcessDocumentThread;
 begin
   try
@@ -1101,7 +1113,7 @@ begin
 
     ProcessDocumentThreadT := (vProcessDocumentThread as TProcessDocumentThread);
     Remote := Sender as TPoolerHttpConnection;
-    ICSService := (ServicePooler as TRESTDWFhttpServicePooler);
+    ICSService := (ServicePooler as TRESTDWFphttpServicePooler);
 
     ProcessDocumentThreadT.Remote := Remote;
     ProcessDocumentThreadT.Flag := Flag;
@@ -1120,7 +1132,7 @@ begin
       ProcessDocumentThreadT.BodyStream.Position := 0;
     end;
 
-    if (Remote.RequestContentLength <> ProcessDocumentThreadT.BodyStream.Size) then
+    if (Remote.ContentLength{ RequestContentLength } <> ProcessDocumentThreadT.BodyStream.Size) then
       raise Exception.Create(cIcsCorruptedPackage);
 
     ProcessDocumentThreadT.Start;
@@ -1130,13 +1142,13 @@ begin
       try
         if Assigned(ICSService.vOnException) then
         begin
-          if ICSService.HttpAppSrv.IsClient(Remote) then
+         { if ICSService.HttpAppSrv. IsClient(Remote) then
             ICSService.vOnException(Remote, 'ProcessDocument - ' + E.Message)
-          else
+          else  }
             ICSService.vOnException(nil, 'ProcessDocument - ' + cIcsHTTPConnectionClosed);
         end;
       finally
-        ICSService.DisconnectClient(Remote, ICSService.HttpAppSrv);
+       // ICSService.DisconnectClient(Remote, ICSService.HttpAppSrv);
       end;
     end;
   end;
@@ -1355,7 +1367,7 @@ begin
 end;
 }
 { TIcsSelfAssignedCert }
-
+{
 function TIcsSelfAssignedCert.CertificateString: string;
 begin
   Result := vCert.SaveCertToText;
@@ -1407,7 +1419,7 @@ function TIcsSelfAssignedCert.PrivateKeyString: string;
 begin
   Result := vCert.SavePKeyToText;
 end;
-
+  }
 { TProcessDocumentThread }
 
 constructor TProcessDocumentThread.Create;
@@ -1455,7 +1467,7 @@ Var
 
   Procedure Redirect(Url: String);
   Begin
-    vRemote.WebRedirectURL := Url;
+    TResponse(vRemote).SendRedirect(Url);
   End;
 
   Procedure SetReplyCORS;
@@ -1487,7 +1499,7 @@ Var
   End;
 
 begin
-  inherited;
+  //inherited;
 
   try
     try
@@ -1495,7 +1507,7 @@ begin
       vResponseHeader := nil;
       vParams := nil;
       ResultStream := nil;
-
+     {
       // Try acquire the critical section, if fails, then HTTP server is
       // destroying the HTTP connection and RDW should not exec the command
 
@@ -1518,24 +1530,24 @@ begin
 
         exit;
       end;
-
+      }
       vCORSHeader := TStringList.Create;
       vResponseHeader := TStringList.Create;
       vParams := TStringList.Create;
 
       vResponseString := '';
-      @vRedirect := @Redirect;
-      vToken := vRemote.AuthDigestUri;
-      vAuthRealm := vRemote.AuthRealm;
-      vContentType := vRemote.RequestContentType;
-      vParams.Text := vRemote.Params;
+     // @vRedirect := @Redirect;
+      vToken := vRemote.Uri;
+     // vAuthRealm := vRemote.AuthRealm;        // O que é Realm
+      vContentType := vRemote.ContentType;
+      //vParams.Text := vRemote.Params;
 
       try
         vICSService.CommandExec(TComponent(vRemote),
-          RemoveBackslashCommands(vRemote.Path), vRemote.Method + ' ' + vRemote.Path,
-          vContentType, vRemote.PeerAddr, vRemote.RequestUserAgent, vRemote.AuthUserName,
-          vRemote.AuthPassword, vToken, vRemote.RequestHeader, StrToInt(vRemote.PeerPort),
-          vRemote.RequestHeader, vParams, vRemote.Params, vBodyStream, vAuthRealm,
+          RemoveBackslashCommands(vRemote.DefaultRequestUploadDir), vRemote.Method + ' ' + vRemote.DefaultRequestUploadDir,
+          vContentType, vRemote.RemoteAddress, vRemote.UserAgent, vRemote.Authorization{UserName},
+          vRemote.Authorization{Password}, vToken, vRemote.CustomHeaders, vRemote.ServerPort,
+          vRemote.CustomHeaders, vParams, vRemote.Connection, vBodyStream, vAuthRealm,
           vCharSet, vErrorMessage, StatusCode, vResponseHeader, vResponseString,
           ResultStream, TStrings(vCORSHeader), vRedirect);
       except
@@ -1547,7 +1559,7 @@ begin
 
       SetReplyCORS;
 
-      vRemote.AuthRealm := vAuthRealm;
+    //  vRemote.AuthRealm := vAuthRealm;
 
       If (vResponseString <> '') Or (vErrorMessage <> '') Then
       Begin
@@ -1560,7 +1572,7 @@ begin
           ResultStream := TStringStream.Create(vErrorMessage);
       End;
 
-      If Assigned(ResultStream) Then
+     { If Assigned(ResultStream) Then
       Begin
         ResultStream.Position := 0;
 
@@ -1570,21 +1582,21 @@ begin
 
         vICSService.CustomAnswerStream(vRemote, vFlag, StatusCode, vContentType,
           vResponseHeader.Text);
-      End;
+      End;    }
     except
       on E: Exception do
       begin
         try
           if Assigned(vICSService.vOnException) then
           begin
-            if vICSService.HttpAppSrv.IsClient(vRemote) then
+          {  if vICSService.HttpAppSrv.IsClient(vRemote) then
               vICSService.vOnException(vRemote, 'ProcessDocumentThread - ' + E.Message)
-            else
+            else  }
               vICSService.vOnException(nil, 'ProcessDocumentThread - ' +
                 cIcsHTTPConnectionClosed);
           end;
         finally
-          vICSService.DisconnectClient(vRemote, vICSService.HttpAppSrv);
+         // vICSService.DisconnectClient(vRemote, vICSService.HttpAppSrv);
         end;
       end;
     end;
