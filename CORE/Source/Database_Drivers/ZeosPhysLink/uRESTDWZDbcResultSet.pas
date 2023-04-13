@@ -544,6 +544,7 @@ begin
         FVariantTable[i,j] := vString;
       end;
     end;
+    Inc(i);
   end;
 end;
 
