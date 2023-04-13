@@ -402,7 +402,7 @@ End;
   aDefaultUrl            : String;
   vEncoding              : TEncodeSelect;
   vOnCreate              : TOnCreate;
-  vSSLVersions           : TRESTDWSSLVersions;
+//  vSSLVersions           : TRESTDWSSLVersions;
   vServerIpVersionConfig : TRESTDWServerIpVersionConfig;
   Procedure SetCORSCustomHeader (Value : TStringList);
   Procedure SetDefaultPage (Value : TStringList);
@@ -627,7 +627,7 @@ End;
   Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
   Property OnCreate                : TOnCreate                     Read vOnCreate                Write vOnCreate;
-  Property SSLVersions             : TRESTDWSSLVersions            Read vSSLVersions             Write vSSLVersions;
+//  Property SSLVersions             : TRESTDWSSLVersions            Read vSSLVersions             Write vSSLVersions;
   Property ServerIPVersionConfig   : TRESTDWServerIpVersionConfig  Read vServerIpVersionConfig   Write vServerIpVersionConfig;
 End;
 
