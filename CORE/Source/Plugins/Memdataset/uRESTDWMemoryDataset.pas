@@ -1050,7 +1050,7 @@ begin
 
       vDWDataType := FieldTypeToDWFieldType(Field.DataType);
 
-      if vDWDataType = dwftFMTBcd then begin
+      if vDWDataType in [dwftBCD, dwftFMTBcd] then begin
         Move(SrcBuffer^,vCurrency,J);
         vFmtBCD := DoubleToBCD(vCurrency);
         Move(vFmtBCD,Buffer^,J);
@@ -1202,7 +1202,7 @@ begin
       if vDWDataType in [dwftWideString, dwftFixedWideChar, dwftFixedChar, dwftString] then
         Dec(J);
 
-      if vDWDataType = dwftFMTBcd then begin
+      if vDWDataType in [dwftBCD, dwftFMTBcd] then begin
         Move(Buffer^,vFmtBCD,SizeOf(tBCD));
         vCurrency := BCDToDouble(vFmtBCD);
         Move(vCurrency,DestBuffer^,J);
