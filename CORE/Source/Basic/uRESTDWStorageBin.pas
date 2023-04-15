@@ -423,20 +423,8 @@ begin
           Inc(vBuf,Sizeof(vByte));
           Dec(vBuf,vFieldSize);
         end
-        // 8 - Bytes - Currency
-        else if (vDWFieldType in [dwftCurrency]) then
-        begin
-          AStream.Read(vCurrency, SizeOf(vCurrency));
-          Move(vCurrency,vBuf^,Sizeof(vCurrency));
-        end
-        // 8 - Bytes - Currency
-        else if (vDWFieldType in [dwftBCD]) then
-        begin
-          AStream.Read(vCurrency, SizeOf(vCurrency));
-          Move(vCurrency,vBuf^,Sizeof(vCurrency));
-        end
-        // 8 - Bytes - Currency
-        else if (vDWFieldType in [dwftFMTBcd]) then
+        // 8 - Bytes - Currency/BCD
+        else if (vDWFieldType in [dwftCurrency,dwftBCD,dwftFMTBcd]) then
         begin
           AStream.Read(vCurrency, SizeOf(vCurrency));
           Move(vCurrency,vBuf^,Sizeof(vCurrency));
@@ -1031,23 +1019,11 @@ Begin
               Dec(vBuf,vFieldSize);
             end
         {$ENDIF}
-        // 8 - Bytes - Currency
-        else if (vDWFieldType in [dwftCurrency]) then
+        // 8 - Bytes - Currency/BCD
+        else if (vDWFieldType in [dwftCurrency,dwftBCD,dwftFMTBcd]) then
         begin
           Move(vBuf^,vCurrency,Sizeof(vCurrency));
           AStream.Write(vCurrency, Sizeof(vCurrency));
-        end
-        // 8 - Bytes - Currency
-        else if (vDWFieldType in [dwftBCD]) then
-        begin
-          Move(vBuf^,vDouble,Sizeof(vDouble));
-          AStream.Write(vDouble, Sizeof(vDouble));
-        end
-        // 8 - Bytes - Currency
-        else if (vDWFieldType in [dwftFMTBcd]) then
-        begin
-          Move(vBuf^,vDouble,Sizeof(vDouble));
-          AStream.Write(vDouble, Sizeof(vDouble));
         end
         // N Bytes - Blobs
         else if (vDWFieldType in [dwftStream,dwftBlob,dwftBytes,dwftWideMemo,
