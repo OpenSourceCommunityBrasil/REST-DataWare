@@ -153,6 +153,7 @@ begin
   ADataset.Open;
 
   ADataset.DisableControls;
+  r := 0;
   While r <=  vRecordCount do //Anderson
   begin
     ADataset.Append;
@@ -309,6 +310,7 @@ begin
   vFieldCount := Length(FFieldNames);
   vFieldCount := vFieldCount - 1;
 
+  r := 0;
   while r <= vRecCount do begin        //Anderson
     GetMem(vBuf, IDataset.GetRecordSize);
     clearBuffer;
