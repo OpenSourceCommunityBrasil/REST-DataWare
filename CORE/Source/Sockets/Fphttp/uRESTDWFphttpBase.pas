@@ -149,8 +149,9 @@ Type
   TRESTDWFphttpServicePooler = Class(TRESTServicePoolerBase)
   Private
     // Events
+    FOnRequest : TOnRequest;
     vOnException: TOnException;
-    vOnRequest : TOnRequest;
+
    {  vOnServerStarted: TOnServerStarted;
     vOnServerStopped: TOnServerStopped;
     vOnClientConnect: TOnClientConnect;
@@ -193,6 +194,10 @@ Type
     // Misc
     //procedure DisconnectClient(Client: TPoolerHttpConnection; Server: TSslHttpAppSrv);
 
+    Property OnRequest : TOnRequest read FOnRequest write FOnRequest;
+    Procedure ExecRequest(Sender: TObject;
+      Var ARequest: TFPHTTPConnectionRequest;
+      Var AResponse : TFPHTTPConnectionResponse);
   Public
     Constructor Create(AOwner: TComponent); Override;
     Destructor Destroy; override;
@@ -309,6 +314,120 @@ const
 Implementation
 
 Uses uRESTDWJSONInterface, Dialogs;//, vcl.Forms;
+
+procedure TRESTDWFphttpServicePooler.ExecRequest(Sender: TObject;
+      Var ARequest: TFPHTTPConnectionRequest;
+      Var AResponse : TFPHTTPConnectionResponse);
+var
+  aContentType,
+  AuthRealm,
+  sCharSet,
+  ErrorMessage,
+  ResponseString      : String;
+  StatusCode,
+  OutPort             : Integer;
+  ResponseHeaders     : TStringList;
+  ResultStream,
+  ContentStringStream : TStream;
+  CORSCustomHeaders   : TStrings;
+  Redirect            : TRedirect;
+
+  a : String;
+
+  aUserName,
+  aPassword : String;
+
+  procedure PassAuth;
+  begin
+    // Daria pra fazer parser do Authorization...
+    {
+    if (Copy(LAuth,1,5) = 'Basic') then
+       begin
+            LUser := DecodeStringBase64( Copy(LAuth,7,Length(LAuth) - 6) ) ;// <> 'anderson:1234'
+            result := LUser;
+            end;
+    }
+  end;
+
+begin
+
+  PassAuth;
+
+  OutPort      := 0;
+  aContentType := ARequest.ContentType;
+  AuthRealm    := '' ;
+  sCharSet     := aRequest.AcceptCharset;
+  ErrorMessage := '';
+  StatusCode   := 200;
+
+  ResponseHeaders     := nil;
+  ResultStream        := nil;
+  CORSCustomHeaders   := nil;
+  ContentStringStream := nil;
+
+
+  ResponseHeaders   := TStringList.Create;
+  ResultStream      := TStream.Create;
+  CORSCustomHeaders := TStrings.Create;
+  ContentStringStream := TStringStream.Create;
+
+  try
+    if CommandExec(TComponent(aRequest),                             //AContext
+                   RemoveBackslashCommands(ARequest.GetHTTPVariable(hvPathInfo) ),           //Url
+                   ARequest.GetHTTPVariable(hvMethod) + ' ' +
+                   ARequest.GetHTTPVariable(hvPathInfo) + ' HTTP/' +
+                   ARequest.GetHTTPVariable(hvHTTPVersion),       //RawHTTPCommand
+                   aContentType,                                     //ContentType
+                   ARequest.GetHTTPVariable(hvRemoteAddress),  //ClientIP
+                   aRequest.GetFieldByName('User-Agent'),     //UserAgent
+                   aRequest.Authorization, //AuthUsername
+                   aRequest.Authorization, //AuthPassword
+                   '',                                               //Token
+                   aRequest.CustomHeaders, //RequestHeaders
+                   StrToInt( aRequest.GetHTTPVariable(hvServerPort) ),  //ClientPort
+                   aRequest.CustomHeaders, //RawHeaders
+                   aRequest.CustomHeaders, //Params
+                   aRequest.URI,           //QueryParams
+                   ContentStringStream,         //ContentStringStream
+                   AuthRealm,                                        //AuthRealm
+                   sCharSet,                                         //sCharSet
+                   ErrorMessage                                    , //ErrorMessage
+                   StatusCode                                      , //StatusCode
+                   ResponseHeaders                                 , //ResponseHeaders
+                   ResponseString                                  , //ResponseString
+                   ResultStream                                    , //ResultStream
+                   CORSCustomHeaders                               , //CORSCustomHeaders
+                   Redirect                                          //Redirect
+                   ) then
+      begin
+       a := 'yes';
+       if assigned(ResponseHeaders)then
+         AResponse.CustomHeaders.Assign( ResponseHeaders );
+       if assigned(ResultStream)then
+         AResponse.ContentStream := ResultStream;
+       if assigned(CORSCustomHeaders)then
+         AResponse.Contents := CORSCustomHeaders;
+
+       AResponse.Content:= ResponseString;
+       AResponse.Code   := StatusCode;
+      end
+      else
+      begin
+        a := 'no';
+      end;
+
+  finally
+    if assigned(ResponseHeaders)then
+      FreeAndNil(ResponseHeaders);
+    if assigned(ResultStream)then
+      FreeAndNil(ResultStream);
+    if assigned(CORSCustomHeaders)then
+      FreeAndNil(CORSCustomHeaders);
+    if assigned(ContentStringStream)then
+      FreeAndNil(ContentStringStream);
+  end;
+end;
+
 {
 Procedure TRESTDWIcsServicePooler.SetHttpServerSSL;
 var
@@ -583,8 +702,7 @@ Begin
 
   HttpAppSrv := TFPHttpServer.Create(nil);
   HttpAppSrv.Port:= ServicePort;
-  HttpAppSrv.OnRequest:= onRequest;
-
+  HttpAppSrv.OnRequest:= @ExecRequest;
   {
   If Assigned(HttpAppSrv.SSLContext) Then
   begin
