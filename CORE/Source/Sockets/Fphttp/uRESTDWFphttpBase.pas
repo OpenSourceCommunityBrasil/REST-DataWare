@@ -454,7 +454,7 @@ begin
       end
       else
       begin
-        a := 'no';
+        a := 'no.';
       end;
 
   finally
