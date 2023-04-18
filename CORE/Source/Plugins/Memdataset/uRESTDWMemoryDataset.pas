@@ -1801,7 +1801,6 @@ end;
 
 procedure TRESTDWMemTable.InternalInitRecord(Buffer: TRESTDWBuffer);
 begin
-  inherited;
   FillChar(Buffer^, FRecordSize, 0);
 end;
 
