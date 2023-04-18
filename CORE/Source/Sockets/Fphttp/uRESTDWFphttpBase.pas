@@ -34,7 +34,7 @@ Uses
   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
   uRESTDWConsts, uRESTDWDataUtils, uRESTDWTools, uRESTDWAuthenticators,
-  fphttpserver, HTTPDefs;
+  fphttpserver, HTTPDefs, base64;
 
 Type
 
@@ -326,7 +326,8 @@ var
   ResponseString      : String;
   StatusCode,
   OutPort             : Integer;
-  ResponseHeaders     : TStringList;
+  ResponseHeaders,
+  HeaderList          : TStringList;
   ResultStream,
   ContentStringStream : TStream;
   CORSCustomHeaders   : TStrings;
@@ -338,19 +339,41 @@ var
   aPassword : String;
 
   procedure PassAuth;
+  var
+    xValue,
+    LAuth: String;
+    PosDelim : Integer;
   begin
     // Daria pra fazer parser do Authorization...
-    {
+    LAuth := ARequest.Authorization ;
     if (Copy(LAuth,1,5) = 'Basic') then
        begin
-            LUser := DecodeStringBase64( Copy(LAuth,7,Length(LAuth) - 6) ) ;// <> 'anderson:1234'
-            result := LUser;
+            xValue    := DecodeStringBase64( Copy(LAuth,7,Length(LAuth) - 6) ) ;// <> 'anderson:1234'
+            PosDelim  := LastDelimiter(':', xValue);
+            aUserName := Copy(xValue, 1, PosDelim - 1);
+            aPassword := Copy(xValue, PosDelim + 1);
             end;
-    }
+
+  end;
+
+  procedure ParseHeader;
+  var
+    I: Integer;
+  begin
+    for I := 0 to Pred(ARequest.FieldCount) do
+      HeaderList.AddPair(ARequest.FieldNames[I], ARequest.FieldValues[I]  );
   end;
 
 begin
+  HeaderList := nil;
+  ResponseHeaders     := nil;
+  ResultStream        := nil;
+  CORSCustomHeaders   := nil;
+  ContentStringStream := nil;
 
+  HeaderList := TStringList.Create;
+
+  ParseHeader;
   PassAuth;
 
   OutPort      := 0;
@@ -360,44 +383,38 @@ begin
   ErrorMessage := '';
   StatusCode   := 200;
 
-  ResponseHeaders     := nil;
-  ResultStream        := nil;
-  CORSCustomHeaders   := nil;
-  ContentStringStream := nil;
-
-
   ResponseHeaders   := TStringList.Create;
   ResultStream      := TStream.Create;
   CORSCustomHeaders := TStrings.Create;
   ContentStringStream := TStringStream.Create;
 
   try
-    if CommandExec(TComponent(aRequest),                             //AContext
-                   RemoveBackslashCommands(ARequest.GetHTTPVariable(hvPathInfo) ),           //Url
+    if CommandExec(TComponent(aRequest)                                           , //AContext
+                   RemoveBackslashCommands(ARequest.GetHTTPVariable(hvPathInfo) ) , //Url
                    ARequest.GetHTTPVariable(hvMethod) + ' ' +
                    ARequest.GetHTTPVariable(hvPathInfo) + ' HTTP/' +
-                   ARequest.GetHTTPVariable(hvHTTPVersion),       //RawHTTPCommand
-                   aContentType,                                     //ContentType
-                   ARequest.GetHTTPVariable(hvRemoteAddress),  //ClientIP
-                   aRequest.GetFieldByName('User-Agent'),     //UserAgent
-                   aRequest.Authorization, //AuthUsername
-                   aRequest.Authorization, //AuthPassword
-                   '',                                               //Token
-                   aRequest.CustomHeaders, //RequestHeaders
-                   StrToInt( aRequest.GetHTTPVariable(hvServerPort) ),  //ClientPort
-                   aRequest.CustomHeaders, //RawHeaders
-                   aRequest.CustomHeaders, //Params
-                   aRequest.URI,           //QueryParams
-                   ContentStringStream,         //ContentStringStream
-                   AuthRealm,                                        //AuthRealm
-                   sCharSet,                                         //sCharSet
-                   ErrorMessage                                    , //ErrorMessage
-                   StatusCode                                      , //StatusCode
-                   ResponseHeaders                                 , //ResponseHeaders
-                   ResponseString                                  , //ResponseString
-                   ResultStream                                    , //ResultStream
-                   CORSCustomHeaders                               , //CORSCustomHeaders
-                   Redirect                                          //Redirect
+                   ARequest.GetHTTPVariable(hvHTTPVersion)                        , //RawHTTPCommand
+                   aContentType                                                   , //ContentType
+                   ARequest.GetHTTPVariable(hvRemoteAddress)                      , //ClientIP
+                   aRequest.GetFieldByName('User-Agent')                          , //UserAgent
+                   aUserName                                                      , //AuthUsername
+                   aPassword                                                      , //AuthPassword
+                   ''                                                             , //Token
+                   aRequest.CustomHeaders                                         , //RequestHeaders
+                   StrToInt( aRequest.GetHTTPVariable(hvServerPort) )             , //ClientPort
+                   HeaderList                                                     , //RawHeaders
+                   aRequest.CustomHeaders                                         , //Params
+                   aRequest.URI                                                   , //QueryParams
+                   ContentStringStream                                            , //ContentStringStream
+                   AuthRealm                                                      , //AuthRealm
+                   sCharSet                                                       , //sCharSet
+                   ErrorMessage                                                   , //ErrorMessage
+                   StatusCode                                                     , //StatusCode
+                   ResponseHeaders                                                , //ResponseHeaders
+                   ResponseString                                                 , //ResponseString
+                   ResultStream                                                   , //ResultStream
+                   CORSCustomHeaders                                              , //CORSCustomHeaders
+                   Redirect                                                         //Redirect
                    ) then
       begin
        a := 'yes';
@@ -425,6 +442,8 @@ begin
       FreeAndNil(CORSCustomHeaders);
     if assigned(ContentStringStream)then
       FreeAndNil(ContentStringStream);
+    if assigned(HeaderList)then
+      FreeAndNil(HeaderList);
   end;
 end;
 

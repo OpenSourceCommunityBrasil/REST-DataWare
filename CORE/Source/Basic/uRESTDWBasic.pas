@@ -1577,7 +1577,7 @@ Var
   Try
    If RawHeaders.Count > 0 Then
     Begin
-     RawHeaders.NameValueSeparator := ':';
+     //RawHeaders.NameValueSeparator := ':';  { #todo -oAnderson : Verificar com o pessoal a questão do separador }
      vRequestHeader.Add(RawHeaders.Text);
      For I := 0 To RawHeaders.Count -1 Do
       Begin
@@ -3838,6 +3838,7 @@ Begin
     Begin
      vJsonMSG := TReplyNOK;
      Result     := True;
+
      If DWParams.ItemsString['POOLER'] <> Nil Then
       Begin
        vResult    := '';
