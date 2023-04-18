@@ -360,6 +360,7 @@ var
   var
     I: Integer;
   begin
+    HeaderList.NameValueSeparator:= ':';
     for I := 0 to Pred(ARequest.FieldCount) do
       HeaderList.AddPair(ARequest.FieldNames[I], ARequest.FieldValues[I]  );
   end;

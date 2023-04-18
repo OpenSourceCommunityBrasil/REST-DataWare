@@ -1577,7 +1577,7 @@ Var
   Try
    If RawHeaders.Count > 0 Then
     Begin
-     //RawHeaders.NameValueSeparator := ':';  { #todo -oAnderson : Verificar com o pessoal a questão do separador }
+     RawHeaders.NameValueSeparator := ':';
      vRequestHeader.Add(RawHeaders.Text);
      For I := 0 To RawHeaders.Count -1 Do
       Begin
