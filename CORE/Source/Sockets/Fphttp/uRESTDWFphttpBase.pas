@@ -319,14 +319,14 @@ procedure TRESTDWFphttpServicePooler.ExecRequest(Sender: TObject;
       Var ARequest: TFPHTTPConnectionRequest;
       Var AResponse : TFPHTTPConnectionResponse);
 var
-  aContentType,
+  vContentType,
   AuthRealm,
   sCharSet,
   ErrorMessage,
-  ResponseString      : String;
+  vResponseString     : String;
   StatusCode,
-  OutPort             : Integer;
-  ResponseHeaders,
+  I                   : Integer;
+  vResponseHeader,
   HeaderList          : TStringList;
   ResultStream,
   ContentStringStream : TStream;
@@ -366,7 +366,7 @@ var
 
 begin
   HeaderList := nil;
-  ResponseHeaders     := nil;
+  vResponseHeader     := nil;
   ResultStream        := nil;
   CORSCustomHeaders   := nil;
   ContentStringStream := nil;
@@ -376,14 +376,14 @@ begin
   ParseHeader;
   PassAuth;
 
-  OutPort      := 0;
-  aContentType := ARequest.ContentType;
-  AuthRealm    := '' ;
-  sCharSet     := aRequest.AcceptCharset;
-  ErrorMessage := '';
-  StatusCode   := 200;
+  vContentType    := ARequest.ContentType;
+  AuthRealm       := '' ;
+  sCharSet        := aRequest.AcceptCharset;
+  ErrorMessage    := '';
+  vResponseString := '';
+  StatusCode      := 200;
 
-  ResponseHeaders   := TStringList.Create;
+  vResponseHeader   := TStringList.Create;
   ResultStream      := TStream.Create;
   CORSCustomHeaders := TStrings.Create;
   ContentStringStream := TStringStream.Create;
@@ -394,7 +394,7 @@ begin
                    ARequest.GetHTTPVariable(hvMethod) + ' ' +
                    ARequest.GetHTTPVariable(hvPathInfo) + ' HTTP/' +
                    ARequest.GetHTTPVariable(hvHTTPVersion)                        , //RawHTTPCommand
-                   aContentType                                                   , //ContentType
+                   vContentType                                                   , //ContentType
                    ARequest.GetHTTPVariable(hvRemoteAddress)                      , //ClientIP
                    aRequest.GetFieldByName('User-Agent')                          , //UserAgent
                    aUserName                                                      , //AuthUsername
@@ -410,23 +410,47 @@ begin
                    sCharSet                                                       , //sCharSet
                    ErrorMessage                                                   , //ErrorMessage
                    StatusCode                                                     , //StatusCode
-                   ResponseHeaders                                                , //ResponseHeaders
-                   ResponseString                                                 , //ResponseString
+                   vResponseHeader                                                , //ResponseHeaders
+                   vResponseString                                                , //ResponseString
                    ResultStream                                                   , //ResultStream
                    CORSCustomHeaders                                              , //CORSCustomHeaders
                    Redirect                                                         //Redirect
                    ) then
       begin
-       a := 'yes';
-       if assigned(ResponseHeaders)then
-         AResponse.CustomHeaders.Assign( ResponseHeaders );
-       if assigned(ResultStream)then
-         AResponse.ContentStream := ResultStream;
-       if assigned(CORSCustomHeaders)then
-         AResponse.Contents := CORSCustomHeaders;
 
-       AResponse.Content:= ResponseString;
-       AResponse.Code   := StatusCode;
+
+            //SetReplyCORS;
+            //AResponseInfo.AuthRealm   := vAuthRealm;
+            AResponse.ContentType := vContentType;
+            If Encoding = esUtf8 Then
+             AResponse.AcceptCharset := 'utf-8'
+            Else
+             AResponse.AcceptCharset := 'ansi';
+            AResponse.Code               := StatusCode;
+            If (vResponseString <> '')   Or
+               (ErrorMessage    <> '')   Then
+             Begin
+              If Assigned(ResultStream)  Then
+               FreeAndNil(ResultStream);
+              If (vResponseString <> '') Then
+               ResultStream  := TStringStream.Create(vResponseString)
+              Else
+               ResultStream  := TStringStream.Create(ErrorMessage);
+             End;
+            If Assigned(ResultStream)    Then
+             Begin
+               AResponse.ContentStream := ResultStream;
+               AResponse.SendContent;  //SendContent é necessário para devolver o conteúdo
+               AResponse.ContentStream := Nil;
+               AResponse.ContentLength := ResultStream.Size;
+             End;
+
+            For I := 0 To vResponseHeader.Count -1 Do
+             AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
+                                             vResponseHeader.Values[vResponseHeader.Names[I]]);
+            If vResponseHeader.Count > 0 Then
+             AResponse.SendHeaders;
+             //AResponse.WriteContent;
       end
       else
       begin
@@ -434,8 +458,8 @@ begin
       end;
 
   finally
-    if assigned(ResponseHeaders)then
-      FreeAndNil(ResponseHeaders);
+    if assigned(vResponseHeader)then
+      FreeAndNil(vResponseHeader);
     if assigned(ResultStream)then
       FreeAndNil(ResultStream);
     if assigned(CORSCustomHeaders)then
