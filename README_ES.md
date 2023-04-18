@@ -1,6 +1,6 @@
 ![dwBanner](https://user-images.githubusercontent.com/26689802/170095987-9dbc6fd3-a3a1-4514-9027-e0954b43a22a.png)
 
-<a href="https://discord.gg/z8Wj7kQX"><img alt="Únete a Discord" src="https://img.shields.io/discord/918891794597544056?color=blue&label=Discord&logo=discord&style=social"></a> <a href="https://t.me/restdatawareoficial"><img src="https://img.shields.io/badge/Telegram-Únete-blue?style=social&logo=telegram"> </a><br>
+<a href="https://discord.gg/pS2xjruCJH"><img alt="Únete a Discord" src="https://img.shields.io/discord/918891794597544056?color=blue&label=Discord&logo=discord&style=social"></a> <a href="https://t.me/restdatawareoficial"><img src="https://img.shields.io/badge/Telegram-Únete-blue?style=social&logo=telegram"> </a><br>
 
 [![enUS](https://img.shields.io/badge/Translate%20To-enUS-blue)](./README_US.md)[![ptBR](https://img.shields.io/badge/Traduzir%20para-ptBR-blue)](./README.md)[![esES](https://img.shields.io/badge/Traducir%20a-esES-blue)](./README_ES.md)
 <br>
