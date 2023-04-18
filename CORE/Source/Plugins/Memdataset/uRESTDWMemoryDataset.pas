@@ -2314,6 +2314,12 @@ begin
   end
   else begin
     // always append
+
+    if state = dsinsert then
+    Begin
+        InternalAddRecord(ActiveBuffer,True);
+    End
+    else
     InternalAddRecord(ActiveBuffer, FCurrentRecord >= FRecords.Count);
   end;
 end;
