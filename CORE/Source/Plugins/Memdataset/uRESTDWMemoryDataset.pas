@@ -1801,6 +1801,7 @@ end;
 
 procedure TRESTDWMemTable.InternalInitRecord(Buffer: TRESTDWBuffer);
 begin
+  inherited;
   FillChar(Buffer^, FRecordSize, 0);
 end;
 
@@ -2314,6 +2315,12 @@ begin
   end
   else begin
     // always append
+
+    if state = dsinsert then
+    Begin
+        InternalAddRecord(ActiveBuffer,True);
+    End
+    else
     InternalAddRecord(ActiveBuffer, FCurrentRecord >= FRecords.Count);
   end;
 end;
