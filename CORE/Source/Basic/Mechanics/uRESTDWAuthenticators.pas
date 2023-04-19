@@ -34,7 +34,7 @@ type
   private
     FAuthDialog: Boolean;
   public
-    constructor Create;
+    constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
   published
     property AuthDialog: Boolean read FAuthDialog write FAuthDialog;
@@ -45,7 +45,8 @@ type
     FPassword: String;
     FUserName: String;
   public
-    constructor Create;
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
   published
     property UserName: String read FUserName write FUserName;
     property Password: String read FPassword write FPassword;
@@ -74,7 +75,7 @@ type
     function GetTokenType(AValue: String): TRESTDWTokenType;
     function GetCryptType(AValue: String): TRESTDWCryptType;
   public
-    constructor Create;
+    constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
     procedure Assign(ASource: TPersistent);
     procedure FromToken(ATokenValue: String);
@@ -114,7 +115,7 @@ type
     FRedirectURI: String;
     FExpiresIn: TDateTime;
   public
-    constructor Create;
+    constructor Create(aOwner: TComponent); override;
   published
     property TokenType: TRESTDWAuthOptionTypes read FTokenType write FTokenType;
     property AutoBuildHex: Boolean read FAutoBuildHex write FAutoBuildHex;
@@ -132,12 +133,17 @@ implementation
 
 { TRESTDWAuthBasic }
 
-constructor TRESTDWAuthBasic.Create;
+constructor TRESTDWAuthBasic.Create(aOwner: TComponent);
 begin
   inherited;
-
   FUserName := cDefaultBasicAuthUser;
   FPassword := cDefaultBasicAuthPassword;
+end;
+
+destructor TRESTDWAuthBasic.Destroy;
+begin
+
+  inherited;
 end;
 
 { TRESTDWAuthToken }
@@ -168,10 +174,9 @@ begin
   FEndTime := 0;
 end;
 
-constructor TRESTDWAuthToken.Create;
+constructor TRESTDWAuthToken.Create(aOwner: TComponent);
 begin
   inherited;
-
   FTokenHash := 'RDWTS_HASH0011';
   FServerSignature := 'RESTDWServer01';
   FGetTokenEvent := 'GetToken';
@@ -183,7 +188,7 @@ begin
   FBeginTime := 0;
   FEndTime := 0;
   FSecrets := '';
-  FGetTokenRoutes := [crAll];
+  FGetTokenRoutes := [crPost];
   FTokenRequestType := rdwtHeader;
   FToken := '';
   FSecrets := '';
@@ -480,10 +485,9 @@ end;
 
 { TRESTDWAuthOAuth }
 
-constructor TRESTDWAuthOAuth.Create;
+constructor TRESTDWAuthOAuth.Create(aOwner: TComponent);
 begin
   inherited;
-
   FClientID := '';
   FClientSecret := '';
   FToken := '';
@@ -498,8 +502,9 @@ end;
 
 { TRESTDWAuthenticatorBase }
 
-constructor TRESTDWAuthenticatorBase.Create;
+constructor TRESTDWAuthenticatorBase.Create(aOwner: TComponent);
 begin
+  inherited;
   FAuthDialog := True;
 end;
 
