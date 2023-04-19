@@ -66,7 +66,7 @@ Begin
   Result := 'Delphi 2010';
  {$ENDIF}
  {$IFDEF ver220} // delphi xe
-  Result := 'Delphi XE (VCL/FMX)';
+  Result := 'Delphi XE';
  {$ENDIF}
  {$IFDEF ver230} // delphi xe2
   Result := 'Delphi XE2 (VCL/FMX)';

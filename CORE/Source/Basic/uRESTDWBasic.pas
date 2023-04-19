@@ -402,7 +402,7 @@ End;
   aDefaultUrl            : String;
   vEncoding              : TEncodeSelect;
   vOnCreate              : TOnCreate;
-  vSSLVersions           : TRESTDWSSLVersions;
+//  vSSLVersions           : TRESTDWSSLVersions;
   vServerIpVersionConfig : TRESTDWServerIpVersionConfig;
   Procedure SetCORSCustomHeader (Value : TStringList);
   Procedure SetDefaultPage (Value : TStringList);
@@ -627,7 +627,7 @@ End;
   Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
   Property OnCreate                : TOnCreate                     Read vOnCreate                Write vOnCreate;
-  Property SSLVersions             : TRESTDWSSLVersions            Read vSSLVersions             Write vSSLVersions;
+//  Property SSLVersions             : TRESTDWSSLVersions            Read vSSLVersions             Write vSSLVersions;
   Property ServerIPVersionConfig   : TRESTDWServerIpVersionConfig  Read vServerIpVersionConfig   Write vServerIpVersionConfig;
 End;
 
@@ -2889,7 +2889,7 @@ Begin
                  If Assigned(TServerMethodDatamodule(vTempServerMethods).OnGetToken) Then
                   Begin
                    vTokenValidate := True;
-                   vAuthTokenParam := TRESTDWAuthToken.Create;
+                   vAuthTokenParam := TRESTDWAuthToken.Create(self);
                    vAuthTokenParam.Assign(TRESTDWAuthToken(vAuthenticator));
                   {$IFNDEF FPC}
                    If Trim(Token) <> '' Then
@@ -2953,7 +2953,7 @@ Begin
                 vNeedAuthorization := vTempEvent.NeedAuthorization;
                If vNeedAuthorization Then
                 Begin
-                 vAuthTokenParam := TRESTDWAuthToken.Create;
+                 vAuthTokenParam := TRESTDWAuthToken.Create(self);
                  vAuthTokenParam.Assign(TRESTDWAuthToken(vAuthenticator));
                  If DWParams.ItemsString[TRESTDWAuthToken(vAuthenticator).Key] <> Nil Then
                   vToken         := DWParams.ItemsString[TRESTDWAuthToken(vAuthenticator).Key].AsString
