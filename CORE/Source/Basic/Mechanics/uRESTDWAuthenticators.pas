@@ -30,42 +30,14 @@ uses
   uRESTDWTools;
 
 type
-  TRESTDWAuthMessages = class(TPersistent)
+  TRESTDWAuthenticatorBase = class(TRESTDWComponent)
   private
     FAuthDialog: Boolean;
-    FCustomDialogAuthMessage: String;
-    FCustom404TitleMessage: String;
-    FCustom404BodyMessage: String;
-    FCustom404FooterMessage: String;
-    FCustomAuthErrorPage: TStringList;
-    procedure SetCustomAuthErrorPage(AValue: TStringList);
   public
     constructor Create;
     destructor Destroy; override;
   published
     property AuthDialog: Boolean read FAuthDialog write FAuthDialog;
-    property CustomDialogAuthMessage: String read FCustomDialogAuthMessage
-      write FCustomDialogAuthMessage;
-    property Custom404TitleMessage: String read FCustom404TitleMessage
-      write FCustom404TitleMessage;
-    property Custom404BodyMessage: String read FCustom404BodyMessage
-      write FCustom404BodyMessage;
-    property Custom404FooterMessage: String read FCustom404FooterMessage
-      write FCustom404FooterMessage;
-    property CustomAuthErrorPage: TStringList read FCustomAuthErrorPage
-      write SetCustomAuthErrorPage;
-  end;
-
-  TRESTDWAuthenticatorBase = class(TRESTDWComponent)
-  private
-    vAuthMessages: TRESTDWAuthMessages;
-  public
-    constructor Create;
-    destructor Destroy; override;
-  published
-    Property AuthMessages: TRESTDWAuthMessages Read vAuthMessages
-      Write vAuthMessages;
-
   end;
 
   TRESTDWAuthBasic = class(TRESTDWAuthenticatorBase)
@@ -157,34 +129,6 @@ type
   end;
 
 implementation
-
-{ TRESTDWAuthMessages }
-
-constructor TRESTDWAuthMessages.Create;
-begin
-  FAuthDialog := True;
-  FCustomDialogAuthMessage := 'Protected Space...';
-  FCustom404TitleMessage :=
-    '(404) The address you are looking for does not exist';
-  FCustom404BodyMessage := '404';
-  FCustom404FooterMessage := 'Take me back to <a href="./">Home REST Dataware </a>';
-  FCustomAuthErrorPage := TStringList.Create;
-end;
-
-destructor TRESTDWAuthMessages.Destroy;
-begin
-  FreeAndNil(FCustomAuthErrorPage);
-  inherited;
-end;
-
-procedure TRESTDWAuthMessages.SetCustomAuthErrorPage(AValue: TStringList);
-var
-  I: Integer;
-begin
-  FCustomAuthErrorPage.Clear;
-  for I := 0 to AValue.Count - 1 do
-    FCustomAuthErrorPage.Add(AValue[I]);
-end;
 
 { TRESTDWAuthBasic }
 
@@ -520,15 +464,11 @@ begin
         if Result then
         begin
           Result := False;
-          LHeader := DecodeStrings(LHeader
-            {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-          LBody := DecodeStrings(LBody
-            {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-          Secrets := DecodeStrings(GetSecretsValue(LBody)
-            {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+          LHeader := DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+          LBody := DecodeStrings(LBody{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+          Secrets := DecodeStrings(GetSecretsValue(LBody){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
           Secrets := DecodeStrings
-            (GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS},
-            csUndefined{$ENDIF});
+            (GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
           Result := ReadBody(LBody);
         end;
       finally
@@ -560,13 +500,12 @@ end;
 
 constructor TRESTDWAuthenticatorBase.Create;
 begin
-  vAuthMessages := TRESTDWAuthMessages.Create;
+  FAuthDialog := True;
 end;
 
 destructor TRESTDWAuthenticatorBase.Destroy;
 begin
-  If Assigned(vAuthMessages) Then
-    FreeAndNil(vAuthMessages);
+
   inherited;
 end;
 
