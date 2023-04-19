@@ -1555,7 +1555,7 @@ begin
         vRemote.DocStream.Position := 0;
 
         vICSService.CustomAnswerStream(vRemote, vFlag, StatusCode, vContentType,
-          vResponseHeader.Text);
+          StringReplace(vResponseHeader.Text, '=', ': ', [rfReplaceAll]));
       End;
     except
       on E: Exception do
