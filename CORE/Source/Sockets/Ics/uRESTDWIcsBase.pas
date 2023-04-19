@@ -583,6 +583,9 @@ Begin
 
   HttpAppSrv := TSslHttpAppSrv.Create(nil);
 
+  // Permitir OPTIONS, DELETE e PUT
+  HttpAppSrv.Options := [hoAllowOptions, hoAllowDelete, hoAllowPut];
+
   If Assigned(HttpAppSrv.SSLContext) Then
   begin
     HttpAppSrv.SSLContext.Free;
@@ -1555,7 +1558,7 @@ begin
         vRemote.DocStream.Position := 0;
 
         vICSService.CustomAnswerStream(vRemote, vFlag, StatusCode, vContentType,
-          vResponseHeader.Text);
+          StringReplace(vResponseHeader.Text, '=', ': ', [rfReplaceAll]));
       End;
     except
       on E: Exception do
