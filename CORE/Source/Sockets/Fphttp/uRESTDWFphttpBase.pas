@@ -34,7 +34,7 @@ Uses
   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
   uRESTDWConsts, uRESTDWDataUtils, uRESTDWTools, uRESTDWAuthenticators,
-  fphttpserver, HTTPDefs;
+  fphttpserver, HTTPDefs, base64;
 
 Type
 
@@ -319,14 +319,15 @@ procedure TRESTDWFphttpServicePooler.ExecRequest(Sender: TObject;
       Var ARequest: TFPHTTPConnectionRequest;
       Var AResponse : TFPHTTPConnectionResponse);
 var
-  aContentType,
+  vContentType,
   AuthRealm,
   sCharSet,
   ErrorMessage,
-  ResponseString      : String;
+  vResponseString     : String;
   StatusCode,
-  OutPort             : Integer;
-  ResponseHeaders     : TStringList;
+  I                   : Integer;
+  vResponseHeader,
+  HeaderList          : TStringList;
   ResultStream,
   ContentStringStream : TStream;
   CORSCustomHeaders   : TStrings;
@@ -338,93 +339,136 @@ var
   aPassword : String;
 
   procedure PassAuth;
+  var
+    xValue,
+    LAuth: String;
+    PosDelim : Integer;
   begin
     // Daria pra fazer parser do Authorization...
-    {
+    LAuth := ARequest.Authorization ;
     if (Copy(LAuth,1,5) = 'Basic') then
        begin
-            LUser := DecodeStringBase64( Copy(LAuth,7,Length(LAuth) - 6) ) ;// <> 'anderson:1234'
-            result := LUser;
+            xValue    := DecodeStringBase64( Copy(LAuth,7,Length(LAuth) - 6) ) ;// <> 'anderson:1234'
+            PosDelim  := LastDelimiter(':', xValue);
+            aUserName := Copy(xValue, 1, PosDelim - 1);
+            aPassword := Copy(xValue, PosDelim + 1);
             end;
-    }
+
+  end;
+
+  procedure ParseHeader;
+  var
+    I: Integer;
+  begin
+    HeaderList.NameValueSeparator:= ':';
+    for I := 0 to Pred(ARequest.FieldCount) do
+      HeaderList.AddPair(ARequest.FieldNames[I], ARequest.FieldValues[I]  );
   end;
 
 begin
-
-  PassAuth;
-
-  OutPort      := 0;
-  aContentType := ARequest.ContentType;
-  AuthRealm    := '' ;
-  sCharSet     := aRequest.AcceptCharset;
-  ErrorMessage := '';
-  StatusCode   := 200;
-
-  ResponseHeaders     := nil;
+  HeaderList := nil;
+  vResponseHeader     := nil;
   ResultStream        := nil;
   CORSCustomHeaders   := nil;
   ContentStringStream := nil;
 
+  HeaderList := TStringList.Create;
 
-  ResponseHeaders   := TStringList.Create;
+  ParseHeader;
+  PassAuth;
+
+  vContentType    := ARequest.ContentType;
+  AuthRealm       := '' ;
+  sCharSet        := aRequest.AcceptCharset;
+  ErrorMessage    := '';
+  vResponseString := '';
+  StatusCode      := 200;
+
+  vResponseHeader   := TStringList.Create;
   ResultStream      := TStream.Create;
   CORSCustomHeaders := TStrings.Create;
   ContentStringStream := TStringStream.Create;
 
   try
-    if CommandExec(TComponent(aRequest),                             //AContext
-                   RemoveBackslashCommands(ARequest.GetHTTPVariable(hvPathInfo) ),           //Url
+    if CommandExec(TComponent(aRequest)                                           , //AContext
+                   RemoveBackslashCommands(ARequest.GetHTTPVariable(hvPathInfo) ) , //Url
                    ARequest.GetHTTPVariable(hvMethod) + ' ' +
-                   ARequest.GetHTTPVariable(hvPathInfo) + ' HTTP/' +
-                   ARequest.GetHTTPVariable(hvHTTPVersion),       //RawHTTPCommand
-                   aContentType,                                     //ContentType
-                   ARequest.GetHTTPVariable(hvRemoteAddress),  //ClientIP
-                   aRequest.GetFieldByName('User-Agent'),     //UserAgent
-                   aRequest.Authorization, //AuthUsername
-                   aRequest.Authorization, //AuthPassword
-                   '',                                               //Token
-                   aRequest.CustomHeaders, //RequestHeaders
-                   StrToInt( aRequest.GetHTTPVariable(hvServerPort) ),  //ClientPort
-                   aRequest.CustomHeaders, //RawHeaders
-                   aRequest.CustomHeaders, //Params
-                   aRequest.URI,           //QueryParams
-                   ContentStringStream,         //ContentStringStream
-                   AuthRealm,                                        //AuthRealm
-                   sCharSet,                                         //sCharSet
-                   ErrorMessage                                    , //ErrorMessage
-                   StatusCode                                      , //StatusCode
-                   ResponseHeaders                                 , //ResponseHeaders
-                   ResponseString                                  , //ResponseString
-                   ResultStream                                    , //ResultStream
-                   CORSCustomHeaders                               , //CORSCustomHeaders
-                   Redirect                                          //Redirect
+                   ARequest.GetHTTPVariable(hvURL) + ' HTTP/' +
+                   ARequest.GetHTTPVariable(hvHTTPVersion)                        , //RawHTTPCommand
+                   vContentType                                                   , //ContentType
+                   ARequest.GetHTTPVariable(hvRemoteAddress)                      , //ClientIP
+                   aRequest.GetFieldByName('User-Agent')                          , //UserAgent
+                   aUserName                                                      , //AuthUsername
+                   aPassword                                                      , //AuthPassword
+                   ''                                                             , //Token
+                   aRequest.CustomHeaders                                         , //RequestHeaders
+                   StrToInt( aRequest.GetHTTPVariable(hvServerPort) )             , //ClientPort
+                   HeaderList                                                     , //RawHeaders
+                   aRequest.CustomHeaders                                         , //Params
+                   aRequest.URI                                                   , //QueryParams
+                   ContentStringStream                                            , //ContentStringStream
+                   AuthRealm                                                      , //AuthRealm
+                   sCharSet                                                       , //sCharSet
+                   ErrorMessage                                                   , //ErrorMessage
+                   StatusCode                                                     , //StatusCode
+                   vResponseHeader                                                , //ResponseHeaders
+                   vResponseString                                                , //ResponseString
+                   ResultStream                                                   , //ResultStream
+                   CORSCustomHeaders                                              , //CORSCustomHeaders
+                   Redirect                                                         //Redirect
                    ) then
       begin
-       a := 'yes';
-       if assigned(ResponseHeaders)then
-         AResponse.CustomHeaders.Assign( ResponseHeaders );
-       if assigned(ResultStream)then
-         AResponse.ContentStream := ResultStream;
-       if assigned(CORSCustomHeaders)then
-         AResponse.Contents := CORSCustomHeaders;
 
-       AResponse.Content:= ResponseString;
-       AResponse.Code   := StatusCode;
+
+            //SetReplyCORS;
+            //AResponseInfo.AuthRealm   := vAuthRealm;
+            AResponse.ContentType := vContentType;
+            If Encoding = esUtf8 Then
+             AResponse.AcceptCharset := 'utf-8'
+            Else
+             AResponse.AcceptCharset := 'ansi';
+            AResponse.Code               := StatusCode;
+            If (vResponseString <> '')   Or
+               (ErrorMessage    <> '')   Then
+             Begin
+              If Assigned(ResultStream)  Then
+               FreeAndNil(ResultStream);
+              If (vResponseString <> '') Then
+               ResultStream  := TStringStream.Create(vResponseString)
+              Else
+               ResultStream  := TStringStream.Create(ErrorMessage);
+             End;
+            If Assigned(ResultStream)    Then
+             Begin
+               AResponse.ContentStream := ResultStream;
+               AResponse.SendContent;  //SendContent é necessário para devolver o conteúdo
+               AResponse.ContentStream := Nil;
+               AResponse.ContentLength := ResultStream.Size;
+             End;
+
+            For I := 0 To vResponseHeader.Count -1 Do
+             AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
+                                             vResponseHeader.Values[vResponseHeader.Names[I]]);
+            If vResponseHeader.Count > 0 Then
+             AResponse.SendHeaders;
+             //AResponse.WriteContent;
       end
       else
       begin
-        a := 'no';
+        a := 'no.';
       end;
 
   finally
-    if assigned(ResponseHeaders)then
-      FreeAndNil(ResponseHeaders);
+    if assigned(vResponseHeader)then
+      FreeAndNil(vResponseHeader);
     if assigned(ResultStream)then
       FreeAndNil(ResultStream);
     if assigned(CORSCustomHeaders)then
       FreeAndNil(CORSCustomHeaders);
     if assigned(ContentStringStream)then
       FreeAndNil(ContentStringStream);
+    if assigned(HeaderList)then
+      FreeAndNil(HeaderList);
   end;
 end;
 
@@ -865,57 +909,37 @@ Var
   Remote: THTTPHeader;
   i: Integer;
 Begin
-
-//  Inherited;
-
   InvalidTag := false;
-
   MyIP := '';
 
   If ServerMethodsClass <> Nil Then
   Begin
-
     For i := 0 To ServerMethodsClass.ComponentCount - 1 Do
     Begin
-
       If (ServerMethodsClass.Components[i].ClassType = TRESTDWPoolerDB) Or
-        (ServerMethodsClass.Components[i].InheritsFrom(TRESTDWPoolerDB)) Then
+         (ServerMethodsClass.Components[i].InheritsFrom(TRESTDWPoolerDB)) Then
       Begin
-
-        If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName,
-          ServerMethodsClass.Components[i].Name]) Then
+        If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name]) Then
         Begin
-
           If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
           Begin
-
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <>
               AccessTag Then
             Begin
               InvalidTag := true;
-
               exit;
             End;
-
           End;
-
           If AContext <> Nil Then
           Begin
             Remote := THTTPHeader(AContext);
-
             MyIP := Remote.RemoteAddress;
           End;
-
           Break;
-
         End;
-
       End;
-
     End;
-
   End;
-
   If MyIP = '' Then
     Raise Exception.Create(cInvalidPoolerName);
 End;
