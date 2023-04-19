@@ -393,7 +393,7 @@ begin
     if CommandExec(TComponent(aRequest)                                           , //AContext
                    RemoveBackslashCommands(ARequest.GetHTTPVariable(hvPathInfo) ) , //Url
                    ARequest.GetHTTPVariable(hvMethod) + ' ' +
-                   ARequest.GetHTTPVariable(hvPathInfo) + ' HTTP/' +
+                   ARequest.GetHTTPVariable(hvURL) + ' HTTP/' +
                    ARequest.GetHTTPVariable(hvHTTPVersion)                        , //RawHTTPCommand
                    vContentType                                                   , //ContentType
                    ARequest.GetHTTPVariable(hvRemoteAddress)                      , //ClientIP
@@ -909,57 +909,37 @@ Var
   Remote: THTTPHeader;
   i: Integer;
 Begin
-
-//  Inherited;
-
   InvalidTag := false;
-
   MyIP := '';
 
   If ServerMethodsClass <> Nil Then
   Begin
-
     For i := 0 To ServerMethodsClass.ComponentCount - 1 Do
     Begin
-
       If (ServerMethodsClass.Components[i].ClassType = TRESTDWPoolerDB) Or
-        (ServerMethodsClass.Components[i].InheritsFrom(TRESTDWPoolerDB)) Then
+         (ServerMethodsClass.Components[i].InheritsFrom(TRESTDWPoolerDB)) Then
       Begin
-
-        If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName,
-          ServerMethodsClass.Components[i].Name]) Then
+        If Pooler = Format('%s.%s', [ServerMethodsClass.ClassName, ServerMethodsClass.Components[i].Name]) Then
         Begin
-
           If Trim(TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag) <> '' Then
           Begin
-
             If TRESTDWPoolerDB(ServerMethodsClass.Components[i]).AccessTag <>
               AccessTag Then
             Begin
               InvalidTag := true;
-
               exit;
             End;
-
           End;
-
           If AContext <> Nil Then
           Begin
             Remote := THTTPHeader(AContext);
-
             MyIP := Remote.RemoteAddress;
           End;
-
           Break;
-
         End;
-
       End;
-
     End;
-
   End;
-
   If MyIP = '' Then
     Raise Exception.Create(cInvalidPoolerName);
 End;
