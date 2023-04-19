@@ -2881,8 +2881,11 @@ Begin
                If (RequestTypeToRoute(RequestType) In TRESTDWAuthToken(vAuthenticator).GetTokenRoutes) Or
                   (crAll in TRESTDWAuthToken(vAuthenticator).GetTokenRoutes) Then
                 Begin
-                 PCustomHeaders := @ResponseHeaders;
-                 BuildCORS(TRESTDWAuthToken(vAuthenticator).GetTokenRoutes, TStrings(PCustomHeaders^));
+                 If CORS Then
+                  Begin
+                   PCustomHeaders := @ResponseHeaders;
+                   BuildCORS(TRESTDWAuthToken(vAuthenticator).GetTokenRoutes, TStrings(PCustomHeaders^));
+                  End;
                  If Assigned(TServerMethodDatamodule(vTempServerMethods).OnGetToken) Then
                   Begin
                    vTokenValidate := True;
