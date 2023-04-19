@@ -3838,6 +3838,7 @@ Begin
     Begin
      vJsonMSG := TReplyNOK;
      Result     := True;
+
      If DWParams.ItemsString['POOLER'] <> Nil Then
       Begin
        vResult    := '';
