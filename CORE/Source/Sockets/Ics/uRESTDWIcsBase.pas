@@ -583,6 +583,9 @@ Begin
 
   HttpAppSrv := TSslHttpAppSrv.Create(nil);
 
+  // Permitir OPTIONS, DELETE e PUT
+  HttpAppSrv.Options := [hoAllowOptions, hoAllowDelete, hoAllowPut];
+
   If Assigned(HttpAppSrv.SSLContext) Then
   begin
     HttpAppSrv.SSLContext.Free;
