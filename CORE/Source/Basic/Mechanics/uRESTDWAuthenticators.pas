@@ -183,7 +183,7 @@ begin
   FKey := 'token';
   FLifeCycle := 1800; // 30 Minutos
   FTokenType := rdwJWT;
-  FCryptType := rdwAES256;
+  FCryptType := rdwHSHA256;
   FServerSignature := '';
   FBeginTime := 0;
   FEndTime := 0;
