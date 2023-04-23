@@ -135,8 +135,8 @@ var
   end;
 
 begin
-  aUserName:= '';
-  aPassword:= '';
+  aUserName:= EmptyStr;
+  aPassword:= EmptyStr;
   HeaderList := nil;
   vResponseHeader     := nil;
   ResultStream        := nil;
