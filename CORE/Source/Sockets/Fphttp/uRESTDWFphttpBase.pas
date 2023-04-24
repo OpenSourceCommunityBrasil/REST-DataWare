@@ -34,7 +34,7 @@ Uses
   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
   uRESTDWConsts, uRESTDWDataUtils, uRESTDWTools, uRESTDWAuthenticators,
-  fphttpserver, HTTPDefs, fpwebclient, base64;
+  fphttpserver, HTTPDefs, fpwebclient, base64, opensslsockets;
 
 Type
 
@@ -125,24 +125,6 @@ var
   aUserName,
   aPassword : String;
 
-  procedure PassAuth;
-  var
-    xValue,
-    LAuth: String;
-    PosDelim : Integer;
-  begin
-    // Daria pra fazer parser do Authorization...
-    LAuth := ARequest.Authorization ;
-    if (Copy(LAuth,1,5) = 'Basic') then
-       begin
-            xValue    := DecodeStringBase64( Copy(LAuth,7,Length(LAuth) - 6) ) ;// <> 'anderson:1234'
-            PosDelim  := LastDelimiter(':', xValue);
-            aUserName := Copy(xValue, 1, PosDelim - 1);
-            aPassword := Copy(xValue, PosDelim + 1);
-    end;
-
-  end;
-
   procedure ParseHeader;
   var
     I: Integer;
@@ -153,6 +135,8 @@ var
   end;
 
 begin
+  aUserName:= EmptyStr;
+  aPassword:= EmptyStr;
   HeaderList := nil;
   vResponseHeader     := nil;
   ResultStream        := nil;
@@ -162,7 +146,6 @@ begin
   HeaderList := TStringList.Create;
 
   ParseHeader;
-  PassAuth;
 
   vContentType    := ARequest.ContentType;
   AuthRealm       := '' ;
@@ -175,7 +158,6 @@ begin
   ResultStream      := TStream.Create;
   CORSCustomHeaders := TStrings.Create;
   ContentStringStream := TStringStream.Create;
-
   try
     if CommandExec(TComponent(aRequest)                                           , //AContext
                    RemoveBackslashCommands(ARequest.GetHTTPVariable(hvPathInfo) ) , //Url
@@ -264,14 +246,14 @@ Begin
   Inherited Create(AOwner);
 
   HttpAppSrv := TFPHttpServer.Create(nil);
-  HttpAppSrv.Port:= ServicePort;
-  HttpAppSrv.OnRequest:= @ExecRequest;
-  vMaxClients := 0;
+
+
+  {vMaxClients := 0;
   vServiceTimeout := 60000; // TimeOut in Milliseconds
   vBuffSizeBytes := 262144; // 256kb Default
   vBandWidthLimitBytes := 0;
   vBandWidthSampleSec := 1;
-  vListenBacklog := 50;
+  vListenBacklog := 50;   }
 End;
 
 destructor TRESTDWFphttpServicePooler.Destroy;
@@ -354,8 +336,6 @@ Begin
 End;
 
 procedure TRESTDWFphttpServicePooler.SetActive(Value: boolean);
-var
-  x: Integer;
 Begin
   If (Value) Then
   Begin
@@ -363,7 +343,22 @@ Begin
       if not(Assigned(ServerMethodClass)) and (Self.GetDataRouteCount = 0) then
         raise Exception.Create(cServerMethodClassNotAssigned);
 
-       HttpAppSrv.Active:= True;
+       HttpAppSrv.Port:= ServicePort;
+       HttpAppSrv.OnRequest:= @ExecRequest;
+
+       HttpAppSrv.UseSSL:= SSLUse;
+
+       if SSLUse and (SSLRootCertFile <> EmptyStr) then
+       begin
+            HttpAppSrv.CertificateData.KeyPassword          := SSLPrivateKeyPassword;//fCertificatePassword;
+            HttpAppSrv.CertificateData.HostName             := SSLRootCertFile;//fCertificateHostName;
+            HttpAppSrv.CertificateData.Certificate.FileName := SSLCertFile;//fCertificateFileName;
+            HttpAppSrv.CertificateData.PrivateKey.FileName  := SSLPrivateKeyFile;//fCertificatePrivateKey;
+       end;
+
+       { #todo -oAnderson : Estudar como passar o SSLVersionMin para o FPHTTP }
+
+      HttpAppSrv.Active:= True;
     Except
       On E: Exception do
       Begin
