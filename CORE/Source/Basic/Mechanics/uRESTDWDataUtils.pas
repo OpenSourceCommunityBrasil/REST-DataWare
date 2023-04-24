@@ -33,6 +33,7 @@ Uses
   DateUtils;
 
 Type
+ // TODO mover isso daqui pro authenticator na próxima versão.
  TRESTDWAuthOptionTypes = (rdwOATBasic, rdwOATBearer, rdwOATToken);
  TRESTDWAuthOption      = (rdwAONone,   rdwAOBasic,   rdwAOBearer,
                            rdwAOToken,  rdwOAuth);
