@@ -2913,6 +2913,13 @@ Begin
                     TServerMethodDatamodule(vTempServerMethods).OnGetToken(vWelcomeMessage, vAccessTag, DWParams,
                                                                            TRESTDWAuthToken(vAuthTokenParam),
                                                                            vErrorCode, vErrorMessage, vToken, vAcceptAuth);
+
+                   If (CORS) And (RequestType = rtOption) Then
+                    Begin
+                      vErrorCode := 200;
+                      vErrorMessage := '';
+                    End;
+
                    If Not vAcceptAuth Then
                     Begin
                      WriteError;
