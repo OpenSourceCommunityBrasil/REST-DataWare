@@ -27,9 +27,26 @@ interface
 uses
   Classes, SysUtils, DateUtils,
   uRESTDWConsts, uRESTDWAbout, uRESTDWDataUtils, uRESTDWJSONInterface,
-  uRESTDWTools;
+  uRESTDWTools, uRESTDWParams;
 
 type
+  TOnBasicAuth = Procedure(Welcomemsg, AccessTag,
+                           Username, Password : String;
+                           Var Params         : TRESTDWParams;
+                           Var ErrorCode      : Integer;
+                           Var ErrorMessage   : String;
+                           Var Accept         : Boolean) Of Object;
+  TOnGetToken = Procedure(Welcomemsg,
+                          AccessTag        : String;
+                          Params           : TRESTDWParams;
+//                          AuthOptions      : TRESTDWAuthToken;
+                          Var ErrorCode    : Integer;
+                          Var ErrorMessage : String;
+                          Var TokenID      : String;
+                          Var Accept       : Boolean) Of Object;
+  TOnRenewToken = Procedure() of Object;
+
+
   TRESTDWAuthenticatorBase = class(TRESTDWComponent)
   private
     FAuthDialog: Boolean;
@@ -44,12 +61,16 @@ type
   private
     FPassword: String;
     FUserName: String;
+    FOnBasicAuth: TOnBasicAuth;
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
+    function ValidateAuth(aUserName, aPassword: string): boolean;
   published
     property UserName: String read FUserName write FUserName;
     property Password: String read FPassword write FPassword;
+    //eventos
+    property OnBasicAuth: TOnBasicAuth read FOnBasicAuth write FOnBasicAuth;
   end;
 
   TRESTDWAuthToken = class(TRESTDWAuthenticatorBase)
@@ -69,6 +90,8 @@ type
     FToken: String;
     FAutoGetToken: Boolean;
     FAutoRenewToken: Boolean;
+    FOnGetToken: TOnGetToken;
+    FOnRenewToken: TOnRenewToken;
     procedure ClearToken;
     procedure SetGetTokenEvent(AValue: String);
     procedure SetToken(AValue: String);
@@ -100,6 +123,9 @@ type
     property Token: String read FToken write SetToken;
     property AutoGetToken: Boolean read FAutoGetToken write FAutoGetToken;
     property AutoRenewToken: Boolean read FAutoRenewToken write FAutoRenewToken;
+    // eventos
+    Property OnGetToken: TOnGetToken Read FOnGetToken Write FOnGetToken;
+    Property OnRenewToken: TOnRenewToken Read FOnRenewToken Write FOnRenewToken;
   end;
 
   TRESTDWAuthOAuth = class(TRESTDWAuthenticatorBase)
@@ -144,6 +170,11 @@ destructor TRESTDWAuthBasic.Destroy;
 begin
 
   inherited;
+end;
+
+function TRESTDWAuthBasic.ValidateAuth(aUserName, aPassword: string): boolean;
+begin
+  Result := (aUserName = UserName) and (aPassword = Password)
 end;
 
 { TRESTDWAuthToken }
@@ -469,11 +500,15 @@ begin
         if Result then
         begin
           Result := False;
-          LHeader := DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-          LBody := DecodeStrings(LBody{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-          Secrets := DecodeStrings(GetSecretsValue(LBody){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+          LHeader := DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS},
+            csUndefined{$ENDIF});
+          LBody := DecodeStrings(LBody{$IFDEF RESTDWLAZARUS},
+            csUndefined{$ENDIF});
+          Secrets := DecodeStrings(GetSecretsValue(LBody){$IFDEF RESTDWLAZARUS},
+            csUndefined{$ENDIF});
           Secrets := DecodeStrings
-            (GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+            (GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS},
+            csUndefined{$ENDIF});
           Result := ReadBody(LBody);
         end;
       finally
