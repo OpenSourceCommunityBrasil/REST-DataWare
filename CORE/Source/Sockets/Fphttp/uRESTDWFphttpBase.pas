@@ -114,11 +114,11 @@ var
   StatusCode,
   I                   : Integer;
   vResponseHeader,
-  HeaderList          : TStringList;
+  HeaderList,
+  CORSCustomHeaders   : TStringList;
   ResultStream,
   ContentStringStream : TStream;
-  CORSCustomHeaders   : TStrings;
-  Redirect            : TRedirect;
+  vRedirect           : TRedirect;
 
   a : String;
 
@@ -134,6 +134,41 @@ var
       HeaderList.AddPair(ARequest.FieldNames[I], ARequest.FieldValues[I]  );
   end;
 
+  procedure SetReplyCORS;
+  var
+    i: Integer;
+   begin
+
+   //  if ARequest.CustomHeaders then
+     //begin
+       if ARequest.CustomHeaders.Count > 0 then
+       begin
+        for i := 0 To ARequest.CustomHeaders.Count - 1 Do
+          vResponseHeader.AddPair(ARequest.CustomHeaders.Names[i],
+            ARequest.CustomHeaders.ValueFromIndex[i]);
+       end
+       else
+         vResponseHeader.AddPair('Access-Control-Allow-Origin', '*');
+
+       if Assigned(CORSCustomHeaders) then
+       begin
+         if CORSCustomHeaders.Count > 0 Then
+           begin
+             for i := 0 To CORSCustomHeaders.Count - 1 Do
+               vResponseHeader.AddPair(CORSCustomHeaders.Names[i], CORSCustomHeaders.ValueFromIndex[i]);
+           end;
+       end;
+
+    // end;
+  //end;
+   end;
+
+  procedure Redirect(Url: String);
+  begin
+    AResponse.SendRedirect(Url);
+  end;
+
+
 begin
   aUserName:= EmptyStr;
   aPassword:= EmptyStr;
@@ -147,6 +182,7 @@ begin
 
   ParseHeader;
 
+  //@vRedirect       := @Redirect; { #todo -oAnderson : Verificar como funciona o Redirect. }
   vContentType    := ARequest.ContentType;
   AuthRealm       := '' ;
   sCharSet        := aRequest.AcceptCharset;
@@ -154,9 +190,9 @@ begin
   vResponseString := '';
   StatusCode      := 200;
 
-  vResponseHeader   := TStringList.Create;
-  ResultStream      := TStream.Create;
-  CORSCustomHeaders := TStrings.Create;
+  vResponseHeader     := TStringList.Create;
+  ResultStream        := TStream.Create;
+  CORSCustomHeaders   := TStringList.Create;
   ContentStringStream := TStringStream.Create;
   try
     if CommandExec(TComponent(aRequest)                                           , //AContext
@@ -183,13 +219,13 @@ begin
                    vResponseHeader                                                , //ResponseHeaders
                    vResponseString                                                , //ResponseString
                    ResultStream                                                   , //ResultStream
-                   CORSCustomHeaders                                              , //CORSCustomHeaders
-                   Redirect                                                         //Redirect
+                   TStrings(CORSCustomHeaders)                                    , //CORSCustomHeaders
+                   vRedirect                                                        //Redirect
                    ) then
       begin
 
 
-            //SetReplyCORS;
+            SetReplyCORS;
             //AResponseInfo.AuthRealm   := vAuthRealm;
             AResponse.ContentType := vContentType;
             If Encoding = esUtf8 Then
@@ -207,7 +243,15 @@ begin
               Else
                ResultStream  := TStringStream.Create(ErrorMessage);
              End;
-            If Assigned(ResultStream)    Then
+
+             For I := 0 To vResponseHeader.Count -1 Do
+             AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
+                                             vResponseHeader.Values[vResponseHeader.Names[I]]);
+             If vResponseHeader.Count > 0 Then
+             AResponse.SendHeaders;
+             //AResponse.WriteContent;
+
+             If Assigned(ResultStream)    Then
              Begin
                AResponse.ContentStream := ResultStream;
                AResponse.SendContent;  //SendContent é necessário para devolver o conteúdo
@@ -215,12 +259,7 @@ begin
                AResponse.ContentLength := ResultStream.Size;
              End;
 
-            For I := 0 To vResponseHeader.Count -1 Do
-             AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
-                                             vResponseHeader.Values[vResponseHeader.Names[I]]);
-            If vResponseHeader.Count > 0 Then
-             AResponse.SendHeaders;
-             //AResponse.WriteContent;
+
       end
       else
       begin
@@ -346,6 +385,7 @@ Begin
        HttpAppSrv.Port:= ServicePort;
        HttpAppSrv.OnRequest:= @ExecRequest;
 
+       { #todo -oAnderson : O servidor para de responder quando o SSL é ativado. }
        HttpAppSrv.UseSSL:= SSLUse;
 
        if SSLUse and (SSLRootCertFile <> EmptyStr) then
