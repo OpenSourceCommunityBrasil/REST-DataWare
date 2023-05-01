@@ -3045,10 +3045,19 @@ Begin
           If vDefaultPage.Count > 0 Then
            vReplyString  := vDefaultPage.Text
           Else
-           vReplyString  := TServerStatusHTML;
-          vErrorCode   := 200;
-          ContentType  := 'text/html';
-         End
+          if vErrorMessage <> EmptyStr then
+            begin
+              vReplyString := vErrorMessage;
+              vErrorCode   := 401;
+              ContentType  := 'text/html';
+            end
+            else
+            begin
+              vReplyString := TServerStatusHTML;
+              vErrorCode   := 200;
+              ContentType  := 'text/html';
+            End
+          end
         Else
          Begin
           If vEncoding = esUtf8 Then
