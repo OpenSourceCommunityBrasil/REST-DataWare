@@ -128,10 +128,39 @@ var
   procedure ParseHeader;
   var
     I: Integer;
-  begin
+    s: string;
+    sl: TStringList;
+
+    begin
+    sl := nil;
+
     HeaderList.NameValueSeparator:= ':';
     for I := 0 to Pred(ARequest.FieldCount) do
       HeaderList.AddPair(ARequest.FieldNames[I], ARequest.FieldValues[I]  );
+
+    for I := 0 to Pred(ARequest.CustomHeaders.Count) do
+      HeaderList.AddPair(ARequest.CustomHeaders.Names[I], ARequest.CustomHeaders.ValueFromIndex[I]  );
+
+    s :=  ARequest.GetHTTPVariable(hvURL);
+    sl := TStringList.Create;
+    try
+      if (Pos('?', s) > 0)then
+      begin
+        s := StringReplace(s, '?', '', [rfReplaceAll]);
+        s := StringReplace(s, '/', '', []);
+        sl.Delimiter := '&';
+        sl.StrictDelimiter := True;
+        sl.DelimitedText := s;
+        for i := 0 to sl.Count - 1 do
+        begin
+          s := sl[i];
+          if Pos('=', s) > 0 then
+            HeaderList.AddPair(Copy(s, 1, Pos('=', s) - 1) , Copy(s, Pos('=', s) + 1, Length(s) - Pos('=', s)));
+        end;
+    end;
+    finally
+      FreeAndNil(sl);
+    end;
   end;
 
   procedure SetReplyCORS;
