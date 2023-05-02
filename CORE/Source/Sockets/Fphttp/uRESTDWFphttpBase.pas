@@ -34,7 +34,7 @@ Uses
   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
   uRESTDWConsts, uRESTDWDataUtils, uRESTDWTools, uRESTDWAuthenticators,
-  fphttpserver, HTTPDefs, fpwebclient, base64;
+  fphttpserver, HTTPDefs, fpwebclient, base64, opensslsockets;
 
 Type
 
@@ -107,52 +107,126 @@ procedure TRESTDWFphttpServicePooler.ExecRequest(Sender: TObject;
       Var AResponse : TFPHTTPConnectionResponse);
 var
   vContentType,
-  AuthRealm,
+  vAuthRealm,
   sCharSet,
   ErrorMessage,
   vResponseString     : String;
   StatusCode,
   I                   : Integer;
   vResponseHeader,
-  HeaderList          : TStringList;
+  HeaderList,
+  CORSCustomHeaders   : TStringList;
   ResultStream,
   ContentStringStream : TStream;
-  CORSCustomHeaders   : TStrings;
-  Redirect            : TRedirect;
+  mb                  : TStringStream;
+  vRedirect           : TRedirect;
 
   a : String;
 
   aUserName,
   aPassword : String;
 
-  procedure PassAuth;
-  var
-    xValue,
-    LAuth: String;
-    PosDelim : Integer;
-  begin
-    // Daria pra fazer parser do Authorization...
-    LAuth := ARequest.Authorization ;
-    if (Copy(LAuth,1,5) = 'Basic') then
-       begin
-            xValue    := DecodeStringBase64( Copy(LAuth,7,Length(LAuth) - 6) ) ;// <> 'anderson:1234'
-            PosDelim  := LastDelimiter(':', xValue);
-            aUserName := Copy(xValue, 1, PosDelim - 1);
-            aPassword := Copy(xValue, PosDelim + 1);
-    end;
-
-  end;
-
   procedure ParseHeader;
   var
     I: Integer;
-  begin
+    s: string;
+    sl: TStringList;
+
+    begin
+    sl := nil;
+
     HeaderList.NameValueSeparator:= ':';
     for I := 0 to Pred(ARequest.FieldCount) do
       HeaderList.AddPair(ARequest.FieldNames[I], ARequest.FieldValues[I]  );
+
+    for I := 0 to Pred(ARequest.CustomHeaders.Count) do
+      HeaderList.AddPair(ARequest.CustomHeaders.Names[I], ARequest.CustomHeaders.ValueFromIndex[I]  );
+
+    s :=  ARequest.GetHTTPVariable(hvURL);
+    sl := TStringList.Create;
+    try
+      if (Pos('?', s) > 0)then
+      begin
+        s := StringReplace(s, '?', '', [rfReplaceAll]);
+        s := StringReplace(s, '/', '', []);
+        sl.Delimiter := '&';
+        sl.StrictDelimiter := True;
+        sl.DelimitedText := s;
+        for i := 0 to sl.Count - 1 do
+        begin
+          s := sl[i];
+          if Pos('=', s) > 0 then
+            HeaderList.AddPair(Copy(s, 1, Pos('=', s) - 1) , Copy(s, Pos('=', s) + 1, Length(s) - Pos('=', s)));
+        end;
+    end;
+    finally
+      FreeAndNil(sl);
+    end;
   end;
 
+  procedure SetReplyCORS;
+  var
+    i: Integer;
+   begin
+
+   //  if ARequest.CustomHeaders then
+     //begin
+       if ARequest.CustomHeaders.Count > 0 then
+       begin
+        for i := 0 To ARequest.CustomHeaders.Count - 1 Do
+          vResponseHeader.AddPair(ARequest.CustomHeaders.Names[i],
+            ARequest.CustomHeaders.ValueFromIndex[i]);
+       end
+       else
+         vResponseHeader.AddPair('Access-Control-Allow-Origin', '*');
+
+       if Assigned(CORSCustomHeaders) then
+       begin
+         if CORSCustomHeaders.Count > 0 Then
+           begin
+             for i := 0 To CORSCustomHeaders.Count - 1 Do
+               vResponseHeader.AddPair(CORSCustomHeaders.Names[i], CORSCustomHeaders.ValueFromIndex[i]);
+           end;
+       end;
+
+    // end;
+  //end;
+   end;
+
+  Procedure DestroyComponents;
+  Begin
+    if assigned(vResponseHeader)then
+      FreeAndNil(vResponseHeader);
+    if assigned(ResultStream)then
+      FreeAndNil(ResultStream);
+    if assigned(CORSCustomHeaders)then
+      FreeAndNil(CORSCustomHeaders);
+    if assigned(ContentStringStream)then
+      FreeAndNil(ContentStringStream);
+    if assigned(HeaderList)then
+      FreeAndNil(HeaderList);
+  End;
+
+  procedure Redirect(Url: String);
+  begin
+    AResponse.SendRedirect(Url);
+  end;
+
+  Procedure WriteError;
+  Begin
+    AResponse.Code                   := StatusCode;
+    mb                               := TStringStream.Create(ErrorMessage);
+    mb.Position                      := 0;
+    AResponse.FreeContentStream      := True;
+    AResponse.ContentStream          := mb;
+    AResponse.ContentStream.Position := 0;
+    AResponse.ContentLength          := -1;//mb.Size;
+    AResponse.SendContent;
+  End;
+
 begin
+  aUserName:= EmptyStr;
+  aPassword:= EmptyStr;
   HeaderList := nil;
   vResponseHeader     := nil;
   ResultStream        := nil;
@@ -162,20 +236,19 @@ begin
   HeaderList := TStringList.Create;
 
   ParseHeader;
-  PassAuth;
 
+  vRedirect       := TRedirect(@Redirect);
   vContentType    := ARequest.ContentType;
-  AuthRealm       := '' ;
+  vAuthRealm      := AResponse.WWWAuthenticate;
   sCharSet        := aRequest.AcceptCharset;
   ErrorMessage    := '';
   vResponseString := '';
   StatusCode      := 200;
 
-  vResponseHeader   := TStringList.Create;
-  ResultStream      := TStream.Create;
-  CORSCustomHeaders := TStrings.Create;
+  vResponseHeader     := TStringList.Create;
+  ResultStream        := TStream.Create;
+  CORSCustomHeaders   := TStringList.Create;
   ContentStringStream := TStringStream.Create;
-
   try
     if CommandExec(TComponent(aRequest)                                           , //AContext
                    RemoveBackslashCommands(ARequest.GetHTTPVariable(hvPathInfo) ) , //Url
@@ -194,22 +267,20 @@ begin
                    aRequest.CustomHeaders                                         , //Params
                    aRequest.URI                                                   , //QueryParams
                    ContentStringStream                                            , //ContentStringStream
-                   AuthRealm                                                      , //AuthRealm
+                   vAuthRealm                                                     , //AuthRealm
                    sCharSet                                                       , //sCharSet
                    ErrorMessage                                                   , //ErrorMessage
                    StatusCode                                                     , //StatusCode
                    vResponseHeader                                                , //ResponseHeaders
                    vResponseString                                                , //ResponseString
                    ResultStream                                                   , //ResultStream
-                   CORSCustomHeaders                                              , //CORSCustomHeaders
-                   Redirect                                                         //Redirect
+                   TStrings(CORSCustomHeaders)                                    , //CORSCustomHeaders
+                   vRedirect                                                        //Redirect
                    ) then
       begin
-
-
-            //SetReplyCORS;
-            //AResponseInfo.AuthRealm   := vAuthRealm;
-            AResponse.ContentType := vContentType;
+            SetReplyCORS;
+            AResponse.WWWAuthenticate   := vAuthRealm;
+            AResponse.ContentType    := vContentType;
             If Encoding = esUtf8 Then
              AResponse.AcceptCharset := 'utf-8'
             Else
@@ -225,7 +296,16 @@ begin
               Else
                ResultStream  := TStringStream.Create(ErrorMessage);
              End;
-            If Assigned(ResultStream)    Then
+
+
+            For I := 0 To vResponseHeader.Count -1 Do
+             AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
+                                             vResponseHeader.Values[vResponseHeader.Names[I]]);
+             If vResponseHeader.Count > 0 Then
+             AResponse.SendHeaders;
+             //AResponse.WriteContent;
+
+             If Assigned(ResultStream)    Then
              Begin
                AResponse.ContentStream := ResultStream;
                AResponse.SendContent;  //SendContent é necessário para devolver o conteúdo
@@ -233,29 +313,26 @@ begin
                AResponse.ContentLength := ResultStream.Size;
              End;
 
-            For I := 0 To vResponseHeader.Count -1 Do
-             AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
-                                             vResponseHeader.Values[vResponseHeader.Names[I]]);
-            If vResponseHeader.Count > 0 Then
-             AResponse.SendHeaders;
-             //AResponse.WriteContent;
       end
       else
       begin
-        a := 'no.';
+        SetReplyCORS;
+        AResponse.WWWAuthenticate := vAuthRealm;
+        AResponse.Code            := StatusCode;
+
+        If ErrorMessage <> '' Then
+         AResponse.Content := ErrorMessage
+        Else
+         Begin
+          AResponse.FreeContentStream      := True;
+          AResponse.ContentStream          := ResultStream;
+          AResponse.ContentStream.Position := 0;
+          AResponse.ContentLength          := -1;
+         End;
       end;
 
   finally
-    if assigned(vResponseHeader)then
-      FreeAndNil(vResponseHeader);
-    if assigned(ResultStream)then
-      FreeAndNil(ResultStream);
-    if assigned(CORSCustomHeaders)then
-      FreeAndNil(CORSCustomHeaders);
-    if assigned(ContentStringStream)then
-      FreeAndNil(ContentStringStream);
-    if assigned(HeaderList)then
-      FreeAndNil(HeaderList);
+    DestroyComponents;
   end;
 end;
 
@@ -264,14 +341,14 @@ Begin
   Inherited Create(AOwner);
 
   HttpAppSrv := TFPHttpServer.Create(nil);
-  HttpAppSrv.Port:= ServicePort;
-  HttpAppSrv.OnRequest:= @ExecRequest;
-  vMaxClients := 0;
+
+
+  {vMaxClients := 0;
   vServiceTimeout := 60000; // TimeOut in Milliseconds
   vBuffSizeBytes := 262144; // 256kb Default
   vBandWidthLimitBytes := 0;
   vBandWidthSampleSec := 1;
-  vListenBacklog := 50;
+  vListenBacklog := 50;   }
 End;
 
 destructor TRESTDWFphttpServicePooler.Destroy;
@@ -354,8 +431,6 @@ Begin
 End;
 
 procedure TRESTDWFphttpServicePooler.SetActive(Value: boolean);
-var
-  x: Integer;
 Begin
   If (Value) Then
   Begin
@@ -363,7 +438,23 @@ Begin
       if not(Assigned(ServerMethodClass)) and (Self.GetDataRouteCount = 0) then
         raise Exception.Create(cServerMethodClassNotAssigned);
 
-       HttpAppSrv.Active:= True;
+       HttpAppSrv.Port:= ServicePort;
+       HttpAppSrv.OnRequest:= @ExecRequest;
+
+       { #todo -oAnderson : O servidor para de responder quando o SSL é ativado. }
+       HttpAppSrv.UseSSL:= SSLUse;
+
+       if SSLUse and (SSLRootCertFile <> EmptyStr) then
+       begin
+            HttpAppSrv.CertificateData.KeyPassword          := SSLPrivateKeyPassword;//fCertificatePassword;
+            HttpAppSrv.CertificateData.HostName             := SSLRootCertFile;//fCertificateHostName;
+            HttpAppSrv.CertificateData.Certificate.FileName := SSLCertFile;//fCertificateFileName;
+            HttpAppSrv.CertificateData.PrivateKey.FileName  := SSLPrivateKeyFile;//fCertificatePrivateKey;
+       end;
+
+       { #todo -oAnderson : Estudar como passar o SSLVersionMin para o FPHTTP }
+
+      HttpAppSrv.Active:= True;
     Except
       On E: Exception do
       Begin
