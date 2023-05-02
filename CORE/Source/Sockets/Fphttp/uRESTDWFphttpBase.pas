@@ -107,7 +107,7 @@ procedure TRESTDWFphttpServicePooler.ExecRequest(Sender: TObject;
       Var AResponse : TFPHTTPConnectionResponse);
 var
   vContentType,
-  AuthRealm,
+  vAuthRealm,
   sCharSet,
   ErrorMessage,
   vResponseString     : String;
@@ -118,6 +118,7 @@ var
   CORSCustomHeaders   : TStringList;
   ResultStream,
   ContentStringStream : TStream;
+  mb                  : TStringStream;
   vRedirect           : TRedirect;
 
   a : String;
@@ -192,11 +193,36 @@ var
   //end;
    end;
 
+  Procedure DestroyComponents;
+  Begin
+    if assigned(vResponseHeader)then
+      FreeAndNil(vResponseHeader);
+    if assigned(ResultStream)then
+      FreeAndNil(ResultStream);
+    if assigned(CORSCustomHeaders)then
+      FreeAndNil(CORSCustomHeaders);
+    if assigned(ContentStringStream)then
+      FreeAndNil(ContentStringStream);
+    if assigned(HeaderList)then
+      FreeAndNil(HeaderList);
+  End;
+
   procedure Redirect(Url: String);
   begin
     AResponse.SendRedirect(Url);
   end;
 
+  Procedure WriteError;
+  Begin
+    AResponse.Code                   := StatusCode;
+    mb                               := TStringStream.Create(ErrorMessage);
+    mb.Position                      := 0;
+    AResponse.FreeContentStream      := True;
+    AResponse.ContentStream          := mb;
+    AResponse.ContentStream.Position := 0;
+    AResponse.ContentLength          := -1;//mb.Size;
+    AResponse.SendContent;
+  End;
 
 begin
   aUserName:= EmptyStr;
@@ -211,9 +237,9 @@ begin
 
   ParseHeader;
 
-  //@vRedirect       := @Redirect; { #todo -oAnderson : Verificar como funciona o Redirect. }
+  vRedirect       := TRedirect(@Redirect);
   vContentType    := ARequest.ContentType;
-  AuthRealm       := '' ;
+  vAuthRealm      := AResponse.WWWAuthenticate;
   sCharSet        := aRequest.AcceptCharset;
   ErrorMessage    := '';
   vResponseString := '';
@@ -241,7 +267,7 @@ begin
                    aRequest.CustomHeaders                                         , //Params
                    aRequest.URI                                                   , //QueryParams
                    ContentStringStream                                            , //ContentStringStream
-                   AuthRealm                                                      , //AuthRealm
+                   vAuthRealm                                                     , //AuthRealm
                    sCharSet                                                       , //sCharSet
                    ErrorMessage                                                   , //ErrorMessage
                    StatusCode                                                     , //StatusCode
@@ -252,11 +278,9 @@ begin
                    vRedirect                                                        //Redirect
                    ) then
       begin
-
-
             SetReplyCORS;
-            //AResponseInfo.AuthRealm   := vAuthRealm;
-            AResponse.ContentType := vContentType;
+            AResponse.WWWAuthenticate   := vAuthRealm;
+            AResponse.ContentType    := vContentType;
             If Encoding = esUtf8 Then
              AResponse.AcceptCharset := 'utf-8'
             Else
@@ -273,7 +297,8 @@ begin
                ResultStream  := TStringStream.Create(ErrorMessage);
              End;
 
-             For I := 0 To vResponseHeader.Count -1 Do
+
+            For I := 0 To vResponseHeader.Count -1 Do
              AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
                                              vResponseHeader.Values[vResponseHeader.Names[I]]);
              If vResponseHeader.Count > 0 Then
@@ -288,24 +313,26 @@ begin
                AResponse.ContentLength := ResultStream.Size;
              End;
 
-
       end
       else
       begin
-        a := 'no.';
+        SetReplyCORS;
+        AResponse.WWWAuthenticate := vAuthRealm;
+        AResponse.Code            := StatusCode;
+
+        If ErrorMessage <> '' Then
+         AResponse.Content := ErrorMessage
+        Else
+         Begin
+          AResponse.FreeContentStream      := True;
+          AResponse.ContentStream          := ResultStream;
+          AResponse.ContentStream.Position := 0;
+          AResponse.ContentLength          := -1;
+         End;
       end;
 
   finally
-    if assigned(vResponseHeader)then
-      FreeAndNil(vResponseHeader);
-    if assigned(ResultStream)then
-      FreeAndNil(ResultStream);
-    if assigned(CORSCustomHeaders)then
-      FreeAndNil(CORSCustomHeaders);
-    if assigned(ContentStringStream)then
-      FreeAndNil(ContentStringStream);
-    if assigned(HeaderList)then
-      FreeAndNil(HeaderList);
+    DestroyComponents;
   end;
 end;
 
