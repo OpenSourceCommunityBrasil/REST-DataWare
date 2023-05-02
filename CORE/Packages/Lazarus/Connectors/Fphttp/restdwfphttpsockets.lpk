@@ -10,7 +10,7 @@
       <SearchPaths>
         <IncludeFiles Value="..\..\..\..\Source\Includes"/>
         <OtherUnitFiles Value="..\..\..\..\Source;..\..\..\..\Source\Sockets\Fphttp;..\..\..\..\Source\Basic"/>
-        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+        <UnitOutputDirectory Value="..\..\..\..\compiledlaz"/>
       </SearchPaths>
       <Linking>
         <Debugging>
@@ -18,6 +18,7 @@
         </Debugging>
       </Linking>
     </CompilerOptions>
+    <Version Major="2" Minor="1"/>
     <Files>
       <Item>
         <Filename Value="..\..\..\..\Source\Sockets\Fphttp\uRESTDWFphttpBase.pas"/>
@@ -31,6 +32,10 @@
       <Item>
         <Filename Value="..\..\..\..\Source\Includes\uRESTDW.inc"/>
         <Type Value="Include"/>
+      </Item>
+      <Item>
+        <Filename Value="RESTDWfphttpSockets.lrs"/>
+        <Type Value="LRS"/>
       </Item>
     </Files>
     <RequiredPkgs>

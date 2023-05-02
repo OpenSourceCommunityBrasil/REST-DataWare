@@ -26,7 +26,7 @@ unit uRESTDWFphttpReg;
 interface
 
 uses
-  Classes, PropEdits, uRESTDWFphttpBase;
+  Classes, PropEdits, uRESTDWFphttpBase, LResources;
 
 Type
   TPoolersList = Class(TStringProperty)
@@ -77,10 +77,11 @@ end;
 
 Procedure Register;
 Begin
-  RegisterComponents('REST Dataware - Service', [TRESTDWFphttpServicePooler]);
+  RegisterComponents('REST Dataware - Service', [TRESTDWfpHttpServicePooler]);
 End;
 
 initialization
+{$I RESTDWfpHttpSockets.lrs}
 
 Finalization
 
