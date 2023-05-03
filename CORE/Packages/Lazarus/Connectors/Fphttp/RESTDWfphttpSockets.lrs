@@ -1,4 +1,4 @@
-LazarusResources.Add('TRESTDWFhttpClientPooler','PNG',[
+LazarusResources.Add('TRESTDWfpHttpClientPooler','PNG',[
   #137'PNG'#13#10#26#10#0#0#0#13'IHDR'#0#0#0#25#0#0#0#25#8#6#0#0#0#196#233#133
   +'c'#0#0#0#9'pHYs'#0#0#8'N'#0#0#8'N'#1#140'1'#0#236#0#0#0#1'sRGB'#0#174#206#28
   +#233#0#0#0#4'gAMA'#0#0#177#143#11#252'a'#5#0#0#2#230'IDATx'#1#189'V;H[Q'#24
@@ -34,7 +34,7 @@ LazarusResources.Add('TRESTDWFhttpClientPooler','PNG',[
   +#129#249'y'#252' "'#6#215#136'-+'#12#137#228#233#21'wr'#191'D'#183#134#191
   +#234#2#25'{'#18#21#230' '#0#0#0#0'IEND'#174'B`'#130
 ]);
-LazarusResources.Add('TRESTDWFhttpClientREST','PNG',[
+LazarusResources.Add('TRESTDWfpHttpClientREST','PNG',[
   #137'PNG'#13#10#26#10#0#0#0#13'IHDR'#0#0#0#24#0#0#0#25#8#6#0#0#0'++'#238']'#0
   +#0#0#9'pHYs'#0#0#8'N'#0#0#8'N'#1#140'1'#0#236#0#0#0#1'sRGB'#0#174#206#28#233
   +#0#0#0#4'gAMA'#0#0#177#143#11#252'a'#5#0#0#3')IDATx'#1#189'V=LSQ'#20#254'Z'
@@ -74,7 +74,7 @@ LazarusResources.Add('TRESTDWFhttpClientREST','PNG',[
   +#231#127#2'f'#161#166#166#230#151'y'#18#252's'#252#4#203#244'Q{'#183#149#205
   +'9'#0#0#0#0'IEND'#174'B`'#130
 ]);
-LazarusResources.Add('TRESTDWFhttpDataBase','PNG',[
+LazarusResources.Add('TRESTDWfpHttpDataBase','PNG',[
   #137'PNG'#13#10#26#10#0#0#0#13'IHDR'#0#0#0#25#0#0#0#25#8#6#0#0#0#196#233#133
   +'c'#0#0#0#9'pHYs'#0#0#8'N'#0#0#8'N'#1#140'1'#0#236#0#0#0#1'sRGB'#0#174#206#28
   +#233#0#0#0#4'gAMA'#0#0#177#143#11#252'a'#5#0#0#3'AIDATx'#1#205'VMH[A'#16#254
@@ -113,7 +113,7 @@ LazarusResources.Add('TRESTDWFhttpDataBase','PNG',[
   +#228#161'Fg'#18#145'a'#139#166#237#27#195'O'#28'xPw'#162#30#238#28#0#0#0#0'I'
   +'END'#174'B`'#130
 ]);
-LazarusResources.Add('TRESTDWFhttpPoolerList','PNG',[
+LazarusResources.Add('TRESTDWfpHttpPoolerList','PNG',[
   #137'PNG'#13#10#26#10#0#0#0#13'IHDR'#0#0#0#25#0#0#0#25#8#6#0#0#0#196#233#133
   +'c'#0#0#0#9'pHYs'#0#0#8'N'#0#0#8'N'#1#140'1'#0#236#0#0#0#1'sRGB'#0#174#206#28
   +#233#0#0#0#4'gAMA'#0#0#177#143#11#252'a'#5#0#0#2#144'IDATx'#1#237#150'=hZQ'
@@ -146,7 +146,7 @@ LazarusResources.Add('TRESTDWFhttpPoolerList','PNG',[
   +#142#15'}'#182#208#23#139#241#244#20'_on0'#12'}'#183'='#196'h4'#254'c'#163#10
   +#232'x'#160#216#19#227#15'#V'#23'UL'#21'C'#252#0#0#0#0'IEND'#174'B`'#130
 ]);
-LazarusResources.Add('TRESTDWFhttpServicePooler','PNG',[
+LazarusResources.Add('TRESTDWfpHttpServicePooler','PNG',[
   #137'PNG'#13#10#26#10#0#0#0#13'IHDR'#0#0#0#25#0#0#0#25#8#6#0#0#0#196#233#133
   +'c'#0#0#0#9'pHYs'#0#0#8'N'#0#0#8'N'#1#140'1'#0#236#0#0#0#1'sRGB'#0#174#206#28
   +#233#0#0#0#4'gAMA'#0#0#177#143#11#252'a'#5#0#0#2#219'IDATx'#1#189'VMK[A'#20
