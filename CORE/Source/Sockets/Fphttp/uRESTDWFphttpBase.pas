@@ -34,7 +34,7 @@ Uses
   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
   uRESTDWConsts, uRESTDWDataUtils, uRESTDWTools, uRESTDWAuthenticators,
-  fphttpserver, HTTPDefs, fpwebclient, base64, opensslsockets;
+  fphttpserver, HTTPDefs, fpwebclient, base64, opensslsockets, httpprotocol;
 
 Type
 
@@ -278,59 +278,62 @@ begin
                    vRedirect                                                        //Redirect
                    ) then
       begin
-            SetReplyCORS;
-            AResponse.WWWAuthenticate   := vAuthRealm;
-            AResponse.ContentType    := vContentType;
-            If Encoding = esUtf8 Then
-             AResponse.AcceptCharset := 'utf-8'
-            Else
-             AResponse.AcceptCharset := 'ansi';
-            AResponse.Code               := StatusCode;
-            If (vResponseString <> '')   Or
-               (ErrorMessage    <> '')   Then
-             Begin
-              If Assigned(ResultStream)  Then
-               FreeAndNil(ResultStream);
-              If (vResponseString <> '') Then
-               ResultStream  := TStringStream.Create(vResponseString)
-              Else
-               ResultStream  := TStringStream.Create(ErrorMessage);
-             End;
+        SetReplyCORS;
+        AResponse.SetHeader(hhWWWAuthenticate, 'Basic realm="API"');  // Aqui estava o vAuthRealm, mas no caso do FPHTTP precisa ser diferente do Indy
+        AResponse.ContentType    := vContentType;
+
+        If Encoding = esUtf8 Then
+          AResponse.AcceptCharset := 'utf-8'
+        else
+          AResponse.AcceptCharset := 'ansi';
+
+        AResponse.Code            := StatusCode;
 
 
-            For I := 0 To vResponseHeader.Count -1 Do
-             AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
-                                             vResponseHeader.Values[vResponseHeader.Names[I]]);
-             If vResponseHeader.Count > 0 Then
-             AResponse.SendHeaders;
-             //AResponse.WriteContent;
 
-             If Assigned(ResultStream)    Then
-             Begin
-               AResponse.ContentStream := ResultStream;
-               AResponse.SendContent;  //SendContent é necessário para devolver o conteúdo
-               AResponse.ContentStream := Nil;
-               AResponse.ContentLength := ResultStream.Size;
-             End;
+        if (vResponseString <> '') Or (ErrorMessage    <> '')   Then
+        begin
+          if Assigned(ResultStream)  then
+            FreeAndNil(ResultStream);
 
+          if (vResponseString <> '') then
+            ResultStream  := TStringStream.Create(vResponseString)
+          else
+            ResultStream  := TStringStream.Create(ErrorMessage);
+        end;
+
+
+        for I := 0 To vResponseHeader.Count -1 Do
+          AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I], vResponseHeader.Values[vResponseHeader.Names[I]]);
+
+        if vResponseHeader.Count > 0 then
+          AResponse.SendHeaders;
+          //AResponse.WriteContent;
+
+        if Assigned(ResultStream)    then
+        begin
+          AResponse.ContentStream := ResultStream;
+          AResponse.SendContent;  //SendContent é necessário para devolver o conteúdo
+          AResponse.ContentStream := Nil;
+          AResponse.ContentLength := ResultStream.Size;
+        end;
       end
       else
       begin
         SetReplyCORS;
-        AResponse.WWWAuthenticate := vAuthRealm;
+        AResponse.SetHeader(hhWWWAuthenticate, 'Basic realm="API"');
         AResponse.Code            := StatusCode;
 
-        If ErrorMessage <> '' Then
-         AResponse.Content := ErrorMessage
-        Else
-         Begin
+        if ErrorMessage <> '' Then
+          AResponse.Content := ErrorMessage
+        else
+        begin
           AResponse.FreeContentStream      := True;
           AResponse.ContentStream          := ResultStream;
           AResponse.ContentStream.Position := 0;
           AResponse.ContentLength          := -1;
-         End;
+        end;
       end;
-
   finally
     DestroyComponents;
   end;
