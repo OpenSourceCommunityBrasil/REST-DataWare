@@ -3045,11 +3045,15 @@ Begin
           If vDefaultPage.Count > 0 Then
            vReplyString  := vDefaultPage.Text
           Else
-          if vErrorMessage <> EmptyStr then
+           if not WelcomeAccept then
             begin
-              vReplyString := vErrorMessage;
-              vErrorCode   := 401;
-              ContentType  := 'text/html';
+             if vErrorMessage <> EmptyStr then
+               vReplyString := vErrorMessage
+             else
+               vReplyString := cInvalidWelcomeMessage;
+
+             vErrorCode   := 401;
+             ContentType  := 'text/html';
             end
             else
             begin
@@ -3059,11 +3063,23 @@ Begin
             End
           end
         Else
+        if not WelcomeAccept then
+            begin
+             if vErrorMessage <> EmptyStr then
+               vReplyString := vErrorMessage
+             else
+               vReplyString := cInvalidWelcomeMessage;
+
+             vErrorCode   := 401;
+             ContentType  := 'text/html';
+            end
+        else
          Begin
           If vEncoding = esUtf8 Then
            sCharSet       := 'utf-8'
           Else
            sCharSet       := 'ansi';
+
           If DWParams <> Nil Then
            Begin
             If (DWParams.ItemsString['dwassyncexec'] <> Nil) And (Not (dwassyncexec)) Then
@@ -3071,6 +3087,7 @@ Begin
             If DWParams.ItemsString['dwusecript'] <> Nil Then
              vdwCriptKey  := DWParams.ItemsString['dwusecript'].AsBoolean;
            End;
+
           If dwassyncexec Then
            Begin
             StatusCode               := 200;
@@ -3085,8 +3102,10 @@ Begin
             WriteStream(mb, ResultStream);
             FreeAndNil(mb);
            End;
+
           If DWParams.itemsstring['binaryRequest']        <> Nil Then
            vBinaryEvent := DWParams.itemsstring['binaryRequest'].Value;
+
           If DWParams.itemsstring['BinaryCompatibleMode'] <> Nil Then
            vBinaryCompatibleMode := DWParams.itemsstring['BinaryCompatibleMode'].Value;
           If DWParams.itemsstring['MetadataRequest']      <> Nil Then
@@ -3098,6 +3117,7 @@ Begin
            Begin
             TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
            End;
+
           If (Not (vGettoken)) And (Not (vTokenValidate)) Then
            Begin
             If Not ServiceMethods(TComponent(vTempServerMethods), AContext, vUrlToExec, vdwservereventname, DWParams,
