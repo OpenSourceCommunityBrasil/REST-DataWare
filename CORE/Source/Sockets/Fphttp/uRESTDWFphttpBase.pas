@@ -142,7 +142,7 @@ var
     for I := 0 to Pred(ARequest.CustomHeaders.Count) do
       HeaderList.AddPair(ARequest.CustomHeaders.Names[I], ARequest.CustomHeaders.ValueFromIndex[I]  );
 
-    s :=  ARequest.GetHTTPVariable(hvURL);
+    s :=  ARequest.GetHTTPVariable(hvQuery);
     sl := TStringList.Create;
     try
       if (Pos('?', s) > 0)then
@@ -265,7 +265,7 @@ begin
                    StrToInt( aRequest.GetHTTPVariable(hvServerPort) )             , //ClientPort
                    HeaderList                                                     , //RawHeaders
                    aRequest.CustomHeaders                                         , //Params
-                   aRequest.URI                                                   , //QueryParams
+                   aRequest.GetHTTPVariable(hvQuery)                              , //QueryParams
                    ContentStringStream                                            , //ContentStringStream
                    vAuthRealm                                                     , //AuthRealm
                    sCharSet                                                       , //sCharSet
@@ -279,7 +279,10 @@ begin
                    ) then
       begin
         SetReplyCORS;
-        AResponse.SetHeader(hhWWWAuthenticate, 'Basic realm="API"');  // Aqui estava o vAuthRealm, mas no caso do FPHTTP precisa ser diferente do Indy
+
+        if (vAuthRealm <> '') then
+          AResponse.SetHeader(hhWWWAuthenticate, 'Basic realm="API"');  // Aqui estava o vAuthRealm, mas no caso do FPHTTP precisa ser diferente do Indy
+
         AResponse.ContentType    := vContentType;
 
         If Encoding = esUtf8 Then
@@ -321,17 +324,18 @@ begin
       else
       begin
         SetReplyCORS;
-        AResponse.SetHeader(hhWWWAuthenticate, 'Basic realm="API"');
+
+        if (vAuthRealm <> '') then
+          AResponse.SetHeader(hhWWWAuthenticate, 'Basic realm="API"');
+
         AResponse.Code            := StatusCode;
 
-        if ErrorMessage <> '' Then
-          AResponse.Content := ErrorMessage
-        else
+        if Assigned(ResultStream)    then
         begin
-          AResponse.FreeContentStream      := True;
           AResponse.ContentStream          := ResultStream;
-          AResponse.ContentStream.Position := 0;
-          AResponse.ContentLength          := -1;
+          AResponse.SendContent;  //SendContent é necessário para devolver o conteúdo
+          AResponse.ContentStream := Nil;
+          AResponse.ContentLength := ResultStream.Size;
         end;
       end;
   finally
