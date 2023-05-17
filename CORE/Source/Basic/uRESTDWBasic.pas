@@ -2732,7 +2732,7 @@ Begin
               vRequestHeader.Add(Url + '?' + QueryParams);
               TRESTDWDataUtils.ParseRESTURL (Url + '?' + QueryParams, vEncoding, vmark, vDatabaseCharSet, DWParams);
               If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then  // Ico Menezes - Post Receber WelcomeMessage   - 20-12-2018
-               vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString, vDatabaseCharSet;
+               vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString, vDatabaseCharSet);
              End;
            End
           Else
@@ -3322,7 +3322,7 @@ Begin
             End
             Else
             Begin
-              {$IFDEF RESTDWLAZARUS}
+              {$IF Defined(RESTDWLAZARUS)}
               If vEncoding = esUtf8 Then
                 mb := TStringStream.Create(Utf8Encode(JSONStr))
               Else
