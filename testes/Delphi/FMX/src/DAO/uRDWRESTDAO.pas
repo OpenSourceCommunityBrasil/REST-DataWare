@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, uConsts, System.SysUtils,
-  uRESTDWDataUtils, uRESTDWResponseTranslator, uRESTDWIdBase;
+  uRESTDWDataUtils, uRESTDWResponseTranslator, uRESTDWIdBase, uRESTDWConsts;
 
 type
   TRDWRESTDAO = Class

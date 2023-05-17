@@ -15,7 +15,6 @@
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -36,7 +35,14 @@ Uses
  zlib, DWDCPrijndael, DWDCPsha256;
 
 Type
- TEncodeSelect    = (esASCII, esUtf8, esANSI);
+ TEncodeSelect          = (esASCII, esUtf8, esANSI);
+ TRESTDWAuthOptionTypes = (rdwOATBasic, rdwOATBearer, rdwOATToken);
+ TRESTDWAuthOption      = (rdwAONone,   rdwAOBasic,   rdwAOBearer,
+                           rdwAOToken,  rdwOAuth);
+ TRESTDWTokenType       = (rdwTS,       rdwJWT,       rdwPersonal);
+ TRESTDWAuthOptions     = Set of TRESTDWAuthOption;
+ TRESTDWCryptType       = (rdwAES256,   rdwHSHA256,   rdwRSA);
+ TRESTDWTokenRequest    = (rdwtHeader,  rdwtRequest);
 
 Const
  tScriptsDetected : Array [0..1] of string = ('.map', '.webdwpc');
