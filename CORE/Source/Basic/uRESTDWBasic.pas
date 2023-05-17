@@ -15,7 +15,6 @@ unit uRESTDWBasic;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -2049,11 +2048,18 @@ Begin
 
      //
      // DataRoute DR001
-     //
-     if (pos('/', cmd, 2) > 0) or (pos('\', cmd, 1) > 0) then
-       vDataRoute := Copy(cmd, 1, pos('/', cmd, 2));
+     // verifica o dataroute na URL do request: "cmd"
+     if vDataRouteList.Count > 0 then
+     begin
+       if (pos('/', cmd, 2) > 0) or (pos('\', cmd, 1) > 0) then
+         vDataRoute := Copy(cmd, 1, pos('/', cmd, 2));
 
-     if not vDataRouteList.RouteExists(vDataRoute) then vDataRoute := '';
+       if not vDataRouteList.RouteExists(vDataRoute) then
+       begin
+         WriteResponseText(cInvalidRequest, 400);
+         exit;
+       end;
+     end;
 
      // DataRoute block
 
