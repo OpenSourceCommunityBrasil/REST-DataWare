@@ -132,6 +132,7 @@ Var
  vTempURL,
  ParamsURI     : String;
  vParamMethods : TRESTDWParamsMethods;
+
  Procedure ParseParams;
  Var
   lst       : TStringList;
@@ -187,6 +188,7 @@ Var
    FreeAndNil(lst);
   End;
  End;
+
  Procedure CopyParams(SourceParams : TRESTDWParamsMethods);
  Var
   isrc       : Integer;
@@ -205,6 +207,7 @@ Var
      End;
    End;
  End;
+
  Procedure ParseURL;
  Begin
   vPosQuery := Pos('?', URL);
@@ -229,6 +232,7 @@ Var
   If URL = '' Then
    URL := '/';
  End;
+
 Begin
  Result   := False;
  If Length(URL) = 0 Then

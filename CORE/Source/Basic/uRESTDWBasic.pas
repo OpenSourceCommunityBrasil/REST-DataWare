@@ -2817,10 +2817,13 @@ Begin
        If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
         vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
 
-       Try
+       Try // identificando o evento a ser chamado no datamodule
         vTempServerMethods  := vServerMethod.Create(Nil);
         If Not vCORS Then
          FreeAndNil(CORSCustomHeaders);
+
+         // remover o dataroute do request pra função abaixo poder achar o endpoint
+         vOldRequest := Copy(vOldrequest, Length(vDataRoute), Length(vOldRequest));
 
          If TServerMethodDataModule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
          Begin
