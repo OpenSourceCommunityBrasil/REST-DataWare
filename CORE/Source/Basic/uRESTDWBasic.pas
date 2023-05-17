@@ -3109,6 +3109,17 @@ Begin
 
          If (vTempServerMethods.ClassType = TServerMethodDatamodule)             Or
              vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule) Then
+        if not WelcomeAccept then
+            begin
+             if vErrorMessage <> EmptyStr then
+               vReplyString := vErrorMessage
+             else
+               vReplyString := cInvalidWelcomeMessage;
+
+             vErrorCode   := 401;
+             ContentType  := 'text/html';
+            end
+        else
          Begin
            TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP,
                                    UserAgent, vUrlToExec, ClientPort);
