@@ -33,14 +33,6 @@ Uses
   DateUtils;
 
 Type
- // TODO mover isso daqui pro authenticator na próxima versão.
- TRESTDWAuthOptionTypes = (rdwOATBasic, rdwOATBearer, rdwOATToken);
- TRESTDWAuthOption      = (rdwAONone,   rdwAOBasic,   rdwAOBearer,
-                           rdwAOToken,  rdwOAuth);
- TRESTDWTokenType       = (rdwTS,       rdwJWT,       rdwPersonal);
- TRESTDWAuthOptions     = Set of TRESTDWAuthOption;
- TRESTDWCryptType       = (rdwAES256,   rdwHSHA256,   rdwRSA);
- TRESTDWTokenRequest    = (rdwtHeader,  rdwtRequest);
  {$IFDEF RESTDWLAZARUS}
   DWInteger       = Longint;
   DWInt64         = Int64;
@@ -87,7 +79,6 @@ Type
   DataSize       : DWInt64; //new for ver15
 End;
 
-Type
  TTokenValue = Class
  Private
   vInitRequest,
@@ -124,7 +115,6 @@ Type
   Property       Token             : String           Read ToToken;
 End;
 
-Type
  TRESTDWAuthOptionParam = Class(TPersistent)
  Private
   vCustom404TitleMessage,
@@ -148,7 +138,6 @@ Type
   Property CustomAuthErrorPage     : TStringList Read vCustomAuthErrorPage    Write SetCustomAuthErrorPage;
 End;
 
-Type
  TRESTDWAuthTokenParam = Class(TRESTDWAuthOptionParam)
  Private
   vInitRequest,
@@ -188,7 +177,6 @@ Type
   Property    LifeCycle         : Integer          Read vLifeCycle       Write vLifeCycle;
 End;
 
-Type
  TRESTDWAuthOptionBasic = Class(TRESTDWAuthOptionParam)
  Private
   vUserName,
@@ -202,7 +190,6 @@ Type
   Property    Password : String Read vPassword Write vPassword;
 End;
 
-Type
  TRESTDWAuthOAuth = Class(TRESTDWAuthOptionParam)
  Private
   vRedirectURI,
@@ -234,7 +221,6 @@ Type
   Property    Expires_in     : TDateTime           Read vExpiresin;
 End;
 
-Type
  TRESTDWAuthOptionBearerClient = Class(TRESTDWAuthOptionParam)
  Private
   vGetTokenName,
@@ -267,7 +253,6 @@ Type
   Property    AutoRenewToken   : Boolean          Read vAutoRenewToken  Write vAutoRenewToken;
 End;
 
-Type
  TRESTDWAuthOptionTokenClient = Class(TRESTDWAuthOptionParam)
  Private
   vSecrets,
@@ -300,7 +285,6 @@ Type
   Property    AutoRenewToken   : Boolean          Read vAutoRenewToken  Write vAutoRenewToken;
 End;
 
-Type
  TRESTDWAuthOptionBearerServer = Class(TRESTDWAuthTokenParam)
  Private
  Protected
@@ -309,7 +293,6 @@ Type
   Function    FromToken(Value    : String)      : Boolean; Override;
 End;
 
-Type
  TRESTDWAuthOptionTokenServer = Class(TRESTDWAuthTokenParam)
  Private
  Protected
@@ -318,7 +301,6 @@ Type
   Function    FromToken(Value    : String)      : Boolean; Override;
 End;
 
-Type
  TRESTDWServerAuthOptionParams = Class(TPersistent)
  Private
   FOwner                          : TPersistent;
@@ -338,7 +320,6 @@ Type
   Property OptionParams           : TRESTDWAuthOptionParam  Read RDWAuthOptionParam Write RDWAuthOptionParam;
 End;
 
-Type
  TRESTDWClientAuthOptionParams = Class(TPersistent)
  Private
   FOwner                          : TPersistent;
@@ -357,7 +338,6 @@ Type
   Property OptionParams           : TRESTDWAuthOptionParam  Read RDWAuthOptionParam Write RDWAuthOptionParam;
 End;
 
-Type
  TRESTDWAuthRequest = Class
  Private
   vToken : String;
@@ -366,7 +346,6 @@ Type
   Property Token : String Read vToken Write vToken;
 End;
 
-Type
  TRESTDWDataUtils = Class
  Public
  Class Procedure ParseRESTURL           (Const Cmd       : String;
@@ -432,8 +411,6 @@ Type
                                          ;DatabaseCharSet: TDatabaseCharSet
                                          {$ENDIF})       : Boolean;
  End;
-
-
 
 Function GettokenValue  (Value      : String) : String;
 Function GetTokenType   (Value      : String) : TRESTDWTokenType;
@@ -708,7 +685,7 @@ Begin
  Result := Format('{"alg": "%s", "typ": "%s"}', [GetCryptType, GetTokenType]);
 End;
 
-Function    TTokenValue.ToToken : String;
+Function TTokenValue.ToToken : String;
 Var
  viss,
  vBuildData : String;
@@ -745,39 +722,30 @@ Begin
                   vBuildData := Format(cValueToken, [viss,
                                                      IntToStr(DateTimeToUnix(vFinalRequest, False)),
                                                      IntToStr(DateTimeToUnix(vInitRequest, False)),
-                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
-                                                                   {$IFDEF FPC}, csUndefined{$ENDIF})])
+                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
+                                                                   {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})])
                  Else
                   vBuildData := Format(cValueTokenNoLife, [viss,
                                                            IntToStr(DateTimeToUnix(vInitRequest, False)),
-                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
-                                                                         {$IFDEF FPC}, csUndefined{$ENDIF})]);
-                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF FPC}, csUndefined{$ENDIF});
+                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
+                                                                         {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
+                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
                  Result     := Format(cTokenStringRDWTS, [Result + '.' + vCripto.Encrypt(Result)]);
                 End;
  End;
 End;
 
-Function    TTokenValue.ToJSON  : String;
+Function TTokenValue.ToJSON  : String;
 Begin
- Result := '';
- Case vRDWTokenType Of
-  rdwTS,
-  rdwPersonal : Begin
-                 Result := EncodeStrings(GetHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-                End;
-  rdwJWT      : Begin
-                 Result := EncodeStrings(GetHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-                End;
- End;
+  Result := EncodeStrings(GetHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
 End;
 
-Procedure   TTokenValue.SetSecrets  (Value : String);
+Procedure TTokenValue.SetSecrets  (Value : String);
 Begin
- vSecrets    := Value;
+ vSecrets := Value;
 End;
 
-Procedure   TTokenValue.SetTokenHash(Token : String);
+Procedure TTokenValue.SetTokenHash(Token : String);
 Begin
  vTokenHash  := Token;
  vCripto.Key := vTokenHash;
@@ -905,7 +873,7 @@ Begin
   Inherited Assign(Source);
 End;
 
-Function  TRESTDWAuthOptionTokenServer.FromToken(Value : String)    : Boolean;
+Function TRESTDWAuthOptionTokenServer.FromToken(Value : String)    : Boolean;
 Var
  vHeader,
  vBody,
@@ -1025,7 +993,7 @@ Begin
   End;
 End;
 
-Function  TRESTDWAuthOptionTokenServer.GetToken(aSecrets   : String = '') : String;
+Function TRESTDWAuthOptionTokenServer.GetToken(aSecrets   : String = '') : String;
 Var
  vTokenValue : TTokenValue;
 Begin
@@ -1115,7 +1083,7 @@ Begin
   Inherited Assign(Source);
 End;
 
-Function  TRESTDWAuthOptionBearerServer.FromToken(Value    : String)    : Boolean;
+Function TRESTDWAuthOptionBearerServer.FromToken(Value    : String)    : Boolean;
 Var
  vHeader,
  vBody,
@@ -1232,7 +1200,7 @@ Begin
   End;
 End;
 
-Function  TRESTDWAuthOptionBearerServer.GetToken(aSecrets : String = '') : String;
+Function TRESTDWAuthOptionBearerServer.GetToken(aSecrets : String = '') : String;
 Var
  vTokenValue : TTokenValue;
 Begin
@@ -1258,7 +1226,7 @@ Begin
  Inherited;
 End;
 
-Procedure   TRESTDWServerAuthOptionParams.CopyServerAuthParams(Var Value : TRESTDWAuthOptionParam);
+Procedure TRESTDWServerAuthOptionParams.CopyServerAuthParams(Var Value : TRESTDWAuthOptionParam);
 Begin
  If RDWAuthOptionParam is TRESTDWAuthTokenParam Then
   Begin
@@ -1403,7 +1371,7 @@ Constructor TRESTDWAuthOptionTokenClient.Create;
 Begin
  inherited;
  vToken          := '';
- vRDWTokenType   := rdwTS;
+ vRDWTokenType   := rdwJWT;
  vTokenRequest   := rdwtHeader;
  vSecrets        := '';
  vGetTokenName   := 'GetToken';
@@ -1422,8 +1390,8 @@ Begin
  vGetTokenName    := 'GetToken';
  vTokenName       := 'token';
  vLifeCycle       := 1800;//30 Minutos
- vRDWTokenType    := rdwTS;
- vRDWCryptType    := rdwAES256;
+ vRDWTokenType    := rdwJWT;
+ vRDWCryptType    := rdwHSHA256;
  vServerSignature := '';
  vInitRequest     := 0;
  vFinalRequest    := 0;
@@ -1449,17 +1417,17 @@ Begin
   Inherited Assign(Source);
 End;
 
-Destructor  TRESTDWAuthTokenParam.Destroy;
+Destructor TRESTDWAuthTokenParam.Destroy;
 Begin
  Inherited;
 End;
 
-Procedure   TRESTDWAuthTokenParam.SetTokenHash(Token : String);
+Procedure TRESTDWAuthTokenParam.SetTokenHash(Token : String);
 Begin
  vTokenHash := Token;
 End;
 
-Function    TRESTDWAuthTokenParam.GetTokenType   (Value : String) : TRESTDWTokenType;
+Function TRESTDWAuthTokenParam.GetTokenType   (Value : String) : TRESTDWTokenType;
 Begin
  Result := rdwTS;
  If Lowercase(Value) = 'jwt' Then
@@ -1468,7 +1436,7 @@ Begin
   Result := rdwPersonal;
 End;
 
-Function    TRESTDWAuthTokenParam.GetCryptType   (Value : String) : TRESTDWCryptType;
+Function TRESTDWAuthTokenParam.GetCryptType   (Value : String) : TRESTDWCryptType;
 Begin
  Result := rdwAES256;
  If Lowercase(Value) = 'hs256' Then
@@ -1477,12 +1445,12 @@ Begin
   Result := rdwRSA;
 End;
 
-Procedure   TRESTDWAuthTokenParam.SetCryptType   (Value : TRESTDWCryptType);
+Procedure TRESTDWAuthTokenParam.SetCryptType   (Value : TRESTDWCryptType);
 Begin
  vRDWCryptType := Value;
 End;
 
-Procedure   TRESTDWAuthTokenParam.SetGetTokenName(Value : String);
+Procedure TRESTDWAuthTokenParam.SetGetTokenName(Value : String);
 Begin
  If Length(Value) > 0 Then
   vGetTokenName := Value

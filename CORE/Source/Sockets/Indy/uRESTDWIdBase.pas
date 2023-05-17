@@ -3013,16 +3013,6 @@ Begin
     Else
      AResponseInfo.CharSet := 'ansi';
     AResponseInfo.ResponseNo               := StatusCode;
-    If (vResponseString <> '')   Or
-       (ErrorMessage    <> '')   Then
-     Begin
-      If Assigned(ResultStream)  Then
-       FreeAndNil(ResultStream);
-      If (vResponseString <> '') Then
-       ResultStream  := TStringStream.Create(vResponseString)
-      Else
-       ResultStream  := TStringStream.Create(ErrorMessage);
-     End;
     If Assigned(ResultStream)    Then
      Begin
       AResponseInfo.FreeContentStream      := True;

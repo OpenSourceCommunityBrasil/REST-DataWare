@@ -30,7 +30,7 @@ uses
   uRESTDWTools, uRESTDWParams;
 
 type
-  TOnBasicAuth = Procedure(Welcomemsg, AccessTag,
+  TOnBasicAuth = Procedure(Welcomemsg, AccessTag, DataRoute,
                            Username, Password : String;
                            Var Params         : TRESTDWParams;
                            Var ErrorCode      : Integer;

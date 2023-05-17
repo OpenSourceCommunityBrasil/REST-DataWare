@@ -289,8 +289,6 @@ begin
 
         AResponse.Code            := StatusCode;
 
-
-
         if (vResponseString <> '') Or (ErrorMessage    <> '')   Then
         begin
           if Assigned(ResultStream)  then
@@ -301,7 +299,6 @@ begin
           else
             ResultStream  := TStringStream.Create(ErrorMessage);
         end;
-
 
         for I := 0 To vResponseHeader.Count -1 Do
           AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I], vResponseHeader.Values[vResponseHeader.Names[I]]);

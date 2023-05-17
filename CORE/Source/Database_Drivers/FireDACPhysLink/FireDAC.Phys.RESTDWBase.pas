@@ -666,7 +666,7 @@ begin
       try
         vRESTDataBase.ExecuteCommand(vPoolermethod, vSQL, vParams, vError,
           vMessageError, vDataSetList, vRowsAffected, exec, (not exec),
-          (not exec), False, vRESTDataBase.RESTClientPooler);
+          (not exec), vRESTDataBase.RESTClientPooler);
 
         FStream.Size := 0;
         if (vDataSetList <> nil) and (not vDataSetList.IsNull) then
