@@ -63,8 +63,8 @@ type
   public
     function AuthValidate(ADataModuleRESTDW: TObject; var ANeedAuthorization: Boolean;
                           AUrlToExec, AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword, ADataRoute: String;
-                          ARawHeaders: TStrings; var ADWParams: TRESTDWParams; var AErrorCode: Integer;
-                          var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; virtual; abstract;
+                          ARawHeaders: TStrings; var ADWParams: TRESTDWParams; var ATokenValidate: Boolean; var AToken: String;
+                          var AErrorCode: Integer; var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; virtual; abstract;
   end;
 
   TRESTDWAuthBasic = class(TRESTDWServerAuthBase)
@@ -78,8 +78,8 @@ type
     destructor Destroy; override;
     function AuthValidate(ADataModuleRESTDW: TObject; var ANeedAuthorization: Boolean;
                           AUrlToExec, AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword, ADataRoute: String;
-                          ARawHeaders: TStrings; var ADWParams: TRESTDWParams; var AErrorCode: Integer;
-                          var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; override;
+                          ARawHeaders: TStrings; var ADWParams: TRESTDWParams; var ATokenValidate: Boolean; var AToken: String;
+                          var AErrorCode: Integer; var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; override;
     function ValidateAuth(AUserName, APassword: string): boolean;
   published
     property UserName: String read FUserName write FUserName;
@@ -119,6 +119,10 @@ type
     procedure FromToken(ATokenValue: String);
     function GetToken(ASecrets: String): String;
     function ValidateToken(AValue: String): Boolean; overload;
+    function AuthValidate(ADataModuleRESTDW: TObject; var ANeedAuthorization: Boolean;
+                          AUrlToExec, AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword, ADataRoute: String;
+                          ARawHeaders: TStrings; var ADWParams: TRESTDWParams; var ATokenValidate: Boolean; var AToken: String;
+                          var AErrorCode: Integer; var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; override;
   published
     property BeginTime: TDateTime read FBeginTime write FBeginTime;
     property EndTime: TDateTime read FEndTime write FEndTime;
@@ -172,13 +176,17 @@ type
 
 implementation
 
+uses
+  uRESTDWDatamodule;
+
 { TRESTDWAuthBasic }
 
 function TRESTDWAuthBasic.AuthValidate(ADataModuleRESTDW: TObject;
   var ANeedAuthorization: Boolean; AUrlToExec, AWelcomeMessage, AAccessTag,
   AAuthUsername, AAuthPassword, ADataRoute: String; ARawHeaders: TStrings;
-  var ADWParams: TRESTDWParams; var AErrorCode: Integer;
-  var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean;
+  var ADWParams: TRESTDWParams; var ATokenValidate: Boolean; var AToken: String;
+  var AErrorCode: Integer; var AErrorMessage: String;
+  var AAcceptAuth: Boolean): Boolean;
 var
   LAuthenticationString: String;
 begin
@@ -240,6 +248,63 @@ begin
   end
   else
     inherited Assign(ASource);
+end;
+
+function TRESTDWAuthToken.AuthValidate(ADataModuleRESTDW: TObject;
+  var ANeedAuthorization: Boolean; AUrlToExec, AWelcomeMessage, AAccessTag,
+  AAuthUsername, AAuthPassword, ADataRoute: String; ARawHeaders: TStrings;
+  var ADWParams: TRESTDWParams; var ATokenValidate: Boolean; var AToken: String;
+  var AErrorCode: Integer; var AErrorMessage: String;
+  var AAcceptAuth: Boolean): Boolean;
+var
+  LToken, LTokenOrig: String;
+  LAuthTokenParam: TRESTDWAuthToken;
+begin
+  AErrorCode     := 401;
+  AErrorMessage  := cInvalidAuth;
+  ATokenValidate := True;
+  LTokenOrig     := AToken;
+
+  LAuthTokenParam := TRESTDWAuthToken.Create(self);
+  LAuthTokenParam.Assign(Self);
+
+  if ADWParams.ItemsString[Self.Key] <> Nil then
+    AToken := ADWParams.ItemsString[Self.Key].AsString
+  else
+  begin
+    if Trim(AToken) = '' then
+      AToken := ARawHeaders.Values['Authorization'];
+
+    if Trim(AToken) <> '' then
+    begin
+      LToken := GetTokenString(AToken);
+
+      if LToken = '' then
+        LToken := GetBearerString(AToken);
+
+      if LToken = '' then
+        LToken := LTokenOrig;
+
+      AToken := LToken;
+    end;
+  end;
+
+  if not LAuthTokenParam.ValidateToken(AToken) then
+  begin
+    AAcceptAuth := False;
+    Exit;
+  end
+  else
+    ATokenValidate := False;
+
+  if Assigned(TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth) then
+  begin
+    TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth(AWelcomeMessage, AAccessTag, ADWParams,
+                                                                TRESTDWAuthToken(LAuthTokenParam),
+                                                                AErrorCode, AErrorMessage, AToken, AAcceptAuth);
+
+    ATokenValidate := Not(AAcceptAuth);
+  end;
 end;
 
 procedure TRESTDWAuthToken.ClearToken;
