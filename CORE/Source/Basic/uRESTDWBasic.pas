@@ -382,7 +382,7 @@ End;
   vForceWelcomeAccess,
   vCORS,
   vActive                : Boolean;
-  vAuthenticator         : TRESTDWAuthenticatorBase;
+  vAuthenticator         : TRESTDWServerAuthBase;
 //  vAuthMessages          : TRESTDWAuthMessages;
   vProxyOptions          : TProxyConnectionInfo;
   vServiceTimeout,
@@ -553,7 +553,7 @@ End;
                                       Var ErrorCode           : Integer) : Boolean;
  Protected
   procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-  procedure SetAuthenticator(const Value: TRESTDWAuthenticatorBase);
+  procedure SetAuthenticator(const Value: TRESTDWServerAuthBase);
  Public
 Procedure EchoPooler       (ServerMethodsClass    : TComponent;
                             AContext              : TComponent;
@@ -592,7 +592,7 @@ Procedure EchoPooler       (ServerMethodsClass    : TComponent;
   Destructor  Destroy; Override;//Destroy a Classe
  Published
   Property Active                  : Boolean                       Read vActive                  Write SetActive;
-  Property Authenticator           : TRESTDWAuthenticatorBase      Read vAuthenticator           Write SetAuthenticator;
+  Property Authenticator           : TRESTDWServerAuthBase         Read vAuthenticator           Write SetAuthenticator;
 //  Property AuthMessages            : TRESTDWAuthMessages           Read vAuthMessages            Write vAuthMessages;
   Property CORS                    : Boolean                       Read vCORS                    Write vCORS;
   Property CORS_CustomHeaders      : TStringList                   Read vCORSCustomHeaders       Write SetCORSCustomHeader;
@@ -1813,13 +1813,6 @@ Var
    End;
  End;
 
- Procedure PrepareBasicAuth(AuthenticationString : String; Var AuthUsername, AuthPassword : String);
- Begin
-  AuthUsername := Copy(AuthenticationString, InitStrPos, Pos(':', AuthenticationString) -1);
-  Delete(AuthenticationString, InitStrPos, Pos(':', AuthenticationString));
-  AuthPassword := AuthenticationString;
- End;
-
  Procedure WriteResponseText(aText: string; aStatusCode: integer; aContentType: string = 'application/json');
  var
    aStreamResponse: TStream;
@@ -2882,24 +2875,16 @@ Begin
            If vNeedAuthorization Then
              If vAuthenticator is TRESTDWAuthBasic Then
              Begin {$REGION AuthBasic}
-               vAuthenticationString := DecodeStrings(StringReplace(RawHeaders.Values['Authorization'], 'Basic ', '', [rfReplaceAll]){$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-               If (vAuthenticationString <> '') And ((AuthUsername = '') And
-                  (AuthPassword = '')) Then
-                 PrepareBasicAuth(vAuthenticationString, AuthUsername, AuthPassword);
-
-               if Assigned(TRESTDWAuthBasic(Authenticator).OnBasicAuth) then
-                 TRESTDWAuthBasic(Authenticator).OnBasicAuth(vWelcomeMessage,
-                                                             vAccessTag,
-                                                             vDataRoute,
-                                                             AuthUsername,
-                                                             AuthPassword,
-                                                             DWParams,
-                                                             vErrorCode,
-                                                             vErrorMessage,
-                                                             vAcceptAuth)
-               else
-                 vAcceptAuth := TRESTDWAuthBasic(vAuthenticator).ValidateAuth(
-                 AuthUsername, AuthPassword);
+               vAuthenticator.AuthValidate(vTempServerMethods,
+                                           vNeedAuthorization,
+                                           vUrlToExec,
+                                           vWelcomeMessage,
+                                           vAccessTag,
+                                           AuthUsername,
+                                           AuthPassword,
+                                           vDataRoute,
+                                           RawHeaders,
+                                           DWParams, vErrorCode, vErrorMessage, vAcceptAuth);
 
                If Not vAcceptAuth Then
                Begin
@@ -3384,7 +3369,7 @@ Begin
 End;
 
 procedure TRESTServiceBase.SetAuthenticator(
-  const Value: TRESTDWAuthenticatorBase);
+  const Value: TRESTDWServerAuthBase);
 begin
   if Value <> vAuthenticator then
     vAuthenticator := Value;

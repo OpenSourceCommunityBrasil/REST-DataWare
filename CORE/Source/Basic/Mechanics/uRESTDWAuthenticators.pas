@@ -56,15 +56,31 @@ type
     property AuthDialog: Boolean read FAuthDialog write FAuthDialog;
   end;
 
-  TRESTDWAuthBasic = class(TRESTDWAuthenticatorBase)
+  // Classe Especifica para Autenticacao pelo Server
+  TRESTDWServerAuthBase = class(TRESTDWAuthenticatorBase)
+  private
+
+  public
+    function AuthValidate(ADataModuleRESTDW: TObject; var ANeedAuthorization: Boolean;
+                          AUrlToExec, AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword, ADataRoute: String;
+                          ARawHeaders: TStrings; var ADWParams: TRESTDWParams; var AErrorCode: Integer;
+                          var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; virtual; abstract;
+  end;
+
+  TRESTDWAuthBasic = class(TRESTDWServerAuthBase)
   private
     FPassword: String;
     FUserName: String;
     FOnBasicAuth: TOnBasicAuth;
+    procedure PrepareBasicAuth(AAuthenticationString: String; var AAuthUsername, AAuthPassword: String);
   public
-    constructor Create(aOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function ValidateAuth(aUserName, aPassword: string): boolean;
+    function AuthValidate(ADataModuleRESTDW: TObject; var ANeedAuthorization: Boolean;
+                          AUrlToExec, AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword, ADataRoute: String;
+                          ARawHeaders: TStrings; var ADWParams: TRESTDWParams; var AErrorCode: Integer;
+                          var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; override;
+    function ValidateAuth(AUserName, APassword: string): boolean;
   published
     property UserName: String read FUserName write FUserName;
     property Password: String read FPassword write FPassword;
@@ -72,7 +88,7 @@ type
     property OnBasicAuth: TOnBasicAuth read FOnBasicAuth write FOnBasicAuth;
   end;
 
-  TRESTDWAuthToken = class(TRESTDWAuthenticatorBase)
+  TRESTDWAuthToken = class(TRESTDWServerAuthBase)
   private
     FBeginTime: TDateTime;
     FEndTime: TDateTime;
@@ -127,7 +143,7 @@ type
     Property OnRenewToken: TOnRenewToken Read FOnRenewToken Write FOnRenewToken;
   end;
 
-  TRESTDWAuthOAuth = class(TRESTDWAuthenticatorBase)
+  TRESTDWAuthOAuth = class(TRESTDWServerAuthBase)
   private
     FTokenType: TRESTDWAuthOptionTypes;
     FAutoBuildHex: Boolean;
@@ -158,6 +174,28 @@ implementation
 
 { TRESTDWAuthBasic }
 
+function TRESTDWAuthBasic.AuthValidate(ADataModuleRESTDW: TObject;
+  var ANeedAuthorization: Boolean; AUrlToExec, AWelcomeMessage, AAccessTag,
+  AAuthUsername, AAuthPassword, ADataRoute: String; ARawHeaders: TStrings;
+  var ADWParams: TRESTDWParams; var AErrorCode: Integer;
+  var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean;
+var
+  LAuthenticationString: String;
+begin
+  LAuthenticationString := DecodeStrings(StringReplace(ARawHeaders.Values['Authorization'], 'Basic ', '', [rfReplaceAll]){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+
+  if (LAuthenticationString <> '') and ((AAuthUsername = '') and (AAuthPassword = '')) then
+    Self.PrepareBasicAuth(LAuthenticationString, AAuthUsername, AAuthPassword);
+
+  if Assigned(Self.OnBasicAuth) then
+    Self.OnBasicAuth(AWelcomeMessage, AAccessTag, ADataRoute, AAuthUsername,
+                      AAuthPassword, ADWParams, AErrorCode, AErrorMessage, AAcceptAuth)
+  else
+    AAcceptAuth := Self.ValidateAuth(AAuthUsername, AAuthPassword);
+
+  Result := AAcceptAuth;
+end;
+
 constructor TRESTDWAuthBasic.Create(aOwner: TComponent);
 begin
   inherited;
@@ -169,6 +207,14 @@ destructor TRESTDWAuthBasic.Destroy;
 begin
 
   inherited;
+end;
+
+procedure TRESTDWAuthBasic.PrepareBasicAuth(AAuthenticationString: String;
+  var AAuthUsername, AAuthPassword: String);
+begin
+  AAuthUsername := Copy(AAuthenticationString, InitStrPos, Pos(':', AAuthenticationString) -1);
+  Delete(AAuthenticationString, InitStrPos, Pos(':', AAuthenticationString));
+  AAuthPassword := AAuthenticationString;
 end;
 
 function TRESTDWAuthBasic.ValidateAuth(aUserName, aPassword: string): boolean;
