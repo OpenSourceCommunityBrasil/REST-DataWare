@@ -16,7 +16,6 @@ unit uRESTDWFphttpBase;
   XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
   A. Brito                   - Admin - Administrador do desenvolvimento.
   Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
-  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
   Flávio Motta               - Member Tester and DEMO Developer.
   Mobius One                 - Devel, Tester and Admin.
   Gustavo                    - Criptografia and Devel.
@@ -28,9 +27,7 @@ unit uRESTDWFphttpBase;
 interface
 
 Uses
-  SysUtils,  Classes,  DateUtils,  SyncObjs,
-  {$IFDEF DELPHIXE2UP}vcl.ExtCtrls{$ELSE}ExtCtrls{$ENDIF},
-
+  SysUtils,  Classes,  DateUtils,  SyncObjs, ExtCtrls,
   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
   uRESTDWConsts, uRESTDWDataUtils, uRESTDWTools, uRESTDWAuthenticators,
@@ -38,21 +35,15 @@ Uses
 
 Type
 
-  TOnRequest = Procedure(Sender: TObject;
-                          var ARequest: TFPHTTPConnectionRequest;
-                          var AResponse: TFPHTTPConnectionResponse) Of Object;
-
-
   { TRESTDWFphttpServicePooler }
 
   TRESTDWFphttpServicePooler = Class(TRESTServicePoolerBase)
   Private
     // Events
-    FOnRequest : TOnRequest;
 
     // HTTP Server
     HttpAppSrv: TFPHttpServer;
-
+    FThreaded : Boolean;
     // SSL Params
     vSSLRootCertFile, vSSLPrivateKeyFile, vSSLPrivateKeyPassword, vSSLCertFile: String;
     vSSLVerMethodMin, vSSLVerMethodMax: TSSLVersion;
@@ -69,7 +60,6 @@ Type
     vBandWidthSampleSec: Cardinal;
     vListenBacklog: Integer;
 
-    Property OnRequest : TOnRequest read FOnRequest write FOnRequest;
     Procedure ExecRequest(Sender: TObject;
                           Var ARequest: TFPHTTPConnectionRequest;
                           Var AResponse : TFPHTTPConnectionResponse);
@@ -94,7 +84,7 @@ Type
     Property SSLVersionMin: TSSLVersion Read vSSLVerMethodMin Write vSSLVerMethodMin default svTLSv12;
     // SSL TimeOut in Seconds
     Property SSLUse: boolean Read vSSLUse Write vSSLUse default false;
-
+    Property Threaded: boolean Read FThreaded Write FThreaded default false;
   End;
 
 
@@ -120,8 +110,6 @@ var
   ContentStringStream : TStream;
   mb                  : TStringStream;
   vRedirect           : TRedirect;
-
-  a : String;
 
   aUserName,
   aPassword : String;
@@ -168,43 +156,46 @@ var
   var
     i: Integer;
    begin
+     if ARequest.CustomHeaders.Count > 0 then
+     begin
+      for i := 0 To ARequest.CustomHeaders.Count - 1 Do
+        vResponseHeader.AddPair(ARequest.CustomHeaders.Names[i],
+          ARequest.CustomHeaders.ValueFromIndex[i]);
+     end
+     else
+       vResponseHeader.AddPair('Access-Control-Allow-Origin', '*');
 
-   //  if ARequest.CustomHeaders then
-     //begin
-       if ARequest.CustomHeaders.Count > 0 then
-       begin
-        for i := 0 To ARequest.CustomHeaders.Count - 1 Do
-          vResponseHeader.AddPair(ARequest.CustomHeaders.Names[i],
-            ARequest.CustomHeaders.ValueFromIndex[i]);
-       end
-       else
-         vResponseHeader.AddPair('Access-Control-Allow-Origin', '*');
-
-       if Assigned(CORSCustomHeaders) then
-       begin
-         if CORSCustomHeaders.Count > 0 Then
-           begin
-             for i := 0 To CORSCustomHeaders.Count - 1 Do
-               vResponseHeader.AddPair(CORSCustomHeaders.Names[i], CORSCustomHeaders.ValueFromIndex[i]);
-           end;
-       end;
-
-    // end;
-  //end;
+     if Assigned(CORSCustomHeaders) then
+     begin
+       if CORSCustomHeaders.Count > 0 Then
+         begin
+           for i := 0 To CORSCustomHeaders.Count - 1 Do
+             vResponseHeader.AddPair(CORSCustomHeaders.Names[i], CORSCustomHeaders.ValueFromIndex[i]);
+         end;
+     end;
    end;
 
   Procedure DestroyComponents;
   Begin
-    if assigned(vResponseHeader)then
-      FreeAndNil(vResponseHeader);
-    if assigned(ResultStream)then
-      FreeAndNil(ResultStream);
-    if assigned(CORSCustomHeaders)then
-      FreeAndNil(CORSCustomHeaders);
-    if assigned(ContentStringStream)then
-      FreeAndNil(ContentStringStream);
-    if assigned(HeaderList)then
-      FreeAndNil(HeaderList);
+   { if assigned(vResponseHeader)then
+      FreeAndNil(vResponseHeader); }
+    vResponseHeader.Free;
+   { if assigned(ResultStream)then
+      FreeAndNil(ResultStream); }
+      ResultStream.Free;
+
+   { if assigned(CORSCustomHeaders)then
+      FreeAndNil(CORSCustomHeaders);}
+      CORSCustomHeaders.Free;
+
+   { if assigned(ContentStringStream)then
+      FreeAndNil(ContentStringStream);}
+      ContentStringStream.Free;
+
+  {  if assigned(HeaderList)then
+      FreeAndNil(HeaderList); }
+      HeaderList.Free;
+
   End;
 
   procedure Redirect(Url: String);
@@ -214,14 +205,19 @@ var
 
   Procedure WriteError;
   Begin
-    AResponse.Code                   := StatusCode;
     mb                               := TStringStream.Create(ErrorMessage);
-    mb.Position                      := 0;
-    AResponse.FreeContentStream      := True;
-    AResponse.ContentStream          := mb;
-    AResponse.ContentStream.Position := 0;
-    AResponse.ContentLength          := -1;//mb.Size;
-    AResponse.SendContent;
+    try
+      AResponse.Code                   := StatusCode;
+      mb.Position                      := 0;
+      AResponse.FreeContentStream      := True;
+      AResponse.ContentStream          := mb;
+      AResponse.ContentStream.Position := 0;
+      AResponse.ContentLength          := -1;//mb.Size;
+      AResponse.SendContent;
+    finally
+      if assigned(mb)then
+        FreeAndNil(mb);
+    end;
   End;
 
 begin
@@ -341,54 +337,25 @@ begin
 end;
 
 constructor TRESTDWFphttpServicePooler.Create(AOwner: TComponent);
-Begin
+begin
   Inherited Create(AOwner);
-
   HttpAppSrv := TFPHttpServer.Create(nil);
 
+end;
 
-  {vMaxClients := 0;
-  vServiceTimeout := 60000; // TimeOut in Milliseconds
-  vBuffSizeBytes := 262144; // 256kb Default
-  vBandWidthLimitBytes := 0;
-  vBandWidthSampleSec := 1;
-  vListenBacklog := 50;   }
-End;
 
 destructor TRESTDWFphttpServicePooler.Destroy;
 Begin
   Try
     If Active Then
-    Begin
-      {If HttpAppSrv.ListenAllOK Then
-        HttpAppSrv.Stop;  }
       HttpAppSrv.Active:= False;
-    End;
   Except
     //
   End;
 
   If Assigned(HttpAppSrv) Then
-  begin
-    {
-    If Assigned(HttpAppSrv.SSLContext) Then
-    begin
-      HttpAppSrv.SSLContext.Free;
-      HttpAppSrv.SSLContext := nil;
-    end;
-     }
     FreeAndNil(HttpAppSrv);
-  end;
-  {
-  if Assigned(vBruteForceProtection) then
-    FreeAndNil(vBruteForceProtection);
 
-  if Assigned(vIcsSelfAssignedCert) then
-    FreeAndNil(vIcsSelfAssignedCert);
-
-  if Assigned(vIpBlackList) then
-    FreeAndNil(vIpBlackList);
-   }
   Inherited Destroy;
 End;
 
@@ -442,10 +409,11 @@ Begin
       if not(Assigned(ServerMethodClass)) and (Self.GetDataRouteCount = 0) then
         raise Exception.Create(cServerMethodClassNotAssigned);
 
-       HttpAppSrv.Port:= ServicePort;
-       HttpAppSrv.OnRequest:= @ExecRequest;
+       HttpAppSrv.Port      := ServicePort;
+       HttpAppSrv.Threaded  := FThreaded;
+       HttpAppSrv.OnRequest := @ExecRequest;
 
-       { #todo -oAnderson : O servidor para de responder quando o SSL é ativado. }
+       
        HttpAppSrv.UseSSL:= SSLUse;
 
        if SSLUse and (SSLRootCertFile <> EmptyStr) then
@@ -456,7 +424,7 @@ Begin
             HttpAppSrv.CertificateData.PrivateKey.FileName  := SSLPrivateKeyFile;//fCertificatePrivateKey;
        end;
 
-       { #todo -oAnderson : Estudar como passar o SSLVersionMin para o FPHTTP }
+
 
       HttpAppSrv.Active:= True;
     Except
