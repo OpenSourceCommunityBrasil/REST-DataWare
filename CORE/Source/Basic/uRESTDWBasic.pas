@@ -2876,13 +2876,11 @@ Begin
             Begin
               // Aqui que Valida a Autenticação
               vAuthenticator.AuthValidate(vTempServerMethods,
-                                          vNeedAuthorization,
                                           vUrlToExec,
                                           vWelcomeMessage,
                                           vAccessTag,
                                           AuthUsername,
                                           AuthPassword,
-                                          vDataRoute,
                                           RawHeaders,
                                           RequestType,
                                           DWParams,
