@@ -19,7 +19,6 @@ unit uRESTDWMasterDetailData;
  Giovani da Cruz            - Admin - Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
  Alexandre Souza            - Admin - Administrador do Grupo de Organização.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Mizael Rocha               - Member Tester and DEMO Developer.
  Flávio Motta               - Member Tester and DEMO Developer.
  Itamar Gaucho              - Member Tester and DEMO Developer.

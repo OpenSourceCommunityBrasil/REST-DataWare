@@ -16,7 +16,6 @@
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alberto Brito              - Admin - Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -154,7 +153,7 @@ begin
 
   ADataset.DisableControls;
   r := 0;
-  While r <=  vRecordCount do //Anderson
+  While r <=  vRecordCount do
   begin
     ADataset.Append;
     LoadRecordFromStream(ADataset,AStream);
@@ -311,7 +310,7 @@ begin
   vFieldCount := vFieldCount - 1;
 
   r := 0;
-  while r <= vRecCount do begin        //Anderson
+  while r <= vRecCount do begin       
     GetMem(vBuf, IDataset.GetRecordSize);
     clearBuffer;
     vDecBuf := 0;
