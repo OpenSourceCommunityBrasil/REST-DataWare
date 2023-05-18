@@ -166,6 +166,10 @@ type
     FExpiresIn: TDateTime;
   public
     constructor Create(aOwner: TComponent); override;
+     function AuthValidate(ADataModuleRESTDW: TObject; var ANeedAuthorization: Boolean;
+                          AUrlToExec, AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword, ADataRoute: String;
+                          ARawHeaders: TStrings; ARequestType: TRequestType; var ADWParams: TRESTDWParams; var AGetToken: Boolean; var ATokenValidate: Boolean;
+                          var AToken: String; var AErrorCode: Integer; var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean;  override;
   published
     property TokenType: TRESTDWAuthOptionTypes read FTokenType write FTokenType;
     property AutoBuildHex: Boolean read FAutoBuildHex write FAutoBuildHex;
@@ -694,6 +698,16 @@ begin
 end;
 
 { TRESTDWAuthOAuth }
+
+function TRESTDWAuthOAuth.AuthValidate(ADataModuleRESTDW: TObject;
+  var ANeedAuthorization: Boolean; AUrlToExec, AWelcomeMessage, AAccessTag,
+  AAuthUsername, AAuthPassword, ADataRoute: String; ARawHeaders: TStrings;
+  ARequestType: TRequestType; var ADWParams: TRESTDWParams; var AGetToken,
+  ATokenValidate: Boolean; var AToken: String; var AErrorCode: Integer;
+  var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean;
+begin
+  raise Exception.Create(cErrorOAuthNotImplenented);
+end;
 
 constructor TRESTDWAuthOAuth.Create(aOwner: TComponent);
 begin

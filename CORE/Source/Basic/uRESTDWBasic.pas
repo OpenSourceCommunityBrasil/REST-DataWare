@@ -2873,34 +2873,8 @@ Begin
              vNeedAuthorization := vTempEvent.NeedAuthorization;
 
            If vNeedAuthorization Then
-             If vAuthenticator is TRESTDWAuthBasic Then
-             Begin {$REGION AuthBasic}
-               vAuthenticator.AuthValidate(vTempServerMethods,
-                                          vNeedAuthorization,
-                                          vUrlToExec,
-                                          vWelcomeMessage,
-                                          vAccessTag,
-                                          AuthUsername,
-                                          AuthPassword,
-                                          vDataRoute,
-                                          RawHeaders,
-                                          RequestType,
-                                          DWParams,
-                                          vGettoken,
-                                          vTokenValidate,
-                                          vToken,
-                                          vErrorCode, vErrorMessage, vAcceptAuth);
-
-               If Not vAcceptAuth Then
-               Begin
-                 AuthRealm    := cAuthRealm;
-                 WriteError;
-                 DestroyComponents;
-                 Exit;
-               End;
-             End {$ENDREGION}
-             Else If vAuthenticator is TRESTDWAuthToken Then
-             Begin {$REGION AuthToken}
+            Begin
+              // Aqui que Valida a Autenticação
               vAuthenticator.AuthValidate(vTempServerMethods,
                                           vNeedAuthorization,
                                           vUrlToExec,
@@ -2924,17 +2898,16 @@ Begin
                  DestroyComponents;
                  Exit;
                End;
-             End{$ENDREGION}
-             Else If vAuthenticator is TRESTDWAuthOAuth Then
-              raise Exception.Create(cErrorOAuthNotImplenented);
-             vErrorCode            := 200;
-             vErrorMessage         := '';
+            End;
 
-             If vGettoken and CORS Then
-              Begin
-                PCustomHeaders := @ResponseHeaders;
-                BuildCORS(TRESTDWAuthToken(vAuthenticator).GetTokenRoutes, TStrings(PCustomHeaders^));
-              End;
+           vErrorCode            := 200;
+           vErrorMessage         := '';
+
+           If vGettoken and CORS Then
+            Begin
+              PCustomHeaders := @ResponseHeaders;
+              BuildCORS(TRESTDWAuthToken(vAuthenticator).GetTokenRoutes, TStrings(PCustomHeaders^));
+            End;
          End
          Else
          If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
