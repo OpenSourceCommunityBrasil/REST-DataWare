@@ -29,23 +29,6 @@ uses
   uRESTDWTools, uRESTDWParams;
 
 type
-  TOnBasicAuth = Procedure(Welcomemsg, AccessTag, DataRoute,
-                           Username, Password : String;
-                           Var Params         : TRESTDWParams;
-                           Var ErrorCode      : Integer;
-                           Var ErrorMessage   : String;
-                           Var Accept         : Boolean) Of Object;
-  TOnGetToken = Procedure(Welcomemsg,
-                          AccessTag        : String;
-                          Params           : TRESTDWParams;
-//                          AuthOptions      : TRESTDWAuthToken;
-                          Var ErrorCode    : Integer;
-                          Var ErrorMessage : String;
-                          Var TokenID      : String;
-                          Var Accept       : Boolean) Of Object;
-  TOnRenewToken = Procedure() of Object;
-
-
   TRESTDWAuthenticatorBase = class(TRESTDWComponent)
   private
     FAuthDialog: Boolean;
@@ -56,23 +39,38 @@ type
     property AuthDialog: Boolean read FAuthDialog write FAuthDialog;
   end;
 
-  TRESTDWAuthBasic = class(TRESTDWAuthenticatorBase)
+  // Classe Especifica para Autenticacao pelo Server
+  TRESTDWServerAuthBase = class(TRESTDWAuthenticatorBase)
+  private
+
+  public
+    function AuthValidate(ADataModuleRESTDW: TObject;
+                          AUrlToExec, AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword: String;
+                          ARawHeaders: TStrings; ARequestType: TRequestType; var ADWParams: TRESTDWParams;
+                          var AGetToken: Boolean; var ATokenValidate: Boolean; var AToken: String;
+                          var AErrorCode: Integer; var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; virtual; abstract;
+  end;
+
+  TRESTDWAuthBasic = class(TRESTDWServerAuthBase)
   private
     FPassword: String;
     FUserName: String;
-    FOnBasicAuth: TOnBasicAuth;
+    procedure PrepareBasicAuth(AAuthenticationString: String; var AAuthUsername, AAuthPassword: String);
   public
-    constructor Create(aOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function ValidateAuth(aUserName, aPassword: string): boolean;
+    function AuthValidate(ADataModuleRESTDW: TObject;
+                          AUrlToExec, AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword: String;
+                          ARawHeaders: TStrings; ARequestType: TRequestType; var ADWParams: TRESTDWParams;
+                          var AGetToken: Boolean; var ATokenValidate: Boolean; var AToken: String;
+                          var AErrorCode: Integer; var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; override;
+    function ValidateAuth(AUserName, APassword: string): boolean;
   published
     property UserName: String read FUserName write FUserName;
     property Password: String read FPassword write FPassword;
-    //eventos
-    property OnBasicAuth: TOnBasicAuth read FOnBasicAuth write FOnBasicAuth;
   end;
 
-  TRESTDWAuthToken = class(TRESTDWAuthenticatorBase)
+  TRESTDWAuthToken = class(TRESTDWServerAuthBase)
   private
     FBeginTime: TDateTime;
     FEndTime: TDateTime;
@@ -89,13 +87,17 @@ type
     FToken: String;
     FAutoGetToken: Boolean;
     FAutoRenewToken: Boolean;
-    FOnGetToken: TOnGetToken;
-    FOnRenewToken: TOnRenewToken;
     procedure ClearToken;
     procedure SetGetTokenEvent(AValue: String);
     procedure SetToken(AValue: String);
     function GetTokenType(AValue: String): TRESTDWTokenType;
     function GetCryptType(AValue: String): TRESTDWCryptType;
+    procedure GenerateToken(ADataModuleRESTDW: TObject; ARequestType: TRequestType;
+                             AParams: TRESTDWParams; ARawHeaders: TStrings;
+                             AWelcomeMessage, AAccessTag: String;
+                             var ATokenValidate: Boolean; var AToken: String;
+                             var AGetToken: Boolean; var AErrorCode: Integer;
+                             var AErrorMessage: String; var AAcceptAuth: Boolean);
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -103,6 +105,11 @@ type
     procedure FromToken(ATokenValue: String);
     function GetToken(ASecrets: String): String;
     function ValidateToken(AValue: String): Boolean; overload;
+    function AuthValidate(ADataModuleRESTDW: TObject;
+                          AUrlToExec, AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword: String;
+                          ARawHeaders: TStrings; ARequestType: TRequestType; var ADWParams: TRESTDWParams;
+                          var AGetToken: Boolean; var ATokenValidate: Boolean; var AToken: String;
+                          var AErrorCode: Integer; var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; override;
   published
     property BeginTime: TDateTime read FBeginTime write FBeginTime;
     property EndTime: TDateTime read FEndTime write FEndTime;
@@ -122,12 +129,9 @@ type
     property Token: String read FToken write SetToken;
     property AutoGetToken: Boolean read FAutoGetToken write FAutoGetToken;
     property AutoRenewToken: Boolean read FAutoRenewToken write FAutoRenewToken;
-    // eventos
-    Property OnGetToken: TOnGetToken Read FOnGetToken Write FOnGetToken;
-    Property OnRenewToken: TOnRenewToken Read FOnRenewToken Write FOnRenewToken;
   end;
 
-  TRESTDWAuthOAuth = class(TRESTDWAuthenticatorBase)
+  TRESTDWAuthOAuth = class(TRESTDWServerAuthBase)
   private
     FTokenType: TRESTDWAuthOptionTypes;
     FAutoBuildHex: Boolean;
@@ -141,6 +145,11 @@ type
     FExpiresIn: TDateTime;
   public
     constructor Create(aOwner: TComponent); override;
+    function AuthValidate(ADataModuleRESTDW: TObject;
+                          AUrlToExec, AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword: String;
+                          ARawHeaders: TStrings; ARequestType: TRequestType; var ADWParams: TRESTDWParams;
+                          var AGetToken: Boolean; var ATokenValidate: Boolean; var AToken: String;
+                          var AErrorCode: Integer; var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; override;
   published
     property TokenType: TRESTDWAuthOptionTypes read FTokenType write FTokenType;
     property AutoBuildHex: Boolean read FAutoBuildHex write FAutoBuildHex;
@@ -154,9 +163,65 @@ type
     property ExpiresIn: TDateTime read FExpiresIn;
   end;
 
+  TOnUserBasicAuth = Procedure(Welcomemsg, AccessTag,
+                               Username, Password : String;
+                               Var Params         : TRESTDWParams;
+                               Var ErrorCode      : Integer;
+                               Var ErrorMessage   : String;
+                               Var Accept         : Boolean) Of Object;
+
+  TOnGetToken = Procedure(Welcomemsg,
+                          AccessTag        : String;
+                          Params           : TRESTDWParams;
+                          AuthOptions      : TRESTDWAuthToken;
+                          Var ErrorCode    : Integer;
+                          Var ErrorMessage : String;
+                          Var TokenID      : String;
+                          Var Accept       : Boolean) Of Object;
+
+  TOnUserTokenAuth = Procedure(Welcomemsg,
+                             AccessTag          : String;
+                             Params             : TRESTDWParams;
+                             AuthOptions        : TRESTDWAuthToken;
+                             Var ErrorCode      : Integer;
+                             Var ErrorMessage   : String;
+                             Var TokenID        : String;
+                             Var Accept         : Boolean) Of Object;
+
+
+
+  TOnRenewToken = Procedure() of Object;
+
+
 implementation
 
+uses
+  uRESTDWDatamodule;
+
 { TRESTDWAuthBasic }
+
+function TRESTDWAuthBasic.AuthValidate(ADataModuleRESTDW: TObject; AUrlToExec,
+  AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword: String;
+  ARawHeaders: TStrings; ARequestType: TRequestType;
+  var ADWParams: TRESTDWParams; var AGetToken, ATokenValidate: Boolean;
+  var AToken: String; var AErrorCode: Integer; var AErrorMessage: String;
+  var AAcceptAuth: Boolean): Boolean;
+var
+  LAuthenticationString: String;
+begin
+  LAuthenticationString := DecodeStrings(StringReplace(ARawHeaders.Values['Authorization'], 'Basic ', '', [rfReplaceAll]){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+
+  if (LAuthenticationString <> '') and ((AAuthUsername = '') and (AAuthPassword = '')) then
+    Self.PrepareBasicAuth(LAuthenticationString, AAuthUsername, AAuthPassword);
+
+  if Assigned(TServerMethodDataModule(ADataModuleRESTDW).OnUserBasicAuth) then
+    TServerMethodDataModule(ADataModuleRESTDW).OnUserBasicAuth(AWelcomeMessage, AAccessTag, AAuthUsername,
+                                                               AAuthPassword, ADWParams, AErrorCode, AErrorMessage, AAcceptAuth)
+  else
+    AAcceptAuth := Self.ValidateAuth(AAuthUsername, AAuthPassword);
+
+  Result := AAcceptAuth;
+end;
 
 constructor TRESTDWAuthBasic.Create(aOwner: TComponent);
 begin
@@ -169,6 +234,14 @@ destructor TRESTDWAuthBasic.Destroy;
 begin
 
   inherited;
+end;
+
+procedure TRESTDWAuthBasic.PrepareBasicAuth(AAuthenticationString: String;
+  var AAuthUsername, AAuthPassword: String);
+begin
+  AAuthUsername := Copy(AAuthenticationString, InitStrPos, Pos(':', AAuthenticationString) -1);
+  Delete(AAuthenticationString, InitStrPos, Pos(':', AAuthenticationString));
+  AAuthPassword := AAuthenticationString;
 end;
 
 function TRESTDWAuthBasic.ValidateAuth(aUserName, aPassword: string): boolean;
@@ -194,6 +267,80 @@ begin
   end
   else
     inherited Assign(ASource);
+end;
+
+function TRESTDWAuthToken.AuthValidate(ADataModuleRESTDW: TObject; AUrlToExec,
+  AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword: String;
+  ARawHeaders: TStrings; ARequestType: TRequestType;
+  var ADWParams: TRESTDWParams; var AGetToken, ATokenValidate: Boolean;
+  var AToken: String; var AErrorCode: Integer; var AErrorMessage: String;
+  var AAcceptAuth: Boolean): Boolean;
+var
+  LUrlToken, LToken, LTokenOrig: String;
+  LAuthTokenParam: TRESTDWAuthToken;
+begin
+  // Se for o Evento Get Token
+  LUrlToken := LowerCase(AUrlToExec);
+
+  if Copy(LUrlToken, InitStrPos, 1) = '/' then
+    Delete(LUrlToken, InitStrPos, 1);
+
+  if LUrlToken = LowerCase(Self.GetTokenEvent) then
+  begin
+    Self.GenerateToken(ADataModuleRESTDW, ARequestType, ADWParams, ARawHeaders,
+                        AWelcomeMessage, AAccessTag, ATokenValidate,
+                        AToken, AGetToken, AErrorCode, AErrorMessage, AAcceptAuth);
+    Exit;
+  end;
+
+  // Se for Validar o Token
+  AErrorCode     := 401;
+  AErrorMessage  := cInvalidAuth;
+  ATokenValidate := True;
+  LTokenOrig     := AToken;
+
+  LAuthTokenParam := TRESTDWAuthToken.Create(self);
+  LAuthTokenParam.Assign(Self);
+
+  if ADWParams.ItemsString[Self.Key] <> Nil then
+    AToken := ADWParams.ItemsString[Self.Key].AsString
+  else
+  begin
+    if Trim(AToken) = '' then
+      AToken := ARawHeaders.Values['Authorization'];
+
+    if Trim(AToken) <> '' then
+    begin
+      LToken := GetTokenString(AToken);
+
+      if LToken = '' then
+        LToken := GetBearerString(AToken);
+
+      if LToken = '' then
+        LToken := LTokenOrig;
+
+      AToken := LToken;
+    end;
+  end;
+
+  if not LAuthTokenParam.ValidateToken(AToken) then
+  begin
+    AAcceptAuth := False;
+    Exit;
+  end
+  else
+    ATokenValidate := False;
+
+  if Assigned(TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth) then
+  begin
+    TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth(AWelcomeMessage, AAccessTag, ADWParams,
+                                                                TRESTDWAuthToken(LAuthTokenParam),
+                                                                AErrorCode, AErrorMessage, AToken, AAcceptAuth);
+
+    ATokenValidate := Not(AAcceptAuth);
+  end;
+
+  Result := AAcceptAuth;
 end;
 
 procedure TRESTDWAuthToken.ClearToken;
@@ -299,6 +446,50 @@ begin
   end;
 end;
 
+procedure TRESTDWAuthToken.GenerateToken(ADataModuleRESTDW: TObject;
+  ARequestType: TRequestType; AParams: TRESTDWParams; ARawHeaders: TStrings;
+  AWelcomeMessage, AAccessTag: String; var ATokenValidate: Boolean; var AToken: String;
+  var AGetToken: Boolean; var AErrorCode: Integer; var AErrorMessage: String;
+  var AAcceptAuth: Boolean);
+var
+  LAuthTokenParam: TRESTDWAuthToken;
+  LParams: TRESTDWParams;
+begin
+  AGetToken     := True;
+  AErrorCode    := 404;
+  AErrorMessage := cEventNotFound;
+
+  if (RequestTypeToRoute(ARequestType) in Self.GetTokenRoutes) or
+     (crAll in Self.GetTokenRoutes) then
+  begin
+    if Assigned(TServerMethodDataModule(ADataModuleRESTDW).OnGetToken) then
+    begin
+      ATokenValidate := True;
+      LAuthTokenParam := TRESTDWAuthToken.Create(Self);
+      LAuthTokenParam.Assign(Self);
+
+      {$IFNDEF FPC}
+      if Trim(AToken) = '' Then
+        AToken := ARawHeaders.Values['Authorization'];
+      {$ENDIF}
+
+      if AParams.ItemsString['RDWParams'] <> Nil then
+      begin
+       LParams := TRESTDWParams.Create;
+       LParams.FromJSON(AParams.ItemsString['RDWParams'].Value);
+
+       TServerMethodDataModule(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag, LParams, LAuthTokenParam,
+                                                              AErrorCode, AErrorMessage, AToken, AAcceptAuth);
+
+       FreeAndNil(LParams);
+      end
+      else
+       TServerMethodDataModule(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag, AParams, LAuthTokenParam,
+                                                              AErrorCode, AErrorMessage, AToken, AAcceptAuth);
+    end;
+  end;
+end;
+
 function TRESTDWAuthToken.GetCryptType(AValue: String): TRESTDWCryptType;
 begin
   Result := rdwAES256;
@@ -332,7 +523,7 @@ begin
   finally
     FreeAndNil(LTokenValue);
   end;
-End;
+end;
 
 function TRESTDWAuthToken.GetTokenType(AValue: String): TRESTDWTokenType;
 begin
@@ -518,6 +709,18 @@ begin
 end;
 
 { TRESTDWAuthOAuth }
+
+function TRESTDWAuthOAuth.AuthValidate(ADataModuleRESTDW: TObject; AUrlToExec,
+  AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword: String;
+  ARawHeaders: TStrings; ARequestType: TRequestType;
+  var ADWParams: TRESTDWParams; var AGetToken, ATokenValidate: Boolean;
+  var AToken: String; var AErrorCode: Integer; var AErrorMessage: String;
+  var AAcceptAuth: Boolean): Boolean;
+begin
+  AAcceptAuth := False;
+  Result := False;
+  raise Exception.Create(cErrorOAuthNotImplenented);
+end;
 
 constructor TRESTDWAuthOAuth.Create(aOwner: TComponent);
 begin

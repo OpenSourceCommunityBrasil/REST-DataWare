@@ -8,23 +8,8 @@ Uses
   SysUtils, Classes, uRESTDWDataUtils, uRESTDWComponentEvents,
   uRESTDWBasicTypes, uRESTDWConsts, uRESTDWJSONObject, uRESTDWParams, uRESTDWAuthenticators;
 
-Type
-// TUserBasicAuth  =             Procedure(Welcomemsg, AccessTag,
-//                                         Username, Password : String;
-//                                         Var Params         : TRESTDWParams;
-//                                         Var ErrorCode      : Integer;
-//                                         Var ErrorMessage   : String;
-//                                         Var Accept         : Boolean) Of Object;
- TUserTokenAuth  =             Procedure(Welcomemsg,
-                                         AccessTag          : String;
-                                         Params             : TRESTDWParams;
-                                         AuthOptions        : TRESTDWAuthToken;
-                                         Var ErrorCode      : Integer;
-                                         Var ErrorMessage   : String;
-                                         Var TokenID        : String;
-                                         Var Accept         : Boolean) Of Object;
 
- Type
+Type
   TRESTDWClientInfo = Class(TObject)
  Private
   vip,
@@ -56,9 +41,9 @@ Type
    vReplyEvent           : TRESTDWReplyEvent;
    vWelcomeMessage       : TWelcomeMessage;
    vMassiveProcess       : TMassiveProcess;
-//   vUserBasicAuth        : TUserBasicAuth;
-   vUserTokenAuth        : TUserTokenAuth;
-//   vOnGetToken           : TOnGetToken;
+   vUserBasicAuth        : TOnUserBasicAuth;
+   vUserTokenAuth        : TOnUserTokenAuth;
+   vOnGetToken           : TOnGetToken;
    vOnMassiveBegin,
    vOnMassiveAfterStartTransaction,
    vOnMassiveAfterBeforeCommit,
@@ -94,9 +79,9 @@ Type
    Property OnMassiveAfterBeforeCommit     : TMassiveEvent       Read vOnMassiveAfterBeforeCommit     Write vOnMassiveAfterBeforeCommit;
    Property OnMassiveAfterAfterCommit      : TMassiveEvent       Read vOnMassiveAfterAfterCommit      Write vOnMassiveAfterAfterCommit;
    Property OnMassiveEnd                   : TMassiveEvent       Read vOnMassiveEnd                   Write vOnMassiveEnd;
-//   Property OnUserBasicAuth                : TUserBasicAuth      Read vUserBasicAuth                  Write vUserBasicAuth;
-   Property OnUserTokenAuth                : TUserTokenAuth      Read vUserTokenAuth                  Write vUserTokenAuth;
-//   Property OnGetToken                     : TOnGetToken         Read vOnGetToken                     Write vOnGetToken;
+   Property OnUserBasicAuth                : TOnUserBasicAuth      Read vUserBasicAuth                  Write vUserBasicAuth;
+   Property OnUserTokenAuth                : TOnUserTokenAuth      Read vUserTokenAuth                  Write vUserTokenAuth;
+   Property OnGetToken                     : TOnGetToken         Read vOnGetToken                     Write vOnGetToken;
    Property QueuedRequest                  : Boolean             Read vQueuedRequest                  Write vQueuedRequest;
  End;
 

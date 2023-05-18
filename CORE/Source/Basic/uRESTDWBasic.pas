@@ -382,7 +382,7 @@ End;
   vForceWelcomeAccess,
   vCORS,
   vActive                : Boolean;
-  vAuthenticator         : TRESTDWAuthenticatorBase;
+  vAuthenticator         : TRESTDWServerAuthBase;
 //  vAuthMessages          : TRESTDWAuthMessages;
   vProxyOptions          : TProxyConnectionInfo;
   vServiceTimeout,
@@ -553,7 +553,7 @@ End;
                                       Var ErrorCode           : Integer) : Boolean;
  Protected
   procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-  procedure SetAuthenticator(const Value: TRESTDWAuthenticatorBase);
+  procedure SetAuthenticator(const Value: TRESTDWServerAuthBase);
  Public
 Procedure EchoPooler       (ServerMethodsClass    : TComponent;
                             AContext              : TComponent;
@@ -592,7 +592,7 @@ Procedure EchoPooler       (ServerMethodsClass    : TComponent;
   Destructor  Destroy; Override;//Destroy a Classe
  Published
   Property Active                  : Boolean                       Read vActive                  Write SetActive;
-  Property Authenticator           : TRESTDWAuthenticatorBase      Read vAuthenticator           Write SetAuthenticator;
+  Property Authenticator           : TRESTDWServerAuthBase         Read vAuthenticator           Write SetAuthenticator;
 //  Property AuthMessages            : TRESTDWAuthMessages           Read vAuthMessages            Write vAuthMessages;
   Property CORS                    : Boolean                       Read vCORS                    Write vCORS;
   Property CORS_CustomHeaders      : TStringList                   Read vCORSCustomHeaders       Write SetCORSCustomHeader;
@@ -1813,13 +1813,6 @@ Var
    End;
  End;
 
- Procedure PrepareBasicAuth(AuthenticationString : String; Var AuthUsername, AuthPassword : String);
- Begin
-  AuthUsername := Copy(AuthenticationString, InitStrPos, Pos(':', AuthenticationString) -1);
-  Delete(AuthenticationString, InitStrPos, Pos(':', AuthenticationString));
-  AuthPassword := AuthenticationString;
- End;
-
  Procedure WriteResponseText(aText: string; aStatusCode: integer; aContentType: string = 'application/json');
  var
    aStreamResponse: TStream;
@@ -1922,7 +1915,7 @@ Begin
  vErrorCode            := 200;
  vIsQueryParam         := False;
  vUrlToExec            := '';
- vToken                := '';
+ vToken                := Token;
  vDataBuff             := '';
  vRequestHeader        := TStringList.Create;
  vCompareContext       := False;
@@ -2880,156 +2873,39 @@ Begin
              vNeedAuthorization := vTempEvent.NeedAuthorization;
 
            If vNeedAuthorization Then
-             If vAuthenticator is TRESTDWAuthBasic Then
-             Begin {$REGION AuthBasic}
-               vAuthenticationString := DecodeStrings(StringReplace(RawHeaders.Values['Authorization'], 'Basic ', '', [rfReplaceAll]){$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-               If (vAuthenticationString <> '') And ((AuthUsername = '') And
-                  (AuthPassword = '')) Then
-                 PrepareBasicAuth(vAuthenticationString, AuthUsername, AuthPassword);
+            Begin
+              // Aqui que Valida a Autenticação
+              vAuthenticator.AuthValidate(vTempServerMethods,
+                                          vUrlToExec,
+                                          vWelcomeMessage,
+                                          vAccessTag,
+                                          AuthUsername,
+                                          AuthPassword,
+                                          RawHeaders,
+                                          RequestType,
+                                          DWParams,
+                                          vGettoken,
+                                          vTokenValidate,
+                                          vToken,
+                                          vErrorCode, vErrorMessage, vAcceptAuth);
 
-               if Assigned(TRESTDWAuthBasic(Authenticator).OnBasicAuth) then
-                 TRESTDWAuthBasic(Authenticator).OnBasicAuth(vWelcomeMessage,
-                                                             vAccessTag,
-                                                             vDataRoute,
-                                                             AuthUsername,
-                                                             AuthPassword,
-                                                             DWParams,
-                                                             vErrorCode,
-                                                             vErrorMessage,
-                                                             vAcceptAuth)
-               else
-                 vAcceptAuth := TRESTDWAuthBasic(vAuthenticator).ValidateAuth(
-                 AuthUsername, AuthPassword);
-
-               If Not vAcceptAuth Then
+              If Not vAcceptAuth Then
                Begin
                  AuthRealm    := cAuthRealm;
                  WriteError;
                  DestroyComponents;
                  Exit;
                End;
-             End {$ENDREGION}
-             Else If vAuthenticator is TRESTDWAuthToken Then
-             Begin {$REGION AuthToken}
-               vUrlToken := Lowercase(vUrlToExec);
-               If Copy(vUrlToken, InitStrPos, 1) = '/' then
-                Delete(vUrlToken, InitStrPos, 1);
-               If vUrlToken =
-                  Lowercase(TRESTDWAuthToken(vAuthenticator).GetTokenEvent) Then
-                Begin
-                 vGettoken     := True;
-                 vErrorCode    := 404;
-                 vErrorMessage := cEventNotFound;
-                 If (RequestTypeToRoute(RequestType) In TRESTDWAuthToken(vAuthenticator).GetTokenRoutes) Or
-                    (crAll in TRESTDWAuthToken(vAuthenticator).GetTokenRoutes) Then
-                  Begin
-                   If CORS Then
-                    Begin
-                     PCustomHeaders := @ResponseHeaders;
-                     BuildCORS(TRESTDWAuthToken(vAuthenticator).GetTokenRoutes, TStrings(PCustomHeaders^));
-                    End;
-                   if Assigned(TRESTDWAuthToken(vAuthenticator).OnGetToken) then
-//                   If Assigned(TServerMethodDatamodule(vTempServerMethods).OnGetToken) Then
-                    Begin
-                     vTokenValidate := True;
-                     vAuthTokenParam := TRESTDWAuthToken.Create(self);
-                     vAuthTokenParam.Assign(TRESTDWAuthToken(vAuthenticator));
-                    {$IFNDEF FPC}
-                     If Trim(Token) <> '' Then
-                       vToken       := Token
-                     Else
-                      vToken        := RawHeaders.Values['Authorization'];
-                    {$ENDIF}
-                     If DWParams.ItemsString['RDWParams'] <> Nil Then
-                      Begin
-                       DWParamsD := TRESTDWParams.Create;
-                       if vCripto.Use then
-                         DWParamsD.FromJSON(vCripto.Decrypt(DWParams.ItemsString['RDWParams'].Value))
-                       else
-                         DWParamsD.FromJSON(DWParams.ItemsString['RDWParams'].Value);
-                       TRESTDWAuthToken(vAuthenticator).OnGetToken(vWelcomeMessage, vAccessTag, DWParamsD,
-                                                                   vErrorCode, vErrorMessage, vToken, vAcceptAuth);
-//                       TServerMethodDatamodule(vTempServerMethods).OnGetToken(vWelcomeMessage, vAccessTag, DWParamsD,
-//                                                                              TRESTDWAuthToken(vAuthTokenParam),
-//                                                                              vErrorCode, vErrorMessage, vToken, vAcceptAuth);
-                       FreeAndNil(DWParamsD);
-                      End
-                     Else
-                       TRESTDWAuthToken(vAuthenticator).OnGetToken(vWelcomeMessage, vAccessTag, DWParamsD,
-                                                                   vErrorCode, vErrorMessage, vToken, vAcceptAuth);
-                     If Not vAcceptAuth Then
-                      Begin
-                       WriteError;
-                       DestroyComponents;
-                       Exit;
-                      End;
-                    End
-                   Else
-                    Begin
-                     WriteError;
-                     DestroyComponents;
-                     Exit;
-                    End;
-                  End
-                 Else
-                  Begin
-                   WriteError;
-                   DestroyComponents;
-                   Exit;
-                  End;
-                End
-               Else
-                Begin
-                 vErrorCode      := 401;
-                 vErrorMessage   := cInvalidAuth;
-                 vTokenValidate  := True;
-                   vAuthTokenParam := TRESTDWAuthToken.Create(self);
-                   vAuthTokenParam.Assign(TRESTDWAuthToken(vAuthenticator));
-                   If DWParams.ItemsString[TRESTDWAuthToken(vAuthenticator).Key] <> Nil Then
-                    vToken         := DWParams.ItemsString[TRESTDWAuthToken(vAuthenticator).Key].AsString
-                   Else
-                    Begin
-                     If Trim(Token) <> '' Then
-                      vToken       := Token
-                     Else
-                      vToken       := RawHeaders.Values['Authorization'];
-                     If Trim(vToken) <> '' Then
-                      Begin
-                       aToken      := GetTokenString(vToken);
-                       If aToken = '' Then
-                        aToken     := GetBearerString(vToken);
-                       If aToken = '' Then
-                        aToken     := Token;
-                       vToken      := aToken;
-                      End;
-                    End;
-                   If Not vAuthTokenParam.ValidateToken(vToken) Then
-                    Begin
-                     WriteError;
-                     DestroyComponents;
-                     Exit;
-                    End
-                   Else
-                    vTokenValidate := False;
-                   If Assigned(TServerMethodDatamodule(vTempServerMethods).OnUserTokenAuth) Then
-                    Begin
-                     TServerMethodDatamodule(vTempServerMethods).OnUserTokenAuth(vWelcomeMessage, vAccessTag, DWParams,
-                                                                                 TRESTDWAuthToken(vAuthTokenParam),
-                                                                                 vErrorCode, vErrorMessage, vToken, vAcceptAuth);
-                     vTokenValidate := Not(vAcceptAuth);
-                     If Not vAcceptAuth Then
-                      Begin
-                       WriteError;
-                       DestroyComponents;
-                       Exit;
-                      End;
-                    End;
-                End;
-             End{$ENDREGION}
-             Else If vAuthenticator is TRESTDWAuthOAuth Then
-              raise Exception.Create(cErrorOAuthNotImplenented);
-             vErrorCode            := 200;
-             vErrorMessage         := '';
+            End;
+
+           vErrorCode            := 200;
+           vErrorMessage         := '';
+
+           If vGettoken and CORS Then
+            Begin
+              PCustomHeaders := @ResponseHeaders;
+              BuildCORS(TRESTDWAuthToken(vAuthenticator).GetTokenRoutes, TStrings(PCustomHeaders^));
+            End;
          End
          Else
          If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
@@ -3384,7 +3260,7 @@ Begin
 End;
 
 procedure TRESTServiceBase.SetAuthenticator(
-  const Value: TRESTDWAuthenticatorBase);
+  const Value: TRESTDWServerAuthBase);
 begin
   if Value <> vAuthenticator then
     vAuthenticator := Value;
