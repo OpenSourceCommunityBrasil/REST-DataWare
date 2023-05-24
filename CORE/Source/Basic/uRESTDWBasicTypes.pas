@@ -15,6 +15,7 @@ unit uRESTDWBasicTypes;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -164,7 +165,8 @@ type
     Function    RouteExists(Var Value : String) : Boolean;
     Procedure   Delete(Index : Integer); Overload;
     Function    Add   (Item  : TRESTDWDataRoute) : Integer; Overload;
-    Function    GetServerMethodClass(Var DataRoute         : String;
+    Function    GetServerMethodClass(Var DataRoute,
+                                     FullRequest           : String;
                                      Var ServerMethodClass : TComponentClass) : Boolean;
     Property    Items [Index : Integer] : TRESTDWDataRoute Read GetRec Write PutRec; Default;
   End;
@@ -686,16 +688,20 @@ End;
 
 Function   TRESTDWDataRouteList.RouteExists(Var Value : String) : Boolean;
 Var
- I: Integer;
+ I          : Integer;
+ vTempRoute,
+ vTempValue : String;
 Begin
-  Result := False;
-  If Length(Value) = 0 Then
-    Exit;
-  For I := 0 To Count -1 Do
+ Result := False;
+ If Length(Value) = 0 Then
+  Exit;
+ For I := 0 To Count -1 Do
   Begin
-    Result := Lowercase(Items[I].DataRoute) = Lowercase(value);
-    If Result Then
-      Break;
+   vTempRoute := Lowercase(Items[I].DataRoute);
+   vTempValue := Lowercase(Value);
+   Result     := vTempRoute = Copy(vTempValue, 1, Length(vTempRoute));
+   If Result Then
+    Break;
   End;
 End;
 
@@ -727,20 +733,32 @@ Begin
   End;
 End;
 
-Function TRESTDWDataRouteList.GetServerMethodClass(Var DataRoute         : String;
+Function TRESTDWDataRouteList.GetServerMethodClass(Var DataRoute,
+                                                   FullRequest           : String;
                                                    Var ServerMethodClass : TComponentClass) : Boolean;
 Var
-  I : Integer;
+ I           : Integer;
+ vTempRoute,
+ vTempValue  : String;
 Begin
-  Result            := False;
-  ServerMethodClass := Nil;
-  for I := 0 to Self.Count -1 do
-    if Self.Items[I].DataRoute = DataRoute then
-    begin
-      ServerMethodClass := Self.Items[I].ServerMethodClass;
-      Result := True;
-      break;
-    end;
+ Result            := False;
+ ServerMethodClass := Nil;
+ Result := False;
+ If Length(DataRoute) = 0 Then
+  Exit;
+ For I := 0 To Self.Count -1 Do
+  Begin
+   vTempRoute := Lowercase(TRESTDWDataRoute(TList(Self).Items[I]^).DataRoute);
+   vTempValue := Lowercase(DataRoute);
+   Result     := vTempRoute = Copy(vTempValue, 1, Length(vTempRoute));
+   If (Result) Then
+    Begin
+     ServerMethodClass := TRESTDWDataRoute(TList(Self).Items[I]^).ServerMethodClass;
+     DataRoute         := Copy(vTempValue,  Length(vTempRoute), Length(DataRoute) - (Length(vTempRoute) -1));
+     FullRequest       := Copy(FullRequest, Length(vTempRoute), Length(FullRequest) - (Length(vTempRoute) -1));
+     Break;
+    End;
+  End;
 End;
 
 Function TRESTDWDataRouteList.Add(Item : TRESTDWDataRoute) : Integer;

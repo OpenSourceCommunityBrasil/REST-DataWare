@@ -16,6 +16,7 @@ unit uRESTDWIdBase;
   XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
   A. Brito                   - Admin - Administrador do desenvolvimento.
   Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
   Flávio Motta               - Member Tester and DEMO Developer.
   Mobius One                 - Devel, Tester and Admin.
   Gustavo                    - Criptografia and Devel.
@@ -282,8 +283,11 @@ End;
   aSSLMethod                       : TIdSSLVersion;
   vSSLMode                         : TIdSSLMode;
  Public
-  Constructor Create               (AOwner  : TComponent);Override;
+  Constructor Create               (AOwner       : TComponent);Override;
   Destructor  Destroy;Override;
+  Function    IsServerLive         (Aip          : String;
+                                    Aport        : Integer;
+                                    AMessageErro : String): Boolean; Override;
  Published
   Property SSLMode                 : TIdSSLMode               Read vSSLMode                 Write vSSLMode;
   Property CipherList              : String                   Read vCipherList              Write vCipherList;
@@ -3012,6 +3016,16 @@ Begin
     Else
      AResponseInfo.CharSet := 'ansi';
     AResponseInfo.ResponseNo               := StatusCode;
+    If (vResponseString <> '')   Or
+       (ErrorMessage    <> '')   Then
+     Begin
+      If Assigned(ResultStream)  Then
+       FreeAndNil(ResultStream);
+      If (vResponseString <> '') Then
+       ResultStream  := TStringStream.Create(vResponseString)
+      Else
+       ResultStream  := TStringStream.Create(ErrorMessage);
+     End;
     If Assigned(ResultStream)    Then
      Begin
       AResponseInfo.FreeContentStream      := True;
@@ -3184,7 +3198,7 @@ Begin
    If (Authenticator is TRESTDWAuthToken)  And
       (Pos('basic', Lowercase(vValueAuth)) = 0) Then
     Begin
-     vAuthValue       := TRESTDWAuthToken.Create(self);
+     vAuthValue       := TRESTDWAuthToken.Create;
      vAuthValue.Token := vValueAuth;
      {$IF Defined(RESTDWFMX) AND not Defined(DELPHI10_4UP)}
      AContext.DataObject := vAuthValue;
@@ -3207,7 +3221,7 @@ Begin
      (Lowercase(AAuthType) = Lowercase('token'))  And
      (AContext.DataObject  = Nil) Then
   Begin
-    vAuthValue          := TRESTDWAuthToken.Create(self);
+    vAuthValue          := TRESTDWAuthToken.Create;
     vAuthValue.Token    := AAuthType + ' ' + AAuthData;
     AContext.DataObject := vAuthValue;
     VHandled            := Authenticator is TRESTDWAuthToken;
@@ -3217,7 +3231,7 @@ Begin
      (Lowercase(AAuthType) = Lowercase('token'))  And
      (AContext.Data        = Nil) Then
    Begin
-    vAuthValue       := TRESTDWAuthToken.Create(self);
+    vAuthValue       := TRESTDWAuthToken.Create;
     vAuthValue.Token := AAuthType + ' ' + AAuthData;
     AContext.Data    := vAuthValue;
     VHandled         := Authenticator is TRESTDWAuthToken;
@@ -4370,6 +4384,37 @@ Begin
  Inherited;
 End;
 
+
+function TRESTDWIdDatabase.IsServerLive(Aip: String; Aport: Integer; AMessageErro: String): Boolean;
+var
+  Ping: TIdTCPClient;
+begin
+  Result := True;
+  Ping := TIdTCPClient.Create(nil);
+  try
+    try
+      with Ping do
+      begin
+        if length(trim(Aip)) > 0 then
+           Host := Aip
+        else
+           Host := Self.PoolerService;
+
+        if Aport > 0 then
+           Port := Aport
+        else
+           Port := Self.PoolerPort;
+        ConnectTimeout := 1000;
+        Connect;
+        Result := Connected;
+      end;
+    finally
+      FreeAndNil(Ping);
+    end;
+  except
+    Result := False;
+  end;
+end;
 
 { TRESTDWIdPoolerList }
 
