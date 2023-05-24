@@ -15,7 +15,6 @@
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -119,12 +118,12 @@ type
     function GetDataset: TDataset;
     function GetRecordObj(idx : integer) : TRESTDWRecord;
 
-    function GetFieldSize(idx : integer) : Integer; overload;
-    function GetFieldSize(name : string) : Integer; overload;
+    function GetFieldSize(idx : integer) : integer; overload;
+    function GetFieldSize(name : string) : integer; overload;
     function GetFieldType(name : string) : TFieldType;
 
-    function GetRecSize : Integer;
-    function GetRecordSize : Word;
+    function GetRecSize : integer;
+    function GetRecordSize : word;
     procedure AddNewRecord(rec : TRESTDWRecord);
     procedure AddBlobList(blob : PRESTDWBlobField);
   end;
@@ -171,7 +170,6 @@ type
   public
     destructor Destroy; override;
     procedure Delete(Index: Integer); overload;
-    procedure Insert(Index: Integer; Item: TRESTDWRecord); overload;
     function Add(Item: TRESTDWRecord): Integer; overload;
 
     property Items[Index: Integer]: TRESTDWRecord read GetRec write PutRec; default;
@@ -411,15 +409,6 @@ begin
     Result := TRESTDWRecord(TList(Self).Items[Index]^);
 end;
 
-procedure TRecordList.Insert(Index: Integer; Item: TRESTDWRecord);
-var
-  vItem: PRESTDWRecord;
-begin
-  New(vItem);
-  vItem^ := Item;
-  inherited Insert(Index, vItem);
-end;
-
 procedure TRecordList.PutRec(Index : Integer; Item : TRESTDWRecord);
 begin
   if (Index < Self.Count) and (Index > -1) then
@@ -469,10 +458,10 @@ begin
   end;
 end;
 
-function TRecordList.Add(Item: TRESTDWRecord) : Integer;
+function TRecordList.Add(Item : TRESTDWRecord) : Integer;
 var
   vItem: PRESTDWRecord;
-begin
+Begin
   New(vItem);
   vItem^ := Item;
   Result := inherited Add(vItem);
@@ -1149,7 +1138,7 @@ var
 begin
   vField := FindField(fdname);
   if vField <> nil then
-    Result := FFieldSize[vField.Index];
+    Result := vField.Index;
 end;
 
 {$IFDEF DELPHIXEUP}
@@ -2277,11 +2266,11 @@ begin
     else
       vRecPos := FCurrentRecord;
     vRec := TRESTDWRecord.Create(Self);
-    FRecords.Insert(vRecPos, vRec);
+    FRecords.Insert(vRecPos,vRec);
     FCurrentRecord := vRecPos;
   end;
-  Move(Buffer^, vRec.FBuffer^, FRecordBufferSize);
-  FRecordCount := FRecords.Count;
+  Move(Buffer^,vRec.FBuffer^,FRecordBufferSize);
+  FRecordCount := FRecordCount + 1;
 end;
 
 {$IFDEF DELPHIXEUP}
@@ -2323,10 +2312,14 @@ begin
     end;
   end
   else begin
-    If State = dsInsert Then
+    // always append
+
+    if state = dsinsert then
     Begin
-     InternalAddRecord(ActiveBuffer, FCurrentRecord >= FRecords.Count);
-    End;
+        InternalAddRecord(ActiveBuffer,True);
+    End
+    else
+    InternalAddRecord(ActiveBuffer, FCurrentRecord >= FRecords.Count);
   end;
 end;
 
@@ -2432,7 +2425,7 @@ begin
 
   FDataset.FLastID := FDataset.FLastID + 1;
   GetMem(FBuffer, FDataset.FRecordBufferSize);
-  FillChar(FBuffer^, FDataset.FRecordBufferSize, 0);
+  FillChar(FBuffer^,FDataset.FRecordBufferSize,0);
 end;
 
 destructor TRESTDWRecord.Destroy;
