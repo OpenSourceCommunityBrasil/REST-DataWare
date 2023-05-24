@@ -21,7 +21,6 @@
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -355,7 +354,7 @@ begin
     try
       vRESTDataBase.ExecuteCommand(vPoolermethod, vSQL, vParams, vError,
                                    vMessageError, vDataSetList, vRowsAffected,
-                                   exec, (not exec), (not exec), False,
+                                   exec, (not exec), (not exec),
                                    vRESTDataBase.RESTClientPooler);
       FStream.Size := 0;
       if (vDataSetList <> nil) and (not vDataSetList.IsNull) then
