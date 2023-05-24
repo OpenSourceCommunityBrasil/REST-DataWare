@@ -15,6 +15,7 @@ unit uRESTDWBasicDB;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -374,8 +375,12 @@ Type
  Protected
   Procedure Loaded; override;
  Public
+  Function  IsServerLive            (Aip                    : String;
+                                     Aport                  : Integer;
+                                     AMessageErro           : String): Boolean; Virtual;
+
   Procedure SetConnection           (Value                  : Boolean;
-                                     aBinaryRequest         : Boolean = True);                    //Seta o Estado da Conexão
+                                     aBinaryRequest         : Boolean = False);                    //Seta o Estado da Conexão
   Procedure DestroyClientPooler;
   Procedure ExecuteCommand          (Var PoolerMethodClient : TRESTDWPoolerMethodClient;
                                      Var SQL                : TStringList;
@@ -385,7 +390,8 @@ Type
                                      Var Result             : TJSONValue;
                                      Var RowsAffected       : Integer;
                                      Execute                : Boolean = False;
-                                     BinaryRequest          : Boolean = True;
+                                     BinaryRequest          : Boolean = False;
+                                     BinaryCompatibleMode   : Boolean = False;
                                      Metadata               : Boolean = False;
                                      RESTClientPooler       : TRESTClientPoolerBase     = Nil);
   Procedure ExecuteCommandTB        (Var PoolerMethodClient : TRESTDWPoolerMethodClient;
@@ -396,6 +402,7 @@ Type
                                      Var Result             : TJSONValue;
                                      Var RowsAffected       : Integer;
                                      BinaryRequest          : Boolean = False;
+                                     BinaryCompatibleMode   : Boolean = False;
                                      Metadata               : Boolean = False;
                                      RESTClientPooler       : TRESTClientPoolerBase     = Nil);
   Procedure ExecuteProcedure        (Var PoolerMethodClient : TRESTDWPoolerMethodClient;
@@ -2731,6 +2738,11 @@ Begin
  FreeAndNil(vRESTConnectionDB);
 End;
 
+function TRESTDWDatabasebaseBase.IsServerLive(Aip: String; Aport: Integer; AMessageErro: String): Boolean;
+begin
+  {Brito}
+end;
+
 procedure TRESTDWDatabasebaseBase.Loaded;
 begin
   inherited Loaded;
@@ -3479,6 +3491,7 @@ Procedure TRESTDWDatabasebaseBase.ExecuteCommandTB(Var PoolerMethodClient : TRES
                                            Var Result             : TJSONValue;
                                            Var RowsAffected       : Integer;
                                            BinaryRequest          : Boolean = False;
+                                           BinaryCompatibleMode   : Boolean = False;
                                            Metadata               : Boolean = False;
                                            RESTClientPooler       : TRESTClientPoolerBase = Nil);
 Var
@@ -3520,7 +3533,7 @@ Begin
                                                            vDataRoute,
                                                            Tablename,
                                                            DWParams, Error,
-                                                           MessageError, SocketError, RowsAffected, BinaryRequest,
+                                                           MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
                                                            Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     FreeAndNil(DWParams);
    End
@@ -3529,7 +3542,7 @@ Begin
                                                               vDataRoute,
                                                               Tablename,
                                                               Error,
-                                                              MessageError, SocketError, RowsAffected, BinaryRequest,
+                                                              MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
                                                               Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
   If SocketError Then
    Begin
@@ -3577,7 +3590,7 @@ Begin
                                                                  vFailOverConnections[I].vDataRoute,
                                                                  Tablename,
                                                                  DWParams, Error,
-                                                                 MessageError, SocketError, RowsAffected, BinaryRequest,
+                                                                 MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
                                                                  Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
           FreeAndNil(DWParams);
          End
@@ -3586,7 +3599,7 @@ Begin
                                                                     vFailOverConnections[I].vDataRoute,
                                                                     Tablename,
                                                                     Error,
-                                                                    MessageError, SocketError, RowsAffected, BinaryRequest,
+                                                                    MessageError, SocketError, RowsAffected, BinaryRequest, BinaryCompatibleMode,
                                                                     Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
         If Not SocketError Then
          Begin
@@ -3696,7 +3709,8 @@ Procedure TRESTDWDatabasebaseBase.ExecuteCommand(Var PoolerMethodClient : TRESTD
                                                  Var Result             : TJSONValue;
                                                  Var RowsAffected       : Integer;
                                                  Execute                : Boolean = False;
-                                                 BinaryRequest          : Boolean = True;
+                                                 BinaryRequest          : Boolean = False;
+                                                 BinaryCompatibleMode   : Boolean = False;
                                                  Metadata               : Boolean = False;
                                                  RESTClientPooler       : TRESTClientPoolerBase     = Nil);
 Var
@@ -3756,7 +3770,7 @@ Begin
       LDataSetList := vRESTConnectionDB.ExecuteCommandJSON(vRestPooler,
                                                            vDataRoute, vSQL,
                                                            DWParams, Error,
-                                                           MessageError, SocketError, RowsAffected, Execute, BinaryRequest,
+                                                           MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
                                                            Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
       FreeAndNil(DWParams);
      End
@@ -3764,7 +3778,7 @@ Begin
      LDataSetList := vRESTConnectionDB.ExecuteCommandPureJSON(vRestPooler,
                                                               vDataRoute,
                                                               vSQL, Error,
-                                                              MessageError, SocketError, RowsAffected, Execute, BinaryRequest,
+                                                              MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
                                                               Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
     If SocketError Then
      Begin
@@ -3814,7 +3828,7 @@ Begin
             LDataSetList := vRESTConnectionDB.ExecuteCommandJSON(vFailOverConnections[I].vRestPooler,
                                                                  vFailOverConnections[I].vDataRoute, GetLineSQL(SQL),
                                                                  DWParams, Error,
-                                                                 MessageError, SocketError, RowsAffected, Execute, BinaryRequest,
+                                                                 MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
                                                                  Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
             FreeAndNil(DWParams);
            End
@@ -3822,7 +3836,7 @@ Begin
            LDataSetList := vRESTConnectionDB.ExecuteCommandPureJSON(vFailOverConnections[I].vRestPooler,
                                                                     vFailOverConnections[I].vDataRoute,
                                                                     GetLineSQL(SQL), Error,
-                                                                    MessageError, SocketError, RowsAffected, Execute, BinaryRequest,
+                                                                    MessageError, SocketError, RowsAffected, Execute, BinaryRequest, BinaryCompatibleMode,
                                                                     Metadata, vTimeOut, vConnectTimeOut, vClientConnectionDefs.vConnectionDefs, vRESTClientPooler);
           If Not SocketError Then
            Begin
@@ -5195,7 +5209,7 @@ Begin
 End;
 
 Procedure TRESTDWDatabasebaseBase.SetConnection(Value          : Boolean;
-                                                aBinaryRequest : Boolean = True);
+                                                aBinaryRequest : Boolean = False);
 Var
  vRESTConnectionDB : TRESTDWPoolerMethodClient;
 Begin
@@ -8170,7 +8184,7 @@ Begin
        If Not vRESTDataBase.Active then
         Exit;
        vRESTDataBase.ExecuteCommand(vActualPoolerMethodClient, vSQL, vParams,   vError, vMessageError,
-                                    vResult, vRowsAffected, True, False, False,  vRESTDataBase.RESTClientPooler);
+                                    vResult, vRowsAffected, True, False, False, False,  vRESTDataBase.RESTClientPooler);
        Result := Not vError;
        Error  := vMessageError;
        If Assigned(vResult) Then
@@ -9516,7 +9530,11 @@ Begin
  vAbortData            := AbortData;
  vOnThreadRequestError := OnThreadRequestError;
  {$IFNDEF RESTDWLAZARUS}
+  {$If DEFINED(RESTDWFMX)}
+ Priority              := 1;
+  {$ELSE}
   Priority              := tpLowest;
+  {$IFEND}
  {$ENDIF}
 End;
 
@@ -10151,7 +10169,7 @@ Begin
     If DataSet = Nil Then
      Begin
       vRESTDataBase.ExecuteCommandTB(vActualPoolerMethodClient, vTablename, vParams, vError, vMessageError, LDataSetList,
-                                     vRowsAffected, BinaryRequest, Fields.Count = 0, Nil);
+                                     vRowsAffected, BinaryRequest,  True, Fields.Count = 0, Nil);
       If LDataSetList <> Nil Then
        Begin
         If BinaryRequest Then
@@ -10443,7 +10461,7 @@ Begin
       For I := 0 To 1 Do
        Begin
         vRESTDataBase.ExecuteCommand(vActualPoolerMethodClient, vSQL, vParams, vError, vMessageError, LDataSetList,
-                                     vRowsAffected, False, BinaryRequest, vMetaData, vRESTDataBase.RESTClientPooler);
+                                     vRowsAffected, False, BinaryRequest,  True, vMetaData, vRESTDataBase.RESTClientPooler);
         If Not(vError) or (vMessageError <> cInvalidAuth) Then
          Break;
        End;

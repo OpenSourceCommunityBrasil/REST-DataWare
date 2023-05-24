@@ -8,8 +8,23 @@ Uses
   SysUtils, Classes, uRESTDWDataUtils, uRESTDWComponentEvents,
   uRESTDWBasicTypes, uRESTDWConsts, uRESTDWJSONObject, uRESTDWParams, uRESTDWAuthenticators;
 
-
 Type
+ TUserBasicAuth  =             Procedure(Welcomemsg, AccessTag,
+                                         Username, Password : String;
+                                         Var Params         : TRESTDWParams;
+                                         Var ErrorCode      : Integer;
+                                         Var ErrorMessage   : String;
+                                         Var Accept         : Boolean) Of Object;
+ TUserTokenAuth  =             Procedure(Welcomemsg,
+                                         AccessTag          : String;
+                                         Params             : TRESTDWParams;
+                                         AuthOptions        : TRESTDWAuthToken;
+                                         Var ErrorCode      : Integer;
+                                         Var ErrorMessage   : String;
+                                         Var TokenID        : String;
+                                         Var Accept         : Boolean) Of Object;
+
+ Type
   TRESTDWClientInfo = Class(TObject)
  Private
   vip,
@@ -41,8 +56,8 @@ Type
    vReplyEvent           : TRESTDWReplyEvent;
    vWelcomeMessage       : TWelcomeMessage;
    vMassiveProcess       : TMassiveProcess;
-   vUserBasicAuth        : TOnUserBasicAuth;
-   vUserTokenAuth        : TOnUserTokenAuth;
+   vUserBasicAuth        : TUserBasicAuth;
+   vUserTokenAuth        : TUserTokenAuth;
    vOnGetToken           : TOnGetToken;
    vOnMassiveBegin,
    vOnMassiveAfterStartTransaction,
@@ -79,8 +94,8 @@ Type
    Property OnMassiveAfterBeforeCommit     : TMassiveEvent       Read vOnMassiveAfterBeforeCommit     Write vOnMassiveAfterBeforeCommit;
    Property OnMassiveAfterAfterCommit      : TMassiveEvent       Read vOnMassiveAfterAfterCommit      Write vOnMassiveAfterAfterCommit;
    Property OnMassiveEnd                   : TMassiveEvent       Read vOnMassiveEnd                   Write vOnMassiveEnd;
-   Property OnUserBasicAuth                : TOnUserBasicAuth      Read vUserBasicAuth                  Write vUserBasicAuth;
-   Property OnUserTokenAuth                : TOnUserTokenAuth      Read vUserTokenAuth                  Write vUserTokenAuth;
+   Property OnUserBasicAuth                : TUserBasicAuth      Read vUserBasicAuth                  Write vUserBasicAuth;
+   Property OnUserTokenAuth                : TUserTokenAuth      Read vUserTokenAuth                  Write vUserTokenAuth;
    Property OnGetToken                     : TOnGetToken         Read vOnGetToken                     Write vOnGetToken;
    Property QueuedRequest                  : Boolean             Read vQueuedRequest                  Write vQueuedRequest;
  End;
@@ -117,7 +132,6 @@ Var
  vTempURL,
  ParamsURI     : String;
  vParamMethods : TRESTDWParamsMethods;
-
  Procedure ParseParams;
  Var
   lst       : TStringList;
@@ -173,7 +187,6 @@ Var
    FreeAndNil(lst);
   End;
  End;
-
  Procedure CopyParams(SourceParams : TRESTDWParamsMethods);
  Var
   isrc       : Integer;
@@ -192,7 +205,6 @@ Var
      End;
    End;
  End;
-
  Procedure ParseURL;
  Begin
   vPosQuery := Pos('?', URL);
@@ -217,7 +229,6 @@ Var
   If URL = '' Then
    URL := '/';
  End;
-
 Begin
  Result   := False;
  If Length(URL) = 0 Then

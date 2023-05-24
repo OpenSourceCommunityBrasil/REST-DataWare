@@ -15,6 +15,7 @@ unit uRESTDWPoolermethod;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -234,6 +235,7 @@ Uses
                                    Var RowsAffected        : Integer;
                                    Execute                 : Boolean;
                                    BinaryRequest           : Boolean;
+                                   BinaryCompatibleMode    : Boolean;
                                    Metadata                : Boolean;
                                    TimeOut                 : Integer = 3000;
                                    ConnectTimeOut          : Integer = 3000;
@@ -248,6 +250,7 @@ Uses
                                    Var SocketError         : Boolean;
                                    Var RowsAffected        : Integer;
                                    BinaryRequest           : Boolean;
+                                   BinaryCompatibleMode    : Boolean;
                                    Metadata                : Boolean;
                                    TimeOut                 : Integer = 3000;
                                    ConnectTimeOut          : Integer = 3000;
@@ -271,6 +274,7 @@ Uses
                                    Var RowsAffected        : Integer;
                                    Execute                 : Boolean;
                                    BinaryRequest           : Boolean;
+                                   BinaryCompatibleMode    : Boolean;
                                    Metadata                : Boolean;
                                    TimeOut                 : Integer = 3000;
                                    ConnectTimeOut          : Integer = 3000;
@@ -284,6 +288,7 @@ Uses
                                      Var SocketError      : Boolean;
                                      Var RowsAffected     : Integer;
                                      BinaryRequest        : Boolean;
+                                     BinaryCompatibleMode : Boolean;
                                      Metadata             : Boolean;
                                      TimeOut              : Integer = 3000;
                                      ConnectTimeOut       : Integer = 3000;
@@ -1741,6 +1746,7 @@ Function TRESTDWPoolerMethodClient.ExecuteCommandJSONTB(Pooler,
                                                     Var SocketError         : Boolean;
                                                     Var RowsAffected        : Integer;
                                                     BinaryRequest           : Boolean;
+                                                    BinaryCompatibleMode    : Boolean;
                                                     Metadata                : Boolean;
                                                     TimeOut                 : Integer = 3000;
                                                     ConnectTimeOut          : Integer = 3000;
@@ -1841,11 +1847,11 @@ Begin
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryRequest;
  DWParams.Add(JSONParam);
-// JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
-// JSONParam.ParamName             := 'BinaryCompatibleMode';
-// JSONParam.ObjectDirection       := odIn;
-// JSONParam.AsBoolean             := BinaryCompatibleMode;
-// DWParams.Add(JSONParam);
+ JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam.ParamName             := 'BinaryCompatibleMode';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.AsBoolean             := BinaryCompatibleMode;
+ DWParams.Add(JSONParam);
  JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MetadataRequest';
  JSONParam.ObjectDirection       := odIn;
@@ -1943,6 +1949,7 @@ Function TRESTDWPoolerMethodClient.ExecuteCommandJSON(Pooler, Method_Prefix,
                                                   Var RowsAffected        : Integer;
                                                   Execute                 : Boolean;
                                                   BinaryRequest           : Boolean;
+                                                  BinaryCompatibleMode    : Boolean;
                                                   Metadata                : Boolean;
                                                   TimeOut                 : Integer = 3000;
                                                   ConnectTimeOut          : Integer = 3000;
@@ -2058,11 +2065,11 @@ Begin
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryRequest;
  DWParams.Add(JSONParam);
-// JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
-// JSONParam.ParamName             := 'BinaryCompatibleMode';
-// JSONParam.ObjectDirection       := odIn;
-// JSONParam.AsBoolean             := BinaryCompatibleMode;
-// DWParams.Add(JSONParam);
+ JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam.ParamName             := 'BinaryCompatibleMode';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.AsBoolean             := BinaryCompatibleMode;
+ DWParams.Add(JSONParam);
  JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MetadataRequest';
  JSONParam.ObjectDirection       := odIn;
@@ -2162,6 +2169,7 @@ Function TRESTDWPoolerMethodClient.ExecuteCommandPureJSONTB(Pooler,
                                                         Var SocketError      : Boolean;
                                                         Var RowsAffected     : Integer;
                                                         BinaryRequest        : Boolean;
+                                                        BinaryCompatibleMode : Boolean;
                                                         Metadata             : Boolean;
                                                         TimeOut              : Integer = 3000;
                                                         ConnectTimeOut       : Integer = 3000;
@@ -2252,11 +2260,11 @@ Begin
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryRequest;
  DWParams.Add(JSONParam);
-// JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
-// JSONParam.ParamName             := 'BinaryCompatibleMode';
-// JSONParam.ObjectDirection       := odIn;
-// JSONParam.AsBoolean             := BinaryCompatibleMode;
-// DWParams.Add(JSONParam);
+ JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam.ParamName             := 'BinaryCompatibleMode';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.AsBoolean             := BinaryCompatibleMode;
+ DWParams.Add(JSONParam);
  JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MetadataRequest';
  JSONParam.ObjectDirection       := odIn;
@@ -2363,6 +2371,7 @@ Function TRESTDWPoolerMethodClient.ExecuteCommandPureJSON(Pooler,
                                                       Var RowsAffected     : Integer;
                                                       Execute              : Boolean;
                                                       BinaryRequest        : Boolean;
+                                                      BinaryCompatibleMode : Boolean;
                                                       Metadata             : Boolean;
                                                       TimeOut              : Integer = 3000;
                                                       ConnectTimeOut       : Integer = 3000;
@@ -2468,11 +2477,11 @@ Begin
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryRequest;
  DWParams.Add(JSONParam);
-// JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
-// JSONParam.ParamName             := 'BinaryCompatibleMode';
-// JSONParam.ObjectDirection       := odIn;
-// JSONParam.AsBoolean             := BinaryCompatibleMode;
-// DWParams.Add(JSONParam);
+ JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam.ParamName             := 'BinaryCompatibleMode';
+ JSONParam.ObjectDirection       := odIn;
+ JSONParam.AsBoolean             := BinaryCompatibleMode;
+ DWParams.Add(JSONParam);
  JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MetadataRequest';
  JSONParam.ObjectDirection       := odIn;
