@@ -1849,17 +1849,20 @@ Var
    if not Assigned(ResultStream) then
      ResultStream := TMemoryStream.Create;
 
-   If compresseddata Then
-   begin
-     ZCompressStream(aStream, aStreamResponse);
-     aStreamResponse.Position := 0;
-     ResultStream.CopyFrom(aStreamResponse, aStreamResponse.Size);
-   end
-   else
-     ResultStream.CopyFrom(aStream, aStream.Size);
-
-   FreeAndNil(aStreamResponse);
-   DestroyComponents;
+   aStreamResponse := TMemoryStream.Create;
+   try
+     If compresseddata Then
+     begin
+       ZCompressStream(aStream, aStreamResponse);
+       aStreamResponse.Position := 0;
+       ResultStream.CopyFrom(aStreamResponse, aStreamResponse.Size);
+     end
+     else
+       ResultStream.CopyFrom(aStream, aStream.Size);
+   finally
+     FreeAndNil(aStreamResponse);
+     DestroyComponents;
+   end;
  end;
 
  Procedure WriteResponseFile(aFileName: string; aStatusCode: integer);
