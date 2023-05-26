@@ -119,7 +119,6 @@ Type
   Procedure ExecProc; Virtual;
   Procedure FetchAll; Virtual;
   Procedure SaveToStream(stream : TStream); Virtual;
-  Procedure SaveToStreamCompatibleMode(stream : TStream); Virtual;
   Procedure ImportParams(DWParams : TRESTDWParams);
   Function  Eof         : Boolean; Virtual;
   Function  RecNo       : Int64;   Virtual;
@@ -180,7 +179,7 @@ Type
  Private
   Function getSQL       : TStrings; Virtual;
  Public
-  Function  GetInsertID  : int64;    Virtual;
+  Function GetInsertID  : int64;    Virtual;
  Published
   Property SQL          : TStrings  Read getSQL;
  End;
@@ -239,15 +238,12 @@ Type
                               Var Error             : Boolean;
                               Var MessageError      : String;
                               Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
-  Function isMinimumVersion(major,
-                            minor,
-                            sub    : Integer) : Boolean; Overload;
-  Function isMinimumVersion(major,
-                            minor  : Integer) : Boolean; Overload;
+  Function isMinimumVersion(major, minor, sub: Integer): Boolean; Overload;
+  Function isMinimumVersion(major, minor: Integer): Boolean; Overload;
 
-  Function ApplyUpdates_MassiveCache  (MassiveDataset: TMassiveDatasetBuffer;
-                                       Var Error        : Boolean;
-                                       Var MessageError : String): String;Overload;
+  Function ApplyUpdates_MassiveCache(MassiveDataset: TMassiveDatasetBuffer;
+                                     Var Error        : Boolean;
+                                     Var MessageError : String): String;Overload;
  Public
   constructor Create(AOwner : TComponent); override;
   destructor Destroy; override;
@@ -264,9 +260,9 @@ Type
   Function ConnectionSet    : Boolean;              Virtual;
   Function GetGenID          (Query                 : TRESTDWDrvQuery;
                               GenName               : String;
-                              valor                 : Integer = 1) : Integer;Overload;Virtual;
+                              valor                 : Integer = 1): Integer;Overload;Virtual;
   Function GetGenID          (GenName               : String;
-                              valor                 : Integer = 1) : Integer;Overload;Virtual;
+                              valor                 : Integer = 1): Integer;Overload;Virtual;
   Function ApplyUpdates      (MassiveStream         : TStream;
                               SQL                   : String;
                               Params                : TRESTDWParams;
@@ -308,9 +304,8 @@ Type
                                Var BinaryBlob        : TMemoryStream;
                                Var RowsAffected      : Integer;
                                Execute               : Boolean = False;
-                               BinaryEvent           : Boolean = False;
-                               MetaData              : Boolean = False;
-                               BinaryCompatibleMode  : Boolean = False) : String;Overload;Virtual;
+                               BinaryEvent           : Boolean = True;
+                               MetaData              : Boolean = False) : String;Overload;Virtual;
   Function ExecuteCommand     (SQL                   : String;
                                Params                : TRESTDWParams;
                                Var Error             : Boolean;
@@ -318,26 +313,23 @@ Type
                                Var BinaryBlob        : TMemoryStream;
                                Var RowsAffected      : Integer;
                                Execute               : Boolean = False;
-                               BinaryEvent           : Boolean = False;
-                               MetaData              : Boolean = False;
-                               BinaryCompatibleMode  : Boolean = False) : String;Overload;Virtual;
+                               BinaryEvent           : Boolean = True;
+                               MetaData              : Boolean = False) : String;Overload;Virtual;
   Function ExecuteCommandTB   (Tablename             : String;
                                Var Error             : Boolean;
                                Var MessageError      : String;
                                Var BinaryBlob        : TMemoryStream;
                                Var RowsAffected      : Integer;
-                               BinaryEvent           : Boolean = False;
-                               MetaData              : Boolean = False;
-                               BinaryCompatibleMode  : Boolean = False) : String; Overload;Virtual;
+                               BinaryEvent           : Boolean = True;
+                               MetaData              : Boolean = False) : String; Overload;Virtual;
   Function ExecuteCommandTB   (Tablename             : String;
                                Params                : TRESTDWParams;
                                Var Error             : Boolean;
                                Var MessageError      : String;
                                Var BinaryBlob        : TMemoryStream;
                                Var RowsAffected      : Integer;
-                               BinaryEvent           : Boolean = False;
-                               MetaData              : Boolean = False;
-                               BinaryCompatibleMode  : Boolean = False) : String; Overload;Virtual;
+                               BinaryEvent           : Boolean = True;
+                               MetaData              : Boolean = False) : String; Overload;Virtual;
   Procedure ExecuteProcedure  (ProcName              : String;
                                Params                : TRESTDWParams;
                                Var Error             : Boolean;
@@ -378,8 +370,7 @@ Type
                                Var Error             : Boolean;
                                Var MessageError      : String;
                                Var BinaryBlob        : TMemoryStream;
-                               aBinaryEvent          : Boolean = False;
-                               aBinaryCompatibleMode : Boolean = False) : TStream; Overload;Virtual;
+                               aBinaryEvent          : Boolean = True) : TStream; Overload;Virtual;
   Class Procedure CreateConnection(Const AConnectionDefs  : TConnectionDefs;
                                    Var AConnection        : TComponent);     Virtual;
   Procedure PrepareConnection     (Var AConnectionDefs    : TConnectionDefs);Virtual;
@@ -688,25 +679,6 @@ Procedure TRESTDWDrvDataset.SaveToStream(stream: TStream);
 Begin
 
 End;
-
-procedure TRESTDWDrvDataset.SaveToStreamCompatibleMode(stream: TStream);
-var
-  qry : TDataSet;
-  stor : TRESTDWStorageBin;
-begin
-  qry := TDataSet(Self.Owner);
-  if FStorageDataType = nil then begin
-    stor := TRESTDWStorageBin.Create(nil);
-    try
-      stor.EncodeStrs := False;
-      stor.SaveToStream(qry, stream);
-    finally
-      stor.Free;
-    end;
-  end
-  else
-    FStorageDataType.SaveToStream(qry,stream);
-end;
 
 procedure TRESTDWDrvDataset.setParamDataType(IParam: integer;
                                              AValue: TFieldType);
@@ -2529,14 +2501,14 @@ Begin
 end;
 
 function TRESTDWDriverBase.ExecuteCommand(
-  SQL : String; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; Execute : Boolean; BinaryEvent : Boolean; MetaData : Boolean; BinaryCompatibleMode : Boolean) : String;
+  SQL : String; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; Execute : Boolean; BinaryEvent : Boolean; MetaData : Boolean) : String;
 Begin
  Result := ExecuteCommand(SQL, Nil, Error, MessageError, BinaryBlob, RowsAffected,
-                          Execute, BinaryEvent, MetaData, BinaryCompatibleMode);
+                          Execute, BinaryEvent, MetaData);
 End;
 
 function TRESTDWDriverBase.ExecuteCommand(
-  SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; Execute : Boolean; BinaryEvent : Boolean; MetaData : Boolean; BinaryCompatibleMode : Boolean) : String;
+  SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; Execute : Boolean; BinaryEvent : Boolean; MetaData : Boolean) : String;
 var
   vTempQuery: TRESTDWDrvQuery;
   vDataSet: TDataSet;
@@ -2579,27 +2551,6 @@ begin
           aResult.LoadFromDataset('RESULTDATA', vDataSet, EncodeStringsJSON);
           Result := aResult.ToJSON;
         end
-        else if not BinaryCompatibleMode then begin
-          if not Assigned(BinaryBlob) then
-            BinaryBlob := TMemoryStream.Create;
-          try
-            vTempQuery.SaveToStream(BinaryBlob);
-            BinaryBlob.Position := 0;
-          finally
-          end;
-        end
-        else begin
-          if not Assigned(BinaryBlob) then
-            BinaryBlob := TMemoryStream.Create;
-
-          try
-            vTempQuery.FStorageDataType := FStorageDataType;
-            vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
-            BinaryBlob.Position := 0;
-          finally
-
-          end;
-        end;
       finally
       end;
     end
@@ -2648,14 +2599,14 @@ begin
 end;
 
 function TRESTDWDriverBase.ExecuteCommandTB(
-  Tablename : String; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; BinaryEvent : Boolean; MetaData : Boolean; BinaryCompatibleMode : Boolean) : String;
+  Tablename : String; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; BinaryEvent : Boolean; MetaData : Boolean) : String;
 begin
-  ExecuteCommandTB(Tablename,nil,Error,MessageError,BinaryBlob,RowsAffected,
-                   BinaryEvent,MetaData,BinaryCompatibleMode);
+  ExecuteCommandTB(Tablename, nil, Error, MessageError, BinaryBlob, RowsAffected,
+                   BinaryEvent, MetaData);
 end;
 
 function TRESTDWDriverBase.ExecuteCommandTB(
-  Tablename : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; BinaryEvent : Boolean; MetaData : Boolean; BinaryCompatibleMode : Boolean) : String;
+  Tablename : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; var RowsAffected : Integer; BinaryEvent : Boolean; MetaData : Boolean) : String;
 var
   vTempQuery     : TRESTDWDrvTable;
   vDataset       : TDataset;
@@ -2691,27 +2642,6 @@ begin
         aResult.Utf8SpecialChars := True;
         aResult.LoadFromDataset('RESULTDATA', TDataset(vTempQuery.Owner), EncodeStringsJSON);
         Result := aResult.ToJson;
-      end
-      else if not BinaryCompatibleMode then begin
-        if not Assigned(BinaryBlob) then
-          BinaryBlob := TMemoryStream.Create;
-        try
-          vTempQuery.SaveToStream(BinaryBlob);
-          BinaryBlob.Position := 0;
-        finally
-
-        end;
-      end
-      else begin
-        if not Assigned(BinaryBlob) then
-          BinaryBlob := TMemoryStream.Create;
-        try
-          vTempQuery.FStorageDataType := FStorageDataType;
-          vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
-          BinaryBlob.Position := 0;
-        finally
-
-        end;
       end;
 
       if not vStateResource then
@@ -3645,8 +3575,7 @@ Var
  I               : Integer;
  vMetaData,
  vBinaryEvent,
- vStateResource,
- vCompatibleMode : Boolean;
+ vStateResource  : Boolean;
  DWParams        : TRESTDWParams;
  bJsonArray      : TRESTDWJSONInterfaceArray;
  bJsonValue      : TRESTDWJSONInterfaceObject;
@@ -3656,7 +3585,6 @@ Begin
  Error           := False;
  vBinaryEvent    := False;
  vMetaData       := False;
- vCompatibleMode := False;
  bJsonArray      := Nil;
  vTempQuery      := getQuery(True);
  Try
@@ -3674,7 +3602,6 @@ Begin
     vTempQuery.SQL.Add(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
     vBinaryEvent    := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[2].Value);
     vMetaData       := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[3].Value);
-    vCompatibleMode := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[4].Value);
     If bJsonArray.ElementCount > 1 Then
      Begin
       DWParams := TRESTDWParams.Create;
@@ -3694,15 +3621,6 @@ Begin
       vTempJSON.Utf8SpecialChars := True;
       vTempJSON.LoadFromDataset('RESULTDATA', TDataSet(vTempQuery.Owner), EncodeStringsJSON);
      End
-    Else If vCompatibleMode Then begin
-      vStream := TMemoryStream.Create;
-      Try
-       vTempQuery.FStorageDataType := FStorageDataType;
-       vTempQuery.SaveToStreamCompatibleMode(vStream);
-       vStream.Position := 0;
-      Finally
-      End;
-    end
     Else
      Begin
       vStream := TMemoryStream.Create;
@@ -3766,7 +3684,7 @@ Begin
 End;
 
 function TRESTDWDriverBase.OpenDatasets(
-  DatapackStream : TStream; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; aBinaryEvent : Boolean; aBinaryCompatibleMode : Boolean) : TStream;
+  DatapackStream : TStream; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream; aBinaryEvent : Boolean) : TStream;
 Var
  X               : Integer;
  vTempQuery      : TRESTDWDrvQuery;
@@ -3824,15 +3742,6 @@ Begin
       FreeAndNil(vParamsStream);
     End;
     vTempQuery.Open;
-    vStream := TMemoryStream.Create;
-    Try
-     vTempQuery.SaveToStreamCompatibleMode(vStream);
-     vStream.Position := 0;
-     BufferOutStream.InputStream(vStream);
-    Finally
-    If Assigned(vStream) Then
-     FreeAndNil(vStream);
-    End;
    End;
   If connInTransaction Then
    connCommit;
