@@ -13,28 +13,28 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [linux-latest]
-        lazarus-versions: [dist, stable, 2.2.0]
+        operating-system: [ubuntu-latest]
+        lazarus-versions: [dist, stable, 2.2.4, 2.2.6]
     steps:
     - name: Checkout source code
       uses: actions/checkout@v2
     - name: Install Lazarus
-      uses: gcarreno/setup-lazarus@v3.2
+      uses: gcarreno/setup-lazarus@v3
       with:
         lazarus-version: ${{ matrix.lazarus-versions }}
         include-packages: "Indy10, ZeosDBO"
         with-cache: false
-    - name: Build the Main package on Windows
+    - name: Build the Main package on Linux
       run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
       
-    - name: Build Indy package on Windows
+    - name: Build Indy package on Linux
       run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
       
-    - name: Build ShellServices package on Windows
+    - name: Build ShellServices package on Linux
       run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"   
       
-    - name: Build ZeosDriver package on Windows
+    - name: Build ZeosDriver package on Linux
       run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"    
       
-    - name: Build LazarusDriver package on Windows
+    - name: Build LazarusDriver package on Linux
       run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"
