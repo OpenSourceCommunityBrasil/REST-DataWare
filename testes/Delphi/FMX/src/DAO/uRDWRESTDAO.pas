@@ -39,7 +39,7 @@ begin
   begin
     FDefaultHeader := TStringList.Create;
     FDefaultHeader.AddPair('BinaryRequest', 'true');
-    FDefaultHeader.AddPair('DataCompression', 'true');
+//    FDefaultHeader.AddPair('DataCompression', 'true');
   end
   else
     FDefaultHeader := nil;
