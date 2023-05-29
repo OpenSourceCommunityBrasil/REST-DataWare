@@ -80,7 +80,7 @@ Begin
 End;
 
 initialization
-{$I RESTDWfpHttpSockets.lrs}
+{$I RESTDWfphttpSockets.lrs}
 
 Finalization
 

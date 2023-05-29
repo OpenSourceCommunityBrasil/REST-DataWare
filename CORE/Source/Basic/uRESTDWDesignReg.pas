@@ -1033,7 +1033,7 @@ initialization
   AddSplash;
  {$ENDIF}
  {$IFDEF RESTDWLAZARUS}
-   {$I restdatawarecomponents.lrs}
+   {$I RESTDataWareComponents.lrs}
  {$ENDIF}
  UnlistPublishedProperty(TRESTDWClientSQL,  'FieldDefs');
  UnlistPublishedProperty(TRESTDWClientSQL,  'Options');
