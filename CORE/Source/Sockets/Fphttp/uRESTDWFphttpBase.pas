@@ -27,30 +27,63 @@ unit uRESTDWFphttpBase;
 interface
 
 Uses
-  SysUtils,  Classes,  DateUtils,  SyncObjs, ExtCtrls,
+  SysUtils,  Classes,  DateUtils, SyncObjs, ExtCtrls, sslbase,
   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
   uRESTDWConsts, uRESTDWDataUtils, uRESTDWTools, uRESTDWAuthenticators,
-  fphttpserver, HTTPDefs, fpwebclient, base64, opensslsockets, httpprotocol;
+  fphttpserver, HTTPDefs, fpwebclient, base64, httpprotocol;
 
 Type
+  TRESTDWFphttpServicePooler = class;
+
+  { TRESTDWFpHttpThread }
+
+  TRESTDWFpHttpThread = class(TThread)
+  private
+    FParent : TRESTDWFphttpServicePooler;
+    FMustDie : Boolean;
+    FServer : TFPHTTPServer;
+    FStartServer : Boolean;
+    FEvent : TSimpleEvent;
+  protected
+    procedure Execute; override;
+
+    Procedure ExecRequest(Sender: TObject;
+                          Var ARequest: TFPHTTPConnectionRequest;
+                          Var AResponse : TFPHTTPConnectionResponse);
+
+    function getActive: boolean;
+    function getCertificateData: TCertificateData;
+    function getPort: word;
+    function getUseSSL: boolean;
+    procedure setActive(AValue: boolean);
+    procedure setPort(AValue: word);
+    procedure setUseSSL(AValue: boolean);
+  public
+    constructor Create(AOwner: TRESTDWFphttpServicePooler);
+    destructor Destroy; override;
+
+    procedure Start;
+    procedure Stop;
+  published
+    property UseSSL : boolean read getUseSSL write setUseSSL;
+    property Active : boolean read getActive write setActive;
+    property Port : word read getPort write setPort;
+    property CertificateData : TCertificateData read getCertificateData;
+  end;
 
   { TRESTDWFphttpServicePooler }
 
   TRESTDWFphttpServicePooler = Class(TRESTServicePoolerBase)
   Private
-    // Events
+    FFpServer : TRESTDWFpHttpThread;
 
-    // HTTP Server
-    HttpAppSrv: TFPHttpServer;
-    FThreaded : Boolean;
     // SSL Params
     vSSLRootCertFile, vSSLPrivateKeyFile, vSSLPrivateKeyPassword, vSSLCertFile: String;
     vSSLVerMethodMin, vSSLVerMethodMax: TSSLVersion;
     vSSLVerifyDepth: Integer;
     vSSLVerifyPeer: boolean;
     vSSLTimeoutSec: Cardinal;
-    vSSLUse: boolean;
 
     // HTTP Params
     vMaxClients: Integer;
@@ -60,20 +93,20 @@ Type
     vBandWidthSampleSec: Cardinal;
     vListenBacklog: Integer;
 
-    Procedure ExecRequest(Sender: TObject;
-                          Var ARequest: TFPHTTPConnectionRequest;
+    Procedure ExecRequest(Var ARequest: TFPHTTPConnectionRequest;
                           Var AResponse : TFPHTTPConnectionResponse);
+  protected
+    function getUseSSL: boolean;
+    procedure setUseSSL(AValue: boolean);
   Public
     Constructor Create(AOwner: TComponent); Override;
     Destructor Destroy; override;
 
     Procedure SetActive(Value: boolean); Override;
+
     Procedure EchoPooler(ServerMethodsClass: TComponent; AContext: TComponent;
       Var Pooler, MyIP: String; AccessTag: String; Var InvalidTag: boolean); Override;
-
   Published
-    // Events
-
     // SSL Params
     Property SSLRootCertFile: String Read vSSLRootCertFile Write vSSLRootCertFile;
     Property SSLPrivateKeyFile: String Read vSSLPrivateKeyFile Write vSSLPrivateKeyFile;
@@ -83,8 +116,7 @@ Type
     Property SSLVerifyPeer: boolean Read vSSLVerifyPeer Write vSSLVerifyPeer default false;
     Property SSLVersionMin: TSSLVersion Read vSSLVerMethodMin Write vSSLVerMethodMin default svTLSv12;
     // SSL TimeOut in Seconds
-    Property SSLUse: boolean Read vSSLUse Write vSSLUse default false;
-    Property Threaded: boolean Read FThreaded Write FThreaded default false;
+    property UseSSL : boolean Read getUseSSL Write setUseSSL;
   End;
 
 
@@ -92,9 +124,112 @@ Implementation
 
 Uses uRESTDWJSONInterface, Dialogs;
 
-procedure TRESTDWFphttpServicePooler.ExecRequest(Sender: TObject;
-      Var ARequest: TFPHTTPConnectionRequest;
-      Var AResponse : TFPHTTPConnectionResponse);
+{ TRESTDWFpHttpThread }
+
+function TRESTDWFpHttpThread.getUseSSL: boolean;
+begin
+  Result := FServer.UseSSL;
+end;
+
+function TRESTDWFpHttpThread.getActive: boolean;
+begin
+  Result := FServer.Active;
+end;
+
+function TRESTDWFpHttpThread.getCertificateData: TCertificateData;
+begin
+  Result := FServer.CertificateData;
+end;
+
+function TRESTDWFpHttpThread.getPort: word;
+begin
+  Result := FServer.Port;
+end;
+
+procedure TRESTDWFpHttpThread.setActive(AValue: boolean);
+begin
+  FServer.Active := AValue;
+end;
+
+procedure TRESTDWFpHttpThread.setPort(AValue: word);
+begin
+  FServer.Port := AValue;
+end;
+
+procedure TRESTDWFpHttpThread.setUseSSL(AValue: boolean);
+begin
+  FServer.UseSSL := AValue;
+end;
+
+procedure TRESTDWFpHttpThread.Execute;
+begin
+  while not Terminated do
+  begin
+    FEvent.WaitFor(INFINITE);
+
+    if FMustDie then begin
+      Terminate;
+      Break;
+    end;
+
+    if (FStartServer) and (not FServer.Active) then
+      FServer.Active := FStartServer;
+  end;
+end;
+
+procedure TRESTDWFpHttpThread.ExecRequest(Sender: TObject;
+  var ARequest: TFPHTTPConnectionRequest;
+  var AResponse: TFPHTTPConnectionResponse);
+begin
+  FParent.ExecRequest(ARequest,AResponse);
+end;
+
+constructor TRESTDWFpHttpThread.Create(AOwner: TRESTDWFphttpServicePooler);
+begin
+  FParent := AOwner;
+
+  FreeOnTerminate := False;
+  FMustDie := False;
+  FEvent := TSimpleEvent.Create;
+  FEvent.ResetEvent;
+
+  FServer := TFPHttpServer.Create(nil);
+  FServer.OnRequest := @ExecRequest;
+  FServer.QueueSize := 15;
+  FServer.Threaded := False;
+
+  inherited Create(False);
+end;
+
+destructor TRESTDWFpHttpThread.Destroy;
+begin
+  FMustDie := True;
+  FEvent.SetEvent;
+
+  FEvent.Free;
+
+  FServer.Active := False;
+  FServer.Free;
+end;
+
+procedure TRESTDWFpHttpThread.Start;
+begin
+  FStartServer := True;
+  FEvent.SetEvent;
+end;
+
+procedure TRESTDWFpHttpThread.Stop;
+begin
+  FStartServer := False;
+  FServer.Active := FStartServer;
+  FEvent.ResetEvent;
+end;
+
+{TRESTDWFphttpServicePooler}
+
+procedure TRESTDWFphttpServicePooler.ExecRequest(
+  var ARequest: TFPHTTPConnectionRequest;
+  var AResponse: TFPHTTPConnectionResponse);
 var
   vContentType,
   vAuthRealm,
@@ -288,6 +423,8 @@ begin
 
         AResponse.Code            := StatusCode;
 
+
+
         if (vResponseString <> '') Or (ErrorMessage    <> '')   Then
         begin
           if Assigned(ResultStream)  then
@@ -298,6 +435,7 @@ begin
           else
             ResultStream  := TStringStream.Create(ErrorMessage);
         end;
+
 
         for I := 0 To vResponseHeader.Count -1 Do
           AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I], vResponseHeader.Values[vResponseHeader.Names[I]]);
@@ -336,26 +474,27 @@ begin
   end;
 end;
 
+function TRESTDWFphttpServicePooler.getUseSSL: boolean;
+begin
+  Result := FFpServer.UseSSL;
+end;
+
+procedure TRESTDWFphttpServicePooler.setUseSSL(AValue: boolean);
+begin
+  FFpServer.UseSSL := AValue;
+end;
+
 constructor TRESTDWFphttpServicePooler.Create(AOwner: TComponent);
 begin
   Inherited Create(AOwner);
-  HttpAppSrv := TFPHttpServer.Create(nil);
-
+  FFpServer := TRESTDWFpHttpThread.Create(Self);
 end;
 
 
 destructor TRESTDWFphttpServicePooler.Destroy;
 Begin
-  Try
-    If Active Then
-      HttpAppSrv.Active:= False;
-  Except
-    //
-  End;
-
-  If Assigned(HttpAppSrv) Then
-    FreeAndNil(HttpAppSrv);
-
+  FFpServer.Stop;
+  FFpServer.Free;
   Inherited Destroy;
 End;
 
@@ -409,24 +548,16 @@ Begin
       if not(Assigned(ServerMethodClass)) and (Self.GetDataRouteCount = 0) then
         raise Exception.Create(cServerMethodClassNotAssigned);
 
-       HttpAppSrv.Port      := ServicePort;
-       HttpAppSrv.Threaded  := FThreaded;
-       HttpAppSrv.OnRequest := @ExecRequest;
+       FFpServer.Port := ServicePort;
 
-       
-       HttpAppSrv.UseSSL:= SSLUse;
-
-       if SSLUse and (SSLRootCertFile <> EmptyStr) then
-       begin
-            HttpAppSrv.CertificateData.KeyPassword          := SSLPrivateKeyPassword;//fCertificatePassword;
-            HttpAppSrv.CertificateData.HostName             := SSLRootCertFile;//fCertificateHostName;
-            HttpAppSrv.CertificateData.Certificate.FileName := SSLCertFile;//fCertificateFileName;
-            HttpAppSrv.CertificateData.PrivateKey.FileName  := SSLPrivateKeyFile;//fCertificatePrivateKey;
+       if UseSSL and (SSLRootCertFile <> EmptyStr) then begin
+         FFpServer.CertificateData.KeyPassword          := SSLPrivateKeyPassword;//fCertificatePassword;
+         FFpServer.CertificateData.HostName             := SSLRootCertFile;//fCertificateHostName;
+         FFpServer.CertificateData.Certificate.FileName := SSLCertFile;//fCertificateFileName;
+         FFpServer.CertificateData.PrivateKey.FileName  := SSLPrivateKeyFile;//fCertificatePrivateKey;
        end;
 
-
-
-      HttpAppSrv.Active:= True;
+       FFpServer.Start;
     Except
       On E: Exception do
       Begin
@@ -438,7 +569,7 @@ Begin
    If Not(Value) Then
    Begin
     Try
-      HttpAppSrv.Active:= False;
+      FFpServer.Stop;
     Except
     End;
   End;
@@ -446,3 +577,4 @@ Begin
 End;
 
 End.
+
