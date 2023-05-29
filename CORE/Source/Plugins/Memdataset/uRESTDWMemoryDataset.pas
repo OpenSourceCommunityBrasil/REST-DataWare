@@ -118,12 +118,12 @@ type
     function GetDataset: TDataset;
     function GetRecordObj(idx : integer) : TRESTDWRecord;
 
-    function GetFieldSize(idx : integer) : integer; overload;
-    function GetFieldSize(name : string) : integer; overload;
+    function GetFieldSize(idx : integer) : Integer; overload;
+    function GetFieldSize(name : string) : Integer; overload;
     function GetFieldType(name : string) : TFieldType;
 
-    function GetRecSize : integer;
-    function GetRecordSize : word;
+    function GetRecSize : Integer;
+    function GetRecordSize : Word;
     procedure AddNewRecord(rec : TRESTDWRecord);
     procedure AddBlobList(blob : PRESTDWBlobField);
   end;
@@ -170,6 +170,7 @@ type
   public
     destructor Destroy; override;
     procedure Delete(Index: Integer); overload;
+    procedure Insert(Index: Integer; Item: TRESTDWRecord); overload;
     function Add(Item: TRESTDWRecord): Integer; overload;
 
     property Items[Index: Integer]: TRESTDWRecord read GetRec write PutRec; default;
@@ -409,6 +410,15 @@ begin
     Result := TRESTDWRecord(TList(Self).Items[Index]^);
 end;
 
+procedure TRecordList.Insert(Index: Integer; Item: TRESTDWRecord);
+var
+  vItem: PRESTDWRecord;
+begin
+  New(vItem);
+  vItem^ := Item;
+  inherited Insert(Index, vItem);
+end;
+
 procedure TRecordList.PutRec(Index : Integer; Item : TRESTDWRecord);
 begin
   if (Index < Self.Count) and (Index > -1) then
@@ -458,10 +468,10 @@ begin
   end;
 end;
 
-function TRecordList.Add(Item : TRESTDWRecord) : Integer;
+function TRecordList.Add(Item: TRESTDWRecord) : Integer;
 var
   vItem: PRESTDWRecord;
-Begin
+begin
   New(vItem);
   vItem^ := Item;
   Result := inherited Add(vItem);
@@ -1138,7 +1148,7 @@ var
 begin
   vField := FindField(fdname);
   if vField <> nil then
-    Result := vField.Index;
+    Result := FFieldSize[vField.Index];
 end;
 
 {$IFDEF DELPHIXEUP}
@@ -2266,11 +2276,11 @@ begin
     else
       vRecPos := FCurrentRecord;
     vRec := TRESTDWRecord.Create(Self);
-    FRecords.Insert(vRecPos,vRec);
+    FRecords.Insert(vRecPos, vRec);
     FCurrentRecord := vRecPos;
   end;
-  Move(Buffer^,vRec.FBuffer^,FRecordBufferSize);
-  FRecordCount := FRecordCount + 1;
+  Move(Buffer^, vRec.FBuffer^, FRecordBufferSize);
+  FRecordCount := FRecords.Count;
 end;
 
 {$IFDEF DELPHIXEUP}
@@ -2312,14 +2322,10 @@ begin
     end;
   end
   else begin
-    // always append
-
-    if state = dsinsert then
+    If State = dsInsert Then
     Begin
-        InternalAddRecord(ActiveBuffer,True);
-    End
-    else
-    InternalAddRecord(ActiveBuffer, FCurrentRecord >= FRecords.Count);
+     InternalAddRecord(ActiveBuffer, FCurrentRecord >= FRecords.Count);
+    End;
   end;
 end;
 
@@ -2425,7 +2431,7 @@ begin
 
   FDataset.FLastID := FDataset.FLastID + 1;
   GetMem(FBuffer, FDataset.FRecordBufferSize);
-  FillChar(FBuffer^,FDataset.FRecordBufferSize,0);
+  FillChar(FBuffer^, FDataset.FRecordBufferSize, 0);
 end;
 
 destructor TRESTDWRecord.Destroy;
