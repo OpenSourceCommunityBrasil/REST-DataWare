@@ -239,15 +239,12 @@ Type
                               Var Error             : Boolean;
                               Var MessageError      : String;
                               Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
-  Function isMinimumVersion(major,
-                            minor,
-                            sub    : Integer) : Boolean; Overload;
-  Function isMinimumVersion(major,
-                            minor  : Integer) : Boolean; Overload;
+  Function isMinimumVersion(major, minor, sub: Integer): Boolean; Overload;
+  Function isMinimumVersion(major, minor: Integer): Boolean; Overload;
 
-  Function ApplyUpdates_MassiveCache  (MassiveDataset: TMassiveDatasetBuffer;
-                                       Var Error        : Boolean;
-                                       Var MessageError : String): String;Overload;
+  Function ApplyUpdates_MassiveCache(MassiveDataset: TMassiveDatasetBuffer;
+                                     Var Error        : Boolean;
+                                     Var MessageError : String): String;Overload;
  Public
   constructor Create(AOwner : TComponent); override;
   destructor Destroy; override;
@@ -264,9 +261,9 @@ Type
   Function ConnectionSet    : Boolean;              Virtual;
   Function GetGenID          (Query                 : TRESTDWDrvQuery;
                               GenName               : String;
-                              valor                 : Integer = 1) : Integer;Overload;Virtual;
+                              valor                 : Integer = 1): Integer;Overload;Virtual;
   Function GetGenID          (GenName               : String;
-                              valor                 : Integer = 1) : Integer;Overload;Virtual;
+                              valor                 : Integer = 1): Integer;Overload;Virtual;
   Function ApplyUpdates      (MassiveStream         : TStream;
                               SQL                   : String;
                               Params                : TRESTDWParams;

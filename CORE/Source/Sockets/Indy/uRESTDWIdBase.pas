@@ -282,8 +282,11 @@ End;
   aSSLMethod                       : TIdSSLVersion;
   vSSLMode                         : TIdSSLMode;
  Public
-  Constructor Create               (AOwner  : TComponent);Override;
+  Constructor Create               (AOwner       : TComponent);Override;
   Destructor  Destroy;Override;
+  Function    IsServerLive         (Aip          : String;
+                                    Aport        : Integer;
+                                    AMessageErro : String): Boolean; Override;
  Published
   Property SSLMode                 : TIdSSLMode               Read vSSLMode                 Write vSSLMode;
   Property CipherList              : String                   Read vCipherList              Write vCipherList;
@@ -3012,6 +3015,16 @@ Begin
     Else
      AResponseInfo.CharSet := 'ansi';
     AResponseInfo.ResponseNo               := StatusCode;
+    If (vResponseString <> '')   Or
+       (ErrorMessage    <> '')   Then
+     Begin
+      If Assigned(ResultStream)  Then
+       FreeAndNil(ResultStream);
+      If (vResponseString <> '') Then
+       ResultStream  := TStringStream.Create(vResponseString)
+      Else
+       ResultStream  := TStringStream.Create(ErrorMessage);
+     End;
     If Assigned(ResultStream)    Then
      Begin
       AResponseInfo.FreeContentStream      := True;
@@ -4370,6 +4383,37 @@ Begin
  Inherited;
 End;
 
+
+function TRESTDWIdDatabase.IsServerLive(Aip: String; Aport: Integer; AMessageErro: String): Boolean;
+var
+  Ping: TIdTCPClient;
+begin
+  Result := True;
+  Ping := TIdTCPClient.Create(nil);
+  try
+    try
+      with Ping do
+      begin
+        if length(trim(Aip)) > 0 then
+           Host := Aip
+        else
+           Host := Self.PoolerService;
+
+        if Aport > 0 then
+           Port := Aport
+        else
+           Port := Self.PoolerPort;
+        ConnectTimeout := 1000;
+        Connect;
+        Result := Connected;
+      end;
+    finally
+      FreeAndNil(Ping);
+    end;
+  except
+    Result := False;
+  end;
+end;
 
 { TRESTDWIdPoolerList }
 
