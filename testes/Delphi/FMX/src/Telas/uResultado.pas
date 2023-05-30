@@ -43,8 +43,8 @@ end;
 
 procedure TfResultado.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  Self.Hide;
-  Action := TCloseAction.caNone;
+  Self := nil;
+  Action := TCloseAction.caFree;
 end;
 
 procedure TfResultado.FormCreate(Sender: TObject);

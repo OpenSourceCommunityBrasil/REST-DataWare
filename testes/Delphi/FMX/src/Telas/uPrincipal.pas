@@ -82,6 +82,9 @@ type
     cbRDWIdClientREST: TCheckBox;
     cbRDWIdClientRESTBin: TCheckBox;
     bRemover: TButton;
+    GroupBox1: TGroupBox;
+    rbSequencial: TRadioButton;
+    rbParalelo: TRadioButton;
     procedure IniciarClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -99,6 +102,7 @@ type
     inicio, fim: Double;
     pass, fail: integer;
     FResultado: TfResultado;
+    procedure IniciaTestes;
     procedure EncerraTeste;
     procedure TesteRESTRequest(aClient: TRESTDAO);
     procedure TesteRDWRequest(aClient: TRDWRESTDAO);
@@ -179,15 +183,73 @@ begin
 end;
 
 procedure TfPrincipal.Button5Click(Sender: TObject);
-var
-  I: integer;
-  RESTClient: TRESTDAO;
-  RDWRESTClient, RDWRESTClientBin: TRDWRESTDAO;
+begin
+  if not assigned(FResultado) then
+    Application.CreateForm(TfResultado, FResultado);
+  FResultado.Show;
+  TThread.CreateAnonymousThread(IniciaTestes).Start;
+end;
+
+procedure TfPrincipal.EncerraTeste;
+begin
+  fim := now;
+  FResultado.LogMessage('=======================================');
+  FResultado.LogMessage('Testes finalizados após ' +
+    FormatDateTime('hh:nn:ss:zzz', (fim - inicio)) + ' (hor:min:seg:mil)');
+  FResultado.LogMessage(Format(' - Total: %d, Sucesso: %d, Falha: %d',
+    [pass + fail, pass, fail]));
+end;
+
+procedure TfPrincipal.FormCreate(Sender: TObject);
+begin
+  FResultado := TfResultado.Create(nil);
+  FResultado.Hide;
+  lVersao.Text := Format('Versão componentes: %s', [RESTDWVERSAO]);
+  StringGrid1.RowCount := 0;
+end;
+
+procedure TfPrincipal.FormDestroy(Sender: TObject);
+begin
+  try
+    if assigned(FResultado) then // vai dar erro de Pointer Exception aqui
+      FResultado.Free; // Porque? Porque o assigned não funciona
+  except // basta ignorar o erro ou rodar em modo release
+  end;
+end;
+
+procedure TfPrincipal.IniciarClick(Sender: TObject);
 begin
   FResultado.Show;
   inicio := now;
 
   FResultado.LogMessage('Testes sequenciais iniciados às ' + TimeToStr(inicio));
+  REST := TRESTDAO.Create(eServidor.Text, ePorta.Text);
+  RDWREST := TRDWRESTDAO.Create(eServidor.Text, ePorta.Text, false);
+  if (ComboBox1.ItemIndex = 1) and
+    ((eUsuario.Text <> EmptyStr) and (eSenha.Text <> EmptyStr)) then
+  begin
+    REST.SetBasicAuth(eUsuario.Text, eSenha.Text);
+    RDWREST.SetBasicAuth(eUsuario.Text, eSenha.Text);
+  end;
+  TThread.CreateAnonymousThread(
+    procedure
+    begin
+      TesteRESTRequest(REST);
+      TesteRDWRequest(RDWREST);
+
+      EncerraTeste;
+    end).Start;
+end;
+
+procedure TfPrincipal.IniciaTestes;
+var
+  I: integer;
+  RESTClient: TRESTDAO;
+  RDWRESTClient, RDWRESTClientBin: TRDWRESTDAO;
+begin
+  inicio := now;
+  FResultado.LogMessage('Testes sequenciais iniciados às ' + TimeToStr(inicio));
+
   for I := 0 to pred(StringGrid1.RowCount) do
   begin
     if cbRESTNativo.IsChecked then
@@ -198,6 +260,7 @@ begin
         ((eUsuarioAv.Text <> EmptyStr) and (eSenhaAv.Text <> EmptyStr)) then
         RESTClient.SetBasicAuth(eUsuarioAv.Text, eSenhaAv.Text);
     end;
+
     if cbRDWIdClientREST.IsChecked then
     begin
       RDWRESTClient := TRDWRESTDAO.Create(StringGrid1.Cells[0, I],
@@ -206,6 +269,7 @@ begin
         ((eUsuarioAv.Text <> EmptyStr) and (eSenhaAv.Text <> EmptyStr)) then
         RDWRESTClient.SetBasicAuth(eUsuarioAv.Text, eSenhaAv.Text);
     end;
+
     if cbRDWIdClientRESTBin.IsChecked then
     begin
       RDWRESTClientBin := TRDWRESTDAO.Create(StringGrid1.Cells[0, I],
@@ -368,66 +432,15 @@ begin
           end;
         end;
 
-        if Assigned(RESTClient) then
+        if assigned(RESTClient) then
           RESTClient.Free;
-        if Assigned(RDWRESTClient) then
+        if assigned(RDWRESTClient) then
           RDWRESTClient.Free;
-        if Assigned(RDWRESTClientBin) then
+        if assigned(RDWRESTClientBin) then
           RDWRESTClientBin.Free;
       end);
   end;
   EncerraTeste;
-end;
-
-procedure TfPrincipal.EncerraTeste;
-begin
-  fim := now;
-  FResultado.LogMessage('=======================================');
-  FResultado.LogMessage('Testes finalizados após ' +
-    FormatDateTime('hh:nn:ss:zzz', (fim - inicio)) + ' (hor:min:seg:mil)');
-  FResultado.LogMessage(Format(' - Total: %d, Sucesso: %d, Falha: %d',
-    [pass + fail, pass, fail]));
-end;
-
-procedure TfPrincipal.FormCreate(Sender: TObject);
-begin
-  FResultado := TfResultado.Create(nil);
-  FResultado.Hide;
-  lVersao.Text := Format('Versão componentes: %s', [RESTDWVERSAO]);
-  StringGrid1.RowCount := 0;
-end;
-
-procedure TfPrincipal.FormDestroy(Sender: TObject);
-begin
-  try
-    if Assigned(FResultado) then // vai dar erro de Pointer Exception aqui
-      FResultado.Free; // Porque? Porque o assigned não funciona
-  except // basta ignorar o erro ou rodar em modo release
-  end;
-end;
-
-procedure TfPrincipal.IniciarClick(Sender: TObject);
-begin
-  FResultado.Show;
-  inicio := now;
-
-  FResultado.LogMessage('Testes sequenciais iniciados às ' + TimeToStr(inicio));
-  REST := TRESTDAO.Create(eServidor.Text, ePorta.Text);
-  RDWREST := TRDWRESTDAO.Create(eServidor.Text, ePorta.Text, false);
-  if (ComboBox1.ItemIndex = 1) and
-    ((eUsuario.Text <> EmptyStr) and (eSenha.Text <> EmptyStr)) then
-  begin
-    REST.SetBasicAuth(eUsuario.Text, eSenha.Text);
-    RDWREST.SetBasicAuth(eUsuario.Text, eSenha.Text);
-  end;
-  TThread.CreateAnonymousThread(
-    procedure
-    begin
-      TesteRESTRequest(REST);
-      TesteRDWRequest(RDWREST);
-
-      EncerraTeste;
-    end).Start;
 end;
 
 procedure TfPrincipal.Rectangle1MouseDown(Sender: TObject; Button: TMouseButton;
