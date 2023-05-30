@@ -16,6 +16,7 @@
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alberto Brito              - Admin - Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -34,9 +35,13 @@ uses
 type
   TRESTDWStorageBin = Class(TRESTDWStorageBase)
   private
-    FFieldTypes  : Array of byte;
-    FFieldNames  : Array of String;
-    FFieldExists : Array of Boolean;
+    FFieldKind      : Array of TFieldKind;
+    FFieldTypes     : Array of byte;
+    FFieldNames     : Array of String;
+    FFieldSize      : Array of Integer;
+    FFieldPrecision : Array of Integer;
+    FFieldAttrs     : Array of byte;
+    FFieldExists    : Array of Boolean;
   public
     procedure SaveRecordToStream(ADataset : TDataset; var AStream : TStream);
     procedure LoadRecordFromStream(ADataset : TDataset; AStream : TStream);
@@ -58,26 +63,30 @@ uses
 
 procedure TRESTDWStorageBin.LoadDatasetFromStream(ADataset: TDataset; AStream: TStream);
 var
-  vFieldCount : integer;
   vFieldKind : TFieldKind;
-  vRecordCount, r : Int64;
-  i : Integer;
-  vInt : integer;
-  vString : utf8string;
+  r,
+  vRecordCount : Int64;
+  i,
+  vInt,
+  vFieldsCount : Integer;
+  vString : UTF8String;
   vFieldType : Byte;
-  vBoolean : boolean;
-  vByte : byte;
+  vBoolean : Boolean;
+  vByte : Byte;
   vFieldDef : TFieldDef;
-  vFieldAttrs  : array of byte;
+  vFieldAttrs  : array of Byte;
   vField : TField;
 begin
   AStream.Position := 0;
   // field count
-  AStream.Read(vFieldCount,SizeOf(Integer));
-  SetLength(FFieldTypes, vFieldCount);
+  AStream.Read(vFieldsCount,SizeOf(Integer));
 
-  SetLength(vFieldAttrs, vFieldCount);
-  SetLength(FFieldNames, vFieldCount);
+  SetLength(FFieldKind,      vFieldsCount);
+  SetLength(FFieldTypes,     vFieldsCount);
+  SetLength(vFieldAttrs,     vFieldsCount);
+  SetLength(FFieldNames,     vFieldsCount);
+  SetLength(FFieldSize,      vFieldsCount);
+  SetLength(FFieldPrecision, vFieldsCount);
 
   // encodestr
   AStream.Read(vBoolean, Sizeof(vBoolean));
@@ -86,35 +95,37 @@ begin
   ADataset.Close;
   ADataset.FieldDefs.Clear;
 
-  for i := 0 to vFieldCount-1 do begin
+  for I := 0 to vFieldsCount-1 do begin
     // field kind
     AStream.Read(vByte,SizeOf(vByte));
-    vFieldKind := TFieldKind(vByte);
+    FFieldKind[I] := TFieldKind(vByte);
 
     vFieldDef := ADataset.FieldDefs.AddFieldDef;
 
     // fieldname
-    AStream.Read(vByte,SizeOf(vByte));
-    SetLength(vString,vByte);
-    AStream.Read(vString[InitStrPos],vByte);
+    AStream.Read(vByte, SizeOf(vByte));
+    SetLength(vString, vByte);
+    AStream.Read(vString[InitStrPos], vByte);
     vFieldDef.Name := vString;
 
-    FFieldNames[i] := vString;
+    FFieldNames[I] := vString;
 
     // field type
-    AStream.Read(vFieldType,SizeOf(vFieldType));
+    AStream.Read(vFieldType, SizeOf(vFieldType));
     vFieldDef.DataType := DWFieldTypeToFieldType(vFieldType);
-
-    FFieldTypes[i] := vFieldType;
+    FFieldTypes[I] := vFieldType;
 
     // field size
-    AStream.Read(vInt,SizeOf(Integer));
+    AStream.Read(vInt, SizeOf(Integer));
     vFieldDef.Size := vInt;
+    FFieldSize[I] := vInt;
 
     // field precision
-    AStream.Read(vInt,SizeOf(Integer));
-    if (vFieldType in [dwftFloat,dwftCurrency,dwftExtended,dwftSingle]) then begin
-      vFieldDef.Precision := vInt;
+    AStream.Read(vInt, SizeOf(Integer));
+    FFieldPrecision[I] := vInt;
+
+    if (FFieldTypes[I] in [dwftFloat,dwftCurrency,dwftExtended,dwftSingle]) then begin
+      vFieldDef.Precision := FFieldPrecision[I];
     end
     else if (vFieldType in [dwftBCD, dwftFMTBcd]) then begin
       vFieldDef.Size := 0;
@@ -122,50 +133,79 @@ begin
     end;
 
     // field required + provider flag
-    AStream.Read(vByte,SizeOf(Byte));
-    vFieldAttrs[i] := vByte;
-    vFieldDef.Required := vByte and 1 > 0;
+    AStream.Read(vByte, SizeOf(Byte));
+    vFieldAttrs[I] := vByte;
+    vFieldDef.Required := vFieldAttrs[I] and 1 > 0;
   end;
 
   // provider flags deve ser recolocado depois dos fields criados
-  for i := 0 to vFieldCount-1 do begin
-    vField := ADataset.FindField(FFieldNames[i]);
+  for I := 0 to vFieldsCount-1 do begin
+    vField := ADataset.FindField(FFieldNames[I]);
     if vField <> nil then begin
       vField.ProviderFlags := [];
-      if vFieldAttrs[i] and 2 > 0 then
+      if vFieldAttrs[I] and 2 > 0 then
         vField.ProviderFlags := vField.ProviderFlags + [pfInUpdate];
-      if vFieldAttrs[i] and 4 > 0 then
+      if vFieldAttrs[I] and 4 > 0 then
         vField.ProviderFlags := vField.ProviderFlags + [pfInWhere];
-      if vFieldAttrs[i] and 8 > 0 then
+      if vFieldAttrs[I] and 8 > 0 then
         vField.ProviderFlags := vField.ProviderFlags + [pfInKey];
-      if vFieldAttrs[i] and 16 > 0 then
+      if vFieldAttrs[I] and 16 > 0 then
         vField.ProviderFlags := vField.ProviderFlags + [pfHidden];
       {$IFDEF RESTDWLAZARUS}
-        if vFieldAttrs[i] and 32 > 0 then
+        if vFieldAttrs[I] and 32 > 0 then
           vField.ProviderFlags := vField.ProviderFlags + [pfRefreshOnInsert];
-        if vFieldAttrs[i] and 64 > 0 then
+        if vFieldAttrs[I] and 64 > 0 then
           vField.ProviderFlags := vField.ProviderFlags + [pfRefreshOnUpdate];
       {$ENDIF}
     end;
   end;
 
-  AStream.Read(vRecordCount,SizeOf(vRecordCount));
+  AStream.Read(vRecordCount, SizeOf(vRecordCount));
   ADataset.Open;
-
   ADataset.DisableControls;
-  r := 0;
-  While r <=  vRecordCount do
-  begin
-    ADataset.Append;
-    LoadRecordFromStream(ADataset,AStream);
-    ADataset.Post;
-    inc(r);
+  try
+    r := 0;
+    While r <= vRecordCount do //Anderson
+    begin
+      ADataset.Append;
+      LoadRecordFromStream(ADataset, AStream);
+      ADataset.Post;
+      Inc(r);
+    end;
+  finally
+    ADataset.EnableControls;
   end;
-
-  ADataset.EnableControls;
 end;
 
 procedure TRESTDWStorageBin.LoadDWMemFromStream(IDataset: IRESTDWMemTable; AStream: TStream);
+  Procedure CreateFieldDefs(DataSet: TDataSet; Index: Integer);
+  Var
+   vFDef: TFieldDef;
+  Begin
+   if Trim(FFieldNames[Index]) <> '' then
+    Begin
+     VFDef          := DataSet.FieldDefs.AddFieldDef;
+     VFDef.Name     := FFieldNames[Index];
+     VFDef.DataType := DWFieldTypeToFieldType(FFieldTypes[Index]);
+     VFDef.Size     := FFieldSize[Index];
+     VFDef.Required := FFieldAttrs[Index] and 1 > 0;
+     case FFieldTypes[Index] of
+       dwftFloat,
+       dwftCurrency,
+       dwftExtended,
+       dwftSingle:
+         begin
+           VFDef.Precision := FFieldPrecision[Index];
+         end;
+       dwftBCD,
+       dwftFMTBcd:
+         begin
+           VFDef.Size := 0;
+           VFDef.Precision := 0;
+         end;
+     end;
+    End;
+  End;
 var
   ADataSet : TRESTDWMemTable;
   I,
@@ -173,15 +213,14 @@ var
   vFieldSize,
   vFieldPrecision : Integer;
   vRecordCount,
-  vFieldKind : TFieldKind;
   vFieldName : UTF8String;
   vBoolean,
-  vCheckField : Boolean;
+  vNoFields : Boolean;
   vByte,
+  vFieldKind,
   vFieldType,
   vFieldProviderFlags : Byte;
   vFieldDef : TFieldDef;
-  vFieldAttrs : Array of byte;
   vField : TField;
 begin
   ADataSet := TRESTDWMemTable(IDataset.GetDataset);
@@ -190,23 +229,26 @@ begin
   AStream.Position := 0;
   AStream.Read(vFieldsCount, SizeOf(vFieldsCount));
 
-  SetLength(FFieldTypes,  vFieldsCount);
-  SetLength(vFieldAttrs,  vFieldsCount);
-  SetLength(FFieldNames,  vFieldsCount);
-  SetLength(FFieldExists, vFieldsCount);
+  SetLength(FFieldKind,      vFieldsCount);
+  SetLength(FFieldTypes,     vFieldsCount);
+  SetLength(FFieldAttrs,     vFieldsCount);
+  SetLength(FFieldNames,     vFieldsCount);
+  SetLength(FFieldSize,      vFieldsCount);
+  SetLength(FFieldPrecision, vFieldsCount);
+  SetLength(FFieldExists,    vFieldsCount);
 
   // encodestrs
   AStream.Read(vBoolean, Sizeof(vBoolean));
   EncodeStrs := vBoolean;
 
-  vCheckField := ADataSet.Fields.Count = 0;
+  vNoFields := ADataSet.Fields.Count = 0;
   ADataSet.Close;
   ADataSet.FieldDefs.Clear;
 
   for I := 0 to vFieldsCount-1 do begin
     // field kind
-    AStream.Read(vByte, SizeOf(vByte));
-    vFieldKind := TFieldKind(vByte);
+    AStream.Read(vFieldKind, SizeOf(vFieldKind));
+    FFieldKind[I] := TFieldKind(vFieldKind);
 
     // field name
     AStream.Read(vByte, SizeOf(vByte));
@@ -214,68 +256,72 @@ begin
     AStream.Read(vFieldName[InitStrPos], vByte);
     FFieldNames[I] := vFieldName;
 
-    // datatype
+    // field type
     AStream.Read(vFieldType, SizeOf(Byte));
     FFieldTypes[I] := vFieldType;
 
     // field size
     AStream.Read(vFieldSize, SizeOf(Integer));
+    FFieldSize[I] := vFieldSize;
 
     // field precision
     AStream.Read(vFieldPrecision, SizeOf(Integer));
+    FFieldPrecision[I] := vFieldPrecision;
 
     // required + provider flags
     AStream.Read(vFieldProviderFlags, SizeOf(Byte));
-    vFieldAttrs[I] := vFieldProviderFlags;
+    FFieldAttrs[I] := vFieldProviderFlags;
 
-    if (ADataSet.FindField(vFieldName) <> nil) or (vCheckField) then
-    begin
-      vFieldDef := ADataSet.FieldDefs.AddFieldDef;
-      vFieldDef.Name := vFieldName;
-      vFieldDef.DataType := DWFieldTypeToFieldType(vFieldType);
-      vFieldDef.Size := vFieldSize;
-      if (vFieldType in [dwftFloat, dwftCurrency,dwftExtended,dwftSingle]) then
-      begin
-        vFieldDef.Precision := vFieldPrecision
-      end
-        else
-          if (vFieldType in [dwftBCD, dwftFMTBcd]) then
-          begin
-            vFieldDef.Size := 0;
-            vFieldDef.Precision := 0;
-          end;
-      vFieldDef.Required := vFieldProviderFlags and 1 > 0;
-    end;
+    // field is persistent or no fields persistet
+    FFieldExists[I] := (ADataSet.FindField(FFieldNames[I]) <> nil) or (vNoFields);
+
+    // create fieldsDefs like fields persistent
+    if ((vNoFields) or
+        (ADataSet.FindField(FFieldNames[I]) <> nil)) then
+      CreateFieldDefs(ADataSet, I);
   end;
 
   ADataSet.Open;
-
   // provider flags deve ser recolocado depois dos fields criados
-  for i := 0 to vFieldsCount-1 do begin
+  for I := 0 to vFieldsCount-1 do
+  begin
     vField := ADataSet.FindField(FFieldNames[I]);
-    FFieldExists[I] := (vField <> nil) or (vCheckField);
-    if vField <> nil then begin
+    if vField <> nil then
+    begin
       vField.ProviderFlags := [];
-      if vFieldAttrs[i] and 2 > 0  Then
+      if FFieldAttrs[I] and 2 > 0  Then
         vField.ProviderFlags := vField.ProviderFlags + [pfInUpdate];
-      if vFieldAttrs[i] and 4 > 0  Then
+      if FFieldAttrs[I] and 4 > 0  Then
         vField.ProviderFlags := vField.ProviderFlags + [pfInWhere];
-      if vFieldAttrs[i] and 8 > 0  Then
+      if FFieldAttrs[I] and 8 > 0  Then
         vField.ProviderFlags := vField.ProviderFlags + [pfInKey];
-      if vFieldAttrs[i] and 16 > 0 Then
+      if FFieldAttrs[I] and 16 > 0 Then
         vField.ProviderFlags := vField.ProviderFlags + [pfHidden];
       {$IFDEF RESTDWLAZARUS}
-        if vFieldAttrs[i] and 32 > 0 Then
+        if FFieldAttrs[I] and 32 > 0 Then
           vField.ProviderFlags := vField.ProviderFlags + [pfRefreshOnInsert];
-        if vFieldAttrs[i] and 64 > 0 Then
+        if FFieldAttrs[I] and 64 > 0 Then
           vField.ProviderFlags := vField.ProviderFlags + [pfRefreshOnUpdate];
       {$ENDIF}
     end;
   end;
 
   ADataSet.DisableControls;
-  LoadRecordDWMemFromStream(IDataset,AStream);
-  ADataSet.EnableControls;
+  try
+    LoadRecordDWMemFromStream(IDataset, AStream);
+
+    // recreate fieldsDefs not persistent
+    if not vNoFields then
+    begin
+      for I := 0 to vFieldsCount-1 do
+      begin
+        if not FFieldExists[I] then
+          CreateFieldDefs(ADataSet, I);
+      end;
+    end;
+  finally
+    ADataSet.EnableControls;
+  end;
 end;
 
 procedure TRESTDWStorageBin.LoadRecordDWMemFromStream(IDataset: IRESTDWMemTable; AStream: TStream);
@@ -322,7 +368,7 @@ begin
   vFieldCount := vFieldCount - 1;
 
   r := 0;
-  while r <= vRecCount do begin       
+  while r <= vRecCount do begin        //Anderson
     GetMem(vBuf, IDataset.GetRecordSize);
     clearBuffer;
     vDecBuf := 0;
@@ -447,14 +493,14 @@ begin
           if FFieldExists[j] then
           begin
             Move(vByte, vBuf^, Sizeof(vByte));
-            Inc(vBuf,Sizeof(vByte));
+            Inc(vBuf, Sizeof(vByte));
           end;
           AStream.Read(vByte, SizeOf(vByte));
           if FFieldExists[j] then
           begin
             Move(vByte, vBuf^,Sizeof(vByte));
-            Inc(vBuf,Sizeof(vByte));
-            Dec(vBuf,vFieldSize);
+            Inc(vBuf, Sizeof(vByte));
+            Dec(vBuf, vFieldSize);
           end;
         end
         // 8 - Bytes - Currency/BCD
