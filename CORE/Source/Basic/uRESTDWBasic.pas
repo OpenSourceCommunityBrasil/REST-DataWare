@@ -1436,7 +1436,6 @@ Function TRESTServiceBase.CommandExec(Const AContext        : TComponent;
 Var
  I, vErrorCode      : Integer;
  DataMode           : TDataMode;
- //DWParamsD,
  DWParams           : TRESTDWParams;
  vOldMethod,
  vBasePath,
@@ -1446,23 +1445,18 @@ Var
  boundary,
  startboundary,
  vReplyString,
- //vReplyStringResult,
- //vUrlToken,
  baseEventUnit,
- //serverEventsName,
  Cmd,
  vmark,
  aurlContext,
  tmp,
  JSONStr,
- //ReturnObject,
  vTempText,
  sFile,
  sContentType,
  vContentType,
  LocalDoc,
  vErrorMessage,
- //aToken,
  vToken,
  vDataBuff,
  vUrlToExec,
@@ -1472,7 +1466,8 @@ Var
  vAuthenticationString,
  LBoundaryStart,
  LBoundaryEnd,
- vBaseData             : String;
+ vBaseData,
+ FSocketKind           : String;
  vAuthTokenParam       : TRESTDWAuthToken;
  vdwConnectionDefs     : TConnectionDefs;
  vTempServerMethods    : TObject;
@@ -1499,8 +1494,7 @@ Var
  vIsQueryParam,
  msgEnd,
  LBoundaryFound,
- LIsStartBoundary  : Boolean;
- //vServerBaseMethod   : TComponentClass;
+ LIsStartBoundary    : Boolean;
  vServerMethod       : TComponentClass;
  ServerContextStream : TMemoryStream;
  newdecoder          : TRESTDWMessageDecoder;
@@ -1872,6 +1866,14 @@ Begin
  vRequestHeader        := TStringList.Create;
  vCompareContext       := False;
  Cmd                   := RemoveBackslashCommands(Trim(RawHTTPCommand));
+
+ if lowercase(Self.ClassName) = lowercase('TRESTDWIdServicePooler') then
+   FSocketKind := 'Indy'
+ else if lowercase(Self.ClassName) = lowercase('TRESTDWICSServicePooler') then
+   FSocketKind := 'ICS'
+ else if lowercase(Self.ClassName) = lowercase('TRESTDWfpHttpServicePooler') then
+   FSocketKind := 'fpHttp';
+
  Try
   sCharSet := '';
   If (UpperCase(Copy (Cmd, 1, 3)) = 'GET')    Then
@@ -1896,8 +1898,10 @@ Begin
     Else If (Pos('.CSS', UpperCase(Cmd)) > 0) Then
      sContentType:='text/css';
     sFile := Url;
+
     If Pos(vTempText, sFile) >= InitStrPos Then
      Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
+
     sFile := IncludeTrailingPathDelimiter(FRootPath) + sFile;
     {$IFDEF RESTDWWINDOWS}
      sFile := StringReplace(sFile, '/', '\', [rfReplaceAll]);
@@ -1905,6 +1909,7 @@ Begin
     {$ELSE}
      sFile := StringReplace(sFile, '//', '/', [rfReplaceAll]);
     {$ENDIF}
+
     If (vPathTraversalRaiseError) And
        (RESTDWFileExists(sFile, FRootPath)) And
        (SystemProtectFiles(sFile)) Then
@@ -1922,6 +1927,7 @@ Begin
       DestroyComponents;
       Exit;
      End;
+
     If RESTDWFileExists(sFile, FRootPath) then
      Begin
       StatusCode    := 200;
@@ -1937,6 +1943,7 @@ Begin
       Exit;
      End;
    End;
+
   If (vPathTraversalRaiseError) And (TravertalPathFind(Trim(RawHTTPCommand))) Then
    Begin
     StatusCode                            := 404;
@@ -1952,6 +1959,7 @@ Begin
     DestroyComponents;
     Exit;
    End;
+
   Cmd := RemoveBackslashCommands(Trim(RawHTTPCommand));
   vRequestHeader.Add(Cmd);
   Cmd := StringReplace(Cmd, ' HTTP/1.0', '', [rfReplaceAll]);
@@ -1976,26 +1984,34 @@ Begin
      RequestType := rtPatch
     Else If (UpperCase(Copy (Cmd, 1, 4)) = 'OPTI') Then
      RequestType := rtOption;
+
     If Url = '/favicon.ico' Then
      Exit;
+
     Cmd := ClearRequestType(Cmd);
     vIsQueryParam := (Pos('?', Lowercase(Url)) > 0) And
                      (Pos('=', Lowercase(Url)) > 0);
+
     If Not vIsQueryParam Then
      vIsQueryParam := (Pos('?', Lowercase(RawHTTPCommand)) > 0);
+
     If (cmd = '') or (cmd = '/') Then
      vOldRequest   := aDefaultUrl
     Else
      vOldRequest   := Cmd;
+
     If vIsQueryParam Then
      vUrlToExec    := Url
     Else
      vUrlToExec    := Cmd;
+
     If (Cmd <> '/') And (Cmd <> '') Then
      ReadRawHeaders;
+
     vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
     If Cmd <> '' Then
-     TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
+     TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
+
     If ((Params.Count > 0) And (RequestType In [rtGet, rtDelete])) Then
      Begin
       vRequestHeader.Add(Url);
@@ -2920,7 +2936,7 @@ Begin
           If vDefaultPage.Count > 0 Then
            vReplyString  := vDefaultPage.Text
           Else
-           vReplyString  := TServerStatusHTML;
+           vReplyString  := Format(cServerStatusHTML, [FSocketKind]);
           vErrorCode   := 200;
           ContentType  := 'text/html';
          End

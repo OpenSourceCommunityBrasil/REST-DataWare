@@ -169,6 +169,11 @@ Const
  cServerEventNotFound            = 'ServerEvent not found...';
  cServerMethodClassNotAssigned   = 'Property ServerMethodClass not assigned';
  cServerMessage                  = 'SERVERMESSAGE';
+ cServerStatusHTML               = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
+                                   '<title>REST Dataware '+ RESTDWVersao +
+                                   '</title></head><body>'+
+                                   '<h2>Server Status - Online</h2>'+
+                                   '<h3>Data Engine - %s</h3></body></html>';
  cServerStream                   = 'SERVERSTREAM';
  cSetPhysicDriver                = 'A PhysicDriver is needed to work';
  cStreamReadError                = 'Stream Error %s %s';
@@ -206,13 +211,10 @@ Const
  TReplyNOK                       = '{"MESSAGE":"FAIL", "RESULT":"FAIL"}';
  TReplyOK                        = '{"MESSAGE":"OK",  "RESULT":"OK"}';
  TReplyTagError                  = '{"MESSAGE":"ERROR", "RESULT":"Invalid Access tag..."}';
- TServerStatusHTML               = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
-                                   '<title>REST Dataware '+ RESTDWVersao +' </title></head><body>'   +
-                                   '<h2>Server Status - Online</h2></body></html>';
- TServerStatusHTMLQX             = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
-                                   '<title>REST Dataware - QuickX</title></head><body>'   +
-                                   '<h1>REST Dataware</h1>'                      +
-                                   '<h2>Server Status - Online</h2></body></html>';
+// TServerStatusHTMLQX             = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
+//                                   '<title>REST Dataware - QuickX</title></head><body>'   +
+//                                   '<h1>REST Dataware</h1>'                      +
+//                                   '<h2>Server Status - Online</h2></body></html>';
  TSepParams                      = '|xxx|xxx|%';
  TSepValueMemString              = '\\';
  TTagParams                      = '<#%s#>';
@@ -247,10 +249,10 @@ Const
  cTooMuchDataInBuffer            = 'Too much data in buffer.';
  cReadLnWaitMaxAttemptsExceeded  = 'Max line read attempts exceeded.';
  cReadTimeout                    = 'Read timed out.';
- cErrorOAuthNotImplenented      = 'OAuth authentication is not implemented';
+ cErrorOAuthNotImplenented       = 'OAuth authentication is not implemented';
 
 Type
-  {$IF DEFINED(HAS_FMX) AND DEFINED(HAS_UTF8)}
+  {$IF DEFINED(HAS_FMX) OR DEFINED(HAS_UTF8)}
     TRESTDWString = String;
   {$ELSE}
     TRESTDWString = AnsiString;
