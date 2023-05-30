@@ -116,6 +116,7 @@ begin
   try
     FRESTAPI.Execute;
     Result := FRESTAPI.Response.StatusCode = expectedCode;
+    FClientAPI.Disconnect;
   except
     Result := false;
     erro := Format('Método %s falhou', [currentmethod]);
