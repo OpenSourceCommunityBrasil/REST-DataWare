@@ -24,3 +24,4 @@ https://github.com/OpenSourceCommunityBrasil/RDWDemos
 
 ## Canais oficiais do componente:
 * [Links e Mídias Externas](https://github.com/OpenSourceCommunityBrasil/REST-DataWare/wiki/Links-e-M%C3%ADdias-Externas)
+
