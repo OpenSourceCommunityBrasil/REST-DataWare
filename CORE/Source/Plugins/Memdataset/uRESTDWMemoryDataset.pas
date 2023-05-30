@@ -15,6 +15,7 @@
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -73,10 +74,10 @@ type
     FAccept : Byte;
     FID     : Integer;
     FStatus : TRESTDWRecordStatus;
-    procedure setBuffer(const Value: TRESTDWBuffer);
+    procedure SetBuffer(const Value: TRESTDWBuffer);
   protected
-    procedure clearRecInfo;
-    procedure clearBlobsFields;
+    procedure ClearRecInfo;
+    procedure ClearBlobsFields;
   public
     constructor Create(AOwner : TRESTDWMemTable);
     destructor Destroy; override;
@@ -219,6 +220,7 @@ type
     function IsCursorOpen: Boolean; override;
     procedure CreateFields; override;
     procedure OpenCursor(InfoQuery: Boolean); override;
+    procedure CloseCursor; override;
 
     // custom functions
     procedure InternalInitFieldDefs; override;
@@ -320,9 +322,9 @@ type
     function GetFieldOffsets(idx : integer) : integer;
     function GetActiveRecord : TRESTDWBuffer;
 
-    function calcFieldSize(ft : TFieldType; fs : integer) : integer;
-    procedure clearRecords;
-    procedure clearBlobs;
+    function CalcFieldSize(ft : TFieldType; fs : integer) : integer;
+    procedure ClearRecords;
+    procedure ClearBlobs;
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
@@ -525,7 +527,8 @@ begin
   EmptyTable;
 
   // disconnet field objects
-//  BindFields(False);
+  //BindFields(False);
+
   // destroy field object (if not persistent)
   {$IFNDEF HAS_AUTOMATIC_DB_FIELDS}
     if DefaultFields then
@@ -533,8 +536,7 @@ begin
     DestroyFields;
 
   // close the file
-  FBlockEvents := vBlock; 
-  FIsTableOpen := False;
+  FBlockEvents := vBlock;
 end;
 
 function TRESTDWMemTable.IsCursorOpen: Boolean;
@@ -1709,8 +1711,9 @@ begin
 
   if Fields.Count > 0 then begin
     // fields defs é obrigatorio para fields fkData
-    for i := 0 to Fields.Count-1 do begin
-      if Fields[i].FieldKind = fkData then begin
+    for i := 0 to Fields.Count-1 do
+     Begin
+      If Fields[i].FieldKind = fkData then begin
         vFieldDef := buscaFieldDef(Fields[i].FieldName);
         vDefName := Fields[i].FieldName;
 
@@ -1733,8 +1736,8 @@ begin
           vFieldDef.Size := Fields[i].Size;
           vFieldDef.Attributes := [faFixed];
         end;
-      end;
-    end;
+      End;
+     End;
     {$IFNDEF RESTDWLAZARUS}
       FieldOptions.AutoCreateMode := acCombineAlways;
       CreateFields;
@@ -1813,7 +1816,7 @@ begin
   FillChar(Buffer^, FRecordSize, 0);
 end;
 
-function TRESTDWMemTable.calcFieldSize(ft: TFieldType; fs: integer): integer;
+function TRESTDWMemTable.CalcFieldSize(ft: TFieldType; fs: integer): integer;
 var
   vDWFieldType : Byte;
 begin
@@ -1873,7 +1876,7 @@ begin
   end;
 end;
 
-procedure TRESTDWMemTable.clearBlobs;
+procedure TRESTDWMemTable.ClearBlobs;
 var
   i : integer;
   vBlob : PRESTDWBlobField;
@@ -1894,12 +1897,18 @@ begin
   FBlobs.Clear;
 end;
 
-procedure TRESTDWMemTable.clearRecords;
+procedure TRESTDWMemTable.ClearRecords;
 begin
   if FRecords = nil then
     Exit;
 
   FRecords.ClearAll;
+end;
+
+procedure TRESTDWMemTable.CloseCursor;
+begin
+  inherited;
+  FIsTableOpen := False;
 end;
 
 function TRESTDWMemTable.CompareRecords(Item1, Item2: TRESTDWRecord): Integer;
@@ -2227,10 +2236,7 @@ var
   vBuffer : TRESTDWBuffer;
   Accept : boolean;
 begin
-  // Eloy - correção até revisão da equipe MemTable
-  //vRec := GetRecordObj(FCurrentRecord);
   FRecords.Delete(FCurrentRecord);
-  //vRec.Free;
 
   if FCurrentRecord >= FRecords.Count then
     Dec(FCurrentRecord);
@@ -2346,7 +2352,7 @@ begin
 end;
 
 { TRESTDWRecord }
-procedure TRESTDWRecord.clearBlobsFields;
+procedure TRESTDWRecord.ClearBlobsFields;
 var
   i : integer;
   vFieldOffSet : integer;
@@ -2389,7 +2395,7 @@ begin
   end;
 end;
 
-procedure TRESTDWRecord.clearRecInfo;
+procedure TRESTDWRecord.ClearRecInfo;
 var
   vRecSize : integer;
   vRecInfo : PRESTDWRecInfo;
@@ -2444,7 +2450,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TRESTDWRecord.setBuffer(const Value: TRESTDWBuffer);
+procedure TRESTDWRecord.SetBuffer(const Value: TRESTDWBuffer);
 begin
   clearBlobsFields;
   Move(Value^,FBuffer^,FDataset.GetRecordSize);

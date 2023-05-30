@@ -468,7 +468,7 @@ begin
       LAuthTokenParam := TRESTDWAuthToken.Create(Self);
       LAuthTokenParam.Assign(Self);
 
-      {$IFNDEF FPC}
+      {$IFNDEF RESTDWLAZARUS}
       if Trim(AToken) = '' Then
         AToken := ARawHeaders.Values['Authorization'];
       {$ENDIF}
