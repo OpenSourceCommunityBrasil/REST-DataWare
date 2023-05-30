@@ -15,6 +15,7 @@ unit uRESTDWDesignReg;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -38,7 +39,7 @@ uses
    {$ENDIF}
   ToolsApi, DesignEditors, DSDesign, DesignIntf, ColnEdit,
   {$ENDIF}
-  Db, SysUtils, Classes,
+  Db, SysUtils, Classes, Menus,
   uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWBasicDB,
   uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWMemoryDataset, uRESTDWBufferDb,
   uRESTDWAbout, uRESTDWDriverBase, uRESTDWAuthenticators;
@@ -144,16 +145,21 @@ Type
   {$ENDIF}
   Function SupportsAggregates: Boolean; Override;
   Function SupportsInternalCalc: Boolean; Override;
+  Procedure BeginUpdateFieldDefs; Override;
+  Procedure InitializeMenu(Menu: TPopupMenu); Override;
+  Procedure UpdateMenus(Menu: TPopupMenu; EditState: TEditState); Override;
 End;
 
 Type
  TRESTDWClientSQLEditor = Class(TComponentEditor)
  Private
+  Procedure EditFields(DataSet: TDataSet);
  Public
   Procedure Edit; override;
   Function  GetVerbCount : Integer; Override;
   Function  GetVerb    (Index : Integer): String; Override;
   Procedure ExecuteVerb(Index : Integer); Override;
+
 End;
 {$ENDIF}
 
@@ -386,42 +392,65 @@ End;
 
 Function TRESTDWCGIApplicationDescriptor.CreateStartFiles(AProject : TLazProject): TModalResult;
 Begin
- //LazarusIDE.DoNewEditorFile(PDRESTDWCGIDatamodule, '', '',
- //                           [nfIsPartOfProject, nfOpenInEditor, nfCreateDefaultSrc]);
  LazarusIDE.DoNewEditorFile(PDRESTDWDatamodule, '', '',
                             [nfIsPartOfProject, nfOpenInEditor, nfCreateDefaultSrc]);
  Result:= mrOK;
 End;
 {$ENDIF}
 
+
 {$IFNDEF RESTDWLAZARUS}
-procedure TRESTDWClientSQLEditor.Edit;
+Procedure TDSDesignerDW.BeginUpdateFieldDefs;
+Var
+ Idx: Integer;
 Begin
-  {$IFDEF DELPHIXEUP}
-   TRESTDWClientSQL(Component).SetInDesignEvents(True);
-  {$ENDIF}
+ Inherited;
+ For Idx := Dataset.FieldDefs.Count -1 DownTo 0 do
+  Begin
+   If Trim(Dataset.FieldDefs[Idx].Name) = '' then
+    Dataset.FieldDefs.Delete(Idx);
+  End;
+End;
+
+Procedure TDSDesignerDW.InitializeMenu(Menu: TPopupMenu);
+Begin
+ Inherited;
+// Ao clicar duas vezes no componente RESTDWClientSQL
+// ou ao selecionar no popup menu opção "Fields Editor".
+End;
+
+Procedure TDSDesignerDW.UpdateMenus(Menu: TPopupMenu; EditState: TEditState);
+Begin
+// Ao acionar o popup menu dos Fields persistents: (Add, Add All, New Field)
+ Inherited;
+ If not TRESTDWClientSQL(DataSet).Active Then
+   TRESTDWClientSQL(DataSet).Open;
+End;
+
+Procedure TRESTDWClientSQLEditor.EditFields(DataSet: TDataSet);
+begin
+ {$IFDEF DELPHIXEUP}
+  TRESTDWClientSQL(Component).SetInDesignEvents(True);
+ {$ENDIF}
  Try
-   {$IFNDEF DELPHIXEUP}
+  {$IFNDEF DELPHIXEUP}
     TRESTDWClientSQL(Component).Close;
     TRESTDWClientSQL(Component).CreateDatasetFromList;
-   {$ENDIF}
+  {$ENDIF}
   ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
  Finally
-   {$IFDEF DELPHIXEUP}
+  {$IFDEF DELPHIXEUP}
    TRESTDWClientSQL(Component).SetInDesignEvents(False);
-   {$ENDIF}
+  {$ENDIF}
  End;
+End;
+
+procedure TRESTDWClientSQLEditor.Edit;
+Begin
+ EditFields(TDataSet(Component));
 end;
 
 procedure TRESTDWClientSQLEditor.ExecuteVerb(Index: Integer);
- Procedure EditFields(DataSet: TDataSet);
- begin
-   {$IFNDEF DELPHIXEUP}
-    TRESTDWClientSQL(DataSet).Close;
-    TRESTDWClientSQL(DataSet).CreateDatasetFromList;
-   {$ENDIF}
-  ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
- End;
 Begin
  Case Index of
   0 : EditFields(TDataSet(Component));
@@ -925,7 +954,7 @@ End;
 
 procedure TRESTDWFieldsList.GetValues(Proc: TGetStrProc);
 Var
- I      : Integer;
+ I : Integer;
 Begin
  //Provide a list of Poolers
  With GetComponent(0) as TRESTDWClientSQL Do
