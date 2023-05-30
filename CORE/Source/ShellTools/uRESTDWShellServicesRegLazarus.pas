@@ -76,7 +76,7 @@ Begin
 End;
 
 initialization
-{$I RESTDWShellservices.lrs}
+{$I RESTDWShellServices.lrs}
  UnlistPublishedProperty(TRESTDWShellService,  'Active');
  UnlistPublishedProperty(TRESTDWShellService,  'ServicePort');
  UnlistPublishedProperty(TRESTDWShellService,  'RequestTimeOut');

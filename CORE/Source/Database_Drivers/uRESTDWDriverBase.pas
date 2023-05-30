@@ -28,7 +28,7 @@ Interface
 Uses
   Classes, SysUtils, TypInfo, DB, Variants, StrUtils,
   uRESTDWMemoryDataset, uRESTDWParams, uRESTDWAbout, uRESTDWComponentEvents,
-  uRESTDWJSONInterface, uRESTDWBufferBase, uRESTDWConsts, uRESTDWDataModule,
+  uRESTDWJSONInterface, uRESTDWBufferBase, uRESTDWConsts, uRESTDWDatamodule,
   uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWTools, uRESTDWStorageBin,
   uRESTDWMassiveBuffer;
 

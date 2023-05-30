@@ -30,7 +30,7 @@ Uses
  uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWJSONObject,
  uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWDataUtils,
  uRESTDWTools, uRESTDWConsts, uRESTDWMessageCoderMIME,
- uRESTDWZLib, uRESTDWMimeTypes, uRESTDWAbout, uRESTDWAuthenticators;
+ uRESTDWZlib, uRESTDWMimeTypes, uRESTDWAbout, uRESTDWAuthenticators;
 
 type
   TRedirect = Procedure(Url : String;
