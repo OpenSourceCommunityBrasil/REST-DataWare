@@ -3114,6 +3114,7 @@ Begin
  HTTPServer.OnParseAuthentication := OnParseAuthentication;
  {$ENDIF}
  HTTPServer.MaxConnections      := -1;
+ FSocketKind := 'Indy';
 End;
 
 Destructor TRESTDWIdServicePooler.Destroy;

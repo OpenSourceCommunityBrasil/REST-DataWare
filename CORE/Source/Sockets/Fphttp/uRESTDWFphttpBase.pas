@@ -488,6 +488,7 @@ constructor TRESTDWFphttpServicePooler.Create(AOwner: TComponent);
 begin
   Inherited Create(AOwner);
   FFpServer := TRESTDWFpHttpThread.Create(Self);
+  FSocketKind := 'fpHttp';
 end;
 
 

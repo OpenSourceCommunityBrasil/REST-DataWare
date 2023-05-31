@@ -17,7 +17,6 @@ type
     procedure Button3Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -25,14 +24,12 @@ type
     procedure LogMessage(aMessage: string);
   end;
 
+var
+  FResultado: TfResultado;
+
 implementation
 
 {$R *.fmx}
-
-procedure TfResultado.Button1Click(Sender: TObject);
-begin
-  Self.Hide;
-end;
 
 procedure TfResultado.Button3Click(Sender: TObject);
 begin
@@ -43,8 +40,8 @@ end;
 
 procedure TfResultado.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  Self.Hide;
-  Action := TCloseAction.caNone;
+  Action := TCloseAction.caFree;
+  FResultado := nil;
 end;
 
 procedure TfResultado.FormCreate(Sender: TObject);
