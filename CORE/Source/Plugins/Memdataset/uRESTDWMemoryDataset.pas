@@ -605,7 +605,6 @@ var
   SaveState: TDataSetState;
   I: Integer;
   vRec : TRESTDWRecord;
-  vBuffer : PRESTDWBuffer;
   vBook : Integer;
   vBookmark : TBookMark;
 
@@ -634,7 +633,7 @@ var
     ii : Integer;
   begin
     if vFieldCount = 1 then begin
-      vField := TField(Fields[0]);
+      vField := TField(vFields[0]);
       Result := CompareField(vField, KeyValues);
     end
     else begin
@@ -669,21 +668,19 @@ begin
       SaveState := SetTempState(dsCalcFields);
       try
         try
-          vBuffer := PRESTDWBuffer(TempBuffer);
           for i := FCurrentRecord to FRecords.Count - 1 Do Begin
             vRec := GetRecordObj(i);
-            vRec.CopyBuffer(vBuffer^);
-            CalculateFields(vBuffer^);
+            CalculateFields(vRec.Buffer);
             Result := CompareRecord;
             if Result Then
               Break;
           end;
 
           if not Result then begin
+
             for i := 0 to FCurrentRecord - 1 Do Begin
               vRec := GetRecordObj(i);
-              vRec.CopyBuffer(vBuffer^);
-              CalculateFields(vBuffer^);
+              CalculateFields(vRec.Buffer);
               Result := CompareRecord;
               if Result Then
                 Break;
@@ -2424,7 +2421,7 @@ end;
 
 procedure TRESTDWRecord.CopyBuffer(var Buffer: TRESTDWBuffer);
 begin
-  Move(FBuffer^,Buffer^,FDataset.FRecordBufferSize);
+  Move(FBuffer^,Buffer^, FDataset.FRecordBufferSize);
 end;
 
 constructor TRESTDWRecord.Create(AOwner : TRESTDWMemTable);
