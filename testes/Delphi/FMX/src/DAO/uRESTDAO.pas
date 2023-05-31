@@ -32,6 +32,7 @@ implementation
 constructor TRESTDAO.Create(aServer, aPort: string);
 begin
   FClientAPI := TRESTClient.Create(nil);
+  FClientAPI.AddParameter('Connection', 'close', pkHTTPHEADER);
   FRESTAPI := TRESTRequest.Create(nil);
   try
     FServer := aServer + ':' + aPort;
@@ -116,7 +117,6 @@ begin
   try
     FRESTAPI.Execute;
     Result := FRESTAPI.Response.StatusCode = expectedCode;
-    FClientAPI.Disconnect;
   except
     Result := false;
     erro := Format('Método %s falhou', [currentmethod]);

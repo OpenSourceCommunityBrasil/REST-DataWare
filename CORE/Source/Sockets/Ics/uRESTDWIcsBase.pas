@@ -617,6 +617,7 @@ begin
   vServerStatusCheck := true;
 
   vBruteForceProtection := TIcsBruteForceProtection.Create;
+  FSocketKind := 'ICS';
 end;
 
 procedure TRESTDWIcsServicePooler.onAnsweredServer(Sender: TObject);

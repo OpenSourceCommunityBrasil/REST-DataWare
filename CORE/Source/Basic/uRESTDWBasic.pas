@@ -558,10 +558,11 @@ End;
                                       RequestHeader           : TStringList;
                                       Var ErrorCode           : Integer) : Boolean;
  Protected
+  FSocketKind: string;
   procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   procedure SetAuthenticator(const Value: TRESTDWServerAuthBase);
  Public
-Procedure EchoPooler       (ServerMethodsClass    : TComponent;
+  Procedure EchoPooler     (ServerMethodsClass    : TComponent;
                             AContext              : TComponent;
                             Var Pooler, MyIP      : String;
                             AccessTag             : String;
@@ -1466,8 +1467,7 @@ Var
  vAuthenticationString,
  LBoundaryStart,
  LBoundaryEnd,
- vBaseData,
- FSocketKind           : String;
+ vBaseData             : String;
  vAuthTokenParam       : TRESTDWAuthToken;
  vdwConnectionDefs     : TConnectionDefs;
  vTempServerMethods    : TObject;
@@ -1866,13 +1866,6 @@ Begin
  vRequestHeader        := TStringList.Create;
  vCompareContext       := False;
  Cmd                   := RemoveBackslashCommands(Trim(RawHTTPCommand));
-
- if lowercase(Self.ClassName) = lowercase('TRESTDWIdServicePooler') then
-   FSocketKind := 'Indy'
- else if lowercase(Self.ClassName) = lowercase('TRESTDWICSServicePooler') then
-   FSocketKind := 'ICS'
- else if lowercase(Self.ClassName) = lowercase('TRESTDWfpHttpServicePooler') then
-   FSocketKind := 'fpHttp';
 
  Try
   sCharSet := '';
@@ -5710,7 +5703,7 @@ Begin
  vCORSCustomHeaders.Add('Access-Control-Allow-Headers=Content-Type, Origin, Accept, Authorization, X-CUSTOM-HEADER');
 // vCORSCustomHeaders.Add('Access-Control-Allow-Credentials=true');
  vCripto                                := TCripto.Create;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  vDatabaseCharSet                       := csUndefined;
  {$ELSE}
  {$ENDIF}
