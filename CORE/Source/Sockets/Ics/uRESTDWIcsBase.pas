@@ -54,14 +54,12 @@ type
     vRawDataLen: Integer;
     vNeedClose: boolean;
     vBytesIn, vBytesOut: Int64;
-    vDestroyCS: TCriticalSection;
     vProcessDocumentThread: TThread;
   public
     function GetTrafficInBytes: Int64;
     function GetTrafficOutBytes: Int64;
     procedure ProcessDocument(Sender: TObject; BodyStream: TStream; Flag: THttpGetFlag;
       ServicePooler: TRESTServicePoolerBase);
-    procedure onDestroyingHttpConnection(Sender: TObject);
     destructor Destroy; override;
     constructor Create(AOwner: TComponent); override;
   end;
@@ -307,9 +305,9 @@ type
   end;
 
 const
-  cIcsHTTPServerNotFound = 'No HTTP server found';
-  cIcsHTTPConnectionClosed = 'Closed HTTP connection';
-  cIcsCorruptedPackage = 'Corrupted package: RequestContentLength <> Stream.Size';
+  cIcsHTTPServerNotFound = 'No HTTP server found.';
+  cIcsHTTPConnectionClosed = 'Closed HTTP connection.';
+  cIcsCorruptedPackage = 'Corrupted package: RequestContentLength <> Stream.Size.';
   cIcsSSLLibNotFoundForSSLDisabled =
     'OpenSSL libs are required by ICS to digest AuthTypes Token and OAuth even if SSL is disabled.';
 
@@ -543,17 +541,13 @@ procedure TRESTDWIcsServicePooler.SetHttpConnectionParams(Remote: TPoolerHttpCon
 begin
   Remote.TimeoutIdle := vServiceTimeout;
   Remote.TimeoutConnect := vServiceTimeout;
-  Remote.TimeoutSampling := 5000;
+  Remote.TimeoutSampling := 500;
   Remote.TimeoutKeepThreadAlive := false;
   Remote.TimeoutStartSampling;
 
   Remote.LineMode := true;
   Remote.LineLimit := MaxInt;
   Remote.LineEnd := sLineBreak;
-
-  Remote.vRawData := '';
-  Remote.vRawDataLen := 0;
-  Remote.vNeedClose := false;
 
   Remote.OnTimeout := onClientTimeout;
   Remote.OnGetDocument := onDocumentReadyServer;
@@ -837,8 +831,7 @@ begin
 
         Remote.ProcessDocument(Sender, Stream, hgWillSendMySelf, Self);
       finally
-        if Assigned(Stream) then
-          FreeAndNil(Stream);
+        FreeAndNil(Stream);
       end;
     end;
   except
@@ -863,12 +856,11 @@ procedure TRESTDWIcsServicePooler.DisconnectClient(Client: TPoolerHttpConnection
   Server: TSslHttpAppSrv);
 begin
   try
-    // Try disconnecting gracefully
     Client.vNeedClose := true;
 
+    // Try disconnecting gracefully
     if Server.IsClient(Client) then
       Client.Shutdown(2);
-
   except
     on E: Exception do
     begin
@@ -884,8 +876,6 @@ begin
         // Forced disconnection
         if Server.IsClient(Client) then
           Server.WSocketServer.Disconnect(Client);
-
-        Client.vNeedClose := true;
       end;
     end;
   end;
@@ -894,7 +884,7 @@ end;
 procedure TRESTDWIcsServicePooler.CustomAnswerStream(Pooler: TPoolerHttpConnection;
   Flag: THttpGetFlag; StatusCode: Integer; ContentType: string; Header: string);
 begin
-  if HttpAppSrv.IsClient(Pooler) = false then
+  if ((HttpAppSrv.IsClient(Pooler) = false) or (Pooler.vNeedClose = true)) then
     raise Exception.Create(cIcsHTTPConnectionClosed);
 
   case StatusCode of
@@ -1017,52 +1007,23 @@ begin
 
   vProcessDocumentThread := nil;
 
-  vDestroyCS := nil;
-
   inherited Create(AOwner);
 
-  vDestroyCS := TCriticalSection.Create;
-
   vNeedClose := false;
-
   SetLength(vRawData, 0);
-
   vRawDataLen := 0;
-
   vBytesIn := 0;
-
   vBytesOut := 0;
-
-  OnDestroying := onDestroyingHttpConnection;
 end;
 
 destructor TPoolerHttpConnection.Destroy;
 begin
   vNeedClose := true;
 
-  if Length(vRawData) > 0 then
-    SetLength(vRawData, 0);
-
-  vRawDataLen := 0;
-
-  vBytesIn := 0;
-
-  vBytesOut := 0;
-
-  if Assigned(DocStream) then
-  begin
-    DocStream.Free;
-    DocStream := nil;
-  end;
+  DocStream.Free;
+  DocStream := nil;
 
   inherited Destroy;
-
-  if Assigned(vDestroyCS) then
-  begin
-    vDestroyCS.Release;
-
-    FreeAndNil(vDestroyCS);
-  end;
 end;
 
 function TPoolerHttpConnection.GetTrafficInBytes: Int64;
@@ -1075,46 +1036,41 @@ begin
   Result := vBytesOut;
 end;
 
-procedure TPoolerHttpConnection.onDestroyingHttpConnection(Sender: TObject);
-begin
-  vDestroyCS.Acquire;
-end;
-
 procedure TPoolerHttpConnection.ProcessDocument(Sender: TObject; BodyStream: TStream;
   Flag: THttpGetFlag; ServicePooler: TRESTServicePoolerBase);
 var
   Remote: TPoolerHttpConnection;
   ICSService: TRESTDWIcsServicePooler;
-  ProcessDocumentThreadT: TProcessDocumentThread;
+  vProcessDocumentThreadAux: TProcessDocumentThread;
 begin
   try
     vProcessDocumentThread := TProcessDocumentThread.Create;
 
-    ProcessDocumentThreadT := (vProcessDocumentThread as TProcessDocumentThread);
+    vProcessDocumentThreadAux := (vProcessDocumentThread as TProcessDocumentThread);
     Remote := Sender as TPoolerHttpConnection;
     ICSService := (ServicePooler as TRESTDWIcsServicePooler);
 
-    ProcessDocumentThreadT.Remote := Remote;
-    ProcessDocumentThreadT.Flag := Flag;
-    ProcessDocumentThreadT.ICSService := ICSService;
+    vProcessDocumentThreadAux.Remote := Remote;
+    vProcessDocumentThreadAux.Flag := Flag;
+    vProcessDocumentThreadAux.ICSService := ICSService;
 
     if BodyStream = nil then
     begin
-      ProcessDocumentThreadT.BodyStream.Size := 0;
+      vProcessDocumentThreadAux.BodyStream.Size := 0;
 
-      ProcessDocumentThreadT.BodyStream.Position := 0;
+      vProcessDocumentThreadAux.BodyStream.Position := 0;
     end
     else
     begin
-      ProcessDocumentThreadT.BodyStream.CopyFrom(BodyStream, BodyStream.Size);
+      vProcessDocumentThreadAux.BodyStream.CopyFrom(BodyStream, BodyStream.Size);
 
-      ProcessDocumentThreadT.BodyStream.Position := 0;
+      vProcessDocumentThreadAux.BodyStream.Position := 0;
     end;
 
-    if (Remote.RequestContentLength <> ProcessDocumentThreadT.BodyStream.Size) then
+    if (Remote.RequestContentLength <> vProcessDocumentThreadAux.BodyStream.Size) then
       raise Exception.Create(cIcsCorruptedPackage);
 
-    ProcessDocumentThreadT.Start;
+    vProcessDocumentThreadAux.Start;
   except
     on E: Exception do
     begin
@@ -1177,10 +1133,11 @@ begin
       Result := false;
     end;
   finally
-    if Assigned(aux) then
+    try
       FreeAndNil(aux);
-
-    vBruteForceCS.Release;
+    finally
+      vBruteForceCS.Release;
+    end;
   end;
 end;
 
@@ -1214,10 +1171,11 @@ begin
         vBruteForceList.Delete(x);
     end;
   finally
-    if Assigned(aux) then
+    try
       FreeAndNil(aux);
-
-    vBruteForceCS.Release;
+    finally
+      vBruteForceCS.Release;
+    end;
   end;
 end;
 
@@ -1293,10 +1251,11 @@ begin
       //
     end;
   finally
-    if Assigned(aux) then
+    try
       FreeAndNil(aux);
-
-    vBruteForceCS.Release;
+    finally
+      vBruteForceCS.Release;
+    end;
   end;
 end;
 
@@ -1411,8 +1370,7 @@ end;
 
 destructor TProcessDocumentThread.Destroy;
 begin
-  if Assigned(vBodyStream) then
-    FreeAndNil(vBodyStream);
+  FreeAndNil(vBodyStream);
 
   inherited Destroy;
 end;
@@ -1429,17 +1387,13 @@ var
 
   procedure DestroyComponents;
   begin
-    if Assigned(vResponseHeader) then
-      FreeAndNil(vResponseHeader);
+    FreeAndNil(vResponseHeader);
 
-    if Assigned(vParams) then
-      FreeAndNil(vParams);
+    FreeAndNil(vParams);
 
-    if Assigned(ResultStream) then
-      FreeAndNil(ResultStream);
+    FreeAndNil(ResultStream);
 
-    if Assigned(vCORSHeader) then
-      FreeAndNil(vCORSHeader);
+    FreeAndNil(vCORSHeader);
   end;
 
   procedure Redirect(Url: string);
@@ -1485,18 +1439,11 @@ begin
       vParams := nil;
       ResultStream := nil;
 
-      // Try acquire the critical section, if fails, then HTTP server is
-      // destroying the HTTP connection and RDW should not exec the command
-
       // Do not process the document if HTTP conection needs to be closed
       // but for some reason it was not closed, or if it was closed before answer
       if ((vICSService.HttpAppSrv.IsClient(vRemote) = false) or
-        (vRemote.vNeedClose = true) or (vRemote.vDestroyCS.TryEnter = false)) then
+        (vRemote.vNeedClose = true)) then
         raise Exception.Create(cIcsHTTPConnectionClosed);
-
-      // Release the critical secton to void server freeze when clinet connection lost
-      // or client connection timeout
-      vRemote.vDestroyCS.Release;
 
       // Server status check protection
       if ((vICSService.vServerStatusCheck = false) and
@@ -1521,7 +1468,8 @@ begin
       vToken := vRemote.AuthDigestUri;
       vAuthRealm := vRemote.AuthRealm;
       vContentType := vRemote.RequestContentType;
-      vParams.Text := vRemote.Params;
+      vParams.Delimiter := '&';
+      vParams.DelimitedText := vRemote.Params;
 
       try
         vICSService.CommandExec(TComponent(vRemote),
@@ -1544,8 +1492,7 @@ begin
 
       if (vResponseString <> '') or (vErrorMessage <> '') then
       begin
-        if Assigned(ResultStream) then
-          FreeAndNil(ResultStream);
+        FreeAndNil(ResultStream);
 
         if (vResponseString <> '') then
           ResultStream := TStringStream.Create(vResponseString)
@@ -1563,7 +1510,9 @@ begin
 
         vICSService.CustomAnswerStream(vRemote, vFlag, StatusCode, vContentType,
           StringReplace(vResponseHeader.Text, '=', ': ', [rfReplaceAll]));
-      end;
+      end
+      else
+        vICSService.DisconnectClient(vRemote, vICSService.HttpAppSrv);
     except
       on E: Exception do
       begin
@@ -1585,7 +1534,7 @@ begin
     try
       DestroyComponents;
     finally
-      vRemote.vDestroyCS.Release;
+      vRemote.vNeedClose := true;
     end;
   end;
 end;
