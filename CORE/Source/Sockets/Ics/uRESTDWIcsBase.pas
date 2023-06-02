@@ -906,7 +906,12 @@ begin
     403:
       Pooler.Answer403;
     404:
-      Pooler.Answer404;
+      begin
+        if Assigned(Pooler.DocStream) then
+          Pooler.AnswerStream(Flag, IntToStr(StatusCode), ContentType, Header)
+        else
+          Pooler.Answer404;
+      end;
   else
     Pooler.AnswerStream(Flag, IntToStr(StatusCode), ContentType, Header);
   end;
