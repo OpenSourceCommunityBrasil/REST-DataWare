@@ -309,13 +309,12 @@ const
   cIcsTimeoutSamplingMultiplier = 2;
   cIcsHTTPServerNotFound = 'No HTTP server found';
   cIcsHTTPConnectionClosed = 'Closed HTTP connection';
-  cIcsCorruptedPackage = 'Corrupted package: RequestContentLength <> Stream.Size';
   cIcsSSLLibNotFoundForSSLDisabled =
     'OpenSSL libs are required by ICS to digest AuthTypes Token and OAuth even if SSL is disabled';
 
 implementation
 
-uses uRESTDWJSONInterface, vcl.Dialogs, OverbyteIcsWSockBuf; // , vcl.Forms;
+uses uRESTDWJSONInterface, vcl.Dialogs, OverbyteIcsWSockBuf;
 
 procedure TRESTDWIcsServicePooler.SetHttpServerSSL;
 var
@@ -535,6 +534,15 @@ end;
 
 procedure TRESTDWIcsServicePooler.SetHttpConnectionParams(Remote: TPoolerHttpConnection);
 begin
+  Remote.TimeoutIdle := vServiceTimeout;
+  Remote.TimeoutConnect := vServiceTimeout;
+  Remote.TimeoutSampling := cIcsTimeoutSamplingMili;
+  Remote.TimeoutKeepThreadAlive := false;
+
+  Remote.LineMode := true;
+  Remote.LineLimit := MaxInt;
+  Remote.LineEnd := sLineBreak;
+
   Remote.OnTimeout := onClientTimeout;
   Remote.OnGetDocument := onDocumentReadyServer;
   Remote.OnPostDocument := onDocumentReadyServer;
@@ -546,17 +554,8 @@ begin
   Remote.OnException := onExceptionServer;
   Remote.OnAfterAnswer := onAnsweredServer;
 
-  Remote.TimeoutIdle := vServiceTimeout;
-  Remote.TimeoutConnect := vServiceTimeout;
-  Remote.TimeoutSampling := cIcsTimeoutSamplingMili;
-  Remote.TimeoutKeepThreadAlive := false;
-
   if vServiceTimeout > 0 then
     Remote.TimeoutStartSampling;
-
-  Remote.LineMode := true;
-  Remote.LineLimit := MaxInt;
-  Remote.LineEnd := sLineBreak;
 end;
 
 function TRESTDWIcsServicePooler.ClientCount: Integer;
@@ -618,9 +617,7 @@ begin
   Remote := Sender as TPoolerHttpConnection;
 
   if Assigned(Remote.DocStream) then
-    Remote.vBytesOut := Remote.vBytesOut + Remote.DocStream.Size
-  else
-    Remote.vBytesOut := Remote.vBytesOut + 0;
+    Remote.vBytesOut := Remote.vBytesOut + Remote.DocStream.Size;
 
   if Assigned(vOnAnswered) then
     vOnAnswered(Remote);
