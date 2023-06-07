@@ -535,6 +535,17 @@ end;
 
 procedure TRESTDWIcsServicePooler.SetHttpConnectionParams(Remote: TPoolerHttpConnection);
 begin
+  Remote.OnTimeout := onClientTimeout;
+  Remote.OnGetDocument := onDocumentReadyServer;
+  Remote.OnPostDocument := onDocumentReadyServer;
+  Remote.OnPutDocument := onDocumentReadyServer;
+  Remote.OnDeleteDocument := onDocumentReadyServer;
+  Remote.OnPatchDocument := onDocumentReadyServer;
+  Remote.OnOptionsDocument := onDocumentReadyServer;
+  Remote.OnPostedData := onPostedDataServer;
+  Remote.OnException := onExceptionServer;
+  Remote.OnAfterAnswer := onAnsweredServer;
+
   Remote.TimeoutIdle := vServiceTimeout;
   Remote.TimeoutConnect := vServiceTimeout;
   Remote.TimeoutSampling := cIcsTimeoutSamplingMili;
@@ -546,17 +557,6 @@ begin
   Remote.LineMode := true;
   Remote.LineLimit := MaxInt;
   Remote.LineEnd := sLineBreak;
-
-  Remote.OnTimeout := onClientTimeout;
-  Remote.OnGetDocument := onDocumentReadyServer;
-  Remote.OnPostDocument := onDocumentReadyServer;
-  Remote.OnPutDocument := onDocumentReadyServer;
-  Remote.OnDeleteDocument := onDocumentReadyServer;
-  Remote.OnPatchDocument := onDocumentReadyServer;
-  Remote.OnOptionsDocument := onDocumentReadyServer;
-  Remote.OnPostedData := onPostedDataServer;
-  Remote.OnException := onExceptionServer;
-  Remote.OnAfterAnswer := onAnsweredServer;
 end;
 
 function TRESTDWIcsServicePooler.ClientCount: Integer;
@@ -617,16 +617,13 @@ var
 begin
   Remote := Sender as TPoolerHttpConnection;
 
-  Remote.vBytesOut := Remote.vBytesOut + Remote.DocStream.Size;
+  if Assigned(Remote.DocStream) then
+    Remote.vBytesOut := Remote.vBytesOut + Remote.DocStream.Size
+  else
+    Remote.vBytesOut := Remote.vBytesOut + 0;
 
-  try
-    if Assigned(vOnAnswered) then
-      vOnAnswered(Remote);
-  finally
-    // Force client disconnection after answer
-    // Avoid ghost connections and timeouts
-    DisconnectClient(Remote, HttpAppSrv);
-  end;
+  if Assigned(vOnAnswered) then
+    vOnAnswered(Remote);
 end;
 
 procedure TRESTDWIcsServicePooler.onClientConnectServer(Sender: TObject; Client: TObject;
@@ -812,7 +809,14 @@ begin
 
       Remote.vBodyStream.Position := 0;
 
-      Remote.ProcessDocument(hgWillSendMySelf, Self);
+      if (Remote.RequestContentLength <> Remote.vBodyStream.Size) then
+      begin
+        CustomAnswerStream(Remote, hg400, 400, '', '');
+      end
+      else
+      begin
+        Remote.ProcessDocument(hgWillSendMySelf, Self);
+      end;
     end;
   except
     on E: Exception do
@@ -854,38 +858,55 @@ end;
 procedure TRESTDWIcsServicePooler.CustomAnswerStream(Remote: TPoolerHttpConnection;
   Flag: THttpGetFlag; StatusCode: Integer; ContentType: string; Header: string);
 begin
-  Header := StringReplace(Header, '=', ': ', [rfReplaceAll]);
+  try
+    Flag := hgSendStream;
 
-  if ((HttpAppSrv.IsClient(Remote) = false) or (Remote.vNeedClose = true)) then
-    DisconnectClient(Remote, HttpAppSrv)
-  else
-  begin
-    case StatusCode of
-      401:
-        begin
-          vBruteForceProtection.BruteForceAttempt(Remote.PeerAddr);
+    Header := StringReplace(Header, '=', ': ', [rfReplaceAll]);
 
-          if vBruteForceProtection.BruteForceAllow(Remote.PeerAddr) then
+    if ((HttpAppSrv.IsClient(Remote) = false) or (Remote.vNeedClose = true)) then
+      DisconnectClient(Remote, HttpAppSrv)
+    else
+    begin
+      case StatusCode of
+        400:
+          Remote.Answer400;
+        401:
           begin
-            if Self.Authenticator <> nil then
-              Remote.Answer401
+            vBruteForceProtection.BruteForceAttempt(Remote.PeerAddr);
+
+            if vBruteForceProtection.BruteForceAllow(Remote.PeerAddr) then
+            begin
+              if Self.Authenticator <> nil then
+                Remote.Answer401
+              else
+                Remote.Answer403;
+            end
             else
               Remote.Answer403;
-          end
-          else
-            Remote.Answer403;
-        end;
-      403:
-        Remote.Answer403;
-      404:
-        begin
-          if Assigned(Remote.DocStream) then
-            Remote.AnswerStream(Flag, IntToStr(StatusCode), ContentType, Header)
-          else
-            Remote.Answer404;
-        end;
-    else
-      Remote.AnswerStream(Flag, IntToStr(StatusCode), ContentType, Header);
+          end;
+        403:
+          Remote.Answer403;
+        404:
+          begin
+            if Assigned(Remote.DocStream) then
+              Remote.AnswerStream(Flag, IntToStr(StatusCode), ContentType, Header)
+            else
+              Remote.Answer404;
+          end;
+      else
+        Remote.AnswerStream(Flag, IntToStr(StatusCode), ContentType, Header);
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      try
+        SendOnException(Remote, 'CustomAnswerStream', E.Message);
+      finally
+        DisconnectClient(Remote, HttpAppSrv);
+
+        raise Exception.Create(E.Message);
+      end;
     end;
   end;
 end;
@@ -915,15 +936,20 @@ begin
 
         Remote.ProcessDocument(Flag, Self);
       end
-      else if (not(Remote.RequestMethod in [THttpMethod.httpMethodGet,
-        THttpMethod.httpMethodDelete, THttpMethod.httpMethodOptions]) and
-        (Remote.RequestContentLength = 0)) then
-      begin
-        Flag := hg400;
-      end
       else
       begin
-        Flag := hgAcceptData;
+        if (Remote.RequestContentLength = 0) then
+        begin
+          Flag := hgWillSendMySelf;
+
+          Remote.vBodyStream := TMemoryStream.Create;
+
+          Remote.ProcessDocument(Flag, Self);
+        end
+        else
+        begin
+          Flag := hgAcceptData;
+        end;
       end;
     except
       on E: Exception do
@@ -1039,17 +1065,14 @@ var
   vProcessDocumentThreadAux: TProcessDocumentThread;
 begin
   try
+    ICSService := (ServicePooler as TRESTDWIcsServicePooler);
+
     vProcessDocumentThread := TProcessDocumentThread.Create;
     vProcessDocumentThreadAux := (vProcessDocumentThread as TProcessDocumentThread);
-
-    ICSService := (ServicePooler as TRESTDWIcsServicePooler);
 
     vProcessDocumentThreadAux.Remote := Self;
     vProcessDocumentThreadAux.Flag := Flag;
     vProcessDocumentThreadAux.ICSService := ICSService;
-
-    if (Self.RequestContentLength <> Self.vBodyStream.Size) then
-      raise Exception.Create(cIcsCorruptedPackage);
 
     vProcessDocumentThreadAux.Start;
   except
