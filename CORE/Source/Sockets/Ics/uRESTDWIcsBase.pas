@@ -52,7 +52,6 @@ type
   private
     vRawData: AnsiString;
     vRawDataLen: Integer;
-    vNeedClose: boolean;
     vBytesIn, vBytesOut: Int64;
     vProcessDocumentThread: TThread;
     vServicePooler: TRESTServicePoolerBase;
@@ -191,7 +190,7 @@ type
     vServerStatusCheck: boolean;
 
     // Misc
-    procedure DisconnectClient(Remote: TPoolerHttpConnection; Server: TSslHttpAppSrv);
+    procedure CustomDisconnectClient(Remote: TPoolerHttpConnection);
     procedure SendOnException(Remote: TPoolerHttpConnection; Step: string;
       ErrorMessage: string);
     function IsConnectionDestroyed(Remote: TPoolerHttpConnection): boolean;
@@ -294,13 +293,18 @@ type
 
   TProcessDocumentThread = class(TThread)
   private
+    vServicePoolerAux: TRESTDWIcsServicePooler;
     vRemote: TPoolerHttpConnection;
     vBodyStream: TStream;
+    vRequestContentType: string;
+    vResponseHeader: TStringList;
+    vStatusCode: Integer;
   protected
     procedure Execute; override;
   public
     constructor Create;
     destructor Destroy; override;
+    procedure onThreadTerminate(Sender: TObject);
   end;
 
 const
@@ -527,7 +531,7 @@ begin
     if Assigned(vOnTimeout) then
       vOnTimeout(Remote, Reason);
   finally
-    DisconnectClient(Remote, HttpAppSrv);
+    CustomDisconnectClient(Remote);
   end;
 end;
 
@@ -568,8 +572,8 @@ function TRESTDWIcsServicePooler.IsConnectionDestroyed
   (Remote: TPoolerHttpConnection): boolean;
 begin
   try
-    if ((csDestroying in Remote.ComponentState) or (HttpAppSrv.IsClient(Remote) = false)
-      or (Remote.vNeedClose = true)) then
+    if ((csDestroying in Remote.ComponentState) or (HttpAppSrv.IsClient(Remote) = false))
+    then
       Result := true
     else
       Result := false;
@@ -661,7 +665,7 @@ begin
       if Assigned(vOnBruteForceBlock) then
         vOnBruteForceBlock(Remote.PeerAddr, Remote.PeerPort);
     finally
-      DisconnectClient(Remote, HttpAppSrv);
+      CustomDisconnectClient(Remote);
     end;
 
     exit;
@@ -679,7 +683,7 @@ begin
         if Assigned(vOnBlackListBlock) then
           vOnBlackListBlock(Remote.PeerAddr, Remote.PeerPort);
       finally
-        DisconnectClient(Remote, HttpAppSrv);
+        CustomDisconnectClient(Remote);
       end;
 
       exit;
@@ -845,25 +849,24 @@ begin
       try
         SendOnException(Remote, 'onPostedDataServer', E.Message);
       finally
-        DisconnectClient(Remote, HttpAppSrv);
+        CustomDisconnectClient(Remote);
       end;
     end;
   end;
 end;
 
-procedure TRESTDWIcsServicePooler.DisconnectClient(Remote: TPoolerHttpConnection;
-  Server: TSslHttpAppSrv);
+procedure TRESTDWIcsServicePooler.CustomDisconnectClient(Remote: TPoolerHttpConnection);
+var
+  Server: TSslHttpAppSrv;
 begin
   try
-    Remote.vNeedClose := true;
+    Server := (Remote.vServicePooler as TRESTDWIcsServicePooler).HttpAppSrv;
 
     // Try disconnecting gracefully
     if Server.IsClient(Remote) then
       Remote.Shutdown(2);
   except
     try
-      Remote.vNeedClose := true;
-
       // Forced disconnection
       if Server.IsClient(Remote) then
         Server.WSocketServer.Disconnect(Remote);
@@ -888,7 +891,7 @@ begin
 
     if IsConnectionDestroyed(Remote) = true then
     begin
-      DisconnectClient(Remote, HttpAppSrv);
+      CustomDisconnectClient(Remote);
     end
     else
     begin
@@ -928,7 +931,7 @@ begin
       try
         SendOnException(Remote, 'CustomAnswerStream', E.Message);
       finally
-        DisconnectClient(Remote, HttpAppSrv);
+        CustomDisconnectClient(Remote);
 
         raise Exception.Create(E.Message);
       end;
@@ -983,7 +986,7 @@ begin
         try
           SendOnException(Remote, 'onDocumentReadyServer', E.Message);
         finally
-          DisconnectClient(Remote, HttpAppSrv);
+          CustomDisconnectClient(Remote);
         end;
       end;
     end;
@@ -1067,7 +1070,6 @@ begin
 
   vProcessDocumentThread := TProcessDocumentThread.Create;
 
-  vNeedClose := false;
   SetLength(vRawData, 0);
   vRawDataLen := 0;
   vBytesIn := 0;
@@ -1078,7 +1080,10 @@ end;
 
 destructor TPoolerHttpConnection.Destroy;
 begin
-  vNeedClose := true;
+  Finalize(vRawData);
+  Finalize(vRawDataLen);
+  Finalize(vBytesIn);
+  Finalize(vBytesOut);
 
   inherited Destroy;
 end;
@@ -1365,8 +1370,16 @@ end;
 constructor TProcessDocumentThread.Create;
 begin
   vBodyStream := nil;
+  vResponseHeader := nil;
+  vServicePoolerAux := nil;
+  vRemote := nil;
+
+  vResponseHeader := TStringList.Create;
+  vStatusCode := 0;
 
   inherited Create(true);
+
+  OnTerminate := onThreadTerminate;
 
   FreeOnTerminate := true;
 end;
@@ -1374,36 +1387,39 @@ end;
 destructor TProcessDocumentThread.Destroy;
 begin
   FreeAndNil(vBodyStream);
+  FreeAndNil(vResponseHeader);
+
+  Finalize(vStatusCode);
+  Finalize(vRequestContentType);
 
   inherited Destroy;
 end;
 
 procedure TProcessDocumentThread.Execute;
 var
-  vRequestContentType: string;
   vCharSet: string;
   vToken: string;
   vErrorMessage: string;
   vResponseString: string;
   vAuthRealm: string;
 
-  vStatusCode: Integer;
-
-  vResponseHeader: TStringList;
   vParams: TStringList;
   vCORSHeader: TStringList;
   vRequestHeader: TStringList;
 
   vRedirect: TRedirect;
 
-  vServicePoolerAux: TRESTDWIcsServicePooler;
-
   procedure DestroyComponents;
   begin
-    FreeAndNil(vResponseHeader);
     FreeAndNil(vParams);
     FreeAndNil(vCORSHeader);
     FreeAndNil(vRequestHeader);
+
+    Finalize(vCharSet);
+    Finalize(vToken);
+    Finalize(vErrorMessage);
+    Finalize(vResponseString);
+    Finalize(vAuthRealm);
   end;
 
   procedure Redirect(Url: string);
@@ -1442,100 +1458,84 @@ begin
   inherited;
 
   vCORSHeader := nil;
-  vResponseHeader := nil;
   vParams := nil;
   vRequestHeader := nil;
 
   try
     try
+      // Initialize vServicePoolerAux as TRESTDWIcsServicePooler;
       vServicePoolerAux := (vRemote.vServicePooler as TRESTDWIcsServicePooler);
 
-      // Do not process the document if HTTP conection needs to be closed
-      // but for some reason it was not closed, or if it was closed before answer
-      if vServicePoolerAux.IsConnectionDestroyed(vRemote) = true then
+      // Do not process the document if HTTP conection was closed
+      if vServicePoolerAux.IsConnectionDestroyed(vRemote) = false then
       begin
-        vServicePoolerAux.DisconnectClient(vRemote, vServicePoolerAux.HttpAppSrv);
-      end
-      // Server status check protection
-      else if ((vServicePoolerAux.vServerStatusCheck = false) and
-        ((vRemote.Path = '') or (vRemote.Path = '/'))) then
-      begin
-        try
-          if Assigned(vServicePoolerAux.vOnServerStatusCheckBlock) then
-            vServicePoolerAux.vOnServerStatusCheckBlock(vRemote.PeerAddr,
-              vRemote.PeerPort);
-        finally
-          vServicePoolerAux.DisconnectClient(vRemote, vServicePoolerAux.HttpAppSrv);
-        end;
-      end
-      else
-      begin
-        // Var creation
-        vCORSHeader := TStringList.Create;
-        vResponseHeader := TStringList.Create;
-        vParams := TStringList.Create;
-        vRequestHeader := TStringList.Create;
-
-        // String var copy
-        vRequestContentType := vRemote.RequestContentType;
-
-        vCharSet := '';
-        vToken := vRemote.AuthDigestUri;
-        vErrorMessage := '';
-        vResponseString := '';
-        vAuthRealm := vRemote.AuthRealm;
-
-        // Integer copy
-        vStatusCode := 0;
-
-        // StringList copy
-        vParams.Delimiter := '&';
-        vParams.DelimitedText := vRemote.Params;
-        vRequestHeader.Delimiter := vRemote.RequestHeader.Delimiter;
-        vRequestHeader.Text := vRemote.RequestHeader.Text;
-
-        // Misc copy
-        @vRedirect := @Redirect;
-
-        try
-          vServicePoolerAux.CommandExec(TComponent(vRemote),
-            RemoveBackslashCommands(vRemote.Path), vRemote.Method + ' ' + vRemote.Path,
-            vRequestContentType, vRemote.PeerAddr, vRemote.RequestUserAgent,
-            vRemote.AuthUserName, vRemote.AuthPassword, vToken, vRequestHeader,
-            vRemote.PeerPort.ToInteger, vRequestHeader, vParams, vRemote.Params,
-            vBodyStream, vAuthRealm, vCharSet, vErrorMessage, vStatusCode,
-            vResponseHeader, vResponseString, vRemote.FDocStream,
-            TStrings(vCORSHeader), vRedirect);
-        except
-          on E: Exception do
-          begin
-            raise Exception.Create('CommandExec - ' + E.Message);
+        // Server status check protection
+        if ((vServicePoolerAux.vServerStatusCheck = false) and
+          ((vRemote.Path = '') or (vRemote.Path = '/'))) then
+        begin
+          try
+            if Assigned(vServicePoolerAux.vOnServerStatusCheckBlock) then
+              vServicePoolerAux.vOnServerStatusCheckBlock(vRemote.PeerAddr,
+                vRemote.PeerPort);
+          finally
+            vServicePoolerAux.CustomDisconnectClient(vRemote);
           end;
-        end;
-
-        SetReplyCORS;
-
-        vRemote.AuthRealm := vAuthRealm;
-
-        if (vResponseString <> '') or (vErrorMessage <> '') then
-        begin
-          FreeAndNil(vRemote.DocStream);
-
-          if (vResponseString <> '') then
-            vRemote.DocStream := TStringStream.Create(vResponseString)
-          else
-            vRemote.DocStream := TStringStream.Create(vErrorMessage);
-        end;
-
-        if Assigned(vRemote.DocStream) then
-        begin
-          vRemote.DocStream.Position := 0;
-
-          vServicePoolerAux.CustomAnswerStream(vRemote, vStatusCode, vRequestContentType,
-            vResponseHeader.Text);
         end
         else
-          vServicePoolerAux.DisconnectClient(vRemote, vServicePoolerAux.HttpAppSrv);
+        begin
+          // Var creation
+          vCORSHeader := TStringList.Create;
+          vParams := TStringList.Create;
+          vRequestHeader := TStringList.Create;
+
+          // String var copy
+          vRequestContentType := vRemote.RequestContentType;
+
+          vCharSet := '';
+          vToken := vRemote.AuthDigestUri;
+          vErrorMessage := '';
+          vResponseString := '';
+          vAuthRealm := vRemote.AuthRealm;
+
+          // StringList copy
+          vParams.Delimiter := '&';
+          vParams.DelimitedText := vRemote.Params;
+          vRequestHeader.Delimiter := vRemote.RequestHeader.Delimiter;
+          vRequestHeader.Text := vRemote.RequestHeader.Text;
+
+          // Misc copy
+          @vRedirect := @Redirect;
+
+          try
+            vServicePoolerAux.CommandExec(TComponent(vRemote),
+              RemoveBackslashCommands(vRemote.Path), vRemote.Method + ' ' + vRemote.Path,
+              vRequestContentType, vRemote.PeerAddr, vRemote.RequestUserAgent,
+              vRemote.AuthUserName, vRemote.AuthPassword, vToken, vRequestHeader,
+              vRemote.PeerPort.ToInteger, vRequestHeader, vParams, vRemote.Params,
+              vBodyStream, vAuthRealm, vCharSet, vErrorMessage, vStatusCode,
+              vResponseHeader, vResponseString, vRemote.FDocStream,
+              TStrings(vCORSHeader), vRedirect);
+          except
+            on E: Exception do
+            begin
+              raise Exception.Create('CommandExec - ' + E.Message);
+            end;
+          end;
+
+          SetReplyCORS;
+
+          vRemote.AuthRealm := vAuthRealm;
+
+          if (vResponseString <> '') or (vErrorMessage <> '') then
+          begin
+            FreeAndNil(vRemote.FDocStream);
+
+            if (vResponseString <> '') then
+              vRemote.DocStream := TStringStream.Create(vResponseString)
+            else
+              vRemote.DocStream := TStringStream.Create(vErrorMessage);
+          end;
+        end;
       end;
     except
       on E: Exception do
@@ -1543,15 +1543,40 @@ begin
         try
           vServicePoolerAux.SendOnException(vRemote, 'ProcessDocumentThread', E.Message);
         finally
-          vServicePoolerAux.DisconnectClient(vRemote, vServicePoolerAux.HttpAppSrv);
+          FreeAndNil(vRemote.FDocStream);
         end;
       end;
     end;
   finally
-    try
-      DestroyComponents;
-    finally
-      vRemote.vNeedClose := true;
+    DestroyComponents;
+  end;
+end;
+
+procedure TProcessDocumentThread.onThreadTerminate(Sender: TObject);
+begin
+  try
+    if vServicePoolerAux.IsConnectionDestroyed(vRemote) = false then
+    begin
+      if Assigned(vRemote.DocStream) then
+      begin
+        vRemote.DocStream.Position := 0;
+
+        vServicePoolerAux.CustomAnswerStream(vRemote, vStatusCode, vRequestContentType,
+          vResponseHeader.Text);
+      end
+      else
+      begin
+        vServicePoolerAux.CustomDisconnectClient(vRemote);
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      try
+        vServicePoolerAux.SendOnException(vRemote, 'onThreadTerminate', E.Message);
+      finally
+        vServicePoolerAux.CustomDisconnectClient(vRemote);
+      end;
     end;
   end;
 end;
