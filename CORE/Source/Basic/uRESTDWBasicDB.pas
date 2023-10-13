@@ -1,6 +1,6 @@
 unit uRESTDWBasicDB;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -26,36 +26,14 @@ unit uRESTDWBasicDB;
 interface
 
 Uses
- {$IFDEF RESTDWUNIDACMEM}DADump, UniDump, VirtualTable, {$ENDIF}
- {$IFDEF RESTKBMMEMTABLE}kbmmemtable, {$ENDIF}
- {$IFDEF FPC}
-  {$IFNDEF RESTDWLAMW}BufDataset, {$ENDIF}
-  memds,
- {$ELSE}
-  {$IF Defined(RESTDWFMX)}
-   {$IFNDEF RESTDWAndroidService}System.UITypes, {$ENDIF}
-  {$IFEND}
-   {$IFDEF RESTDWCLIENTDATASET}DBClient, {$ENDIF}
-   {$IF CompilerVersion > 23} // Delphi Xe3 pra cima
-    {$IFDEF RESTDWFDMEMTABLE}
-     FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
-     FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-     FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-    {$IF CompilerVersion > 26}FireDAC.Stan.StorageBin,{$IFEND}
-    {$ENDIF}
-    {$IFDEF RESTDWADMEMTABLE}
-     uADStanIntf, uADStanOption, uADStanParam, uADStanError, uADPhysIntf,
-     uADDAptIntf, uADCompDataSet, uADCompClient,
-    {$IF CompilerVersion > 26}uADStanStorageBin,{$IFEND}
-    {$ENDIF}
-   {$IFEND}
- {$ENDIF}
+ {$IFDEF RESTDWLAZARUS}memds,{$ENDIF}
+ {$IFDEF RESTDWFMX}System.UITypes, {$ENDIF}
  SysUtils, Classes, Db, SyncObjs, Variants,
- uRESTDWDataUtils, uRESTDWComponentBase, uRESTDWBasicTypes, uRESTDWConsts,
- uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWResponseTranslator,
- uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams, uRESTDWBasic,
- uRESTDWMassiveBuffer, uRESTDWEncodeClass, uRESTDWMasterDetailData,
- uRESTDWDataset, uRESTDWBufferBase;
+ uRESTDWDataUtils, uRESTDWBasicTypes, uRESTDWProtoTypes,
+ uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWAbout, uRESTDWConsts,
+ uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
+ uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWMasterDetailData,
+ uRESTDWMemoryDataset, uRESTDWBufferBase, uRESTDWDriverBase, uRESTDWTools;
 
 Type
  TOnExecuteData           = Procedure                                        Of Object;
@@ -183,7 +161,7 @@ Type
   vPoolerList           : TStringList;
   vProxyOptions         : TProxyOptions;
   vEncoding             : TEncodeSelect;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   vDatabaseCharSet      : TDatabaseCharSet;
   {$ENDIF}
   vTypeRequest          : TTypeRequest;
@@ -196,7 +174,7 @@ Type
   Property    PoolerList         : TStringList                Read GetPoolerList;
  Published
   Property Active                : Boolean                    Read vActive               Write vActive;            //Seta o Estado da Conexão
-  Property BinaryRequest         : Boolean                    Read vBinaryRequest        Write vBinaryRequest;
+  Property BinaryRequest         : Boolean                    Read vBinaryRequest;       // Write vBinaryRequest;
   Property Compression           : Boolean                    Read vCompression          Write vCompression;       //Compressão de Dados
   Property Login                 : String                     Read vLogin                Write vLogin;             //Login do Usuário caso haja autenticação
   Property Password              : String                     Read vPassword             Write vPassword;          //Senha do Usuário caso haja autenticação
@@ -210,7 +188,7 @@ Type
   Property EncodeStrings         : Boolean                    Read vEncodeStrings        Write vEncodeStrings;
   Property Encoding              : TEncodeSelect              Read vEncoding             Write vEncoding;          //Encoding da string
   Property WelcomeMessage        : String                     Read vWelcomeMessage       Write vWelcomeMessage;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Property DatabaseCharSet       : TDatabaseCharSet           Read vDatabaseCharSet      Write vDatabaseCharSet;
   {$ENDIF}
   Property AccessTag             : String                     Read vAccessTag            Write vAccessTag;
@@ -240,7 +218,7 @@ Type
   vRestWebService       : String;
   vProxyOptions         : TProxyOptions;
   vEncoding             : TEncodeSelect;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   vDatabaseCharSet      : TDatabaseCharSet;
   {$ENDIF}
   vTypeRequest          : TTypeRequest;
@@ -254,7 +232,7 @@ Type
   Property    PoolerList        : TStringList                 Read GetPoolerList;
  Published
   Property Active                : Boolean                    Read vActive               Write vActive;            //Seta o Estado da Conexão
-  Property BinaryRequest         : Boolean                    Read vBinaryRequest        Write vBinaryRequest;
+  Property BinaryRequest         : Boolean                    Read vBinaryRequest ;      // Write vBinaryRequest;
   Property Compression           : Boolean                    Read vCompression          Write vCompression;       //Compressão de Dados
   Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams     Write vAuthOptionParams;
   Property Proxy                 : Boolean                    Read vProxy                Write vProxy;             //Diz se tem servidor Proxy
@@ -268,7 +246,7 @@ Type
   Property Encoding              : TEncodeSelect              Read vEncoding             Write vEncoding;          //Encoding da string
   Property WelcomeMessage        : String                     Read vWelcomeMessage       Write vWelcomeMessage;
   Property DataRoute             : String                     Read vDataRoute            Write vDataRoute;         //URL do WebService REST
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Property DatabaseCharSet      : TDatabaseCharSet            Read vDatabaseCharSet      Write vDatabaseCharSet;
   {$ENDIF}
   Property Name                 : String                      Read vListName             Write vListName;
@@ -278,6 +256,7 @@ Type
 End;
 
 Type
+ TOnBuildConnection       = Procedure (DataBase: TRESTDWComponent) Of Object;
  TOnFailOverExecute       = Procedure (ConnectionServer   : TRESTDWConnectionServer) Of Object;
  TOnFailOverError         = Procedure (ConnectionServer   : TRESTDWConnectionServer;
                                        MessageError       : String)                  Of Object;
@@ -308,6 +287,8 @@ End;
 Type
  TRESTDWDatabasebaseBase = Class(TRESTDWComponent)
  Private
+  vOnBuildConnection    : TOnBuildConnection;
+  vClientIpVersion      : TRESTDWClientIpVersions;
   vSSLVersions          : TRESTDWSSLVersions;
   vOnWorkBegin,
   vOnWork               : TOnWork;
@@ -359,6 +340,7 @@ Type
   vTypeRequest          : Ttyperequest;
   vFailOverConnections  : TListDefConnections;
   vRESTClientPooler     : TRESTClientPoolerBase;
+  Procedure SetIpVersion            (IpV: TRESTDWClientIpVersions);
   Procedure CopyParams              (ConnectionDB           : TRESTDWPoolerMethodClient;
                                      Var RESTClientPooler   : TRESTClientPoolerBase);
   Function  RenewToken              (Var PoolerMethodClient : TRESTDWPoolerMethodClient;
@@ -393,6 +375,9 @@ Type
  Protected
   Procedure Loaded; override;
  Public
+  Function    IsServerLive          (Aip                    : String;
+                                     Aport                  : Integer;
+                                     AMessageErro           : String): Boolean; Virtual;
   Procedure SetConnection           (Value                  : Boolean;
                                      aBinaryRequest         : Boolean = False);                    //Seta o Estado da Conexão
   Procedure DestroyClientPooler;
@@ -458,7 +443,7 @@ Type
   Procedure   ApplyUpdates          (Var MassiveCache       : TRESTDWMassiveCache;
                                      Var   Error            : Boolean;
                                      Var   MessageError     : String);Overload;
-  Procedure   ApplyUpdates          (Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
+  Procedure   ApplyUpdates          (Datasets               : Array of {$IFDEF RESTDWLAZARUS}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
                                      Var   Error            : Boolean;
                                      Var   MessageError     : String);Overload;
   Procedure   ProcessMassiveSQLCache(Var MassiveSQLCache    : TRESTDWMassiveSQLCache;
@@ -467,7 +452,7 @@ Type
   Procedure   ProcessMassiveSQLCache(Var MassiveSQLCache    : TRESTDWMassiveCacheSQLList;
                                      Var   Error            : Boolean;
                                      Var   MessageError     : String);Overload;
-  Procedure   OpenDatasets          (Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
+  Procedure   OpenDatasets          (Datasets               : Array of {$IFDEF RESTDWLAZARUS}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
                                      Var   Error            : Boolean;
                                      Var   MessageError     : String;
                                      BinaryRequest          : Boolean = True;
@@ -477,7 +462,7 @@ Type
                                      Var FieldNames         : TStringList)  : Boolean;
   Function    GetKeyFieldNames      (TableName              : String;
                                      Var FieldNames         : TStringList)  : Boolean;
-  Procedure   OpenDatasets          (Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
+  Procedure   OpenDatasets          (Datasets               : Array of {$IFDEF RESTDWLAZARUS}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
                                      BinaryCompatible       : Boolean = False);Overload;
   Property    Connected            : Boolean                    Read GetStateDB               Write SetConnectionProp;
   Property    PoolerList           : TStringList                Read GetRestPoolers;
@@ -532,6 +517,8 @@ Type
   Property UseSSL                  : Boolean                    Read vUseSSL                  Write vUseSSL;
   Property SSLVersions             : TRESTDWSSLVersions         Read vSSLVersions             Write vSSLVersions;
   Property UserAgent               : String                     Read vUserAgent               Write vUserAgent;
+  Property ClientIpVersion         : TRESTDWClientIpVersions    Read vClientIpVersion         Write SetIpVersion default civIPv4;
+  Property OnBuildConnection       : TOnBuildConnection         Read vOnBuildConnection       Write vOnBuildConnection;
 End;
 
 Type
@@ -601,8 +588,15 @@ Type
                      OnThreadRequestError : TOnThreadRequestError);
 End;
 
+type
+  IRESTDWPlus = interface
+    procedure loadStream(stream : TStream);
+    function findFieldName(name : string) : TField;
+    function getDataset : TDataSet;
+  end;
+
 Type
- TRESTDWClientSQL = Class(TRESTDWClientSQLBase) //Classe com as funcionalidades de um DBQuery
+ TRESTDWClientSQL = Class (TRESTDWClientSQLBase) //Classe com as funcionalidades de um DBQuery
  Private
   vActualPoolerMethodClient : TRESTDWPoolerMethodClient;
   vOldState             : TDatasetState;
@@ -643,7 +637,6 @@ Type
   vOldRecordCount,
   vDatapacks,
   vJsonCount,
-  vParamCount,
   vActualRec            : Integer;
   vActualJSON,
   vOldSQL,
@@ -687,46 +680,8 @@ Type
   vMasterDetailList     : TMasterDetailList;                 //DataSet MasterDetail Function
   vMassiveDataset       : TMassiveDataset;
   vLastOpen             : Integer;
-  {$IFDEF FPC}
-  {$IFDEF RESTDWLAZDRIVER}
-  procedure CloneDefinitions     (Source  : TMemDataset;
-                                  aSelf   : TMemDataset);
-  {$ENDIF}
-  {$IFDEF RESTDWMEMTABLE}
   Procedure CloneDefinitions     (Source  : TRESTDWMemtable;
                                   aSelf   : TRESTDWMemtable); //Fields em Definições
-  {$ENDIF}
-  {$IFDEF RESTDWUNIDACMEM}
-  Procedure CloneDefinitions     (Source  : TVirtualTable;
-                                   aSelf  : TVirtualTable);
-  {$ENDIF}
-  {$ELSE}
-  {$IFDEF RESTDWCLIENTDATASET}
-  Procedure  CloneDefinitions    (Source  : TClientDataset;
-                                  aSelf   : TClientDataset); //Fields em Definições
-  {$ENDIF}
-  {$IFDEF RESTDWUNIDACMEM}
-  Procedure CloneDefinitions     (Source  : TVirtualTable;
-                                   aSelf  : TVirtualTable);
-  {$ENDIF}
-  {$IFDEF RESTDWKBMMEMTABLE}
-  Procedure  CloneDefinitions    (Source  : TKbmMemtable;
-                                  aSelf   : TKbmMemtable); //Fields em Definições
-  {$ENDIF}
-  {$IFDEF RESTDWFDMEMTABLE}
-  Procedure  CloneDefinitions    (Source  : TFdMemtable;
-                                  aSelf   : TFdMemtable); //Fields em Definições
-  {$ENDIF}
-  {$IFDEF RESTDWADMEMTABLE}
-  Procedure  CloneDefinitions    (Source  : TAdMemtable;
-                                  aSelf   : TAdMemtable); //Fields em Definições
-  Property CommandText;
-  {$ENDIF}
-  {$IFDEF RESTDWMEMTABLE}
-  Procedure  CloneDefinitions    (Source  : TRESTDWMemtable;
-                                  aSelf   : TRESTDWMemtable); //Fields em Definições
-  {$ENDIF}
-  {$ENDIF}
   Procedure   OnChangingSQL      (Sender  : TObject);       //Quando Altera o SQL da Lista
   Procedure   OnBeforeChangingSQL(Sender  : TObject);
   Procedure   SetActiveDB        (Value   : Boolean);       //Seta o Estado do Dataset
@@ -778,15 +733,15 @@ Type
   Procedure   SetDWResponseTranslator(const Value: TRESTDWResponseTranslator);
   Function    GetReadData                   : Boolean;
   Property    MasterFields                  : String   Read vMasterFields  Write vMasterFields;
-//  Procedure   InternalDeferredPost;override; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
+  Procedure   InternalClose;override;
  Protected
   vBookmark : Integer;
   vActive,
   vInactive : Boolean;
-  Procedure   InternalPost; override; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
+  Procedure   InternalPost; overload; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
   procedure   InternalOpen; override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Open
   Function    GetRecordCount : Integer; Override;
-  procedure   InternalRefresh; override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Refresh
+  procedure   InternalRefresh; overload; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Refresh
   procedure   CloseCursor; override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Close
   Procedure   Notification(AComponent: TComponent; Operation: TOperation); override;
   Procedure   ThreadStart(ExecuteData : TOnExecuteData);
@@ -860,10 +815,9 @@ Type
   Property    MasterDetailList     : TMasterDetailList     Read vMasterDetailList         Write vMasterDetailList;
  Published
   Property MasterDataSet           : TRESTDWClientSQL      Read vMasterDataSet            Write SetMasterDataSet;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Property DatabaseCharSet;
   {$ENDIF}
-  Property BinaryCompatibleMode;
   Property MasterCascadeDelete     : Boolean               Read vCascadeDelete            Write vCascadeDelete;
   Property BinaryRequest           : Boolean               Read vBinaryRequest            Write vBinaryRequest;
   Property Datapacks               : Integer               Read vDatapacks                Write SetDatapacks;
@@ -950,7 +904,6 @@ Type
   vOldRecordCount,
   vDatapacks,
   vJsonCount,
-  vParamCount,
   vActualRec            : Integer;
   vActualJSON,
   vMasterFields,
@@ -1037,10 +990,10 @@ Type
   vBookmark : Integer;
   vActive,
   vInactive : Boolean;
-  Procedure   InternalPost; override; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
+  Procedure   InternalPost; overload; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
   procedure   InternalOpen; override; // Gilberto Rocha 07/09/2020 - usado para poder fazer datasource.dataset.Open
   Function  GetRecordCount : Integer; Override;
-  procedure InternalRefresh; override; // Gilberto Rocha 07/09/2020 - usado para poder fazer datasource.dataset.Refresh
+  procedure InternalRefresh; overload; // Gilberto Rocha 07/09/2020 - usado para poder fazer datasource.dataset.Refresh
   procedure CloseCursor; override; // Gilberto Rocha 07/09/2020 - usado para poder fazer datasource.dataset.Close
   Procedure Notification(AComponent: TComponent; Operation: TOperation); override;
  Public
@@ -1092,7 +1045,7 @@ Type
   Function    MassiveToJSON : String; //Transporte de MASSIVE em formato JSON
   Procedure   DWParams        (Var Value  : TRESTDWParams);
   Procedure   RestoreDatasetPosition;
-  Procedure   SetFilteredB(aValue  : Boolean);
+ // Procedure   SetFilteredB(aValue  : Boolean);
   Procedure   InternalLast;Override;
   Procedure   Setnotrepage (Value : Boolean);
   Procedure   SetRecordCount(aJsonCount, aRecordCount : Integer);
@@ -1103,12 +1056,12 @@ Type
   Property    FieldDefs;
  Published
   Property MasterDataSet           : TRESTDWClientSQLBase  Read vMasterDataSet            Write SetMasterDataSet;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Property DatabaseCharSet;
   {$ENDIF}
-  Property BinaryCompatibleMode;
+//  Property BinaryCompatibleMode;
   Property MasterCascadeDelete     : Boolean               Read vCascadeDelete            Write vCascadeDelete;
-  Property BinaryRequest           : Boolean               Read vBinaryRequest            Write vBinaryRequest;
+  Property BinaryRequest           : Boolean               Read vBinaryRequest;           // Write vBinaryRequest;
   Property Datapacks               : Integer               Read vDatapacks                Write SetDatapacks;
   Property OnGetDataError          : TOnEventConnection    Read vOnGetDataError           Write vOnGetDataError;         //Recebe os Erros de ExecSQL ou de GetData
   Property AfterScroll             : TOnAfterScroll        Read vOnAfterScroll            Write vOnAfterScroll;
@@ -1144,7 +1097,7 @@ Type
   Property OnCalcFields            : TDatasetEvents        Read vOnCalcFields             Write vOnCalcFields;
   Property OnNewRecord             : TDatasetEvents        Read vNewRecord                Write vNewRecord;
   Property MassiveCache            : TRESTDWMassiveCache       Read GetMassiveCache           Write SetMassiveCache;
-  Property Filtered                : Boolean               Read vFiltered                 Write SetFilteredB;
+  //Property Filtered                : Boolean               Read vFiltered                 Write SetFilteredB;
   Property ResponseTranslator      : TRESTDWResponseTranslator Read GetDWResponseTranslator   Write SetDWResponseTranslator;
 //  Property ActionCursor            : TCursor               Read vActionCursor             Write vActionCursor;
 End;
@@ -1251,13 +1204,12 @@ Type
 End;
 
 Type
- TRESTDWStoredProc = Class(TRESTDWClientSQLBase)
+ TRESTDWStoredProcedure = Class(TRESTDWClientSQLBase)
  Private
   vActualPoolerMethodClient : TRESTDWPoolerMethodClient;
   vParams        : TParams;
   vBinaryRequest : Boolean;
   vFieldsList    : TFieldsList;
-  vParamCount,
   vActualRec     : Integer;
   vSchemaName,
   vProcName      : String;
@@ -1282,61 +1234,69 @@ Type
 End;
 
 Type
- TRESTDWPoolerList = Class(TRESTDWComponent)
- Private
-  vEncoding            : TEncodeSelect;
-  vUserAgent,
-  vAccessTag,
-  vWelcomeMessage,
-  vPoolerPrefix,                                     //Prefixo do WS
-  vDataRoute,
-  vRestWebService,                                   //Rest WebService para consultas
-  vPoolerNotFoundMessage,
-  vRestURL             : String;                     //Qual o Pooler de Conexão do DataSet
-  vTimeOut,
-  vConnectTimeOut,
-  vRedirectMaximum,
-  vPoolerPort          : Integer;                    //A Porta do Pooler
-  vCompression,
-  vHandleRedirects,
-  vConnected,
-  vProxy               : Boolean;                    //Diz se tem servidor Proxy
-  vProxyOptions        : TProxyOptions;              //Se tem Proxy diz quais as opções
-  vPoolerList          : TStringList;
-  vAuthOptionParams    : TRESTDWClientAuthOptionParams;
-  vCripto              : TCripto;
-  vTypeRequest         : TTypeRequest;
-  Procedure SetConnection(Value : Boolean);          //Seta o Estado da Conexão
-  Procedure SetPoolerPort(Value : Integer);          //Seta a Porta do Pooler a ser usada
-  Function  TryConnect : Boolean;                    //Tenta Conectar o Servidor para saber se posso executar comandos
-//  Procedure SetConnectionOptions(Var Value : TRESTClientPoolerBase); //Seta as Opções de Conexão
- Public
-  Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
-  Destructor  Destroy;Override;                      //Destroy a Classe
- Published
-  Property Active                : Boolean                    Read vConnected          Write SetConnection;      //Seta o Estado da Conexão
-  Property WelcomeMessage        : String                     Read vWelcomeMessage     Write vWelcomeMessage;    //Welcome Message Event
-  Property Proxy                 : Boolean                    Read vProxy              Write vProxy;             //Diz se tem servidor Proxy
-  Property Compression           : Boolean                    Read vCompression        Write vCompression;       //Compressão de Dados
-  Property DataRoute             : String                     Read vDataRoute          Write vDataRoute;
-  Property RequestTimeOut        : Integer                    Read vTimeOut            Write vTimeOut;           //Timeout da Requisição
-  Property ConnectTimeOut        : Integer                    Read vConnectTimeOut     Write vConnectTimeOut;
-  Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams   Write vAuthOptionParams;
-  Property CriptOptions          : TCripto                    Read vCripto             Write vCripto;
-  Property ProxyOptions          : TProxyOptions              Read vProxyOptions       Write vProxyOptions;      //Se tem Proxy diz quais as opções
-  Property PoolerService         : String                     Read vRestWebService     Write vRestWebService;    //Host do WebService REST
-  Property PoolerURL             : String                     Read vRestURL            Write vRestURL;           //URL do WebService REST
-  Property PoolerPort            : Integer                    Read vPoolerPort         Write SetPoolerPort;      //A Porta do Pooler do DataSet
-  Property PoolerPrefix          : String                     Read vPoolerPrefix       Write vPoolerPrefix;      //Prefixo do WebService REST
-  Property Poolers               : TStringList                Read vPoolerList;
-  Property HandleRedirects       : Boolean                    Read vHandleRedirects    Write vHandleRedirects;
-  Property RedirectMaximum       : Integer                    Read vRedirectMaximum    Write vRedirectMaximum;
-  Property AccessTag             : String                     Read vAccessTag          Write vAccessTag;
-  Property Encoding              : TEncodeSelect              Read vEncoding           Write vEncoding;          //Encoding da string
-  Property UserAgent             : String                     Read vUserAgent          Write vUserAgent;
-  Property PoolerNotFoundMessage : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;
-  Property TypeRequest           : TTypeRequest               Read vTypeRequest        Write vTypeRequest       Default trHttp;
- End;
+  TRESTDWPoolerListBase = Class(TRESTDWComponent)
+  Private
+    vEncoding            : TEncodeSelect;
+    vUserAgent,
+    vAccessTag,
+    vWelcomeMessage,
+    vPoolerPrefix,                                     //Prefixo do WS
+    vDataRoute,
+    vRestWebService,                                   //Rest WebService para consultas
+    vPoolerNotFoundMessage,
+    vRestURL             : String;                     //Qual o Pooler de Conexão do DataSet
+    vTimeOut,
+    vConnectTimeOut,
+    vRedirectMaximum,
+    vPoolerPort          : Integer;                    //A Porta do Pooler
+    vCompression,
+    vHandleRedirects,
+    vConnected,
+    vProxy               : Boolean;                    //Diz se tem servidor Proxy
+    vProxyOptions        : TProxyOptions;              //Se tem Proxy diz quais as opções
+    vPoolerList          : TStringList;
+    vAuthOptionParams    : TRESTDWClientAuthOptionParams;
+    vCripto              : TCripto;
+    vTypeRequest         : TTypeRequest;
+    {$IFDEF RESTDWLAZARUS}
+    vDatabaseCharSet      : TDatabaseCharSet;
+    {$ENDIF}
+    Procedure SetConnection(Value : Boolean);          //Seta o Estado da Conexão
+    Procedure SetPoolerPort(Value : Integer);          //Seta a Porta do Pooler a ser usada
+    Function  TryConnect : Boolean;                    //Tenta Conectar o Servidor para saber se posso executar comandos
+    Function  GetPoolerList: TStringList;              // Listar os Poolers
+  //  Procedure SetConnectionOptions(Var Value : TRESTClientPoolerBase); //Seta as Opções de Conexão
+  Public
+    RESTClientPooler: TRESTClientPoolerBase;           //Pooler
+    Constructor Create(AOwner  : TComponent);Override; //Cria o Componente
+    Destructor  Destroy;Override;                      //Destroy a Classe
+  Published
+    Property Active                : Boolean                    Read vConnected          Write SetConnection;      //Seta o Estado da Conexão
+    Property WelcomeMessage        : String                     Read vWelcomeMessage     Write vWelcomeMessage;    //Welcome Message Event
+    Property Proxy                 : Boolean                    Read vProxy              Write vProxy;             //Diz se tem servidor Proxy
+    Property Compression           : Boolean                    Read vCompression        Write vCompression;       //Compressão de Dados
+    Property DataRoute             : String                     Read vDataRoute          Write vDataRoute;
+    Property RequestTimeOut        : Integer                    Read vTimeOut            Write vTimeOut;           //Timeout da Requisição
+    Property ConnectTimeOut        : Integer                    Read vConnectTimeOut     Write vConnectTimeOut;
+    Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams   Write vAuthOptionParams;
+    Property CriptOptions          : TCripto                    Read vCripto             Write vCripto;
+    Property ProxyOptions          : TProxyOptions              Read vProxyOptions       Write vProxyOptions;      //Se tem Proxy diz quais as opções
+    Property PoolerService         : String                     Read vRestWebService     Write vRestWebService;    //Host do WebService REST
+    Property PoolerURL             : String                     Read vRestURL            Write vRestURL;           //URL do WebService REST
+    Property PoolerPort            : Integer                    Read vPoolerPort         Write SetPoolerPort;      //A Porta do Pooler do DataSet
+    Property PoolerPrefix          : String                     Read vPoolerPrefix       Write vPoolerPrefix;      //Prefixo do WebService REST
+    Property Poolers               : TStringList                Read vPoolerList;
+    Property HandleRedirects       : Boolean                    Read vHandleRedirects    Write vHandleRedirects;
+    Property RedirectMaximum       : Integer                    Read vRedirectMaximum    Write vRedirectMaximum;
+    Property AccessTag             : String                     Read vAccessTag          Write vAccessTag;
+    Property Encoding              : TEncodeSelect              Read vEncoding           Write vEncoding;          //Encoding da string
+    Property UserAgent             : String                     Read vUserAgent          Write vUserAgent;
+    Property PoolerNotFoundMessage : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;
+    Property TypeRequest           : TTypeRequest               Read vTypeRequest        Write vTypeRequest       Default trHttp;
+    {$IFDEF RESTDWLAZARUS}
+    Property DatabaseCharSet       : TDatabaseCharSet           Read vDatabaseCharSet      Write vDatabaseCharSet;
+    {$ENDIF}
+   End;
 
 Type
  PRESTDWValueKey = ^TRESTDWValueKey;
@@ -1386,7 +1346,7 @@ Type
  TRESTDWPoolerDB  = Class(TRESTDWComponent)
  Private
 //  FLock          : TCriticalSection;
-  vRESTDriver    : TRESTDWDriver;
+  vRESTDriver    : TRESTDWDriverBase;
   vActive,
   vStrsTrim,
   vStrsEmpty2Null,
@@ -1396,8 +1356,8 @@ Type
   vAccessTag,
   vMessagePoolerOff : String;
   vParamCreate   : Boolean;
-  Procedure SetConnection(Value : TRESTDWDriver);
-  Function  GetConnection  : TRESTDWDriver;
+  Procedure SetConnection(Value : TRESTDWDriverBase);
+  Function  GetConnection  : TRESTDWDriverBase;
  protected
   procedure Notification(AComponent: TComponent; Operation: TOperation); override;
  Public
@@ -1431,16 +1391,16 @@ Type
   Constructor Create(AOwner : TComponent);Override; //Cria o Componente
   Destructor  Destroy;Override;                     //Destroy a Classe
  Published
-  Property    RESTDriver       : TRESTDWDriver Read GetConnection     Write SetConnection;
-  Property    Compression      : Boolean       Read vCompression      Write vCompression;
-  Property    Encoding         : TEncodeSelect Read vEncoding         Write vEncoding;
-  Property    StrsTrim         : Boolean       Read vStrsTrim         Write vStrsTrim;
-  Property    StrsEmpty2Null   : Boolean       Read vStrsEmpty2Null   Write vStrsEmpty2Null;
-  Property    StrsTrim2Len     : Boolean       Read vStrsTrim2Len     Write vStrsTrim2Len;
-  Property    Active           : Boolean       Read vActive           Write vActive;
-  Property    PoolerOffMessage : String        Read vMessagePoolerOff Write vMessagePoolerOff;
-  Property    AccessTag        : String        Read vAccessTag        Write vAccessTag;
-  Property    ParamCreate      : Boolean       Read vParamCreate      Write vParamCreate;
+  Property    RESTDriver       : TRESTDWDriverBase Read GetConnection     Write SetConnection;
+  Property    Compression      : Boolean           Read vCompression      Write vCompression;
+  Property    Encoding         : TEncodeSelect     Read vEncoding         Write vEncoding;
+  Property    StrsTrim         : Boolean           Read vStrsTrim         Write vStrsTrim;
+  Property    StrsEmpty2Null   : Boolean           Read vStrsEmpty2Null   Write vStrsEmpty2Null;
+  Property    StrsTrim2Len     : Boolean           Read vStrsTrim2Len     Write vStrsTrim2Len;
+  Property    Active           : Boolean           Read vActive           Write vActive;
+  Property    PoolerOffMessage : String            Read vMessagePoolerOff Write vMessagePoolerOff;
+  Property    AccessTag        : String            Read vAccessTag        Write vAccessTag;
+  Property    ParamCreate      : Boolean           Read vParamCreate      Write vParamCreate;
 End;
 
  Function GeTRESTDWParams(Params : TParams; Encondig : TEncodeSelect) : TRESTDWParams;
@@ -1450,7 +1410,7 @@ Var
 
 implementation
 
-Uses uRESTDWJSONInterface, uRESTDWTools;
+Uses uRESTDWJSONInterface;
 
 Function GeTRESTDWParams(Params : TParams; Encondig : TEncodeSelect) : TRESTDWParams;
 Var
@@ -1558,12 +1518,12 @@ Begin
   Inherited;
 End;
 
-Function  TRESTDWPoolerDB.GetConnection : TRESTDWDriver;
+Function  TRESTDWPoolerDB.GetConnection : TRESTDWDriverBase;
 Begin
  Result := vRESTDriver;
 End;
 
-Procedure TRESTDWPoolerDB.SetConnection(Value : TRESTDWDriver);
+Procedure TRESTDWPoolerDB.SetConnection(Value : TRESTDWDriverBase);
 Begin
  If vRESTDriver <> Value Then
   vRESTDriver := Value;
@@ -1589,7 +1549,7 @@ Begin
  Else
   Begin
    Error        := True;
-   MessageError := 'Selected Pooler Does Not Have a Driver Set';
+   MessageError := cErrorDriverNotSet;
   End;
 End;
 
@@ -1612,7 +1572,7 @@ Begin
  Else
   Begin
    Error        := True;
-   MessageError := 'Selected Pooler Does Not Have a Driver Set';
+   MessageError := cErrorDriverNotSet;
   End;
 End;
 
@@ -1645,7 +1605,7 @@ Begin
  Else
   Begin
    Error        := True;
-   MessageError := 'Selected Pooler Does Not Have a Driver Set';
+   MessageError := cErrorDriverNotSet;
   End;
 End;
 
@@ -1671,7 +1631,7 @@ Begin
  Else
   Begin
    Error        := True;
-   MessageError := 'Selected Pooler Does Not Have a Driver Set';
+   MessageError := cErrorDriverNotSet;
   End;
 End;
 
@@ -1693,7 +1653,7 @@ Begin
  Else
   Begin
    Error        := True;
-   MessageError := 'Selected Pooler Does Not Have a Driver Set';
+   MessageError := cErrorDriverNotSet;
   End;
 End;
 
@@ -1714,7 +1674,7 @@ Begin
  Else
   Begin
    Error        := True;
-   MessageError := 'Selected Pooler Does Not Have a Driver Set';
+   MessageError := cErrorDriverNotSet;
   End;
 End;
 
@@ -1730,15 +1690,11 @@ Begin
  vStrsEmpty2Null   := False;
  vStrsTrim2Len     := True;
  vActive           := True;
- {$IFNDEF FPC}
- {$IF CompilerVersion > 21}
-  vEncoding         := esUtf8;
+ {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+ vEncoding         := esUtf8;
  {$ELSE}
-  vEncoding         := esAscii;
+ vEncoding         := esAscii;
  {$IFEND}
- {$ELSE}
-  vEncoding         := esUtf8;
- {$ENDIF}
  vMessagePoolerOff := 'RESTPooler not active.';
  vParamCreate      := True;
 End;
@@ -1838,40 +1794,9 @@ Begin
  vPort     := 8888;
 End;
 
-{
-Procedure TRESTDWPoolerList.SetConnectionOptions(Var Value : TRESTClientPoolerBase);
-Begin
- Value                   := TRESTClientPoolerBase.Create(Nil);
- Value.TypeRequest       := trHttp;
- Value.Host              := vRestWebService;
- Value.Port              := vPoolerPort;
- Value.UrlPath           := vRestURL;
- Value.UserName          := vLogin;
- Value.Password          := vPassword;
- if vProxy then
-  Begin
-   Value.ProxyOptions.ProxyServer   := vProxyOptions.vServer;
-   Value.ProxyOptions.ProxyPort     := vProxyOptions.vPort;
-   Value.ProxyOptions.ProxyUsername := vProxyOptions.vLogin;
-   Value.ProxyOptions.ProxyPassword := vProxyOptions.vPassword;
-  End
- Else
-  Begin
-   Value.ProxyOptions.ProxyServer   := '';
-   Value.ProxyOptions.ProxyPort     := 0;
-   Value.ProxyOptions.ProxyUsername := '';
-   Value.ProxyOptions.ProxyPassword := '';
-  End;
-End;
-}
-
 Procedure TRESTDWDatabasebaseBase.SetOnStatus(Value : TOnStatus);
 Begin
- {$IFDEF FPC}
   vOnStatus            := Value;
- {$ELSE}
-  vOnStatus            := Value;
- {$ENDIF}
 End;
 
 Function  TRESTDWDatabasebaseBase.RenewToken(Var PoolerMethodClient : TRESTDWPoolerMethodClient;
@@ -1902,7 +1827,7 @@ Begin
  vConnection.CriptOptions.Key := vCripto.Key;
  vConnection.DataRoute        := DataRoute;
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
- {$IFNDEF FPC}
+ {$IFNDEF RESTDWLAZARUS}
   vConnection.Encoding      := vEncoding;
  {$ELSE}
   vConnection.DatabaseCharSet := csUndefined;
@@ -2166,29 +2091,17 @@ End;
 
 Procedure TRESTDWDatabasebaseBase.SetOnWork(Value : TOnWork);
 Begin
- {$IFDEF FPC}
-  vOnWork            := Value;
- {$ELSE}
-  vOnWork            := Value;
- {$ENDIF}
+  vOnWork := Value;
 End;
 
 Procedure TRESTDWDatabasebaseBase.SetOnWorkBegin(Value : TOnWork);
 Begin
- {$IFDEF FPC}
-  vOnWorkBegin            := Value;
- {$ELSE}
-  vOnWorkBegin            := Value;
- {$ENDIF}
+  vOnWorkBegin := Value;
 End;
 
 Procedure TRESTDWDatabasebaseBase.SetOnWorkEnd(Value : TOnWorkEnd);
 Begin
- {$IFDEF FPC}
-  vOnWorkEnd            := Value;
- {$ELSE}
-  vOnWorkEnd            := Value;
- {$ENDIF}
+  vOnWorkEnd := Value;
 End;
 
 Procedure TRESTDWDatabasebaseBase.ApplyUpdatesTB(Var PoolerMethodClient : TRESTDWPoolerMethodClient;
@@ -2823,6 +2736,13 @@ Begin
  FreeAndNil(vRESTConnectionDB);
 End;
 
+
+function TRESTDWDatabasebaseBase.IsServerLive(Aip: String; Aport: Integer;
+  AMessageErro: String): Boolean;
+begin
+//
+end;
+
 procedure TRESTDWDatabasebaseBase.Loaded;
 begin
   inherited Loaded;
@@ -3129,7 +3049,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWDatabasebaseBase.OpenDatasets(Datasets         : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
+Procedure TRESTDWDatabasebaseBase.OpenDatasets(Datasets         : Array of {$IFDEF RESTDWLAZARUS}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
                                                BinaryCompatible : Boolean = False);
 Var
  Error        : Boolean;
@@ -3140,7 +3060,7 @@ Begin
   Raise Exception.Create(PChar(MessageError));
 End;
 
-Procedure TRESTDWDatabasebaseBase.OpenDatasets(Datasets         : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
+Procedure TRESTDWDatabasebaseBase.OpenDatasets(Datasets         : Array of {$IFDEF RESTDWLAZARUS}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
                                                Var Error        : Boolean;
                                                Var MessageError : String;
                                                BinaryRequest    : Boolean = True;
@@ -3174,14 +3094,14 @@ Var
     TRESTDWClientSQL(Value).DWParams(vDWParams);
     If vDWParams <> Nil Then
      Begin
-      {$IFDEF FPC}
+      {$IFDEF RESTDWLAZARUS}
       vTempLineParams := EncodeStrings(vDWParams.ToJSON, TRESTDWClientSQL(Value).DatabaseCharSet);
       {$ELSE}
       vTempLineParams := EncodeStrings(vDWParams.ToJSON);
       {$ENDIF}
       FreeAndNil(vDWParams);
      End;
-    {$IFDEF FPC}
+    {$IFDEF RESTDWLAZARUS}
     vTempLineSQL      := EncodeStrings(TRESTDWClientSQL(Value).SQL.Text, TRESTDWClientSQL(Value).DatabaseCharSet);
     {$ELSE}
     vTempLineSQL      := EncodeStrings(TRESTDWClientSQL(Value).SQL.Text);
@@ -3189,7 +3109,7 @@ Var
     Result            := Format(TDatasetRequestJSON, [vTempLineSQL, vTempLineParams,
                                                       BooleanToString(TRESTDWClientSQL(Value).BinaryRequest),
                                                       BooleanToString(TRESTDWClientSQL(Value).Fields.Count = 0),
-                                                      BooleanToString(TRESTDWClientSQL(Value).BinaryCompatibleMode)]);
+                                                      BooleanToString(True)]);
    End;
  End;
  Procedure DatasetRequestToStream(Value : TRESTDWClientSQLBase);
@@ -3417,7 +3337,7 @@ Begin
             vJSONValue.Encoded := True;
             vJSONValue.OnWriterProcess := TRESTDWClientSQL(Datasets[I]).OnWriterProcess;
             vJSONValue.ServerFieldList := TRESTDWClientSQL(Datasets[I]).ServerFieldList;
-            {$IFDEF FPC}
+            {$IFDEF RESTDWLAZARUS}
              vJSONValue.DatabaseCharSet := TRESTDWClientSQL(Datasets[I]).DatabaseCharSet;
              vJSONValue.NewFieldList    := @TRESTDWClientSQL(Datasets[I]).NewFieldList;
              vJSONValue.NewDataField    := @TRESTDWClientSQL(Datasets[I]).NewDataField;
@@ -3457,9 +3377,6 @@ Begin
           Else
            Begin
             vStream := DecodeStream(TRESTDWJSONInterfaceObject(vJsonValueB).pairs[0].value);
-            {$IFNDEF RESTDWMEMTABLE}
-            TRESTDWClientSQLBase(Datasets[I]).BinaryCompatibleMode := TRESTDWClientSQL(Datasets[I]).BinaryCompatibleMode;
-            {$ENDIF}
             TRESTDWClientSQLBase(Datasets[I]).SetInBlockEvents(True);
             Try
              TRESTDWClientSQLBase(Datasets[I]).LoadFromStream(TMemoryStream(vStream));
@@ -3516,9 +3433,6 @@ Begin
           Begin
            vStream := BufferStream.ReadStream;
            Try
-            {$IFNDEF RESTDWMEMTABLE}
-            TRESTDWClientSQLBase(Datasets[I]).BinaryCompatibleMode := TRESTDWClientSQL(Datasets[I]).BinaryCompatibleMode;
-            {$ENDIF}
             TRESTDWClientSQLBase(Datasets[I]).SetInBlockEvents(True);
             Try
              TRESTDWClientSQLBase(Datasets[I]).LoadFromStream(TMemoryStream(vStream));
@@ -3730,7 +3644,7 @@ Begin
        (Not (Error))                       Then
      Begin
       Try
-       {$IFDEF  ANDROID}
+       {$IFDEF RESTDWANDROID}
        Result.Clear;
        If Not BinaryRequest Then
         Begin
@@ -3831,7 +3745,7 @@ Var
  If Params <> Nil Then
    For I := 0 To Params.Count -1 Do
     Begin
-     If Params[I].DataType = ftUnknown then
+     If (Params[I].DataType = ftUnknown) then
       Params[I].DataType := ftString;
     End;
  End;
@@ -3963,7 +3877,7 @@ Begin
            Not(BinaryRequest)        Then
        Begin
         Try
-         {$IFDEF  ANDROID}
+         {$IFDEF RESTDWANDROID}
          Result.Clear;
          If Not BinaryRequest Then
           Begin
@@ -4077,7 +3991,7 @@ Begin
  vConnection.AcceptEncoding   := AcceptEncoding;
  vConnection.ContentType      := ContentType;
  vConnection.ContentEncoding  := ContentEncoding;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   vConnection.DatabaseCharSet := csUndefined;
  {$ENDIF}
  CopyParams(vConnection, vRESTClientPooler);
@@ -4146,27 +4060,6 @@ Begin
  Result := vConnected;
 End;
 
-Constructor TRESTDWPoolerList.Create(AOwner : TComponent);
-Begin
- Inherited;
- vDataRoute        := '';
- vPoolerNotFoundMessage := cPoolerNotFound;
- vPoolerPort       := 8082;
- vTimeOut          := 3000;
- vConnectTimeOut   := 3000;
- vProxy            := False;
- vCompression      := True;
- vTypeRequest      := trHttp;
- vProxyOptions     := TProxyOptions.Create;
- vPoolerList       := TStringList.Create;
- vAuthOptionParams := TRESTDWClientAuthOptionParams.Create(Self);
- vCripto           := TCripto.Create;
- vEncoding         := esUtf8;
- vUserAgent        := cUserAgent;
- vHandleRedirects  := False;
- vRedirectMaximum  := 0;
-End;
-
 Constructor TRESTDWDatabasebaseBase.Create(AOwner : TComponent);
 Begin
  Inherited;
@@ -4205,30 +4098,17 @@ Begin
  vAccept                   := 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
  vAcceptEncoding           := '';
  vCharset                  := 'utf8';
- {$IFNDEF FPC}
- {$IF CompilerVersion > 21}
-  vEncoding                := esUtf8;
+ {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+ vEncoding                := esUtf8;
  {$ELSE}
-  vEncoding                := esAscii;
+ vEncoding                := esAscii;
  {$IFEND}
- {$ELSE}
-  vEncoding                := esUtf8;
- {$ENDIF}
  vContentex                := '';
  vStrsTrim                 := False;
  vStrsEmpty2Null           := False;
  vStrsTrim2Len             := True;
  vParamCreate              := True;
-End;
-
-Destructor  TRESTDWPoolerList.Destroy;
-Begin
- vProxyOptions.Free;
- FreeAndNil(vAuthOptionParams);
- FreeAndNil(vCripto);
- If vPoolerList <> Nil Then
-  vPoolerList.Free;
- Inherited;
+ vClientIpVersion          := civIPv4;
 End;
 
 Destructor  TRESTDWDatabasebaseBase.Destroy;
@@ -4687,7 +4567,7 @@ Begin
           vJSONValue.Encoded := True;
           vJSONValue.OnWriterProcess := TRESTDWClientSQL(Datasets[I]).OnWriterProcess;
           vJSONValue.ServerFieldList := TRESTDWClientSQL(Datasets[I]).ServerFieldList;
-          {$IFDEF FPC}
+          {$IFDEF RESTDWLAZARUS}
            vJSONValue.DatabaseCharSet := TRESTDWClientSQL(Datasets[I]).DatabaseCharSet;
            vJSONValue.NewFieldList    := @TRESTDWClientSQL(Datasets[I]).NewFieldList;
            vJSONValue.CreateDataSet   := @TRESTDWClientSQL(Datasets[I]).CreateDataSet;
@@ -4765,6 +4645,7 @@ Var
  vError        : Boolean;
  vMessageError : String;
 Begin
+ vError := False;
  vMessageError := '';
  ApplyUpdates(MassiveCache, vError, vMessageError);
  If (vError) Or (vMessageError <> '') Then
@@ -4776,8 +4657,7 @@ Procedure TRESTDWDatabasebaseBase.ApplyUpdates(Var MassiveCache       : TRESTDWM
                                                Var MessageError       : String);
 Var
  I                    : Integer;
- vUpdateLine          : String;
- vMassiveStream       : TStream;
+ vUpdateLine          : TStream;
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
  ResultData           : TJSONValue;
@@ -4786,10 +4666,12 @@ Var
 Begin
  vLocalClient := False;
  SocketError := False;
- RESTClientPoolerExec := nil;
+ RESTClientPoolerExec := Nil;
+ vUpdateLine          := Nil;
  If MassiveCache.MassiveCount > 0 Then
   Begin
-   vUpdateLine := MassiveCache.ToJSON;
+   vUpdateLine := TMemoryStream.Create;
+   MassiveCache.SaveToStream(vUpdateLine);
    If vRestPooler = '' Then
     Exit;
    If Not vConnected Then
@@ -4805,7 +4687,7 @@ Begin
         ResultData := vRESTConnectionDB.ApplyUpdates_MassiveCache(vUpdateLine, vRestPooler,  vDataRoute,
                                                                   Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                                   vClientConnectionDefs.vConnectionDefs,
-                                                                  MassiveCache.ReflectChanges, vRESTClientPooler);
+                                                                  True,        vRESTClientPooler);
         If Not(Error) or (MessageError <> cInvalidAuth) Then
          Break
         Else
@@ -4881,7 +4763,7 @@ Begin
                                                                       vFailOverConnections[I].vDataRoute,
                                                                       Error,       MessageError, SocketError, vTimeOut, vConnectTimeOut,
                                                                       vClientConnectionDefs.vConnectionDefs,
-                                                                      MassiveCache.ReflectChanges);
+                                                                      True);
             If Not SocketError Then
              Begin
               If vFailOverReplaceDefaults Then
@@ -4912,6 +4794,8 @@ Begin
         MassiveCache.ProcessChanges(ResultData.Value);
       If Assigned(ResultData) Then
        FreeAndNil(ResultData);
+      If Assigned(vUpdateLine) Then
+       FreeAndNil(vUpdateLine);
       FreeAndNil(vRESTConnectionDB);
       If Not Error Then
        Error := MessageError <> '';
@@ -4925,37 +4809,6 @@ End;
 Procedure TRESTDWDatabasebaseBase.Close;
 Begin
  SetConnection(False);
-End;
-
-Function  TRESTDWPoolerList.TryConnect : Boolean;
-Var
- vConnection : TRESTDWPoolerMethodClient;
- I           : Integer;
-Begin
- vConnection                  := TRESTDWPoolerMethodClient.Create(Nil);
- vConnection.PoolerNotFoundMessage := PoolerNotFoundMessage;
- vConnection.UserAgent        := vUserAgent;
- vConnection.HandleRedirects  := vHandleRedirects;
- vConnection.RedirectMaximum  := vRedirectMaximum;
- vConnection.WelcomeMessage   := vWelcomeMessage;
- vConnection.Host             := vRestWebService;
- vConnection.Port             := vPoolerPort;
- vConnection.Compression      := vCompression;
- vConnection.TypeRequest      := VtypeRequest;
- vConnection.AccessTag        := vAccessTag;
- vConnection.Encoding         := Encoding;
- vConnection.CriptOptions.Use := VCripto.Use;
- vConnection.CriptOptions.Key := VCripto.Key;
- vConnection.DataRoute        := DataRoute;
- vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
- Try
-  vPoolerList.Clear;
-  vPoolerList.Assign(vConnection.GetPoolerList(vRestURL, vTimeOut, vConnectTimeOut));
-  Result      := True;
- Finally
-  If Assigned(vConnection) Then
-   FreeAndNil(vConnection);
- End;
 End;
 
 Procedure TRESTDWDatabasebaseBase.ReconfigureConnection(Var Connection        : TRESTDWPoolerMethodClient;
@@ -4989,7 +4842,7 @@ Begin
    ConnectionExec.SetAccessTag(Connection.AccessTag);
    ConnectionExec.Encoding              := Connection.Encoding;
    ConnectionExec.AuthenticationOptions.Assign(AuthenticationOptions);
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
     ConnectionExec.DatabaseCharSet := csUndefined;
    {$ENDIF}
   End;
@@ -5171,12 +5024,14 @@ Begin
       Begin
        If Assigned(vOnEventConnection) Then
         vOnEventConnection(False, cAuthenticationError);
+       // Eloy
+       If vErrorBoolean then
+        raise Exception.Create(vMessageError);
       End;
     End;
   Except
    On E : Exception do
     Begin
-//     DestroyComponents;
      If vFailOver Then
       Begin
        If vFailOverConnections.Count > 0 Then
@@ -5184,7 +5039,6 @@ Begin
          If Assigned(vFailOverConnections) Then
          For I := 0 To vFailOverConnections.Count -1 Do
           Begin
-           //DestroyComponents;
            If I = 0 Then
             Begin
              If ((vFailOverConnections[I].vTypeRequest    = Connection.TypeRequest)    And
@@ -5291,7 +5145,7 @@ Begin
     End;
   End;
  Finally
-//  DestroyComponents;
+  //DestroyComponents;
  End;
 End;
 
@@ -5301,6 +5155,8 @@ Begin
  If Assigned(RESTClientPooler) And
     Assigned(ConnectionDB)     Then
   Begin
+   RESTClientPooler.Host            := ConnectionDB.Host;
+   RESTClientPooler.Port            := ConnectionDB.Port;
    RESTClientPooler.Accept          := ConnectionDB.Accept;
    RESTClientPooler.AcceptEncoding  := ConnectionDB.AcceptEncoding;
    RESTClientPooler.AccessTag       := ConnectionDB.AccessTag;
@@ -5316,6 +5172,11 @@ End;
 
 Function TRESTDWDatabasebaseBase.BuildConnection(aBinaryRequest : Boolean) : TRESTDWPoolerMethodClient;
 Begin
+ Result                       := nil;
+
+ if Assigned(vOnBuildConnection) then
+  vOnBuildConnection(Self);
+
  Result                       := TRESTDWPoolerMethodClient.Create(Nil);
  Result.PoolerNotFoundMessage := PoolerNotFoundMessage;
  Result.AuthenticationOptions.Assign(AuthenticationOptions);
@@ -5342,7 +5203,7 @@ Begin
  Result.AcceptEncoding        := AcceptEncoding;
  Result.ContentType           := ContentType;
  Result.ContentEncoding       := ContentEncoding;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   Result.DatabaseCharSet      := csUndefined;
  {$ENDIF}
 End;
@@ -5352,6 +5213,8 @@ Procedure TRESTDWDatabasebaseBase.SetConnection(Value          : Boolean;
 Var
  vRESTConnectionDB : TRESTDWPoolerMethodClient;
 Begin
+ vRESTConnectionDB := nil;
+
  If (csLoading in ComponentState) then
   Value := False;
  If (Value) And Not(vConnected) then
@@ -5378,7 +5241,8 @@ Begin
   Begin
    vConnected := Value;
    vMyIP := '';
-   If vAuthOptionParams.AuthorizationOption in [rdwAOBearer, rdwAOToken] Then
+   If (Assigned(vAuthOptionParams)) and
+      (vAuthOptionParams.AuthorizationOption in [rdwAOBearer, rdwAOToken]) Then
     Begin
      Case vAuthOptionParams.AuthorizationOption Of
       rdwAOBearer : TRESTDWAuthOptionBearerClient(vAuthOptionParams.OptionParams).Token := '';
@@ -5407,19 +5271,16 @@ Begin
   End;
 End;
 
-Procedure TRESTDWPoolerList.SetConnection(Value : Boolean);
-Begin
- vConnected := Value;
- If vConnected Then
-  vConnected := TryConnect;
-End;
+procedure TRESTDWDatabasebaseBase.SetIpVersion(IpV: TRESTDWClientIpVersions);
+begin
+ vClientIpVersion := IpV;
+
+ if Assigned(RESTClientPooler) then
+  RESTClientPooler.ClientIpVersion := IpV;
+
+end;
 
 Procedure TRESTDWDatabasebaseBase.SetPoolerPort(Value : Integer);
-Begin
- vPoolerPort := Value;
-End;
-
-Procedure TRESTDWPoolerList.SetPoolerPort(Value : Integer);
 Begin
  vPoolerPort := Value;
 End;
@@ -5486,19 +5347,19 @@ Begin
   vDWResponseTranslator.FreeNotification(Self);
 End;
 
-Procedure TRESTDWTable.SetFilteredB(aValue: Boolean);
-Var
- vFilter   : String;
-Begin
- vFiltered := aValue;
- vFilter   := Filter;
- If Assigned(vOnFiltered) Then
-  vOnFiltered(vFiltered, vFilter);
- TDataset(Self).Filter   := vFilter;
- TDataset(Self).Filtered := vFiltered;
- If vFiltered Then
-  ProcAfterScroll(Self);
-End;
+//Procedure TRESTDWTable.SetFilteredB(aValue: Boolean);
+//Var
+// vFilter   : String;
+//Begin
+// vFiltered := aValue;
+// vFilter   := Filter;
+// If Assigned(vOnFiltered) Then
+//  vOnFiltered(vFiltered, vFilter);
+// TDataset(Self).Filter   := vFilter;
+// TDataset(Self).Filtered := vFiltered;
+// If vFiltered Then
+//  ProcAfterScroll(Self);
+//End;
 
 Procedure TRESTDWClientSQL.SetFilteredB(aValue: Boolean);
 Var
@@ -5560,15 +5421,15 @@ Begin
    vParamsString := '';
    vDWParams     := GeTRESTDWParams(vMassiveCacheSQLList[A].Params, vEncoding);
    If Assigned(vDWParams) Then
-    vParamsString := EncodeStrings(vDWParams.ToJSON{$IFDEF FPC}, csUndefined{$ENDIF});
+    vParamsString := EncodeStrings(vDWParams.ToJSON{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
    vTempJSON  := Format(cJSONValue, [MassiveSQLMode(msqlExecute),
-                                     EncodeStrings(vMassiveCacheSQLList[A].SQL.Text{$IFDEF FPC}, csUndefined{$ENDIF}),
+                                     EncodeStrings(vMassiveCacheSQLList[A].SQL.Text{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
                                      vParamsString,
-                                     EncodeStrings(vMassiveCacheSQLList[A].Bookmark{$IFDEF FPC}, csUndefined{$ENDIF}),
+                                     EncodeStrings(vMassiveCacheSQLList[A].Bookmark{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
                                      BooleanToString(vMassiveCacheSQLList[A].BinaryRequest),
-                                     EncodeStrings(vMassiveCacheSQLList[A].FetchRowSQL.Text{$IFDEF FPC}, csUndefined{$ENDIF}),
-                                     EncodeStrings(vMassiveCacheSQLList[A].LockSQL.Text{$IFDEF FPC},     csUndefined{$ENDIF}),
-                                     EncodeStrings(vMassiveCacheSQLList[A].UnlockSQL.Text{$IFDEF FPC},   csUndefined{$ENDIF})]);
+                                     EncodeStrings(vMassiveCacheSQLList[A].FetchRowSQL.Text{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                                     EncodeStrings(vMassiveCacheSQLList[A].LockSQL.Text{$IFDEF RESTDWLAZARUS},     csUndefined{$ENDIF}),
+                                     EncodeStrings(vMassiveCacheSQLList[A].UnlockSQL.Text{$IFDEF RESTDWLAZARUS},   csUndefined{$ENDIF})]);
    If vJSONValue = '' Then
     vJSONValue := vTempJSON
    Else
@@ -5653,12 +5514,12 @@ Begin
    vClientSQLBase := Value;
    TRESTDWTable (vClientSQLBase).UpdateSQL := Self;
   End
- Else If Value is TRESTDWStoredProc Then
+ Else If Value is TRESTDWStoredProcedure Then
   Begin
    If Assigned(vClientSQLBase) Then
-    TRESTDWStoredProc(vClientSQLBase).UpdateSQL := Nil;
+    TRESTDWStoredProcedure(vClientSQLBase).UpdateSQL := Nil;
    vClientSQLBase := Value;
-   TRESTDWStoredProc (vClientSQLBase).UpdateSQL := Self;
+   TRESTDWStoredProcedure (vClientSQLBase).UpdateSQL := Self;
   End
  Else
   Begin
@@ -5733,15 +5594,11 @@ Constructor TRESTDWUpdateSQL.Create    (AOwner : TComponent);
 Begin
  Inherited;
  vClientSQLBase := Nil;
- {$IFNDEF FPC}
- {$IF CompilerVersion > 21}
-  vEncoding         := esUtf8;
+ {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+ vEncoding         := esUtf8;
  {$ELSE}
-  vEncoding         := esAscii;
+ vEncoding         := esAscii;
  {$IFEND}
- {$ELSE}
-  vEncoding         := esUtf8;
- {$ENDIF}
  vMassiveCacheSQLList := TRESTDWMassiveCacheSQLList.Create(Self, TRESTDWMassiveCacheSQLValue);
  vSQLInsert           := TStringList.Create;
  vSQLDelete           := TStringList.Create;
@@ -5759,8 +5616,8 @@ Begin
   Begin
    If vClientSQLBase.ClassType     = TRESTDWClientSQL Then
     TRESTDWClientSQL(vClientSQLBase).UpdateSQL := Nil
-   Else If vClientSQLBase.ClassType = TRESTDWStoredProc Then
-    TRESTDWStoredProc(vClientSQLBase).UpdateSQL := Nil;
+   Else If vClientSQLBase.ClassType = TRESTDWStoredProcedure Then
+    TRESTDWStoredProcedure(vClientSQLBase).UpdateSQL := Nil;
   End;
  vClientSQLBase := Value;
 End;
@@ -5904,54 +5761,6 @@ Begin
  vNotRepage := Value;
 End;
 
-//Procedure TRESTDWTable.SetOldCursor;
-//{$IFNDEF FPC}
-//{$IFDEF WINFMX}
-//Var
-// CS: IFMXCursorService;
-//{$ENDIF}
-//{$ENDIF}
-//Begin
-//{$IFNDEF FPC}
-// {$IFDEF WINFMX}
-//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-//  If Assigned(CS) then
-//   CS.SetCursor(vOldCursor);
-// {$ELSE}
-//  {$IFNDEF HAS_FMX}
-//   Screen.Cursor := vOldCursor;
-//  {$ENDIF}
-// {$ENDIF}
-//{$ELSE}
-// Screen.Cursor := vOldCursor;
-//{$ENDIF}
-//End;
-//
-//Procedure TRESTDWClientSQL.SetOldCursor;
-//{$IFNDEF FPC}
-//{$IFDEF WINFMX}
-//Var
-// CS: IFMXCursorService;
-//{$ENDIF}
-//{$ENDIF}
-//Begin
-//{$IFNDEF FPC}
-// {$IFDEF WINFMX}
-//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-//  If Assigned(CS) then
-//   CS.SetCursor(vOldCursor);
-// {$ELSE}
-//  {$IFNDEF HAS_FMX}
-//   Screen.Cursor := vOldCursor;
-//  {$ENDIF}
-// {$ENDIF}
-//{$ELSE}
-// Screen.Cursor := vOldCursor;
-//{$ENDIF}
-//End;
-
 Procedure TRESTDWTable.SetParams(const Value: TParams);
 begin
  vParams.Assign(Value);
@@ -5985,14 +5794,13 @@ End;
 Constructor TRESTDWTable.Create(AOwner: TComponent);
 Begin
  Inherited;
- vParamCount                       := 0;
  vJsonCount                        := 0;
  vRowsAffected                     := 0;
  vOldRecordCount                   := -1;
  vActualJSON                       := '';
  vMassiveMode                      := mtMassiveCache;
  vFiltered                         := False;
- vBinaryRequest                    := False;
+ vBinaryRequest                    := True;
  vInitDataset                      := False;
  vOnPacks                          := False;
  vInternalLast                     := False;
@@ -6024,7 +5832,7 @@ Begin
  vMasterDetailList                 := TMasterDetailList.Create;
  vMasterDataSet                    := Nil;
  vDataSource                       := TDataSource.Create(Nil);
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  TDataset(Self).AfterScroll        := @ProcAfterScroll;
  TDataset(Self).BeforeScroll       := @ProcBeforeScroll;
  TDataset(Self).BeforeOpen         := @ProcBeforeOpen;
@@ -6076,14 +5884,13 @@ End;
 Constructor TRESTDWClientSQL.Create(AOwner: TComponent);
 Begin
  Inherited;
- vParamCount                       := 0;
  vJsonCount                        := 0;
  vRowsAffected                     := 0;
  vOldRecordCount                   := -1;
  vActualJSON                       := '';
  vMassiveMode                      := mtMassiveCache;
  vFiltered                         := False;
- vBinaryRequest                    := False;
+ vBinaryRequest                    := True;
  vInitDataset                      := False;
  vOnPacks                          := False;
  vInternalLast                     := False;
@@ -6111,7 +5918,7 @@ Begin
  vCascadeDelete                    := True;
  vSQL                              := TStringList.Create;
  vRelationFields                   := TStringList.Create;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   vSQL.OnChanging                  := @OnBeforeChangingSQL;
   vSQL.OnChange                    := @OnChangingSQL;
  {$ELSE}
@@ -6125,7 +5932,7 @@ Begin
  vMasterDetailList                 := TMasterDetailList.Create;
  vMasterDataSet                    := Nil;
  vDataSource                       := TDataSource.Create(Nil);
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  TDataset(Self).AfterScroll        := @ProcAfterScroll;
  TDataset(Self).BeforeScroll       := @ProcBeforeScroll;
  TDataset(Self).BeforeOpen         := @ProcBeforeOpen;
@@ -6438,14 +6245,11 @@ Var
 Begin
  ParamList       := ReturnParams(vSQL.Text);
  ParamsListAtual := ReturnParamsAtual(vParams);
- vParamCount     := 0;
  If Not CompareParams(ParamsListAtual, ParamList) Then
   vParams.Clear;
  If ParamList <> Nil Then
  For I := 0 to ParamList.Count -1 Do
   CreateParam(ParamList[I]);
- If ParamList.Count > 0 Then
-  vParamCount := vParams.Count;
  ParamList.Free;
  If Assigned(ParamsListAtual) then
   FreeAndNil(ParamsListAtual);
@@ -6494,7 +6298,7 @@ Begin
          Try
           JSONValue.Encoding := vRESTDataBase.Encoding;
           JSONValue.Encoded  := vRESTDataBase.EncodedStrings;
-          {$IFDEF FPC}
+          {$IFDEF RESTDWLAZARUS}
           JSONValue.DatabaseCharSet := DatabaseCharSet;
           {$ENDIF}
           JSONValue.Utf8SpecialChars := True;
@@ -6503,7 +6307,7 @@ Begin
             vInternalLast := False;
             JSONValue.OnWriterProcess := OnWriterProcess;
             JSONValue.ServerFieldList := ServerFieldList;
-            {$IFDEF FPC}
+            {$IFDEF RESTDWLAZARUS}
              JSONValue.NewFieldList       := @NewFieldList;
              JSONValue.CreateDataSet      := @CreateDataSet;
              JSONValue.NewDataField       := @NewDataField;
@@ -6538,7 +6342,7 @@ Begin
            Begin
             JSONValue.OnWriterProcess := OnWriterProcess;
             JSONValue.ServerFieldList := ServerFieldList;
-            {$IFDEF FPC}
+            {$IFDEF RESTDWLAZARUS}
              JSONValue.NewFieldList   := @NewFieldList;
              JSONValue.CreateDataSet  := @CreateDataSet;
              JSONValue.NewDataField   := @NewDataField;
@@ -6620,7 +6424,7 @@ Begin
           JSONValue.Encoding := vRESTDataBase.Encoding;
           JSONValue.Encoded  := vRESTDataBase.EncodedStrings;
           JSONValue.ServerFieldList := ServerFieldList;
-          {$IFDEF FPC}
+          {$IFDEF RESTDWLAZARUS}
            JSONValue.DatabaseCharSet := DatabaseCharSet;
            JSONValue.NewFieldList    := @NewFieldList;
            JSONValue.CreateDataSet   := @CreateDataSet;
@@ -6735,6 +6539,7 @@ Procedure TRESTDWTable.ProcBeforeDelete(DataSet: TDataSet);
 Var
  I             : Integer;
  vDetailClient : TRESTDWClientSQLBase;
+ vStream       : TStream;
 Begin
  If Not vReadData Then
   Begin
@@ -6782,8 +6587,14 @@ Begin
           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             //FreeAndNil(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
@@ -6809,6 +6620,7 @@ procedure TRESTDWClientSQL.ProcBeforeDelete(DataSet: TDataSet);
 Var
  I             : Integer;
  vDetailClient : TRESTDWClientSQL;
+ vStream       : TStream;
 Begin
  If Not vReadData Then
   Begin
@@ -6858,8 +6670,14 @@ Begin
           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             //FreeAndNil(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
@@ -6957,6 +6775,8 @@ Begin
 End;
 
 Procedure TRESTDWTable.ProcBeforePost(DataSet: TDataSet);
+Var
+ vStream : TStream;
 Begin
  If Not vReadData Then
   Begin
@@ -7009,8 +6829,14 @@ Begin
            TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             //FreeAndNil(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
@@ -7034,6 +6860,8 @@ Begin
 End;
 
 procedure TRESTDWClientSQL.ProcBeforePost(DataSet: TDataSet);
+Var
+ vStream : TStream;
 Begin
  If Not vReadData Then
   Begin
@@ -7085,8 +6913,14 @@ Begin
            TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             //FreeAndNil(vStream);
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
@@ -7110,6 +6944,8 @@ Begin
 End;
 
 procedure TRESTDWClientSQL.ProcBeforeExec(DataSet: TDataSet);
+Var
+ vStream : TStream;
 Begin
  If Not vReadData Then
   Begin
@@ -7135,8 +6971,14 @@ Begin
            If vMassiveCache <> Nil Then
             Begin
              vMassiveCache.MassiveType                          := MassiveType;
-             vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+             vStream := TMemoryStream.Create;
+             Try
+              TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
+              vMassiveCache.Add(vStream, Self);
+             Finally
+              //FreeAndNil(vStream);
+              TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+             End;
             End;
           End;
         End;
@@ -7544,7 +7386,7 @@ Var
    Begin
     Result := StrToInt(Copy(vTempString, InitStrPos, Pos('|', vTempString) -1));
     vTempString := Copy(vTempString, Pos('|', vTempString) +1, Length(vTempString));
-    LastTime := DecodeStrings(vTempString{$IFDEF FPC}, csUndefined{$ENDIF});
+    LastTime := DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
    End;
  End;
 Begin
@@ -7564,7 +7406,7 @@ Begin
    Begin
     bJsonValueB  := bJsonOBJ.GetObject(I);
     Try
-     vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+     vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
      Try
       vActualRecB := DecodeREC(vValue, vLastTimeB);
       If (vActualRecB > -1) Then
@@ -7587,22 +7429,18 @@ Begin
                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
                Continue;
               End;
-             If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
-                                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                                       ftString,    ftWideString,
-                                                                       ftMemo, ftFmtMemo {$IFNDEF FPC}
-                                                                               {$IF CompilerVersion > 21}
-                                                                                       , ftWideMemo
-                                                                                {$IFEND}
-                                                                               {$ENDIF}]    Then
+             If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType
+                in [{$IFDEF DELPHIXEUP}ftFixedChar, ftFixedWideChar,{$ENDIF}
+                    ftString, ftWideString, ftMemo, ftFmtMemo
+                    {$IFDEF DELPHIXEUP}, ftWideMemo{$ENDIF}] Then
               Begin
                If (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value <> Null) And
                   (Trim(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value) <> 'null') Then
                 Begin
-                 vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}); //TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value;
-                 {$IFNDEF FPC}{$IF CompilerVersion < 18}
+                 vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}); //TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value;
+                 {$IFNDEF DELPHI2006UP}
                  vValue := utf8Decode(vValue);
-                 {$IFEND}{$ENDIF}
+                 {$ENDIF}
                  If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size > 0 Then
                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsString := Copy(vValue, 1, Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size)
                  Else
@@ -7613,34 +7451,34 @@ Begin
               End
              Else
               Begin
-               If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftInteger, ftSmallInt, ftWord, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF} ftLargeint] Then
+               If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftInteger, ftSmallInt, ftWord, {$IFDEF DELPHIXEUP}ftLongWord,{$ENDIF} ftLargeint] Then
                 Begin
                  If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
                   Begin
                    If TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value <> Null Then
                     Begin
-                     If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
+                     If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFDEF DELPHIXEUP}ftLongWord,{$ENDIF}ftLargeint] Then
                       Begin
-                       {$IFNDEF FPC}
-                        {$IF CompilerVersion > 21}Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                        {$ELSE} Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger                    := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                        {$IF Defined(RESTDWLAZARUS)}
+                        Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value, csUndefined));
+                        {$ELSEIF Defined(DELPHIXEUP)}
+                        Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
+                        {$ELSE}
+                        Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger  := StrToInt(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
                         {$IFEND}
-                       {$ELSE}
-                        Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                       {$ENDIF}
                       End
                      Else
-                      Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger  := StrToInt(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                      Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger  := StrToInt(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
                     End;
                   End
                  Else
                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
                 End
-               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFDEF DELPHIXEUP}, ftSingle{$ENDIF}] Then
                 Begin
                  If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
                   Begin
-                   {$IFNDEF FPC}
+                   {$IFNDEF RESTDWLAZARUS}
                     Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value   := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
                    {$ELSE}
                     Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsFloat := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
@@ -7729,7 +7567,7 @@ Var
    Begin
     Result := StrToInt(Copy(vTempString, InitStrPos, Pos('|', vTempString) -1));
     vTempString := Copy(vTempString, Pos('|', vTempString) +1, Length(vTempString));
-    LastTime := DecodeStrings(vTempString{$IFDEF FPC}, csUndefined{$ENDIF});
+    LastTime := DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
    End;
  End;
 Begin
@@ -7749,7 +7587,7 @@ Begin
    Begin
     bJsonValueB  := bJsonOBJ.GetObject(I);
     Try
-     vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+     vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
      Try
       vActualRecB := DecodeREC(vValue, vLastTimeB);
       If (vActualRecB > -1) Then
@@ -7773,22 +7611,18 @@ Begin
                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
                Continue;
               End;
-             If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$if CompilerVersion > 21} // Delphi 2010 pra baixo
-                                                                       ftFixedChar, ftFixedWideChar,{$IFEND}{$ENDIF}
-                                                                       ftString,    ftWideString,
-                                                                       ftMemo, ftFmtMemo {$IFNDEF FPC}
-                                                                               {$IF CompilerVersion > 21}
-                                                                                       , ftWideMemo
-                                                                                {$IFEND}
-                                                                               {$ENDIF}]    Then
+             If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType
+                in [{$IFDEF DELPHIXEUP}ftFixedChar, ftFixedWideChar,{$ENDIF}
+                    ftString, ftWideString, ftMemo, ftFmtMemo
+                    {$IFDEF DELPHIXEUP}, ftWideMemo{$ENDIF}] Then
               Begin
                If (TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value <> Null) And
                   (Trim(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value) <> 'null') Then
                 Begin
-                 vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}); //TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value;
-                 {$IFNDEF FPC}{$IF CompilerVersion < 18}
+                 vValue := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}); //TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value;
+                 {$IFNDEF DELPHI2006UP}
                  vValue := utf8Decode(vValue);
-                 {$IFEND}{$ENDIF}
+                 {$ENDIF}
                  If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size > 0 Then
                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsString := Copy(vValue, 1, Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Size)
                  Else
@@ -7807,26 +7641,26 @@ Begin
                     Begin
                      If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [{$IFNDEF FPC}{$IF CompilerVersion > 21}ftLongWord, {$IFEND}{$ENDIF}ftLargeint] Then
                       Begin
-                       {$IFNDEF FPC}
-                        {$IF CompilerVersion > 21}Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                        {$ELSE} Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger                    := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                        {$IF Defined(RESTDWLAZARUS)}
+                        Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value, csUndefined));
+                        {$ELSEIF Defined(DELPHIXEUP)}
+                        Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
+                        {$ELSE}
+                        Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger  := StrToInt(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
                         {$IFEND}
-                       {$ELSE}
-                        Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsLargeInt := StrToInt64(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
-                       {$ENDIF}
                       End
                      Else
-                      Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger  := StrToInt(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+                      Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsInteger  := StrToInt(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
                     End;
                   End
                  Else
                   Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
                 End
-               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion > 21}, ftSingle{$IFEND}{$ENDIF}] Then
+               Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftFloat,   ftCurrency, ftBCD, ftFMTBcd{$IFDEF DELPHIXEUP}, ftSingle{$ENDIF}] Then
                 Begin
                  If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
                   Begin
-                   {$IFNDEF FPC}
+                   {$IFNDEF RESTDWLAZARUS}
                     Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value   := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
                    {$ELSE}
                     Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsFloat := StrToFloat(BuildFloatString(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value));
@@ -7934,7 +7768,7 @@ Begin
  Else
   Begin
    If TMassiveDatasetBuffer(vMassiveDataset).RecordCount = 0 Then
-    Error := 'No data to "Applyupdates"...'
+    Error := cInvalidDataToApply
    Else
     Begin
      vMassiveJSON := TMassiveDatasetBuffer(vMassiveDataset).ToJSON;
@@ -8063,7 +7897,7 @@ Begin
  Else
   Begin
    If TMassiveDatasetBuffer(vMassiveDataset).RecordCount = 0 Then
-    Error := 'No data to "Applyupdates"...'
+    Error := cInvalidDataToApply
    Else
     Begin
      Result     := False;
@@ -8144,6 +7978,7 @@ Begin
              TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
              RebuildMassiveDataset;
             End;
+
           End;
         End;
        If Assigned(vResult) Then
@@ -8183,7 +8018,7 @@ Begin
      Break;
     End;
   End;
- If Not Assigned(Result) Then 
+ If Not Assigned(Result) Then
   Raise Exception.Create(Format(cParamNotFound, [Value]));
 End;
 
@@ -8208,18 +8043,18 @@ Begin
      Break;
     End;
   End;
- If Not Assigned(Result) Then 
+ If Not Assigned(Result) Then
   Raise Exception.Create(Format(cParamNotFound, [Value]));
 End;
 
 Function TRESTDWTable.ParamCount: Integer;
 Begin
- Result := vParamCount;
+ Result := vParams.Count;
 End;
 
 Function TRESTDWClientSQL.ParamCount: Integer;
 Begin
- Result := vParamCount;
+ Result := vParams.Count;
 End;
 
 Procedure TRESTDWTable.FieldDefsToFields;
@@ -8417,47 +8252,8 @@ Begin
  vCreateDS := True;
  SetInBlockEvents(True);
  Try
-  {$IFDEF FPC}
-   {$IFDEF ZEOSDRIVER} //TODO
-   {$ENDIF}
-   {$IFDEF RESTDWMEMTABLE}
-    TRESTDWMemtable(Self).Close;
-    TRESTDWMemtable(Self).Open;
-   {$ENDIF}
-   {$IFDEF LAZDRIVER}
-    TMemDataset(Self).CreateTable;
-    TMemDataset(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-    TVirtualTable(Self).Close;
-    TVirtualTable(Self).Open;
-   {$ENDIF}
-  {$ELSE}
-  {$IFDEF CLIENTDATASET}
-   TClientDataset(Self).CreateDataSet;
-   TClientDataset(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTDWUNIDACMEM}
-   TVirtualTable(Self).Close;
-   TVirtualTable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTKBMMEMTABLE}
-   Tkbmmemtable(Self).Close;
-   Tkbmmemtable(Self).open;
-  {$ENDIF}
-  {$IFDEF RESTDWFDMEMTABLE}
-   TFDmemtable(Self).CreateDataSet;
-   TFDmemtable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTADMEMTABLE}
-   TADmemtable(Self).CreateDataSet;
-   TADmemtable(Self).Open;
-  {$ENDIF}
-  {$IFDEF RESTDWMEMTABLE}
-   TRESTDWMemtable(Self).Close;
-   TRESTDWMemtable(Self).Open;
-   {$ENDIF}
-  {$ENDIF}
+  TRESTDWMemtable(Self).Close;
+  TRESTDWMemtable(Self).Open;
   vCreateDS := False;
   vActive   := Not vCreateDS;
  Finally
@@ -8474,47 +8270,9 @@ Begin
  vCreateDS := True;
  SetInBlockEvents(True);
  Try
-  {$IFDEF FPC}
-   {$IFDEF ZEOSDRIVER} //TODO
-   {$ENDIF}
-   {$IFDEF RESTDWMEMTABLE}
-    TRESTDWMemtable(Self).Close;
-    TRESTDWMemtable(Self).Open;
-   {$ENDIF}
-   {$IFDEF LAZDRIVER}
-    TMemDataset(Self).CreateTable;
-    TMemDataset(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-    TVirtualTable(Self).Close;
-    TVirtualTable(Self).Open;
-   {$ENDIF}
-  {$ELSE}
-   {$IFDEF CLIENTDATASET}
-    TClientDataset(Self).CreateDataSet;
-    TClientDataset(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTDWUNIDACMEM}
-    TVirtualTable(Self).Close;
-    TVirtualTable(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTKBMMEMTABLE}
-    Tkbmmemtable(Self).Close;
-    Tkbmmemtable(Self).open;
-   {$ENDIF}
-   {$IFDEF RESTDWFDMEMTABLE}
-    TFDmemtable(Self).CreateDataSet;
-    TFDmemtable(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTADMEMTABLE}
-    TADmemtable(Self).CreateDataSet;
-    TADmemtable(Self).Open;
-   {$ENDIF}
-   {$IFDEF RESTDWMEMTABLE}
-    TRESTDWMemtable(Self).Close;
-    TRESTDWMemtable(Self).Open;
-   {$ENDIF}
-  {$ENDIF}
+
+  EmptyTable;
+
   vCreateDS := False;
   vActive   := Not vCreateDS;
  Finally
@@ -8524,70 +8282,8 @@ End;
 Class Procedure TRESTDWTable.CreateEmptyDataset(Const Dataset : TDataset);
 Begin
  Try
-  {$IFDEF RESTDWMEMTABLE}
-  If (Dataset.ClassParent = TRESTDWMemtable) Or
-     (Dataset.ClassType   = TRESTDWMemtable) Then
-   Begin
-    TRESTDWMemtable(Dataset).Close;
-    TRESTDWMemtable(Dataset).Open;
-   End;
-  {$ENDIF}
-  {$IFDEF FPC}
-   If (Dataset.ClassParent = TMemDataset) Or
-      (Dataset.ClassType   = TMemDataset) Then
-    Begin
-     TMemDataset(Dataset).CreateTable;
-//     TMemDataset(Self).Open;
-    End;
-   If (Dataset.ClassParent = TBufDataset) Or
-      (Dataset.ClassType   = TBufDataset) Then
-    Begin
-     TBufDataset(Dataset).Close;
-     TBufDataset(Dataset).CreateDataset;
-    End;
-  {$ELSE}
-   {$IF CompilerVersion > 27} // Delphi XE7 pra cima
-    {$IFNDEF HAS_FMX}  // Incluído inicialmente para iOS/Brito
-     {$IFDEF RESTDWCLIENTDATASET}
-     If (Dataset.ClassParent = TCustomClientDataSet) Or
-        (Dataset.ClassType   = TCustomClientDataSet) Or
-        (Dataset.ClassParent = TClientDataSet)       Or
-        (Dataset.ClassType   = TClientDataSet)       Then
-      Begin
-       TClientDataset(Dataset).Close;
-       TClientDataset(Dataset).CreateDataSet;
-      End;
-     {$ENDIF}
-     {$IFDEF RESTDWMEMTABLE}
-     If (Dataset.ClassParent = TRESTDWMemtable) Or
-        (Dataset.ClassType   = TRESTDWMemtable) Then
-      Begin
-       TRESTDWMemtable(Dataset).Close;
-       TRESTDWMemtable(Dataset).CreateDataSet;
-      End;
-     {$ENDIF}
-     {$IFDEF RESTDWFDMEMTABLE}
-     If (Dataset.ClassParent = TFDmemtable) Or
-        (Dataset.ClassType   = TFDmemtable) Then
-      Begin
-       TFDmemtable(Dataset).Close;
-       TFDmemtable(Dataset).CreateDataSet;
-      End;
-     {$ENDIF}
-    {$ENDIF}
-   {$ELSE}
-    {$IFDEF RESTDWCLIENTDATASET}
-    If (Dataset.ClassParent = TCustomClientDataSet) Or
-       (Dataset.ClassType   = TCustomClientDataSet) Or
-       (Dataset.ClassParent = TClientDataSet)       Or
-       (Dataset.ClassType   = TClientDataSet)       Then
-     Begin
-      TClientDataset(Dataset).Close;
-      TClientDataset(Dataset).CreateDataSet;
-     End;
-    {$ENDIF}
-   {$IFEND}
-  {$ENDIF}
+  TRESTDWMemtable(Dataset).Close;
+  TRESTDWMemtable(Dataset).Open;
  Finally
  End;
 End;
@@ -8595,70 +8291,8 @@ End;
 Class Procedure TRESTDWClientSQL.CreateEmptyDataset(Const Dataset : TDataset);
 Begin
  Try
-  {$IFDEF RESTDWMEMTABLE}
-  If (Dataset.ClassParent = TRESTDWMemtable) Or
-     (Dataset.ClassType   = TRESTDWMemtable) Then
-   Begin
-    TRESTDWMemtable(Dataset).Close;
-    TRESTDWMemtable(Dataset).Open;
-   End;
-  {$ENDIF}
-  {$IFDEF FPC}
-   If (Dataset.ClassParent = TMemDataset) Or
-      (Dataset.ClassType   = TMemDataset) Then
-    Begin
-     TMemDataset(Dataset).CreateTable;
-//     TMemDataset(Self).Open;
-    End;
-   If (Dataset.ClassParent = TBufDataset) Or
-      (Dataset.ClassType   = TBufDataset) Then
-    Begin
-     TBufDataset(Dataset).Close;
-     TBufDataset(Dataset).CreateDataset;
-    End;
-  {$ELSE}
-   {$IF CompilerVersion > 27} // Delphi XE7 pra cima
-    {$IFNDEF HAS_FMX}  // Incluído inicialmente para iOS/Brito
-     {$IFDEF CLIENTDATASET}
-      If (Dataset.ClassParent = TCustomClientDataSet) Or
-         (Dataset.ClassType   = TCustomClientDataSet) Or
-         (Dataset.ClassParent = TClientDataSet)       Or
-         (Dataset.ClassType   = TClientDataSet)       Then
-       Begin
-        TClientDataset(Dataset).Close;
-        TClientDataset(Dataset).CreateDataSet;
-       End;
-     {$ENDIF}
-     {$IFDEF RESTDWMEMTABLE}
-     If (Dataset.ClassParent = TRESTDWMemtable) Or
-        (Dataset.ClassType   = TRESTDWMemtable) Then
-      Begin
-       TRESTDWMemtable(Dataset).Close;
-       TRESTDWMemtable(Dataset).CreateDataSet;
-      End;
-     {$ENDIF}
-     {$IFDEF RESTDWFDMEMTABLE}
-     If (Dataset.ClassParent = TFDmemtable) Or
-        (Dataset.ClassType   = TFDmemtable) Then
-      Begin
-       TFDmemtable(Dataset).Close;
-       TFDmemtable(Dataset).CreateDataSet;
-      End;
-     {$ENDIF}
-    {$ENDIF}
-   {$ELSE}
-    {$IFDEF CLIENTDATASET}
-    If (Dataset.ClassParent = TCustomClientDataSet) Or
-       (Dataset.ClassType   = TCustomClientDataSet) Or
-       (Dataset.ClassParent = TClientDataSet)       Or
-       (Dataset.ClassType   = TClientDataSet)       Then
-     Begin
-      TClientDataset(Dataset).Close;
-      TClientDataset(Dataset).CreateDataSet;
-     End;
-    {$ENDIF}
-   {$IFEND}
-  {$ENDIF}
+  TRESTDWMemtable(Dataset).Close;
+  TRESTDWMemtable(Dataset).Open;
  Finally
  End;
 End;
@@ -8678,8 +8312,9 @@ Begin
      FieldDef.Name     := vFieldsList[I].FieldName;
      FieldDef.DataType := vFieldsList[I].DataType;
      FieldDef.Size     := vFieldsList[I].Size;
-     If FieldDef.DataType In [ftFloat, ftCurrency, ftBCD, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                                          {$IFEND}{$ENDIF}ftFMTBcd] Then
+     If FieldDef.DataType In [ftFloat, ftCurrency, ftBCD,
+                              {$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
+                              ftFMTBcd] Then
       Begin
        FieldDef.Size      := vFieldsList[I].Size;
        FieldDef.Precision := vFieldsList[I].Precision;
@@ -8697,18 +8332,19 @@ Var
  I        : Integer;
  FieldDef : TFieldDef;
 Begin
- TDataset(Self).Close;
+ TRESTDWMemtable(Self).Close;
  For I := 0 To Length(vFieldsList) -1 Do
   Begin
    FieldDef := FieldDefExist(Self, vFieldsList[I].FieldName);
    If FieldDef = Nil Then
     Begin
-     FieldDef          := TDataset(Self).FieldDefs.AddFieldDef;
+     FieldDef          := TRESTDWMemtable(Self).FieldDefs.AddFieldDef;
      FieldDef.Name     := vFieldsList[I].FieldName;
      FieldDef.DataType := vFieldsList[I].DataType;
      FieldDef.Size     := vFieldsList[I].Size;
-     If FieldDef.DataType In [ftFloat, ftCurrency, ftBCD, {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                                          {$IFEND}{$ENDIF}ftFMTBcd] Then
+     If FieldDef.DataType In [ftFloat, ftCurrency, ftBCD,
+                              {$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
+                              ftFMTBcd] Then
       Begin
        FieldDef.Size      := vFieldsList[I].Size;
        FieldDef.Precision := vFieldsList[I].Precision;
@@ -8720,28 +8356,6 @@ Begin
   End;
  CreateDataset;
 End;
-
-//Procedure TRESTDWTable.ChangeCursor(OldCursor : Boolean = False);
-//Begin
-// If Not OldCursor Then
-//  Begin
-//   GetTmpCursor;
-//   SetCursor;
-//  End
-// Else
-//  SetOldCursor;
-//End;
-
-//Procedure TRESTDWClientSQL.ChangeCursor(OldCursor : Boolean = False);
-//Begin
-// If Not OldCursor Then
-//  Begin
-//   GetTmpCursor;
-//   SetCursor;
-//  End
-// Else
-//  SetOldCursor;
-//End;
 
 procedure TRESTDWTable.CleanFieldList;
 Var
@@ -8954,6 +8568,8 @@ Begin
 End;
 
 Procedure TRESTDWClientSQL.OpenCursor(InfoQuery: Boolean);
+var
+ Error: String;
 Begin
  Try
   If (vRESTDataBase <> Nil) And
@@ -8999,8 +8615,7 @@ Begin
        Else
         Inherited OpenCursor(InfoQuery);
       Except
-       If Not (csDesigning in ComponentState) Then
-        Exception.Create(Name + ': ' + cErrorOpenDataset);
+       Raise;
       End;
      End
     Else If (Self.FieldDefs.Count = 0)    And
@@ -9046,7 +8661,8 @@ End;
 
 procedure TRESTDWTable.OldAfterPost(DataSet: TDataSet);
 Var
- vError     : String;
+ vError  : String;
+ vStream : TStream;
 Begin
  vErrorBefore := False;
  vError       := '';
@@ -9069,8 +8685,13 @@ Begin
           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
@@ -9099,7 +8720,8 @@ End;
 
 procedure TRESTDWClientSQL.OldAfterPost(DataSet: TDataSet);
 Var
- vError     : String;
+ vError  : String;
+ vStream : TStream;
 Begin
  vErrorBefore := False;
  vError       := '';
@@ -9124,8 +8746,13 @@ Begin
           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
-            vMassiveCache.Add(TMassiveDatasetBuffer(vMassiveDataset).ToJSON, Self);
-            TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            vStream := TMemoryStream.Create;
+            Try
+             TMassiveDatasetBuffer(vMassiveDataset).SaveToStream(vStream, TMassiveDatasetBuffer(vMassiveDataset));
+             vMassiveCache.Add(vStream, Self);
+            Finally
+             TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
+            End;
            End;
          End;
        End;
@@ -9178,6 +8805,10 @@ Begin
        ProcAfterScroll(Dataset);
       End;
     Except
+      On E: Exception Do
+      Begin
+        Raise Exception.Create(E.Message);
+      End;
     End;
    End;
  Finally
@@ -9208,6 +8839,10 @@ Begin
        ProcAfterScroll(Dataset);
       End;
     Except
+      On E: Exception Do
+      Begin
+       Raise Exception.Create(E.Message);
+      End;
     End;
    End;
  Finally
@@ -9235,7 +8870,7 @@ Procedure TRESTDWClientSQL.ThreadStart(ExecuteData : TOnExecuteData);
 Begin
  If Assigned(vThreadRequest) Then
   ThreadDestroy;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   vThreadRequest        := TRESTDWThreadRequest.Create(Self,
                                                        ExecuteData,
                                                        @AbortData,
@@ -9253,13 +8888,6 @@ Procedure TRESTDWClientSQL.ThreadDestroy;
 Begin
  Try
   vThreadRequest.Kill;
-//  {$IFDEF FPC}
-//   WaitForThreadTerminate(vThreadRequest.Handle, INFINITE);
-//  {$ELSE}
-//   {$IF Not Defined(RESTDWFMX)}
-//    WaitForSingleObject  (vThreadRequest.Handle, INFINITE);
-//   {$IFEND}
-//  {$ENDIF}
  Except
  End;
  FreeAndNil(vThreadRequest);
@@ -9273,6 +8901,17 @@ Begin
    vInternalLast := True;
   End;
  Inherited InternalLast;
+End;
+
+Procedure TRESTDWClientSQL.InternalClose;
+Begin
+ BaseClose;
+ vinactive       := False;
+ vRowsAffected   := 0;
+ vOldRecordCount := 0;
+ vJsonCount      := 0;
+ vActualRec      := 0;
+ Inherited InternalClose;
 End;
 
 Procedure TRESTDWClientSQL.InternalLast;
@@ -9392,9 +9031,6 @@ Begin
  vInBlockEvents := True;
  Try
   Stream.Position := 0;
-  {$IFNDEF RESTDWMEMTABLE}
-  BinaryCompatibleMode := False;
-  {$ENDIF}
   TRESTDWClientSQLBase(Self).LoadFromStream(Stream);
  Finally
   vInBlockEvents := False;
@@ -9411,9 +9047,6 @@ begin
  vInBlockEvents := True;
  Try
   Stream.Position := 0;
-  {$IFNDEF RESTDWMEMTABLE}
-  BinaryCompatibleMode := False;
-  {$ENDIF}
   TRESTDWClientSQLBase(Self).LoadFromStream(Stream);
  Finally
   vInBlockEvents := False;
@@ -9509,7 +9142,7 @@ Procedure TRESTDWTable.Newtable;
 Begin
  TRESTDWTable(Self).Inactive   := True;
  Try
- {$IFNDEF FPC}
+ {$IFNDEF RESTDWLAZARUS}
   Self.Close;
   Self.Open;
  {$ELSE}
@@ -9776,19 +9409,15 @@ Begin
  Inherited;
  vPoolerList           := Nil;
  vClientConnectionDefs := TClientConnectionDefs.Create(Self);
- {$IFNDEF FPC}
- {$IF CompilerVersion > 21}
+ {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
   vEncoding            := esUtf8;
  {$ELSE}
   vEncoding            := esAscii;
  {$IFEND}
- {$ELSE}
-  vEncoding           := esUtf8;
- {$ENDIF}
  vListName            :=  Format('server(%d)', [aCollection.Count]);
  vRestWebService      := '127.0.0.1';
  vCompression         := True;
- vBinaryRequest       := False;
+ vBinaryRequest       := True;
  vAuthOptionParams    := TRESTDWClientAuthOptionParams.Create(Self);
  vAuthOptionParams.AuthorizationOption := rdwAONone;
  vRestPooler          := '';
@@ -9896,17 +9525,19 @@ constructor TRESTDWThreadRequest.Create(aSelf                : TComponent;
                                         OnThreadRequestError : TOnThreadRequestError);
 Begin
  Inherited Create(False);
- vSelf                := aSelf;
+ vSelf                 := aSelf;
  vOnExecuteData        := OnExecuteData;
  vAbortData            := AbortData;
  vOnThreadRequestError := OnThreadRequestError;
- {$IFNDEF FPC}
-  {$IF Defined(HAS_FMX)}
-   {$IF Not Defined(HAS_UTF8)}
-    Priority          := tpLowest;
-   {$IFEND}
+ {$IFNDEF RESTDWLAZARUS}
+  {$If DEFINED(RESTDWFMX)}
+    {$If DEFINED(RESTDWWINDOWS)}
+      Priority              := tpLowest;
+    {$ELSE}
+      Priority              := 1;
+    {$IFEND}
   {$ELSE}
-   Priority           := tpLowest;
+  Priority              := tpLowest;
   {$IFEND}
  {$ENDIF}
 End;
@@ -9953,39 +9584,8 @@ Begin
 // {$ENDIF}
 End;
 
-{$IFDEF FPC}
-{$IFDEF RESTDWLAZDRIVER}
-procedure TRESTDWClientSQL.CloneDefinitions(Source  : TMemDataset;
-                                            aSelf   : TMemDataset);
-{$ENDIF}
-{$IFDEF RESTDWMEMTABLE}
 Procedure TRESTDWClientSQL.CloneDefinitions(Source  : TRESTDWMemtable;
                                             aSelf   : TRESTDWMemtable); //Fields em Definições
-{$ENDIF}
-{$IFDEF RESTDWUNIDACMEM}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TVirtualTable; aSelf : TVirtualTable);
-{$ENDIF}
-{$ELSE}
-{$IFDEF RESTDWCLIENTDATASET}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TClientDataset; aSelf : TClientDataset);
-{$ENDIF}
-{$IFDEF RESTDWUNIDACMEM}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TVirtualTable; aSelf : TVirtualTable);
-{$ENDIF}
-{$IFDEF RESTDWKBMMEMTABLE}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TKbmmemtable; aSelf : TKbmmemtable);
-{$ENDIF}
-{$IFDEF RESTDWFDMEMTABLE}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TFDmemtable; aSelf : TFDmemtable);
-{$ENDIF}
-{$IFDEF RESTDWADMEMTABLE}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source : TADmemtable; aSelf : TADmemtable);
-{$ENDIF}
-{$IFDEF RESTDWMEMTABLE}
-Procedure TRESTDWClientSQL.CloneDefinitions(Source  : TRESTDWMemtable;
-                                            aSelf   : TRESTDWMemtable); //Fields em Definições
-{$ENDIF}
-{$ENDIF}
 Var
  I, A : Integer;
 Begin
@@ -10127,14 +9727,10 @@ Var
        Begin
         If Not FindField(vFieldA).IsNull Then
          Begin
-          {$IFNDEF FPC}
-           {$IF CompilerVersion > 31}
+          {$IFDEF DELPHI10_2UP}
             Value.ParamByName(vFieldD).AsGUID := FindField(vFieldA).AsGUID;
-           {$ELSE}
-            Value.ParamByName(vFieldD).AsString := FindField(vFieldA).AsString;
-           {$IFEND}
           {$ELSE}
-           Value.ParamByName(vFieldD).AsString := FindField(vFieldA).AsString;
+            Value.ParamByName(vFieldD).AsString := FindField(vFieldA).AsString;
           {$ENDIF}
          End
         Else
@@ -10211,12 +9807,8 @@ Var
        Begin
         If Not FindField(vFieldA).IsNull Then
          Begin
-          {$IFNDEF FPC}
-           {$IF CompilerVersion > 31}
-            Value.ParamByName(vFieldD).AsGUID := FindField(vFieldA).AsGUID;
-           {$ELSE}
-            Value.ParamByName(vFieldD).AsString := FindField(vFieldA).AsString;
-           {$IFEND}
+          {$IFDEF DELPHI10_2UP}
+           Value.ParamByName(vFieldD).AsGUID := FindField(vFieldA).AsGUID;
           {$ELSE}
            Value.ParamByName(vFieldD).AsString := FindField(vFieldA).AsString;
           {$ENDIF}
@@ -10232,6 +9824,7 @@ Var
    Begin
     If FindField(Value.Params[I].Name) <> Nil Then
      Begin
+      Value.Params[I].Clear;
       If Not Result Then
        Result := Not (Value.Params[I].Value = FindField(Value.Params[I].Name).Value) or (Value.Params[0].isnull);
       If ((Value.Params[I].Value = FindField(Value.Params[I].Name).Value)) And
@@ -10254,8 +9847,6 @@ Begin
    If vDetailClient <> Nil Then
     Begin
      vDetailClient.vInactive := False;
-     For J := 0 to vDetailClient.Params.Count -1 Do
-      vDetailClient.Params[J].Clear;
      If CloneDetails(vDetailClient) Then
       Begin
        vDetailClient.Active := False;
@@ -10267,7 +9858,7 @@ End;
 
 Procedure TRESTDWTable.Post;
 Begin
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  If State <> dsSetKey then // Lazarus bug
  {$ENDIF}
   Inherited;
@@ -10281,7 +9872,7 @@ End;
 
 Procedure TRESTDWClientSQL.Post;
 Begin
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  If State <> dsSetKey then // Lazarus bug
  {$ENDIF}
   Inherited;
@@ -10322,7 +9913,7 @@ Begin
      LDataSetList.Encoded  := False;
      LDataSetList.Encoding := esUtf8;
      LDataSetList.ServerFieldList := ServerFieldList;
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       LDataSetList.DatabaseCharSet := DatabaseCharSet;
       LDataSetList.NewFieldList    := @NewFieldList;
       LDataSetList.CreateDataSet   := @CreateDataSet;
@@ -10404,7 +9995,7 @@ Begin
      LDataSetList.Encoded  := False;
      LDataSetList.Encoding := esUtf8;
      LDataSetList.ServerFieldList := ServerFieldList;
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       LDataSetList.DatabaseCharSet := DatabaseCharSet;
       LDataSetList.NewFieldList    := @NewFieldList;
       LDataSetList.CreateDataSet   := @CreateDataSet;
@@ -10582,7 +10173,7 @@ Begin
     If DataSet = Nil Then
      Begin
       vRESTDataBase.ExecuteCommandTB(vActualPoolerMethodClient, vTablename, vParams, vError, vMessageError, LDataSetList,
-                                     vRowsAffected, BinaryRequest,  BinaryCompatibleMode, Fields.Count = 0, Nil);
+                                     vRowsAffected, BinaryRequest,  True, Fields.Count = 0, Nil);
       If LDataSetList <> Nil Then
        Begin
         If BinaryRequest Then
@@ -10656,11 +10247,7 @@ Begin
            vStream.Position := 0;
            vTempDS := TRESTDWClientSQL.Create(Nil);
            Try
-            TRESTDWClientSQLBase(vTempDS).BinaryCompatibleMode := BinaryCompatibleMode;
-            If BinaryCompatibleMode Then
-             TRESTDWClientSQLBase(vTempDS).LoadFromStream(TMemoryStream(vStream), stMetadata)
-            Else
-             TRESTDWClientSQL(vTempDS).LoadFromStream(TMemoryStream(vStream));
+            TRESTDWClientSQL(vTempDS).LoadFromStream(vStream);
             NewBinaryFieldList;
            Finally
             FreeAndNil(vTempDS);
@@ -10668,7 +10255,6 @@ Begin
           End;
          vStream.Position := 0;
          SetInBlockEvents(True);
-         TRESTDWClientSQLBase(Self).BinaryCompatibleMode := BinaryCompatibleMode;
          Try
           TRESTDWClientSQLBase(Self).LoadFromStream(TMemoryStream(vStream));
           TRESTDWClientSQLBase(Self).DisableControls;
@@ -10773,23 +10359,20 @@ Var
       Begin
        For J := 0 To vTempDS.Fields.Count - 1 Do
         Begin
-         If vTempDS.Fields[J].FieldKind = fkData Then
-          Begin
-           vFieldDefinition.FieldName := vTempDS.Fields[J].FieldName;
-           vFieldDefinition.DataType  := vTempDS.Fields[J].DataType;
-           If (vFieldDefinition.DataType <> ftFloat) Then
-            vFieldDefinition.Size     := vTempDS.Fields[J].Size
-           Else
-            vFieldDefinition.Size         := 0;
-           If (vFieldDefinition.DataType In [ftCurrency, ftBCD,
-                                             {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                             {$IFEND}{$ENDIF} ftFMTBcd]) Then
-            vFieldDefinition.Precision := TBCDField(vTempDS.Fields[J]).Precision
-           Else If (vFieldDefinition.DataType = ftFloat) Then
-            vFieldDefinition.Precision := TFloatField(vTempDS.Fields[J]).Precision;
-           vFieldDefinition.Required   := vTempDS.Fields[J].Required;
-           NewDataField(vFieldDefinition);
-          End;
+         vFieldDefinition.FieldName := vTempDS.Fields[J].Name;
+         vFieldDefinition.DataType  := vTempDS.Fields[J].DataType;
+         If (vFieldDefinition.DataType <> ftFloat) Then
+          vFieldDefinition.Size     := vTempDS.Fields[J].Size
+         Else
+          vFieldDefinition.Size         := 0;
+         If (vFieldDefinition.DataType
+            In [ftCurrency, ftBCD, {$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
+                ftFMTBcd]) Then
+          vFieldDefinition.Precision := TBCDField(vTempDS.Fields[J]).Precision
+         Else If (vFieldDefinition.DataType = ftFloat) Then
+          vFieldDefinition.Precision := TFloatField(vTempDS.Fields[J]).Precision;
+         vFieldDefinition.Required   := vTempDS.Fields[J].Required;
+         NewDataField(vFieldDefinition);
         End;
       End;
     End;
@@ -10819,7 +10402,7 @@ Begin
     End;
     If vValue = '[]' Then
      vValue := '';
-    {$IFDEF FPC}
+    {$IFDEF RESTDWLAZARUS}
      vValue := StringReplace(vValue, #10, '', [rfReplaceAll]);
     {$ELSE}
      vValue := StringReplace(vValue, #$A, '', [rfReplaceAll]);
@@ -10829,7 +10412,7 @@ Begin
      Begin
       Try
        LDataSetList.ServerFieldList := ServerFieldList;
-       {$IFDEF FPC}
+       {$IFDEF RESTDWLAZARUS}
         LDataSetList.DatabaseCharSet := DatabaseCharSet;
         LDataSetList.NewFieldList    := @NewFieldList;
         LDataSetList.CreateDataSet   := @CreateDataSet;
@@ -10882,7 +10465,7 @@ Begin
       For I := 0 To 1 Do
        Begin
         vRESTDataBase.ExecuteCommand(vActualPoolerMethodClient, vSQL, vParams, vError, vMessageError, LDataSetList,
-                                     vRowsAffected, False, BinaryRequest,  BinaryCompatibleMode, vMetaData, vRESTDataBase.RESTClientPooler);
+                                     vRowsAffected, False, BinaryRequest,  True, vMetaData, vRESTDataBase.RESTClientPooler);
         If Not(vError) or (vMessageError <> cInvalidAuth) Then
          Break;
        End;
@@ -10922,7 +10505,7 @@ Begin
        vJsonCount  := 0;
        LDataSetList.OnWriterProcess     := OnWriterProcess;
        LDataSetList.ServerFieldList := ServerFieldList;
-       {$IFDEF FPC}
+       {$IFDEF RESTDWLAZARUS}
         LDataSetList.DatabaseCharSet    := DatabaseCharSet;
         LDataSetList.NewFieldList       := @NewFieldList;
         LDataSetList.CreateDataSet      := @CreateDataSet;
@@ -10959,17 +10542,12 @@ Begin
         LDataSetList.WriteToDataset(dtFull, vValue, Self, vJsonCount, vDatapacks, vActualRec)
        Else
         Begin
-//         vStream         := DecodeStream(vValue);
          If (csDesigning in ComponentState) Then //Clone end compare Fields
           Begin
            vStream.Position := 0;
-           vTempDS := TRESTDWClientSQL.Create(Nil);
+           vTempDS := TRESTDWClientSQLBase.Create(Nil);
            Try
-            TRESTDWClientSQLBase(vTempDS).BinaryCompatibleMode := BinaryCompatibleMode;
-            If BinaryCompatibleMode Then
-             TRESTDWClientSQLBase(vTempDS).LoadFromStream(TMemoryStream(vStream), stMetadata)
-            Else
-             TRESTDWClientSQL(vTempDS).LoadFromStream(TMemoryStream(vStream));
+            TRESTDWClientSQLBase(vTempDS).LoadFromStream(TMemoryStream(vStream));
             NewBinaryFieldList;
            Finally
             FreeAndNil(vTempDS);
@@ -10977,11 +10555,9 @@ Begin
           End;
          vStream.Position := 0;
          SetInBlockEvents(True);
-         TRESTDWClientSQLBase(Self).BinaryCompatibleMode := BinaryCompatibleMode;
          Try
-          TRESTDWClientSQLBase(Self).LoadFromStream(TMemoryStream(vStream));
           TRESTDWClientSQLBase(Self).DisableControls;
-          SetInBlockEvents(True);
+          TRESTDWClientSQLBase(Self).LoadFromStream(TMemoryStream(vStream));
           If TRESTDWClientSQLBase(Self).Active Then
            Begin
             TRESTDWClientSQLBase(Self).SetInBlockEvents(True); // Novavix
@@ -10991,15 +10567,16 @@ Begin
              vJsonCount := TRESTDWClientSQLBase(Self).Recordcount
             Else
              vJsonCount := TRESTDWClientSQLBase(Self).RecNo;
-            //A Linha a baixo e pedido do Tiago Istuque que não mostrava o recordcount com BN
-            TRESTDWClientSQL(Self).SetRecordCount(vJsonCount, vJsonCount);
+//            //A Linha a baixo e pedido do Tiago Istuque que não mostrava o recordcount com BN
             TRESTDWClientSQLBase(Self).SetInBlockEvents(True); // Novavix
-            TRESTDWClientSQLBase(Self).First;
+            TRESTDWClientSQL(Self).SetRecordCount(vJsonCount, vJsonCount);
+            TRESTDWClientSQL(Self).First;
             TRESTDWClientSQLBase(Self).SetInBlockEvents(False); // Novavix
            End;
          Finally
-          TRESTDWClientSQLBase(Self).EnableControls;
           SetInBlockEvents(False);
+          TRESTDWClientSQLBase(Self).EnableControls;
+
           If Active Then
            If Not (vInBlockEvents) and not vBinaryRequest and not vInRefreshData Then
             Begin
@@ -11138,69 +10715,16 @@ End;
 
 Function TRESTDWClientSQL.GetRecordCount : Integer;
 Begin
- If Not Filtered Then
-  Result := vJsonCount
+ If Not vInBlockEvents Then
+  Begin
+   If Not Filtered Then
+    Result := vJsonCount
+   Else
+    Result := Inherited GetRecordCount;
+  End
  Else
   Result := Inherited GetRecordCount;
 End;
-
-//Procedure TRESTDWTable.GetTmpCursor;
-//{$IFNDEF FPC}
-//{$IFDEF WINFMX}
-//Var
-// CS: IFMXCursorService;
-//{$ENDIF}
-//{$ENDIF}
-//Begin
-//{$IFNDEF FPC}
-// {$IFDEF WINFMX}
-//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-//  If Assigned(CS) then
-//   Begin
-//    If CS.GetCursor <> vActionCursor Then
-//     vOldCursor := CS.GetCursor;
-//   End;
-// {$ELSE}
-//  {$IFNDEF HAS_FMX}
-//  If Screen.Cursor <> vActionCursor Then
-//   vOldCursor := Screen.Cursor;
-//  {$ENDIF}
-// {$ENDIF}
-//{$ELSE}
-// If Screen.Cursor <> vActionCursor Then
-//  vOldCursor := Screen.Cursor;
-//{$ENDIF}
-//End;
-//
-//Procedure TRESTDWClientSQL.GetTmpCursor;
-//{$IFNDEF FPC}
-//{$IFDEF WINFMX}
-//Var
-// CS: IFMXCursorService;
-//{$ENDIF}
-//{$ENDIF}
-//Begin
-//{$IFNDEF FPC}
-// {$IFDEF WINFMX}
-//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-//  If Assigned(CS) then
-//   Begin
-//    If CS.GetCursor <> vActionCursor Then
-//     vOldCursor := CS.GetCursor;
-//   End;
-// {$ELSE}
-//  {$IFNDEF HAS_FMX}
-//  If Screen.Cursor <> vActionCursor Then
-//   vOldCursor := Screen.Cursor;
-//  {$ENDIF}
-// {$ENDIF}
-//{$ELSE}
-// If Screen.Cursor <> vActionCursor Then
-//  vOldCursor := Screen.Cursor;
-//{$ENDIF}
-//End;
 
 Procedure TRESTDWTable.SaveToStream(Var Stream : TMemoryStream);
 Begin
@@ -11208,7 +10732,7 @@ Begin
   Exit;
  vInBlockEvents := True;
  Try
-  TRESTDWClientSQLBase(Self).SaveToStream(Stream);
+  TRESTDWClientSQLBase(Self).SaveToStream(TStream(Stream));
  Finally
   vInBlockEvents := False;
  End;
@@ -11220,7 +10744,7 @@ Begin
   Exit;
  vInBlockEvents := True;
  Try
-  TRESTDWClientSQLBase(Self).SaveToStream(Stream);
+  TRESTDWClientSQLBase(Self).SaveToStream(TStream(Stream));
  Finally
   vInBlockEvents := False;
  End;
@@ -11270,16 +10794,16 @@ Begin
    End;
   If State = dsBrowse Then
    CreateMassiveDataset;
-  If BinaryRequest        Then
-   Begin
-    If Assigned(OnCalcFields) Then
-     Begin
-      DisableControls;
-      Last;
-      First;
-      EnableControls;
-     End;
-   End;
+//  If BinaryRequest        Then
+//   Begin
+//    If Assigned(OnCalcFields) Then
+//     Begin
+//      DisableControls;
+//      Last;
+//      First;
+//      EnableControls;
+//     End;
+//   End;
  Except
   Raise;
  End;
@@ -11434,7 +10958,7 @@ Begin
         ExecuteOpen
        Else
         Begin
-         {$IFDEF FPC}
+         {$IFDEF RESTDWLAZARUS}
           ThreadStart(@ExecuteOpen);
          {$ELSE}
           ThreadStart(ExecuteOpen);
@@ -11518,87 +11042,22 @@ Begin
  vCacheUpdateRecords := Value;
 End;
 
-//Procedure TRESTDWTable.SetCursor;
-//{$IFNDEF FPC}
-//{$IFDEF WINFMX}
-//Var
-// CS: IFMXCursorService;
-//{$ENDIF}
-//{$ENDIF}
-//Begin
-//{$IFNDEF FPC}
-// {$IFDEF WINFMX}
-//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-//  If Assigned(CS) then
-//   Begin
-//    If vActionCursor <> crNone Then
-//     If CS.GetCursor <> vActionCursor Then
-//      CS.SetCursor(vActionCursor);
-//   End;
-// {$ELSE}
-//  {$IFNDEF HAS_FMX}
-//  If vActionCursor <> crNone Then
-//   If Screen.Cursor <> vActionCursor Then
-//    Screen.Cursor := vActionCursor;
-//  {$ENDIF}
-// {$ENDIF}
-//{$ELSE}
-// If vActionCursor <> crNone Then
-//  If Screen.Cursor <> vActionCursor Then
-//   Screen.Cursor := vActionCursor;
-//{$ENDIF}
-//End;
-//
-//Procedure TRESTDWClientSQL.SetCursor;
-//{$IFNDEF FPC}
-//{$IFDEF WINFMX}
-//Var
-// CS: IFMXCursorService;
-//{$ENDIF}
-//{$ENDIF}
-//Begin
-//{$IFNDEF FPC}
-// {$IFDEF WINFMX}
-//  If TPlatformServices.Current.SupportsPlatformService(IFMXCursorService) Then
-//   CS := TPlatformServices.Current.GetPlatformService(IFMXCursorService) As IFMXCursorService;
-//  If Assigned(CS) then
-//   Begin
-//    If vActionCursor <> crNone Then
-//     If CS.GetCursor <> vActionCursor Then
-//      CS.SetCursor(vActionCursor);
-//   End;
-// {$ELSE}
-//  {$IFNDEF HAS_FMX}
-//  If vActionCursor <> crNone Then
-//   If Screen.Cursor <> vActionCursor Then
-//    Screen.Cursor := vActionCursor;
-//  {$ENDIF}
-// {$ENDIF}
-//{$ELSE}
-// If vActionCursor <> crNone Then
-//  If Screen.Cursor <> vActionCursor Then
-//   Screen.Cursor := vActionCursor;
-//{$ENDIF}
-//End;
-
-constructor TRESTDWStoredProc.Create(AOwner: TComponent);
+constructor TRESTDWStoredProcedure.Create(AOwner: TComponent);
 begin
  Inherited;
  vParams        := TParams.Create(Self);
  vProcName      := '';
  vSchemaName    := vProcName;
- vParamCount    := 0;
- vBinaryRequest := False;
+ vBinaryRequest := True;
 end;
 
-destructor TRESTDWStoredProc.Destroy;
+destructor TRESTDWStoredProcedure.Destroy;
 begin
  vParams.Free;
  Inherited;
 end;
 
-Function TRESTDWStoredProc.ExecProc(Var Error : String) : Boolean;
+Function TRESTDWStoredProcedure.ExecProc(Var Error : String) : Boolean;
 Begin
  If vRESTDataBase <> Nil Then
   Begin
@@ -11609,12 +11068,12 @@ Begin
   Raise Exception.Create(PChar(cEmptyDBName));
 End;
 
-Function TRESTDWStoredProc.ParamByName(Value: String): TParam;
+Function TRESTDWStoredProcedure.ParamByName(Value: String): TParam;
 Begin
  Result := Params.ParamByName(Value);
 End;
 
-Procedure TRESTDWStoredProc.SetUpdateSQL(Value : TRESTDWUpdateSQL);
+Procedure TRESTDWStoredProcedure.SetUpdateSQL(Value : TRESTDWUpdateSQL);
 Begin
  If (Assigned(vUpdateSQL)) And
     (vUpdateSQL <> Value)  Then
@@ -11631,12 +11090,12 @@ Begin
   End;
 End;
 
-Function  TRESTDWStoredProc.GetUpdateSQL       : TRESTDWUpdateSQL;
+Function  TRESTDWStoredProcedure.GetUpdateSQL       : TRESTDWUpdateSQL;
 Begin
  Result := vUpdateSQL;
 End;
 
-Procedure TRESTDWStoredProc.Notification(AComponent : TComponent;
+Procedure TRESTDWStoredProcedure.Notification(AComponent : TComponent;
                                          Operation  : TOperation);
 Begin
  If (Operation    = opRemove)              And
@@ -11648,7 +11107,7 @@ Begin
  Inherited Notification(AComponent, Operation);
 end;
 
-procedure TRESTDWStoredProc.SetDataBase(const Value: TRESTDWDatabasebaseBase);
+procedure TRESTDWStoredProcedure.SetDataBase(const Value: TRESTDWDatabasebaseBase);
 begin
  vRESTDataBase := Value;
 end;
@@ -11680,7 +11139,7 @@ End;
 
 Procedure TClientConnectionDefs.DestroyParam;
 Begin
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  If Not(csDesigning in TComponent(GetOwner).ComponentState) Then
   Begin
    If Assigned(vConnectionDefs) Then
@@ -11870,20 +11329,18 @@ Begin
   Begin
    If Assigned(TList(Self).Items[Index])  Then
     Begin
-     {$IFDEF FPC}
-     FreeAndNil(TList(Self).Items[Index]^);
-     {$ELSE}
-      {$IF CompilerVersion > 33}
-       FreeAndNil(TRESTDWValueKey(TList(Self).Items[Index]^));
+      {$IF Defined(RESTDWLAZARUS)}
+      FreeAndNil(TList(Self).Items[Index]^);
+      {$ELSEIF Defined(DELPHI10_4UP)}
+      FreeAndNil(TRESTDWValueKey(TList(Self).Items[Index]^));
       {$ELSE}
-       FreeAndNil(TList(Self).Items[Index]^);
+      FreeAndNil(TList(Self).Items[Index]^);
       {$IFEND}
-     {$ENDIF}
-     {$IFDEF FPC}
-      Dispose(PRESTDWValueKey(TList(Self).Items[Index]));
-     {$ELSE}
-      Dispose(TList(Self).Items[Index]);
-     {$ENDIF}
+      {$IFDEF FPC}
+       Dispose(PRESTDWValueKey(TList(Self).Items[Index]));
+      {$ELSE}
+       Dispose(TList(Self).Items[Index]);
+      {$ENDIF}
     End;
    TList(Self).Delete(Index);
   End;
@@ -11997,19 +11454,15 @@ Begin
  vAuthOptionParams     := TRESTDWClientAuthOptionParams.Create(Self);
  vAuthOptionParams.AuthorizationOption := rdwAONone;
  vPoolerList           := Nil;
- {$IFNDEF FPC}
- {$IF CompilerVersion > 21}
+ {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
   vEncoding         := esUtf8;
  {$ELSE}
   vEncoding         := esAscii;
  {$IFEND}
- {$ELSE}
-  vEncoding         := esUtf8;
- {$ENDIF}
  vLogin             := cDefaultBasicAuthUser;
  vRestWebService    := '127.0.0.1';
  vCompression       := True;
- vBinaryRequest     := False;
+ vBinaryRequest     := True;
  vPassword          := cDefaultBasicAuthPassword;
  vRestPooler        := '';
  vPoolerPort        := 8082;
@@ -12028,6 +11481,147 @@ Begin
  FreeAndNil(vProxyOptions);
  FreeAndNil(vAuthOptionParams);
  Inherited;
+End;
+
+{ TRESTDWPoolerListBase }
+
+Constructor TRESTDWPoolerListBase.Create(AOwner: TComponent);
+Begin
+ Inherited;
+ vDataRoute        := '';
+ vPoolerNotFoundMessage := cPoolerNotFound;
+ vPoolerPort       := 8082;
+ vTimeOut          := 3000;
+ vConnectTimeOut   := 3000;
+ vProxy            := False;
+ vCompression      := True;
+ vTypeRequest      := trHttp;
+ vProxyOptions     := TProxyOptions.Create;
+ vPoolerList       := TStringList.Create;
+ vAuthOptionParams := TRESTDWClientAuthOptionParams.Create(Self);
+ vCripto           := TCripto.Create;
+ vEncoding         := esUtf8;
+ vUserAgent        := cUserAgent;
+ vHandleRedirects  := False;
+ vRedirectMaximum  := 0;
+End;
+
+Destructor TRESTDWPoolerListBase.Destroy;
+Begin
+ vProxyOptions.Free;
+ FreeAndNil(vAuthOptionParams);
+ FreeAndNil(vCripto);
+ FreeAndNil(RESTClientPooler);
+ If vPoolerList <> Nil Then
+  FreeAndNil(vPoolerList);
+ Inherited;
+End;
+
+Function TRESTDWPoolerListBase.GetPoolerList: TStringList;
+Var
+ vTempString,
+ lResponse            : String;
+ JSONParam            : TJSONParam;
+ DWParams             : TRESTDWParams;
+Begin
+ Result := Nil;
+ RESTClientPooler.PoolerNotFoundMessage := PoolerNotFoundMessage;
+ RESTClientPooler.WelcomeMessage  := vWelcomeMessage;
+ RESTClientPooler.HandleRedirects := vHandleRedirects;
+ RESTClientPooler.RedirectMaximum := vRedirectMaximum;
+ RESTClientPooler.Host            := vRestWebService;
+ RESTClientPooler.Port            := vPoolerPort;
+ RESTClientPooler.RequestTimeOut  := vTimeOut;
+ RESTClientPooler.ConnectTimeOut  := vConnectTimeOut;
+ RESTClientPooler.DataCompression := Compression;
+ RESTClientPooler.TypeRequest     := vTypeRequest;
+ RESTClientPooler.Encoding        := vEncoding;
+ RESTClientPooler.UserAgent       := vUserAgent;
+ RESTClientPooler.SetAccessTag(vAccessTag);
+ RESTClientPooler.CriptOptions.Use:= vCripto.Use;
+ RESTClientPooler.CriptOptions.Key:= vCripto.Key;
+ RESTClientPooler.DataRoute        := vDataRoute;
+ RESTClientPooler.AuthenticationOptions := vAuthOptionParams;
+ {$IFDEF RESTDWLAZARUS}
+ RESTClientPooler.DatabaseCharSet  := vDatabaseCharSet;
+ {$ENDIF}
+ DWParams  := TRESTDWParams.Create;
+ DWParams.Encoding               := RESTClientPooler.Encoding;
+ JSONParam                       := TJSONParam.Create(RESTClientPooler.Encoding);
+ JSONParam.ParamName             := 'Result';
+ JSONParam.ObjectDirection       := odOUT;
+ JSONParam.ObjectValue           := ovString;
+ JSONParam.AsString              := '';
+// JSONParam.SetValue('', JSONParam.Encoded);
+ DWParams.Add(JSONParam);
+ Try
+  Try
+   lResponse := RESTClientPooler.SendEvent('GetPoolerList', DWParams);
+   If (lResponse <> '') And
+      (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
+    Begin
+     Result      := TStringList.Create;
+     vTempString := DWParams.ItemsString['Result'].AsString;
+     While Not (vTempString = '') Do
+      Begin
+       if Pos('|', vTempString) > 0 then
+        Begin
+         Result.Add(Copy(vTempString, 1, Pos('|', vTempString) -1));
+         Delete(vTempString, 1, Pos('|', vTempString));
+        End
+       Else
+        Begin
+         Result.Add(Copy(vTempString, 1, Length(vTempString)));
+         Delete(vTempString, 1, Length(vTempString));
+        End;
+      End;
+    End
+   Else
+    Begin
+     If (lResponse = '') Then
+      lResponse  := Format('Unresolved Host : ''%s''', [vRestWebService])
+     Else If (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
+      lResponse  := 'Unauthorized...';
+     Raise Exception.Create(lResponse);
+     lResponse := '';
+    End;
+  Except
+   On E : Exception Do
+    Begin
+     Raise Exception.Create(E.Message);
+    End;
+  End;
+ Finally
+  FreeAndNil(DWParams);
+ End;
+End;
+
+Procedure TRESTDWPoolerListBase.SetConnection(Value: Boolean);
+Begin
+ vConnected := Value;
+ If vConnected Then
+  vConnected := TryConnect;
+End;
+
+Procedure TRESTDWPoolerListBase.SetPoolerPort(Value: Integer);
+Begin
+ vPoolerPort := Value;
+End;
+
+Function TRESTDWPoolerListBase.TryConnect: Boolean;
+Var
+ PoolerList: TStringList;
+Begin
+ PoolerList := Self.GetPoolerList;
+
+ try
+  vPoolerList.Clear;
+  vPoolerList.Assign(PoolerList);
+  Result := True;
+ finally
+  FreeAndNil(PoolerList)
+ end;
+
 End;
 
 end.

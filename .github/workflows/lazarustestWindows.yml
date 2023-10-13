@@ -1,0 +1,40 @@
+name: lazarustestwindows
+
+on:
+  pull_request:
+  push:
+    paths-ignore:
+    - "README.md"
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [windows-latest]
+        lazarus-versions: [dist, stable, 2.2.0]
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v2
+    - name: Install Lazarus
+      uses: gcarreno/setup-lazarus@v3.2
+      with:
+        lazarus-version: ${{ matrix.lazarus-versions }}
+        include-packages: "Indy10, ZeosDBO"
+        with-cache: false
+    - name: Build the Main package on Windows
+      run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
+      
+    - name: Build Indy package on Windows
+      run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
+      
+    - name: Build ShellServices package on Windows
+      run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"   
+      
+    - name: Build ZeosDriver package on Windows
+      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"    
+      
+    - name: Build LazarusDriver package on Windows
+      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"

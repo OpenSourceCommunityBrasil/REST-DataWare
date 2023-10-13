@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <PathDelim Value="\"/>
+    <Name Value="RESTDWFphttpSockets"/>
+    <Type Value="RunAndDesignTime"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\..\..\..\Source\Includes"/>
+        <OtherUnitFiles Value="..\..\..\..\Source;..\..\..\..\Source\Sockets\Fphttp;..\..\..\..\Source\Basic"/>
+        <UnitOutputDirectory Value="..\..\..\..\compiledlaz"/>
+      </SearchPaths>
+      <Linking>
+        <Debugging>
+          <DebugInfoType Value="dsDwarf3"/>
+        </Debugging>
+      </Linking>
+    </CompilerOptions>
+    <Version Major="2" Minor="1"/>
+    <Files>
+      <Item>
+        <Filename Value="..\..\..\..\Source\Sockets\Fphttp\uRESTDWFphttpBase.pas"/>
+        <UnitName Value="uRESTDWFphttpBase"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\..\..\Source\Sockets\Fphttp\uRESTDWFphttpReg.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="uRESTDWFphttpReg"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\..\..\Source\Includes\uRESTDW.inc"/>
+        <Type Value="Include"/>
+      </Item>
+      <Item>
+        <Filename Value="RESTDWfphttpSockets.lrs"/>
+        <Type Value="LRS"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="restdatawarecomponents"/>
+        <MinVersion Major="2" Valid="True"/>
+      </Item>
+      <Item>
+        <PackageName Value="weblaz"/>
+      </Item>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

@@ -1,19 +1,15 @@
 unit uRESTDWDataJSON;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 Interface
 
 Uses
- {$IFDEF FPC}
-  {$IFNDEF RESTDWLAMW}
+ {$IF Defined(RESTDWLAZARUS) AND not Defined(RESTDWLAMW)}
    LCL,
-  {$ENDIF}
- {$ELSE}
-  {$IFDEF RESTDWWINDOWS}
+ {$ELSEIF Defined(RESTDWWINDOWS)}
    Windows,
-  {$ENDIF}
- {$ENDIF}
+ {$IFEND}
   SysUtils, uRESTDWDataUtils, Classes, TypInfo, Variants, uRESTDWConsts;
 
 Type
@@ -223,8 +219,9 @@ Function unescape_chars     (s     : String)    : String;
 
 Implementation
 
-Uses uRESTDWTools, uRESTDWJSON, uRESTDWJSONInterface
-     {$IFNDEF FPC}{$IF Defined(RESTDWFMX)}, system.json{$IFEND}{$ENDIF};
+Uses
+  uRESTDWTools, uRESTDWJSON, uRESTDWJSONInterface
+ {$IFDEF RESTDWFMX}, system.json{$ENDIF};
 
 Function TrashRemove(Value : String) : String;
 Begin
@@ -338,7 +335,7 @@ Var
  End;
 Begin
  c      := #0;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  b      := #0;
  i      := 0;
  {$ENDIF}
@@ -551,7 +548,7 @@ Var
 Begin
  New(BaseObjectClass);
  BaseObjectClass^ := Value;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   If BaseObjectClass^.ObjectType = jtArray Then
    ElementName   := Key
   Else
@@ -688,7 +685,7 @@ Begin
      Begin
       Case TRESTDWJSONBaseObjectClass(vList.Items[Index]^).ElementType Of
        etString   : Begin
-                     {$IFDEF FPC}
+                     {$IFDEF RESTDWLAZARUS}
                       FreeAndNil(vList.Items[Index]^);
                      {$ELSE}
                       FreeAndNil(TRESTDWJSONString(vList.Items[Index]^));
@@ -696,7 +693,7 @@ Begin
                      Dispose(PRESTDWJSONString(vList.Items[Index]));
                     End;
        etNumeric  : Begin
-                     {$IFDEF FPC}
+                     {$IFDEF RESTDWLAZARUS}
                       FreeAndNil(vList.Items[Index]^);
                      {$ELSE}
                       FreeAndNil(TRESTDWJSONNumeric(vList.Items[Index]^));
@@ -704,7 +701,7 @@ Begin
                      Dispose(PRESTDWJSONNumeric(vList.Items[Index]));
                     End;
        etInteger  : Begin
-                     {$IFDEF FPC}
+                     {$IFDEF RESTDWLAZARUS}
                       FreeAndNil(vList.Items[Index]^);
                      {$ELSE}
                       FreeAndNil(TRESTDWJSONInteger(vList.Items[Index]^));
@@ -712,7 +709,7 @@ Begin
                      Dispose(PRESTDWJSONInteger(vList.Items[Index]));
                     End;
        etBoolean  : Begin
-                     {$IFDEF FPC}
+                     {$IFDEF RESTDWLAZARUS}
                       FreeAndNil(vList.Items[Index]^);
                      {$ELSE}
                       FreeAndNil(TRESTDWJSONBoolean(vList.Items[Index]^));
@@ -720,7 +717,7 @@ Begin
                      Dispose(PRESTDWJSONBoolean(vList.Items[Index]));
                     End;
        etDateTime : Begin
-                     {$IFDEF FPC}
+                     {$IFDEF RESTDWLAZARUS}
                       FreeAndNil(vList.Items[Index]^);
                      {$ELSE}
                       FreeAndNil(TRESTDWJSONDateTime(vList.Items[Index]^));
@@ -728,7 +725,7 @@ Begin
                      Dispose(PRESTDWJSONDateTime(vList.Items[Index]));
                     End;
        etBlob     : Begin
-                     {$IFDEF FPC}
+                     {$IFDEF RESTDWLAZARUS}
                       FreeAndNil(vList.Items[Index]^);
                      {$ELSE}
                       FreeAndNil(TRESTDWJSONBlob(vList.Items[Index]^));
@@ -737,7 +734,7 @@ Begin
                     End;
        Else
         Begin
-         {$IFDEF FPC}
+         {$IFDEF RESTDWLAZARUS}
           FreeAndNil(vList.Items[Index]^);
          {$ELSE}
           FreeAndNil(TRESTDWJSONBaseObjectClass(vList.Items[Index]^));
@@ -931,8 +928,8 @@ Var
 begin
  If JSON = '' Then
   Exit;
- {$IFNDEF FPC}
-  {$IF Defined(HAS_FMX)}
+ {$IFNDEF RESTDWLAZARUS}
+  {$IFDEF RESTDWFMX}
    If JSON[InitStrPos] = '[' then
     bJsonValue  := TRESTDWJSONBaseClass(TJSONObject.ParseJSONValue(JSON) as TJsonArray)
    Else If JSON[InitStrPos] = '{' then
@@ -946,7 +943,7 @@ begin
     bJsonValue  := TRESTDWJSONBaseClass(TRESTDWJSONObject.Create(JSON))
    Else
     bJsonValue  := TRESTDWJSONBaseClass(TRESTDWJSONObject.Create('{}'));
-  {$IFEND}
+  {$ENDIF}
  {$ELSE}
   Try
    If JSON[InitStrPos] = '[' then
@@ -1386,15 +1383,11 @@ Var
  JSONBase     : TRESTDWJSONBase;
  DecimalLocal : String;
 begin
- {$IFDEF FPC}
+  {$IF Defined(RESTDWLAZARUS) or not Defined(DELPHIXEUP)}
   DecimalLocal := DecimalSeparator;
- {$ELSE}
-  {$IF CompilerVersion > 21} // Delphi 2010 pra cima
-  DecimalLocal := FormatSettings.DecimalSeparator;
   {$ELSE}
-  DecimalLocal := DecimalSeparator;
+  DecimalLocal := FormatSettings.DecimalSeparator;
   {$IFEND}
- {$ENDIF}
  bJsonValue  := TRESTDWJSONInterfaceObject.Create(TrashRemove(JSON));
  Try
   If Assigned(vList) Then

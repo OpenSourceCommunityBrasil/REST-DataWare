@@ -1,6 +1,6 @@
 unit uRESTDWCoder3to4;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWCoder3to4;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -26,7 +25,7 @@ unit uRESTDWCoder3to4;
 Interface
 
 Uses
-  Classes, SysUtils, uRESTDWCoder, uRESTDWBasicTypes;
+  Classes, SysUtils, uRESTDWCoder, uRESTDWBasicTypes, uRESTDWProtoTypes;
 
  Type
   TRESTDWDecodeTable = Array[1..127] of Byte;

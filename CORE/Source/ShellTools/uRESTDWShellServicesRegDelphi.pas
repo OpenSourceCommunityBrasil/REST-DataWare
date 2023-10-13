@@ -1,6 +1,6 @@
 unit uRESTDWShellServicesRegDelphi;
 
-{$I ..\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -16,7 +16,6 @@ unit uRESTDWShellServicesRegDelphi;
   XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
   A. Brito                   - Admin - Administrador do desenvolvimento.
   Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
-  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
   Flávio Motta               - Member Tester and DEMO Developer.
   Mobius One                 - Devel, Tester and Admin.
   Gustavo                    - Criptografia and Devel.
@@ -27,11 +26,9 @@ unit uRESTDWShellServicesRegDelphi;
 interface
 
 uses
-   {$IFDEF COMPILER16_UP} UITypes, {$ENDIF}
-   {$if CompilerVersion > 22}ExptIntf, {$ELSE} DbTables, {$IFEND}   
-   
-   Windows, SysUtils, Variants, StrEdit, TypInfo, RTLConsts, ToolsApi, Classes,
-   DesignWindows, DesignEditors, DBReg, DSDesign, ColnEdit, Db, DesignIntf,
+   {$IFNDEF DELPHIXE2UP} DbTables, {$ENDIF}
+   Classes,
+   DesignIntf,
    uRESTDWShellServicesDelphi;
 
 Procedure Register;

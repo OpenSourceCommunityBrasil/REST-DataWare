@@ -1,6 +1,6 @@
 unit DWDCPcrypt2;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit DWDCPcrypt2;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -74,13 +73,17 @@ type
     { Update the hash buffer with Size bytes of data from Buffer }
     procedure UpdateStream(Stream: TStream; Size: longword);
     { Update the hash buffer with Size bytes of data from the stream }
-    procedure UpdateStr(const Str: DWDCPRawString); {$IFNDEF NOTRAWSUPPORT}overload;{$ENDIF}
-
-    { Update the hash buffer with the string }
-    {$IFNDEF NOTRAWSUPPORT}
-    procedure UpdateStr(const Str: DWDCPUnicodeString); overload;
-      { Update the hash buffer with the string }
+    procedure UpdateStr(Const Str: DWDCPRawString); overload;
+    {$IFNDEF FPC}
+     {$IFDEF DELPHI2010UP}
+     { Update the hash buffer with the string }
+     procedure UpdateStr(Const Str: DWDCPUnicodeString); overload;
+     {$ENDIF}
+    {$ELSE}
+     { Update the hash buffer with the string }
+     procedure UpdateStr(Const Str: DWDCPUnicodeString); overload;
     {$ENDIF}
+      { Update the hash buffer with the string }
     destructor Destroy; override;
 
   published
@@ -127,15 +130,18 @@ type
 
     procedure Init(const Key; Size: longword; InitVector: pointer); virtual;
     { Do key setup based on the data in Key, size is in bits }
-    procedure InitStr(const Key: DWDCPRawString; HashType: TDWDCP_hashclass); {$IFNDEF NOTRAWSUPPORT}overload;{$ENDIF}
-
+    procedure InitStr(const Key: DWDCPRawString; HashType: TDWDCP_hashclass); overload;
+    {$IFNDEF FPC}
+     {$IFDEF DELPHI2010UP}
+      procedure InitStr(const Key : DWDCPUnicodeString;
+                        HashType  : TDWDCP_hashclass); overload;
+      { Do key setup based on a hash of the key string }
+     {$ENDIF}
+    {$ELSE}
+     procedure InitStr(const Key : DWDCPUnicodeString;
+                       HashType  : TDWDCP_hashclass); overload;
     { Do key setup based on a hash of the key string }
-
-{$IFNDEF NOTRAWSUPPORT}
-    procedure InitStr(const Key: DWDCPUnicodeString;
-      HashType: TDWDCP_hashclass); overload;
-    { Do key setup based on a hash of the key string }
-{$ENDIF}
+    {$ENDIF}
     procedure Burn; virtual;
     { Clear all stored key information }
     procedure Reset; virtual;
@@ -148,17 +154,23 @@ type
     { Encrypt size bytes of data from InStream and place in OutStream }
     function DecryptStream(InStream, OutStream: TStream; Size: longword): longword;
     { Decrypt size bytes of data from InStream and place in OutStream }
-    function EncryptString(const Str: DWDCPRawString): DWDCPRawString; {$IFNDEF NOTRAWSUPPORT}overload;{$ENDIF} virtual;
+    function EncryptString(const Str: DWDCPRawString): DWDCPRawString; overload;virtual;
     { Encrypt a string and return Base64 encoded }
-    function DecryptString(const Str: DWDCPRawString): DWDCPRawString; {$IFNDEF NOTRAWSUPPORT}overload;{$ENDIF} virtual;
+    function DecryptString(const Str: DWDCPRawString): DWDCPRawString; overload;virtual;
     { Decrypt a Base64 encoded string }
-
-{$IFNDEF NOTRAWSUPPORT}
-    function EncryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString; overload; virtual;
-      { Encrypt a Unicode string and return Base64 encoded }
-    function DecryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString; overload; virtual;
+    {$IFNDEF FPC}
+     {$IFDEF DELPHI2010UP}
+       function EncryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString; overload; virtual;
+         { Encrypt a Unicode string and return Base64 encoded }
+       function DecryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString; overload; virtual;
+         { Decrypt a Base64 encoded Unicode string }
+     {$ENDIF}
+    {$ELSE}
+     function EncryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString; overload; virtual;
+        { Encrypt a Unicode string and return Base64 encoded }
+     function DecryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString; overload; virtual;
       { Decrypt a Base64 encoded Unicode string }
-{$ENDIF}
+    {$ENDIF}
     function PartialEncryptStream(AStream: TMemoryStream; Size: longword)
       : longword;
     { Partially Encrypt up to 16K bytes of data in AStream }
@@ -212,13 +224,15 @@ type
     { Encrypt a string and return Base64 encoded }
     function DecryptString(const Str: DWDCPRawString): DWDCPRawString; overload; override;
     { Decrypt a Base64 encoded string }
-{$IFNDEF NOTRAWSUPPORT}
-    function EncryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString; overload; override;
+    {$IFNDEF FPC}
+     {$IFDEF DELPHI2010UP}
+      function EncryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString; overload;override;
+       { Encrypt a Unicode string and return Base64 encoded }
+     {$ENDIF}
+    {$ELSE}
+     function EncryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString; overload; override;
       { Encrypt a Unicode string and return Base64 encoded }
-    function DecryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString; overload; override;
-      { Decrypt a Base64 encoded Unicode string }
-{$ENDIF}
-
+    {$ENDIF}
     procedure EncryptECB(const Indata; var Outdata); virtual;
     { Encrypt a block of data using the ECB method of encryption }
     procedure DecryptECB(const Indata; var Outdata); virtual;
@@ -260,12 +274,10 @@ type
 
 implementation
 
-{$IFNDEF FPC}
- {$IFDEF WINDOWS}
-uses Windows;
- {$Q-}{$R-}
- {$ENDIF}
-{$ENDIF}
+// {$IFDEF RESTDWWINDOWS}
+//uses Windows;
+// {$Q-}{$R-}
+//{$ENDIF}
 
 const
 {$IFDEF NEXTGEN}
@@ -353,18 +365,24 @@ begin
   end;
 end;
 
-procedure TDWDCP_hash.UpdateStr(const Str: DWDCPRawString);
-begin
-  Update(Str[STRINGBASE], Length(Str));
-end;
+Procedure TDWDCP_hash.UpdateStr(Const Str: DWDCPRawString);
+Begin
+ Update(Str[STRINGBASE], Length(Str));
+End;
 
-{$IFNDEF NOTRAWSUPPORT}
-procedure TDWDCP_hash.UpdateStr(const Str: DWDCPUnicodeString);
-begin
+{$IFNDEF FPC}
+ {$IFDEF DELPHI2010UP}
+  Procedure TDWDCP_hash.UpdateStr(Const Str: DWDCPUnicodeString);
+  Begin
+   Update(Str[STRINGBASE], Length(Str) * SizeOf(Str[STRINGBASE]));
+  End;
+ {$ENDIF}
+{$ELSE}
+ Procedure TDWDCP_hash.UpdateStr(Const Str: DWDCPUnicodeString);
+ Begin
   Update(Str[STRINGBASE], Length(Str) * SizeOf(Str[STRINGBASE]));
-end; { DecryptString }
+ End;
 {$ENDIF}
-
 destructor TDWDCP_hash.Destroy;
 begin
   if fInitialized then
@@ -429,8 +447,8 @@ end;
 
 procedure TDWDCP_cipher.InitStr(const Key: DWDCPRawString; HashType: TDWDCP_hashclass);
 var
-  Hash: TDWDCP_hash;
-  Digest: pointer;
+  Hash   : TDWDCP_hash;
+  Digest : pointer;
 begin
   if fInitialized then
     Burn;
@@ -456,7 +474,34 @@ begin
   end;
 end;
 
-{$IFNDEF NOTRAWSUPPORT}
+{$IFNDEF FPC}
+ {$IFDEF DELPHI2010UP}
+  procedure TDWDCP_cipher.InitStr(const Key: DWDCPUnicodeString; HashType: TDWDCP_hashclass);
+  var
+    Hash: TDWDCP_hash;
+    Digest: pointer;
+  begin
+    if fInitialized then
+      Burn;
+    try
+      GetMem(Digest, HashType.GetHashSize div 8);
+      Hash := HashType.Create(Self);
+      Hash.Init;
+      Hash.UpdateStr(Key);
+      Hash.Final(Digest^);
+      Hash.Free;
+      if MaxKeySize < HashType.GetHashSize then
+        Init(Digest^, MaxKeySize, nil)
+      else
+        Init(Digest^, HashType.GetHashSize, nil);
+      FillChar(Digest^, HashType.GetHashSize div 8, $FF);
+      FreeMem(Digest);
+    except
+      raise EDWDCP_cipher.Create('Unable to allocate sufficient memory for hash digest');
+    end;
+  end;
+ {$ENDIF}
+{$ELSE}
 procedure TDWDCP_cipher.InitStr(const Key: DWDCPUnicodeString; HashType: TDWDCP_hashclass);
 var
   Hash: TDWDCP_hash;
@@ -583,7 +628,21 @@ begin
   Decrypt(Result[STRINGBASE], Result[STRINGBASE], Length(Result));
 end;
 
-{$IFNDEF NOTRAWSUPPORT}
+{$IFNDEF FPC}
+ {$IFDEF DELPHI2010UP}
+  function TDWDCP_cipher.EncryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString;
+  begin
+    SetLength(Result,Length(Str));
+    Encrypt(Str[STRINGBASE],Result[STRINGBASE],Length(Str)*SizeOf(Str[STRINGBASE]));
+    Result := Base64EncodeStr(Result);
+  end;
+  function TDWDCP_cipher.DecryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString;
+  begin
+    Result := Base64DecodeStr(Str);
+    Decrypt(Result[STRINGBASE], Result[STRINGBASE], Length(Result) * SizeOf(Result[STRINGBASE]));
+  end;
+ {$ENDIF}
+{$ELSE}
 function TDWDCP_cipher.EncryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString;
 begin
   SetLength(Result,Length(Str));
@@ -664,18 +723,21 @@ begin
   DecryptCFB8bit(Result[STRINGBASE], Result[STRINGBASE], Length(Result));
 end;
 
-{$IFNDEF NOTRAWSUPPORT}
+{$IFNDEF FPC}
+ {$IFDEF DELPHI2010UP}
+  function TDWDCP_blockcipher.EncryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString;
+  begin
+    SetLength(Result,Length(Str));
+    EncryptCFB8bit(Str[STRINGBASE],Result[STRINGBASE],Length(Str)*SizeOf(Str[STRINGBASE]));
+    Result := Base64EncodeStr(Result);
+  end;
+ {$ENDIF}
+{$ELSE}
 function TDWDCP_blockcipher.EncryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString;
 begin
   SetLength(Result,Length(Str));
   EncryptCFB8bit(Str[STRINGBASE],Result[STRINGBASE],Length(Str)*SizeOf(Str[STRINGBASE]));
   Result := Base64EncodeStr(Result);
-end;
-
-function TDWDCP_blockcipher.DecryptString(const Str: DWDCPUnicodeString): DWDCPUnicodeString;
-begin
-  Result := Base64DecodeStr(Str);
-  DecryptCFB8bit(Result[STRINGBASE],Result[STRINGBASE],Length(Result)*SizeOf(Result[STRINGBASE]));
 end;
 {$ENDIF}
 
@@ -748,22 +810,6 @@ begin
   inherited Create(AOwner);
   fCipherMode := cmCBC;
 end;
-
-{
-procedure XorBlock(var InData1, InData2; Size: longword);
-var
-  b1,
-  b2: PByteArray;
-  i: longword;
-begin
-  b1 := @InData1;
-  b2 := @InData2;
-  for i := 0 to Size - 1 do
-    b1[i] := (b1[i] xor b2[i]);
-end;
-}
-
-{ ** RECENT Additions after Version 2.0 ** }
 
 // Version 2.1 : Partial Stream Read capability.
 function TDWDCP_cipher.PartialDecryptStream(AStream: TMemoryStream;

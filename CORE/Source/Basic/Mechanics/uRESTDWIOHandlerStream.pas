@@ -1,6 +1,6 @@
 unit uRESTDWIOHandlerStream;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWIOHandlerStream;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -26,8 +25,8 @@ unit uRESTDWIOHandlerStream;
 Interface
 
 Uses
- Classes, uRESTDWBasicTypes, uRESTDWTools, uRESTDWConsts, uRESTDWIOHandler,
- uRESTDWComponentBase;
+ Classes, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWTools, uRESTDWConsts,
+ uRESTDWIOHandler, uRESTDWAbout;
 
  Type
   TRESTDWIOHandlerStream     = Class;

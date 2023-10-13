@@ -1,7 +1,7 @@
 object FrmDWSqlEditor: TFrmDWSqlEditor
-  Left = 639
+  Left = 472
   Height = 756
-  Top = 125
+  Top = 195
   Width = 1079
   BorderWidth = 5
   Caption = 'RESTDWClientSQL Editor'
@@ -11,12 +11,12 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
+  OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
-  OnResize = FormResize
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.0.10.0'
+  LCLVersion = '2.2.4.0'
   object PnlSQL: TPanel
     Left = 5
     Height = 415
@@ -47,29 +47,73 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         TabOrder = 0
       end
     end
-    object PageControl: TPageControl
-      Left = 216
-      Height = 377
+    object pEditor: TPanel
+      Left = 209
+      Height = 415
       Top = 0
-      Width = 583
-      ActivePage = TabSheetSQL
-      TabIndex = 0
+      Width = 765
+      Align = alClient
+      BevelOuter = bvNone
+      ClientHeight = 415
+      ClientWidth = 765
       TabOrder = 1
-      object TabSheetSQL: TTabSheet
-        BorderWidth = 5
-        Caption = 'SQL Command'
-        ClientHeight = 351
-        ClientWidth = 575
-        object Memo: TMemo
-          Left = 0
-          Height = 351
-          Top = 0
-          Width = 575
-          Align = alClient
-          OnDragDrop = MemoDragDrop
-          OnDragOver = MemoDragOver
-          ScrollBars = ssBoth
-          TabOrder = 0
+      object PageControl: TPageControl
+        Left = 0
+        Height = 394
+        Top = 0
+        Width = 765
+        ActivePage = TabSheetSQL
+        Align = alClient
+        TabIndex = 0
+        TabOrder = 0
+        object TabSheetSQL: TTabSheet
+          BorderWidth = 5
+          Caption = 'SQL Command'
+          ClientHeight = 368
+          ClientWidth = 757
+          object Memo: TMemo
+            Left = 0
+            Height = 368
+            Top = 0
+            Width = 757
+            Align = alClient
+            OnDragDrop = MemoDragDrop
+            OnDragOver = MemoDragOver
+            ScrollBars = ssBoth
+            TabOrder = 0
+          end
+        end
+      end
+      object Panel1: TPanel
+        Left = 0
+        Height = 21
+        Top = 394
+        Width = 765
+        Align = alBottom
+        BevelOuter = bvLowered
+        ClientHeight = 21
+        ClientWidth = 765
+        TabOrder = 1
+        object Label3: TLabel
+          Left = 7
+          Height = 13
+          Top = 4
+          Width = 79
+          Caption = 'Execute Time:'
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+        end
+        object lbExecutedTime: TLabel
+          Left = 91
+          Height = 13
+          Top = 4
+          Width = 66
+          Caption = '00:00:00:000'
+          ParentColor = False
         end
       end
     end
@@ -91,9 +135,9 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Align = alTop
         AutoSize = False
         Caption = ' .: TABLES'
-        Color = clGrayText
+        Color = clBtnShadow
         Font.Color = clWhite
-        Font.Height = -16
+        Font.Height = 24
         Font.Name = 'Segoe UI'
         Layout = tlCenter
         ParentColor = False
@@ -108,7 +152,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Align = alTop
         AutoSize = False
         Caption = ' .: FIELDS'
-        Color = clGrayText
+        Color = clBtnShadow
         Font.Color = clWhite
         Font.Height = -16
         Font.Name = 'Segoe UI'
@@ -125,7 +169,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Align = alTop
         AutoSize = False
         Caption = ' .: SQL TYPE'
-        Color = clGrayText
+        Color = clBtnShadow
         Font.Color = clWhite
         Font.Height = -16
         Font.Name = 'Segoe UI'
@@ -224,7 +268,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Anchors = [akTop, akRight]
       Caption = 'Ok'
       Default = True
-      ModalResult = 1
       OnClick = BtnOkClick
       TabOrder = 0
     end
@@ -236,7 +279,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Anchors = [akTop, akRight]
       Cancel = True
       Caption = 'Cancel'
-      ModalResult = 2
       OnClick = BtnCancelarClick
       TabOrder = 1
     end
@@ -269,5 +311,12 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         TitleFont.Name = 'Tahoma'
       end
     end
+  end
+  object tmClose: TTimer
+    Enabled = False
+    Interval = 200
+    OnTimer = tmCloseTimer
+    Left = 341
+    Top = 240
   end
 end

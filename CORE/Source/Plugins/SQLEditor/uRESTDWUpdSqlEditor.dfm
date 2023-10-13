@@ -11,12 +11,10 @@ object FrmDWUpdSqlEditor: TFrmDWUpdSqlEditor
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnResize = FormResize
-  PixelsPerInch = 96
   TextHeight = 13
   object PnlSQL: TPanel
     Left = 0
@@ -38,10 +36,6 @@ object FrmDWUpdSqlEditor: TFrmDWUpdSqlEditor
       object tsInsertSQL: TTabSheet
         BorderWidth = 5
         Caption = 'Insert'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object mInsertSQL: TMemo
           Left = 0
           Top = 0
@@ -57,10 +51,6 @@ object FrmDWUpdSqlEditor: TFrmDWUpdSqlEditor
       object tsModifySQL: TTabSheet
         Caption = 'Modify'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object mModifySQL: TMemo
           Left = 0
           Top = 0
@@ -76,10 +66,6 @@ object FrmDWUpdSqlEditor: TFrmDWUpdSqlEditor
       object tsDeleteSQL: TTabSheet
         Caption = 'Delete'
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object mDeleteSQL: TMemo
           Left = 0
           Top = 0
@@ -95,10 +81,6 @@ object FrmDWUpdSqlEditor: TFrmDWUpdSqlEditor
       object tsLockSQL: TTabSheet
         Caption = 'Lock'
         ImageIndex = 3
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object mLockSQL: TMemo
           Left = 0
           Top = 0
@@ -114,10 +96,6 @@ object FrmDWUpdSqlEditor: TFrmDWUpdSqlEditor
       object tsUnlockSQL: TTabSheet
         Caption = 'Unlock'
         ImageIndex = 4
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object mUnlockSQL: TMemo
           Left = 0
           Top = 0
@@ -133,10 +111,6 @@ object FrmDWUpdSqlEditor: TFrmDWUpdSqlEditor
       object tsFetchRowSQL: TTabSheet
         Caption = 'FetchRow'
         ImageIndex = 5
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object mFetchRowSQL: TMemo
           Left = 0
           Top = 0

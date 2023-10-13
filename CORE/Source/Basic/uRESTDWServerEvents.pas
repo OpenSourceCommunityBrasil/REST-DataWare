@@ -1,36 +1,27 @@
 unit uRESTDWServerEvents;
 
+{$I ..\Includes\uRESTDW.inc}
+
 {
   REST Dataware .
-  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
- de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
   Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
- Membros do Grupo :
-
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
- Ivan Cesar                 - Admin - Administrador  do pacote.
- Joanan Mendonça Jr. (jlmj) - Admin - Administrador  do pacote.
- Giovani da Cruz            - Admin - Administrador  do pacote.
- Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Alexandre Souza            - Admin - Administrador do Grupo de Organização.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Mizael Rocha               - Member Tester and DEMO Developer.
- Flávio Motta               - Member Tester and DEMO Developer.
- Itamar Gaucho              - Member Tester and DEMO Developer.
- Ico Menezes                - Member Tester and DEMO Developer.
+ Maiores informações:
+ https://github.com/OpenSourceCommunityBrasil/REST-DataWare
 }
 
 
 interface
 
 Uses
- SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWComponentBase,
- uRESTDWBasic, uRESTDWBasicTypes, uRESTDWTools, uRESTDWParams,
- uRESTDWJSONInterface;
+ SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts,
+ uRESTDWBasic, uRESTDWProtoTypes, uRESTDWTools, uRESTDWParams,
+ uRESTDWJSONInterface, uRESTDWAbout;
 
 Const
  TServerEventsConst = '{"typeobject":"%s", "objectdirection":"%s", "objectvalue":"%s", "paramname":"%s", "encoded":"%s", "default":"%s"}';
@@ -81,8 +72,7 @@ Type
   vDWParams                              : TRESTDWParamsMethods;
   vOwnerCollection                       : TCollection;
   vCallbackEvent,
-  vOnlyPreDefinedParams,
-  vNeedAuthorization                     : Boolean;
+  vOnlyPreDefinedParams                  : Boolean;
   DWReplyEventData                       : TDWReplyEventData;
   vBeforeExecute                         : TObjectExecute;
   Function  GetReplyEvent                : TDWReplyEvent;
@@ -105,7 +95,6 @@ Type
   Destructor  Destroy; Override;
  Published
   Property    Routes               : TRESTDWRoutes        Read vDWRoutes             Write vDWRoutes;
-  Property    NeedAuthorization    : Boolean              Read vNeedAuthorization    Write vNeedAuthorization;
   Property    Params               : TRESTDWParamsMethods Read vDWParams             Write vDWParams;
   Property    DataMode             : TDataMode            Read vDataMode             Write SetDataMode;
   Property    Name                 : String               Read GetDisplayName        Write SetDisplayName;
@@ -236,12 +225,12 @@ begin
  vOwnerCollection      := aCollection;
  FName                 := 'dwevent' + IntToStr(aCollection.Count);
  DWReplyEventData.Name := FName;
- vNeedAuthorization    := True;
+ vCallbackEvent        := False;
  vOnlyPreDefinedParams := False;
  vEventName            := '';
  vBaseURL              := '/';
  vDescription          := TStringList.Create;
- vDWRoutes             := [crAll];
+ vDWRoutes             := TRESTDWRoutes.Create;
  vContentType          := cDefaultContentType;
  vCallbackEvent        := False;
 end;
@@ -249,6 +238,7 @@ end;
 Destructor TRESTDWEvent.Destroy;
 Begin
  vDWParams.Free;
+ vDWRoutes.Free;
  DWReplyEventData.Free;
  vDescription.Free;
  Inherited;
@@ -453,7 +443,7 @@ Begin
        vparams    := bJsonOBJb.Pairs[2].Value; //params
        vneedauth  := StringToBoolean(bJsonOBJb.Pairs[3].Value); //params
        vonlypredefparams := StringToBoolean(bJsonOBJb.Pairs[4].Value); //params
-       vContentType := DecodeStrings(bJsonOBJb.Pairs[5].Value{$IFDEF FPC}, csUndefined{$ENDIF}); //Final
+       vContentType := DecodeStrings(bJsonOBJb.Pairs[5].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}); //Final
        If EventByName[vEventName] = Nil Then
         vDWEvent  := TRESTDWEvent(Self.Add)
        Else
@@ -461,7 +451,7 @@ Begin
        vDWEvent.DataMode := GetDataModeName(vDataMode);
        vDWEvent.DefaultContentType := vContentType;
        vDWEvent.Name := vEventName;
-       vDWEvent.NeedAuthorization    := vneedauth;
+       vDWEvent.Routes.All.Active := vneedauth;
        vDWEvent.OnlyPreDefinedParams := vonlypredefparams;
        If vparams <> '' Then
         Begin
@@ -483,7 +473,7 @@ Begin
              vDWParamMethod.Encoded         := StringToBoolean(bJsonOBJc.Pairs[4].Value); // StringToBoolean(bJsonOBJc.get('encoded').toString);
             If bJsonArrayC.ElementCount > 5 Then
              If Trim(bJsonOBJc.Pairs[5].Value) <> '' Then //Trim(bJsonOBJc.get('default').toString) <> '' Then
-              vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.Pairs[5].Value{$IFDEF FPC}, csUndefined{$ENDIF}); // bJsonOBJc.get('default').toString{$IFDEF FPC}, csUndefined{$ENDIF});
+              vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.Pairs[5].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}); // bJsonOBJc.get('default').toString{$IFDEF FPC}, csUndefined{$ENDIF});
             FreeAndNil(bJsonOBJc);
            End;
          Finally
@@ -566,7 +556,7 @@ Begin
  vEventsLines := '';
  For I := 0 To Count -1 Do
   Begin
-   vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s", "ContentType":"%s"', [BooleanToString(Items[I].NeedAuthorization),
+   vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s", "ContentType":"%s"', [BooleanToString(Items[I].Routes.All.Active),
                                                                                            BooleanToString(Items[I].OnlyPreDefinedParams),
                                                                                            EncodeStrings(Items[I].DefaultContentType{$IFDEF FPC}, csUndefined{$ENDIF})]);
    vTagEvent    := Format('{"eventname":"%s"', [TRESTDWEvent(Items[I]).EventName]);
@@ -581,7 +571,7 @@ Begin
                            GetValueType(Items[I].vDWParams[A].ObjectValue),
                            Items[I].vDWParams[A].ParamName,
                            BooleanToString(Items[I].vDWParams[A].Encoded),
-                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF FPC}, csUndefined{$ENDIF})]);
+                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
      If vParamsLines = '' Then
       vParamsLines := vParamLine
      Else
@@ -600,7 +590,6 @@ Procedure TRESTDWServerEvents.CreateDWParams(EventName    : String;
 Var
  vParamNameS : String;
  dwParam     : TJSONParam;
- vParamName,
  I           : Integer;
  vFound      : Boolean;
 Begin
@@ -810,7 +799,7 @@ Begin
      If (lResponse = '') Then
       lResponse  := Format('Unresolved Host : ''%s''', [RESTClientPoolerExec.Host])
      Else If (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
-      lResponse  := 'Unauthorized...';
+      lResponse  := cInvalidAuth;
      Raise Exception.Create(lResponse);
      lResponse   := '';
     End;
@@ -848,20 +837,12 @@ begin
   inherited Notification(AComponent, Operation);
 end;
 
-{
-procedure TRESTDWClientEvents.SetEditParamList(Value: Boolean);
-begin
- vEditParamList := Value;
- vEventList.Editable(vEditParamList);
-end;
-}
-
 Function TRESTDWClientEvents.SendEvent(EventName        : String;
-                                   Var DWParams     : TRESTDWParams;
-                                   Var Error        : String;
-                                   Var NativeResult : String;
-                                   EventType        : TSendEvent = sePOST;
-                                   Assyncexec       : Boolean = False): Boolean;
+                                       Var DWParams     : TRESTDWParams;
+                                       Var Error        : String;
+                                       Var NativeResult : String;
+                                       EventType        : TSendEvent = sePOST;
+                                       Assyncexec       : Boolean = False): Boolean;
 Var
  vDataMode : TDataMode;
 Begin
@@ -888,31 +869,28 @@ Begin
    Except
     On E : Exception Do
      Begin
+      // Eloy
       Error := E.Message;
       If Error = cInvalidAuth Then
        Begin
         Case vRESTClientPooler.AuthenticationOptions.AuthorizationOption Of
          rdwAOBearer : Begin
                         If (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
+                           (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken) And
                            (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token <> '')  Then
-                         TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
-                        If Assigned(vOnBeforeSend) Then
-                         vOnBeforeSend(Self);
-                        If Assigned(vRESTClientPooler.OnBeforeExecute) Then
-                         vRESTClientPooler.OnBeforeExecute(Self);
-                        If TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
-                         TokenValidade(DWParams, Error);
+                         Begin
+                          TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
+                          SendEvent(EventName, DWParams, Error, NativeResult, EventType, Assyncexec);
+                         End;
                        End;
          rdwAOToken  : Begin
                         If (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)  And
-                            (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token  <> '')  Then
-                         TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
-                        If Assigned(vOnBeforeSend) Then
-                         vOnBeforeSend(Self);
-                        If Assigned(vRESTClientPooler.OnBeforeExecute) Then
-                         vRESTClientPooler.OnBeforeExecute(Self);
-                        If TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
-                         TokenValidade(DWParams, Error);
+                           (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken) And
+                           (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token  <> '')  Then
+                         Begin
+                          TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
+                          SendEvent(EventName, DWParams, Error, NativeResult, EventType, Assyncexec);
+                         End;
                        End;
         End;
        End
@@ -948,9 +926,6 @@ Begin
   Begin
    Case vRESTClientPooler.AuthenticationOptions.AuthorizationOption Of
     rdwAOBearer : Begin
-//                   If (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)    And
-//                      (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).EndTime < Now()) Then
-//                    TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
                    If (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
                       (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token = '') Then
                     Begin
@@ -963,9 +938,6 @@ Begin
                     End;
                   End;
     rdwAOToken  : Begin
-//                   If (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)    And
-//                      (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).EndTime < Now()) Then
-//                    TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
                    If (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
                       (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token = '') Then
                     Begin
@@ -988,17 +960,9 @@ Function TRESTDWClientEvents.SendEvent(EventName    : String;
                                    Assyncexec   : Boolean = False): Boolean;
 Var
  vDataMode     : TDataMode;
- I,
- vErrorCode    : Integer;
- vRenewTokenData,
- vErrorBoolean : Boolean;
- vToken        : String;
 Begin
  // Add por Ico Menezes
  Result          := False;
- vErrorCode      := 0;
- vErrorBoolean   := False;
- vRenewTokenData := False;
  Error           := '';
  If vRESTClientPooler <> Nil Then
   Begin
@@ -1014,55 +978,45 @@ Begin
     End;
    TokenValidade(DWParams, Error);
    vDataMode := vEventList.EventByName[EventName].vDataMode;
-   For I := 0 To 1 Do
-    Begin
-     If Error = '' Then
-      Error    := vRESTClientPooler.SendEvent(EventName, DWParams, EventType, vDataMode, vServerEventName, Assyncexec);
-     Result    := (Error = TReplyOK) Or (Error = AssyncCommandMSG);
-     If Result Then
-      Begin
-       Error  := '';
-       Break;
-      End
-     Else
-      Begin
-       If Error = cInvalidAuth Then
-        Begin
-         Case vRESTClientPooler.AuthenticationOptions.AuthorizationOption Of
-          rdwAOBearer : Begin
-                         If (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
-                            (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token <> '')  Then
+   Try
+    Error    := vRESTClientPooler.SendEvent(EventName, DWParams, EventType, vDataMode, vServerEventName, Assyncexec);
+    Result   := (Error = TReplyOK) Or (Error = AssyncCommandMSG);
+    If Result Then
+     Error  := '';
+   Except
+    On E : Exception Do
+     Begin
+      // Eloy
+      Error := E.Message;
+      If Error = cInvalidAuth Then
+       Begin
+        Case vRESTClientPooler.AuthenticationOptions.AuthorizationOption Of
+         rdwAOBearer : Begin
+                        If (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken) And
+                           (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken) And
+                           (TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token <> '')  Then
+                         Begin
                           TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
-                         If Assigned(vOnBeforeSend) Then
-                          vOnBeforeSend(Self);
-                         If Assigned(vRESTClientPooler.OnBeforeExecute) Then
-                          vRESTClientPooler.OnBeforeExecute(Self);
-                         If TRESTDWAuthOptionBearerClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
-                          TokenValidade(DWParams, Error)
-                         Else
-                          Break;
-                        End;
-          rdwAOToken  : Begin
-                         If (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)  And
-                             (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token  <> '')  Then
+                          SendEvent(EventName, DWParams, Error, EventType, Assyncexec);
+                         End;
+                       End;
+         rdwAOToken  : Begin
+                        If (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoGetToken)  And
+                           (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken) And
+                           (TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token  <> '')  Then
+                         Begin
                           TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).Token := '';
-                         If Assigned(vOnBeforeSend) Then
-                          vOnBeforeSend(Self);
-                         If Assigned(vRESTClientPooler.OnBeforeExecute) Then
-                          vRESTClientPooler.OnBeforeExecute(Self);
-                         If TRESTDWAuthOptionTokenClient(vRESTClientPooler.AuthenticationOptions.OptionParams).AutoRenewToken Then
-                          TokenValidade(DWParams, Error)
-                         Else
-                          Break;
-                        End;
-         End;
-        End
-       Else
-        Begin
-         Break;
+                          SendEvent(EventName, DWParams, Error, EventType, Assyncexec);
+                         End;
+                       End;
         End;
-      End;
-    End;
+       End
+      Else
+       Begin
+        Raise Exception.Create(Error);
+       End;
+     End;
+   End;
   End;
 End;
 

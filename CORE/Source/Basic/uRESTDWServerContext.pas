@@ -1,40 +1,32 @@
 unit uRESTDWServerContext;
 
+{$I ..\Includes\uRESTDW.inc}
+
 {
   REST Dataware .
-  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
- de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros).
   O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
   Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
- Membros do Grupo :
-
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
- Ivan Cesar                 - Admin - Administrador  do pacote.
- Joanan Mendonça Jr. (jlmj) - Admin - Administrador  do pacote.
- Giovani da Cruz            - Admin - Administrador  do pacote.
- Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Alexandre Souza            - Admin - Administrador do Grupo de Organização.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Mizael Rocha               - Member Tester and DEMO Developer.
- Flávio Motta               - Member Tester and DEMO Developer.
- Itamar Gaucho              - Member Tester and DEMO Developer.
- Ico Menezes                - Member Tester and DEMO Developer.
+ Maiores informações:
+ https://github.com/OpenSourceCommunityBrasil/REST-DataWare
 }
 
 
 interface
 
 Uses
-  {$IF Defined(HAS_FMX)}
+  {$IFDEF RESTDWFMX}
     System.JSON,
   {$ELSE}
     uRESTDWJSON,
-  {$IFEND}
-  SysUtils, Classes, uRESTDWJSONObject, uRESTDWConsts, uRESTDWComponentBase,
-  uRESTDWParams, uRESTDWBasic, uRESTDWBasicTypes, uRESTDWTools;
+  {$ENDIF}
+  SysUtils, Classes,
+  uRESTDWJSONObject, uRESTDWConsts, uRESTDWParams, uRESTDWBasic,
+  uRESTDWBasicTypes, uRESTDWTools, uRESTDWAbout;
 
 Const
  TServerEventsConst = '{"typeobject":"%s", "objectdirection":"%s", "objectvalue":"%s", "paramname":"%s", "encoded":"%s", "default":"%s"}';
@@ -42,24 +34,26 @@ Const
 
 Type
  TRESTDWReplyRequest       = Procedure(Const Params         : TRESTDWParams;
-                                   Var   ContentType,
-                                         Result         : String;
-                                   Const RequestType    : TRequestType)    Of Object;
+                                       Var   ContentType,
+                                             Result         : String;
+                                       Const RequestType    : TRequestType)    Of Object;
  TRESTDWAuthRequest        = Procedure(Const Params         : TRESTDWParams;
-                                   Var   Rejected       : Boolean;
-                                   Var   ResultError    : String;
-                                   Var   StatusCode     : Integer;
-                                   RequestHeader        : TStringList)     Of Object;
+                                       Var   Rejected       : Boolean;
+                                       Var   ResultError    : String;
+                                       Var   StatusCode     : Integer;
+                                       RequestHeader        : TStringList)     Of Object;
  TRESTDWMarkRequest        = Procedure(Const Params         : TRESTDWParams;
-                                   Var   ContentType,
-                                         Result         : String)          Of Object;
+                                       Var   ContentType,
+                                             Result         : String)          Of Object;
  TRESTDWGetContextItemTag  = Procedure(Var   ContextItemTag : String)          Of Object;
  TRESTDWBeforeRenderer     = Procedure(Const BaseHeader     : String;
-                                   Var   ContentType,
-                                   ContentRenderer      : String;
-                                   Const RequestType    : TRequestType)    Of Object;
- TObjectEvent          = Procedure(aSelf                : TComponent)      Of Object;
- TObjectExecute        = Procedure(Const aSelf          : TCollectionItem) Of Object;
+                                       Var   ContentType,
+                                       ContentRenderer      : String;
+                                       Const RequestType    : TRequestType;
+                                       Const Params         : TRESTDWParams)   Of Object;
+ TObjectEvent              = Procedure(aSelf                : TComponent;
+                                       Const Params         : TRESTDWParams)   Of Object;
+ TObjectExecute            = Procedure(Const aSelf          : TCollectionItem) Of Object;
 
 
  TRESTDWReplyRequestStream = Procedure(Const Params       : TRESTDWParams;
@@ -167,16 +161,17 @@ Type
   Destructor  Destroy; Override;
   Constructor Create(AOwner      : TComponent);Override; //Cria o Componente
   Function    BuildContext(BaseHTML         : TStrings;
-                           IgnoreBaseHeader : Boolean) : String;
+                           IgnoreBaseHeader : Boolean;
+                           Const Params     : TRESTDWParams) : String;
  Published
-  Property    ContentType        : String             Read vContentType           Write vContentType;
-  Property    MasterHtml         : TStrings           Read vMasterHtml            Write SetMasterHtml;
-  Property    MasterHtmlTag      : String             Read vMasterHTMLTag         Write vMasterHTMLTag;
-  Property IncludeScripts        : TStrings           Read vIncludeScripts        Write SetIncludeScripts;
-  Property IncludeScriptsHtmlTag : String             Read vIncludeScriptsHtmlTag Write vIncludeScriptsHtmlTag;
-  Property DeleteInvalidChars    : TStrings           Read vInvalidChars          Write SetInvalidChars;
-  Property Items                 : TRESTDWContextRuleList Read vDWContextRuleList     Write vDWContextRuleList;
-  Property    OnBeforeRenderer   : TObjectEvent       Read vOnBeforeRenderer      Write SetOnBeforeRenderer;
+  Property    ContentType           : String                 Read vContentType           Write vContentType;
+  Property    MasterHtml            : TStrings               Read vMasterHtml            Write SetMasterHtml;
+  Property    MasterHtmlTag         : String                 Read vMasterHTMLTag         Write vMasterHTMLTag;
+  Property    IncludeScripts        : TStrings               Read vIncludeScripts        Write SetIncludeScripts;
+  Property    IncludeScriptsHtmlTag : String                 Read vIncludeScriptsHtmlTag Write vIncludeScriptsHtmlTag;
+  Property    DeleteInvalidChars    : TStrings               Read vInvalidChars          Write SetInvalidChars;
+  Property    Items                 : TRESTDWContextRuleList Read vDWContextRuleList     Write vDWContextRuleList;
+  Property    OnBeforeRenderer      : TObjectEvent           Read vOnBeforeRenderer      Write SetOnBeforeRenderer;
 End;
 
 Type
@@ -200,7 +195,6 @@ Type
   vOnBeforeCall                          : TObjectExecute;
   vAuthRequest                           : TRESTDWAuthRequest;
   vOnlyPreDefinedParams,
-  vNeedAuthorization,
   vignorebaseheader                      : Boolean;
   Function  GetReplyRequest              : TRESTDWReplyRequest;
   Procedure SetReplyRequest   (Value     : TRESTDWReplyRequest);
@@ -231,7 +225,6 @@ Type
   Property    ContextRules               : TRESTDWContextRules        Read vDWContextRules        Write vDWContextRules;
   Property    OnlyPreDefinedParams       : Boolean                    Read vOnlyPreDefinedParams  Write vOnlyPreDefinedParams;
   Property    IgnoreBaseHeader           : Boolean                    Read vignorebaseheader      Write vignorebaseheader;
-  Property    NeedAuthorization          : Boolean                    Read vNeedAuthorization     Write vNeedAuthorization;
   Property    OnAuthRequest              : TRESTDWAuthRequest         Read vAuthRequest           Write vAuthRequest;
   Property    OnReplyRequest             : TRESTDWReplyRequest        Read GetReplyRequest        Write SetReplyRequest;
   Property    OnReplyRequestStream       : TRESTDWReplyRequestStream  Read GetReplyRequestStream  Write SetReplyRequestStream;
@@ -313,8 +306,7 @@ begin
  vContextName            := '';
  vBaseURL                := '/';
  DWReplyRequestData.Name := FName;
- vNeedAuthorization      := True;
- vDWRoutes               := [crAll];
+ vDWRoutes               := TRESTDWRoutes.Create;
  vDefaultHtml            := TStringList.Create;
  vDescription            := TStringList.Create;
  vDWContextRules         := Nil;
@@ -325,6 +317,7 @@ end;
 destructor TRESTDWContext.Destroy;
 begin
   vDWParams.Free;
+  vDWRoutes.Free;
   DWReplyRequestData.Free;
   vDefaultHtml.Free;
   vDescription.Free;
@@ -488,7 +481,7 @@ begin
 end;
 }
 
-{$IFDEF Defined(HAS_FMX)}
+{$IFDEF RESTDWFMX}
 Procedure TRESTDWContextList.FromJSON(Value : String);
 Var
  bJsonOBJ,
@@ -553,15 +546,16 @@ Begin
  End;
 End;
 {$ELSE}
+
 Procedure TRESTDWContextList.FromJSON(Value : String);
 Var
  bJsonOBJ,
  bJsonOBJb,
- bJsonOBJc    : {$IFDEF Defined(HAS_FMX)}system.json.TJsonObject;
+ bJsonOBJc    : {$IFDEF RESTDWFMX}system.json.TJsonObject;
                 {$ELSE}       uRESTDWJSON.TJsonObject;{$ENDIF}
  bJsonArray,
  bJsonArrayB,
- bJsonArrayC  : {$IFDEF Defined(HAS_FMX)}system.json.TJsonArray;
+ bJsonArrayC  : {$IFDEF RESTDWFMX}system.json.TJsonArray;
                 {$ELSE}       uRESTDWJSON.TJsonArray;{$ENDIF}
  I, X, Y      : Integer;
  vDWEvent     : TRESTDWContext;
@@ -694,7 +688,7 @@ Begin
                            GetValueType(Items[I].vDWParams[A].ObjectValue),
                            Items[I].vDWParams[A].ParamName,
                            BooleanToString(Items[I].vDWParams[A].Encoded),
-                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF FPC}, csUndefined{$ENDIF})]);
+                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
      If vParamsLines = '' Then
       vParamsLines := vParamLine
      Else
@@ -707,15 +701,6 @@ Begin
   End;
  Result := Format('{"serverevents":[%s]}', [vEventsLines]);
 End;
-
-{
-Procedure TRESTDWServerContext.AfterConstruction;
-Begin
- Inherited;
- If Assigned(vOnCreate) Then
-  vOnCreate(Self);
-End;
-}
 
 Constructor TRESTDWServerContext.Create(AOwner : TComponent);
 Begin
@@ -920,7 +905,8 @@ Begin
 End;
 
 Function TRESTDWContextRules.BuildContext(BaseHTML         : TStrings;
-                                      IgnoreBaseHeader : Boolean): String;
+                                          IgnoreBaseHeader : Boolean;
+                                          Const Params     : TRESTDWParams): String;
 Var
  vTempResult,
  vTempComponent,
@@ -944,7 +930,7 @@ Var
  End;
 Begin
  If Assigned(vOnBeforeRenderer) Then
-  vOnBeforeRenderer(Self);
+  vOnBeforeRenderer(Self, Params);
  vTempResult := '';
  Result      := '';
  If Not IgnoreBaseHeader Then

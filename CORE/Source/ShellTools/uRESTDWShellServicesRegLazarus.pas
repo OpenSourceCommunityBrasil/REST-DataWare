@@ -1,6 +1,6 @@
 unit uRESTDWShellServicesRegLazarus;
 
-{$I ..\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -16,7 +16,6 @@ unit uRESTDWShellServicesRegLazarus;
   XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
   A. Brito                   - Admin - Administrador do desenvolvimento.
   Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
-  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
   Flávio Motta               - Member Tester and DEMO Developer.
   Mobius One                 - Devel, Tester and Admin.
   Gustavo                    - Criptografia and Devel.
@@ -27,8 +26,10 @@ unit uRESTDWShellServicesRegLazarus;
 interface
 
 uses
-    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls, Variants, TypInfo, uRESTDWShellServicesLazarus,
-    LResources, LazFileUtils, SysUtils, FormEditingIntf, PropEdits, lazideintf, ProjectIntf, ComponentEditors, Classes, fpWeb, uRESTDWComponentBase;
+    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
+    Variants, TypInfo, SysUtils, FormEditingIntf, PropEdits, lazideintf,
+    LResources, LazFileUtils, ProjectIntf, ComponentEditors, Classes, fpWeb,
+    uRESTDWShellServicesLazarus, uRESTDWAbout;
 
 Type
  TRESTDWAboutDialogProperty = class(TClassPropertyEditor)
@@ -46,7 +47,7 @@ uses uRESTDWConsts, utemplateproglaz;
 
 Procedure Register;
 Begin
- RegisterComponents('REST Dataware - Service',     [TRESTDWShellService]);
+ RegisterComponents('REST Dataware - Service', [TRESTDWShellService]);
  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TRESTDWAboutDialogProperty);
 End;
 
@@ -75,6 +76,7 @@ Begin
 End;
 
 initialization
+{$I RESTDWShellServices.lrs}
  UnlistPublishedProperty(TRESTDWShellService,  'Active');
  UnlistPublishedProperty(TRESTDWShellService,  'ServicePort');
  UnlistPublishedProperty(TRESTDWShellService,  'RequestTimeOut');

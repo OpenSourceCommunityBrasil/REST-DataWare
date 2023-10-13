@@ -5,7 +5,7 @@ object fResultado: TfResultado
   BorderStyle = ToolWindow
   Caption = 'Resultado dos testes'
   ClientHeight = 318
-  ClientWidth = 357
+  ClientWidth = 417
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -17,24 +17,23 @@ object fResultado: TfResultado
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
     AutoHide = False
     DataDetectorTypes = []
-    ShowScrollBars = False
     TextSettings.WordWrap = True
     Align = Client
     Bounces = False
     ControlType = Platform
     DisableFocusEffect = True
-    Size.Width = 357.000000000000000000
+    Size.Width = 417.000000000000000000
     Size.Height = 276.000000000000000000
     Size.PlatformDefault = False
     StyleLookup = 'memostyle'
     TabOrder = 0
-    Viewport.Width = 353.000000000000000000
+    Viewport.Width = 413.000000000000000000
     Viewport.Height = 272.000000000000000000
   end
   object Layout1: TLayout
     Align = Bottom
     Position.Y = 276.000000000000000000
-    Size.Width = 357.000000000000000000
+    Size.Width = 417.000000000000000000
     Size.Height = 42.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1

@@ -1,6 +1,6 @@
 unit uRESTDWComponentEvents;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWComponentEvents;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -27,8 +26,8 @@ interface
 
 Uses
  SysUtils, Classes, Db,
- uRESTDWDataUtils, uRESTDWParams, uRESTDWBasicTypes, uRESTDWConsts,
- uRESTDWMassiveBuffer;
+ uRESTDWDataUtils, uRESTDWParams, uRESTDWBasicTypes, uRESTDWProtoTypes,
+ uRESTDWConsts, uRESTDWMassiveBuffer, uRESTDWAuthenticators;
 
  Type
   TOnCreate               = Procedure(Sender                : TObject)               Of Object;
@@ -111,7 +110,7 @@ Uses
   TOnGetToken             = Procedure(Welcomemsg,
                                       AccessTag             : String;
                                       Params                : TRESTDWParams;
-                                      AuthOptions           : TRESTDWAuthTokenParam;
+                                      AuthOptions           : TRESTDWAuthToken;
                                       Var ErrorCode         : Integer;
                                       Var ErrorMessage      : String;
                                       Var TokenID           : String;

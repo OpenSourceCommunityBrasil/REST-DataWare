@@ -3,7 +3,7 @@ unit uRESTDWMessageParts;
 Interface
 
 Uses
- Classes, uRESTDWException, uRESTDWBasicTypes, uRESTDWHeaderList;
+ Classes, uRESTDWException, uRESTDWProtoTypes, uRESTDWHeaderList;
 
  Type
   TOnGetMessagePartStream = Procedure(AStream: TStream) of object;

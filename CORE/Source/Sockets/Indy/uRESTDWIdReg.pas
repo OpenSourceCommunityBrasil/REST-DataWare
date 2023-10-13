@@ -1,6 +1,6 @@
 unit uRESTDWIdReg;
 
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -13,8 +13,8 @@ unit uRESTDWIdReg;
   Membros do Grupo :
 
   XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+  A. Brito                   - Admin - Administrador do desenvolvimento.
   Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
-  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
   Flávio Motta               - Member Tester and DEMO Developer.
   Mobius One                 - Devel, Tester and Admin.
   Gustavo                    - Criptografia and Devel.
@@ -25,22 +25,18 @@ unit uRESTDWIdReg;
 interface
 
 uses
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
     LResources, LazFileUtils, FormEditingIntf, PropEdits, lazideintf,
     ProjectIntf, ComponentEditors, fpWeb,
   {$ELSE}
-    StrEdit, RTLConsts, Db, ColnEdit, DBReg, DesignIntf, DSDesign, ToolsApi,
-    DesignWindows, DesignEditors,
-    {$IFDEF COMPILER16_UP}UITypes,{$ENDIF}
-    {$IF CompilerVersion > 22}
-      ExptIntf,
-    {$ELSE}
-      Graphics, DbTables,
-    {$IFEND}
+    {$IFNDEF DELPHIXE2UP}
+      Graphics,
+      DbTables,
+    {$ENDIF}
+    DesignIntf, DesignEditors,
   {$ENDIF}
-  Classes, Variants, TypInfo, SysUtils,
-  uRESTDWIdBase;
+  Classes, uRESTDWIdBase;
 
 Type
   TPoolersList = Class(TStringProperty)
@@ -53,11 +49,6 @@ Type
 Procedure Register;
 
 Implementation
-
-{$IFDEF FPC}
-uses
-  utemplateproglaz;
-{$ENDIF}
 
 Function TPoolersList.GetAttributes: TPropertyAttributes;
 Begin
@@ -96,16 +87,17 @@ End;
 
 Procedure Register;
 Begin
-  RegisterComponents('REST Dataware - Service', [TRESTDWIdServicePooler]);
-  RegisterComponents('REST Dataware - Client''s',
+  RegisterComponents('REST Dataware - Service', [TRESTDWIdServicePooler, TRESTDWIdPoolerList]);
+  RegisterComponents('REST Dataware - Client',
     [TRESTDWIdClientREST, TRESTDWIdClientPooler]);
   RegisterComponents('REST Dataware - DB', [TRESTDWIdDatabase]);
   RegisterPropertyEditor(TypeInfo(String), TRESTDWIdDatabase, 'PoolerName',
     TPoolersList);
 End;
 
+{$IFDEF RESTDWLAZARUS}
 initialization
-
-Finalization
+{$I RESTDWIndySockets.lrs}
+{$ENDIF}
 
 end.

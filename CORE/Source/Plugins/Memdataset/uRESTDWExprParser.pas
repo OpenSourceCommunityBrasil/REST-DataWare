@@ -1,82 +1,110 @@
 unit uRESTDWExprParser;
 
-{$I ..\..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDW.inc}
 
-Interface
+{
+  REST Dataware .
+  Criado por XyberX (Gilberto Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+ de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+ Pascal e com compatibilidade entre sistemas operacionais.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+ de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
-Uses
-  SysUtils, Contnrs, Classes, DB;
+ Membros do Grupo :
 
-Type
-  TOnGetVariableValue = Function(Sender         : TObject;
-                                 Const VarName  : string;
-                                 Var Value      : Variant) : Boolean Of Object;
-  TOnExecuteFunction  = Function(Sender         : TObject;
-                                 Const FuncName : String;
-                                 Const Args     : Variant;
-                                 Var ResVal     : Variant) : Boolean Of Object;
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+ Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
+ Flávio Motta               - Member Tester and DEMO Developer.
+ Mobius One                 - Devel, Tester and Admin.
+ Gustavo                    - Criptografia and Devel.
+ Eloy                       - Devel.
+ Roniery                    - Devel.
+ Fernando Banhos            - Refactor Drivers REST Dataware.
+}
+
+interface
+
+uses
+  SysUtils,Contnrs;
+
+type
+  TOnGetVariableValue = function(Sender: TObject; const VarName: string;
+    var Value: Variant): Boolean of object;
+
+  TOnExecuteFunction = function(Sender: TObject; const FuncName: string;
+    const Args: Variant; var ResVal: Variant): Boolean of object;
+
   TExprParser = class
-  Private
-   FValue                  : Variant;
-   FParser,
-   FScan                   : TObject;
-   FErrorMessage,
-   FExpression             : String;
-   FOnGetVariable          : TOnGetVariableValue;
-   FOnExecuteFunction      : TOnExecuteFunction;
-   FEnableWildcardMatching,
-   FCaseInsensitive        : Boolean;
-   Procedure SetExpression(Const Value   : String);
-   Function  DoGetVariable(Const VarName : String;
-                           Var Value     : Variant) : Boolean;
-   Function  DoExecuteFunction (Const FuncName : String;
-                                Const Args     : Variant;
-                                Var ResVal     : Variant) : Boolean;
-   Procedure SetCaseInsensitive(Const Value    : Boolean);
-  Public
-   Constructor Create;
-   Destructor  Destroy;     Override;
-   Function Eval : Boolean; Overload;
-   Function Eval(Const AExpression : String) : Boolean; Overload;
-   Property Expression             : String               Read FExpression             Write SetExpression;
-   Property OnGetVariable          : TOnGetVariableValue  Read FOnGetVariable          Write FOnGetVariable;
-   Property OnExecuteFunction      : TOnExecuteFunction   Read FOnExecuteFunction      Write FOnExecuteFunction;
-   property ErrorMessage           : String               Read FErrorMessage;
-   Property Value                  : Variant              Read FValue;
-   Property EnableWildcardMatching : Boolean              Read FEnableWildcardMatching Write FEnableWildcardMatching;
-   Property CaseInsensitive        : Boolean              Read FCaseInsensitive        Write SetCaseInsensitive;
-  End;
+  private
+    FValue: Variant;
+    FParser: TObject; // TParser
+    FScan: TObject; // TScan
+    FExpression: string;
+    FOnGetVariable: TOnGetVariableValue;
+    FOnExecuteFunction: TOnExecuteFunction;
+    FEnableWildcardMatching: Boolean;
+    FErrorMessage: string;
+    FCaseInsensitive: Boolean;
+    procedure SetExpression(const Value: string);
+    function DoGetVariable(const VarName: string; var Value: Variant): Boolean;
+    function DoExecuteFunction(const FuncName: string; const Args: Variant; var ResVal: Variant): Boolean;
+    procedure SetCaseInsensitive(const Value: Boolean);
+    function ConvertDoubleOperators(Value : String) : String;
+  public
+    constructor Create();
+    destructor Destroy; override;
+    function Eval: Boolean; overload;
+    function Eval(const AExpression: string): Boolean; overload;
+    property ErrorMessage: string read FErrorMessage;
+  {published} // ahuser: not a TPersistent derived class
+    property Expression: string read FExpression write SetExpression;
+    property OnGetVariable: TOnGetVariableValue read FOnGetVariable write FOnGetVariable;
+    property OnExecuteFunction: TOnExecuteFunction read FOnExecuteFunction write FOnExecuteFunction;
+    property Value: Variant read FValue;
+    property EnableWildcardMatching: Boolean read FEnableWildcardMatching write FEnableWildcardMatching;
+    property CaseInsensitive: Boolean read FCaseInsensitive write SetCaseInsensitive;
+  end;
 
   EExprParserError = class(Exception);
 
 {$IFDEF TESTING_PARSER}
 var
- DebugText : string;
+  DebugText: string;
 {$ENDIF TESTING_PARSER}
 
 implementation
 
 uses
- Variants, Masks;
+  Classes, Variants, Masks;
 
-{$IFDEF COMPILER12_UP}
+{$IFDEF DELPHI2009UP}
   // Our charsets do not contain any char > 127 what makes it safe because the
   // compiler generates correct code.
   {$WARN WIDECHAR_REDUCED OFF}
-{$ENDIF COMPILER12_UP}
+{$ENDIF DELPHI2009UP}
 
 const
   cNumbers = ['0'..'9'];
   cLetters = ['a'..'z', 'A'..'Z', '_'];
   cLettersAndNumbers = cLetters + cNumbers;
-  cOperators = ['+', '-', '/', '*',
-                '=', '<', '>', '&',
-                '|', '!', '~'];
+  cOperators = [
+    '+', '-',
+    '/', '*',
+    '=', '�', // >=
+    '<', '@', // <=
+    '>', '#', // <>
+    '&',
+    '|',
+    '!',
+    '~'];
 
 type
-  TToken = (tkNA, tkEOF,      tkError,    tkLParen,
-            tkRParen, tkComa, tkOperator, tkString,
-            tkIdentifier,     tkNumber,   tkInteger);
+  TToken = (tkNA, tkEOF, tkError,
+    tkLParen, tkRParen, tkComa,
+    tkOperator, tkIdentifier,
+    tkNumber, tkInteger, tkString);
 
   TLex = class
   private
@@ -88,7 +116,7 @@ type
     constructor Create(AToken: TToken; APos: Integer); overload;
     constructor Create(AToken: TToken; const AStr: string; APos: Integer); overload;
     constructor Create(AToken: TToken; AChr: Char; APos: Integer); overload;
-    Function Debug : string;
+    function Debug(): string;
     property Token: TToken read FToken;
     property Chr: Char read FChr;
     property Str: string read FStr;
@@ -110,13 +138,11 @@ type
   end;
 
   TParser = class;
-
   TNode = class
   private
     FParser: TParser;
   public
     constructor Create(Parser: TParser); virtual;
-
     // Delphi 5 compiler shows hints about a not exported or used symbol
     // TNode.Eval. This is a compiler bug that is caused by the "abstract" keyword.
     function Eval(): Variant; virtual; abstract;
@@ -184,18 +210,14 @@ type
     FValue: Variant;
   public
     destructor Destroy; override;
-
     function Parse(): Boolean;
     function Execute(): Boolean;
-
     function Expr(): TNode;
     function Term(): TNode;
     function Factor(): TNode;
-
     function LexC(): TLex;
     function LexLook(LookAhead: Integer = 1): TLex;
     procedure LexAccept();
-
     property Parent: TExprParser read FParent write FParent;
     property Value: Variant read FValue;
     property ErrorMessage: string read FErrorMessage;
@@ -278,14 +300,12 @@ begin
   Idx := 1;
   S := '';
   CToken := tkNA;
-
   while Idx <= Len do
   begin
     C := Str[Idx];
     StartIdx := Idx;
     Inc(Idx);
     CToken := tkNA;
-
     case C of
       '(': CToken := tkLParen;
       ')': CToken := tkRParen;
@@ -361,7 +381,6 @@ begin
           FErrorMessage := Format('Bad character ''%s''', [string(C)]);
         end;
     end;
-
     case CToken of
       tkError: break;
       tkNA: ;                           // continue
@@ -435,7 +454,7 @@ begin
   if FRoot <> nil then
   begin
     try
-      FValue := FRoot.Eval;
+      FValue := FRoot.Eval();
       Result := True;
     except
       on E: Exception do
@@ -474,7 +493,6 @@ begin
   try
     CNode := Term();
     Lex := LexC();
-
     if Lex.Token = tkOperator then
     begin
       if Lex.Chr in ['+', '-'] then
@@ -508,10 +526,9 @@ begin
   try
     CNode := Factor();
     Lex := LexC();
-
     if Lex.Token = tkOperator then
     begin
-      if Lex.Chr in ['*', '/', '=', '&', '|', '<', '>', '~'] then
+      if Lex.Chr in ['*', '/', '=', '&', '|', '<', '>', '~', '�', '@', '#'] then
       begin
         LexAccept();
         RightNode := Expr();
@@ -585,7 +602,6 @@ begin
                 fNode.AddArg(Expr());
               end;
             end;
-
             if (LexC().token = tkRParen) then
               LexAccept()
             else
@@ -641,7 +657,6 @@ end;
 function TNodeBin.Eval: Variant;
 var
   LeftValue, RightValue: Variant;
-
   function FixupBoolean(var AVal1: Variant; var AVal2: Variant): Boolean;
   begin
     Result := (TVarData(AVal1).VType = varBoolean) or (TVarData(AVal2).VType = varBoolean);
@@ -651,14 +666,12 @@ var
         AVal1 := 1
       else
         AVal1 := 0;
-
       if UpperCase(AVal2) = 'TRUE' then
         AVal2 := 1
       else
-        AVal1 := 0;
+        AVal2 := 0;
     end;
   end;
-
   function FixupDateTime(var AVal1: Variant; var AVal2: Variant): Boolean;
   begin
     Result := TVarData(AVal1).VType = varDate;
@@ -668,14 +681,12 @@ var
         AVal2 := StrToDateTime(AVal2); //convert;
     end;
   end;
-
   function FixupString(var aVal: Variant): Boolean;
   begin
     Result:=((TVarData(aVal).VType = varString) {$IFDEF UNICODE}or (TVarData(aVal).VType = varUString){$ENDIF UNICODE}) and FParser.Parent.FCaseInsensitive;
     if Result then
       aVal := AnsiUpperCase(aVal);
   end;
-
   //returns 'True' if a conversion was necessary.
   function FixupValues(var AVal1: Variant; var AVal2: Variant): Boolean;
   var
@@ -693,7 +704,6 @@ var
       Result := Result or bChanged; //ensure that both Fixups are executed regardless of optimisations
     end;
   end;
-
   function EvalLike: Boolean;
   var
     Wildcard1, Wildcard2: Boolean;
@@ -707,7 +717,6 @@ var
       // Left hand contains wildcards -> Match right hand against left hand.
       // Right hand contains wildcards -> Match left hand against right hand.
       // Both hands contain wildcards -> Match for string equality as if no wildcards are supported.
-
       LeftStr := LeftValue;
       RightStr := RightValue;
       Wildcard1 := (Pos('*', LeftStr) > 0) or (Pos('?', LeftStr) > 0);
@@ -721,7 +730,6 @@ var
         Result := LeftValue = RightValue;
     end;
   end;
-
   function EvalEquality: Boolean;
   begin
     // Special case, at least one of both is null:
@@ -737,7 +745,6 @@ var
         Result := LeftValue = RightValue;
     end;
   end;
-
   function EvalLT: Boolean;
   begin
     // Special case, at least one of both is Null:
@@ -747,7 +754,6 @@ var
     else
       Result := LeftValue < RightValue;
   end;
-
   function EvalGT: Boolean;
   begin
     // Special case, at least one of both is Null:
@@ -757,6 +763,24 @@ var
     else
       Result := LeftValue > RightValue;
   end;
+  function EvalLTE: Boolean;
+  begin
+    // Special case, at least one of both is Null:
+    if (LeftValue = Null) or (RightValue = Null) then
+      // Null is considered to be smaller than any value.
+      Result := LeftValue = Null
+    else
+      Result := LeftValue <= RightValue;
+  end;
+  function EvalGTE: Boolean;
+  begin
+    // Special case, at least one of both is Null:
+    if (LeftValue = Null) or (RightValue = Null) then
+      // Null is considered to be smaller than any value.
+      Result := RightValue = Null
+    else
+      Result := LeftValue >= RightValue;
+  end;
 
 var
   LeftStr, RightStr: string;
@@ -765,7 +789,6 @@ begin
   LeftValue := FLeftNode.Eval;
   RightValue := FRightNode.Eval;
   FixupValues(LeftValue, RightValue);
-
   case FOperator.Chr of
     '+':
       begin
@@ -790,6 +813,9 @@ begin
     '&': Result := FLeftNode.Eval and FRightNode.Eval;
     '|': Result := FLeftNode.Eval or FRightNode.Eval;
     '~': Result := EvalLike;
+    '�': Result := EvalGTE();
+    '@': Result := EvalLTE();
+    '#': Result := not EvalEquality();
   else
     Result := Null;
   end;
@@ -867,7 +893,6 @@ var
   VArgs: Variant;
   I: Integer;
 begin
-
   VArgs := VarArrayCreate([0, FArgs.Count - 1], varVariant);
   for I := 0 to FArgs.Count - 1 do
     VArgs[I] := TNode(FArgs[I]).Eval();
@@ -906,49 +931,49 @@ end;
 
 { TExprParser }
 
-Constructor TExprParser.Create;
-Begin
- Inherited Create;
- FErrorMessage := '';
-End;
+constructor TExprParser.Create;
+begin
+  inherited Create;
+  FErrorMessage := '';
+end;
 
-Destructor TExprParser.Destroy;
-Begin
- FParser.Free;
- FScan.Free;
- Inherited Destroy;
-End;
+destructor TExprParser.Destroy;
+begin
+  FParser.Free;
+  FScan.Free;
+  inherited Destroy;
+end;
 
-Function TExprParser.Eval : Boolean;
-Var
- Parser: TParser;
- {$IFDEF TESTING_PARSER}
- Scan: TScan;
- {$ENDIF TESTING_PARSER}
-Begin
- FErrorMessage := '';
- {$IFDEF TESTING_PARSER}
- DebugText := '';
- Scan := TScan(FScan);
- Scan.DebugPrint();
- {$ENDIF TESTING_PARSER}
- Parser := TParser(FParser);
- If Parser.Execute Then
-  Begin
-   FValue := Parser.Value;
-   Result := True;
-  End
- Else
-  Begin
-   FErrorMessage := Parser.ErrorMessage;
-   Result := False;
-  End
-End;
+function TExprParser.Eval(): Boolean;
+var
+  Parser: TParser;
+  {$IFDEF TESTING_PARSER}
+  Scan: TScan;
+  {$ENDIF TESTING_PARSER}
+begin
+  FErrorMessage := '';
+  {$IFDEF TESTING_PARSER}
+  DebugText := '';
+  Scan := TScan(FScan);
+  Scan.DebugPrint();
+  {$ENDIF TESTING_PARSER}
+  Parser := TParser(FParser);
+  if Parser.Execute() then
+  begin
+    FValue := Parser.Value;
+    Result := True;
+  end
+  else
+  begin
+    FErrorMessage := Parser.ErrorMessage;
+    Result := False;
+  end
+end;
 
 function TExprParser.Eval(const AExpression: string): Boolean;
 begin
   SetExpression(AExpression);
-  Result := Eval;
+  Result := Eval();
 end;
 
 procedure TExprParser.SetCaseInsensitive(const Value: Boolean);
@@ -957,10 +982,14 @@ begin
 end;
 
 procedure TExprParser.SetExpression(const Value: string);
+var
+  nValue : string;
 begin
-  if Value <> FExpression then
-  begin
-    FExpression := Value;
+  // alguns parses tiveram se ser mudados
+  // porque o operador � Char
+  nValue := ConvertDoubleOperators(Value);
+  if nValue <> FExpression then begin
+    FExpression := nValue;
     FParser.Free;
     FScan.Free;
     FParser := TParser.Create;
@@ -990,5 +1019,43 @@ begin
     Result := FOnExecuteFunction(Self, FuncName, Args, ResVal);
 end;
 
-end.
+function TExprParser.ConvertDoubleOperators(Value: String): String;
+var
+  i : integer;
+  bEscapeDoubleQuote,
+  bEscapeQuote : Boolean;
+  sOperator : string;
+begin
+  Result := '';
+  bEscapeDoubleQuote := False;
+  bEscapeQuote := False;
+  i := 1;
+  while i <= Length(Value) do begin
+    if (Value[i] = '"') and (not bEscapeQuote) then begin
+      bEscapeDoubleQuote := not bEscapeDoubleQuote;
+      Result := Result + Value[i];
+    end
+    else if (Value[i] = '''') and (not bEscapeDoubleQuote) then begin
+      bEscapeQuote := not bEscapeQuote;
+      Result := Result + Value[i];
+    end
+    else if (Value[i] in cOperators) and (not bEscapeQuote) and (not bEscapeDoubleQuote) then begin
+      sOperator := sOperator + Value[i];
+    end
+    else begin
+      if sOperator <> '' then begin
+        sOperator := StringReplace(sOperator,'>=','�',[rfReplaceAll]);
+        sOperator := StringReplace(sOperator,'<=','@',[rfReplaceAll]);
+        sOperator := StringReplace(sOperator,'<>','#',[rfReplaceAll]);
+        sOperator := StringReplace(sOperator,'!=','#',[rfReplaceAll]);
+        Result := Result + sOperator;
+        sOperator := '';
+      end;
+      Result := Result + Value[i];
+    end;
 
+    i := i + 1;
+  end;
+end;
+
+end.

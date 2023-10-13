@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, uConsts, System.SysUtils,
-  uRESTDWDataUtils, uRESTDWResponseTranslator, uRESTDWIdBase;
+  uRESTDWDataUtils, uRESTDWResponseTranslator, uRESTDWIdBase, uRESTDWConsts;
 
 type
   TRDWRESTDAO = Class
@@ -39,7 +39,7 @@ begin
   begin
     FDefaultHeader := TStringList.Create;
     FDefaultHeader.AddPair('BinaryRequest', 'true');
-    FDefaultHeader.AddPair('DataCompression', 'true');
+//    FDefaultHeader.AddPair('DataCompression', 'true');
   end
   else
     FDefaultHeader := nil;

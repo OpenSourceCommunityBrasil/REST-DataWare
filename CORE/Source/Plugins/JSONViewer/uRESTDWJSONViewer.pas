@@ -8,7 +8,7 @@ uses
   SysUtils, Dialogs, Forms, ExtCtrls, StdCtrls, ComCtrls, DBGrids, Messages, Variants,
   Classes, Graphics, Controls,
   uRESTDWJSONInterface, uRESTDWConsts, uRESTDWResponseTranslator, DB,
-  uRESTDWDataset, uRESTDWBasicDB, uRESTDWComponentBase, Grids{$IFNDEF DEBBUGRDW},
+  uRESTDWMemoryDataset, uRESTDWBasicDB, uRESTDWAbout, Grids{$IFNDEF DEBBUGRDW},
   {$IFDEF FPC}ComponentEditors, FormEditingIntf, PropEdits, lazideintf{$ELSE}DesignWindows, DesignEditors,
   uRESTDWBasicTypes{$ENDIF}{$ENDIF};
 

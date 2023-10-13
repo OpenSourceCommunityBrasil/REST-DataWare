@@ -1,6 +1,6 @@
 unit uRESTDWUpdSqlEditor;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWUpdSqlEditor;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -100,7 +99,7 @@ Const
   { Private declarations }
   vLastSelect        : String;
   RESTDWDatabase     : TRESTDWDatabasebaseBase;
-  RESTDWStoredProc   : TRESTDWStoredProc;
+  RESTDWStoredProc   : TRESTDWStoredProcedure;
   RESTDWClientSQL    : TRESTDWClientSQL;
   RESTDWUpdateSQL    : TRESTDWUpdateSQL;
   Procedure SetFields;
@@ -652,9 +651,9 @@ Procedure TFrmDWUpdSqlEditor.SetClientSQL(Value: TRESTDWClientSQL);
 Var
  vMemString : TStringList;
 Begin
- If Value.ClassType = TRESTDWStoredProc Then
+ If Value.ClassType = TRESTDWStoredProcedure Then
   Begin
-   RESTDWStoredProc   := TRESTDWStoredProc(Value);
+   RESTDWStoredProc   := TRESTDWStoredProcedure(Value);
    If RESTDWStoredProc <> Nil Then
     Begin
      If RESTDWStoredProc.DataBase <> Nil Then

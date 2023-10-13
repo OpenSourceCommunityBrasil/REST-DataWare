@@ -1,5 +1,7 @@
 unit uRESTDWMasterDetailData;
 
+{$I ..\..\Source\Includes\uRESTDW.inc}
+
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -17,7 +19,6 @@ unit uRESTDWMasterDetailData;
  Giovani da Cruz            - Admin - Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
  Alexandre Souza            - Admin - Administrador do Grupo de Organização.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Mizael Rocha               - Member Tester and DEMO Developer.
  Flávio Motta               - Member Tester and DEMO Developer.
  Itamar Gaucho              - Member Tester and DEMO Developer.
@@ -84,19 +85,16 @@ Begin
   Begin
    If Assigned(TList(Self).Items[Index]) Then
     Begin
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
      FreeAndNil(TList(Self).Items[Index]^);
+     Dispose(PMasterDetailItem(TList(Self).Items[Index]));
      {$ELSE}
-      {$IF CompilerVersion > 33}
-       FreeAndNil(TMasterDetailItem(TList(Self).Items[Index]^));
-      {$ELSE}
-       FreeAndNil(TList(Self).Items[Index]^);
-      {$IFEND}
-     {$ENDIF}
-     {$IFDEF FPC}
-      Dispose(PMasterDetailItem(TList(Self).Items[Index]));
-     {$ELSE}
-      Dispose(TList(Self).Items[Index]);
+       {$IFDEF DELPHI10_4UP}
+         FreeAndNil(TMasterDetailItem(TList(Self).Items[Index]^));
+       {$ELSE}
+         FreeAndNil(TList(Self).Items[Index]^);
+       {$ENDIF}
+       Dispose(TList(Self).Items[Index]);
      {$ENDIF}
     End;
    TList(Self).Delete(Index);

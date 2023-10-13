@@ -1,6 +1,6 @@
 unit uRESTDWException;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWException;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -32,13 +31,12 @@ Uses
   eRESTDWException = Class(Exception)
  Public
   Constructor Create  (Const AMsg : String); Overload; Virtual;
-  Class Procedure Toss(Const AMsg : String); {$IFDEF HAS_DEPRECATED}Deprecated{$IFDEF HAS_DEPRECATED_MSG}'Use raise instead'{$ENDIF};{$ENDIF}
  End;
  TClassIdException                      = Class Of eRESTDWException;
  eRESTDWSilentException                 = Class(eRESTDWException);
  eRESTDWConnClosedGracefully            = Class(eRESTDWSilentException);
  eRESTDWSocketHandleError               = Class(eRESTDWException);
- {$IFDEF UNIX}
+ {$IFDEF RESTDWLINUX}
   eRESTDWNonBlockingNotSupported        = Class(eRESTDWException);
  {$ENDIF}
  eRESTDWMessageException                = Class(eRESTDWException);
@@ -58,11 +56,6 @@ Implementation
 Constructor eRESTDWException.Create  (Const AMsg : String);
 Begin
  Inherited Create(AMsg);
-End;
-
-Class Procedure eRESTDWException.Toss(Const AMsg : String);
-Begin
- Raise Create(AMsg);
 End;
 
 End.

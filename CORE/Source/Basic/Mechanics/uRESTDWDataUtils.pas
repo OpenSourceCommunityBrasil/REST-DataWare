@@ -1,6 +1,6 @@
 unit uRESTDWDataUtils;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWDataUtils;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -26,21 +25,14 @@ unit uRESTDWDataUtils;
 interface
 
 Uses
-  {$IFNDEF FPC}StringBuilderUnit,{$ENDIF}
+  {$IFNDEF RESTDWLAZARUS}StringBuilderUnit,{$ENDIF}
   Classes, SysUtils,
-  uRESTDWTools, uRESTDWConsts, uRESTDWMD5, uRESTDWBasicTypes,
-  uRESTDWEncodeClass, uRESTDWParams, uRESTDWMimeTypes,
+  uRESTDWTools, uRESTDWConsts, uRESTDWMD5, uRESTDWBasicTypes, uRESTDWParams,
+  uRESTDWMimeTypes,
   DateUtils;
 
 Type
- TRESTDWAuthOptionTypes = (rdwOATBasic, rdwOATBearer, rdwOATToken);
- TRESTDWAuthOption      = (rdwAONone,   rdwAOBasic,   rdwAOBearer,
-                        rdwAOToken,  rdwOAuth);
- TRESTDWTokenType       = (rdwTS,       rdwJWT,       rdwPersonal);
- TRESTDWAuthOptions     = Set of TRESTDWAuthOption;
- TRESTDWCryptType       = (rdwAES256,   rdwHSHA256,   rdwRSA);
- TRESTDWTokenRequest    = (rdwtHeader,  rdwtRequest);
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   DWInteger       = Longint;
   DWInt64         = Int64;
   DWFloat         = Real;
@@ -54,28 +46,29 @@ Type
   DWBufferSize    = Longint;
  {$ENDIF}
  PDWInt64         = ^DWInt64;
- {$IFNDEF FPC}
-  {$IF (CompilerVersion >= 26) And (CompilerVersion <= 30)}
-   {$IF Defined(HAS_FMX)}
-    DWString     = String;
-    DWWideString = String;
-   {$ELSE}
-    DWString     = Utf8String;
-    DWWideString = Utf8String;
-   {$IFEND}
-  {$ELSE}
-   {$IF Defined(HAS_FMX)}
-    DWString     = Utf8String;
-    DWWideString = Utf8String;
-   {$ELSE}
-    DWString     = AnsiString;
-    DWWideString = WideString;
-   {$IFEND}
-  {$IFEND}
- {$ELSE}
+
+  {$IFDEF RESTDWLAZARUS}
   DWString     = AnsiString;
   DWWideString = WideString;
- {$ENDIF}
+  {$ELSE}
+    {$IF (Defined(DELPHIXE5UP) and (not defined(DELPHI10_0UP)))}
+      {$IFDEF RESTDWFMX}
+      DWString     = String;
+      DWWideString = String;
+      {$ELSE}
+      DWString     = Utf8String;
+      DWWideString = Utf8String;
+      {$ENDIF}
+    {$ELSE}
+      {$IFDEF RESTDWFMX}
+      DWString     = Utf8String;
+      DWWideString = Utf8String;
+      {$ELSE}
+      DWString     = AnsiString;
+      DWWideString = WideString;
+      {$ENDIF}
+    {$IFEND}
+  {$ENDIF}
 
 Type
  TRESTDWParamsHeader = Packed Record
@@ -85,7 +78,6 @@ Type
   DataSize       : DWInt64; //new for ver15
 End;
 
-Type
  TTokenValue = Class
  Private
   vInitRequest,
@@ -97,21 +89,21 @@ Type
   vMD5                  : String;
   vRDWTokenType         : TRESTDWTokenType;
   vRDWCryptType         : TRESTDWCryptType;
-  vCripto               : TCripto;
   Procedure   SetTokenHash (Token : String);
   Function    ToJSON       : String;
-  Function    ToToken      : String;
   Function    GetCryptType : String;
   Function    GetTokenType : String;
   Function    GetHeader    : String;
   Procedure   SetSecrets     (Value : String);
   Procedure   SetFinalRequest(Value : TDateTime);
  Public
+  vCripto: TCripto;
   Constructor    Create;
   Destructor     Destroy;Override;
   Class Function GetMD5       (Const Value : String)    : String;
   Class Function ISO8601FromDateTime(Value : TDateTime) : String;
   Class Function DateTimeFromISO8601(Value : String)    : TDateTime;
+  Function       ToToken           : String;
   Property       TokenType         : TRESTDWTokenType Read vRDWTokenType      Write vRDWTokenType;
   Property       CryptType         : TRESTDWCryptType Read vRDWCryptType      Write vRDWCryptType;
   Property       BeginTime         : TDateTime        Read vInitRequest       Write vInitRequest;
@@ -122,7 +114,6 @@ Type
   Property       Token             : String           Read ToToken;
 End;
 
-Type
  TRESTDWAuthOptionParam = Class(TPersistent)
  Private
   vCustom404TitleMessage,
@@ -145,8 +136,6 @@ Type
   Property Custom404FooterMessage  : String      Read vCustom404FooterMessage Write vCustom404FooterMessage;
   Property CustomAuthErrorPage     : TStringList Read vCustomAuthErrorPage    Write SetCustomAuthErrorPage;
 End;
-
-Type
  TRESTDWAuthTokenParam = Class(TRESTDWAuthOptionParam)
  Private
   vInitRequest,
@@ -172,21 +161,20 @@ Type
   Procedure   Assign   (Source   : TPersistent);Override;
   Function    GetToken (aSecrets : String) : String;  Virtual; Abstract;
   Function    FromToken(Value    : String) : Boolean; Virtual; Abstract;
-  Property    BeginTime          : TDateTime    Read vInitRequest     Write vInitRequest;
-  Property    EndTime            : TDateTime    Read vFinalRequest    Write vFinalRequest;
-  Property    Secrets            : String       Read vSecrets         Write vSecrets;
+  Property    BeginTime          : TDateTime       Read vInitRequest     Write vInitRequest;
+  Property    EndTime            : TDateTime       Read vFinalRequest    Write vFinalRequest;
+  Property    Secrets            : String          Read vSecrets         Write vSecrets;
  Published
   Property    TokenType         : TRESTDWTokenType Read vRDWTokenType    Write vRDWTokenType;
   Property    CryptType         : TRESTDWCryptType Read vRDWCryptType    Write SetCryptType;
-  Property    Key               : String        Read vTokenName       Write vTokenName;
-  Property    GetTokenEvent     : String        Read vGetTokenName    Write SetGetTokenName;
-  Property    GetTokenRoutes    : TRESTDWRoutes     Read vDWRoutes        Write vDWRoutes;
-  Property    TokenHash         : String        Read vTokenHash       Write SetTokenHash;
-  Property    ServerSignature   : String        Read vServerSignature Write vServerSignature;
-  Property    LifeCycle         : Integer       Read vLifeCycle       Write vLifeCycle;
+  Property    Key               : String           Read vTokenName       Write vTokenName;
+  Property    GetTokenEvent     : String           Read vGetTokenName    Write SetGetTokenName;
+  Property    GetTokenRoutes    : TRESTDWRoutes    Read vDWRoutes        Write vDWRoutes;
+  Property    TokenHash         : String           Read vTokenHash       Write SetTokenHash;
+  Property    ServerSignature   : String           Read vServerSignature Write vServerSignature;
+  Property    LifeCycle         : Integer          Read vLifeCycle       Write vLifeCycle;
 End;
 
-Type
  TRESTDWAuthOptionBasic = Class(TRESTDWAuthOptionParam)
  Private
   vUserName,
@@ -200,7 +188,6 @@ Type
   Property    Password : String Read vPassword Write vPassword;
 End;
 
-Type
  TRESTDWAuthOAuth = Class(TRESTDWAuthOptionParam)
  Private
   vRedirectURI,
@@ -232,7 +219,6 @@ Type
   Property    Expires_in     : TDateTime           Read vExpiresin;
 End;
 
-Type
  TRESTDWAuthOptionBearerClient = Class(TRESTDWAuthOptionParam)
  Private
   vGetTokenName,
@@ -265,7 +251,6 @@ Type
   Property    AutoRenewToken   : Boolean          Read vAutoRenewToken  Write vAutoRenewToken;
 End;
 
-Type
  TRESTDWAuthOptionTokenClient = Class(TRESTDWAuthOptionParam)
  Private
   vSecrets,
@@ -298,7 +283,6 @@ Type
   Property    AutoRenewToken   : Boolean          Read vAutoRenewToken  Write vAutoRenewToken;
 End;
 
-Type
  TRESTDWAuthOptionBearerServer = Class(TRESTDWAuthTokenParam)
  Private
  Protected
@@ -307,7 +291,6 @@ Type
   Function    FromToken(Value    : String)      : Boolean; Override;
 End;
 
-Type
  TRESTDWAuthOptionTokenServer = Class(TRESTDWAuthTokenParam)
  Private
  Protected
@@ -316,7 +299,6 @@ Type
   Function    FromToken(Value    : String)      : Boolean; Override;
 End;
 
-Type
  TRESTDWServerAuthOptionParams = Class(TPersistent)
  Private
   FOwner                          : TPersistent;
@@ -336,7 +318,6 @@ Type
   Property OptionParams           : TRESTDWAuthOptionParam  Read RDWAuthOptionParam Write RDWAuthOptionParam;
 End;
 
-Type
  TRESTDWClientAuthOptionParams = Class(TPersistent)
  Private
   FOwner                          : TPersistent;
@@ -355,7 +336,6 @@ Type
   Property OptionParams           : TRESTDWAuthOptionParam  Read RDWAuthOptionParam Write RDWAuthOptionParam;
 End;
 
-Type
  TRESTDWAuthRequest = Class
  Private
   vToken : String;
@@ -364,83 +344,144 @@ Type
   Property Token : String Read vToken Write vToken;
 End;
 
-Type
  TRESTDWDataUtils = Class
-  Public
-   Class Procedure ParseRESTURL        (Const Cmd          : String;
-                                        Encoding           : TEncodeSelect;
-                                        Var mark           : String
-                                        {$IFDEF FPC};
-                                         DatabaseCharSet   : TDatabaseCharSet
-                                        {$ENDIF};
-                                        Var Result         : TRESTDWParams);Overload;
-   Class Procedure ParseRESTURL        (UriParams          : String;
-                                        Encoding           : TEncodeSelect;
-                                        {$IFDEF FPC}
-                                        DatabaseCharSet    : TDatabaseCharSet;
-                                        {$ENDIF}
-                                        Var Result         : TRESTDWParams);Overload;
-   Class Function  Result2JSON          (wsResult          : TResultErro)     : String;
-   Class Procedure ParseWebFormsParams (Params             : TStrings;
-                                        Const URL,
-                                        Query              : String;
-                                        Var mark           : String;
-                                        Encoding           : TEncodeSelect;
-                                        {$IFDEF FPC}
-                                         DatabaseCharSet   : TDatabaseCharSet;
-                                        {$ENDIF}
-                                        Var Result         : TRESTDWParams;
-                                        MethodType         : TRequestType = rtPost;
-                                        ContentType        : String = 'application/json'); Overload;
-   Class Procedure ParseWebFormsParams (Var DWParams       : TRESTDWParams;
-                                        WebParams          : TStrings;
-                                        Encoding           : TEncodeSelect
-                                        {$IFDEF FPC}
-                                        ;DatabaseCharSet   : TDatabaseCharSet
-                                        {$ENDIF};
-                                        MethodType         : TRequestType = rtPost);Overload;
-   Class Function ParseDWParamsURL     (Const Cmd          : String;
-                                        Encoding           : TEncodeSelect;
-                                        Var ResultPR       : TRESTDWParams{$IFDEF FPC}
-                                        ;DatabaseCharSet   : TDatabaseCharSet
-                                        {$ENDIF})          : Boolean;
-   Class Function ParseBodyRawToDWParam(Const BodyRaw      : String;
-                                        Encoding           : TEncodeSelect;
-                                        Var ResultPR       : TRESTDWParams
-                                        {$IFDEF FPC}
-                                        ;DatabaseCharSet   : TDatabaseCharSet
-                                        {$ENDIF})          : Boolean;Overload;
-   Class Function ParseBodyRawToDWParam(Const BodyRaw      : TStream;
-                                        Encoding           : TEncodeSelect;
-                                        Var ResultPR       : TRESTDWParams
-                                        {$IFDEF FPC}
-                                        ;DatabaseCharSet   : TDatabaseCharSet
-                                        {$ENDIF})          : Boolean;Overload;
-   Class Function ParseBodyBinToDWParam(Const BodyBin      : String;
-                                        Encoding           : TEncodeSelect;
-                                        Var ResultPR       : TRESTDWParams
-                                        {$IFDEF FPC}
-                                        ;DatabaseCharSet   : TDatabaseCharSet
-                                        {$ENDIF})          : Boolean;
-   Class Function ParseFormParamsToDWParam(Const FormParams : String;
-                                           Encoding         : TEncodeSelect;
-                                           Var ResultPR     : TRESTDWParams
-                                           {$IFDEF FPC}
-                                           ;DatabaseCharSet : TDatabaseCharSet
-                                           {$ENDIF})        : Boolean;
+ Public
+ Class Procedure ParseRESTURL           (Const Cmd       : String;
+                                         Encoding        : TEncodeSelect;
+                                         Var mark        : String
+                                         {$IFDEF RESTDWLAZARUS}
+                                         ;DatabaseCharSet: TDatabaseCharSet
+                                         {$ENDIF};
+                                         Var Result      : TRESTDWParams);Overload;
+ Class Procedure ParseRESTURL           (UriParams       : String;
+                                         Encoding        : TEncodeSelect;
+                                         {$IFDEF RESTDWLAZARUS}
+                                         DatabaseCharSet : TDatabaseCharSet;
+                                         {$ENDIF}
+                                         Var Result      : TRESTDWParams);Overload;
+ Class Function  Result2JSON            (wsResult        : TResultErro): String;
+ Class Procedure ParseWebFormsParams    (Params          : TStrings;
+                                         Const URL,
+                                         Query           : String;
+                                         Var mark        : String;
+                                         Encoding        : TEncodeSelect;
+                                         {$IFDEF RESTDWLAZARUS}
+                                         DatabaseCharSet : TDatabaseCharSet;
+                                         {$ENDIF}
+                                         Var Result      : TRESTDWParams;
+                                         MethodType      : TRequestType = rtPost;
+                                         ContentType     : String = cDefaultContentType); Overload;
+ Class Procedure ParseWebFormsParams    (Var DWParams    : TRESTDWParams;
+                                         WebParams       : TStrings;
+                                         Encoding        : TEncodeSelect
+                                         {$IFDEF RESTDWLAZARUS}
+                                         ;DatabaseCharSet: TDatabaseCharSet
+                                         {$ENDIF};
+                                         MethodType      : TRequestType = rtPost);Overload;
+ Class Function ParseDWParamsURL        (Const Cmd       : String;
+                                         Encoding        : TEncodeSelect;
+                                         Var ResultPR    : TRESTDWParams
+                                         {$IFDEF RESTDWLAZARUS}
+                                         ;DatabaseCharSet: TDatabaseCharSet
+                                         {$ENDIF})       : Boolean;
+ Class Function ParseBodyRawToDWParam   (Const BodyRaw   : String;
+                                         Encoding        : TEncodeSelect;
+                                         Var ResultPR    : TRESTDWParams
+                                         {$IFDEF RESTDWLAZARUS}
+                                         ;DatabaseCharSet: TDatabaseCharSet
+                                         {$ENDIF})       : Boolean;Overload;
+ Class Function ParseBodyRawToDWParam   (Const BodyRaw   : TStream;
+                                         Encoding        : TEncodeSelect;
+                                         Var ResultPR    : TRESTDWParams
+                                         {$IFDEF RESTDWLAZARUS}
+                                         ;DatabaseCharSet: TDatabaseCharSet
+                                         {$ENDIF})       : Boolean;Overload;
+ Class Function ParseBodyBinToDWParam   (Const BodyBin   : String;
+                                         Encoding        : TEncodeSelect;
+                                         Var ResultPR    : TRESTDWParams
+                                         {$IFDEF RESTDWLAZARUS}
+                                         ;DatabaseCharSet: TDatabaseCharSet
+                                         {$ENDIF})       : Boolean;
+ Class Function ParseFormParamsToDWParam(Const FormParams: String;
+                                         Encoding        : TEncodeSelect;
+                                         Var ResultPR    : TRESTDWParams
+                                         {$IFDEF RESTDWLAZARUS}
+                                         ;DatabaseCharSet: TDatabaseCharSet
+                                         {$ENDIF})       : Boolean;
  End;
-
-
 
 Function GettokenValue  (Value      : String) : String;
 Function GetTokenType   (Value      : String) : TRESTDWTokenType;
 Function CountExpression(Value      : String;
                          Expression : Char)   : Integer;
 Function GetSecretsValue(Value      : String) : String;
+Procedure BuildCORS(Routes                 : TRESTDWRoutes;
+                    Var CORS_CustomHeaders : TStrings);
 
 implementation
 
 Uses uRESTDWJSONInterface;
+
+Procedure BuildCORS(Routes                 : TRESTDWRoutes;
+                    Var CORS_CustomHeaders : TStrings);
+Var
+ vStrAcceptedRoutes : String;
+Begin
+ vStrAcceptedRoutes := '';
+ If Assigned(CORS_CustomHeaders) Then
+  Begin
+//   CORS_CustomHeaders.Clear;
+   If Routes.All.Active Then
+    CORS_CustomHeaders.Add('Access-Control-Allow-Methods=GET, POST, PATCH, PUT, DELETE, OPTIONS')
+   Else
+    Begin
+     If Routes.Get.Active Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', GET'
+       Else
+        vStrAcceptedRoutes := 'GET';
+      End;
+     If Routes.Post.Active Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', POST'
+       Else
+        vStrAcceptedRoutes := 'POST';
+      End;
+     If Routes.Put.Active Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', PUT'
+       Else
+        vStrAcceptedRoutes := 'PUT';
+      End;
+     If Routes.Patch.Active Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', PATCH'
+       Else
+        vStrAcceptedRoutes := 'PATCH';
+      End;
+     If Routes.Delete.Active Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', DELETE'
+       Else
+        vStrAcceptedRoutes := 'DELETE';
+      End;
+     If Routes.Option.Active Then
+      Begin
+       If vStrAcceptedRoutes <> '' Then
+        vStrAcceptedRoutes := vStrAcceptedRoutes + ', OPTION'
+       Else
+        vStrAcceptedRoutes := 'OPTION';
+      End;
+     If vStrAcceptedRoutes <> '' Then
+      CORS_CustomHeaders.Add('Access-Control-Allow-Methods=' + vStrAcceptedRoutes);
+    End;
+  End;
+End;
 
 Function URLDecode(Const s : String) : String;
 Var
@@ -642,7 +683,7 @@ Begin
  Result := Format('{"alg": "%s", "typ": "%s"}', [GetCryptType, GetTokenType]);
 End;
 
-Function    TTokenValue.ToToken : String;
+Function TTokenValue.ToToken : String;
 Var
  viss,
  vBuildData : String;
@@ -662,14 +703,14 @@ Begin
                   vBuildData := Format(cValueToken, [viss,
                                                      ISO8601FromDateTime(vFinalRequest),
                                                      ISO8601FromDateTime(vInitRequest),
-                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
-                                                                   {$IFDEF FPC}, csUndefined{$ENDIF})])
+                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
+                                                                   {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})])
                  Else
                   vBuildData := Format(cValueTokenNoLife, [viss,
                                                            ISO8601FromDateTime(vInitRequest),
-                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
-                                                                         {$IFDEF FPC}, csUndefined{$ENDIF})]);
-                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF FPC}, csUndefined{$ENDIF});
+                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
+                                                                         {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
+                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
                  Result     := Format(cTokenStringRDWTS, [Result + '.' + vCripto.Encrypt(Result)]);
                 End;
   rdwJWT      : Begin
@@ -677,41 +718,32 @@ Begin
                  vMD5        := TTokenValue.GetMD5(vSecrets);
                  If vFinalRequest <> 0 Then
                   vBuildData := Format(cValueToken, [viss,
-                                                     IntToStr(DateTimeToUnix(vFinalRequest{$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF})),
-                                                     IntToStr(DateTimeToUnix(vInitRequest{$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF})),
-                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
-                                                                   {$IFDEF FPC}, csUndefined{$ENDIF})])
+                                                     IntToStr(DateTimeToUnix(vFinalRequest{$IFNDEF FPC}{$IFDEF DELPHI2010UP}, False{$ENDIF}{$ELSE}, False{$ENDIF})),
+                                                     IntToStr(DateTimeToUnix(vInitRequest{$IFNDEF FPC}{$IFDEF DELPHI2010UP}, False{$ENDIF}{$ELSE}, False{$ENDIF})),
+                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
+                                                                   {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})])
                  Else
                   vBuildData := Format(cValueTokenNoLife, [viss,
-                                                           IntToStr(DateTimeToUnix(vInitRequest{$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF})),
-                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
-                                                                         {$IFDEF FPC}, csUndefined{$ENDIF})]);
-                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF FPC}, csUndefined{$ENDIF});
+                                                           IntToStr(DateTimeToUnix(vInitRequest {$IFNDEF FPC}{$IFDEF DELPHI2010UP}, False{$ENDIF}{$ELSE}, False{$ENDIF})),
+                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
+                                                                         {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
+                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
                  Result     := Format(cTokenStringRDWTS, [Result + '.' + vCripto.Encrypt(Result)]);
                 End;
  End;
 End;
 
-Function    TTokenValue.ToJSON  : String;
+Function TTokenValue.ToJSON  : String;
 Begin
- Result := '';
- Case vRDWTokenType Of
-  rdwTS,
-  rdwPersonal : Begin
-                 Result := EncodeStrings(GetHeader{$IFDEF FPC}, csUndefined{$ENDIF});
-                End;
-  rdwJWT      : Begin
-                 Result := EncodeStrings(GetHeader{$IFDEF FPC}, csUndefined{$ENDIF});
-                End;
- End;
+  Result := EncodeStrings(GetHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
 End;
 
-Procedure   TTokenValue.SetSecrets  (Value : String);
+Procedure TTokenValue.SetSecrets  (Value : String);
 Begin
- vSecrets    := Value;
+ vSecrets := Value;
 End;
 
-Procedure   TTokenValue.SetTokenHash(Token : String);
+Procedure TTokenValue.SetTokenHash(Token : String);
 Begin
  vTokenHash  := Token;
  vCripto.Key := vTokenHash;
@@ -782,7 +814,7 @@ Begin
   //Read Header
   If Trim(vHeader) <> '' Then
    Begin
-    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
+    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
     If bJsonValue.PairCount > 0 Then
      Begin
       If Not bJsonValue.PairByName['typ'].isnull Then
@@ -793,7 +825,7 @@ Begin
   //Read Body
   If Trim(vBody) <> '' Then
    Begin
-    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vBody{$IFDEF FPC}, csUndefined{$ENDIF}));
+    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vBody{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
     If bJsonValue.PairCount > 0 Then
      Begin
       If (Not (bJsonValue.PairByName['iat'].isnull)) And
@@ -802,7 +834,9 @@ Begin
         If      vRDWTokenType = rdwTS Then
          vInitRequest := TTokenValue.DateTimeFromISO8601(bJsonValue.PairByName['iat'].Value)
         Else If vRDWTokenType = rdwJWT Then
-         vInitRequest := UnixToDateTime(StrToInt64(bJsonValue.PairByName['iat'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF});
+         vInitRequest := UnixToDateTime(StrToInt64(bJsonValue.PairByName['iat'].Value)
+                         {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE6UP)}
+                         , False{$IFEND});
        End;
       If (Not (bJsonValue.PairByName['exp'].isnull)) And
          (bJsonValue.PairByName['exp'].Value <> '') Then
@@ -810,10 +844,12 @@ Begin
         If      vRDWTokenType = rdwTS Then
          vFinalRequest := TTokenValue.DateTimeFromISO8601(bJsonValue.PairByName['exp'].Value)
         Else If vRDWTokenType = rdwJWT Then
-         vFinalRequest := UnixToDateTime(StrToInt64(bJsonValue.PairByName['exp'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF});
+         vFinalRequest := UnixToDateTime(StrToInt64(bJsonValue.PairByName['exp'].Value)
+                          {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE6UP)}
+                         , False{$IFEND});
        End;
       If Not bJsonValue.PairByName['secrets'].isnull Then
-       vSecrets := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+       vSecrets := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
      End;
     FreeAndNil(bJsonValue);
    End;
@@ -835,7 +871,7 @@ Begin
   Inherited Assign(Source);
 End;
 
-Function  TRESTDWAuthOptionTokenServer.FromToken(Value : String)    : Boolean;
+Function TRESTDWAuthOptionTokenServer.FromToken(Value : String)    : Boolean;
 Var
  vHeader,
  vBody,
@@ -888,18 +924,22 @@ Var
          If vRDWTokenType = rdwTS Then
           vInitRequest   := TTokenValue.DateTimeFromISO8601(bJsonValue.PairByName['iat'].Value)
          Else
-          vInitRequest   := UnixToDateTime(StrToInt64(bJsonValue.PairByName['iat'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF});
+          vInitRequest   := UnixToDateTime(StrToInt64(bJsonValue.PairByName['iat'].Value)
+                            {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE6UP)}
+                            , False{$IFEND});
         End;
        Result            := Trim(bJsonValue.PairByName['secrets'].Name) <> '';
        If Result Then
-        vSecrets         := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+        vSecrets         := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
        If Trim(bJsonValue.PairByName['exp'].Name) <> '' Then
         Begin
          Result          := False;
          If vRDWTokenType = rdwTS Then
           vFinalRequest  := TTokenValue.DateTimeFromISO8601(bJsonValue.PairByName['exp'].Value)
          Else
-          vFinalRequest  := UnixToDateTime(StrToInt64(bJsonValue.PairByName['exp'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF});
+          vFinalRequest  := UnixToDateTime(StrToInt64(bJsonValue.PairByName['exp'].Value)
+                            {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE6UP)}
+                            , False{$IFEND});
          Result          := Now < vFinalRequest;
         End;
       End;
@@ -925,7 +965,7 @@ Begin
  Result          := (Trim(vHeader) <> '') And (Trim(vBody) <> '') And (Trim(vStringComparer) <> '');
  If Result Then
   Begin
-   Result                   := ReadHeader(DecodeStrings(vHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
+   Result                   := ReadHeader(DecodeStrings(vHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
    If Result Then
     Begin
      Result                 := False;
@@ -938,10 +978,10 @@ Begin
       If Result Then
        Begin
         Result              := False;
-        vHeader             := DecodeStrings(vHeader                 {$IFDEF FPC}, csUndefined{$ENDIF});
-        vBody               := DecodeStrings(vBody                   {$IFDEF FPC}, csUndefined{$ENDIF});
-        Secrets             := DecodeStrings(GetSecretsValue(vBody)  {$IFDEF FPC}, csUndefined{$ENDIF});
-        Secrets             := DecodeStrings(GetSecretsValue(Secrets){$IFDEF FPC}, csUndefined{$ENDIF});
+        vHeader             := DecodeStrings(vHeader                 {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        vBody               := DecodeStrings(vBody                   {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        Secrets             := DecodeStrings(GetSecretsValue(vBody)  {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        Secrets             := DecodeStrings(GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
         Result              := ReadBody(vBody);
        End;
      Finally
@@ -951,7 +991,7 @@ Begin
   End;
 End;
 
-Function  TRESTDWAuthOptionTokenServer.GetToken(aSecrets   : String = '') : String;
+Function TRESTDWAuthOptionTokenServer.GetToken(aSecrets   : String = '') : String;
 Var
  vTokenValue : TTokenValue;
 Begin
@@ -986,7 +1026,7 @@ Begin
   //Read Header
   If Trim(vHeader) <> '' Then
    Begin
-    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
+    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
     If bJsonValue.PairCount > 0 Then
      Begin
       If Not bJsonValue.PairByName['typ'].isnull Then
@@ -997,7 +1037,7 @@ Begin
   //Read Body
   If Trim(vBody) <> '' Then
    Begin
-    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vBody{$IFDEF FPC}, csUndefined{$ENDIF}));
+    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vBody{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
     If bJsonValue.PairCount > 0 Then
      Begin
       If Not bJsonValue.PairByName['iat'].isnull Then
@@ -1005,17 +1045,21 @@ Begin
         If      vRDWTokenType = rdwTS Then
          vInitRequest := TTokenValue.DateTimeFromISO8601(bJsonValue.PairByName['iat'].Value)
         Else If vRDWTokenType = rdwJWT Then
-         vInitRequest := UnixToDateTime(StrToInt64(bJsonValue.PairByName['iat'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF});
+         vInitRequest := UnixToDateTime(StrToInt64(bJsonValue.PairByName['iat'].Value)
+                         {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE6UP)}
+                         , False{$IFEND});
        End;
       If Not bJsonValue.PairByName['exp'].isnull Then
        Begin
         If      vRDWTokenType = rdwTS Then
          vFinalRequest := TTokenValue.DateTimeFromISO8601(bJsonValue.PairByName['exp'].Value)
         Else If vRDWTokenType = rdwJWT Then
-         vFinalRequest := UnixToDateTime(StrToInt64(bJsonValue.PairByName['exp'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF});
+         vFinalRequest := UnixToDateTime(StrToInt64(bJsonValue.PairByName['exp'].Value)
+                          {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE6UP)}
+                          , False{$IFEND});
        End;
       If Not bJsonValue.PairByName['secrets'].isnull Then
-       vSecrets := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+       vSecrets := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
      End;
     FreeAndNil(bJsonValue);
    End;
@@ -1037,7 +1081,7 @@ Begin
   Inherited Assign(Source);
 End;
 
-Function  TRESTDWAuthOptionBearerServer.FromToken(Value    : String)    : Boolean;
+Function TRESTDWAuthOptionBearerServer.FromToken(Value    : String)    : Boolean;
 Var
  vHeader,
  vBody,
@@ -1090,18 +1134,22 @@ Var
          If vRDWTokenType = rdwTS Then
           vInitRequest   := TTokenValue.DateTimeFromISO8601(bJsonValue.PairByName['iat'].Value)
          Else
-          vInitRequest   := UnixToDateTime(StrToInt64(bJsonValue.PairByName['iat'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF});
+          vInitRequest   := UnixToDateTime(StrToInt64(bJsonValue.PairByName['iat'].Value)
+                            {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE6UP)}
+                            , False{$IFEND});
         End;
        Result            := Trim(bJsonValue.PairByName['secrets'].Name) <> '';
        If Result Then
-        vSecrets         := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+        vSecrets         := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
        If Trim(bJsonValue.PairByName['exp'].Name) <> '' Then
         Begin
          Result          := False;
          If vRDWTokenType = rdwTS Then
           vFinalRequest  := TTokenValue.DateTimeFromISO8601(bJsonValue.PairByName['exp'].Value)
          Else
-          vFinalRequest  := UnixToDateTime(StrToInt64(bJsonValue.PairByName['exp'].Value){$IFDEF FPC}{$IFDEF LCL_FULLVERSION >= 2010000}, False{$ENDIF}{$ELSE}{$IF (CompilerVersion > 26)}, False{$IFEND}{$ENDIF});
+          vFinalRequest  := UnixToDateTime(StrToInt64(bJsonValue.PairByName['exp'].Value)
+                            {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE6UP)}
+                            , False{$IFEND});
          Result          := Now < vFinalRequest;
         End;
       End;
@@ -1124,7 +1172,7 @@ Begin
  Result          := (Trim(vHeader) <> '') And (Trim(vBody) <> '') And (Trim(vStringComparer) <> '');
  If Result Then
   Begin
-   Result                   := ReadHeader(DecodeStrings(vHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
+   Result                   := ReadHeader(DecodeStrings(vHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
    If Result Then
     Begin
      Result                 := False;
@@ -1137,10 +1185,10 @@ Begin
       If Result Then
        Begin
         Result              := False;
-        vHeader             := DecodeStrings(vHeader{$IFDEF FPC}, csUndefined{$ENDIF});
-        vBody               := DecodeStrings(vBody{$IFDEF FPC},   csUndefined{$ENDIF});
-        Secrets             := DecodeStrings(GetSecretsValue(vBody)  {$IFDEF FPC}, csUndefined{$ENDIF});
-        Secrets             := DecodeStrings(GetSecretsValue(Secrets){$IFDEF FPC}, csUndefined{$ENDIF});
+        vHeader             := DecodeStrings(vHeader                 {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        vBody               := DecodeStrings(vBody                   {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        Secrets             := DecodeStrings(GetSecretsValue(vBody)  {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        Secrets             := DecodeStrings(GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
         Result              := ReadBody(vBody);
        End;
      Finally
@@ -1150,7 +1198,7 @@ Begin
   End;
 End;
 
-Function  TRESTDWAuthOptionBearerServer.GetToken(aSecrets : String = '') : String;
+Function TRESTDWAuthOptionBearerServer.GetToken(aSecrets : String = '') : String;
 Var
  vTokenValue : TTokenValue;
 Begin
@@ -1176,13 +1224,13 @@ Begin
  Inherited;
 End;
 
-Procedure   TRESTDWServerAuthOptionParams.CopyServerAuthParams(Var Value : TRESTDWAuthOptionParam);
+Procedure TRESTDWServerAuthOptionParams.CopyServerAuthParams(Var Value : TRESTDWAuthOptionParam);
 Begin
  If RDWAuthOptionParam is TRESTDWAuthTokenParam Then
   Begin
    If Value <> Nil Then
     FreeAndNil(Value);
-   Value                                     := TRESTDWAuthTokenParam.Create;
+   Value                                        := TRESTDWAuthTokenParam.Create;
    TRESTDWAuthTokenParam(Value).TokenType       := TRESTDWAuthTokenParam(RDWAuthOptionParam).TokenType;
    TRESTDWAuthTokenParam(Value).CryptType       := TRESTDWAuthTokenParam(RDWAuthOptionParam).CryptType;
    TRESTDWAuthTokenParam(Value).GetTokenEvent   := TRESTDWAuthTokenParam(RDWAuthOptionParam).GetTokenEvent;
@@ -1201,7 +1249,7 @@ Begin
   Begin
    If Value <> Nil Then
     FreeAndNil(Value);
-   Value                                               := TRESTDWAuthOptionBasic.Create;
+   Value                                                  := TRESTDWAuthOptionBasic.Create;
    TRESTDWAuthOptionBasic(Value).Username                 := TRESTDWAuthOptionBasic(RDWAuthOptionParam).Username;
    TRESTDWAuthOptionBasic(Value).Password                 := TRESTDWAuthOptionBasic(RDWAuthOptionParam).Password;
    TRESTDWAuthOptionBasic(Value).AuthDialog               := TRESTDWAuthOptionBasic(RDWAuthOptionParam).AuthDialog;
@@ -1321,7 +1369,7 @@ Constructor TRESTDWAuthOptionTokenClient.Create;
 Begin
  inherited;
  vToken          := '';
- vRDWTokenType   := rdwTS;
+ vRDWTokenType   := rdwJWT;
  vTokenRequest   := rdwtHeader;
  vSecrets        := '';
  vGetTokenName   := 'GetToken';
@@ -1340,13 +1388,13 @@ Begin
  vGetTokenName    := 'GetToken';
  vTokenName       := 'token';
  vLifeCycle       := 1800;//30 Minutos
- vRDWTokenType    := rdwTS;
- vRDWCryptType    := rdwAES256;
+ vRDWTokenType    := rdwJWT;
+ vRDWCryptType    := rdwHSHA256;
  vServerSignature := '';
  vInitRequest     := 0;
  vFinalRequest    := 0;
  vSecrets         := '';
- vDWRoutes        := [crAll];
+ vDWRoutes        := TRESTDWRoutes.Create;
 End;
 
 Procedure TRESTDWAuthTokenParam.Assign(Source: TPersistent);
@@ -1367,17 +1415,17 @@ Begin
   Inherited Assign(Source);
 End;
 
-Destructor  TRESTDWAuthTokenParam.Destroy;
+Destructor TRESTDWAuthTokenParam.Destroy;
 Begin
  Inherited;
 End;
 
-Procedure   TRESTDWAuthTokenParam.SetTokenHash(Token : String);
+Procedure TRESTDWAuthTokenParam.SetTokenHash(Token : String);
 Begin
  vTokenHash := Token;
 End;
 
-Function    TRESTDWAuthTokenParam.GetTokenType   (Value : String) : TRESTDWTokenType;
+Function TRESTDWAuthTokenParam.GetTokenType   (Value : String) : TRESTDWTokenType;
 Begin
  Result := rdwTS;
  If Lowercase(Value) = 'jwt' Then
@@ -1386,7 +1434,7 @@ Begin
   Result := rdwPersonal;
 End;
 
-Function    TRESTDWAuthTokenParam.GetCryptType   (Value : String) : TRESTDWCryptType;
+Function TRESTDWAuthTokenParam.GetCryptType   (Value : String) : TRESTDWCryptType;
 Begin
  Result := rdwAES256;
  If Lowercase(Value) = 'hs256' Then
@@ -1395,12 +1443,12 @@ Begin
   Result := rdwRSA;
 End;
 
-Procedure   TRESTDWAuthTokenParam.SetCryptType   (Value : TRESTDWCryptType);
+Procedure TRESTDWAuthTokenParam.SetCryptType   (Value : TRESTDWCryptType);
 Begin
  vRDWCryptType := Value;
 End;
 
-Procedure   TRESTDWAuthTokenParam.SetGetTokenName(Value : String);
+Procedure TRESTDWAuthTokenParam.SetGetTokenName(Value : String);
 Begin
  If Length(Value) > 0 Then
   vGetTokenName := Value
@@ -1464,21 +1512,21 @@ Constructor TRESTDWClientAuthOptionParams.Create(AOwner: TPersistent);
 Begin
  inherited Create;
  FOwner             := AOwner;
- RDWAuthOption      := rdwAONone;
  RDWAuthOptionParam := Nil;
+ RDWAuthOption      := rdwAONone;
 End;
 
 Constructor TRESTDWServerAuthOptionParams.Create(AOwner: TPersistent);
 Begin
  inherited Create;
  FOwner             := AOwner;
- RDWAuthOption      := rdwAONone;
  RDWAuthOptionParam := Nil;
+ RDWAuthOption      := rdwAONone;
 End;
 
 Procedure TRESTDWClientAuthOptionParams.DestroyParam;
 Begin
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  If Not(csDesigning in TComponent(GetOwner).ComponentState) Then
   Begin
    If Assigned(RDWAuthOptionParam) Then
@@ -1497,7 +1545,7 @@ End;
 
 Procedure TRESTDWServerAuthOptionParams.DestroyParam;
 Begin
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  If Not(csDesigning in TComponent(GetOwner).ComponentState) Then
   Begin
    If Assigned(RDWAuthOptionParam) Then
@@ -1548,54 +1596,11 @@ Begin
  Result := FOwner;
 End;
 
-//{ TRESTDWAuthOptionParam }
-//
-//Procedure TRESTDWAuthOptionParam.Assign(Source: TPersistent);
-//Begin
-// If Source is TRESTDWAuthTokenParam Then
-//  Begin
-//   {$IFNDEF FPC}
-//    {$IF Defined(HAS_FMX)}
-//     {$IFDEF HAS_UTF8}
-//      If Self <> Nil Then
-//       Begin
-//        Self.DisposeOf;
-//        Self := Nil;
-//       End;
-//     {$ELSE}
-//      If Self <> Nil Then
-//       FreeAndNil(Self);
-//     {$ENDIF}
-//    {$ELSE}
-//     If Self <> Nil Then
-//      Self.Free;
-//    {$IFEND}
-//   {$ELSE}
-//    If Self <> Nil Then
-//     FreeAndNil(Self);
-//   {$ENDIF}
-//   Self                                     := TRESTDWAuthTokenParam.Create;
-//   TRESTDWAuthTokenParam(Self).TokenType       := TRESTDWAuthTokenParam(Source).TokenType;
-//   TRESTDWAuthTokenParam(Self).CryptType       := TRESTDWAuthTokenParam(Source).CryptType;
-//   TRESTDWAuthTokenParam(Self).GetTokenEvent   := TRESTDWAuthTokenParam(Source).GetTokenEvent;
-//   TRESTDWAuthTokenParam(Self).TokenHash       := TRESTDWAuthTokenParam(Source).TokenHash;
-//   TRESTDWAuthTokenParam(Self).ServerSignature := TRESTDWAuthTokenParam(Source).ServerSignature;
-//   TRESTDWAuthTokenParam(Self).LifeCycle       := TRESTDWAuthTokenParam(Source).LifeCycle;
-//  End
-// Else If Source is TRESTDWAuthOptionBasic Then
-//  Begin
-//   If Self <> Nil Then
-//    FreeAndNil(Self);
-//   Self                                     := TRESTDWAuthOptionBasic.Create;
-//   TRESTDWAuthOptionBasic(Self).Username       := TRESTDWAuthOptionBasic(Source).Username;
-//   TRESTDWAuthOptionBasic(Self).Password       := TRESTDWAuthOptionBasic(Source).Password;
-//  End
-// Else
-//  Inherited Assign(Source);
-//End;
+{ TRESTDWAuthOptionParam }
 
 Constructor TRESTDWAuthOptionParam.Create;
 Begin
+ Inherited;
  vCustomAuthMessage      := 'Protected Space...';
  vCustom404TitleMessage  := '(404) The address you are looking for does not exist';
  vCustom404BodyMessage   := '404';
@@ -1619,10 +1624,10 @@ Begin
   vCustomAuthErrorPage.Add(Value[I]);
 End;
 
-Class Procedure TRESTDWDataUtils.ParseRESTURL(Const Cmd         : String;
-                                        Encoding          : TEncodeSelect;
-                                        Var mark          : String
-                                        {$IFDEF FPC};
+Class Procedure TRESTDWDataUtils.ParseRESTURL(Const Cmd    : String;
+                                        Encoding           : TEncodeSelect;
+                                        Var mark           : String
+                                        {$IFDEF RESTDWLAZARUS};
                                         DatabaseCharSet    : TDatabaseCharSet
                                         {$ENDIF};
                                         Var Result         : TRESTDWParams);
@@ -1654,7 +1659,7 @@ Begin
   Begin
    Result := TRESTDWParams.Create;
    Result.Encoding := Encoding;
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
    Result.DatabaseCharSet := DatabaseCharSet;
    {$ENDIF}
   End;
@@ -1727,9 +1732,9 @@ Begin
   End;
 End;
 
-Class Procedure TRESTDWDataUtils.ParseRESTURL(UriParams          : String;
+Class Procedure TRESTDWDataUtils.ParseRESTURL(UriParams    : String;
                                         Encoding           : TEncodeSelect;
-                                        {$IFDEF FPC}
+                                        {$IFDEF RESTDWLAZARUS}
                                         DatabaseCharSet    : TDatabaseCharSet;
                                         {$ENDIF}
                                         Var Result         : TRESTDWParams);
@@ -1747,7 +1752,7 @@ Begin
   Begin
    Result := TRESTDWParams.Create;
    Result.Encoding := Encoding;
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
    Result.DatabaseCharSet := DatabaseCharSet;
    {$ENDIF}
   End;
@@ -1811,7 +1816,7 @@ End;
 
 Class Function TRESTDWDataUtils.Result2JSON(wsResult : TResultErro) : String;
 Begin
- Result := '{"STATUS":"' + wsResult.Status + '","MENSSAGE":"' + wsResult.MessageText + '"}';
+ Result := '{"STATUS":"' + wsResult.Status + '","MESSAGE":"' + wsResult.MessageText + '"}';
 End;
 
 Class Procedure TRESTDWDataUtils.ParseWebFormsParams(Params             : TStrings;
@@ -1819,12 +1824,12 @@ Class Procedure TRESTDWDataUtils.ParseWebFormsParams(Params             : TStrin
                                                Query              : String;
                                                Var mark           : String;
                                                Encoding           : TEncodeSelect;
-                                               {$IFDEF FPC}
+                                               {$IFDEF RESTDWLAZARUS}
                                                 DatabaseCharSet   : TDatabaseCharSet;
                                                {$ENDIF}
                                                Var Result         : TRESTDWParams;
                                                MethodType         : TRequestType = rtPost;
-                                               ContentType        : String = 'application/json');
+                                               ContentType        : String = cDefaultContentType);
 Var
  aParamsIndex,
  I, IBar    : Integer;
@@ -1844,7 +1849,7 @@ Begin
   Begin
    Result := TRESTDWParams.Create;
    Result.Encoding := Encoding;
-   {$IFDEF FPC}
+   {$IFDEF RESTDWLAZARUS}
    Result.DatabaseCharSet := DatabaseCharSet;
    {$ENDIF}
   End;
@@ -1886,7 +1891,7 @@ Begin
         Begin
          vCreateParam := True;
          JSONParam := TJSONParam.Create(Result.Encoding);
-         {$IFDEF FPC}
+         {$IFDEF RESTDWLAZARUS}
          JSONParam.DatabaseCharSet := DatabaseCharSet;
          {$ENDIF}
          JSONParam.ObjectDirection := odIN;
@@ -1905,7 +1910,7 @@ Begin
             Begin
              vCreateParam := True;
              JSONParam := TJSONParam.Create(Result.Encoding);
-             {$IFDEF FPC}
+             {$IFDEF RESTDWLAZARUS}
              JSONParam.DatabaseCharSet := DatabaseCharSet;
              {$ENDIF}
              JSONParam.ObjectDirection := odIN;
@@ -1922,7 +1927,7 @@ Begin
             Begin
              vCreateParam := True;
              JSONParam := TJSONParam.Create(Result.Encoding);
-             {$IFDEF FPC}
+             {$IFDEF RESTDWLAZARUS}
              JSONParam.DatabaseCharSet := DatabaseCharSet;
              {$ENDIF}
              JSONParam.ObjectDirection := odIN;
@@ -1937,7 +1942,7 @@ Begin
            If ContentType <> cApplicationJSON Then
             Begin
              vValue  := Trim(Copy(Params[I], Pos('=', Params[I]) + 1, Length(Params[I])));
-             {$IFNDEF FPC}
+             {$IFNDEF RESTDWLAZARUS}
               If Result.Encoding = esUtf8 then
                vValue   := Utf8Encode(vValue);
              {$ENDIF}
@@ -1966,7 +1971,7 @@ Begin
     End;
    vParams := TStringList.Create;
    vParams.Delimiter := '&';
-   {$IFNDEF FPC}{$if CompilerVersion > 21}vParams.StrictDelimiter := true;{$IFEND}{$ENDIF}
+   {$IFDEF DELPHIXEUP}vParams.StrictDelimiter := true;{$ENDIF}
    If ((Params.Count > 0) And (Pos('?', URL) = 0)) And (Query = '') then
     Cmd := Cmd + URLDecode(Params.Text)
    Else
@@ -2011,7 +2016,7 @@ Begin
               JSONParam.ParamName       := IntToStr(I);
               JSONParam.AsString        := vParams[I];
              End;
-            {$IFDEF FPC}
+            {$IFDEF RESTDWLAZARUS}
             JSONParam.DatabaseCharSet := DatabaseCharSet;
             {$ENDIF}
 //          If vNewParam Then
@@ -2025,10 +2030,10 @@ Begin
   End;
 End;
 
-Class Procedure TRESTDWDataUtils.ParseWebFormsParams (Var DWParams      : TRESTDWParams;
+Class Procedure TRESTDWDataUtils.ParseWebFormsParams (Var DWParams: TRESTDWParams;
                                                 WebParams         : TStrings;
                                                 Encoding          : TEncodeSelect
-                                                {$IFDEF FPC}
+                                                {$IFDEF RESTDWLAZARUS}
                                                  ;DatabaseCharSet : TDatabaseCharSet
                                                 {$ENDIF};
                                                 MethodType        : TRequestType = rtPost);
@@ -2078,10 +2083,11 @@ Begin
 End;
 
 Class Function TRESTDWDataUtils.ParseDWParamsURL(Const Cmd        : String;
-                                           Encoding         : TEncodeSelect;
-                                           Var ResultPR     : TRESTDWParams{$IFDEF FPC}
-                                           ;DatabaseCharSet : TDatabaseCharSet
-                                           {$ENDIF})        : Boolean;
+                                                 Encoding         : TEncodeSelect;
+                                                 Var ResultPR     : TRESTDWParams
+                                                 {$IFDEF RESTDWLAZARUS}
+                                                 ;DatabaseCharSet : TDatabaseCharSet
+                                                 {$ENDIF})        : Boolean;
 Var
  vTempData,
  vTempName,
@@ -2103,7 +2109,7 @@ Begin
       Begin
        ResultPR := TRESTDWParams.Create;
        ResultPR.Encoding := Encoding;
-       {$IFDEF FPC}
+       {$IFDEF RESTDWLAZARUS}
        ResultPR.DatabaseCharSet := DatabaseCharSet;
        {$ENDIF}
       End;
@@ -2203,11 +2209,11 @@ Begin
 End;
 
 Class Function TRESTDWDataUtils.ParseBodyRawToDWParam(Const BodyRaw    : String;
-                                                Encoding         : TEncodeSelect;
-                                                Var ResultPR     : TRESTDWParams
-                                                {$IFDEF FPC}
-                                                ;DatabaseCharSet : TDatabaseCharSet
-                                                {$ENDIF})        : Boolean;
+                                                      Encoding         : TEncodeSelect;
+                                                      Var ResultPR     : TRESTDWParams
+                                                      {$IFDEF RESTDWLAZARUS}
+                                                      ;DatabaseCharSet : TDatabaseCharSet
+                                                      {$ENDIF})        : Boolean;
 Var
  JSONParam: TJSONParam;
 Begin
@@ -2217,7 +2223,7 @@ Begin
     Begin
      ResultPR := TRESTDWParams.Create;
      ResultPR.Encoding := Encoding;
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
      ResultPR.DatabaseCharSet := DatabaseCharSet;
      {$ENDIF}
     End;
@@ -2233,11 +2239,11 @@ Begin
 End;
 
 Class Function TRESTDWDataUtils.ParseBodyRawToDWParam(Const BodyRaw    : TStream;
-                                                Encoding         : TEncodeSelect;
-                                                Var ResultPR     : TRESTDWParams
-                                                {$IFDEF FPC}
-                                                ;DatabaseCharSet : TDatabaseCharSet
-                                                {$ENDIF})        : Boolean;
+                                                      Encoding         : TEncodeSelect;
+                                                      Var ResultPR     : TRESTDWParams
+                                                      {$IFDEF RESTDWLAZARUS}
+                                                      ;DatabaseCharSet : TDatabaseCharSet
+                                                      {$ENDIF})        : Boolean;
 Var
  JSONParam: TJSONParam;
 Begin
@@ -2248,7 +2254,7 @@ Begin
     Begin
      ResultPR := TRESTDWParams.Create;
      ResultPR.Encoding := Encoding;
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
      ResultPR.DatabaseCharSet := DatabaseCharSet;
      {$ENDIF}
     End;
@@ -2264,11 +2270,11 @@ Begin
 End;
 
 Class Function TRESTDWDataUtils.ParseBodyBinToDWParam(Const BodyBin    : String;
-                                                Encoding         : TEncodeSelect;
-                                                Var ResultPR     : TRESTDWParams
-                                                {$IFDEF FPC}
-                                                ;DatabaseCharSet : TDatabaseCharSet
-                                                {$ENDIF})        : Boolean;
+                                                      Encoding         : TEncodeSelect;
+                                                      Var ResultPR     : TRESTDWParams
+                                                      {$IFDEF RESTDWLAZARUS}
+                                                      ;DatabaseCharSet : TDatabaseCharSet
+                                                      {$ENDIF})        : Boolean;
 Var
  JSONParam    : TJSONParam;
  vContentType : String;
@@ -2279,7 +2285,7 @@ Begin
     Begin
      ResultPR := TRESTDWParams.Create;
      ResultPR.Encoding := Encoding;
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
      ResultPR.DatabaseCharSet := DatabaseCharSet;
      {$ENDIF}
     End;
@@ -2300,7 +2306,7 @@ Begin
      ResultPR.Add(JSONParam);
      If Not Assigned(ResultPR.ItemsString['Content-Type']) then
       Begin
-       vContentType:= GetMIMEType(ResultPR.ItemsString['dwFileNameBody'].AsString);
+       vContentType:= TRESTDWMimeType.GetMIMEType(ResultPR.ItemsString['dwFileNameBody'].AsString);
        If vContentType <> '' then
         Begin
          JSONParam   := TJSONParam.Create(ResultPR.Encoding);
@@ -2315,11 +2321,11 @@ Begin
 End;
 
 Class Function TRESTDWDataUtils.ParseFormParamsToDWParam(Const FormParams : String;
-                                                   Encoding         : TEncodeSelect;
-                                                   Var ResultPR     : TRESTDWParams
-                                                   {$IFDEF FPC}
-                                                   ;DatabaseCharSet : TDatabaseCharSet
-                                                   {$ENDIF})        : Boolean;
+                                                         Encoding         : TEncodeSelect;
+                                                         Var ResultPR     : TRESTDWParams
+                                                         {$IFDEF RESTDWLAZARUS}
+                                                         ;DatabaseCharSet : TDatabaseCharSet
+                                                         {$ENDIF})        : Boolean;
 Var
  JSONParam: TJSONParam;
  i            : Integer;
@@ -2359,7 +2365,7 @@ begin
        Begin
         ResultPR := TRESTDWParams.Create;
         ResultPR.Encoding := Encoding;
-        {$IFDEF FPC}
+        {$IFDEF RESTDWLAZARUS}
         ResultPR.DatabaseCharSet := DatabaseCharSet;
         {$ENDIF}
        End;

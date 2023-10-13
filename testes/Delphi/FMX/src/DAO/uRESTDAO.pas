@@ -32,6 +32,7 @@ implementation
 constructor TRESTDAO.Create(aServer, aPort: string);
 begin
   FClientAPI := TRESTClient.Create(nil);
+  FClientAPI.AddParameter('Connection', 'close', pkHTTPHEADER);
   FRESTAPI := TRESTRequest.Create(nil);
   try
     FServer := aServer + ':' + aPort;

@@ -1,6 +1,6 @@
 unit uRESTDWMessageCoder;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWMessageCoder;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -26,7 +25,7 @@ unit uRESTDWMessageCoder;
 Interface
 
 uses
-  Classes, SysUtils, uRESTDWComponentBase, uRESTDWMessage, uRESTDWTools, uRESTDWConsts, uRESTDWException;
+  Classes, SysUtils, uRESTDWAbout, uRESTDWMessage, uRESTDWTools, uRESTDWConsts, uRESTDWException;
 
   Type
    TRESTDWMessageCoderPartType = (mcptText, mcptAttachment, mcptIgnore, mcptEOF);
@@ -110,7 +109,7 @@ uses
 
 Implementation
 
-Uses uRESTDWMessageCoderMIME, uRESTDWBuffer, uRESTDWBasicTypes;
+Uses uRESTDWMessageCoderMIME, uRESTDWBuffer, uRESTDWBasicTypes, uRESTDWProtoTypes;
 
 var
   GMessageDecoderList: TRESTDWMessageDecoderList = nil;

@@ -1,13 +1,14 @@
 unit uRESTDWAbout;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 interface
 
-uses Classes, SysUtils, uRESTDWConsts{$IFDEF FPC}, lclversion{$ENDIF};
+uses Classes, SysUtils, uRESTDWConsts{$IFDEF RESTDWLAZARUS}, lclversion{$ENDIF};
 
 Type
- TRESTDWComponent       = Class(TComponent)
+ TRESTDWAboutInfo = (RESTDWAbout);
+ TRESTDWComponent = Class(TComponent)
  Private
   fsAbout : TRESTDWAboutInfo;
   Function GetVersionInfo : String;
@@ -31,7 +32,7 @@ Implementation
 
 //uses {$IFNDEF RESTDWLAMW}uRESTDWAboutForm{$ENDIF};
 
-{$IFNDEF FPC}
+{$IFNDEF RESTDWLAZARUS}
 Function GetDelphiVersion : String;
 Begin
  Result := '';
@@ -65,7 +66,7 @@ Begin
   Result := 'Delphi 2010';
  {$ENDIF}
  {$IFDEF ver220} // delphi xe
-  Result := 'Delphi XE (VCL/FMX)';
+  Result := 'Delphi XE';
  {$ENDIF}
  {$IFDEF ver230} // delphi xe2
   Result := 'Delphi XE2 (VCL/FMX)';
@@ -150,7 +151,7 @@ Begin
           'Version : '+ RESTDWVERSAO;
    Msg := DWStr(Msg);
   {$IFNDEF RESTDWLAMW}
-   {$IFNDEF LINUXFMX}
+   {$IFNDEF RESTDWFMX}
 //    frm := Tfrm_About.Create(nil);
 //    {$IFNDEF FPC}
 //     {$IF Defined(RESTDWFMX)}

@@ -1,6 +1,6 @@
 Unit uRESTDWMessageCoderMIME;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ Unit uRESTDWMessageCoderMIME;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -27,8 +26,8 @@ Interface
 
 Uses
  Classes, SysUtils,
- uRESTDWBasicTypes, uRESTDWException, uRESTDWComponentBase, uRESTDWMessage,
- uRESTDWTools, uRESTDWCoder, uRESTDWMessageCoder, uRESTDWCoderHeader;
+ uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWException, uRESTDWMessage,
+ uRESTDWTools, uRESTDWCoder, uRESTDWMessageCoder, uRESTDWCoderHeader, uRESTDWAbout;
 
  Type
   eRESTDWNotEnoughDataInBuffer = Class(eRESTDWException);
@@ -47,6 +46,7 @@ Uses
   Public
    Constructor Create             (AOwner      : TComponent;
                                    Const ALine : String); Reintroduce; Overload;
+   Destructor  Destroy;  Override;
    Function    ReadBody           (ADestStream : TStream;
                                    Var VMsgEnd : Boolean) : TRESTDWMessageDecoder; Override;
    Procedure   CheckAndSetType    (Const AContentType,
@@ -271,6 +271,11 @@ Begin
     End;
   End;
 End;
+
+destructor TRESTDWMessageDecoderMIME.Destroy;
+begin
+  inherited;
+end;
 
 Function TRESTDWMessageDecoderMIME.ReadBody(ADestStream : TStream;
                                             Var VMsgEnd : Boolean) : TRESTDWMessageDecoder;

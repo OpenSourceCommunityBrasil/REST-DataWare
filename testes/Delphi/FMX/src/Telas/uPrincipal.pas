@@ -82,6 +82,9 @@ type
     cbRDWIdClientREST: TCheckBox;
     cbRDWIdClientRESTBin: TCheckBox;
     bRemover: TButton;
+    GroupBox1: TGroupBox;
+    rbSequencial: TRadioButton;
+    rbParalelo: TRadioButton;
     procedure IniciarClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -98,7 +101,7 @@ type
     RDWREST, RDWBinary: TRDWRESTDAO;
     inicio, fim: Double;
     pass, fail: integer;
-    FResultado: TfResultado;
+    procedure IniciaTestes;
     procedure EncerraTeste;
     procedure TesteRESTRequest(aClient: TRESTDAO);
     procedure TesteRDWRequest(aClient: TRDWRESTDAO);
@@ -142,6 +145,8 @@ end;
 
 procedure TfPrincipal.Button2Click(Sender: TObject);
 begin
+  if not Assigned(FResultado) then
+    Application.CreateForm(TFResultado, FResultado);
   FResultado.Show;
   inicio := now;
 
@@ -179,222 +184,25 @@ begin
 end;
 
 procedure TfPrincipal.Button5Click(Sender: TObject);
-var
-  I: integer;
-  RESTClient: TRESTDAO;
-  RDWRESTClient, RDWRESTClientBin: TRDWRESTDAO;
 begin
+  if not Assigned(FResultado) then
+    Application.CreateForm(TFResultado, FResultado);
   FResultado.Show;
-  inicio := now;
-
-  FResultado.LogMessage('Testes sequenciais iniciados às ' + TimeToStr(inicio));
-  for I := 0 to pred(StringGrid1.RowCount) do
-  begin
-    if cbRESTNativo.IsChecked then
-    begin
-      RESTClient := TRESTDAO.Create(StringGrid1.Cells[0, I],
-        StringGrid1.Cells[1, I]);
-      if (cbMetodoAv.ItemIndex = 1) and
-        ((eUsuarioAv.Text <> EmptyStr) and (eSenhaAv.Text <> EmptyStr)) then
-        RESTClient.SetBasicAuth(eUsuarioAv.Text, eSenhaAv.Text);
-    end;
-    if cbRDWIdClientREST.IsChecked then
-    begin
-      RDWRESTClient := TRDWRESTDAO.Create(StringGrid1.Cells[0, I],
-        StringGrid1.Cells[1, I], false);
-      if (cbMetodoAv.ItemIndex = 1) and
-        ((eUsuarioAv.Text <> EmptyStr) and (eSenhaAv.Text <> EmptyStr)) then
-        RDWRESTClient.SetBasicAuth(eUsuarioAv.Text, eSenhaAv.Text);
-    end;
-    if cbRDWIdClientRESTBin.IsChecked then
-    begin
-      RDWRESTClientBin := TRDWRESTDAO.Create(StringGrid1.Cells[0, I],
-        StringGrid1.Cells[1, I], true);
-      if (cbMetodoAv.ItemIndex = 1) and
-        ((eUsuarioAv.Text <> EmptyStr) and (eSenhaAv.Text <> EmptyStr)) then
-        RDWRESTClientBin.SetBasicAuth(eUsuarioAv.Text, eSenhaAv.Text);
-    end;
-
-    TThread.Queue(nil,
-      procedure
-      begin
-        if cbGET.IsChecked then
-        begin
-          if cbRESTNativo.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com REST Nativos...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointREST(StringGrid1.Cells[2, I], rtmGET,
-              eRequisicoes.Text.ToInteger, RESTClient);
-          end;
-
-          if cbRDWIdClientREST.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com RESTDW ClientREST...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointRDW(StringGrid1.Cells[2, I], rtmGET,
-              eRequisicoes.Text.ToInteger, RDWRESTClient);
-          end;
-
-          if cbRDWIdClientRESTBin.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com RESTDW ClientREST Binário...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointRDW(StringGrid1.Cells[2, I], rtmGET,
-              eRequisicoes.Text.ToInteger, RDWRESTClientBin);
-          end;
-        end;
-
-        if cbPOST.IsChecked then
-        begin
-          if cbRESTNativo.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com REST Nativos...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointREST(StringGrid1.Cells[2, I], rtmPOST,
-              eRequisicoes.Text.ToInteger, RESTClient);
-          end;
-
-          if cbRDWIdClientREST.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com RESTDW ClientREST...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPOST,
-              eRequisicoes.Text.ToInteger, RDWRESTClient);
-          end;
-
-          if cbRDWIdClientRESTBin.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com RESTDW ClientREST Binário...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPOST,
-              eRequisicoes.Text.ToInteger, RDWRESTClientBin);
-          end;
-        end;
-
-        if cbPUT.IsChecked then
-        begin
-          if cbRESTNativo.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com REST Nativos...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointREST(StringGrid1.Cells[2, I], rtmPUT,
-              eRequisicoes.Text.ToInteger, RESTClient);
-          end;
-
-          if cbRDWIdClientREST.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com RESTDW ClientREST...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPUT,
-              eRequisicoes.Text.ToInteger, RDWRESTClient);
-          end;
-
-          if cbRDWIdClientRESTBin.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com RESTDW ClientREST Binário...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPUT,
-              eRequisicoes.Text.ToInteger, RDWRESTClientBin);
-          end;
-        end;
-
-        if cbPATCH.IsChecked then
-        begin
-          if cbRESTNativo.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com REST Nativos...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointREST(StringGrid1.Cells[2, I], rtmPATCH,
-              eRequisicoes.Text.ToInteger, RESTClient);
-          end;
-
-          if cbRDWIdClientREST.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com RESTDW ClientREST...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPATCH,
-              eRequisicoes.Text.ToInteger, RDWRESTClient);
-          end;
-
-          if cbRDWIdClientRESTBin.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com RESTDW ClientREST Binário...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPATCH,
-              eRequisicoes.Text.ToInteger, RDWRESTClientBin);
-          end;
-        end;
-
-        if cbDELETE.IsChecked then
-        begin
-          if cbRESTNativo.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com REST Nativos...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointREST(StringGrid1.Cells[2, I], rtmDELETE,
-              eRequisicoes.Text.ToInteger, RESTClient);
-          end;
-
-          if cbRDWIdClientREST.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com RESTDW ClientREST...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointRDW(StringGrid1.Cells[2, I], rtmDELETE,
-              eRequisicoes.Text.ToInteger, RDWRESTClient);
-          end;
-
-          if cbRDWIdClientRESTBin.IsChecked then
-          begin
-            FResultado.LogMessage
-              (Format('testando servidor %s:%s com RESTDW ClientREST Binário...',
-              [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
-            TesteEndpointRDW(StringGrid1.Cells[2, I], rtmDELETE,
-              eRequisicoes.Text.ToInteger, RDWRESTClientBin);
-          end;
-        end;
-
-        if Assigned(RESTClient) then
-          RESTClient.Free;
-        if Assigned(RDWRESTClient) then
-          RDWRESTClient.Free;
-        if Assigned(RDWRESTClientBin) then
-          RDWRESTClientBin.Free;
-      end);
-  end;
-  EncerraTeste;
+  TThread.CreateAnonymousThread(IniciaTestes).Start;
 end;
 
 procedure TfPrincipal.EncerraTeste;
 begin
   fim := now;
-  FResultado.LogMessage('=======================================');
   FResultado.LogMessage('Testes finalizados após ' +
     FormatDateTime('hh:nn:ss:zzz', (fim - inicio)) + ' (hor:min:seg:mil)');
   FResultado.LogMessage(Format(' - Total: %d, Sucesso: %d, Falha: %d',
     [pass + fail, pass, fail]));
+  FResultado.LogMessage('=======================================');
 end;
 
 procedure TfPrincipal.FormCreate(Sender: TObject);
-var
-  I: integer;
 begin
-  FResultado := TfResultado.Create(nil);
-  FResultado.Hide;
   lVersao.Text := Format('Versão componentes: %s', [RESTDWVERSAO]);
   StringGrid1.RowCount := 0;
 end;
@@ -410,6 +218,8 @@ end;
 
 procedure TfPrincipal.IniciarClick(Sender: TObject);
 begin
+  if not Assigned(FResultado) then
+    Application.CreateForm(TFResultado, FResultado);
   FResultado.Show;
   inicio := now;
 
@@ -430,6 +240,219 @@ begin
 
       EncerraTeste;
     end).Start;
+end;
+
+procedure TfPrincipal.IniciaTestes;
+var
+  I: integer;
+  RESTClient: TRESTDAO;
+  RDWRESTClient, RDWRESTClientBin: TRDWRESTDAO;
+begin
+  inicio := now;
+  FResultado.LogMessage('Testes sequenciais iniciados às ' + TimeToStr(inicio));
+  FResultado.LogMessage('-------------------------------------');
+  for I := 0 to pred(StringGrid1.RowCount) do
+  begin
+    if cbRESTNativo.IsChecked then
+    begin
+      RESTClient := TRESTDAO.Create(StringGrid1.Cells[0, I],
+        StringGrid1.Cells[1, I]);
+      if (cbMetodoAv.ItemIndex = 1) and
+        ((eUsuarioAv.Text <> EmptyStr) and (eSenhaAv.Text <> EmptyStr)) then
+        RESTClient.SetBasicAuth(eUsuarioAv.Text, eSenhaAv.Text);
+    end;
+
+    if cbRDWIdClientREST.IsChecked then
+    begin
+      RDWRESTClient := TRDWRESTDAO.Create(StringGrid1.Cells[0, I],
+        StringGrid1.Cells[1, I], false);
+      if (cbMetodoAv.ItemIndex = 1) and
+        ((eUsuarioAv.Text <> EmptyStr) and (eSenhaAv.Text <> EmptyStr)) then
+        RDWRESTClient.SetBasicAuth(eUsuarioAv.Text, eSenhaAv.Text);
+    end;
+
+    if cbRDWIdClientRESTBin.IsChecked then
+    begin
+      RDWRESTClientBin := TRDWRESTDAO.Create(StringGrid1.Cells[0, I],
+        StringGrid1.Cells[1, I], true);
+      if (cbMetodoAv.ItemIndex = 1) and
+        ((eUsuarioAv.Text <> EmptyStr) and (eSenhaAv.Text <> EmptyStr)) then
+        RDWRESTClientBin.SetBasicAuth(eUsuarioAv.Text, eSenhaAv.Text);
+    end;
+
+    if cbGET.IsChecked then
+    begin
+      if cbRESTNativo.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com REST Nativos...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo GET...');
+        TesteEndpointREST(StringGrid1.Cells[2, I], rtmGET,
+          eRequisicoes.Text.ToInteger, RESTClient);
+      end;
+
+      if cbRDWIdClientREST.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com RESTDW ClientREST...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo GET...');
+        TesteEndpointRDW(StringGrid1.Cells[2, I], rtmGET,
+          eRequisicoes.Text.ToInteger, RDWRESTClient);
+      end;
+
+      if cbRDWIdClientRESTBin.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com RESTDW ClientREST Binário...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo GET...');
+        TesteEndpointRDW(StringGrid1.Cells[2, I], rtmGET,
+          eRequisicoes.Text.ToInteger, RDWRESTClientBin);
+      end;
+    end;
+
+    if cbPOST.IsChecked then
+    begin
+      if cbRESTNativo.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com REST Nativos...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo POST...');
+        TesteEndpointREST(StringGrid1.Cells[2, I], rtmPOST,
+          eRequisicoes.Text.ToInteger, RESTClient);
+      end;
+
+      if cbRDWIdClientREST.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com RESTDW ClientREST...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo POST...');
+        TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPOST,
+          eRequisicoes.Text.ToInteger, RDWRESTClient);
+      end;
+
+      if cbRDWIdClientRESTBin.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com RESTDW ClientREST Binário...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo POST...');
+        TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPOST,
+          eRequisicoes.Text.ToInteger, RDWRESTClientBin);
+      end;
+    end;
+
+    if cbPUT.IsChecked then
+    begin
+      if cbRESTNativo.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com REST Nativos...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo PUT...');
+        TesteEndpointREST(StringGrid1.Cells[2, I], rtmPUT,
+          eRequisicoes.Text.ToInteger, RESTClient);
+      end;
+
+      if cbRDWIdClientREST.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com RESTDW ClientREST...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo PUT...');
+        TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPUT,
+          eRequisicoes.Text.ToInteger, RDWRESTClient);
+      end;
+
+      if cbRDWIdClientRESTBin.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com RESTDW ClientREST Binário...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo PUT...');
+        TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPUT,
+          eRequisicoes.Text.ToInteger, RDWRESTClientBin);
+      end;
+    end;
+
+    if cbPATCH.IsChecked then
+    begin
+      if cbRESTNativo.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com REST Nativos...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo PATCH...');
+        TesteEndpointREST(StringGrid1.Cells[2, I], rtmPATCH,
+          eRequisicoes.Text.ToInteger, RESTClient);
+      end;
+
+      if cbRDWIdClientREST.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com RESTDW ClientREST...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo PATCH...');
+        TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPATCH,
+          eRequisicoes.Text.ToInteger, RDWRESTClient);
+      end;
+
+      if cbRDWIdClientRESTBin.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com RESTDW ClientREST Binário...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo PATCH...');
+        TesteEndpointRDW(StringGrid1.Cells[2, I], rtmPATCH,
+          eRequisicoes.Text.ToInteger, RDWRESTClientBin);
+      end;
+    end;
+
+    if cbDELETE.IsChecked then
+    begin
+      if cbRESTNativo.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com REST Nativos...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo DELETE...');
+        TesteEndpointREST(StringGrid1.Cells[2, I], rtmDELETE,
+          eRequisicoes.Text.ToInteger, RESTClient);
+      end;
+
+      if cbRDWIdClientREST.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com RESTDW ClientREST...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo DELETE...');
+        TesteEndpointRDW(StringGrid1.Cells[2, I], rtmDELETE,
+          eRequisicoes.Text.ToInteger, RDWRESTClient);
+      end;
+
+      if cbRDWIdClientRESTBin.IsChecked then
+      begin
+        FResultado.LogMessage
+          (Format('Testando servidor %s:%s com RESTDW ClientREST Binário...',
+          [StringGrid1.Cells[0, I], StringGrid1.Cells[1, I]]));
+        FResultado.LogMessage('Testando verbo DELETE...');
+        TesteEndpointRDW(StringGrid1.Cells[2, I], rtmDELETE,
+          eRequisicoes.Text.ToInteger, RDWRESTClientBin);
+      end;
+    end;
+
+    if Assigned(RESTClient) then
+      RESTClient.Free;
+    if Assigned(RDWRESTClient) then
+      RDWRESTClient.Free;
+    if Assigned(RDWRESTClientBin) then
+      RDWRESTClientBin.Free;
+  end;
+  EncerraTeste;
 end;
 
 procedure TfPrincipal.Rectangle1MouseDown(Sender: TObject; Button: TMouseButton;
@@ -464,6 +487,7 @@ begin
 
   FResultado.LogMessage(' - finalizado após ' + FormatDateTime('nn:ss:zzz',
     (fim - ini)) + ' (min:seg:mil)');
+  FResultado.LogMessage('=======================================');
 end;
 
 procedure TfPrincipal.TesteEndpointRDW(aEndpoint: string;
@@ -487,6 +511,7 @@ begin
   inc(pass);
   FResultado.LogMessage(' - finalizado após ' + FormatDateTime('nn:ss:zzz',
     (fim - ini)) + ' (min:seg:mil)');
+  FResultado.LogMessage('=======================================');
 end;
 
 procedure TfPrincipal.TesteRDWRequest(aClient: TRDWRESTDAO);

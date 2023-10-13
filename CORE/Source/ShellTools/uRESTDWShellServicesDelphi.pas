@@ -1,6 +1,6 @@
 unit uRESTDWShellServicesDelphi;
 
-{$I ..\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -16,7 +16,6 @@ unit uRESTDWShellServicesDelphi;
   XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
   A. Brito                   - Admin - Administrador do desenvolvimento.
   Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
-  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
   Flávio Motta               - Member Tester and DEMO Developer.
   Mobius One                 - Devel, Tester and Admin.
   Gustavo                    - Criptografia and Devel.
@@ -28,12 +27,12 @@ unit uRESTDWShellServicesDelphi;
 interface
 
 Uses
-  {$IF CompilerVersion <= 22}
-   EncdDecd, uRESTDWMassiveBuffer,
-  {$IFEND}
+  {$IFNDEF DELPHIXEUP}
+    uRESTDWMassiveBuffer,
+  {$ENDIF}
   SysUtils, Classes, Db, Variants, HTTPApp, SyncObjs,
   uRESTDWBasic, uRESTDWJSONObject, uRESTDWBasicTypes, uRESTDWComponentEvents,
-  uRESTDWComponentBase, uRESTDWBasicClass, uRESTDWParams, uRESTDWBasicDB,
+  uRESTDWAbout, uRESTDWBasicClass, uRESTDWParams, uRESTDWBasicDB,
   uRESTDWTools, uRESTDWConsts;
 
 Type
@@ -80,6 +79,7 @@ Var
  I,
  StatusCode      : Integer;
  ResultStream    : TStream;
+ vCORSHeader     : TStrings;
  vRawHeader,
  vResponseHeader : TStringList;
  mb              : TStringStream;
@@ -87,21 +87,21 @@ Var
  vRedirect       : TRedirect;
  Procedure WriteError;
  Begin
-  AResponse.StatusCode              := StatusCode;
-  mb                               := TStringStream.Create(ErrorMessage{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND});
-  mb.Position                      := 0;
-   {$IF CompilerVersion > 23}
-    AResponse.FreeContentStream      := True;
-   {$IFEND}
-  AResponse.ContentStream          := mb;
-  AResponse.ContentStream.Position := 0;
-  AResponse.ContentLength          := mb.Size;
-  Handled := True;
+   AResponse.StatusCode             := StatusCode;
+   mb                               := TStringStream.Create(ErrorMessage{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
+   mb.Position                      := 0;
+   {$IFDEF DELPHIXEUP}
+   AResponse.FreeContentStream      := True;
+   {$ENDIF}
+   AResponse.ContentStream          := mb;
+   AResponse.ContentStream.Position := 0;
+   AResponse.ContentLength          := mb.Size;
+   Handled := True;
    AResponse.SendResponse;
-   {$IF CompilerVersion < 21}
-    If Assigned(mb) Then
+   {$IFNDEF DELPHIXEUP}
+   If Assigned(mb) Then
      FreeAndNil(mb);
-   {$IFEND}
+   {$ENDIF}
  End;
  Procedure DestroyComponents;
  Begin
@@ -111,39 +111,61 @@ Var
    FreeAndNil(vStream);
   If Assigned(vRawHeader) Then
    FreeAndNil(vRawHeader);
+  If Assigned(vCORSHeader) Then
+   FreeAndNil(vCORSHeader);
  End;
-Begin
- ResultStream    := TStringStream.Create('');
- vResponseHeader := TStringList.Create;
- vResponseString := '';
- vStream         := Nil;
- vRedirect       := Redirect;
- {$IF CompilerVersion > 26}
-  ARequest.ReadTotalContent;
- {$IFEND}
- Try
+ Procedure SetReplyCORS;
+ Var
+  I : Integer;
+ Begin
   If CORS Then
    Begin
     If CORS_CustomHeaders.Count > 0 Then
      Begin
       For I := 0 To CORS_CustomHeaders.Count -1 Do
        Begin
-         {$IF CompilerVersion > 30}
+        {$IFDEF DELPHI10_1UP}
          AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
-         {$ELSE}
+        {$ELSE}
          AResponse.CustomHeaders.Add(CORS_CustomHeaders.Names[I] + cNameValueSeparator + CORS_CustomHeaders.ValueFromIndex[I]);
-         {$IFEND}
+        {$ENDIF}
        End;
      End
     Else
      Begin
-       {$IF CompilerVersion > 30}
+      {$IFDEF DELPHI10_1UP}
        AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
-       {$ELSE}
+      {$ELSE}
        AResponse.CustomHeaders.Add('Access-Control-Allow-Origin' + cNameValueSeparator + '*');
-       {$IFEND}
+      {$ENDIF}
+     End;
+    If Assigned(vCORSHeader) Then
+     Begin
+      If vCORSHeader.Count > 0 Then
+       Begin
+        For I := 0 To vCORSHeader.Count -1 Do
+         Begin
+          {$IFDEF DELPHI10_1UP}
+           AResponse.CustomHeaders.AddPair(vCORSHeader.Names[I], vCORSHeader.ValueFromIndex[I]);
+          {$ELSE}
+           AResponse.CustomHeaders.Add(vCORSHeader.Names[I] + cNameValueSeparator + vCORSHeader.ValueFromIndex[I]);
+          {$ENDIF}
+         End;
+       End;
      End;
    End;
+ End;
+Begin
+ ResultStream    := TStringStream.Create('');
+ vCORSHeader     := TStringList.Create;
+ vResponseHeader := TStringList.Create;
+ vResponseString := '';
+ vStream         := Nil;
+ vRedirect       := Redirect;
+ {$IFDEF DELPHIXE6UP}
+  ARequest.ReadTotalContent;
+ {$ENDIF}
+ Try
   vAuthRealm := AResponse.Realm;
   vToken     := ARequest.Authorization;
   //ARequest.Connection
@@ -152,7 +174,7 @@ Begin
    vRawHeader.Add('Authorization:' + vToken);
   If ARequest.ContentLength > 0 Then
    Begin
-    {$IF CompilerVersion > 29}
+    {$IFDEF DELPHI10_0UP}
      ARequest.ReadTotalContent;
      vStream    := TMemoryStream.Create;
      vStream.Write(TBytes(ARequest.RawContent), Length(ARequest.RawContent));
@@ -162,7 +184,7 @@ Begin
       If vStream = Nil Then
        vStream := TStringStream.Create(ARequest.Content);
      End;
-    {$IFEND}
+    {$ENDIF}
    End
   Else
    vStream         := TMemoryStream.Create;
@@ -170,9 +192,9 @@ Begin
   vContentType     := ARequest.ContentType;
   If CommandExec  (TComponent(AResponse),
                    RemoveBackslashCommands(ARequest.PathInfo),
-                   ARequest.Method + ' ' + ARequest.{$IF CompilerVersion < 21}PathInfo{$ELSE}RawPathInfo{$IFEND},
+                   ARequest.Method + ' ' + ARequest.{$IFNDEF DELPHIXEUP}PathInfo{$ELSE}RawPathInfo{$ENDIF},
                    vContentType,
-                   ARequest.{$IF CompilerVersion < 21}RemoteAddr{$ELSE}RemoteIP{$IFEND},
+                   ARequest.{$IFNDEF DELPHIXEUP}RemoteAddr{$ELSE}RemoteIP{$ENDIF},
                    ARequest.UserAgent,
                    '',
                    '',
@@ -190,11 +212,13 @@ Begin
                    vResponseHeader,
                    vResponseString,
                    ResultStream,
+                   vCORSHeader,
                    vRedirect) Then
    Begin
+    SetReplyCORS;
     AResponse.Realm       := vAuthRealm;
     AResponse.ContentType := vContentType;
-    {$if CompilerVersion > 21}
+    {$IFDEF DELPHIXEUP}
      If (sCharSet <> '') Then
       Begin
        If Pos('utf8', Lowercase(sCharSet)) > 0 Then
@@ -208,7 +232,7 @@ Begin
           AResponse.ContentType := AResponse.ContentType + ';charset=ansi';
         End;
       End;
-    {$IFEND}
+    {$ENDIF}
     AResponse.StatusCode               := StatusCode;
     If (vResponseString <> '') Or
        (ErrorMessage    <> '') Then
@@ -226,30 +250,32 @@ Begin
       AResponse.ContentStream          := ResultStream;
       AResponse.ContentStream.Position := 0;
       AResponse.ContentLength          := ResultStream.Size;
-      {$IF CompilerVersion > 23}
-       AResponse.FreeContentStream      := True;
-      {$IFEND}
+      {$IFDEF DELPHIXEUP}
+       AResponse.FreeContentStream     := True;
+      {$ENDIF}
      End;
     For I := 0 To vResponseHeader.Count -1 Do
      Begin
-       {$IF CompilerVersion > 30}
+       {$IFDEF DELPHI10_1UP}
         AResponse.CustomHeaders.AddPair(vResponseHeader.Names [I],
                                         vResponseHeader.Values[vResponseHeader.Names[I]]);
        {$ELSE}
-        AResponse.CustomHeaders.Add(vResponseHeader.Names[I] + cNameValueSeparator + vResponseHeader.Values[vResponseHeader.Names[I]]);
-       {$IFEND}
+        AResponse.CustomHeaders.Add(vResponseHeader.Names[I] + cNameValueSeparator
+                            + vResponseHeader.Values[vResponseHeader.Names[I]]);
+       {$ENDIF}
      End;
     Handled := True;
-     AResponse.SendResponse;
-     {$IF CompilerVersion < 21}
-      If Assigned(ResultStream) Then
-       FreeAndNil(ResultStream);
-     {$IFEND}
+    AResponse.SendResponse;
+    {$IFNDEF DELPHIXEUP}
+     If Assigned(ResultStream) Then
+      FreeAndNil(ResultStream);
+    {$ENDIF}
    End
   Else //Tratamento de Erros.
    Begin
+    SetReplyCORS;
     AResponse.Realm := vAuthRealm;
-    {$if CompilerVersion > 21}
+    {$IFDEF DELPHIXEUP}
      If (sCharSet <> '') Then
       Begin
        If Pos('utf8', Lowercase(sCharSet)) > 0 Then
@@ -263,7 +289,7 @@ Begin
           AResponse.ContentType := AResponse.ContentType + ';charset=ansi';
         End;
       End;
-    {$IFEND}
+    {$ENDIF}
     AResponse.StatusCode    := StatusCode;
     If AResponse.StatusCode <> 200 Then
      Begin

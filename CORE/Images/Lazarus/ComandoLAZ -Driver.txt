@@ -1,3 +1,0 @@
-c:\lazarus\tools\lazres.exe restdwlazdriver.lrs TRESTDWLazDriver.png
-
-pause

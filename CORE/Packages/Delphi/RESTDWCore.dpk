@@ -30,24 +30,12 @@ package RESTDWCore;
 {$IMPLICITBUILD OFF}
 
 requires
-  {$IF Defined(VER150) or Defined(VER160) or Defined(VER170)
-    or Defined(VER180) or Defined(VER185) or Defined(VER190)
-    or Defined(VER200) or Defined(VER210) or Defined(VER220)
-    or Defined(VER230)}
-   bdertl,
-  {$ELSE}
-   FireDAC, FireDACCommonDriver, FireDACCommon,
+  {$IF Defined(VER150)}
+  bdertl,
   {$IFEND}
-  {$IFDEF WIN32}
-   dcldb,
-   designide,
-  {$ENDIF}
-  rtl,
-  dbrtl,
   soaprtl;
 
 contains
-  PropertyPersist in '..\..\Source\Basic\PropertyPersist.pas',
   uRESTDWBasic in '..\..\Source\Basic\uRESTDWBasic.pas',
   uRESTDWBasicDB in '..\..\Source\Basic\uRESTDWBasicDB.pas',
   uRESTDWBasicTypes in '..\..\Source\Basic\uRESTDWBasicTypes.pas',
@@ -59,7 +47,6 @@ contains
   uRESTDWServerEvents in '..\..\Source\Basic\uRESTDWServerEvents.pas',
   uRESTDWConsts in '..\..\Source\Consts\uRESTDWConsts.pas',
   uRESTDWDatamodule in '..\..\Source\Plugins\DMDados\uRESTDWDatamodule.pas' {ServerMethodDataModule: TDataModule},
-  uRESTDWDataset in '..\..\Source\Plugins\Memdataset\uRESTDWDataset.pas',
   uRESTDWMessageCoderMIME in '..\..\Source\Basic\Mechanics\uRESTDWMessageCoderMIME.pas',
   uRESTDWException in '..\..\Source\Basic\Mechanics\uRESTDWException.pas',
   uRESTDWMessage in '..\..\Source\Basic\Mechanics\uRESTDWMessage.pas',
@@ -92,25 +79,29 @@ contains
   uRESTDWBufferDb in '..\..\Source\Basic\uRESTDWBufferDb.pas',
   uRESTDWResponseTranslator in '..\..\Source\Basic\uRESTDWResponseTranslator.pas',
   uRESTDWBasicClass in '..\..\Source\Basic\uRESTDWBasicClass.pas',
-  uRESTDWEncodeClass in '..\..\Source\Basic\uRESTDWEncodeClass.pas',
   uRESTDWFileBuffer in '..\..\Source\Basic\uRESTDWFileBuffer.pas',
   uRESTDWDataUtils in '..\..\Source\Basic\Mechanics\uRESTDWDataUtils.pas',
-  uRESTDWBasicComponent in '..\..\Source\Basic\uRESTDWBasicComponent.pas',
-  uRESTDWComponentBase in '..\..\Source\Basic\uRESTDWComponentBase.pas',
   StringBuilderUnit in '..\..\Source\utils\StringBuilderUnit.pas',
   uRESTDWBase64 in '..\..\Source\utils\uRESTDWBase64.pas',
-  uRESTDWDynamic in '..\..\Source\utils\uRESTDWDynamic.pas',
   uRESTDWJSONObject in '..\..\Source\utils\uRESTDWJSONObject.pas',
   uRESTDWMassiveBuffer in '..\..\Source\utils\uRESTDWMassiveBuffer.pas',
   uRESTDWMD5 in '..\..\Source\utils\uRESTDWMD5.pas',
-  uRESTDWTools in '..\..\Source\utils\uRESTDWTools.pas',
-  uzliblaz in '..\..\Source\utils\uzliblaz.pas',
+  uRESTDWZlib in '..\..\Source\utils\uRESTDWZlib.pas',
   uRESTDWDataJSON in '..\..\Source\utils\JSON\uRESTDWDataJSON.pas',
-  uRESTDWDynArray in '..\..\Source\utils\JSON\uRESTDWDynArray.pas',
   uRESTDWJSON in '..\..\Source\utils\JSON\uRESTDWJSON.pas',
   uRESTDWJSONInterface in '..\..\Source\utils\JSON\uRESTDWJSONInterface.pas',
   uRESTDWSerialize in '..\..\Source\utils\JSON\uRESTDWSerialize.pas',
   uRESTDWMimeTypes in '..\..\Source\utils\uRESTDWMimeTypes.pas',
-  uRESTDWBufferBase in '..\..\Source\Basic\uRESTDWBufferBase.pas';
+  uRESTDWBufferBase in '..\..\Source\Basic\uRESTDWBufferBase.pas',
+  uRESTDWURLFunctions in '..\..\Source\utils\uRESTDWURLFunctions.pas',
+  uRESTDWPropertyPersist in '..\..\Source\Basic\uRESTDWPropertyPersist.pas',
+  uRESTDWStorageBin in '..\..\Source\Basic\uRESTDWStorageBin.pas',
+  uRESTDWMemoryDataset in '..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas',
+  uRESTDWProtoTypes in '..\..\Source\Basic\uRESTDWProtoTypes.pas',
+  uRESTDWExprParser in '..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas',
+  uRESTDWDriverBase in '..\..\Source\Database_Drivers\uRESTDWDriverBase.pas',
+  uRESTDWTools in '..\..\Source\utils\uRESTDWTools.pas',
+  uRESTDWAuthenticators in '..\..\Source\Basic\Mechanics\uRESTDWAuthenticators.pas',
+  uRESTDWDynamic in '..\..\Source\utils\uRESTDWDynamic.pas';
 
 End.

@@ -1,6 +1,6 @@
 unit uRESTDWBufferBase;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -16,7 +16,6 @@ unit uRESTDWBufferBase;
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador do pacote.
  A. Brito                   - Admin - Administrador do desenvolvimento.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -28,7 +27,7 @@ interface
 
 Uses
   SysUtils, Classes, Variants,
-  uRESTDWBasicComponent, uRESTDWBasicTypes;
+  uRESTDWAbout, uRESTDWProtoTypes;
 
 Type
  TRESTDWBufferBase = Class(TObject)
@@ -78,13 +77,13 @@ Var
  aByte     : Byte;
  aLongWord : LongWord;
  aDouble   : Double;
- {$IF (Not DEFINED(FPC)) AND (CompilerVersion < 21)}
+ {$IFNDEF DELPHIXEUP}
  aDate     : TDateTime;
  {$ELSE}
  aDate     : TDate;
- {$IFEND}
+ {$ENDIF}
  S         : Integer;
- vSt       : Char;
+ vSt,
  aString   : DWString;
 Begin
  Case vType Of
@@ -97,7 +96,7 @@ Begin
   varSmallint,
   varInteger,
   varInt64,
-  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE4UP)}
   varUInt64,
   {$IFEND}
   varSingle   : Begin
@@ -112,13 +111,9 @@ Begin
                  Result := aLongWord;
                 End;
   varString
-  {$IFDEF FPC}
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE4UP)}
    , varUString
-  {$ELSE}
-   {$IF CompilerVersion >= 22}
-    , varUString
-   {$IFEND}
-  {$ENDIF}     : Begin
+   {$IFEND}   : Begin
                   Move(Pointer(@ByteValue[0])^, Pointer(@aSize)^,  SizeOf(DWInteger));
                   If aSize > 0 Then
                    Begin
@@ -127,26 +122,27 @@ Begin
                    End
                   Else
                    Result := '';
-                 End;
+                End;
   varDouble,
-  varCurrency  : Begin
+  varCurrency : Begin
                   S := SizeOf(Double);
                   Move(Pointer(@ByteValue[0])^, aDouble, S);
                   Result := aDouble;
-                 End;
-  varDate      : Begin
+                End;
+  varDate     : Begin
                   S := SizeOf(Date);
                   Move(Pointer(@ByteValue[0])^, aDate, S);
                   Result := aDate;
-                 End;
-  varBoolean   : Begin
+                End;
+  varBoolean  : Begin
                   S := SizeOf(Boolean);
-                  Move(Pointer(@ByteValue[0])^, Pointer(@vSt)^,  S);
+                  vSt := BytesToString(ByteValue, 0, 1);
+//                  Move(Pointer(@ByteValue[0])^, Pointer(@vSt)^,  S);
                   aBoolean    := vSt = 'T';
                   Result      := aBoolean;
-                 End;
+                End;
   varNull,
-  varEmpty     : Result := Null;
+  varEmpty    : Result := Null;
   Else
    Variant(Result) := Null;
  End;
@@ -161,11 +157,11 @@ Var
  aByte     : Byte;
  aLongWord : LongWord;
  aDouble   : Double;
- {$IF (Not DEFINED(FPC)) AND (CompilerVersion < 21)}
+ {$IFNDEF DELPHIXEUP}
  aDate     : TDateTime;
  {$ELSE}
  aDate     : TDate;
- {$IFEND}
+ {$ENDIF}
  S         : Integer;
  vSt       : Char;
  aString   : DWString;
@@ -183,7 +179,7 @@ Begin
   varSmallint,
   varInteger,
   varInt64,
-  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE4UP)}
   varUInt64,
   {$IFEND}
   varSingle   : Begin
@@ -200,7 +196,7 @@ Begin
                  Move(aLongWord, Pointer(@Result[0])^, S);
                 End;
   varString
-  {$IF (Defined(FPC)) OR (not(Defined(FPC)) AND (CompilerVersion > 24))}
+  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXE4UP)}
   , varUString
   {$IFEND}
               : Begin
@@ -343,13 +339,18 @@ Begin
    If aResetBuffer Then
     NewBuffer;
    vBufferPosition := Stream.Position;
-   Try
-    vBufferBase.CopyFrom(Stream, Stream.Size);
-   Finally
-    Stream.Position := vBufferPosition;
-   End;
-   If aResetPosition Then
-    ResetPosition;
+   If Stream.Position < (Stream.Size -1) Then
+    Begin
+     Try
+      vBufferBase.CopyFrom(Stream, Stream.Size - Stream.Position);
+     Finally
+      Stream.Position := vBufferPosition;
+     End;
+     If aResetPosition Then
+      ResetPosition;
+    End;
+//   Else
+//    Raise Exception.Create('Range Check Error on LoadFromStream, Size and position error...');
   End;
 End;
 
@@ -358,7 +359,8 @@ Var
  vBufferSize : DWBufferSize;
 Begin
  Result := Nil;
- If vBufferBase.Size > 0 Then
+ If (vBufferBase.Size > 0)                          And
+    (vBufferBase.Position < (vBufferBase.Size -1))  Then
   Begin
    Try
     vBufferBase.Read(vBufferSize, SizeOf(DWBufferSize));
@@ -371,7 +373,9 @@ Begin
    Except
 
    End;
-  End;
+  End
+ Else
+  Raise Exception.Create('Range Check Error on ReadStream, Size and position error...');
 End;
 
 Procedure TRESTDWBufferBase.ResetPosition;
@@ -409,7 +413,7 @@ Function TRESTDWBufferBase.Bof : Boolean;
 Begin
  Result := Assigned(vBufferBase);
  If Result Then
-  Result := vBufferBase.Position = 0;
+  Result := (vBufferBase.Position = 0);
 End;
 
 Constructor TRESTDWBufferBase.Create;
@@ -427,7 +431,7 @@ Function TRESTDWBufferBase.Eof : Boolean;
 Begin
  Result := Not Assigned(vBufferBase);
  If Not Result Then
-  Result := vBufferBase.Position = vBufferBase.Size;
+  Result := vBufferBase.Position >= (vBufferBase.Size -1);
 End;
 
 Procedure TRESTDWBufferBase.InputBuffer(Const Buffer : TRESTDWBufferBase);

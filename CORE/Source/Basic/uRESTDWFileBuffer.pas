@@ -1,6 +1,6 @@
 unit uRESTDWFileBuffer;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWFileBuffer;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -28,19 +27,12 @@ interface
 
 uses
   SysUtils, Types, Variants, Classes,
-  uRESTDWConsts, uRESTDWDynamic, uRESTDWTools, uRESTDWBasicTypes,
-  uRESTDWComponentBase;
+  uRESTDWConsts, uRESTDWDynamic, uRESTDWTools, uRESTDWProtoTypes, uRESTDWAbout;
 
 Const
  cFinalLine      = #10;
- {$IFDEF FPC}
-  {$IFDEF WINDOWS}
-   cFinalReturn  = #13;
-  {$ENDIF}
- {$ELSE}
-  {$IFDEF MSWINDOWS}
-   cFinalReturn  = #13;
-  {$ENDIF}
+ {$IFDEF RESTDWWINDOWS}
+ cFinalReturn  = #13;
  {$ENDIF}
  cBufferSize     = 1024;
 
@@ -94,10 +86,10 @@ Public
  Procedure   ReadArray    (Var Buffer; ElementClassType : Pointer);
  Procedure   WriteArray   (Var Buffer; ElementClassType : Pointer);
  Class       Function StreamToFile (Stream : TStream; Filename : String) : Boolean;
- Property    Bof            : Boolean           Read GetBof             Write SetBof;
- Property    Eof            : Boolean           Read GetEof             Write SetEof;
- Property    Size           : DWBufferSize      Read GetBufferSize;
- Property    Stream         : TStream           Read GetStreamObject;
+ Property Bof               : Boolean           Read GetBof             Write SetBof;
+ Property Eof               : Boolean           Read GetEof             Write SetEof;
+ Property Size              : DWBufferSize      Read GetBufferSize;
+ Property Stream            : TStream           Read GetStreamObject;
 Published
  Property BufferSize        : Integer           Read vBufferSize        Write vBufferSize;
  Property StreamMode        : TRESTDWStreamMode Read vRESTDWStreamMode  Write SetStreamMode;
@@ -313,12 +305,12 @@ Begin
  End;
 End;
 
-Function    TRESTDWStreamBuffer.ReadLn(InitFile : Boolean = False) : DWString;
+Function TRESTDWStreamBuffer.ReadLn(InitFile : Boolean = False) : DWString;
 Var
  I, A, X      : Integer;
  vTempString  : DWString;
  vFinalLine   : Boolean;
- {$IFDEF MSWINDOWS}
+ {$IFDEF RESTDWWINDOWS}
   vOldString  : DWString;
  {$ENDIF}
 Begin
@@ -335,7 +327,7 @@ Begin
    vActualStream.Position := 0;
   I := vActualStream.Position;
   A := 0;
-  {$IFDEF MSWINDOWS}
+  {$IFDEF RESTDWWINDOWS}
    vOldString := '';
   {$ENDIF}
   While I < vActualStream.Size -1 Do
@@ -349,9 +341,9 @@ Begin
     For X := InitStrPos To Length(vTempString) - FinalStrPos Do
      Begin
       If (vTempString[X] = cFinalLine)
-         {$IFDEF MSWINDOWS} And (vOldString = cFinalReturn){$ENDIF} Then
+         {$IFDEF RESTDWWINDOWS} And (vOldString = cFinalReturn){$ENDIF} Then
        Begin
-        {$IFDEF MSWINDOWS}
+        {$IFDEF RESTDWWINDOWS}
          If Length(Result) > 0 Then
           If Result[Length(Result) - FinalStrPos] = cFinalReturn Then
            Delete(Result, Length(Result), 1);
@@ -362,7 +354,7 @@ Begin
         Break;
        End;
       Result         := Result + vTempString[X];
-      {$IFDEF MSWINDOWS}
+      {$IFDEF RESTDWWINDOWS}
        vOldString    := vTempString[X];
       {$ENDIF}
      End;
@@ -372,7 +364,7 @@ Begin
      Break;
    End;
   vTempString       := '';
-  {$IFDEF MSWINDOWS}
+  {$IFDEF RESTDWWINDOWS}
    vOldString := '';
   {$ENDIF}
   vPosition := vActualStream.Position;
@@ -381,7 +373,7 @@ Begin
  End;
 End;
 
-Procedure   TRESTDWStreamBuffer.WriteLn  (Value : DWString);
+Procedure TRESTDWStreamBuffer.WriteLn  (Value : DWString);
 Begin
  If Length(Value) >  0 Then
   Begin

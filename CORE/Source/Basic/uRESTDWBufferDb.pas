@@ -1,6 +1,6 @@
 unit uRESTDWBufferDb;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Source\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWBufferDb;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -27,8 +26,7 @@ interface
 
 uses
  SysUtils, Variants, TypInfo, Classes, Db,
- uRESTDWConsts,uRESTDWFileBuffer, uRESTDWTools, uRESTDWBasicTypes,
- uRESTDWEncodeClass, uRESTDWComponentBase;
+ uRESTDWConsts,uRESTDWFileBuffer, uRESTDWTools, uRESTDWBasicTypes, uRESTDWAbout;
 
 Const                                      // \b  \t  \n   \f   \r
  TSpecialChars     : Array [0 .. 7] Of Char = ('\', '"', '/', #8, #9, #10, #12, #13);
@@ -185,7 +183,7 @@ Type
   vIgnoreBlobs,
   vHeaderFields     : Boolean;
   vEncoding         : TEncodeSelect;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   vEncodingLazarus  : TEncoding;
   vDatabaseCharSet  : TDatabaseCharSet;
   {$ENDIF}
@@ -211,7 +209,7 @@ Type
   Property    FileName           : String           Read vFileName          Write vFileName;
   Property    Encoding           : TEncodeSelect    Read vEncoding          Write SetEncoding;
   Property    Utf8SpecialChars   : Boolean          Read vUtf8SpecialChars  Write vUtf8SpecialChars;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
   Property    DatabaseCharSet    : TDatabaseCharSet Read vDatabaseCharSet   Write vDatabaseCharSet;
   {$ENDIF}
 End;
@@ -353,15 +351,13 @@ Begin
  vHeaderTag         := '';
  vLineTag           := '';
 // vTagFile           := TTagFile;
- {$IFNDEF FPC}
-  {$IF CompilerVersion > 21}
+ {$IF Defined(DELPHIXEUP) or Defined(RESTDWLAZARUS)}
    vEncoding        := esUtf8;
-  {$ELSE}
-   vEncoding        := esASCII;
-  {$IFEND}
  {$ELSE}
-  vEncoding         := esUtf8;
-  vDatabaseCharSet  := csUndefined;
+   vEncoding        := esASCII;
+ {$IFEND}
+ {$IFDEF RESTDWLAZARUS}
+   vDatabaseCharSet := csUndefined;
  {$ENDIF}
 End;
 
@@ -405,10 +401,10 @@ Var
 Begin
  For I := 0 to Count -1 Do
   Begin
-   If TFieldImport(Items[I]^).FieldType in [{$IFDEF COMPILER14_UP}ftWideMemo, {$ENDIF}ftBlob,     ftMemo,
-                                            ftGraphic,  ftFmtMemo,  {$IFDEF COMPILER14_UP}ftStream,{$ENDIF}
-                                            ftBytes,    ftVarBytes, ftOraBlob,
-                                            ftOraClob,  ftTypedBinary] Then
+   If TFieldImport(Items[I]^).FieldType in [
+      {$IFDEF DELPHIXEUP}ftWideMemo, ftStream,{$ENDIF}
+      ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftBytes, ftVarBytes, ftOraBlob,
+      ftOraClob, ftTypedBinary] Then
     Begin
      If TFieldImport(Items[I]^).Blob <> Nil Then
       TFieldImport(Items[I]^).Blob.Clear;
@@ -423,10 +419,10 @@ Var
 Begin
  For I := 0 to Count -1 Do
   Begin
-   If TFieldImport(Items[I]^).FieldType in [{$IFDEF COMPILER14_UP}ftWideMemo, {$ENDIF}ftBlob,     ftMemo,
-                                            ftGraphic,  ftFmtMemo,  {$IFDEF COMPILER14_UP}ftStream, {$ENDIF}
-                                            ftBytes,    ftVarBytes, ftOraBlob,
-                                            ftOraClob,  ftTypedBinary] Then
+   If TFieldImport(Items[I]^).FieldType in [
+      {$IFDEF DELPHIXEUP}ftWideMemo, ftStream,{$ENDIF}
+      ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftBytes, ftVarBytes, ftOraBlob,
+      ftOraClob, ftTypedBinary] Then
     Begin
      If TFieldImport(Items[I]^).Blob <> Nil Then
       TFieldImport(Items[I]^).Blob.Clear;
@@ -438,7 +434,7 @@ End;
 Procedure TFileOptions.SetEncoding(bValue : TEncodeSelect);
 Begin
  vEncoding := bValue;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
   Case vEncoding Of
    esASCII : vEncodingLazarus := TEncoding.ANSI;
    esUtf8  : vEncodingLazarus := TEncoding.Utf8;
@@ -522,9 +518,8 @@ Var
     FieldImport.IsPK := GetPKValue(FieldImport.Name);
    FieldImport.FieldType := Value.DataType;
    FieldImport.Size      := Value.Size;
-   If (FieldImport.FieldType In [ftCurrency, ftBCD,
-                                 {$IFNDEF FPC}{$IF CompilerVersion > 21}ftExtended, ftSingle,
-                                 {$IFEND}{$ENDIF} ftFMTBcd]) Then
+   If (FieldImport.FieldType In [{$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
+                                 ftCurrency, ftBCD, ftFMTBcd]) Then
     FieldImport.Precision := TBCDField(Value).Precision;
   End;
  Begin
@@ -636,9 +631,9 @@ Var
       FieldImport^.Name := vFieldName;
       FieldImport^.FieldType := vDataset.FieldByName(vFieldName).DataType;
       FieldImport^.IsPK := (pfInKey in vDataset.FieldByName(vFieldName).ProviderFlags) Or GetPKValue(FieldImport^.Name);
-      If FieldImport^.FieldType In [ftFixedChar, ftWideString, ftString{$IFDEF COMPILER14_UP}, ftFixedWideChar{$ENDIF}] Then
+      If FieldImport^.FieldType In [ftFixedChar, ftWideString, ftString{$IFDEF DELPHIXEUP}, ftFixedWideChar{$ENDIF}] Then
        FieldImport^.Size := vDataset.FieldByName(vFieldName).Size
-      Else If FieldImport^.FieldType In [ftFMTBcd, {$IFDEF COMPILER14_UP}TFieldType.ftExtended,{$ENDIF} ftFloat, ftCurrency, ftBCD] Then
+      Else If FieldImport^.FieldType In [ftFMTBcd, {$IFDEF DELPHIXEUP}TFieldType.ftExtended,{$ENDIF} ftFloat, ftCurrency, ftBCD] Then
        Begin
         FieldImport^.Size      := TCurrencyField(vDataset.FieldByName(vFieldName)).DisplayWidth -
                                   TCurrencyField(vDataset.FieldByName(vFieldName)).Size;
@@ -680,7 +675,7 @@ Var
         If Trim(vValue) <> '' Then
          TFieldImport(vFieldsImport.Items[I]^).Value := StrToInt(vValue) = 1;
        End;
-      {$IFDEF COMPILER14_UP}TFieldType.ftSingle,
+      {$IFDEF DELPHIXEUP}TFieldType.ftSingle,
       ftByte,
       ftLongWord,
       ftShortint,
@@ -696,14 +691,14 @@ Var
        End;
       ftFixedChar,
       ftWideString,
-      ftString{$IFDEF COMPILER14_UP},
+      ftString{$IFDEF DELPHIXEUP},
       ftFixedWideChar{$ENDIF} :
        Begin
         If Trim(vValue) <> '' Then
          TFieldImport(vFieldsImport.Items[I]^).Value := vValue;
        End;
       ftFMTBcd,
-      {$IFDEF COMPILER14_UP}
+      {$IFDEF DELPHIXEUP}
       TFieldType.ftExtended,
       {$ENDIF}
       ftFloat,
@@ -713,7 +708,7 @@ Var
         If Trim(vValue) <> '' Then
          TFieldImport(vFieldsImport.Items[I]^).Value := StrToFloat(vValue);
        End;
-      {$IFDEF COMPILER14_UP}
+      {$IFDEF DELPHIXEUP}
       ftTimeStampOffset,
       ftOraTimeStamp,
       {$ENDIF}
@@ -724,7 +719,7 @@ Var
         If Trim(vValue) <> '' Then
          TFieldImport(vFieldsImport.Items[I]^).Value := StrToDateTime(vValue);
        End;
-      {$IFDEF COMPILER14_UP}
+      {$IFDEF DELPHIXEUP}
       ftWideMemo,
       ftStream,
       {$ENDIF}
@@ -738,7 +733,7 @@ Var
        Begin
         If Not (vFileOptions.vIgnoreBlobs) Then
          Begin
-          If TFieldImport(vFieldsImport.Items[I]^).FieldType In [{$IFDEF COMPILER14_UP}
+          If TFieldImport(vFieldsImport.Items[I]^).FieldType In [{$IFDEF DELPHIXEUP}
                                                                   ftWideMemo,
                                                                  {$ENDIF} ftMemo, ftFmtMemo] Then
            Begin
@@ -761,7 +756,7 @@ Var
             If vFileOptions.BlobsFiles Then
              Begin
               vFilePath := vValue;
-              {$IFDEF MSWINDOWS}
+              {$IFDEF RESTDWWINDOWS}
                vFilePath := StringReplace(vFilePath, '/', '\', [rfReplaceAll]);
               {$ELSE}
                vFilePath := StringReplace(vFilePath, '\', '/', [rfReplaceAll]);
@@ -866,12 +861,12 @@ Var
      FieldImport := vFieldsImport.FielByIndex(I);
      If vDataset.FindField(UpperCase(FieldImport.Name)) <> Nil Then
       Begin
-       If FieldImport.FieldType in [{$IFDEF COMPILER14_UP}ftWideMemo, ftStream, {$ENDIF}ftBlob,     ftMemo,
-                                    ftGraphic,  ftFmtMemo,
-                                    ftBytes,    ftVarBytes, ftOraBlob,
-                                    ftOraClob,  ftTypedBinary] Then
+       If FieldImport.FieldType in [{$IFDEF DELPHIXEUP}ftWideMemo, ftStream, {$ENDIF}
+                                    ftBlob, ftMemo, ftGraphic, ftFmtMemo,
+                                    ftBytes, ftVarBytes, ftOraBlob, ftOraClob,
+                                    ftTypedBinary] Then
         Begin
-         If FieldImport.FieldType In [{$IFDEF COMPILER14_UP}
+         If FieldImport.FieldType In [{$IFDEF DELPHIXEUP}
                                        ftWideMemo,
                                       {$ENDIF} ftMemo, ftFmtMemo] Then
           vDataset.FindField(UpperCase(FieldImport.Name)).AsString := FieldImport.Value
@@ -879,7 +874,7 @@ Var
           TBlobField(vDataset.FindField(UpperCase(FieldImport.Name))).LoadFromStream(FieldImport.Blob);
         End
        Else If vDataset.FindField(UpperCase(FieldImport.Name)).DataType In
-               [ftFixedChar, ftWideString, ftString{$IFDEF COMPILER14_UP}, ftFixedWideChar{$ENDIF}] Then
+               [ftFixedChar, ftWideString, ftString{$IFDEF DELPHIXEUP}, ftFixedWideChar{$ENDIF}] Then
         Begin
          If Not VarIsNull(FieldImport.Value) Then
           Begin
@@ -902,42 +897,7 @@ Var
    FieldImport : TFieldImport;
   Begin
    For I := 0 To vFieldsImport.ItemsCount -1 Do
-    Begin
      FieldImport := vFieldsImport.FielByIndex(I);
-     If FieldImport.IsPK Then
-      Begin
-//       If vReadObject Is TIBDatabase Then
-//        Begin
-//         If vIBQuery.ParamByName(UpperCase(FieldImport.Name)) <> Nil Then
-//          Begin
-//           vIBQuery.ParamByName(UpperCase(FieldImport.Name)).DataType := FieldImport.FieldType;
-//           If FieldImport.FieldType in [{$IFDEF COMPILER14_UP}ftWideMemo, ftStream, {$ENDIF}ftBlob,     ftMemo,
-//                                        ftGraphic,  ftFmtMemo,
-//                                        ftBytes,    ftVarBytes, ftOraBlob,
-//                                        ftOraClob,  ftTypedBinary] Then
-//            vIBQuery.ParamByName(UpperCase(FieldImport.Name)).LoadFromStream(FieldImport.Blob, ftBlob)
-//           Else
-//            vIBQuery.ParamByName(UpperCase(FieldImport.Name)).Value   := FieldImport.Value;
-//          End;
-//        {$IFDEF COMPILER14_UP}
-//        End
-//       Else If vReadObject Is TFDConnection Then
-//        Begin
-//         If vFDQuery.ParamByName(UpperCase(FieldImport.Name)) <> Nil Then
-//          Begin
-//           vFDQuery.ParamByName(UpperCase(FieldImport.Name)).DataType := FieldImport.FieldType;
-//           If FieldImport.FieldType in [ftWideMemo, ftBlob,     ftMemo,
-//                                        ftGraphic,  ftFmtMemo,  ftStream,
-//                                        ftBytes,    ftVarBytes, ftOraBlob,
-//                                        ftOraClob,  ftTypedBinary] Then
-//            vFDQuery.ParamByName(UpperCase(FieldImport.Name)).LoadFromStream(FieldImport.Blob, ftBlob)
-//           Else
-//            vFDQuery.ParamByName(UpperCase(FieldImport.Name)).Value    := FieldImport.Value;
-//          End;
-//        {$ENDIF}
-//        End;
-      End;
-    End;
   End;
   Procedure ResizeValues;
   Var
@@ -948,7 +908,7 @@ Var
      If vDataset.FindField(TFieldImport(vFieldsImport.Items[I]^).Name) <> Nil Then
       Begin
        If TFieldImport(vFieldsImport.Items[I]^).FieldType In
-         [ftFixedChar, ftWideString, ftString{$IFDEF COMPILER14_UP}, ftFixedWideChar{$ENDIF}] Then
+         [ftFixedChar, ftWideString, ftString{$IFDEF DELPHIXEUP}, ftFixedWideChar{$ENDIF}] Then
         If TFieldImport(vFieldsImport.Items[I]^).Size <> vDataset.FindField(TFieldImport(vFieldsImport.Items[I]^).Name).Size Then
          TFieldImport(vFieldsImport.Items[I]^).Size := vDataset.FindField(TFieldImport(vFieldsImport.Items[I]^).Name).Size;
       End;
@@ -976,7 +936,7 @@ Var
 Begin
  If Not Assigned(vDataset) Then
   Begin
-   Raise Exception.Create('Dataset no Set');
+   Raise Exception.Create(cErrorDataSetNotDefined);
    Exit;
   End;
  vFieldsImport := TFieldsImport.Create;
@@ -1065,15 +1025,10 @@ Var
      Begin
       vFieldPk := '';
       If vFileOptions.IgnoreBlobs Then
-       If ObjectValueToFieldType(vCustomFieldDefs.Items[I].vFieldtype) in [{$IFDEF COMPILER14_UP}
-                                                                            ftWideMemo,
-                                                                            ftStream,
-                                                                            {$ENDIF}
-                                                                            ftBlob, ftMemo,
-                                                                            ftGraphic, ftFmtMemo,
-                                                                            ftBytes, ftVarBytes,
-                                                                            ftOraBlob, ftOraClob,
-                                                                            ftTypedBinary] Then
+       If ObjectValueToFieldType(vCustomFieldDefs.Items[I].vFieldtype)
+          in [{$IFDEF DELPHIXEUP}ftWideMemo, ftStream,{$ENDIF}
+              ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftBytes, ftVarBytes,
+              ftOraBlob, ftOraClob, ftTypedBinary] Then
        Continue;
       vFieldTypeName := UpperCase(GetEnumName(TypeInfo(TFieldType), Integer(ObjectValueToFieldType(vCustomFieldDefs.Items[I].vFieldtype))));
       Delete(vFieldTypeName, 1, 2);
@@ -1105,26 +1060,21 @@ Var
        Continue;
       vFieldPk := '';
       If vFileOptions.IgnoreBlobs Then
-       If ObjectValueToFieldType(vCustomFieldDefs.ItemsString[Dataset.Fields[I].FieldName].vFieldtype) in [{$IFDEF COMPILER14_UP}
-                                                                                                            ftWideMemo,
-                                                                                                            ftStream,
-                                                                                                            {$ENDIF}
-                                                                                                            ftBlob, ftMemo,
-                                                                                                            ftGraphic, ftFmtMemo,
-                                                                                                            ftBytes, ftVarBytes,
-                                                                                                            ftOraBlob, ftOraClob,
-                                                                                                            ftTypedBinary] Then
+       If ObjectValueToFieldType(vCustomFieldDefs.ItemsString[Dataset.Fields[I].FieldName].vFieldtype)
+          in [{$IFDEF DELPHIXEUP}ftWideMemo, ftStream,{$ENDIF}
+              ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftBytes, ftVarBytes,
+              ftOraBlob, ftOraClob, ftTypedBinary] Then
        Continue;
       vFieldTypeName := UpperCase(GetEnumName(TypeInfo(TFieldType), Integer(Dataset.Fields[I].DataType)));
       Delete(vFieldTypeName, 1, 2);
       If (pfInKey in Dataset.Fields[I].ProviderFlags) Or (GetPKValue(Dataset.Fields[I].FieldName)) Then
        vFieldPk := UpperCase('&pk');
-      If Dataset.Fields[I].DataType In [ftWideString, ftString{$IFNDEF FPC}{$if CompilerVersion > 22}, ftFixedChar, ftFixedWideChar{$IFEND}{$ENDIF}] Then
+      If Dataset.Fields[I].DataType In [ftWideString, ftString{$IFDEF DELPHIXEUP}, ftFixedChar, ftFixedWideChar{$ENDIF}] Then
        vHeaderLine := vHeaderLine + Format('%s:%s(%d)%s', [UpperCase(Dataset.Fields[I].FieldName) + vFieldPk,
                                                            vFieldTypeName,
                                                            Dataset.Fields[I].Size,
                                                            vFileOptions.vSeparator])
-      Else If Dataset.Fields[I].DataType In [ftFloat, ftCurrency, ftBCD, ftFMTBcd{$IFNDEF FPC}{$IF CompilerVersion >= 22},ftSingle, ftExtended{$IFEND}{$ENDIF}] Then
+      Else If Dataset.Fields[I].DataType In [ftFloat, ftCurrency, ftBCD, ftFMTBcd{$IFDEF DELPHIXEUP},ftSingle, ftExtended{$ENDIF}] Then
        vHeaderLine := vHeaderLine + Format('%s:%s(%d,%d)%s', [UpperCase(Dataset.Fields[I].FieldName) + vFieldPk,
                                                               vFieldTypeName,
                                                               TCurrencyField(Dataset.Fields[I]).Precision,
@@ -1208,7 +1158,7 @@ Var
        ftbCSVFile   : Result := Format('%s%s', [vAtualValue, vFileOptions.vSeparator]);
       End;
      End;
-    {$IFDEF COMPILER14_UP}
+    {$IFDEF DELPHIXEUP}
     ftByte,
     ftLongWord,
     ftShortint,
@@ -1268,220 +1218,212 @@ Var
                  End;
     ftWideString,
     ftString
-    {$IFNDEF FPC}
-    {$if CompilerVersion > 22}
+    {$IFDEF DELPHIXEUP}
     , ftFixedChar,
     ftFixedWideChar
-    {$IFEND}
-    {$ENDIF}                : Begin
-                               vCustomFieldDef := vCustomFieldDefs.ItemsString[Field.FieldName];
-                               Try
-                                If vCustomFieldDef <> Nil Then
-                                 Begin
-                                  If vAtualValue = '' Then
-                                   If Not VarIsNull(Field.Value) Then
-                                    vAtualValue := Field.AsString
-                                   Else
-                                    vAtualValue := '';
-                                  If Assigned(vCustomFieldDef.OnGetFieldValue) Then
-                                   vCustomFieldDef.OnGetFieldValue(vCustomFieldDef, vAtualValue);
-                                  If vCustomFieldDef.FieldSize > 0 Then
-                                   If vAtualValue <> '' Then
-                                    vAtualValue := Copy(vAtualValue, 1, vCustomFieldDef.FieldSize);
-                                  vAtualValue := InsertChar(vAtualValue,
-                                                            vCustomFieldDef.vInsertChar,
-                                                            vCustomFieldDef.vFieldSize,
-                                                            vCustomFieldDef.vInsertCharLeft);
-                                 End
-                                Else
-                                 Begin
-                                  If vAtualValue = '' Then
-                                   If Not Field.IsNull Then
-                                    vAtualValue := Field.AsString;
-                                  If vMaskOptions.vDefaultFieldSize > 0 Then
-                                   If vAtualValue <> '' Then
-                                    vAtualValue := Copy(vAtualValue, 1, vMaskOptions.vDefaultFieldSize);
-                                  vAtualValue := InsertChar(vAtualValue,
-                                                            vMaskOptions.vInsertChar,
-                                                            vMaskOptions.vDefaultFieldSize,
-                                                            vMaskOptions.vDefaultInsertLeftChar);
-                                 End;
-                               Except
-                                On E : Exception Do
-                                 Begin
-                                  If Assigned(vOnError) Then
-                                   vOnError(Dataset.RecNo, Format('Field %s Value %s no is a %s Value', [Field.FieldName,
-                                                                                                         Field.AsString,
-                                                                                                         'String']));
-                                 End;
-                               End;
-                               Case vFileOptions.vFileType Of
-                                ftbFixedText : Result := vAtualValue;
-                                ftbCSVFile   : Result := Format('%s%s', [vAtualValue, vFileOptions.vSeparator]);
-                               End;
-                              End;
+    {$ENDIF}: Begin
+                vCustomFieldDef := vCustomFieldDefs.ItemsString[Field.FieldName];
+                Try
+                 If vCustomFieldDef <> Nil Then
+                  Begin
+                   If vAtualValue = '' Then
+                    If Not VarIsNull(Field.Value) Then
+                     vAtualValue := Field.AsString
+                    Else
+                     vAtualValue := '';
+                   If Assigned(vCustomFieldDef.OnGetFieldValue) Then
+                    vCustomFieldDef.OnGetFieldValue(vCustomFieldDef, vAtualValue);
+                   If vCustomFieldDef.FieldSize > 0 Then
+                    If vAtualValue <> '' Then
+                     vAtualValue := Copy(vAtualValue, 1, vCustomFieldDef.FieldSize);
+                   vAtualValue := InsertChar(vAtualValue,
+                                             vCustomFieldDef.vInsertChar,
+                                             vCustomFieldDef.vFieldSize,
+                                             vCustomFieldDef.vInsertCharLeft);
+                  End
+                 Else
+                  Begin
+                   If vAtualValue = '' Then
+                    If Not Field.IsNull Then
+                     vAtualValue := Field.AsString;
+                   If vMaskOptions.vDefaultFieldSize > 0 Then
+                    If vAtualValue <> '' Then
+                     vAtualValue := Copy(vAtualValue, 1, vMaskOptions.vDefaultFieldSize);
+                   vAtualValue := InsertChar(vAtualValue,
+                                             vMaskOptions.vInsertChar,
+                                             vMaskOptions.vDefaultFieldSize,
+                                             vMaskOptions.vDefaultInsertLeftChar);
+                  End;
+                Except
+                 On E : Exception Do
+                  Begin
+                   If Assigned(vOnError) Then
+                    vOnError(Dataset.RecNo, Format(cErrorInvalidFieldStringValue, [Field.FieldName, Field.AsString]));
+                  End;
+                End;
+                Case vFileOptions.vFileType Of
+                 ftbFixedText : Result := vAtualValue;
+                 ftbCSVFile   : Result := Format('%s%s', [vAtualValue, vFileOptions.vSeparator]);
+                End;
+              End;
     ftFloat,
     ftCurrency,
     ftBCD,
     ftFMTBcd
-    {$IFNDEF FPC}
-    {$IF CompilerVersion >= 22}
+    {$IFDEF DELPHIXEUP}
     ,ftSingle,
     ftExtended
-    {$IFEND}
-    {$ENDIF}        : Begin
-                       vCustomFieldDef := vCustomFieldDefs.ItemsString[Field.FieldName];
-                       Try
-                        If vCustomFieldDef <> Nil Then
-                         Begin
-                          If vAtualValue = '' Then
-                           If Not VarIsNull(Field.Value) Then
-                            Begin
-                             If vCustomFieldDef.MaskOptions.vNumberMask <> '' Then
-                              vAtualValue := FormatFloat(vCustomFieldDef.MaskOptions.vNumberMask, Field.AsCurrency)
-                             Else
-                              vAtualValue := FloatToStr(Field.AsCurrency);
-                            End
-                           Else
-                            vAtualValue := '';
-                          If Assigned(vCustomFieldDef.OnGetFieldValue) Then
-                           vCustomFieldDef.OnGetFieldValue(vCustomFieldDef, vAtualValue);
-                          If vCustomFieldDef.vMaskOptions.vDefaultPrecision > 0 Then
-                           If Pos(vCustomFieldDef.vMaskOptions.DecimalSeparator, vAtualValue) > 0 Then
-                            vAtualValue := Copy(vAtualValue, 1,
-                                                Pos(vCustomFieldDef.vMaskOptions.DecimalSeparator, vAtualValue) +
-                                                    vCustomFieldDef.vMaskOptions.vDefaultPrecision);
-                          If vCustomFieldDef.vMaskOptions.vNumberMask <> '' Then
-                           If (vAtualValue <> '') Then
-                            vAtualValue := FormatFloat(vCustomFieldDef.vMaskOptions.vNumberMask, StrToFloat(vAtualValue))
-                           Else If vCustomFieldDef.DefaultValue <> '' Then
-                            vAtualValue := FormatFloat(vCustomFieldDef.vMaskOptions.vNumberMask, StrToFloat(vCustomFieldDef.DefaultValue));
-                          If vCustomFieldDef.FieldSize > 0 Then
-                           If vAtualValue <> '' Then
-                            vAtualValue := Copy(vAtualValue, 1, vCustomFieldDef.FieldSize);
-                          If vCustomFieldDef.vMaskOptions.vExcludeDecimalSeparator Then
-                           vAtualValue := StringReplace(vAtualValue, vCustomFieldDef.vMaskOptions.vDecimalSeparator, '', [rfReplaceAll]);
-                          vAtualValue := InsertChar(vAtualValue,
-                                                    vCustomFieldDef.vInsertChar,
-                                                    vCustomFieldDef.vFieldSize,
-                                                    vCustomFieldDef.vInsertCharLeft);
-                         End
-                        Else
-                         Begin
-                          If vAtualValue = '' Then
-                           If Not VarIsNull(Field.Value) Then
-                            Begin
-                             If vMaskOptions.vNumberMask <> '' Then
-                              vAtualValue := FormatFloat(vMaskOptions.vNumberMask, Field.AsCurrency)
-                             Else
-                              vAtualValue := FloatToStr(Field.AsCurrency);
-                            End
-                           Else
-                            vAtualValue := '';
-                          If vMaskOptions.vDefaultPrecision > 0 Then
-                           If Pos(vMaskOptions.DecimalSeparator, vAtualValue) > 0 Then
-                            vAtualValue := Copy(vAtualValue, 1,
-                                                Pos(vMaskOptions.DecimalSeparator, vAtualValue) +
-                                                    vMaskOptions.vDefaultPrecision);
-                          If vMaskOptions.vNumberMask <> '' Then
-                           If (vAtualValue <> '') Then
-                            vAtualValue := FormatFloat(vMaskOptions.vNumberMask, StrToFloat(vAtualValue));
-                          If vMaskOptions.vDefaultFieldSize > 0 Then
-                           If vAtualValue <> '' Then
-                            vAtualValue := Copy(vAtualValue, 1, vMaskOptions.vDefaultFieldSize);
-                          If vMaskOptions.vExcludeDecimalSeparator Then
-                           vAtualValue := StringReplace(vAtualValue, vMaskOptions.vDecimalSeparator, '', [rfReplaceAll]);
-                          vAtualValue := InsertChar(vAtualValue,
-                                                    vMaskOptions.vInsertChar,
-                                                    vMaskOptions.vDefaultFieldSize,
-                                                    vMaskOptions.vDefaultInsertLeftChar);
-                         End;
-                       Except
-                        On E : Exception Do
-                         Begin
-                          If Assigned(vOnError) Then
-                           vOnError(Dataset.RecNo, Format('Field %s Value %s no is a %s Value', [Field.FieldName,
-                                                                                                 Field.AsString,
-                                                                                                 'Float']));
-                         End;
-                       End;
-                       Case vFileOptions.vFileType Of
-                        ftbFixedText : Result := vAtualValue;
-                        ftbCSVFile   : Result := Format('%s%s', [vAtualValue, vFileOptions.vSeparator]);
-                       End;
-                      End;
-    {$IFDEF DELPHI12_UP}
+    {$ENDIF}: Begin
+                vCustomFieldDef := vCustomFieldDefs.ItemsString[Field.FieldName];
+                Try
+                 If vCustomFieldDef <> Nil Then
+                  Begin
+                   If vAtualValue = '' Then
+                    If Not VarIsNull(Field.Value) Then
+                     Begin
+                      If vCustomFieldDef.MaskOptions.vNumberMask <> '' Then
+                       vAtualValue := FormatFloat(vCustomFieldDef.MaskOptions.vNumberMask, Field.AsCurrency)
+                      Else
+                       vAtualValue := FloatToStr(Field.AsCurrency);
+                     End
+                    Else
+                     vAtualValue := '';
+                   If Assigned(vCustomFieldDef.OnGetFieldValue) Then
+                    vCustomFieldDef.OnGetFieldValue(vCustomFieldDef, vAtualValue);
+                   If vCustomFieldDef.vMaskOptions.vDefaultPrecision > 0 Then
+                    If Pos(vCustomFieldDef.vMaskOptions.DecimalSeparator, vAtualValue) > 0 Then
+                     vAtualValue := Copy(vAtualValue, 1,
+                                         Pos(vCustomFieldDef.vMaskOptions.DecimalSeparator, vAtualValue) +
+                                             vCustomFieldDef.vMaskOptions.vDefaultPrecision);
+                   If vCustomFieldDef.vMaskOptions.vNumberMask <> '' Then
+                    If (vAtualValue <> '') Then
+                     vAtualValue := FormatFloat(vCustomFieldDef.vMaskOptions.vNumberMask, StrToFloat(vAtualValue))
+                    Else If vCustomFieldDef.DefaultValue <> '' Then
+                     vAtualValue := FormatFloat(vCustomFieldDef.vMaskOptions.vNumberMask, StrToFloat(vCustomFieldDef.DefaultValue));
+                   If vCustomFieldDef.FieldSize > 0 Then
+                    If vAtualValue <> '' Then
+                     vAtualValue := Copy(vAtualValue, 1, vCustomFieldDef.FieldSize);
+                   If vCustomFieldDef.vMaskOptions.vExcludeDecimalSeparator Then
+                    vAtualValue := StringReplace(vAtualValue, vCustomFieldDef.vMaskOptions.vDecimalSeparator, '', [rfReplaceAll]);
+                   vAtualValue := InsertChar(vAtualValue,
+                                             vCustomFieldDef.vInsertChar,
+                                             vCustomFieldDef.vFieldSize,
+                                             vCustomFieldDef.vInsertCharLeft);
+                  End
+                 Else
+                  Begin
+                   If vAtualValue = '' Then
+                    If Not VarIsNull(Field.Value) Then
+                     Begin
+                      If vMaskOptions.vNumberMask <> '' Then
+                       vAtualValue := FormatFloat(vMaskOptions.vNumberMask, Field.AsCurrency)
+                      Else
+                       vAtualValue := FloatToStr(Field.AsCurrency);
+                     End
+                    Else
+                     vAtualValue := '';
+                   If vMaskOptions.vDefaultPrecision > 0 Then
+                    If Pos(vMaskOptions.DecimalSeparator, vAtualValue) > 0 Then
+                     vAtualValue := Copy(vAtualValue, 1,
+                                         Pos(vMaskOptions.DecimalSeparator, vAtualValue) +
+                                             vMaskOptions.vDefaultPrecision);
+                   If vMaskOptions.vNumberMask <> '' Then
+                    If (vAtualValue <> '') Then
+                     vAtualValue := FormatFloat(vMaskOptions.vNumberMask, StrToFloat(vAtualValue));
+                   If vMaskOptions.vDefaultFieldSize > 0 Then
+                    If vAtualValue <> '' Then
+                     vAtualValue := Copy(vAtualValue, 1, vMaskOptions.vDefaultFieldSize);
+                   If vMaskOptions.vExcludeDecimalSeparator Then
+                    vAtualValue := StringReplace(vAtualValue, vMaskOptions.vDecimalSeparator, '', [rfReplaceAll]);
+                   vAtualValue := InsertChar(vAtualValue,
+                                             vMaskOptions.vInsertChar,
+                                             vMaskOptions.vDefaultFieldSize,
+                                             vMaskOptions.vDefaultInsertLeftChar);
+                  End;
+                Except
+                 On E : Exception Do
+                  Begin
+                   If Assigned(vOnError) Then
+                    vOnError(Dataset.RecNo, Format(cErrorInvalidFieldFloatValue,
+                                             [Field.FieldName, Field.AsString]));
+                  End;
+                End;
+                Case vFileOptions.vFileType Of
+                 ftbFixedText : Result := vAtualValue;
+                 ftbCSVFile   : Result := Format('%s%s', [vAtualValue, vFileOptions.vSeparator]);
+                End;
+              End;
+    {$IFDEF DELPHIXEUP}
     ftTimeStampOffset, //Tipos Date/DateTime
     ftOraTimeStamp,
     {$ENDIF}
     ftTimeStamp,
     ftDate, ftTime,
-    ftDateTime      : Begin
-                       vCustomFieldDef := vCustomFieldDefs.ItemsString[Field.FieldName];
-                       Try
-                        If vCustomFieldDef <> Nil Then
-                         Begin
-                          If vAtualValue = '' Then
-                           If Not VarIsNull(Field.Value) Then
-                            Begin
-                             If Field.DataType in [ftTimeStamp, {$IFDEF DELPHI12_UP}ftTimeStampOffset,
-                                                  ftOraTimeStamp,{$ENDIF} ftDateTime] Then
-                              vAtualValue := FormatDateTime(vCustomFieldDef.MaskOptions.vDateTimeMask, Field.AsDateTime)
-                             Else If Field.DataType = ftDate Then
-                              vAtualValue := FormatDateTime(vCustomFieldDef.MaskOptions.vDateMask, Field.AsDateTime)
-                             Else
-                              vAtualValue := FormatDateTime(vCustomFieldDef.MaskOptions.vTimeMask, Field.AsDateTime);
-                            End
-                           Else
-                            vAtualValue := '';
-                          If Assigned(vCustomFieldDef.OnGetFieldValue) Then
-                           vCustomFieldDef.OnGetFieldValue(vCustomFieldDef, vAtualValue);
-                          If vCustomFieldDef.FieldSize > 0 Then
-                           If vAtualValue <> '' Then
-                            vAtualValue := Copy(vAtualValue, 1, vCustomFieldDef.FieldSize);
-                          vAtualValue := InsertChar(vAtualValue,
-                                                    vCustomFieldDef.vInsertChar,
-                                                    vCustomFieldDef.vFieldSize,
-                                                    vCustomFieldDef.vInsertCharLeft);
-                         End
+    ftDateTime: Begin
+                  vCustomFieldDef := vCustomFieldDefs.ItemsString[Field.FieldName];
+                  Try
+                   If vCustomFieldDef <> Nil Then
+                    Begin
+                     If vAtualValue = '' Then
+                      If Not VarIsNull(Field.Value) Then
+                       Begin
+                        If Field.DataType in [ftTimeStamp, {$IFDEF DELPHIXEUP}ftTimeStampOffset,
+                                             ftOraTimeStamp,{$ENDIF} ftDateTime] Then
+                         vAtualValue := FormatDateTime(vCustomFieldDef.MaskOptions.vDateTimeMask, Field.AsDateTime)
+                        Else If Field.DataType = ftDate Then
+                         vAtualValue := FormatDateTime(vCustomFieldDef.MaskOptions.vDateMask, Field.AsDateTime)
                         Else
-                         Begin
-                          If vAtualValue = '' Then
-                           If Not Field.IsNull Then
-                            Begin
-                             If Field.DataType in [ftTimeStamp, {$IFDEF DELPHI12_UP}ftTimeStampOffset,
-                                                  ftOraTimeStamp,{$ENDIF} ftDateTime] Then
-                              vAtualValue := FormatDateTime(vMaskOptions.vDateTimeMask, Field.AsDateTime)
-                             Else If Field.DataType = ftDate Then
-                              vAtualValue := FormatDateTime(vMaskOptions.vDateMask, Field.AsDateTime)
-                             Else
-                              vAtualValue := FormatDateTime(vMaskOptions.vTimeMask, Field.AsDateTime);
-                            End
-                           Else
-                            vAtualValue := '';
-                          If vMaskOptions.vDefaultFieldSize > 0 Then
-                           If vAtualValue <> '' Then
-                            vAtualValue := Copy(vAtualValue, 1, vMaskOptions.vDefaultFieldSize);
-                          vAtualValue := InsertChar(vAtualValue,
-                                                    vMaskOptions.vInsertChar,
-                                                    vMaskOptions.vDefaultFieldSize,
-                                                    vMaskOptions.vDefaultInsertLeftChar);
-                         End;
-                       Except
-                        On E : Exception Do
-                         Begin
-                          If Assigned(vOnError) Then
-                           vOnError(Dataset.RecNo, Format('Field %s Value %s no is a %s Value', [Field.FieldName,
-                                                                                                 Field.AsString,
-                                                                                                 'DateTime']));
-                         End;
-                       End;
-                       Case vFileOptions.vFileType Of
-                        ftbFixedText : Result := vAtualValue;
-                        ftbCSVFile   : Result := Format('%s%s', [vAtualValue, vFileOptions.vSeparator]);
-                       End;
-                      End;
-    {$IFDEF COMPILER14_UP}
+                         vAtualValue := FormatDateTime(vCustomFieldDef.MaskOptions.vTimeMask, Field.AsDateTime);
+                       End
+                      Else
+                       vAtualValue := '';
+                     If Assigned(vCustomFieldDef.OnGetFieldValue) Then
+                      vCustomFieldDef.OnGetFieldValue(vCustomFieldDef, vAtualValue);
+                     If vCustomFieldDef.FieldSize > 0 Then
+                      If vAtualValue <> '' Then
+                       vAtualValue := Copy(vAtualValue, 1, vCustomFieldDef.FieldSize);
+                     vAtualValue := InsertChar(vAtualValue,
+                                               vCustomFieldDef.vInsertChar,
+                                               vCustomFieldDef.vFieldSize,
+                                               vCustomFieldDef.vInsertCharLeft);
+                    End
+                   Else
+                    Begin
+                     If vAtualValue = '' Then
+                      If Not Field.IsNull Then
+                       Begin
+                        If Field.DataType in [ftTimeStamp, {$IFDEF DELPHIXEUP}ftTimeStampOffset,
+                                             ftOraTimeStamp,{$ENDIF} ftDateTime] Then
+                         vAtualValue := FormatDateTime(vMaskOptions.vDateTimeMask, Field.AsDateTime)
+                        Else If Field.DataType = ftDate Then
+                         vAtualValue := FormatDateTime(vMaskOptions.vDateMask, Field.AsDateTime)
+                        Else
+                         vAtualValue := FormatDateTime(vMaskOptions.vTimeMask, Field.AsDateTime);
+                       End
+                      Else
+                       vAtualValue := '';
+                     If vMaskOptions.vDefaultFieldSize > 0 Then
+                      If vAtualValue <> '' Then
+                       vAtualValue := Copy(vAtualValue, 1, vMaskOptions.vDefaultFieldSize);
+                     vAtualValue := InsertChar(vAtualValue,
+                                               vMaskOptions.vInsertChar,
+                                               vMaskOptions.vDefaultFieldSize,
+                                               vMaskOptions.vDefaultInsertLeftChar);
+                    End;
+                  Except
+                   On E : Exception Do
+                    Begin
+                     If Assigned(vOnError) Then
+                      vOnError(Dataset.RecNo, Format(cErrorInvalidFieldDateTimeValue,
+                                            [Field.FieldName, Field.AsString]));
+                    End;
+                  End;
+                  Case vFileOptions.vFileType Of
+                   ftbFixedText : Result := vAtualValue;
+                   ftbCSVFile   : Result := Format('%s%s', [vAtualValue, vFileOptions.vSeparator]);
+                  End;
+                End;
+    {$IFDEF DELPHIXEUP}
     ftWideMemo,        //Tipos Blob
     ftStream,
     {$ENDIF}
@@ -1500,11 +1442,8 @@ Var
          vBlobStreamFile := TMemoryStream.Create;
          vBlobStreamFile.LoadFromStream(Dataset.CreateBlobStream(Field, bmRead));
          vBlobStreamFile.Position := 0;
-         If Field.DataType In [{$IFDEF COMPILER14_UP}
-                                ftWideMemo,
-                               {$ENDIF}
-                                ftMemo,
-                                ftFmtMemo] Then
+         If Field.DataType In [{$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
+                                ftMemo, ftFmtMemo] Then
           Begin
            vAtualValue     := Field.AsString;
            vCustomFieldDef := vCustomFieldDefs.ItemsString[Field.FieldName];
@@ -1540,9 +1479,8 @@ Var
          On E : Exception Do
           Begin
            If Assigned(vOnError) Then
-            vOnError(Dataset.RecNo, Format('Field %s Value %s no is a %s Value', [Field.FieldName,
-                                                                                  Field.AsString,
-                                                                                  'Blob']));
+            vOnError(Dataset.RecNo, Format(cErrorInvalidFieldBlobValue,
+                                           [Field.FieldName, Field.AsString]));
           End;
         End;
        End;
@@ -1585,7 +1523,7 @@ Var
   Else
    Begin
     If Assigned(vOnError) Then
-     vOnError(Dataset.RecNo, 'Can''''t write this register.' + #13 + 'Result value is null.');
+     vOnError(Dataset.RecNo, cErrorWriteDataSetNullValue);
    End;
   Result     := vValueLine;
  End;
@@ -1780,7 +1718,7 @@ End;
 Constructor TMaskOptions.Create;
 Begin
  vNumberMask              := '#########0.00';
- {$IFDEF COMPILER16_UP}
+ {$IFDEF DELPHIXE2UP}
  vDecimalSeparator        := FormatSettings.DecimalSeparator;
  vDateMask                := FormatSettings.ShortDateFormat;
  vTimeMask                := FormatSettings.ShortTimeFormat;
@@ -1827,19 +1765,6 @@ Begin
    vFieldName       := Value;
   End;
 End;
-
-{
-Function TCustomFieldDefs.Add(Item : TCustomFieldDef) : Integer;
-Var
- vItem : ^TCustomFieldDef;
-Begin
- If Not vEditable Then
-  Exit;
- New(vItem);
- vItem^ := Item;
- Result := TList(Self).Add(vItem);
-End;
-}
 
 Function TCustomFieldDefs.Add: TCollectionItem;
 Begin

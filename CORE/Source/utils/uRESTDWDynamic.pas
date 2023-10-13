@@ -1,6 +1,6 @@
 unit uRESTDWDynamic;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 Interface
 
@@ -9,17 +9,12 @@ Uses
   SysUtils, Classes, TypInfo, RTLConsts;
 
 Type
- {$IFNDEF FPC}
-  {$IF CompilerVersion >= 25}
-   {$LEGACYIFEND on}
-  {$IFEND}
-  {$IF CompilerVersion < 21}
-   NativeInt             = Integer;
-   NativeUInt            = Cardinal;
-   PNativeInt            = ^NativeInt;
-   PNativeUInt           = ^NativeUInt;
-  {$IFEND}
- {$ENDIF}
+ {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)}
+ NativeInt             = Integer;
+ NativeUInt            = Cardinal;
+ PNativeInt            = ^NativeInt;
+ PNativeUInt           = ^NativeUInt;
+ {$IFEND}
  RDWSize                = NativeInt;
  PRDWPointerMath        = ^RDWPointerMath;
  RDWPointerMath         = NativeUInt;

@@ -1,6 +1,6 @@
 unit uRESTDWAttachmentFile;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWAttachmentFile;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -27,9 +26,7 @@ Interface
 
 Uses
  Classes,
- uRESTDWAttachment,
- uRESTDWMessageParts,
- uRESTDWTools;
+ uRESTDWAttachment, uRESTDWMessageParts, uRESTDWTools, uRESTDWMimeTypes;
 
  Type
   TRESTDWAttachmentFile = Class(TRESTDWAttachment)
@@ -55,12 +52,12 @@ Uses
 Implementation
 
 Uses
-  {$IFDEF USE_VCL_POSIX}
-  Posix.Unistd,
-  {$ENDIF}
-  {$IFDEF WINDOWS}
-   Windows,
-  {$ENDIF}
+//  {$IFDEF USE_VCL_POSIX}
+//  Posix.Unistd,
+//  {$ENDIF}
+//  {$IFDEF WINDOWS}
+//   Windows,
+//  {$ENDIF}
   uRESTDWException,
   uRESTDWMessage,
   uRESTDWConsts,
@@ -81,7 +78,7 @@ Begin
  FStoredPathName := AFileName;
  FFileIsTempFile := False;
  If FFilename <> '' Then
-  ContentType := GetMimeTypeFromFile(FFilename);
+  ContentType := TRESTDWMimeType.GetMIMEType(FFilename);
 End;
 
 Destructor TRESTDWAttachmentFile.Destroy;

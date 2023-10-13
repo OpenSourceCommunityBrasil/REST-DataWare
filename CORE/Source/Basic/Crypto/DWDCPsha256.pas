@@ -24,6 +24,8 @@
 {******************************************************************************}
 unit DWDCPsha256;
 
+{$I ..\..\Includes\uRESTDW.inc}
+
 interface
 uses
   Classes, Sysutils, DWDCPtypes, DWDCPcrypt2, DWDCPconst;
@@ -193,26 +195,26 @@ begin
   FillChar(TestOut, SizeOf(TestOut), 0);
   TestHash:= TRESTDWDCP_sha256.Create(nil);
   TestHash.Init;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
    TestHash.UpdateStr(AnsiString('abc'));
   {$ELSE}
-   {$if Defined(HAS_FMX)} // Delphi 2010 pra cima
-    TestHash.UpdateStr(String('abc'));
-   {$ELSE} // Delphi 2010 pra cima
+   {$IFDEF RESTDWFMX}
+    TestHash.UpdateStr('abc');
+   {$ELSE}
     TestHash.UpdateStr(DWDCPRawString('abc'));
-   {$IFEND} // Delphi 2010 pra cima
+   {$ENDIF}
   {$ENDIF}
   TestHash.Final(TestOut);
   Result:= boolean(CompareMem(@TestOut,@Test1Out,Sizeof(Test1Out)));
   TestHash.Init;
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
    TestHash.UpdateStr(AnsiString('abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq'));
   {$ELSE}
-   {$if Defined(HAS_FMX)} // Delphi 2010 pra cima
-    TestHash.UpdateStr(String('abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq'));
-   {$ELSE} // Delphi 2010 pra cima
+   {$IFDEF RESTDWFMX}
+    TestHash.UpdateStr('abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq');
+   {$ELSE}
     TestHash.UpdateStr(DWDCPRawString('abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq'));
-   {$IFEND} // Delphi 2010 pra cima
+   {$ENDIF}
   {$ENDIF}
   TestHash.Final(TestOut);
   Result:= boolean(CompareMem(@TestOut,@Test2Out,Sizeof(Test2Out))) and Result;

@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils,
-  uRESTDWIdBase, uRESTDWBasicDB, uRESTDWDataUtils;
+  uRESTDWIdBase, uRESTDWBasicDB, uRESTDWDataUtils, uRESTDWConsts;
 
 type
   TRDWDBWareDAO = class

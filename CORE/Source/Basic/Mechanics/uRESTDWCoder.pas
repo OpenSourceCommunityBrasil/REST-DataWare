@@ -1,8 +1,6 @@
 unit uRESTDWCoder;
 
-interface
-
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -17,7 +15,6 @@ interface
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -25,8 +22,10 @@ interface
  Roniery                    - Devel.
 }
 
+interface
+
 uses
-  Classes, uRESTDWComponentBase, uRESTDWBasicTypes, uRESTDWTools;
+  Classes, uRESTDWAbout, uRESTDWProtoTypes, uRESTDWTools;
 
  Type
   TRESTDWEncoder = Class(TRESTDWComponent)

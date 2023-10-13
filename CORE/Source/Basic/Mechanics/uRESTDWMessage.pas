@@ -1,6 +1,6 @@
 unit uRESTDWMessage;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWMessage;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -26,8 +25,9 @@ unit uRESTDWMessage;
 Interface
 
 Uses
- Classes, uRESTDWAttachment, uRESTDWHeaderList, uRESTDWMessageParts,
- uRESTDWComponentBase, uRESTDWException;
+ Classes,
+ uRESTDWAbout, uRESTDWAttachment, uRESTDWHeaderList, uRESTDWMessageParts,
+ uRESTDWException, uRESTDWProtoTypes;
 
 Type
  TRESTDWMessagePriority = (mpHighest, mpHigh, mpNormal, mpLow, mpLowest);
@@ -433,7 +433,7 @@ Begin
   LDate := Now
  Else
   LDate := Self.Date;
- FLastGeneratedHeaders.Values['Date'] := LocalDateTimeToGMT(LDate); {do not localize}
+// FLastGeneratedHeaders.Values['Date'] := LocalDateTimeToGMT(LDate); {do not localize}
  If Priority <> mpNormal Then
   Begin
    FLastGeneratedHeaders.Values['Priority'] := cPriorityStrs[Priority]; {do not localize}
@@ -494,7 +494,7 @@ Begin
   ContentTransferEncoding := Headers.Values['Content-Transfer-Encoding']; {do not localize}
   ContentDisposition := Headers.Values['Content-Disposition'];  {do not localize}
   References := Headers.Values['References']; {do not localize}
-  Date  := GMTToLocalDateTime(Headers.Values['Date']); {do not localize}
+//  Date  := GMTToLocalDateTime(Headers.Values['Date']); {do not localize}
   FText := Headers.Values['Sender']; {do not localize}
   If Length(Headers.Values['X-Priority']) > 0 Then
    Priority := GetMsgPriority(Headers.Values['X-Priority'])

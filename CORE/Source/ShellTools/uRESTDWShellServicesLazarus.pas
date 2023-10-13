@@ -1,6 +1,6 @@
 unit uRESTDWShellServicesLazarus;
 
-{$I ..\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -16,7 +16,6 @@ unit uRESTDWShellServicesLazarus;
   XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
   A. Brito                   - Admin - Administrador do desenvolvimento.
   Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
-  Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
   Flávio Motta               - Member Tester and DEMO Developer.
   Mobius One                 - Devel, Tester and Admin.
   Gustavo                    - Criptografia and Devel.
@@ -27,9 +26,10 @@ unit uRESTDWShellServicesLazarus;
 interface
 
 Uses
-   SysUtils, Classes, Db, HTTPDefs, LConvEncoding, Variants, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject,
-   uRESTDWBasic, uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass, uRESTDWComponentBase, uRESTDWTools,
-   uRESTDWConsts;
+   SysUtils, Classes, Db, HTTPDefs, LConvEncoding, Variants,
+   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
+   uRESTDWBasicDB, uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWBasicClass,
+   uRESTDWTools, uRESTDWConsts;
 
 Type
  TRESTDWShellService = Class(TRESTShellServicesBase)
@@ -58,15 +58,16 @@ Procedure TRESTDWShellService.Command(ARequest    : TRequest;
                                       Var Handled : Boolean);
 Var
  sCharSet,
- vCommandLine,
  vToken,
  ErrorMessage,
  vAuthRealm,
+ vCommandLine,
  vContentType,
  vResponseString : String;
  I,
  StatusCode      : Integer;
  ResultStream    : TStream;
+ vCORSHeader     : TStrings;
  vRawHeader,
  vResponseHeader : TStringList;
  mb              : TStringStream;
@@ -91,29 +92,45 @@ Var
    FreeAndNil(vRawHeader);
   If Assigned(vStream) Then
    FreeAndNil(vStream);
+  If Assigned(vCORSHeader) Then
+   FreeAndNil(vCORSHeader);
  End;
  Procedure Redirect(AURL : String);
  Begin
   If Trim(aUrl) <> '' Then
    AResponse.SendRedirect(AUrl);
  End;
-Begin
- ResultStream    := TStringStream.Create('');
- vResponseHeader := TStringList.Create;
- vResponseString := '';
- vStream         := Nil;
- vRedirect      := TRedirect(@Redirect);
- Try
+ Procedure SetReplyCORS;
+ Var
+  I : Integer;
+ Begin
   If CORS Then
    Begin
     If CORS_CustomHeaders.Count > 0 Then
      Begin
       For I := 0 To CORS_CustomHeaders.Count -1 Do
-       AResponse.CustomHeaders.AddPair(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
+       AResponse.CustomHeaders.Add(CORS_CustomHeaders.Names[I] + cNameValueSeparator + CORS_CustomHeaders.ValueFromIndex[I]);
      End
     Else
-     AResponse.CustomHeaders.AddPair('Access-Control-Allow-Origin','*');
+     AResponse.CustomHeaders.Add('Access-Control-Allow-Origin' + cNameValueSeparator + '*');
+    If Assigned(vCORSHeader) Then
+     Begin
+      If vCORSHeader.Count > 0 Then
+       Begin
+        For I := 0 To vCORSHeader.Count -1 Do
+         AResponse.CustomHeaders.Add(vCORSHeader.Names[I] + cNameValueSeparator + vCORSHeader.ValueFromIndex[I]);
+       End;
+     End;
    End;
+ End;
+Begin
+ ResultStream    := TStringStream.Create('');
+ vResponseHeader := TStringList.Create;
+ vCORSHeader     := TStringList.Create;
+ vResponseString := '';
+ vStream         := Nil;
+ vRedirect      := TRedirect(@Redirect);
+ Try
   vAuthRealm := '';//AResponse.Realm;
   vToken     := ARequest.Authorization;
   vRawHeader := Nil;
@@ -164,9 +181,11 @@ Begin
                    vResponseHeader,
                    vResponseString,
                    ResultStream,
+                   vCORSHeader,
                    vRedirect) Then
    Begin
     //AResponse.Realm   := vAuthRealm;
+    SetReplyCORS;
     AResponse.ContentType := vContentType;
      If (sCharSet <> '') Then
       Begin
@@ -205,6 +224,7 @@ Begin
   Else //Tratamento de Erros.
    Begin
     //AResponse.Realm := vAuthRealm;
+    SetReplyCORS;
     If (sCharSet <> '') Then
      Begin
       If Pos('utf8', Lowercase(sCharSet)) > 0 Then

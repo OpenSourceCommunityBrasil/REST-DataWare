@@ -1,2 +1,4 @@
-TRESTDWDRIVERZEOS BITMAP "..\icons\components\TRESTDWDRIVERZEOS.bmp"
-TRESTDWDRIVERZEOS16 BITMAP "..\icons\components\TRESTDWDRIVERZEOS16.bmp"
+TRESTDWZEOSDriver BITMAP "..\icons\components\drivers\TRESTDWZEOSDriver.bmp"
+TRESTDWZEOSDriver16 BITMAP "..\icons\components\drivers\TRESTDWZEOSDriver16.bmp"
+TRESTDWZeosPhysLink BITMAP "..\icons\components\drivers\phys\TRESTDWZeosPhysLink.bmp"
+TRESTDWZeosPhysLink16 BITMAP "..\icons\components\drivers\phys\TRESTDWZeosPhysLink16.bmp"

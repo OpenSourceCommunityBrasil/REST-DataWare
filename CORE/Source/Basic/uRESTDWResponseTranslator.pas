@@ -1,7 +1,7 @@
 unit uRESTDWResponseTranslator;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
-{$IFDEF FPC}
+{$I ..\..\Source\Includes\uRESTDW.inc}
+{$IFDEF RESTDWLAZARUS}
  {$mode objfpc}{$H+}
 {$ENDIF}
 
@@ -18,7 +18,6 @@ unit uRESTDWResponseTranslator;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -30,7 +29,7 @@ interface
 
 Uses
   SysUtils, Classes,
-  uRESTDWComponentBase, uRESTDWTools, uRESTDWConsts;
+  uRESTDWAbout, uRESTDWTools, uRESTDWConsts;
 
 Type
  TPrepareGet         = Procedure (Var AUrl          : String;
@@ -203,27 +202,23 @@ begin
 end;
 
 Function TRESTDWResponseTranslator.Open(ResquestType : TRequestType;
-                                    RequestURL   : String) : String;
+                                        RequestURL   : String) : String;
 Var
  vResult : TStringStream;
 Begin
- Result  := '';
- {$IFDEF FPC}
-  vResult  := TStringStream.Create('');
- {$ELSE}
-  {$if CompilerVersion > 21}
-   vResult := TStringStream.Create;
+  Result  := '';
+  {$IFDEF DELPHIXEUP}
+    vResult := TStringStream.Create('', TEncoding.UTF8);
   {$ELSE}
-   vResult := TStringStream.Create('');
-  {$IFEND}
- {$ENDIF}
+    vResult  := TStringStream.Create('');
+  {$ENDIF}
  Try
   Case ResquestType Of
    rtGet  : TRESTDWClientRESTBase(ClientREST).Get (RequestURL, Nil, vResult);
    rtPost : TRESTDWClientRESTBase(ClientREST).Post(RequestURL, Nil, vResult);
   End;
  Finally
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
    Result  := StringReplace(vResult.DataString, #10, '', [rfReplaceAll]);
   {$ELSE}
    Result  := StringReplace(vResult.DataString, #$A, '', [rfReplaceAll]);

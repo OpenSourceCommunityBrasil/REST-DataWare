@@ -1,7 +1,5 @@
 unit uRESTDWMD5;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
-
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -15,7 +13,6 @@ unit uRESTDWMD5;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -26,7 +23,6 @@ unit uRESTDWMD5;
 Interface
 
 Uses
-  {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
   SysUtils, Classes;
 
 Type
@@ -201,6 +197,7 @@ Begin
  a := a + b;
 End;
 
+{
 //procedure MD5Encode(Output: PByteArray; Input: PUINT4Array; Len: LongWord);
 //var
 // i, j: LongWord;
@@ -230,6 +227,7 @@ End;
 //  Inc(i);
 // End;
 //End;
+}
 
 procedure MD5_memcpy(Output: PByteArray; Input: PByteArray; Len: LongWord);
 Begin
@@ -241,6 +239,7 @@ Begin
  FillChar(Output^, Len, Byte(Value));
 End;
 
+{
 //procedure MD5Transform(State: PArray4UINT4; Buffer: PArray64Byte);
 //var
 // a, b, c, d: UINT4;
@@ -325,7 +324,7 @@ End;
 //
 // MD5_memset (PByteArray(@x), 0, SizeOf (x));
 //End;
-
+}
 
 procedure MD5Init(var Context: TMD5Context);
 Begin
@@ -336,10 +335,10 @@ Begin
  Context.state[3] := $10325476;
 End;
 
+{
 procedure MD5Update(var Context: TMD5Context; Input: PByteArray; InputLen: LongWord);
 var
  i, index, partLen: LongWord;
-
 Begin
  //index := LongWord( (context.count[0] shr 3) and $3F);
  //Inc(Context.count[0], UINT4(InputLen) shl 3);
@@ -359,7 +358,6 @@ Begin
  //MD5_memcpy(PByteArray(@Context.buffer[index]), PByteArray(@Input[i]), inputLen - i);
 End;
 
-
 procedure MD5Final(var Digest: TRESTDWMD5Digest; var Context: TMD5Context);
 var
  bits: array [0..7] of Byte;
@@ -373,6 +371,7 @@ Begin
  //MD5Encode(PByteArray(@Digest), PUINT4Array(@Context.state), 16);
  //MD5_memset(PByteArray(@Context), 0, SizeOf(Context));
 End;
+}
 
 Function MD5DigestToStr(const Digest: TRESTDWMD5Digest): string;
 var
@@ -417,12 +416,12 @@ Begin
   repeat
    ReadBytes:=Stream.Read(Buffer, SizeOf(Buffer));
    Inc(TotalBytes, ReadBytes);
-   MD5Update(Context, @Buffer, ReadBytes);
+//   MD5Update(Context, @Buffer, ReadBytes);
   until (ReadBytes = 0) or (TotalBytes = Size);
  finally
   Stream.Position :=  0; //Roniery-04/09/2022
  End;
- MD5Final(Result, Context);
+// MD5Final(Result, Context);
 End;
 
 Function MD5Buffer(const Buffer; Size: Integer): TRESTDWMD5Digest;
@@ -430,8 +429,8 @@ var
  Context: TMD5Context;
 Begin
  MD5Init(Context);
- MD5Update(Context, PByteArray(@Buffer), Size);
- MD5Final(Result, Context);
+// MD5Update(Context, PByteArray(@Buffer), Size);
+// MD5Final(Result, Context);
 End;
 
 Function MD5DigestCompare(const Digest1, Digest2: TRESTDWMD5Digest): Boolean;

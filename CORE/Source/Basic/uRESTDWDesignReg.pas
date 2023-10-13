@@ -1,6 +1,6 @@
 unit uRESTDWDesignReg;
 
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+{$I ..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -26,28 +26,25 @@ unit uRESTDWDesignReg;
 interface
 
 uses
-  {$IFDEF FPC}
+  {$IFDEF RESTDWLAZARUS}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
     LResources, LazFileUtils,  FormEditingIntf, PropEdits, lazideintf,
-    ProjectIntf, ComponentEditors, fpWeb,
+    ProjectIntf, ComponentEditors, fpWeb, TypInfo,
   {$ELSE}
-   Windows, StrEdit, RTLConsts, Db, DBReg, ToolsApi, DesignWindows,
-   DesignEditors, DSDesign, DesignIntf, ColnEdit,
-   {$IF CompilerVersion > 22}
-    vcl.Graphics,  ExptIntf,
+    Windows,
+   {$IFDEF DELPHIXE2UP}
+     vcl.Graphics,
    {$ELSE}
      Graphics, DbTables,
-   {$IFEND}
-   {$IFDEF COMPILER16_UP}UITypes,{$ENDIF}
+   {$ENDIF}
+  ToolsApi, DesignEditors, DSDesign, DesignIntf, ColnEdit,
   {$ENDIF}
-  Variants, TypInfo, SysUtils, Classes,
+  Db, SysUtils, Classes, Menus,
   uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWBasicDB,
-  uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWDataset, uRESTDWBufferDb,
-  uRESTDWComponentBase
+  uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWMemoryDataset, uRESTDWBufferDb,
+  uRESTDWAbout, uRESTDWDriverBase, uRESTDWAuthenticators;
 
-  ;
-
-{$IFNDEF CLR}
+{$IFNDEF RESTDWDELPHINET}
 Const
  varUString  = Succ(Succ(varString)); { Variant type code }
 {$ENDIF}
@@ -55,14 +52,6 @@ Const
 Var
  EnabledAllTableDefs : Boolean = False;
  LoadAndStoreToForm  : Boolean = False;
-
-{$IFNDEF FPC} //TODO
-Type
- TDWDSDesigner = class(TDSDesigner)
-Public
- Function DoCreateField(const FieldName : {$IF CompilerVersion > 17}WideString{$ELSE}String{$IFEND}; Origin: String): TField; Override;
-End;
-{$ENDIF}
 
 Type
  TAddFields = Procedure (All: Boolean) of Object;
@@ -121,6 +110,15 @@ Type
   Procedure Edit;                                 Override;
 End;
 
+Type
+  TDriverConnectionListProperty = class(TComponentProperty)
+  public
+    function  GetAttributes: TPropertyAttributes; override;
+    procedure GetValueList(List: TStrings); virtual;
+    procedure GetValues(Proc: TGetStrProc); override;
+  end;
+
+
 type
  TRESTDWServerEventsEditor = Class(TComponentEditor)
   Function  GetVerbCount       : Integer;  Override;
@@ -135,30 +133,34 @@ Type
   Procedure ExecuteVerb(Index : Integer); Override;
 End;
 
-{$IFNDEF FPC}
+{$IFNDEF RESTDWLAZARUS}
 Type
  TDSDesignerDW = Class(TDSDesigner)
  Private
  Public
-  {$if CompilerVersion > 17}
+  {$IFDEF DELPHI2006UP}
   Function  DoCreateField(const FieldName: WideString; Origin: string): TField; override;
   {$ELSE}
   Function  DoCreateField(const FieldName: String; Origin: string): TField; override;
-  {$IFEND}
-  {$IFNDEF FPC}
+  {$ENDIF}
   Function SupportsAggregates: Boolean; Override;
   Function SupportsInternalCalc: Boolean; Override;
-  {$ENDIF}
+  Procedure BeginUpdateFieldDefs; Override;
+  Procedure EndUpdateFieldDefs; Override;
+  Procedure InitializeMenu(Menu: TPopupMenu); Override;
+  Procedure UpdateMenus(Menu: TPopupMenu; EditState: TEditState); Override;
 End;
 
 Type
  TRESTDWClientSQLEditor = Class(TComponentEditor)
  Private
+  Procedure EditFields(DataSet: TDataSet);
  Public
   Procedure Edit; override;
   Function  GetVerbCount : Integer; Override;
   Function  GetVerb    (Index : Integer): String; Override;
   Procedure ExecuteVerb(Index : Integer); Override;
+
 End;
 {$ENDIF}
 
@@ -179,7 +181,7 @@ Public
 End;
 
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
 Type
  TRESTDWCGIApplicationDescriptor = Class(TProjectDescriptor)
  Public
@@ -217,7 +219,7 @@ Type
 
 Procedure Register;
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
 Resourcestring
   rsRESTDWCGIApplicati      = 'REST Dataware - CGI Application';
   rsRESTDWCGIApplicatiDesc  = 'REST Dataware - CGI Application%sA CGI (Common Gateway Interface) ' +
@@ -238,13 +240,12 @@ Var
 Implementation
 
 uses
-  {$IFDEF FPC} utemplateproglaz,{$ENDIF}
+  {$IFDEF RESTDWLAZARUS} utemplateproglaz,{$ENDIF}
    uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic, uRESTDWResponseTranslator,
    uRESTDWFieldSourceEditor, uRESTDWSqlEditor, uRESTDWUpdSqlEditor,
    uRESTDWJSONViewer;
 
-{$IFNDEF FPC}
-{$IFDEF  RTL240_UP}
+{$IFDEF DELPHIXE3UP}
 Var
  AboutBoxServices : IOTAAboutBoxServices = nil;
  AboutBoxIndex    : Integer = 0;
@@ -288,8 +289,8 @@ Begin
  End;
  bmp.Free;
 End;
-{$ENDIF}
 {$ELSE}
+{$IFDEF RESTDWLAZARUS}
 Constructor TRESTDWCGIApplicationDescriptor.Create;
 Begin
  inherited Create;
@@ -297,13 +298,10 @@ Begin
  Name  := 'REST Dataware - CGI Application';
 End;
 
-//Constructor TRESTDWCGIDatamodule.Create;
-//Begin
-// Inherited Create;
-// Name                    := 'RESTDWCGIWebModule';
-// ResourceClass           := Trestdwcgiwebmodule;
-// UseCreateFormStatements := True;
-//End;
+Function TRESTDWCGIApplicationDescriptor.GetLocalizedName : String;
+Begin
+ Result := rsRESTDWCGIApplicati;
+End;
 
 Constructor TRESTDWDatamodule.Create;
 Var
@@ -324,20 +322,10 @@ Begin
   End;
 End;
 
-Function TRESTDWCGIApplicationDescriptor.GetLocalizedName : String;
-Begin
- Result := rsRESTDWCGIApplicati;
-End;
-
 Function TRESTDWDatamodule.GetLocalizedName : String;
 Begin
  Result := rsRESTDWDatamodule;
 End;
-
-//Function TRESTDWCGIDatamodule.GetLocalizedName : String;
-//Begin
-// Result := rsRESTDWCGIDatamodule;
-//End;
 
 Function TRESTDWDatamodule.GetInterfaceUsesSection : String;
 Begin
@@ -345,14 +333,6 @@ Begin
  Result  := Result + ', SysTypes, uRESTDWBasicTypes, uRESTDWJSONObject,' + LineEnding;
  Result  := Result + '  uRESTDWParams, uRESTDWDataUtils, uRESTDWComponentEvents, uRESTDWDatamodule';
 End;
-
-//Function TRESTDWCGIDatamodule.GetInterfaceUsesSection : String;
-//Begin
-// Result  := 'SysUtils, Classes';
-// If GetResourceType = rtLRS Then
-//  Result :=  Result+ ', LResources, ';
-// Result  := Result + ', uRESTDWBase, httpdefs, fpHTTP, fpWeb, dmdwcgiserver, unit2';
-//End;
 
 Function TRESTDWDatamodule.GetInterfaceSource(Const Filename, SourceName, ResourceName : String) : String;
 Const
@@ -371,23 +351,6 @@ Begin
                    + '  ' + ResourceName + ': T' + ResourceName + ';' + LE + LE;
 End;
 
-//Function TRESTDWCGIDatamodule.GetInterfaceSource(Const Filename, SourceName, ResourceName : String) : String;
-//Const
-// LE = LineEnding;
-//Begin
-// Result := 'Type'+ LE
-//         + '  T'+ResourceName+' = class(Trestdwcgiwebmodule)'+LE
-//         + '  Private'+LE
-//         + LE
-//         + '  Public'+LE
-//         + LE
-//         + ' End;'+LE
-//         + LE;
-// If DeclareClassVariable Then
-//  Result := Result + 'Var' + LE
-//                   + '  ' + ResourceName + ': T' + ResourceName + ';' + LE + LE;
-//End;
-
 Function TRESTDWCGIApplicationDescriptor.GetLocalizedDescription : String;
 Begin
  Result := Format(rsRESTDWCGIApplicatiDesc, [#13#13]);
@@ -397,11 +360,6 @@ Function TRESTDWDatamodule.GetLocalizedDescription : String;
 Begin
  Result := Format(rsRESTDWDatamoduleADa, [#13#13]);
 End;
-
-//Function TRESTDWCGIDatamodule.GetLocalizedDescription : String;
-//Begin
-// Result := Format(rsRESTDWCGIDatamoduleADa, [#13#13]);
-//End;
 
 Function TRESTDWCGIApplicationDescriptor.InitProject(AProject : TLazProject) : TModalResult;
 Var
@@ -433,68 +391,75 @@ Begin
  Result := Inherited GetImplementationSource(FileName, SourceName, ResourceName);
 End;
 
-//Function TRESTDWCGIDatamodule.GetImplementationSource(const Filename, SourceName, ResourceName : String) : String;
-//Var
-// ResourceFilename: String;
-//Begin
-// Case GetResourceType Of
-//  rtLRS :
-//   Begin
-//    ResourceFilename := TrimFilename(ExtractFilenameOnly(Filename) + DefaultResFileExt);
-//    Result           := 'Initialization' + LineEnding + '  {$I ' + ResourceFilename + '}' + LineEnding + LineEnding;
-//   End;
-//  rtRes : Result := '{$R *.lfm}' + LineEnding + LineEnding;
-//  Else    Result := '';
-// End;
-// Result := Result + 'Initialization' + LineEnding + ' RegisterHTTPModule('''', T' + ResourceName + ');' + LineEnding;
-//End;
-
 Function TRESTDWCGIApplicationDescriptor.CreateStartFiles(AProject : TLazProject): TModalResult;
 Begin
- //LazarusIDE.DoNewEditorFile(PDRESTDWCGIDatamodule, '', '',
- //                           [nfIsPartOfProject, nfOpenInEditor, nfCreateDefaultSrc]);
  LazarusIDE.DoNewEditorFile(PDRESTDWDatamodule, '', '',
                             [nfIsPartOfProject, nfOpenInEditor, nfCreateDefaultSrc]);
  Result:= mrOK;
 End;
 {$ENDIF}
+{$ENDIF}
 
-{$IFNDEF FPC}
-procedure TRESTDWClientSQLEditor.Edit;
+
+{$IFNDEF RESTDWLAZARUS}
+Procedure TDSDesignerDW.BeginUpdateFieldDefs;
+Var
+ Idx: Integer;
 Begin
- {$IFNDEF FPC}
-  {$IF CompilerVersion > 21}
-   TRESTDWClientSQL(Component).SetInDesignEvents(True);
-  {$IFEND}
+ Inherited;
+ For Idx := Dataset.FieldDefs.Count -1 DownTo 0 do
+  Begin
+   If Trim(Dataset.FieldDefs[Idx].Name) = '' then
+    Dataset.FieldDefs.Delete(Idx);
+  End;
+End;
+
+Procedure TDSDesignerDW.EndUpdateFieldDefs;
+Begin
+ Inherited;
+ If TRESTDWClientSQL(DataSet).Active Then
+   TRESTDWClientSQL(DataSet).Close;
+End;
+
+Procedure TDSDesignerDW.InitializeMenu(Menu: TPopupMenu);
+Begin
+ Inherited;
+ // Ao clicar duas vezes no componente RESTDWClientSQL
+ // ou ao selecionar no popup menu opção "Fields Editor".
+End;
+
+Procedure TDSDesignerDW.UpdateMenus(Menu: TPopupMenu; EditState: TEditState);
+Begin
+ // Ao acionar o popup menu dos Fields persistents: (Add, Add All, New Field)
+ Inherited;
+ If not TRESTDWClientSQL(DataSet).Active Then
+   TRESTDWClientSQL(DataSet).Open;
+End;
+
+Procedure TRESTDWClientSQLEditor.EditFields(DataSet: TDataSet);
+begin
+ {$IFDEF DELPHIXEUP}
+  TRESTDWClientSQL(Component).SetInDesignEvents(True);
  {$ENDIF}
  Try
-  {$IFNDEF FPC}
-   {$IF CompilerVersion < 21}
+  {$IFNDEF DELPHIXEUP}
     TRESTDWClientSQL(Component).Close;
     TRESTDWClientSQL(Component).CreateDatasetFromList;
-   {$IFEND}
   {$ENDIF}
   ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
  Finally
-  {$IFNDEF FPC}
-   {$IF CompilerVersion > 21}
+  {$IFDEF DELPHIXEUP}
    TRESTDWClientSQL(Component).SetInDesignEvents(False);
-   {$IFEND}
   {$ENDIF}
  End;
+End;
+
+procedure TRESTDWClientSQLEditor.Edit;
+Begin
+ EditFields(TDataSet(Component));
 end;
 
 procedure TRESTDWClientSQLEditor.ExecuteVerb(Index: Integer);
- Procedure EditFields(DataSet: TDataSet);
- begin
-  {$IFNDEF FPC}
-   {$IF CompilerVersion < 21}
-    TRESTDWClientSQL(DataSet).Close;
-    TRESTDWClientSQL(DataSet).CreateDatasetFromList;
-   {$IFEND}
-  {$ENDIF}
-  ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
- End;
 Begin
  Case Index of
   0 : EditFields(TDataSet(Component));
@@ -513,11 +478,11 @@ Begin
  Result := 1;
 End;
 
-{$if CompilerVersion > 17}
+{$IFDEF DELPHI2006UP}
 Function  TDSDesignerDW.DoCreateField(const FieldName: WideString; Origin: string): TField;
 {$ELSE}
 Function  TDSDesignerDW.DoCreateField(const FieldName: String; Origin: string): TField;
-{$IFEND}
+{$ENDIF}
 Var
   F: TField;
   I: Integer;
@@ -629,42 +594,8 @@ Begin
 end;
 
 Procedure TPoolersListCDF.GetValues(Proc : TGetStrProc);
-Var
- vLista : TStringList;
- I      : Integer;
 Begin
- //Provide a list of Poolers
- vLista := Nil;
-// If GetComponent(0) is TRESTDWConnectionServer Then
-//  Begin
-//   With GetComponent(0) as TRESTDWConnectionServer Do
-//    Begin
-//     vLista := TRESTDWConnectionServer(GetComponent(0)).PoolerList;
-//     Try
-//      If Assigned(vLista) Then
-//       For I := 0 To vLista.Count -1 Do
-//        Proc (vLista[I]);
-//     Finally
-//      If Assigned(vLista) Then
-//       FreeAndNil(vLista);
-//     End;
-//    End;
-//  End
-// Else If GetComponent(0) is TRESTDWConnectionParams Then
-//  Begin
-//   With GetComponent(0) as TRESTDWConnectionParams Do
-//    Begin
-//     vLista := TRESTDWConnectionParams(GetComponent(0)).PoolerList;
-//     Try
-//      If Assigned(vLista) Then
-//       For I := 0 To vLista.Count -1 Do
-//        Proc (vLista[I]);
-//     Finally
-//      If Assigned(vLista) Then
-//       FreeAndNil(vLista);
-//     End;
-//    End;
-//  End;
+
 End;
 
 Procedure TTableList.GetValues(Proc : TGetStrProc);
@@ -674,17 +605,35 @@ Var
 Begin
  //Provide a list of Tables
  vLista := Nil;
- With GetComponent(0) as TRESTDWTable Do
+ If GetComponent(0) is TRESTDWTable Then
   Begin
-   Try
-    If TRESTDWTable(GetComponent(0)).DataBase <> Nil Then
-     Begin
-      TRESTDWTable(GetComponent(0)).DataBase.GetTableNames(vLista);
-      For I := 0 To vLista.Count -1 Do
-       Proc (vLista[I]);
+   With GetComponent(0) as TRESTDWTable Do
+    Begin
+     Try
+      If TRESTDWTable(GetComponent(0)).DataBase <> Nil Then
+       Begin
+        TRESTDWTable(GetComponent(0)).DataBase.GetTableNames(vLista);
+        For I := 0 To vLista.Count -1 Do
+        Proc (vLista[I]);
+       End;
+     Except
      End;
-   Except
-   End;
+    End;
+  End
+ Else If GetComponent(0) is TRESTDWClientSQL Then
+  Begin
+   With GetComponent(0) as TRESTDWClientSQL Do
+    Begin
+     Try
+      If TRESTDWClientSQL(GetComponent(0)).DataBase <> Nil Then
+       Begin
+        TRESTDWClientSQL(GetComponent(0)).DataBase.GetTableNames(vLista);
+        For I := 0 To vLista.Count -1 Do
+        Proc (vLista[I]);
+       End;
+     Except
+     End;
+    End;
   End;
 End;
 
@@ -708,7 +657,7 @@ End;
 {Ico Testando }
 {Editor de Proriedades de Componente para mostrar o AboutDW}
 Type
- TDWAboutDialogProperty = class({$IFDEF FPC}TClassPropertyEditor{$ELSE}TPropertyEditor{$ENDIF})
+ TDWAboutDialogProperty = class({$IFDEF RESTDWLAZARUS}TClassPropertyEditor{$ELSE}TPropertyEditor{$ENDIF})
 Public
  Procedure Edit; override;
  Function  GetAttributes : TPropertyAttributes; Override;
@@ -733,7 +682,7 @@ End;
 procedure TRESTDWServerContextEditor.ExecuteVerb(Index: Integer);
 Begin
  Case Index of
-  0 : {$IFNDEF FPC}
+  0 : {$IFNDEF RESTDWLAZARUS}
        ShowCollectionEditor(Designer, Component, TRESTDWServerContext(Component).ContextList, 'ContextList');
       {$ELSE}
        TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWServerContext(Component).ContextList, Component, 'ContextList');
@@ -744,7 +693,7 @@ end;
 procedure TRESTDWContextRulesEditor.ExecuteVerb(Index: Integer);
 Begin
  Case Index of
-  0 : {$IFNDEF FPC}
+  0 : {$IFNDEF RESTDWLAZARUS}
        ShowCollectionEditor(Designer, Component, TRESTDWContextRules(Component).Items, 'Items');
       {$ELSE}
        TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWContextRules(Component).Items, Component, 'Items');
@@ -778,7 +727,7 @@ End;
 
 Procedure Register;
 Begin
- {$IFNDEF FPC}
+ {$IFNDEF RESTDWLAZARUS}
   RegisterNoIcon([TServerMethodDataModule]);
   RegisterCustomModule(TServerMethodDataModule, TCustomModule);
  {$ELSE}
@@ -791,33 +740,36 @@ Begin
 //  FormEditingHook.RegisterDesignerBaseClass(TServerMethodDataModule);
  {$ENDIF}
 // RegisterComponents('REST Dataware - Service',     [TRESTDWServiceNotification]);
- RegisterComponents('REST Dataware - Client''s',   [TRESTDWClientEvents]);
- RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents, TRESTDWServerContext, TRESTDWContextRules]);
+ RegisterComponents('REST Dataware - Client',      [TRESTDWClientEvents]);
+ RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents,       TRESTDWServerContext, TRESTDWContextRules]);
  RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
-
- RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,        TRESTDWClientSQL,  TRESTDWMemtable, TRESTDWTable,      TRESTDWUpdateSQL,
-                                                   TRESTDWMassiveSQLCache, TRESTDWStoredProc, TRESTDWPoolerList, TRESTDWMassiveCache,  TRESTDWBatchMove]);
+ RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,           TRESTDWMemTable,      TRESTDWClientSQL,
+                                                    TRESTDWTable,              TRESTDWUpdateSQL,     TRESTDWMassiveSQLCache,
+                                                    TRESTDWStoredProcedure,    TRESTDWMassiveCache,  TRESTDWBatchMove]);
+ RegisterComponents('REST Dataware - Authenticators', [TRESTDWAuthBasic,       TRESTDWAuthToken,     TRESTDWAuthOAuth]);
 // AddIDEMenu;//Menu do REST Debugger
- {$IFNDEF FPC}
+ {$IFNDEF RESTDWLAZARUS}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
-//  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
 //  RegisterPackageWizard(TCustomMenuItemDW.Create);//Request Debbuger
  {$ELSE}
   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
 //  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
  {$ENDIF}
+  RegisterPropertyEditor(TypeInfo(TComponent),        TRESTDWDriverBase,         'Connection',      TDriverConnectionListProperty);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWTable,              'Tablename',       TTableList);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientEvents,       'ServerEventName', TServerEventsList);
   RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'SQL',             TRESTDWSQLEditor);
   RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'RelationFields',  TRESTDWFieldsRelationEditor);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientSQL,          'SequenceField',   TRESTDWFieldsList);
+  RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientSQL,          'UpdateTableName', TTableList);
+
   RegisterComponentEditor(TRESTDWServerEvents,        TComponentEditorClass(TRESTDWServerEventsEditor));
   RegisterComponentEditor(TRESTDWClientEvents,        TComponentEditorClass(TRESTDWClientEventsEditor));
   RegisterComponentEditor(TRESTDWResponseTranslator,  TComponentEditorClass(TRESTDWJSONViewer));
   RegisterPropertyEditor (TypeInfo(TRESTDWComponent), TRESTDWResponseTranslator, 'ClientREST', TRESTDWClientRESTList);
   RegisterComponentEditor(TRESTDWServerContext,       TComponentEditorClass(TRESTDWServerContextEditor));
   RegisterComponentEditor(TRESTDWContextRules,        TComponentEditorClass(TRESTDWContextRulesEditor));
- {$IFNDEF FPC}
+ {$IFNDEF RESTDWLAZARUS}
   RegisterComponentEditor(TRESTDWClientSQL,         TRESTDWClientSQLEditor);
   RegisterComponentEditor(TRESTDWServerContext,     TRESTDWServerContextEditor);
   RegisterComponentEditor(TRESTDWContextRules,      TRESTDWContextRulesEditor);
@@ -831,7 +783,7 @@ begin
  Inherited;
  Case Index of
   0 : Begin
-       {$IFNDEF FPC}
+       {$IFNDEF RESTDWLAZARUS}
         ShowCollectionEditor(Designer, Component, (Component as TRESTDWServerEvents).Events, 'Events');
        {$ELSE}
         TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWServerEvents(Component).Events, Component, 'Events');
@@ -857,7 +809,7 @@ Begin
  Inherited;
  Case Index of
    0 : Begin
-        {$IFNDEF FPC}
+        {$IFNDEF RESTDWLAZARUS}
          ShowCollectionEditor(Designer, Component, TRESTDWClientEvents(Component).Events, 'Events');
         {$ELSE}
          TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWClientEvents(Component).Events,Component, 'Events');
@@ -881,15 +833,6 @@ Function TRESTDWClientEventsEditor.GetVerbCount: Integer;
 Begin
  Result := 3;
 End;
-
-{$IFNDEF FPC}
-Function TDWDSDesigner.DoCreateField(Const FieldName : {$IF CompilerVersion > 17}WideString{$ELSE}String{$IFEND}; Origin: string): TField;
-Begin
-// TDWCustomDataSet(DataSet).DesignNotify(FieldName, 0);
-// Result  := Inherited DoCreateField(FieldName, Origin);
-// TDWCustomDataSet(DataSet).DesignNotify(FieldName, 104);
-End;
-{$ENDIF}
 
 { TServerEventsList }
 
@@ -931,22 +874,8 @@ begin
 end;
 
 procedure TServerEventsListCV.GetValues(Proc: TGetStrProc);
-Var
- vLista : TStringList;
- I      : Integer;
 Begin
- //Provide a list of Poolers
- vLista := Nil;
-// With GetComponent(0) as TRESTDWConnectionServerCP Do
-//  Begin
-//   vLista := TRESTDWConnectionServerCP(GetComponent(0)).GetPoolerList;
-//   Try
-//    For I := 0 To vLista.Count -1 Do
-//     Proc (vLista[I]);
-//   Except
-//   End;
-//   FreeAndNil(vLista);
-//  End;
+
 End;
 
 procedure TServerEventsList.GetValues(Proc: TGetStrProc);
@@ -1034,7 +963,7 @@ End;
 
 procedure TRESTDWFieldsList.GetValues(Proc: TGetStrProc);
 Var
- I      : Integer;
+ I : Integer;
 Begin
  //Provide a list of Poolers
  With GetComponent(0) as TRESTDWClientSQL Do
@@ -1055,10 +984,10 @@ Begin
   End;
 End;
 
-{$IFDEF FPC}
+{$IFDEF RESTDWLAZARUS}
  Procedure UnlistPublishedProperty (ComponentClass:TPersistentClass; const PropertyName:String);
  var
-   pi :PPropInfo;
+   pi : PPropInfo;
  begin
    pi := TypInfo.GetPropInfo (ComponentClass, PropertyName);
    if (pi <> nil) then
@@ -1077,7 +1006,7 @@ Var
  Finded    : Boolean;
 Begin
 // COwner := FormEditor.FormDesigner.GetRoot;
- {$IFDEF FPC}
+ {$IFDEF RESTDWLAZARUS}
  COwner := TComponent(GetComponent(0)).GetParentComponent;
  {$ELSE}
  COwner := Designer.GetRoot;
@@ -1095,23 +1024,62 @@ Begin
   End;
 End;
 
+{ TDriverConnectionListProperty }
+
+function TDriverConnectionListProperty.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paValueList, paSortList];
+end;
+
+procedure TDriverConnectionListProperty.GetValueList(List: TStrings);
+var
+  comp : TComponent;
+  drv : TRESTDWDriverBase;
+  i : integer;
+begin
+  drv  := TRESTDWDriverBase(GetComponent(0));
+  comp := drv.Owner;
+  if Assigned(Comp) then begin
+    i := 0;
+    while i < comp.ComponentCount do begin
+      if drv.compConnIsValid(comp.Components[i]) then
+        List.Add(comp.Components[i].Name);
+
+      i := i + 1;
+    end;
+  end;
+end;
+
+procedure TDriverConnectionListProperty.GetValues(Proc: TGetStrProc);
+var
+  i: Integer;
+  Values: TStringList;
+begin
+  Values := TStringList.Create;
+  try
+    GetValueList(Values);
+    for i := 0 to Pred(Values.Count) do
+      Proc(Values[i]);
+  finally
+    Values.Free;
+  end;
+end;
+
 initialization
- {$IFNDEF FPC}
-  {$IFDEF  RTL240_UP}
+  {$IFDEF DELPHIXE3UP}
  	RegisterAboutBox;
-   AddSplash;
-  {$ENDIF}
+  AddSplash;
  {$ENDIF}
- {$IFDEF FPC}
-  {$I restdatawarecomponents.lrs}
+ {$IFDEF RESTDWLAZARUS}
+   {$I RESTDataWareComponents.lrs}
  {$ENDIF}
  UnlistPublishedProperty(TRESTDWClientSQL,  'FieldDefs');
  UnlistPublishedProperty(TRESTDWClientSQL,  'Options');
- UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceName');
- UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceField');
- UnlistPublishedProperty(TRESTDWStoredProc, 'OnWriterProcess');
- UnlistPublishedProperty(TRESTDWStoredProc, 'FieldDefs');
- UnlistPublishedProperty(TRESTDWStoredProc, 'Options');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceName');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceField');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'OnWriterProcess');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'FieldDefs');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'Options');
  UnlistPublishedProperty(TRESTDWClientSQL,  'CachedUpdates');
  UnlistPublishedProperty(TRESTDWClientSQL,  'MasterSource');
  UnlistPublishedProperty(TRESTDWClientSQL,  'MasterFields');
@@ -1130,26 +1098,22 @@ initialization
  UnlistPublishedProperty(TRESTDWClientSQL,  'FieldOptions');
  UnlistPublishedProperty(TRESTDWClientSQL,  'Constraints');
  UnlistPublishedProperty(TRESTDWClientSQL,  'ConstraintsEnabled');
- UnlistPublishedProperty(TRESTDWStoredProc, 'StoreDefs');
- UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceName');
- UnlistPublishedProperty(TRESTDWStoredProc, 'SequenceField');
- UnlistPublishedProperty(TRESTDWStoredProc, 'OnWriterProcess');
- UnlistPublishedProperty(TRESTDWStoredProc, 'UpdateOptions');
- UnlistPublishedProperty(TRESTDWStoredProc, 'FetchOptions');
- UnlistPublishedProperty(TRESTDWStoredProc, 'ObjectView');
- UnlistPublishedProperty(TRESTDWStoredProc, 'ResourceOptions');
- UnlistPublishedProperty(TRESTDWStoredProc, 'CachedUpdates');
- UnlistPublishedProperty(TRESTDWStoredProc, 'MasterSource');
- UnlistPublishedProperty(TRESTDWStoredProc, 'MasterFields');
- UnlistPublishedProperty(TRESTDWStoredProc, 'DetailFields');
- UnlistPublishedProperty(TRESTDWStoredProc, 'ActiveStoredUsage');
- UnlistPublishedProperty(TRESTDWStoredProc, 'Adapter');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'StoreDefs');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceName');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceField');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'OnWriterProcess');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'UpdateOptions');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'FetchOptions');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'ObjectView');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'ResourceOptions');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'CachedUpdates');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'MasterSource');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'MasterFields');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'DetailFields');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'ActiveStoredUsage');
+ UnlistPublishedProperty(TRESTDWStoredProcedure, 'Adapter');
 
 Finalization
- {$IFNDEF FPC}
- {$IFDEF  RTL240_UP}
-	UnregisterAboutBox;
- {$ENDIF}
- {$ENDIF}
+ {$IFDEF DELPHIXE3UP}UnregisterAboutBox; {$ENDIF}
 
 end.

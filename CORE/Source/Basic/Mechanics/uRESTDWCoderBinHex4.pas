@@ -1,6 +1,6 @@
 unit uRESTDWCoderBinHex4;
 
-{$I ..\..\Includes\uRESTDWPlataform.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 
 {
   REST Dataware .
@@ -15,7 +15,6 @@ unit uRESTDWCoderBinHex4;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -27,7 +26,7 @@ Interface
 
 Uses
  Classes, SysUtils, uRESTDWException, uRESTDWCoder, uRESTDWCoder3to4, uRESTDWTools,
- uRESTDWBasicTypes;
+ uRESTDWBasicTypes, uRESTDWProtoTypes;
 
  Type
   TRESTDWEncoderBinHex4 = Class(TRESTDWEncoder3to4)
