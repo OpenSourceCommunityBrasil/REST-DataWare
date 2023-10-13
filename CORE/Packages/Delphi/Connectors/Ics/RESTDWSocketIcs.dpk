@@ -30,7 +30,8 @@ package RESTDWSocketIcs;
 {$IMPLICITBUILD ON}
 
 requires
-  RESTDWCore;
+  RESTDWCore,
+  vcl;
 
 contains
   uRESTDWIcsBase in '..\..\..\..\Source\Sockets\Ics\uRESTDWIcsBase.pas';

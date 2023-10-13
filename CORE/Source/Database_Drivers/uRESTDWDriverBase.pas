@@ -1,4 +1,4 @@
-﻿unit uRESTDWDriverBase;
+unit uRESTDWDriverBase;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -98,6 +98,9 @@ Type
  private
   FParamsList : TStringList;
   FStorageDataType : TRESTDWStorageBase;
+  {$IFDEF FPC}
+   FDatabaseCharSet: TDatabaseCharSet;
+  {$ENDIF}
   function getRDWDrvParam(idx: integer): TRDWDrvParam;
  Protected
   Function  getFields                     : TFields; Virtual;
@@ -150,6 +153,9 @@ Type
   property StorageDataType : TRESTDWStorageBase read FStorageDataType write FStorageDataType;
  Published
   Property Fields : TFields Read getFields;
+  {$IFDEF FPC}
+   Property DatabaseCharSet : TDatabaseCharSet Read FDatabaseCharSet Write FDatabaseCharSet;
+  {$ENDIF}
  End;
  { TRESTDWDrvStoreProc }
   TRESTDWDrvStoreProc = Class(TRESTDWDrvDataset)
@@ -187,9 +193,10 @@ Type
   { TRESTDWDriverBase }
   TRESTDWDriverBase = Class(TRESTDWComponent)
  Private
-  FConnection : TComponent;
-  FServerMethod : TServerMethodDataModule;
-  FStorageDataType : TRESTDWStorageBase;
+  FConnection          : TComponent;
+  FServerMethod        : TServerMethodDataModule;
+  FStorageDataType     : TRESTDWStorageBase;
+  vDatabaseType        : TRESTDWDatabaseType;
   vStrsTrim,
   vStrsEmpty2Null,
   vStrsTrim2Len,
@@ -251,6 +258,7 @@ Type
 
   Function compConnIsValid(comp : TComponent) : boolean; virtual;
   Function  getConectionType : TRESTDWDatabaseType; Virtual;
+  Procedure setConectionType(aValue : TRESTDWDatabaseType); Virtual;
   Function  getDatabaseInfo  : TRESTDWDatabaseInfo; Virtual;
   Function  getQuery : TRESTDWDrvQuery; Overload; Virtual;
   Function  getQuery(AUnidir : boolean) : TRESTDWDrvQuery; Overload; Virtual;
@@ -387,26 +395,26 @@ Type
                                    Massivedataset         : TMassivedatasetBuffer;
                                    MassiveCache           : Boolean = False);
 
-  property ServerMethod  : TServerMethodDataModule read FServerMethod;
-  property StorageDataType     : TRESTDWStorageBase   Read FStorageDataType       Write FStorageDataType;
+  Property ServerMethod        : TServerMethodDataModule Read FServerMethod;
+  Property StorageDataType     : TRESTDWStorageBase      Read FStorageDataType       Write FStorageDataType;
  Published
-  Property Connection          : TComponent           read FConnection            write setConnection;
-
-  Property StrsTrim            : Boolean              Read vStrsTrim              Write vStrsTrim;
-  Property StrsEmpty2Null      : Boolean              Read vStrsEmpty2Null        Write vStrsEmpty2Null;
-  Property StrsTrim2Len        : Boolean              Read vStrsTrim2Len          Write vStrsTrim2Len;
-  Property Compression         : Boolean              Read vCompression           Write vCompression;
-  Property EncodeStringsJSON   : Boolean              Read vEncodeStrings         Write vEncodeStrings;
-  Property Encoding            : TEncodeSelect        Read vEncoding              Write vEncoding;
-  Property ParamCreate         : Boolean              Read vParamCreate           Write vParamCreate;
+  Property Connection          : TComponent              Read FConnection            Write setConnection;
+  Property ConectionType       : TRESTDWDatabaseType     Read getConectionType       Write setConectionType;
+  Property StrsTrim            : Boolean                 Read vStrsTrim              Write vStrsTrim;
+  Property StrsEmpty2Null      : Boolean                 Read vStrsEmpty2Null        Write vStrsEmpty2Null;
+  Property StrsTrim2Len        : Boolean                 Read vStrsTrim2Len          Write vStrsTrim2Len;
+  Property Compression         : Boolean                 Read vCompression           Write vCompression;
+  Property EncodeStringsJSON   : Boolean                 Read vEncodeStrings         Write vEncodeStrings;
+  Property Encoding            : TEncodeSelect           Read vEncoding              Write vEncoding;
+  Property ParamCreate         : Boolean                 Read vParamCreate           Write vParamCreate;
   {$IFDEF RESTDWLAZARUS}
-  Property DatabaseCharSet     : TDatabaseCharSet     Read vDatabaseCharSet       Write vDatabaseCharSet;
+  Property DatabaseCharSet     : TDatabaseCharSet        Read vDatabaseCharSet       Write vDatabaseCharSet;
   {$ENDIF}
-  Property CommitRecords       : Integer              Read vCommitRecords         Write vCommitRecords;
-  Property OnPrepareConnection : TOnPrepareConnection Read vOnPrepareConnection   Write vOnPrepareConnection;
-  Property OnTableBeforeOpen   : TOnTableBeforeOpen   Read vOnTableBeforeOpen     Write vOnTableBeforeOpen;
-  Property OnQueryBeforeOpen   : TOnQueryBeforeOpen   Read vOnQueryBeforeOpen     Write vOnQueryBeforeOpen;
-  Property OnQueryException    : TOnQueryException    Read vOnQueryException      Write vOnQueryException;
+  Property CommitRecords       : Integer                 Read vCommitRecords         Write vCommitRecords;
+  Property OnPrepareConnection : TOnPrepareConnection    Read vOnPrepareConnection   Write vOnPrepareConnection;
+  Property OnTableBeforeOpen   : TOnTableBeforeOpen      Read vOnTableBeforeOpen     Write vOnTableBeforeOpen;
+  Property OnQueryBeforeOpen   : TOnQueryBeforeOpen      Read vOnQueryBeforeOpen     Write vOnQueryBeforeOpen;
+  Property OnQueryException    : TOnQueryException       Read vOnQueryException      Write vOnQueryException;
  End;
 
 Implementation
@@ -480,6 +488,9 @@ begin
   FParamsList := TStringList.Create;
   FParamsList.Sorted := True;
   FStorageDataType := nil;
+  {$IFDEF FPC}
+   FDatabaseCharSet := csUndefined;
+  {$ENDIF}
 end;
 
 Procedure TRESTDWDrvDataset.createSequencedField(seqname,
@@ -595,10 +606,24 @@ begin
                     dwftFmtMemo] then begin
               if (not DWParams[I].IsNull) then
               Begin
-                if vParam.RESTDWDataTypeParam in [dwftMemo] then
-                 vParam.Value := utf8tostring(DecodeStrings(DWParams[I].AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
-                else
-                 vParam.Value := utf8tostring(DWParams[I].AsString);
+                {$IFNDEF FPC}
+                 {$IFDEF DELPHI2010UP}
+                  if vParam.RESTDWDataTypeParam in [dwftMemo] then
+                   vParam.Value := utf8tostring(DecodeStrings(DWParams[I].AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
+                  else
+                   vParam.Value := utf8tostring(DWParams[I].AsString);
+                 {$ELSE}
+                  if vParam.RESTDWDataTypeParam in [dwftMemo] then
+                   vParam.Value := DecodeStrings(DWParams[I].AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
+                  else
+                   vParam.Value := DWParams[I].AsString;
+                 {$ENDIF}
+                {$ELSE}
+                 if vParam.RESTDWDataTypeParam in [dwftMemo] then
+                  vParam.Value := utf8tostring(DecodeStrings(DWParams[I].AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
+                 else
+                  vParam.Value := utf8tostring(DWParams[I].AsString);
+                {$ENDIF}
               End
               Else
                vParam.Clear;
@@ -694,6 +719,9 @@ begin
   qry := TDataSet(Self.Owner);
   if FStorageDataType = nil then begin
     stor := TRESTDWStorageBin.Create(nil);
+    {$IFDEF FPC}
+    stor.DatabaseCharSet := DatabaseCharSet;
+    {$ENDIF}
     try
       stor.EncodeStrs := False;
       stor.SaveToStream(qry, stream);
@@ -914,9 +942,15 @@ End;
 
 { TRESTDWDriverBase }
 
+Procedure TRESTDWDriverBase.setConectionType(aValue : TRESTDWDatabaseType);
+Begin
+ vDatabaseType := aValue;
+End;
+
 function TRESTDWDriverBase.getConectionType : TRESTDWDatabaseType;
 Begin
- Result := dbtUndefined;
+ Result := vDatabaseType;//        : TRESTDWDatabaseType;
+// Result := dbtUndefined;
 End;
 
 function TRESTDWDriverBase.getDatabaseInfo : TRESTDWDatabaseInfo;
@@ -2591,6 +2625,9 @@ begin
 
           try
             vTempQuery.FStorageDataType := FStorageDataType;
+            {$IFDEF FPC}
+             vTempQuery.DatabaseCharSet       := DatabaseCharSet;
+            {$ENDIF}
             vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
             BinaryBlob.Position := 0;
           finally
@@ -2704,6 +2741,9 @@ begin
           BinaryBlob := TMemoryStream.Create;
         try
           vTempQuery.FStorageDataType := FStorageDataType;
+          {$IFDEF FPC}
+           vTempQuery.DatabaseCharSet       := DatabaseCharSet;
+          {$ENDIF}
           vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
           BinaryBlob.Position := 0;
         finally
@@ -3695,6 +3735,9 @@ Begin
       vStream := TMemoryStream.Create;
       Try
        vTempQuery.FStorageDataType := FStorageDataType;
+       {$IFDEF FPC}
+        vTempQuery.DatabaseCharSet       := DatabaseCharSet;
+       {$ENDIF}
        vTempQuery.SaveToStreamCompatibleMode(vStream);
        vStream.Position := 0;
       Finally
@@ -3823,6 +3866,9 @@ Begin
     vTempQuery.Open;
     vStream := TMemoryStream.Create;
     Try
+     {$IFDEF FPC}
+      vTempQuery.DatabaseCharSet       := DatabaseCharSet;
+     {$ENDIF}
      vTempQuery.SaveToStreamCompatibleMode(vStream);
      vStream.Position := 0;
      BufferOutStream.InputStream(vStream);
@@ -3860,6 +3906,7 @@ begin
   {$IFDEF RESTDWLAZARUS}
     vDatabaseCharSet   := csUndefined;
   {$ENDIF}
+  vDatabaseType        := dbtUndefined;
   vCommitRecords       := 100;
   vOnTableBeforeOpen   := Nil;
   vOnPrepareConnection := Nil;

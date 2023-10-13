@@ -1495,7 +1495,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                           If Field.IsNull Then
                            MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Null
                           Else If Trim(Field.AsString) <> '' Then
-                           MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.AsDateTime
+                           MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Field.Value
                           Else
                            MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
                          End
@@ -1513,7 +1513,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
                            End
                           Else
                            Begin
-                            If  ((MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> Field.Value)   Or
+                            If  ((MassiveLineBuff.vMassiveValues.Items[I + 1].Value <> Field.AsDateTime)   Or
                                 (MassiveLineBuff.vMassiveValues.Items[I + 1].isnull <> Field.IsNull)) Then
                              Begin
                               If Trim(Field.AsString) <> '' Then
@@ -2330,7 +2330,7 @@ Var
                                               ovWideMemo, ovFixedChar, ovFixedWideChar] Then
                MassiveValue.Value := vTempValue
               Else If MassiveValue.vJSONValue.ObjectValue in [ovDate, ovTime, ovDateTime, ovTimeStamp] then     // ajuste massive
-               MassiveValue.Value := UnixToDateTime(StrToInt64(vTempValue))
+               MassiveValue.Value := vTempValue //UnixToDateTime(StrToInt64(vTempValue))
               Else
                MassiveValue.Value := vTempValue;
              End;
@@ -3381,9 +3381,11 @@ Begin
                    If (vValue <> Null) And (Trim(vValue) <> cNullvalue) and (Trim(vValue) <> '') Then
                     Begin
                      vValue := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-                     {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHI2009UP)}}
-                     vValue := utf8Decode(vValue);
-                     {$IFEND}
+                     {$IFNDEF FPC}
+                      {$IFDEF DELPHI2009UP}
+                       vValue := utf8Decode(vValue);
+                      {$ENDIF}
+                     {$ENDIF}
                      If TRESTDWTable(Dataset).FindField(TRESTDWJSONInterfaceObject(bJsonValueY).Pairs[0].Name).Size > 0 Then
                       TRESTDWTable(Dataset).FindField(TRESTDWJSONInterfaceObject(bJsonValueY).Pairs[0].Name).AsString := Copy(vValue, 1, TRESTDWTable(Dataset).FindField(TRESTDWJSONInterfaceObject(bJsonValueY).Pairs[0].Name).Size)
                      Else

@@ -818,14 +818,28 @@ Begin
     Begin //TODO
      If Length(vTempString) > 0 Then
      Begin
-       vTempString:= Tencoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))));
+      {$IFNDEF FPC}
+       {$IFDEF DELPHI2010UP}
+        vTempString:= TEncoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))));
+       {$ELSE}
+        vTempString:= DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+       {$ENDIF}
+      {$ELSE}
+       vTempString:= TEncoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))));
+      {$ENDIF}
        If (vObjectValue In [ovWideString, ovWidememo, ovMemo]) then
        Begin
          vTempString:=DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
          {$IFDEF RESTDWLINUX}
            vTempString:= Tencoding.UTF8.Getstring(stringtobytes(vTempString));
          {$ELSE}
+          {$IFNDEF FPC}
+           {$IFDEF DELPHI2010UP}
+            vTempString:= utf8tostring(vTempString);
+           {$ENDIF}
+          {$ELSE}
            vTempString:= utf8tostring(vTempString);
+          {$ENDIF}
          {$ENDIF}
        end;
      End;
@@ -4705,7 +4719,7 @@ Var
 Begin
  If TestNilParam Then
   Exit;
-  vValue     := StringReplace(json, '=', '', [rfReplaceAll]);
+ vValue     := Trim(json);//StringReplace(json, '=', '', [rfReplaceAll]);
  If Pos(sLineBreak, vValue) > 0 Then
   vValue     := StringReplace(vValue, sLineBreak, '', [rfReplaceAll])
  Else

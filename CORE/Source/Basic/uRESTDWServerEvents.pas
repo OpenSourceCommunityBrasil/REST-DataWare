@@ -72,8 +72,7 @@ Type
   vDWParams                              : TRESTDWParamsMethods;
   vOwnerCollection                       : TCollection;
   vCallbackEvent,
-  vOnlyPreDefinedParams,
-  vNeedAuthorization                     : Boolean;
+  vOnlyPreDefinedParams                  : Boolean;
   DWReplyEventData                       : TDWReplyEventData;
   vBeforeExecute                         : TObjectExecute;
   Function  GetReplyEvent                : TDWReplyEvent;
@@ -96,7 +95,6 @@ Type
   Destructor  Destroy; Override;
  Published
   Property    Routes               : TRESTDWRoutes        Read vDWRoutes             Write vDWRoutes;
-  Property    NeedAuthorization    : Boolean              Read vNeedAuthorization    Write vNeedAuthorization;
   Property    Params               : TRESTDWParamsMethods Read vDWParams             Write vDWParams;
   Property    DataMode             : TDataMode            Read vDataMode             Write SetDataMode;
   Property    Name                 : String               Read GetDisplayName        Write SetDisplayName;
@@ -227,12 +225,12 @@ begin
  vOwnerCollection      := aCollection;
  FName                 := 'dwevent' + IntToStr(aCollection.Count);
  DWReplyEventData.Name := FName;
- vNeedAuthorization    := True;
+ vCallbackEvent        := False;
  vOnlyPreDefinedParams := False;
  vEventName            := '';
  vBaseURL              := '/';
  vDescription          := TStringList.Create;
- vDWRoutes             := [crAll];
+ vDWRoutes             := TRESTDWRoutes.Create;
  vContentType          := cDefaultContentType;
  vCallbackEvent        := False;
 end;
@@ -240,6 +238,7 @@ end;
 Destructor TRESTDWEvent.Destroy;
 Begin
  vDWParams.Free;
+ vDWRoutes.Free;
  DWReplyEventData.Free;
  vDescription.Free;
  Inherited;
@@ -452,7 +451,7 @@ Begin
        vDWEvent.DataMode := GetDataModeName(vDataMode);
        vDWEvent.DefaultContentType := vContentType;
        vDWEvent.Name := vEventName;
-       vDWEvent.NeedAuthorization    := vneedauth;
+       vDWEvent.Routes.All.Active := vneedauth;
        vDWEvent.OnlyPreDefinedParams := vonlypredefparams;
        If vparams <> '' Then
         Begin
@@ -557,7 +556,7 @@ Begin
  vEventsLines := '';
  For I := 0 To Count -1 Do
   Begin
-   vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s", "ContentType":"%s"', [BooleanToString(Items[I].NeedAuthorization),
+   vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s", "ContentType":"%s"', [BooleanToString(Items[I].Routes.All.Active),
                                                                                            BooleanToString(Items[I].OnlyPreDefinedParams),
                                                                                            EncodeStrings(Items[I].DefaultContentType{$IFDEF FPC}, csUndefined{$ENDIF})]);
    vTagEvent    := Format('{"eventname":"%s"', [TRESTDWEvent(Items[I]).EventName]);

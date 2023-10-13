@@ -257,7 +257,15 @@ Begin
            {$IFDEF RESTDWLAZARUS}
              tkUString, tkAString,
            {$ELSE}
-           {$IF Defined(DELPHIXEUP)}tkUString,{$ELSE}tkAString,{$IFEND}
+           {$IF Defined(DELPHIXEUP)}tkUString,{$ELSE}
+           {$IFNDEF FPC}
+            {$IFDEF DELPHI10_0UP}
+             tkAString,
+            {$ENDIF DELPHI10_0UP}
+           {$ELSE}
+            tkAString,
+           {$ENDIF}
+           {$IFEND}
            {$ENDIF}
            tkString      : Begin  //Classes baseadas em Strings
                             SetStrProp(aArrayOf[X], aPropInfo, String(aElement.Value));
@@ -516,7 +524,15 @@ Begin
               {$IFDEF RESTDWLAZARUS}
                 tkUString, tkAString,
               {$ELSE}
-              {$IF Defined(DELPHIXEUP)}tkUString,{$ELSE}tkAString,{$IFEND}
+              {$IF Defined(DELPHIXEUP)}tkUString,{$ELSE}
+              {$IFNDEF FPC}
+              {$IFDEF DELPHI10_0UP}
+               tkAString,
+              {$ENDIF DELPHI10_0UP}
+              {$ELSE}
+               tkAString,
+              {$ENDIF}
+              {$IFEND}
               {$ENDIF}
               tkString      : Begin  //Classes baseadas em Strings
                                SetStrProp(TObject(Result), aPropInfo, String(JSONObject.Elements[A].Value));

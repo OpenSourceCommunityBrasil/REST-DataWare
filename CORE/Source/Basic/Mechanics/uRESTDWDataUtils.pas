@@ -136,7 +136,6 @@ End;
   Property Custom404FooterMessage  : String      Read vCustom404FooterMessage Write vCustom404FooterMessage;
   Property CustomAuthErrorPage     : TStringList Read vCustomAuthErrorPage    Write SetCustomAuthErrorPage;
 End;
-
  TRESTDWAuthTokenParam = Class(TRESTDWAuthOptionParam)
  Private
   vInitRequest,
@@ -432,46 +431,46 @@ Begin
  If Assigned(CORS_CustomHeaders) Then
   Begin
 //   CORS_CustomHeaders.Clear;
-   If crAll In Routes Then
+   If Routes.All.Active Then
     CORS_CustomHeaders.Add('Access-Control-Allow-Methods=GET, POST, PATCH, PUT, DELETE, OPTIONS')
    Else
     Begin
-     If crGet in Routes Then
+     If Routes.Get.Active Then
       Begin
        If vStrAcceptedRoutes <> '' Then
         vStrAcceptedRoutes := vStrAcceptedRoutes + ', GET'
        Else
         vStrAcceptedRoutes := 'GET';
       End;
-     If crPost in Routes Then
+     If Routes.Post.Active Then
       Begin
        If vStrAcceptedRoutes <> '' Then
         vStrAcceptedRoutes := vStrAcceptedRoutes + ', POST'
        Else
         vStrAcceptedRoutes := 'POST';
       End;
-     If crPut in Routes Then
+     If Routes.Put.Active Then
       Begin
        If vStrAcceptedRoutes <> '' Then
         vStrAcceptedRoutes := vStrAcceptedRoutes + ', PUT'
        Else
         vStrAcceptedRoutes := 'PUT';
       End;
-     If crPatch in Routes Then
+     If Routes.Patch.Active Then
       Begin
        If vStrAcceptedRoutes <> '' Then
         vStrAcceptedRoutes := vStrAcceptedRoutes + ', PATCH'
        Else
         vStrAcceptedRoutes := 'PATCH';
       End;
-     If crDelete in Routes Then
+     If Routes.Delete.Active Then
       Begin
        If vStrAcceptedRoutes <> '' Then
         vStrAcceptedRoutes := vStrAcceptedRoutes + ', DELETE'
        Else
         vStrAcceptedRoutes := 'DELETE';
       End;
-     If crOption in Routes Then
+     If Routes.Option.Active Then
       Begin
        If vStrAcceptedRoutes <> '' Then
         vStrAcceptedRoutes := vStrAcceptedRoutes + ', OPTION'
@@ -719,13 +718,13 @@ Begin
                  vMD5        := TTokenValue.GetMD5(vSecrets);
                  If vFinalRequest <> 0 Then
                   vBuildData := Format(cValueToken, [viss,
-                                                     IntToStr(DateTimeToUnix(vFinalRequest, False)),
-                                                     IntToStr(DateTimeToUnix(vInitRequest, False)),
+                                                     IntToStr(DateTimeToUnix(vFinalRequest{$IFNDEF FPC}{$IFDEF DELPHI2010UP}, False{$ENDIF}{$ELSE}, False{$ENDIF})),
+                                                     IntToStr(DateTimeToUnix(vInitRequest{$IFNDEF FPC}{$IFDEF DELPHI2010UP}, False{$ENDIF}{$ELSE}, False{$ENDIF})),
                                                      EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
                                                                    {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})])
                  Else
                   vBuildData := Format(cValueTokenNoLife, [viss,
-                                                           IntToStr(DateTimeToUnix(vInitRequest, False)),
+                                                           IntToStr(DateTimeToUnix(vInitRequest {$IFNDEF FPC}{$IFDEF DELPHI2010UP}, False{$ENDIF}{$ELSE}, False{$ENDIF})),
                                                            EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
                                                                          {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
                  Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
@@ -1395,7 +1394,7 @@ Begin
  vInitRequest     := 0;
  vFinalRequest    := 0;
  vSecrets         := '';
- vDWRoutes        := [crAll];
+ vDWRoutes        := TRESTDWRoutes.Create;
 End;
 
 Procedure TRESTDWAuthTokenParam.Assign(Source: TPersistent);

@@ -1,4 +1,4 @@
-﻿unit uRESTDWZDbcMetadata;
+unit uRESTDWZDbcMetadata;
 
 {$I ..\..\Includes\uRESTDW.inc}
 

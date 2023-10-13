@@ -31,7 +31,7 @@ function Base64EncodeStr(const Value: DWDCPRawString): DWDCPRawString; overload;
   { Encode a string into Base64 format }
 function Base64DecodeStr(const Value: DWDCPRawString): DWDCPRawString; overload;
   { Decode a Base64 format string }
-{$IFNDEF NOTRAWSUPPORT}
+{$IFDEF DELPHI2010UP}
 function Base64EncodeStr(const Value: DWDCPUnicodeString): String; overload;
   { Encode a Unicode string into Base64 format }
 function Base64DecodeStr(const Value: DWDCPUnicodeString): String; overload;
@@ -99,7 +99,7 @@ begin
   Base64Encode(@Value[STRINGBASE],@Result[STRINGBASE],Length(Value));
 end;
 
-{$IFNDEF NOTRAWSUPPORT}
+{$IFDEF DELPHI2010UP}
 function Base64EncodeStr(const Value: DWDCPUnicodeString): String;
 var
   temp: DWDCPRawString;
@@ -158,7 +158,7 @@ begin
   SetLength(Result,Base64Decode(@Value[STRINGBASE],@Result[STRINGBASE],Length(Value)));
 end;
 
-{$IFNDEF NOTRAWSUPPORT}
+{$IFDEF DELPHI2010UP}
 function Base64DecodeStr(const Value: DWDCPUnicodeString): String;
 var
   temp: DWDCPRawString;

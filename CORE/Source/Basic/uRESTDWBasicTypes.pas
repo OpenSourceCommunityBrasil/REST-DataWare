@@ -15,6 +15,7 @@ unit uRESTDWBasicTypes;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -215,7 +216,7 @@ type
  End;
 
  Type
-  TRESTDWClientSQLBase  = Class(TRESTDWMemTable)             //Classe com as funcionalidades de um DBQuery
+  TRESTDWClientSQLBase  = Class(TRESTDWMemTableEx)             //Classe com as funcionalidades de um DBQuery
   Private
    fsAbout                            : TRESTDWAboutInfo;
    vComponentTag,
@@ -226,11 +227,6 @@ type
    vOnLoadStream,
    vBinaryLoadRequest                 : Boolean;
    vOnWriterProcess                   : TOnWriterProcess;
-   {$IFDEF RESTDWLAZARUS}
-   vDatabaseCharSet                   : TDatabaseCharSet;
-   Procedure SetDatabaseCharSet(Value : TDatabaseCharSet);
-   Function  GetDatabaseCharSet : TDatabaseCharSet;
-   {$ENDIF}
    Function  OnEditingState : Boolean;
   Public
    Procedure   BaseOpen;
@@ -247,9 +243,6 @@ type
    Property    BinaryLoadRequest : Boolean       Read vBinaryLoadRequest;
    Property    OnLoadStream      : Boolean       Read vOnLoadStream       Write vOnLoadStream;
    Property    Componenttag      : String        Read vComponentTag;
-   {$IFDEF RESTDWLAZARUS}
-   Property DatabaseCharSet      : TDatabaseCharSet Read GetDatabaseCharSet Write SetDatabaseCharSet;
-   {$ENDIF}
   Published
    Property    SequenceName      : String           Read vSequenceName          Write vSequenceName;
    Property    SequenceField     : String           Read vSequenceField         Write vSequenceField;
@@ -596,18 +589,6 @@ Begin
  vLoadFromStream       := False;
  vBinaryCompatibleMode := True;
 End;
-
-{$IFDEF RESTDWLAZARUS}
-Function  TRESTDWClientSQLBase.GetDatabaseCharSet : TDatabaseCharSet;
-Begin
- Result := vDatabaseCharSet;
-End;
-
-Procedure TRESTDWClientSQLBase.SetDatabaseCharSet(Value : TDatabaseCharSet);
-Begin
- vDatabaseCharSet := Value;
-End;
-{$ENDIF}
 
 Function TRESTDWClientSQLBase.OnEditingState: Boolean;
 Begin

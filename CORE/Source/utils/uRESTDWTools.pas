@@ -98,6 +98,7 @@ Type
  Function  StringToBytes          (AStr                 : String;
                                    aUnicode             : Boolean)         : TRESTDWBytes;Overload;
  Function  StreamToBytes          (Stream               : TStream)         : TRESTDWBytes;
+ Function  StreamToString         (Stream               : TStream)         : String;
  Function  StringToFieldType      (Const S              : String)          : Integer;
  Function  Escape_chars           (s                    : String)          : String;
  Function  Unescape_chars         (s                    : String)          : String;
@@ -423,7 +424,7 @@ Type
 // Function  RESTDWFileExists             (sFile,
 //                                     BaseFilePath       : String)                 : Boolean;
  Function  SystemProtectFiles       (sFile              : String) : Boolean;
- Function  RequestTypeToRoute       (RequestType        : TRequestType)           : TRESTDWRoute;
+ Function  RequestTypeToRoute       (RequestType        : TRequestType)           : TRESTDWRouteData;
  Procedure DeleteStr                (Var Value          : String;
                                      InitPos,
                                      FinalPos           : Integer);
@@ -458,6 +459,8 @@ var
     {$ELSEIF Defined(DELPHIXE6UP) AND not Defined(DELPHIXE7UP)}
       LVarBounds : Array of NativeInt;
     {$ELSEIF Defined(DELPHIXE2UP)}
+      LVarBounds : Array of Integer;
+    {$ELSE}
       LVarBounds : Array of Integer;
     {$IFEND}
   {$ENDIF}
@@ -884,17 +887,25 @@ Function MakeTempFilename(Const APath : TFileName = '') : TFileName;
 {$IFNDEF RESTDWLAZARUS}
 Var
  lPath,
- lExt: TFileName;
+ lExt: {$IFDEF DELPHI2010UP}TFileName{$ELSE}PAnsiChar{$ENDIF};
 {$ENDIF}
 Begin
  {$IFDEF RESTDWLAZARUS}
   Result := SysUtils.GetTempFileName(APath, 'restdw'); {Do not Localize}
  {$ELSE}
-  lPath := APath;
+  {$IFDEF DELPHI2010UP}
+   lPath := APath;
+  {$ELSE}
+   lPath := PAnsiChar(@APath);
+  {$ENDIF}
   lExt := {$IFDEF RESTDWLINUX}''{$ELSE}'.tmp'{$ENDIF}; {Do not Localize}
   {$IFDEF RESTDWWINDOWS}
   If lPath = '' Then
-   GetTempPath(0, PWideChar(lPath));
+   {$IFDEF DELPHI2010UP}
+    GetTempPath(0, PWideChar(lPath));
+   {$ELSE}
+    GetTempPath(0, lPath);
+   {$ENDIF}
   {$ELSE}
    {$IFDEF RESTDWFMX}
     If lPath = '' Then
@@ -3188,6 +3199,21 @@ Begin
  End;
 end;
 
+Function StreamToString(Stream : TStream) : String;
+Var
+ mb : TStringStream;
+Begin
+ mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+ Try
+  Stream.Position := 0;
+  mb.CopyFrom(Stream, Stream.Size);
+  mb.Position := 0;
+  Result := mb.DataString;
+ Finally
+  FreeAndNil(mb);
+ End;
+end;
+
 Function StringToBytes(AStr     : String;
                        aUnicode : Boolean) : TRESTDWBytes;
 Begin
@@ -3575,15 +3601,29 @@ Begin
  While LPos <= LLineLen Do
   Begin
    LCurChar := ALine[LPos];
-   {$IFDEF STRING_IS_ANSI}
-   If IsLeadChar(LCurChar) Then
-    Begin
-     Inc(LPos);
-     Inc(LCol);
-    End
-   Else
-    Begin
+   {$IFNDEF FPC}
+    {$IFDEF DELPHI10_0UP}
+     {$IFDEF STRING_IS_ANSI}
+     If IsLeadChar(LCurChar) Then
+      Begin
+       Inc(LPos);
+       Inc(LCol);
+      End
+     Else
+      Begin
+      {$ENDIF}
+    {$ENDIF DELPHI10_0UP}
+   {$ELSE}
+    {$IFDEF STRING_IS_ANSI}
+    If IsLeadChar(LCurChar) Then
+     Begin
+      Inc(LPos);
+      Inc(LCol);
+     End
+    Else
+     Begin
     {$ENDIF}
+   {$ENDIF}
      If LCurChar = ABreakStr[1] Then
       Begin
        If LQuoteChar = ' ' Then
@@ -3617,9 +3657,15 @@ Begin
           End;
         End;
       End;
-    {$IFDEF STRING_IS_ANSI}
-    End;
+   {$IFNDEF FPC}
+    {$IFDEF DELPHI10_0UP}
+     {$IFDEF STRING_IS_ANSI}
+      End;
+     {$ENDIF}
     {$ENDIF}
+   {$ELSE}
+      End;
+   {$ENDIF}
     Inc(LPos);
     Inc(LCol);
     If Not (CharIsInSet(LQuoteChar, 1, QuoteChars)) And
@@ -3706,7 +3752,7 @@ Begin
  Delete(Value, InitPos, FinalPos);
 End;
 
-Function  RequestTypeToRoute(RequestType  : TRequestType) : TRESTDWRoute;
+Function  RequestTypeToRoute(RequestType  : TRequestType) : TRESTDWRouteData;
 Begin
  Result    := crAll;
  Case RequestType Of
@@ -3749,12 +3795,22 @@ End;
 
 Function DateTimeToUnix(ConvDate: TDateTime; AInputIsUTC: Boolean = True): Int64;
 begin
- Result := DateUtils.DateTimeToUnix(ConvDate, AInputIsUTC);
+ Result := DateUtils.DateTimeToUnix(ConvDate {$IFNDEF FPC}{$IFDEF DELPHI10_0UP}
+                                              , AInputIsUTC
+                                                          {$ENDIF DELPHI10_0UP}
+                                             {$ELSE}
+                                             , AInputIsUTC
+                                             {$ENDIF});
 end;
 
 Function UnixToDateTime(USec : Int64; AInputIsUTC : Boolean = True) : TDateTime;
 begin
- Result := DateUtils.UnixToDateTime(USec, AInputIsUTC);
+ Result := DateUtils.UnixToDateTime(USec {$IFNDEF FPC}{$IFDEF DELPHI10_0UP}
+                                              , AInputIsUTC
+                                                          {$ENDIF DELPHI10_0UP}
+                                             {$ELSE}
+                                             , AInputIsUTC
+                                             {$ENDIF});
 end;
 
 Function MassiveModeToString(MassiveMode : TMassiveMode) : String;

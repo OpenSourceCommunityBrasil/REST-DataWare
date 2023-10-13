@@ -1,4 +1,4 @@
-﻿unit uRESTDWZDbcResultSet;
+unit uRESTDWZDbcResultSet;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
@@ -213,7 +213,7 @@ constructor TZRESTDWResultSet.Create(const Statement: IZStatement;
 var
   Metadata: TContainedObject;
 begin
-  FRESTDWConnection := Statement.GetConnection as TZRESTDWConnection;
+  FRESTDWConnection := TZRESTDWConnection(Statement.GetConnection);
   Metadata := TZRESTDWResultSetMetadata.Create(FRESTDWConnection.GetMetadata,SQL,Self);
   inherited Create(Statement, SQL, MetaData, Statement.GetConnection.GetConSettings);
   FFirstRow := True;
@@ -493,7 +493,7 @@ begin
       else if (FFieldTypes[j] in [dwftMemo,dwftWideMemo,dwftFmtMemo]) then begin
         FStream.Read(vInt64, Sizeof(vInt64));
         if vInt64 > 0 then Begin
-          vStringStream := TStringStream.Create;
+          vStringStream := TStringStream.Create('');
           try
             vStringStream.CopyFrom(FStream, vInt64);
             vStringStream.Position := 0;
@@ -511,12 +511,19 @@ begin
       else if (FFieldTypes[j] in [dwftStream,dwftBlob,dwftBytes]) then begin
         FStream.Read(vInt64, Sizeof(vInt64));
         if vInt64 > 0 then Begin
-          vStringStream := TStringStream.Create;
+          vStringStream := TStringStream.Create('');
           try
             vStringStream.CopyFrom(FStream, vInt64);
             vStringStream.Position := 0;
-
-            FVariantTable[i,j] := vStringStream.Bytes;
+            {$IFNDEF FPC}
+             {$IFDEF DELPHI2010UP}
+              FVariantTable[i,j] := vStringStream.Bytes;
+             {$ELSE}
+              FVariantTable[i,j] := StreamToBytes(vStringStream);
+             {$ENDIF}
+            {$ELSE}
+             FVariantTable[i,j] := vStringStream.Bytes;
+            {$ENDIF}
           finally
             vStringStream.Free;
           end;
@@ -898,7 +905,15 @@ end;
         end;
       end
       else begin
-        sStr := TStringStream.Create(TBytes(FVariantTable[RowNo-1,ColumnIndex]));
+            {$IFNDEF FPC}
+             {$IFDEF DELPHI2010UP}
+              sStr := TStringStream.Create(TBytes(FVariantTable[RowNo-1,ColumnIndex]));
+             {$ELSE}
+              sStr := TStringStream.Create(BytesToString(TRESTDWBytes(FVariantTable[RowNo-1,ColumnIndex])));
+             {$ENDIF}
+            {$ELSE}
+             sStr := TStringStream.Create(TBytes(FVariantTable[RowNo-1,ColumnIndex]));
+            {$ENDIF}
         try
           sStr.Position := 0;
           Result := TZAbstractBlob.CreateWithStream(sStr);

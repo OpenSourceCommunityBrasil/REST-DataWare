@@ -34,24 +34,26 @@ Const
 
 Type
  TRESTDWReplyRequest       = Procedure(Const Params         : TRESTDWParams;
-                                   Var   ContentType,
-                                         Result         : String;
-                                   Const RequestType    : TRequestType)    Of Object;
+                                       Var   ContentType,
+                                             Result         : String;
+                                       Const RequestType    : TRequestType)    Of Object;
  TRESTDWAuthRequest        = Procedure(Const Params         : TRESTDWParams;
-                                   Var   Rejected       : Boolean;
-                                   Var   ResultError    : String;
-                                   Var   StatusCode     : Integer;
-                                   RequestHeader        : TStringList)     Of Object;
+                                       Var   Rejected       : Boolean;
+                                       Var   ResultError    : String;
+                                       Var   StatusCode     : Integer;
+                                       RequestHeader        : TStringList)     Of Object;
  TRESTDWMarkRequest        = Procedure(Const Params         : TRESTDWParams;
-                                   Var   ContentType,
-                                         Result         : String)          Of Object;
+                                       Var   ContentType,
+                                             Result         : String)          Of Object;
  TRESTDWGetContextItemTag  = Procedure(Var   ContextItemTag : String)          Of Object;
  TRESTDWBeforeRenderer     = Procedure(Const BaseHeader     : String;
-                                   Var   ContentType,
-                                   ContentRenderer      : String;
-                                   Const RequestType    : TRequestType)    Of Object;
- TObjectEvent          = Procedure(aSelf                : TComponent)      Of Object;
- TObjectExecute        = Procedure(Const aSelf          : TCollectionItem) Of Object;
+                                       Var   ContentType,
+                                       ContentRenderer      : String;
+                                       Const RequestType    : TRequestType;
+                                       Const Params         : TRESTDWParams)   Of Object;
+ TObjectEvent              = Procedure(aSelf                : TComponent;
+                                       Const Params         : TRESTDWParams)   Of Object;
+ TObjectExecute            = Procedure(Const aSelf          : TCollectionItem) Of Object;
 
 
  TRESTDWReplyRequestStream = Procedure(Const Params       : TRESTDWParams;
@@ -159,16 +161,17 @@ Type
   Destructor  Destroy; Override;
   Constructor Create(AOwner      : TComponent);Override; //Cria o Componente
   Function    BuildContext(BaseHTML         : TStrings;
-                           IgnoreBaseHeader : Boolean) : String;
+                           IgnoreBaseHeader : Boolean;
+                           Const Params     : TRESTDWParams) : String;
  Published
-  Property    ContentType        : String             Read vContentType           Write vContentType;
-  Property    MasterHtml         : TStrings           Read vMasterHtml            Write SetMasterHtml;
-  Property    MasterHtmlTag      : String             Read vMasterHTMLTag         Write vMasterHTMLTag;
-  Property IncludeScripts        : TStrings           Read vIncludeScripts        Write SetIncludeScripts;
-  Property IncludeScriptsHtmlTag : String             Read vIncludeScriptsHtmlTag Write vIncludeScriptsHtmlTag;
-  Property DeleteInvalidChars    : TStrings           Read vInvalidChars          Write SetInvalidChars;
-  Property Items                 : TRESTDWContextRuleList Read vDWContextRuleList     Write vDWContextRuleList;
-  Property    OnBeforeRenderer   : TObjectEvent       Read vOnBeforeRenderer      Write SetOnBeforeRenderer;
+  Property    ContentType           : String                 Read vContentType           Write vContentType;
+  Property    MasterHtml            : TStrings               Read vMasterHtml            Write SetMasterHtml;
+  Property    MasterHtmlTag         : String                 Read vMasterHTMLTag         Write vMasterHTMLTag;
+  Property    IncludeScripts        : TStrings               Read vIncludeScripts        Write SetIncludeScripts;
+  Property    IncludeScriptsHtmlTag : String                 Read vIncludeScriptsHtmlTag Write vIncludeScriptsHtmlTag;
+  Property    DeleteInvalidChars    : TStrings               Read vInvalidChars          Write SetInvalidChars;
+  Property    Items                 : TRESTDWContextRuleList Read vDWContextRuleList     Write vDWContextRuleList;
+  Property    OnBeforeRenderer      : TObjectEvent           Read vOnBeforeRenderer      Write SetOnBeforeRenderer;
 End;
 
 Type
@@ -192,7 +195,6 @@ Type
   vOnBeforeCall                          : TObjectExecute;
   vAuthRequest                           : TRESTDWAuthRequest;
   vOnlyPreDefinedParams,
-  vNeedAuthorization,
   vignorebaseheader                      : Boolean;
   Function  GetReplyRequest              : TRESTDWReplyRequest;
   Procedure SetReplyRequest   (Value     : TRESTDWReplyRequest);
@@ -223,7 +225,6 @@ Type
   Property    ContextRules               : TRESTDWContextRules        Read vDWContextRules        Write vDWContextRules;
   Property    OnlyPreDefinedParams       : Boolean                    Read vOnlyPreDefinedParams  Write vOnlyPreDefinedParams;
   Property    IgnoreBaseHeader           : Boolean                    Read vignorebaseheader      Write vignorebaseheader;
-  Property    NeedAuthorization          : Boolean                    Read vNeedAuthorization     Write vNeedAuthorization;
   Property    OnAuthRequest              : TRESTDWAuthRequest         Read vAuthRequest           Write vAuthRequest;
   Property    OnReplyRequest             : TRESTDWReplyRequest        Read GetReplyRequest        Write SetReplyRequest;
   Property    OnReplyRequestStream       : TRESTDWReplyRequestStream  Read GetReplyRequestStream  Write SetReplyRequestStream;
@@ -305,8 +306,7 @@ begin
  vContextName            := '';
  vBaseURL                := '/';
  DWReplyRequestData.Name := FName;
- vNeedAuthorization      := True;
- vDWRoutes               := [crAll];
+ vDWRoutes               := TRESTDWRoutes.Create;
  vDefaultHtml            := TStringList.Create;
  vDescription            := TStringList.Create;
  vDWContextRules         := Nil;
@@ -317,6 +317,7 @@ end;
 destructor TRESTDWContext.Destroy;
 begin
   vDWParams.Free;
+  vDWRoutes.Free;
   DWReplyRequestData.Free;
   vDefaultHtml.Free;
   vDescription.Free;
@@ -904,7 +905,8 @@ Begin
 End;
 
 Function TRESTDWContextRules.BuildContext(BaseHTML         : TStrings;
-                                      IgnoreBaseHeader : Boolean): String;
+                                          IgnoreBaseHeader : Boolean;
+                                          Const Params     : TRESTDWParams): String;
 Var
  vTempResult,
  vTempComponent,
@@ -928,7 +930,7 @@ Var
  End;
 Begin
  If Assigned(vOnBeforeRenderer) Then
-  vOnBeforeRenderer(Self);
+  vOnBeforeRenderer(Self, Params);
  vTempResult := '';
  Result      := '';
  If Not IgnoreBaseHeader Then

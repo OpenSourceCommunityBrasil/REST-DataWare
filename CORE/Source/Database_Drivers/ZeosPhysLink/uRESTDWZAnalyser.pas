@@ -1,4 +1,4 @@
-﻿unit uRESTDWZAnalyser;
+unit uRESTDWZAnalyser;
 
 {$I ..\..\Includes\uRESTDW.inc}
 

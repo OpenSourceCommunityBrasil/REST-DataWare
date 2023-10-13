@@ -1,4 +1,4 @@
-﻿unit uRESTDWZDbcStatement;
+unit uRESTDWZDbcStatement;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
@@ -302,11 +302,27 @@ var
             vDataType := ftString;
             DataType  := vDataType;
             vZBlob := ClientVarManager.GetAsInterface(InParamValues[i]) as IZBlob;
-            AsAnsiString := vZBlob.GetString;
+            {$IFNDEF FPC}
+             {$IFDEF DELPHI2010UP}
+              AsAnsiString := vZBlob.GetString;
+             {$ELSE}
+              AsString     := vZBlob.GetString;
+             {$ENDIF}
+            {$ELSE}
+             AsAnsiString  := vZBlob.GetString;
+            {$ENDIF}
           end
           else if InParamTypes[i] = stAsciiStream then begin
             vZBlob := ClientVarManager.GetAsInterface(InParamValues[i]) as IZBlob;
-            AsAnsiString := vZBlob.GetAnsiString;
+            {$IFNDEF FPC}
+             {$IFDEF DELPHI2010UP}
+              AsAnsiString := vZBlob.GetAnsiString;
+             {$ELSE}
+              AsString     := vZBlob.GetAnsiString;
+             {$ENDIF}
+            {$ELSE}
+             AsAnsiString  := vZBlob.GetAnsiString;
+            {$ENDIF}
           end
           else begin
             vValue := EncodeVariant(InParamValues[i]);

@@ -15,6 +15,7 @@ unit uRESTDWExprParser;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -26,7 +27,7 @@ unit uRESTDWExprParser;
 interface
 
 uses
-  SysUtils, Contnrs;
+  SysUtils,Contnrs;
 
 type
   TOnGetVariableValue = function(Sender: TObject; const VarName: string;

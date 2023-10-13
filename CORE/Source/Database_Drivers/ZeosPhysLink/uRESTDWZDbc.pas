@@ -1,4 +1,4 @@
-﻿unit uRESTDWZDbc;
+unit uRESTDWZDbc;
 
 {$I ..\..\Includes\uRESTDW.inc}
 {$IFNDEF FPC}
@@ -98,8 +98,10 @@ type
     function GetTokenizer: IZTokenizer;
     function GetStatementAnalyser: IZStatementAnalyser;
     function GetDatabase : TRESTDWDatabasebaseBase;
-
+  {$IFDEF ZEOS80UP}
     function GetServerProvider: TZServerProvider; override;
+  {$ENDIF}
+
 
     procedure Open; override;
   end;
@@ -203,16 +205,18 @@ function TZRESTDWConnection.GetPlainDriver: IZPlainDriver;
 begin
   {$IFNDEF ZEOS80UP}
     if FPlainDriver = nil then
-      FPlainDriver := PlainDriver as TZRESTDWPlainDriver;
+      FPlainDriver := TZRESTDWPlainDriver(PlainDriver);
   {$ENDIF}
 
   Result := FPlainDriver;
 end;
 
+{$IFDEF ZEOS80UP}
 function TZRESTDWConnection.GetServerProvider: TZServerProvider;
 begin
   Result := spUnknown;
 end;
+{$ENDIF}
 
 function TZRESTDWConnection.GetStatementAnalyser: IZStatementAnalyser;
 begin

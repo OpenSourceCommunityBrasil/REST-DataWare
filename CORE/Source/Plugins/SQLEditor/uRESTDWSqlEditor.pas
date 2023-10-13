@@ -222,7 +222,7 @@ Begin
  Screen.Cursor := crHourGlass;
  Try
   RESTDWClientSQLB.Close;
-  RESTDWClientSQLB.BinaryRequest := RESTDWClientSQL.BinaryRequest;
+//  RESTDWClientSQLB.BinaryRequest := RESTDWClientSQL.BinaryRequest;
   RESTDWClientSQLB.SQL.Clear;
   RESTDWClientSQLB.SQL.Add(Memo.Lines.Text);
 

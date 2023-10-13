@@ -1,4 +1,4 @@
-﻿unit uRESTDWZeosPhysLink;
+unit uRESTDWZeosPhysLink;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
@@ -34,14 +34,18 @@ type
   private
     FZConnection : TZConnection;
     FDatabase : TRESTDWDatabasebaseBase;
+    {$IFDEF ZEOS80UP}
     FProvider : TZServerProvider;
+    {$ENDIF}
     FOldZeosBeforeConnect : TNotifyEvent;
     procedure setZConnection(const Value: TZConnection);
   protected
     procedure OnRESTDWZeosBeforeConnect(Sender : TObject);
   published
     property ZConnection : TZConnection read FZConnection write setZConnection;
+    {$IFDEF ZEOS80UP}
     property Provider : TZServerProvider read FProvider write FProvider;
+    {$ENDIF}
     property Database : TRESTDWDatabasebaseBase read FDatabase write FDatabase;
   end;
 

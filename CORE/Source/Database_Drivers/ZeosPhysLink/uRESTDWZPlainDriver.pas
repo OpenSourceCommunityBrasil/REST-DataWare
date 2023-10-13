@@ -1,4 +1,4 @@
-﻿unit uRESTDWZPlainDriver;
+unit uRESTDWZPlainDriver;
 
 {$I ..\..\Includes\uRESTDW.inc}
 

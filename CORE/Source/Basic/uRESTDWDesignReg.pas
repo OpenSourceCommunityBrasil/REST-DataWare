@@ -146,6 +146,7 @@ Type
   Function SupportsAggregates: Boolean; Override;
   Function SupportsInternalCalc: Boolean; Override;
   Procedure BeginUpdateFieldDefs; Override;
+  Procedure EndUpdateFieldDefs; Override;
   Procedure InitializeMenu(Menu: TPopupMenu); Override;
   Procedure UpdateMenus(Menu: TPopupMenu; EditState: TEditState); Override;
 End;
@@ -289,12 +290,17 @@ Begin
  bmp.Free;
 End;
 {$ELSE}
-
+{$IFDEF RESTDWLAZARUS}
 Constructor TRESTDWCGIApplicationDescriptor.Create;
 Begin
  inherited Create;
  Flags := Flags - [pfMainUnitHasCreateFormStatements];
  Name  := 'REST Dataware - CGI Application';
+End;
+
+Function TRESTDWCGIApplicationDescriptor.GetLocalizedName : String;
+Begin
+ Result := rsRESTDWCGIApplicati;
 End;
 
 Constructor TRESTDWDatamodule.Create;
@@ -314,11 +320,6 @@ Begin
    LazarusIDE.DoNewEditorFile(PDRESTDWDatamodule, '', '',
                               [nfIsPartOfProject, nfOpenInEditor, nfCreateDefaultSrc]);
   End;
-End;
-
-Function TRESTDWCGIApplicationDescriptor.GetLocalizedName : String;
-Begin
- Result := rsRESTDWCGIApplicati;
 End;
 
 Function TRESTDWDatamodule.GetLocalizedName : String;
@@ -397,6 +398,7 @@ Begin
  Result:= mrOK;
 End;
 {$ENDIF}
+{$ENDIF}
 
 
 {$IFNDEF RESTDWLAZARUS}
@@ -412,16 +414,23 @@ Begin
   End;
 End;
 
+Procedure TDSDesignerDW.EndUpdateFieldDefs;
+Begin
+ Inherited;
+ If TRESTDWClientSQL(DataSet).Active Then
+   TRESTDWClientSQL(DataSet).Close;
+End;
+
 Procedure TDSDesignerDW.InitializeMenu(Menu: TPopupMenu);
 Begin
  Inherited;
-// Ao clicar duas vezes no componente RESTDWClientSQL
-// ou ao selecionar no popup menu opção "Fields Editor".
+ // Ao clicar duas vezes no componente RESTDWClientSQL
+ // ou ao selecionar no popup menu opção "Fields Editor".
 End;
 
 Procedure TDSDesignerDW.UpdateMenus(Menu: TPopupMenu; EditState: TEditState);
 Begin
-// Ao acionar o popup menu dos Fields persistents: (Add, Add All, New Field)
+ // Ao acionar o popup menu dos Fields persistents: (Add, Add All, New Field)
  Inherited;
  If not TRESTDWClientSQL(DataSet).Active Then
    TRESTDWClientSQL(DataSet).Open;

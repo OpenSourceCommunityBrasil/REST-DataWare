@@ -1861,7 +1861,7 @@ Begin
  vErrorCode            := 200;
  vIsQueryParam         := False;
  vUrlToExec            := '';
- vToken                := '';
+ vToken                := Token;
  vDataBuff             := '';
  vRequestHeader        := TStringList.Create;
  vCompareContext       := False;
@@ -2098,13 +2098,13 @@ Begin
         If Not vBinaryEvent Then
          Begin
           Try
-//            mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+           mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
            Try
-//             mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
-//                         ContentStringStream.Position := 0;
-//             mb.Position := 0;
-//             If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
-            If (pos('boundary', ContentType) > 0) Then
+            mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
+                        ContentStringStream.Position := 0;
+            mb.Position := 0;
+            If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+//            If (pos('boundary', ContentType) > 0) Then
              Begin
               msgEnd           := False;
               LBoundaryFound   := False;
@@ -2133,8 +2133,8 @@ Begin
 //               Until tmp = startboundary;
              End;
            Finally
-//           If Assigned(mb) Then
-//            FreeAndNil(mb);
+            If Assigned(mb) Then
+             FreeAndNil(mb);
            End;
           Except
           End;
@@ -2152,7 +2152,7 @@ Begin
             decoder.FreeSourceStream := False;
             decoder.ReadHeader;
             Case Decoder.PartType of
-             mcptAttachment: {$REGION mcptAttachment}
+             mcptAttachment: 
               Begin
                ms := TMemoryStream.Create;
                ms.Position := 0;
@@ -2228,7 +2228,8 @@ Begin
                 End
                Else
                 Begin
-                 vBaseData := Copy(TStringStream(ms).DataString, 1, TStringStream(ms).Size);
+                 vBaseData := StreamToString(ms);
+                 vBaseData := Copy(vBaseData, 1, Length(vBaseData));
                  If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(vBaseData)) > 0) Then
                   JSONParam.FromJSON(vBaseData)
                  Else
@@ -2237,8 +2238,8 @@ Begin
                DWParams.Add(JSONParam);
                ms.Free;
                vDecoderHeaderList.Free;
-              End;{$ENDREGION}
-             mcptText : {$REGION mcptText}
+              End;
+             mcptText : 
               Begin
                {$IFDEF RESTDWLAZARUS}
                ms := TStringStream.Create('');
@@ -2354,8 +2355,8 @@ Begin
                FreeAndNil(ms);
                If Assigned(Newdecoder)  Then
                 FreeAndNil(Newdecoder);
-              End;{$ENDREGION}
-             mcptIgnore : {$REGION mcptIgnore}
+              End;
+             mcptIgnore :
               Begin
                Try
                 If decoder <> Nil Then
@@ -2364,7 +2365,7 @@ Begin
                 TRESTDWMessageDecoderMIME(decoder).MIMEBoundary := boundary;
                Finally
                End;
-              End;{$ENDREGION}
+              End;
              mcptEOF:
               Begin
                FreeAndNil(decoder);
@@ -2416,7 +2417,7 @@ Begin
                   decoder.ReadHeader;
                   Inc(I);
                   Case Decoder.PartType of
-                   mcptAttachment: {$REGION mcptAttachment}
+                   mcptAttachment:
                     Begin
                      ms := TMemoryStream.Create;
                      ms.Position := 0;
@@ -2538,8 +2539,8 @@ Begin
                       DWParams.Add(JSONParam);
                      FreeAndNil(ms);
                      FreeAndNil(vDecoderHeaderList);
-                    End; {$ENDREGION mcptAttachment}
-                   mcptText : {$REGION mcptText}
+                    End;
+                   mcptText :
                     begin
                      {$IFDEF RESTDWLAZARUS}
                      ms := TStringStream.Create('');
@@ -2621,15 +2622,15 @@ Begin
                      {$IFNDEF RESTDWLAZARUS}ms.Size := 0;{$ENDIF}
                      FreeAndNil(ms);
                      FreeAndNil(newdecoder);
-                    end; {$ENDREGION mcptAttachment}
-                   mcptIgnore : {$REGION mcptIgnore}
+                    end;
+                   mcptIgnore :
                     Begin
                      Try
                       If decoder <> Nil Then
                        FreeAndNil(decoder);
                      Finally
                      End;
-                    End; {$ENDREGION mcptAttachment}
+                    End;
                    mcptEOF:
                     Begin
                       FreeAndNil(decoder);
@@ -2660,15 +2661,23 @@ Begin
               Begin
                If vEncoding = esUtf8 Then
                 Begin
-//                 TRESTDWDataUtils.ParseDWParamsURL(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
-                 if DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(mb, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                 If (mb.size > 0) Then
+                  Begin
+                   If DWParams.ItemsString['undefined'] = nil then
+                    TRESTDWDataUtils.ParseBodyRawToDWParam(mb, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                  End;
+//                 Else
+//                  TRESTDWDataUtils.ParseDWParamsURL(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End
                Else
                 Begin
-//                 TRESTDWDataUtils.ParseDWParamsURL(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
-                 if DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(mb, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                 If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+                  Begin
+                   If DWParams.ItemsString['undefined'] = nil then
+                    TRESTDWDataUtils.ParseBodyRawToDWParam(mb, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                  End
+                 Else
+                  TRESTDWDataUtils.ParseDWParamsURL(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End;
               End;
              {Fim alteração feita por Tiago Istuque - 28/12/2018}
@@ -2841,6 +2850,8 @@ Begin
 
          If vAuthenticator <> Nil Then
          Begin
+           If vToken = '' Then
+            vToken := Token;
            vAcceptAuth           := False;
            vErrorCode            := 401;
            vErrorMessage         := cInvalidAuth;
@@ -2849,15 +2860,15 @@ Begin
            vNeedAuthorization := False;
            vTempEvent   := ReturnEventValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
            If vTempEvent = Nil Then
-           Begin
+            Begin
              vTempContext := ReturnContextValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
              If vTempContext <> Nil Then
-               vNeedAuthorization := vTempContext.NeedAuthorization
+               vNeedAuthorization := vTempContext.Routes.RouteNeedAuthorization(RequestType)
              Else
                vNeedAuthorization := True;
-           End
+            End
            Else
-             vNeedAuthorization := vTempEvent.NeedAuthorization;
+            vNeedAuthorization := vTempEvent.Routes.RouteNeedAuthorization(RequestType);
 
            If vNeedAuthorization Then
             Begin
@@ -2878,7 +2889,12 @@ Begin
 
               If Not vAcceptAuth Then
                Begin
-                 AuthRealm    := cAuthRealm;
+                 //Eloy
+                 if vAuthenticator is TRESTDWAuthBasic then
+                   AuthRealm  := cAuthRealm;
+                 StatusCode   := vErrorCode;
+                 ErrorMessage := vErrorMessage;
+                 //
                  WriteError;
                  DestroyComponents;
                  Exit;
@@ -5298,19 +5314,19 @@ Begin
              Break;
             End;
           End;
-         If (RequestTypeToRoute(RequestType) In TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes) Or
-            (crAll in TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes) Then
+         If (TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes.RouteIsActive(RequestType)) Or
+            (TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes.RouteIsActive(rtAll))      Then
           Begin
            vResult := '';
            TRESTDWServerEvents(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, DWParams);
-           IF TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].NeedAuthorization then
+           IF TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes.RouteNeedAuthorization(RequestType) Or
+              TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes.RouteNeedAuthorization(rtAll)       Then
            Begin
-           If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest) Then
-            TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest(DWParams, vRejected, vErrorMessage, ErrorCode, RequestHeader);
-           end
-           else
-             Vrejected:= False;
-
+            If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest) Then
+             TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest(DWParams, vRejected, vErrorMessage, ErrorCode, RequestHeader);
+           End
+          Else
+           Vrejected := False;
            If Not vRejected Then
             Begin
              TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].CompareParams(DWParams);
@@ -5362,42 +5378,42 @@ Begin
           Begin
            vStrAcceptedRoutes := '';
            vDWRoutes := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes;
-           If crGet in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtGet) Then
             Begin
              If vStrAcceptedRoutes <> '' Then
               vStrAcceptedRoutes := vStrAcceptedRoutes + ', GET'
              Else
               vStrAcceptedRoutes := 'GET';
             End;
-           If crPost in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtPost) Then
             Begin
              If vStrAcceptedRoutes <> '' Then
               vStrAcceptedRoutes := vStrAcceptedRoutes + ', POST'
              Else
               vStrAcceptedRoutes := 'POST';
             End;
-           If crPut in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtPut) Then
             Begin
              If vStrAcceptedRoutes <> '' Then
               vStrAcceptedRoutes := vStrAcceptedRoutes + ', PUT'
              Else
               vStrAcceptedRoutes := 'PUT';
             End;
-           If crPatch in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtPatch) Then
             Begin
              If vStrAcceptedRoutes <> '' Then
               vStrAcceptedRoutes := vStrAcceptedRoutes + ', PATCH'
              Else
               vStrAcceptedRoutes := 'PATCH';
             End;
-           If crDelete in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtDelete) Then
             Begin
              If vStrAcceptedRoutes <> '' Then
               vStrAcceptedRoutes := vStrAcceptedRoutes + ', DELETE'
              Else
               vStrAcceptedRoutes := 'DELETE';
             End;
-           If crOption in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtOption) Then
             Begin
              If vStrAcceptedRoutes <> '' Then
               vStrAcceptedRoutes := vStrAcceptedRoutes + ', OPTION'
@@ -5511,15 +5527,15 @@ Begin
        Else
         Begin
          Result   := False;
-         If (RequestTypeToRoute(RequestType) In TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes) Or
-            (crAll in TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes) Then
+         If (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes.RouteIsActive(RequestType)) Or
+            (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes.RouteIsActive(rtAll)) Then
           Begin
            If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnAuthRequest) Then
             TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnAuthRequest(DWParams, vRejected, vErrorMessage, ErrorCode, RequestHeader);
            If RequestType <> rtOption Then
             Begin
              If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).OnBeforeRenderer) Then
-              TRESTDWServerContext(ServerMethodsClass.Components[i]).OnBeforeRenderer(ServerMethodsClass.Components[i]);
+              TRESTDWServerContext(ServerMethodsClass.Components[i]).OnBeforeRenderer(ServerMethodsClass.Components[i], DWParams);
              If Not vRejected Then
               Begin
                Result  := True;
@@ -5551,7 +5567,7 @@ Begin
                   vBaseHeader := '';
                   ContentType := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.ContentType;
                   vResult := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].ContextRules.BuildContext(TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader,
-                                                                                                                                            TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].IgnoreBaseHeader);
+                                                                                                                                                TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].IgnoreBaseHeader, DWParams);
                  End
                 Else
                  Begin
@@ -5578,7 +5594,7 @@ Begin
                      vBaseHeader := TRESTDWServerContext(ServerMethodsClass.Components[i]).BaseHeader.Text;
                     vResult := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].DefaultHtml.Text;
                     If Assigned(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer) Then
-                     TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer(vBaseHeader, ContentType, vResult, RequestType);
+                     TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].OnBeforeRenderer(vBaseHeader, ContentType, vResult, RequestType, DWParams);
                    End;
                  End;
                Except
@@ -5611,42 +5627,42 @@ Begin
           Begin
            vStrAcceptedRoutes := '';
            vDWRoutes := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[Pooler].Routes;
-           If crGet in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtGet) Then
             Begin
              If vStrAcceptedRoutes <> '' Then
               vStrAcceptedRoutes := vStrAcceptedRoutes + ', GET'
              Else
               vStrAcceptedRoutes := 'GET';
             End;
-           If crPost in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtPost) Then
             Begin
                If vStrAcceptedRoutes <> '' Then
                 vStrAcceptedRoutes := vStrAcceptedRoutes + ', POST'
                Else
                 vStrAcceptedRoutes := 'POST';
             End;
-           If crPut in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtPut) Then
             Begin
              If vStrAcceptedRoutes <> '' Then
               vStrAcceptedRoutes := vStrAcceptedRoutes + ', PUT'
              Else
               vStrAcceptedRoutes := 'PUT';
             End;
-           If crPatch in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtPatch) Then
             Begin
              If vStrAcceptedRoutes <> '' Then
               vStrAcceptedRoutes := vStrAcceptedRoutes + ', PATCH'
              Else
               vStrAcceptedRoutes := 'PATCH';
             End;
-           If crDelete in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtDelete) Then
             Begin
              If vStrAcceptedRoutes <> '' Then
               vStrAcceptedRoutes := vStrAcceptedRoutes + ', DELETE'
              Else
               vStrAcceptedRoutes := 'DELETE';
             End;
-           If crOption in vDWRoutes Then
+           If vDWRoutes.RouteIsActive(rtOption) Then
             Begin
              If vStrAcceptedRoutes <> '' Then
               vStrAcceptedRoutes := vStrAcceptedRoutes + ', OPTION'

@@ -1,4 +1,4 @@
-﻿unit uRESTDWZToken;
+unit uRESTDWZToken;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
@@ -36,21 +36,15 @@ uses
 
 type
 
-  {** Implements a RESTDW-specific number state object. }
-  TZRESTDWNumberState = TZGenericSQLNoHexNumberState;
-
   {** Implements a RESTDW-specific quote string state object. }
   {$IFDEF ZEOS80UP}
-    TZRESTDWQuoteState = TZGenericSQLBracketQuoteState;
+   TZRESTDWNumberState = TZGenericSQLNoHexNumberState;
+   TZRESTDWQuoteState = TZGenericSQLBracketQuoteState;
+   TZRESTDWCommentState = TZGenericSQLCommentState;
   {$ELSE}
-    TZRESTDWQuoteState = TZQuoteState;
+   TZRESTDWQuoteState = TZQuoteState;
   {$ENDIF}
 
-  {**
-    This state will either delegate to a comment-handling
-    state, or return a token with just a slash in it.
-  }
-  TZRESTDWCommentState = TZGenericSQLCommentState;
 
   {** Implements a symbol state object. }
   TZRESTDWSymbolState = class (TZSymbolState)
@@ -123,10 +117,13 @@ begin
   WhitespaceState := TZWhitespaceState.Create;
 
   SymbolState := TZRESTDWSymbolState.Create;
-  NumberState := TZRESTDWNumberState.Create;
+  {$IFDEF ZEOS80UP}
+   NumberState := TZRESTDWNumberState.Create;
+   CommentState := TZRESTDWCommentState.Create;
+  {$ENDIF}
+
   QuoteState := TZRESTDWQuoteState.Create;
   WordState := TZRESTDWWordState.Create;
-  CommentState := TZRESTDWCommentState.Create;
 
   SetCharacterState(#0, #32, WhitespaceState);
   SetCharacterState(#33, #191, SymbolState);

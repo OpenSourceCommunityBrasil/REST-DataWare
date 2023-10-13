@@ -1,4 +1,4 @@
-﻿Unit uRESTDWConsts;
+Unit uRESTDWConsts;
 
 {$I ..\..\Source\Includes\uRESTDW.inc}
 
@@ -55,7 +55,7 @@ Const
  // controle de versão
  RESTDWVersionINFO               = 'v2.1.0-';
  RESTDWRelease                   = '792';
- RESTDWCodeProject               = 'Galaga - GitHub';
+ RESTDWCodeProject               = 'Galaga - SourceForge';
  RESTDWVersao                    = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWDialogoTitulo             = 'REST DataWare Components ' + RESTDWVersao;
  RESTDWSobreTitulo               = 'REST DataWare '+ RESTDWVersao;
@@ -277,18 +277,63 @@ Type
                          ovLongWord,        ovShortint,     ovByte, ovExtended, ovConnection, ovParams,    ovStream,             //42..48
                          ovTimeStampOffset, ovObject,       ovSingle);                                                           //49..51
  TRequestMode         = (rtOnlyFields, rtOnlyData, rtJSONAll);
- TRequestType         = (rtGet, rtPost, rtPut, rtPatch, rtDelete, rtOption);
+ TRequestType         = (rtGet, rtPost, rtPut, rtPatch, rtDelete, rtOption, rtAll);
  TRESTDWIPVersion     = (Id_IPv4, Id_IPv6);
  TRESTDWJSONType      = (TRESTDWJSONObjectType, TRESTDWJSONArrayType);
  TRESTDWJSONTypes     = Set of TRESTDWJSONType;
  TRESTDWMaxLineAction = (maException, maSplit);
  TRESTDWOSType        = (otUnknown, otUnix, otWindows, otDotNet);
- TRESTDWRoute         = (crAll, crGet, crPost, crPut, crPatch, crDelete, crOption);
- TRESTDWRoutes        = Set of TRESTDWRoute;
  TRESTDWSSLVersion    = (sslvSSLv2, sslvSSLv23,  sslvSSLv3, sslvTLSv1, sslvTLSv1_1, sslvTLSv1_2);
  TRESTDWSSLVersions   = set of TRESTDWSSLVersion;
  TTypeObject          = (toDataset,   toParam, toMassive, toVariable,  toObject);
- TCaseType        = (ctNone,            ctUpperCase,    ctLowerCase,        ctCamelCase);
+ TCaseType            = (ctNone,      ctUpperCase,        ctLowerCase, ctCamelCase);
+ TRESTDWRouteData     = (crAll, crGet, crPost, crPut, crPatch, crDelete, crOption);
+
+Type
+ TRESTDWChangeActive  = Procedure(aActive    : Boolean;
+                                  aRouteData : TRESTDWRouteData) Of Object;
+ TRESTDWRoute = Class(TPersistent)
+ Private
+  vLoadRoute         : TRESTDWRouteData;
+  vActive,
+  vNeedAuthorization : Boolean;
+  vOnChangeActive    : TRESTDWChangeActive;
+  Procedure SetActive(aActive : Boolean);
+ Public
+  Constructor Create(aMethod : TRESTDWRouteData);
+  Destructor  Destroy;
+  Property    Method         : TRESTDWRouteData    Read vLoadRoute;
+  Property OnChangeActive    : TRESTDWChangeActive Read vOnChangeActive    Write vOnChangeActive;
+ Published
+  Property Active            : Boolean             Read vActive            Write SetActive;
+  Property NeedAuthorization : Boolean             Read vNeedAuthorization Write vNeedAuthorization;
+End;
+ TRESTDWRoutes = Class(TPersistent)
+ Private
+  vRouteAll,
+  vRouteGet,
+  vRoutePost,
+  vRoutePut,
+  vRoutePatch,
+  vRouteDelete,
+  vRouteOption               : TRESTDWRoute;
+  Procedure ChangeActive(aActive    : Boolean;
+                         aRouteData : TRESTDWRouteData);
+ Public
+  Constructor Create;
+  Destructor  Destroy;Override;
+  Function    RouteIsActive         (RequestType       : TRequestType) : Boolean;
+  Function    RouteNeedAuthorization(RequestType       : TRequestType) : Boolean;
+ Published
+  Property All    : TRESTDWRoute Read vRouteAll    Write vRouteAll;
+  Property Get    : TRESTDWRoute Read vRouteGet    Write vRouteGet;
+  Property Post   : TRESTDWRoute Read vRoutePost   Write vRoutePost;
+  Property Put    : TRESTDWRoute Read vRoutePut    Write vRoutePut;
+  Property Patch  : TRESTDWRoute Read vRoutePatch  Write vRoutePatch;
+  Property Delete : TRESTDWRoute Read vRouteDelete Write vRouteDelete;
+  Property Option : TRESTDWRoute Read vRouteOption Write vRouteOption;
+ End;
+
 
 Var
  InitStrPos,
@@ -296,5 +341,132 @@ Var
  DecimalLocal : Char;
 
 implementation
+
+{ TRESTDWRoute }
+
+Constructor TRESTDWRoute.Create(aMethod : TRESTDWRouteData);
+Begin
+ vNeedAuthorization := False;
+ vLoadRoute         := aMethod;
+ vActive            := aMethod = crAll;
+End;
+
+Destructor TRESTDWRoute.Destroy;
+Begin
+End;
+
+Procedure TRESTDWRoute.SetActive(aActive : Boolean);
+Begin
+ vActive := aActive;
+ If Assigned(vOnChangeActive) Then
+  vOnChangeActive(vActive, vLoadRoute);
+End;
+
+Procedure TRESTDWRoutes.ChangeActive(aActive    : Boolean;
+                                     aRouteData : TRESTDWRouteData);
+Begin
+ If (aActive)            And
+    (aRouteData = crAll) Then
+  Begin
+   vRouteGet.vActive    := Not aActive;
+   vRoutePost.vActive   := vRouteGet.vActive;
+   vRoutePut.vActive    := vRouteGet.vActive;
+   vRoutePatch.vActive  := vRouteGet.vActive;
+   vRouteDelete.vActive := vRouteGet.vActive;
+   vRouteOption.vActive := vRouteGet.vActive;
+  End
+ Else If (aActive) Then
+  vRouteAll.vActive := Not aActive;
+End;
+
+Constructor TRESTDWRoutes.Create;
+Begin
+ vRouteAll                   := TRESTDWRoute.Create(crAll);
+ vRouteGet                   := TRESTDWRoute.Create(crGet);
+ vRoutePost                  := TRESTDWRoute.Create(crPost);
+ vRoutePut                   := TRESTDWRoute.Create(crPut);
+ vRoutePatch                 := TRESTDWRoute.Create(crPatch);
+ vRouteDelete                := TRESTDWRoute.Create(crDelete);
+ vRouteOption                := TRESTDWRoute.Create(crOption);
+ {$IFDEF FPC}
+  vRouteAll.OnChangeActive   := @ChangeActive;
+ {$ELSE}
+  vRouteAll.OnChangeActive   := ChangeActive;
+ {$ENDIF}
+ {$IFDEF FPC}
+  vRouteGet.OnChangeActive   := @ChangeActive;
+ {$ELSE}
+  vRouteGet.OnChangeActive   := ChangeActive;
+ {$ENDIF}
+ {$IFDEF FPC}
+  vRoutePost.OnChangeActive  := @ChangeActive;
+ {$ELSE}
+  vRoutePost.OnChangeActive  := ChangeActive;
+ {$ENDIF}
+ {$IFDEF FPC}
+  vRoutePut.OnChangeActive   := @ChangeActive;
+ {$ELSE}
+  vRoutePut.OnChangeActive   := ChangeActive;
+ {$ENDIF}
+ {$IFDEF FPC}
+  vRoutePatch.OnChangeActive := @ChangeActive;
+ {$ELSE}
+  vRoutePatch.OnChangeActive := ChangeActive;
+ {$ENDIF}
+ {$IFDEF FPC}
+  vRouteDelete.OnChangeActive := @ChangeActive;
+ {$ELSE}
+  vRouteDelete.OnChangeActive := ChangeActive;
+ {$ENDIF}
+ {$IFDEF FPC}
+  vRouteOption.OnChangeActive := @ChangeActive;
+ {$ELSE}
+  vRouteOption.OnChangeActive := ChangeActive;
+ {$ENDIF}
+ vRouteAll.Active            := True;
+End;
+
+Destructor TRESTDWRoutes.Destroy;
+Begin
+ FreeAndNil(vRouteAll);
+ FreeAndNil(vRouteGet);
+ FreeAndNil(vRoutePost);
+ FreeAndNil(vRoutePut);
+ FreeAndNil(vRoutePatch);
+ FreeAndNil(vRouteDelete);
+ FreeAndNil(vRouteOption);
+End;
+
+Function TRESTDWRoutes.RouteIsActive(RequestType: TRequestType) : Boolean;
+Begin
+ Result := False;
+ Case RequestType Of
+  rtGet    : Result := (vRouteGet.vActive)    Or (vRouteAll.vActive);
+  rtPost   : Result := (vRoutePost.vActive)   Or (vRouteAll.vActive);
+  rtPut    : Result := (vRoutePut.vActive)    Or (vRouteAll.vActive);
+  rtPatch  : Result := (vRoutePatch.vActive)  Or (vRouteAll.vActive);
+  rtDelete : Result := (vRouteDelete.vActive) Or (vRouteAll.vActive);
+  rtOption : Result := (vRouteOption.vActive) Or (vRouteAll.vActive);
+ End;
+End;
+
+Function TRESTDWRoutes.RouteNeedAuthorization(RequestType : TRequestType) : Boolean;
+Begin
+ Result := False;
+ Case RequestType Of
+  rtGet    : Result := ((vRouteGet.vActive)   And (vRouteGet.vNeedAuthorization))   Or
+                       ((vRouteAll.vActive)   And (vRouteAll.vNeedAuthorization));
+  rtPost   : Result := (vRoutePost.vActive)   And (vRoutePost.vNeedAuthorization)   Or
+                       ((vRouteAll.vActive)   And (vRouteAll.vNeedAuthorization));
+  rtPut    : Result := (vRoutePut.vActive)    And (vRoutePut.vNeedAuthorization)    Or
+                       ((vRouteAll.vActive)   And (vRouteAll.vNeedAuthorization));
+  rtPatch  : Result := (vRoutePatch.vActive)  And (vRoutePatch.vNeedAuthorization)  Or
+                       ((vRouteAll.vActive)   And (vRouteAll.vNeedAuthorization));
+  rtDelete : Result := (vRouteDelete.vActive) And (vRouteDelete.vNeedAuthorization) Or
+                       ((vRouteAll.vActive)   And (vRouteAll.vNeedAuthorization));
+  rtOption : Result := (vRouteOption.vActive) And (vRouteOption.vNeedAuthorization) Or
+                       ((vRouteAll.vActive)   And (vRouteAll.vNeedAuthorization));
+ End;
+End;
 
 end.

@@ -1,7 +1,5 @@
 unit uRESTDWProtoTypes;
-
 {$I ..\..\Source\Includes\uRESTDW.inc}
-
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -10,26 +8,23 @@ unit uRESTDWProtoTypes;
  Pascal e com compatibilidade entre sistemas operacionais.
   Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
-
  Membros do Grupo :
-
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
  Roniery                    - Devel.
 }
-
 interface
 
 uses
-  {$IF (NOT Defined(DELPHIXE4UP)) AND (NOT Defined(RESTDWLAZARUS))}
+  {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXE3UP)}
   DbTables,
   {$IFEND}
   SysUtils,  Classes, Db, FMTBcd;
-
  Const
   dwftColor       = Integer(255);
   RESTDWHexPrefix = '0x';
@@ -94,7 +89,6 @@ uses
   dwftTimeStampOffset = Integer(49);
   dwftSingle          = Integer(51);
   {$ENDIF}
-
   {Unsupported types}
   dwftUnknown         = Integer(DB.ftUnknown);
   dwftCursor          = Integer(DB.ftCursor);
@@ -103,7 +97,6 @@ uses
   dwftReference       = Integer(DB.ftReference);
   dwftDataSet         = Integer(DB.ftDataSet);
   {Unknown newest types for support in future}
-
   {$IFDEF DELPHI2010UP}
   dwftConnection      = Integer(DB.ftConnection); //46
   dwftParams          = Integer(DB.ftParams); //47
@@ -122,7 +115,6 @@ uses
                                                                      (Value: dwftColor;           Name: 'ftColor'));
  {$ENDIF}
 
-
   FieldGroupChar: set of 0..255 = [dwftFixedChar, dwftString];
   FieldGroupWideChar: set of 0..255 = [dwftFixedWideChar, dwftWideString];
   FieldGroupStream: set of 0..255 = [dwftStream, dwftBlob, dwftBytes, dwftWideMemo, dwftMemo, dwftFMTMemo];
@@ -132,7 +124,6 @@ uses
   // but 8 bytes unassigned for all 64bits platforms except Windows 64bits.
   //  We are setting LongWord as Cardinal (4 bytes unassigned for all platforms)
   // to avoid buffer overflows in cross-platform binary exchange.
-
   FieldGroupInt64: set of 0..255 = [dwftAutoInc, dwftLargeint];
   // AutoInc Should be Int64 to accept BIGINT primary keys.
   FieldGroupFloat: set of 0..255 = [dwftFloat, dwftOraTimeStamp];
@@ -146,33 +137,45 @@ uses
   // Windows 32 bits and 16 bytes assigned on all other platforms.
   //  We are setting Extended as Double (8 bytes assigned for all platforms)
   // to avoid buffer overflows in cross-platform binary exchange.
-
   FieldGroupCurrency: set of 0..255 = [dwftCurrency];
   FieldGroupBCD: set of 0..255 = [dwftBCD, dwftFMTBcd];
   FieldGroupVariant: set of 0..255 = [dwftVariant];
   FieldGroupGUID: set of 0..255 = [dwftGUID];
-
 Type
  {$IFDEF RESTDWLAZARUS}
+  DWSmallint      = Smallint;
   DWInteger       = Longint;
   DWInt16         = Integer;
   DWInt64         = Int64;
   DWInt32         = Int32;
   DWFloat         = Real;
+  DWSingle        = Single;
+  DWDouble        = Double;
+  DWWord          = Word;
+  DWCurrency      = Currency;
+  DWCardinal      = Cardinal;
   DWFieldTypeSize = Longint;
   DWBufferSize    = Longint;
   DWUInt16        = Word;
   DWUInt32        = LongWord;
+  DWBCD           = TBCD;
  {$ELSE}
+  DWSmallint      = Smallint;
   DWInteger       = Integer;
   DWInt16         = Integer;
   DWInt64         = Int64;
   DWInt32         = Longint;
   DWFloat         = Real;
+  DWSingle        = Single;
+  DWDouble        = Double;
+  DWWord          = Word;
+  DWCurrency      = Currency;
+  DWCardinal      = Cardinal;
   DWFieldTypeSize = Integer;
   DWBufferSize    = Longint;
   DWUInt16        = Word;
   DWUInt32        = LongWord;
+  DWBCD           = TBCD;
  {$ENDIF}
  DWInt8           = Integer;
  DWUInt8          = DWInt8;
@@ -224,7 +227,11 @@ Type
   {$ELSEIF NOT Defined(RESTDWLAZARUS)}
    {$IFDEF RESTDWFMX}
     DWString     = Utf8String;
-    DWWideString = WideString;
+    {$IF Defined (DELPHI11UP)}
+    DWWideString = Widestring;
+    {$Else}
+    DWWideString = UnicodeString;
+    {$IFEND}
     DWChar       = Utf8Char;
    {$ELSE}
     DWString     = AnsiString;
@@ -274,13 +281,10 @@ Type
    Max     : Int64;
    Level   : Integer;
  End;
-
  {$IFDEF STREAM_SIZE_64}
   TRESTDWStreamSize = Int64;
  {$ELSE}
   TRESTDWStreamSize = DWInt32;
  {$ENDIF}
-
 implementation
-
 end.

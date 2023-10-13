@@ -15,6 +15,7 @@ unit uRESTDWBasicDB;
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+ Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
  Flávio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
@@ -173,7 +174,7 @@ Type
   Property    PoolerList         : TStringList                Read GetPoolerList;
  Published
   Property Active                : Boolean                    Read vActive               Write vActive;            //Seta o Estado da Conexão
-  Property BinaryRequest         : Boolean                    Read vBinaryRequest        Write vBinaryRequest;
+  Property BinaryRequest         : Boolean                    Read vBinaryRequest;       // Write vBinaryRequest;
   Property Compression           : Boolean                    Read vCompression          Write vCompression;       //Compressão de Dados
   Property Login                 : String                     Read vLogin                Write vLogin;             //Login do Usuário caso haja autenticação
   Property Password              : String                     Read vPassword             Write vPassword;          //Senha do Usuário caso haja autenticação
@@ -231,7 +232,7 @@ Type
   Property    PoolerList        : TStringList                 Read GetPoolerList;
  Published
   Property Active                : Boolean                    Read vActive               Write vActive;            //Seta o Estado da Conexão
-  Property BinaryRequest         : Boolean                    Read vBinaryRequest        Write vBinaryRequest;
+  Property BinaryRequest         : Boolean                    Read vBinaryRequest ;      // Write vBinaryRequest;
   Property Compression           : Boolean                    Read vCompression          Write vCompression;       //Compressão de Dados
   Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams     Write vAuthOptionParams;
   Property Proxy                 : Boolean                    Read vProxy                Write vProxy;             //Diz se tem servidor Proxy
@@ -374,10 +375,9 @@ Type
  Protected
   Procedure Loaded; override;
  Public
-  Function  IsServerLive            (Aip                    : String;
+  Function    IsServerLive          (Aip                    : String;
                                      Aport                  : Integer;
                                      AMessageErro           : String): Boolean; Virtual;
-
   Procedure SetConnection           (Value                  : Boolean;
                                      aBinaryRequest         : Boolean = False);                    //Seta o Estado da Conexão
   Procedure DestroyClientPooler;
@@ -738,10 +738,10 @@ Type
   vBookmark : Integer;
   vActive,
   vInactive : Boolean;
-  Procedure   InternalPost; override; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
+  Procedure   InternalPost; overload; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
   procedure   InternalOpen; override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Open
   Function    GetRecordCount : Integer; Override;
-  procedure   InternalRefresh; override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Refresh
+  procedure   InternalRefresh; overload; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Refresh
   procedure   CloseCursor; override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Close
   Procedure   Notification(AComponent: TComponent; Operation: TOperation); override;
   Procedure   ThreadStart(ExecuteData : TOnExecuteData);
@@ -818,7 +818,6 @@ Type
   {$IFDEF RESTDWLAZARUS}
   Property DatabaseCharSet;
   {$ENDIF}
-//  Property BinaryCompatibleMode;
   Property MasterCascadeDelete     : Boolean               Read vCascadeDelete            Write vCascadeDelete;
   Property BinaryRequest           : Boolean               Read vBinaryRequest            Write vBinaryRequest;
   Property Datapacks               : Integer               Read vDatapacks                Write SetDatapacks;
@@ -991,10 +990,10 @@ Type
   vBookmark : Integer;
   vActive,
   vInactive : Boolean;
-  Procedure   InternalPost; override; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
+  Procedure   InternalPost; overload; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
   procedure   InternalOpen; override; // Gilberto Rocha 07/09/2020 - usado para poder fazer datasource.dataset.Open
   Function  GetRecordCount : Integer; Override;
-  procedure InternalRefresh; override; // Gilberto Rocha 07/09/2020 - usado para poder fazer datasource.dataset.Refresh
+  procedure InternalRefresh; overload; // Gilberto Rocha 07/09/2020 - usado para poder fazer datasource.dataset.Refresh
   procedure CloseCursor; override; // Gilberto Rocha 07/09/2020 - usado para poder fazer datasource.dataset.Close
   Procedure Notification(AComponent: TComponent; Operation: TOperation); override;
  Public
@@ -1046,7 +1045,7 @@ Type
   Function    MassiveToJSON : String; //Transporte de MASSIVE em formato JSON
   Procedure   DWParams        (Var Value  : TRESTDWParams);
   Procedure   RestoreDatasetPosition;
-  Procedure   SetFilteredB(aValue  : Boolean);
+ // Procedure   SetFilteredB(aValue  : Boolean);
   Procedure   InternalLast;Override;
   Procedure   Setnotrepage (Value : Boolean);
   Procedure   SetRecordCount(aJsonCount, aRecordCount : Integer);
@@ -1062,7 +1061,7 @@ Type
   {$ENDIF}
 //  Property BinaryCompatibleMode;
   Property MasterCascadeDelete     : Boolean               Read vCascadeDelete            Write vCascadeDelete;
-  Property BinaryRequest           : Boolean               Read vBinaryRequest            Write vBinaryRequest;
+  Property BinaryRequest           : Boolean               Read vBinaryRequest;           // Write vBinaryRequest;
   Property Datapacks               : Integer               Read vDatapacks                Write SetDatapacks;
   Property OnGetDataError          : TOnEventConnection    Read vOnGetDataError           Write vOnGetDataError;         //Recebe os Erros de ExecSQL ou de GetData
   Property AfterScroll             : TOnAfterScroll        Read vOnAfterScroll            Write vOnAfterScroll;
@@ -1098,7 +1097,7 @@ Type
   Property OnCalcFields            : TDatasetEvents        Read vOnCalcFields             Write vOnCalcFields;
   Property OnNewRecord             : TDatasetEvents        Read vNewRecord                Write vNewRecord;
   Property MassiveCache            : TRESTDWMassiveCache       Read GetMassiveCache           Write SetMassiveCache;
-  Property Filtered                : Boolean               Read vFiltered                 Write SetFilteredB;
+  //Property Filtered                : Boolean               Read vFiltered                 Write SetFilteredB;
   Property ResponseTranslator      : TRESTDWResponseTranslator Read GetDWResponseTranslator   Write SetDWResponseTranslator;
 //  Property ActionCursor            : TCursor               Read vActionCursor             Write vActionCursor;
 End;
@@ -2737,9 +2736,11 @@ Begin
  FreeAndNil(vRESTConnectionDB);
 End;
 
-function TRESTDWDatabasebaseBase.IsServerLive(Aip: String; Aport: Integer; AMessageErro: String): Boolean;
+
+function TRESTDWDatabasebaseBase.IsServerLive(Aip: String; Aport: Integer;
+  AMessageErro: String): Boolean;
 begin
-  {Brito}
+//
 end;
 
 procedure TRESTDWDatabasebaseBase.Loaded;
@@ -5346,19 +5347,19 @@ Begin
   vDWResponseTranslator.FreeNotification(Self);
 End;
 
-Procedure TRESTDWTable.SetFilteredB(aValue: Boolean);
-Var
- vFilter   : String;
-Begin
- vFiltered := aValue;
- vFilter   := Filter;
- If Assigned(vOnFiltered) Then
-  vOnFiltered(vFiltered, vFilter);
- TDataset(Self).Filter   := vFilter;
- TDataset(Self).Filtered := vFiltered;
- If vFiltered Then
-  ProcAfterScroll(Self);
-End;
+//Procedure TRESTDWTable.SetFilteredB(aValue: Boolean);
+//Var
+// vFilter   : String;
+//Begin
+// vFiltered := aValue;
+// vFilter   := Filter;
+// If Assigned(vOnFiltered) Then
+//  vOnFiltered(vFiltered, vFilter);
+// TDataset(Self).Filter   := vFilter;
+// TDataset(Self).Filtered := vFiltered;
+// If vFiltered Then
+//  ProcAfterScroll(Self);
+//End;
 
 Procedure TRESTDWClientSQL.SetFilteredB(aValue: Boolean);
 Var
@@ -5799,7 +5800,7 @@ Begin
  vActualJSON                       := '';
  vMassiveMode                      := mtMassiveCache;
  vFiltered                         := False;
- vBinaryRequest                    := False;
+ vBinaryRequest                    := True;
  vInitDataset                      := False;
  vOnPacks                          := False;
  vInternalLast                     := False;
@@ -5889,7 +5890,7 @@ Begin
  vActualJSON                       := '';
  vMassiveMode                      := mtMassiveCache;
  vFiltered                         := False;
- vBinaryRequest                    := False;
+ vBinaryRequest                    := True;
  vInitDataset                      := False;
  vOnPacks                          := False;
  vInternalLast                     := False;
@@ -8363,7 +8364,6 @@ Begin
  If Self is TRESTDWTable Then
   For I := 0 To Length(vFieldsList) -1 Do
    FreeAndNil(vFieldsList[I]);
- SetLength(vFieldsList, 0);
 End;
 
 procedure TRESTDWClientSQL.CleanFieldList;
@@ -8373,7 +8373,6 @@ Begin
  If Self is TRESTDWClientSQL Then
   For I := 0 To Length(vFieldsList) -1 Do
    FreeAndNil(vFieldsList[I]);
- SetLength(vFieldsList, 0);
 End;
 
 Procedure TRESTDWTable.ClearMassive;
@@ -8648,13 +8647,13 @@ Begin
   On E : Exception do
    Begin
     If csDesigning in ComponentState Then
-     Raise Exception.Create(Name + ': ' + PChar(E.Message))
+     Raise Exception.Create(Name+': ' + PChar(E.Message))
     Else
      Begin
       If Assigned(vOnGetDataError) Then
-       vOnGetDataError(False, Name + ': '+E.Message)
+       vOnGetDataError(False, Name+': '+E.Message)
       Else
-       Raise Exception.Create(PChar(Name + ': ' + E.Message));
+       Raise Exception.Create(PChar(Name+': ' + E.Message));
      End;
    End;
  End;
@@ -9418,7 +9417,7 @@ Begin
  vListName            :=  Format('server(%d)', [aCollection.Count]);
  vRestWebService      := '127.0.0.1';
  vCompression         := True;
- vBinaryRequest       := False;
+ vBinaryRequest       := True;
  vAuthOptionParams    := TRESTDWClientAuthOptionParams.Create(Self);
  vAuthOptionParams.AuthorizationOption := rdwAONone;
  vRestPooler          := '';
@@ -9531,7 +9530,15 @@ Begin
  vAbortData            := AbortData;
  vOnThreadRequestError := OnThreadRequestError;
  {$IFNDEF RESTDWLAZARUS}
+  {$If DEFINED(RESTDWFMX)}
+    {$If DEFINED(RESTDWWINDOWS)}
+      Priority              := tpLowest;
+    {$ELSE}
+      Priority              := 1;
+    {$IFEND}
+  {$ELSE}
   Priority              := tpLowest;
+  {$IFEND}
  {$ENDIF}
 End;
 
@@ -9903,15 +9910,15 @@ Begin
   Try
    If JsonValue <> '' Then
     Begin
-     LDataSetList.Encoded             := False;
-     LDataSetList.Encoding            := esUtf8;
-     LDataSetList.ServerFieldList     := ServerFieldList;
+     LDataSetList.Encoded  := False;
+     LDataSetList.Encoding := esUtf8;
+     LDataSetList.ServerFieldList := ServerFieldList;
      {$IFDEF RESTDWLAZARUS}
-      LDataSetList.DatabaseCharSet    := DatabaseCharSet;
-      LDataSetList.NewFieldList       := @NewFieldList;
-      LDataSetList.CreateDataSet      := @CreateDataSet;
-      LDataSetList.NewDataField       := @NewDataField;
-      LDataSetList.SetInitDataset     := @SetInitDataset;
+      LDataSetList.DatabaseCharSet := DatabaseCharSet;
+      LDataSetList.NewFieldList    := @NewFieldList;
+      LDataSetList.CreateDataSet   := @CreateDataSet;
+      LDataSetList.NewDataField    := @NewDataField;
+      LDataSetList.SetInitDataset  := @SetInitDataset;
       LDataSetList.SetRecordCount     := @SetRecordCount;
       LDataSetList.Setnotrepage       := @Setnotrepage;
       LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
@@ -9921,10 +9928,10 @@ Begin
       LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
       LDataSetList.PrepareDetails     := @PrepareDetails;
      {$ELSE}
-      LDataSetList.NewFieldList       := NewFieldList;
-      LDataSetList.CreateDataSet      := CreateDataSet;
-      LDataSetList.NewDataField       := NewDataField;
-      LDataSetList.SetInitDataset     := SetInitDataset;
+      LDataSetList.NewFieldList    := NewFieldList;
+      LDataSetList.CreateDataSet   := CreateDataSet;
+      LDataSetList.NewDataField    := NewDataField;
+      LDataSetList.SetInitDataset  := SetInitDataset;
       LDataSetList.SetRecordCount     := SetRecordCount;
       LDataSetList.Setnotrepage       := Setnotrepage;
       LDataSetList.SetInDesignEvents  := SetInDesignEvents;
@@ -9934,10 +9941,10 @@ Begin
       LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
       LDataSetList.PrepareDetails     := PrepareDetails;
      {$ENDIF}
-     LDataSetList.Utf8SpecialChars    := Utf8SpecialChars;
+     LDataSetList.Utf8SpecialChars := Utf8SpecialChars;
      Try
-      LDataSetList.OnWriterProcess    := OnWriterProcess;
-      LDataSetList.Utf8SpecialChars   := True;
+      LDataSetList.OnWriterProcess := OnWriterProcess;
+      LDataSetList.Utf8SpecialChars := True;
       LDataSetList.WriteToDataset(JsonValue, Self, oDWResponseTranslator, rtJSONAll);
       Result := True;
      Except
@@ -10567,8 +10574,9 @@ Begin
             TRESTDWClientSQLBase(Self).SetInBlockEvents(False); // Novavix
            End;
          Finally
-          TRESTDWClientSQLBase(Self).EnableControls;
           SetInBlockEvents(False);
+          TRESTDWClientSQLBase(Self).EnableControls;
+
           If Active Then
            If Not (vInBlockEvents) and not vBinaryRequest and not vInRefreshData Then
             Begin
@@ -11040,7 +11048,7 @@ begin
  vParams        := TParams.Create(Self);
  vProcName      := '';
  vSchemaName    := vProcName;
- vBinaryRequest := False;
+ vBinaryRequest := True;
 end;
 
 destructor TRESTDWStoredProcedure.Destroy;
@@ -11454,7 +11462,7 @@ Begin
  vLogin             := cDefaultBasicAuthUser;
  vRestWebService    := '127.0.0.1';
  vCompression       := True;
- vBinaryRequest     := False;
+ vBinaryRequest     := True;
  vPassword          := cDefaultBasicAuthPassword;
  vRestPooler        := '';
  vPoolerPort        := 8082;

@@ -672,9 +672,9 @@ begin
           vDataSetList.SaveToStream(FStream);
       finally
         FreeAndNil(vDataSetList);
+        vSQL.Free;
+        vParams.Free;
       end;
-      vSQL.Free;
-      vParams.Free;
       if not vError then
       begin
         Result := vRowsAffected;
@@ -769,7 +769,7 @@ begin
     Exit;
 
   // N - Bytes
-  if (FFieldTypes[col] in [dwftFixedChar, dwftString, dwftMemo]) then
+  if (FFieldTypes[col] in [dwftFixedChar, dwftString, dwftMemo, dwftWideMemo, dwftFmtMemo]) then
   begin
     FStream.Read(vInt64, SizeOf(vInt64));
     vRawByteString := '';
@@ -882,24 +882,24 @@ begin
     Result := vCurrency;
   end
   // N Bytes - Wide Memos
-  else if (FFieldTypes[col] in [ dwftWideMemo, dwftFmtMemo]) then
-  begin
-    FStream.Read(vInt64, SizeOf(vInt64));
-    if vInt64 > 0 then
-    Begin
-      vStringStream := TStringStream.Create;
-      try
-        vStringStream.CopyFrom(FStream, vInt64);
-        vStringStream.Position := 0;
-        Result := TEncoding.UTF8.GetString(vStringStream.Bytes);
-        //Result := vStringStream.DataString;
-        if Pos(#0, Result) > 0 then
-          Result := StringReplace(Result, #0, '', [rfReplaceAll]);
-      finally
-        vStringStream.Free;
-      end;
-    end;
-  end
+//  else if (FFieldTypes[col] in [ dwftWideMemo, dwftFmtMemo]) then
+//  begin
+//    FStream.Read(vInt64, SizeOf(vInt64));
+//    if vInt64 > 0 then
+//    Begin
+//      vStringStream := TStringStream.Create;
+//      try
+//        vStringStream.CopyFrom(FStream, vInt64);
+//        vStringStream.Position := 0;
+//        Result := TEncoding.UTF8.GetString(vStringStream.Bytes);
+//        //Result := vStringStream.DataString;
+//        if Pos(#0, Result) > 0 then
+//          Result := StringReplace(Result, #0, '', [rfReplaceAll]);
+//      finally
+//        vStringStream.Free;
+//      end;
+//    end;
+//  end
   // N Bytes - Memos e Blobs
   else if (FFieldTypes[col] in [dwftStream, dwftBlob, dwftBytes]) then
   begin

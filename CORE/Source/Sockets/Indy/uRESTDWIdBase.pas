@@ -3512,12 +3512,11 @@ Var
                Begin
                  {$IF Defined(RESTDWLAZARUS)}
                  vValue := DecodeStrings(bJsonOBJ.Pairs[4].Value, DatabaseCharSet);
-                 {$ELSEIF Defined(DELPHIXEUP)}
-                 vValue := DecodeStrings(bJsonOBJ.Pairs[4].Value);
                  {$ELSE}
+                 vValue := DecodeStrings(bJsonOBJ.Pairs[4].Value);
                  If Encoding = esUtf8 Then
                    vValue := Utf8Decode(vValue);
-                 vValue := AnsiString(vValue);
+//                 vValue := AnsiString(vValue);
                  {$IFEND}
                End
               Else If JSONParam.ObjectValue <> ovObject then

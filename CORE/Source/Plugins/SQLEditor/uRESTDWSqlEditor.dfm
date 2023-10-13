@@ -1,23 +1,21 @@
 object FrmDWSqlEditor: TFrmDWSqlEditor
   Left = 479
   Top = 236
-  Width = 1079
-  Height = 756
   BorderWidth = 5
   Caption = 'RESTDWClientSQL Editor'
+  ClientHeight = 707
+  ClientWidth = 1053
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object PnlSQL: TPanel
     Left = 0

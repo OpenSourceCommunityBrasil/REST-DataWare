@@ -1,4 +1,4 @@
-﻿Unit uRESTDWJSONObject;
+Unit uRESTDWJSONObject;
 
 {$I ..\Includes\uRESTDW.inc}
 
