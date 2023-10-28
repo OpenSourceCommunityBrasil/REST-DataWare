@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{40FCEF6B-18F5-4D83-96E2-6F9B76C70917}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="..\..\..\HTMLEditorDSG.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DWhtmlEditor.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="HTMLEditorDSG">
+        <MSBuild Projects="..\..\..\HTMLEditorDSG.dproj"/>
+    </Target>
+    <Target Name="HTMLEditorDSG:Clean">
+        <MSBuild Projects="..\..\..\HTMLEditorDSG.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="HTMLEditorDSG:Make">
+        <MSBuild Projects="..\..\..\HTMLEditorDSG.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DWhtmlEditor">
+        <MSBuild Projects="DWhtmlEditor.dproj"/>
+    </Target>
+    <Target Name="DWhtmlEditor:Clean">
+        <MSBuild Projects="DWhtmlEditor.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DWhtmlEditor:Make">
+        <MSBuild Projects="DWhtmlEditor.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="HTMLEditorDSG;DWhtmlEditor"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="HTMLEditorDSG:Clean;DWhtmlEditor:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="HTMLEditorDSG:Make;DWhtmlEditor:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

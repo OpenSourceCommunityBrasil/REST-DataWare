@@ -23,6 +23,7 @@ Type
   vValue       : Variant;
   vSpecialChars,
   vIsNull      : Boolean;
+  VObjectType  : TRESTDWJSONObjectType;
   Procedure   SetValue    (aValue : Variant);
  Public
   Constructor Create(aElementType : TRESTDWJSONElementType);
@@ -30,6 +31,7 @@ Type
   Procedure   Clear;
   Function    ToJSON              : String;Virtual;
   Property    ElementType         : TRESTDWJSONElementType Read VElementType  Write VElementType;
+  Property    ObjectType          : TRESTDWJSONObjectType  Read VObjectType   Write VObjectType;
   Property    Value               : Variant                Read vValue        Write SetValue;
   Property    IsNull              : Boolean                Read vIsNull       Write vIsNull;
   Property    SpecialChars        : Boolean                Read vSpecialChars Write vSpecialChars;
@@ -40,7 +42,6 @@ Type
  TRESTDWJSONBaseObjectClass = Class(TRESTDWJSONBaseClass)
  Private
   vElementName  : String;
-  VObjectType   : TRESTDWJSONObjectType;
  Private
   Property ElementType  : TRESTDWJSONElementType Read VElementType  Write VElementType;
  Public
@@ -414,6 +415,8 @@ Begin
  BaseObjectClass^.SpecialChars := vSpecialChars;
  BaseObjectClass^.ElementName  := Key;
  BaseObjectClass^.Value        := Value;
+ BaseObjectClass^.ElementType  := etInteger;
+ BaseObjectClass^.VObjectType  := jtValue;
  Result                        := vList.Add(BaseObjectClass);
 End;
 
@@ -428,6 +431,8 @@ Begin
  BaseObjectClass^.ElementName  := Key;
  BaseObjectClass^.Value        := Value;
  BaseObjectClass^.SpecialChars := SpecialChars;
+ BaseObjectClass^.ElementType  := etString;
+ BaseObjectClass^.VObjectType  := jtValue;
  Result                        := vList.Add(BaseObjectClass);
 End;
 
@@ -441,6 +446,8 @@ Begin
  BaseObjectClass^.SpecialChars := vSpecialChars;
  BaseObjectClass^.ElementName  := Key;
  BaseObjectClass^.Value        := Value;
+ BaseObjectClass^.ElementType  := etNumeric;
+ BaseObjectClass^.VObjectType  := jtValue;
  Result                        := vList.Add(BaseObjectClass);
 End;
 
@@ -454,6 +461,8 @@ Begin
  BaseObjectClass^.SpecialChars := vSpecialChars;
  BaseObjectClass^.ElementName  := Key;
  BaseObjectClass^.Value        := Value;
+ BaseObjectClass^.ElementType  := etNumeric;
+ BaseObjectClass^.VObjectType  := jtValue;
  Result                        := vList.Add(BaseObjectClass);
 End;
 
@@ -467,6 +476,8 @@ Begin
  BaseObjectClass^.SpecialChars := vSpecialChars;
  BaseObjectClass^.ElementName  := Key;
  BaseObjectClass^.Value        := Value;
+ BaseObjectClass^.ElementType  := etBoolean;
+ BaseObjectClass^.VObjectType  := jtValue;
  Result                        := vList.Add(BaseObjectClass);
 End;
 
@@ -484,6 +495,8 @@ Begin
  BaseObjectClass^.Value          := Value;
  BaseObjectClass^.DateTimeFormat := aDateTimeFormat;
  BaseObjectClass^.FormatMask     := aFormatMask;
+ BaseObjectClass^.ElementType    := etDateTime;
+ BaseObjectClass^.VObjectType  := jtValue;
  Result                          := vList.Add(BaseObjectClass);
 End;
 
@@ -501,6 +514,8 @@ Begin
  BaseObjectClass^.Value          := Value;
  BaseObjectClass^.DateTimeFormat := aDateTimeFormat;
  BaseObjectClass^.FormatMask     := aFormatMask;
+ BaseObjectClass^.ElementType    := etDateTime;
+ BaseObjectClass^.VObjectType    := jtValue;
  Result                          := vList.Add(BaseObjectClass);
 End;
 
@@ -514,6 +529,8 @@ Begin
  BaseObjectClass^.SpecialChars := vSpecialChars;
  BaseObjectClass^.ElementName  := Key;
  BaseObjectClass^.Value        := EncodeStream(Value);
+ BaseObjectClass^.ElementType  := etBlob;
+ BaseObjectClass^.VObjectType  := jtValue;
  Result                        := vList.Add(BaseObjectClass);
 End;
 
@@ -526,6 +543,8 @@ Begin
  BaseObjectClass^.SpecialChars := vSpecialChars;
  BaseObjectClass^.ElementName  := '';
  BaseObjectClass^.Value        := Value;
+ BaseObjectClass^.ElementType  := etInteger;
+ BaseObjectClass^.VObjectType  := jtValue;
  Result                        := vList.Add(BaseObjectClass);
 End;
 
@@ -538,6 +557,8 @@ Begin
  BaseObjectClass^.SpecialChars := vSpecialChars;
  BaseObjectClass^.ElementName  := '';
  BaseObjectClass^.Value        := Value;
+ BaseObjectClass^.ElementType  := etString;
+ BaseObjectClass^.VObjectType  := jtValue;
  Result                        := vList.Add(BaseObjectClass);
 End;
 
@@ -918,7 +939,7 @@ Function TRESTDWJSONBase.Count : Integer;
 Begin
  Result := -1;
  If Assigned(vList) Then
-  Result := TList(vList).Count;
+  Result := vList.Count;
 End;
 
 Constructor TRESTDWJSONBase.Create(JSON : String);
@@ -957,17 +978,25 @@ begin
   End;
  {$ENDIF}
  Try
-  If (bJsonValue.ClassType = TRESTDWJSONObject) Or
-     (bJsonValue.ClassType = TJSONObject)   Then
-   Begin
-    Create(jtObject);
-    ReadJSON(JSON);
-   End
-  Else
-   Begin
-    Create(jtArray);
-    ReadJSON(JSON);
-   End;
+  Try
+   If (bJsonValue.ClassType = TRESTDWJSONObject) Or
+      (bJsonValue.ClassType = TJSONObject)   Then
+    Begin
+     Create(jtObject);
+     ReadJSON(JSON);
+    End
+   Else
+    Begin
+     Create(jtArray);
+     ReadJSON(JSON);
+    End;
+  Except
+   On E: Exception Do
+    Begin
+     Raise Exception.Create(PChar(cInvalidJSON));
+     Exit;
+    End;
+  End;
  Finally
   FreeAndNil(bJsonValue);
  End;
@@ -1144,6 +1173,10 @@ Begin
  vElementType  := aElementType;
  vIsNull       := True;
  vValue        := varNull;
+ If vElementType = etUnknow Then
+  vObjectType  := jtObject
+ Else
+  vObjectType  := jtValue;
 End;
 
 Procedure TRESTDWJSONBaseClass.SetValue(aValue : Variant);
@@ -1160,6 +1193,7 @@ End;
 Constructor TRESTDWJSONString.Create;
 Begin
  Inherited Create(etString);
+ VObjectType   := jtValue;//, jtUnknow
  vSpecialChars := True;
 End;
 
@@ -1194,6 +1228,7 @@ End;
 Constructor TRESTDWJSONNumeric.Create;
 Begin
  Inherited Create(etNumeric);
+ VObjectType   := jtValue;//, jtUnknow
 End;
 
 Function TRESTDWJSONNumeric.ToJSON : String;
@@ -1217,6 +1252,7 @@ End;
 Constructor TRESTDWJSONInteger.Create;
 Begin
  Inherited Create(etInteger);
+ VObjectType   := jtValue;//, jtUnknow
 End;
 
 Function TRESTDWJSONInteger.ToJSON : String;
@@ -1240,6 +1276,7 @@ End;
 Constructor TRESTDWJSONBoolean.Create;
 Begin
  Inherited Create(etBoolean);
+ VObjectType   := jtValue;//, jtUnknow
 End;
 
 Function TRESTDWJSONBoolean.ToJSON : String;
@@ -1271,6 +1308,7 @@ End;
 Constructor TRESTDWJSONDateTime.Create;
 Begin
  Inherited Create(etDateTime);
+ VObjectType   := jtValue;//, jtUnknow
 End;
 
 Function TRESTDWJSONDateTime.ToJSON : String;
@@ -1308,6 +1346,7 @@ End;
 Constructor TRESTDWJSONBlob.Create;
 Begin
  Inherited Create(etBlob);
+ VObjectType   := jtValue;//, jtUnknow
 End;
 
 Function TRESTDWJSONBlob.SaveToFile  (Filename    : String) : Boolean;

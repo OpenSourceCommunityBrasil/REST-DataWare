@@ -1,4 +1,4 @@
-Unit uRESTDWConsts;
+﻿Unit uRESTDWConsts;
 
 {$I ..\..\Source\Includes\uRESTDW.inc}
 
@@ -96,6 +96,7 @@ Const
  cDefaultContentType             = 'application/json';
  cDefaultContentEncoding         = 'gzip, identity';
  cEmptyDBName                    = 'Empty Database Property';
+ cInvalidJSON                    = 'Invalid JSON Object/Array';
  cErrorDatabaseNotFound          = 'Database not found...';
  cErrorDataSetNotDefined         = 'Dataset not defined...';
  cErrorDriverNotSet              = 'Selected pooler does not have a driver set';

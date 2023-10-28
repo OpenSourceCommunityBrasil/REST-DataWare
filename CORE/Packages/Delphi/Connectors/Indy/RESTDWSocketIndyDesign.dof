@@ -105,10 +105,6 @@ HostApplication=
 Launcher=
 UseLauncher=0
 DebugCWD=
-[Language]
-ActiveLang=
-ProjectLang=
-RootDir=D:\IDE\Embarcadero\Studio\7\Bin\
 [Version Info]
 IncludeVerInfo=1
 AutoIncBuild=0
@@ -134,13 +130,3 @@ OriginalFilename=
 ProductName=RESTDWSocketIndyDesign
 ProductVersion=1.0.0.0
 ProgramID=com.embarcadero.RESTDWSocketIndyDesign
-[HistoryLists\hlConditionals]
-Count=1
-Item0=DEBUG
-[HistoryLists\hlUnitAliases]
-Count=1
-Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[HistoryLists\hlUnitOutputDirectory]
-Count=2
-Item0=..\..\..\..\compiled
-Item1=..\..\..\compiled

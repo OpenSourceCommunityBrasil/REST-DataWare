@@ -1,4 +1,4 @@
-unit uRESTDWMemExprParser;
+﻿unit uRESTDWMemExprParser;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
@@ -93,11 +93,11 @@ const
     '/',
     '*',
     '=',
-    {$IFNDEF FPC}
-     {$IFDEF DELPHI2010UP}
-      '�',
-     {$ENDIF}
-    {$ENDIF}
+//    {$IFNDEF FPC}
+//     {$IFDEF DELPHI2010UP}
+//      '�',
+//     {$ENDIF}
+//    {$ENDIF}
     '<',
     '@', // <=
     '>',
