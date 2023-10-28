@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>LoadStrings Method</TITLE>
+<link rel="stylesheet" type="text/css" href="help.css">
+</HEAD>
+
+<BODY class="v114">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="LoadStrings Method">
+</OBJECT>
+
+<H1><A NAME="loadstrings_method"></A><B>LoadStrings Method</B></H1>
+<HR>
+
+<H2 class="AppliesTo">Applies to</H2>
+
+<P><A HREF="thtmlviewer_component.htm">THtmlViewer</A> component</P>
+
+<H2 class="deprecated">Deprecated</H2>
+<P>Use method <A HREF="LoadFromString_method.htm">LoadFromString</A> instead.</P>
+
+<H2 class="Declaration">Declaration</H2>
+
+<P>procedure LoadStrings(Strings: <A href="type_thtstrings.htm">ThtStrings</A>; const Reference: <A href="type_thtstring.htm">ThtString</A> = '');</P>
+
+<H2 class="Description">Description</H2>
+
+<P>The LoadStrings method loads an HTML document from a TStrings object.  </P>
+
+<P><I>Reference</I> is an optional <A HREF="reference.htm">reference</A> parameter.</P>
+
+<P>Example</P>
+
+<P>Assume an HTML document exists in a TMemo object.  The following line of code could be used to then copy the document to an THtmlViewer object:</P>
+
+<PRE>Viewer.LoadStrings(Memo1.Lines);</PRE>
+
+<H2 class"SeeAlso">See also</H2>
+<UL class="SeeAlso">
+<LI><A HREF="loadfromdocument_method.htm">LoadFromDocument Method</A>
+<LI><A HREF="loadfromfile_method.htm">LoadFromFile Method</A>
+<LI><A HREF="loadfromstream_method.htm">LoadFromStream Method</A>
+<LI><A HREF="loadfromstring_method.htm">LoadFromString Method</A>
+</UL>
+
+</BODY>
+</HTML>

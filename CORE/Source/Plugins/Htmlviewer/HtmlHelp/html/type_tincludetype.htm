@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Type TIncludeType</TITLE>
+<link rel="stylesheet" type="text/css" href="help.css">
+</HEAD>
+
+<BODY class="v114">
+
+<H1><A NAME="type_tincludetype"></A><B>Type TIncludeType</B></H1>
+<HR>
+
+<H2 class="Declaration">Declaration</H2>
+
+<P>TIncludeType = procedure (Sender: TObject; const Command: string;</P>
+
+<P>Params: TStrings; var IString: string) of Object;</P>
+
+<H2 class="Description">Description</H2>
+
+<P>The TIncludeType type is the type for <A HREF="oninclude_event.htm">OnInclude</A> events.  These events occur when server side include syntax is encountered in the HTML document at load time.</P>
+
+<P>The server side include syntax takes the form:</P>
+
+<P>&lt;!--#<I>command arg1="value1" arg2="value2"</I>  <B>...</B>  --&gt;</P>
+
+<P>The '#' distinguishes this syntax from an ordinary comment.  The <I>command</I> word appears as the <I>Command</I> parameter in the event call.  The <I>command</I> word may be followed by zero or more <I>arg,value</I> pairs.  These are formed into a TStringList object to make up the <I>Params</I> parameter.  For use in THtmlViewer, TFrameViewer, TFrameBrowzer, the parameters can be anything that's convenient.</P>
+
+<P>The HTML text to be inserted is passed back in <I>IString</I>.  This string replaces the entire original include statement.</P>
+
+<P>Note that:</P>
+
+<P>Quotes are stripped from the Value parts of <I>Params</I>.</P>
+
+<P><S>The event handler should contain a  Params.Free;  statement.</S>
+Since version 11.1 freeing Params is done by THtmlViewer, TFrameViewer, resp. TFrameBrowser and you <b>MUST NOT</b> do it. 
+</P>
+
+<P><B>See also:</B></P>
+
+<P><A HREF="oninclude_event.htm">OnInclude Event</A></P>
+
+</BODY>
+</HTML>

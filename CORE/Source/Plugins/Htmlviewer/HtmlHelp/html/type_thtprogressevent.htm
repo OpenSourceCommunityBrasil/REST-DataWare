@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Type ThtProgressEvent</TITLE>
+<link rel="stylesheet" type="text/css" href="help.css">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<H1><A NAME="type_thtprogressevent"></A><B>Type ThtProgressEvent</B></H1>
+<HR>
+
+<H2 class="Declaration">Declaration</H2>
+
+<P>TProgressStage = (psStarting, psRunning, psEnding);</P>
+
+<P>ThtProgresstEvent = <B>procedure</B>(Sender: TObject; Stage: TProgressStage;</P>
+
+<P>PercentDone: integer) of <B>Object</B>;</P>
+
+<H2 class="Description">Description</H2>
+
+<P>The <B>ThtProgressEvent</B> type is the type for the <A HREF="onprogress_event.htm">OnProgress</A> event.</P>
+
+<P><I>Sender</I>The <A HREF="thtmlviewer_component.htm">THtmlViewer</A> doing the parsing and formatting.</P>
+
+<P><I>Stage</I>The stage in the action.</P>
+
+<P><I>PercentDone</I>An approximation to the percentage of completion.</P>
+
+<P>Note that the <B>TProgressStage</B> type is defined in Graphics.pas.</P>
+
+</BODY>
+</HTML>
