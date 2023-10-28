@@ -93,11 +93,6 @@ const
     '/',
     '*',
     '=',
-//    {$IFNDEF FPC}
-//     {$IFDEF DELPHI2010UP}
-//      '�',
-//     {$ENDIF}
-//    {$ENDIF}
     '<',
     '@', // <=
     '>',
