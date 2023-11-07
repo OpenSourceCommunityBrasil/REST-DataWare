@@ -2887,7 +2887,7 @@ Begin
                                           vToken,
                                           vErrorCode, vErrorMessage, vAcceptAuth);
 
-              If Not vAcceptAuth Then
+              If Not vAcceptAuth and not ((vCORS) And (RequestType = rtOption)) Then  //Roniery
                Begin
                  //Eloy
                  if vAuthenticator is TRESTDWAuthBasic then
