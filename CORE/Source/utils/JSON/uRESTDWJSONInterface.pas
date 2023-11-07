@@ -212,6 +212,8 @@ End;
 
 Destructor TRESTDWJSONInterfaceArray.Destroy;
 Begin
+  If Assigned(vJSONObject) Then
+   FreeAndNil(TJSONBaseClass(vJSONObject));
   inherited;
 End;
 
@@ -289,27 +291,24 @@ End;
 
 Constructor TRESTDWJSONInterfaceObject.Create(JSONValue: String);
 Begin
-  Inherited Create;
-  If JSONValue <> '' Then
+ Inherited Create;
+ If JSONValue <> '' Then
   Begin
-    {$IFDEF RESTDWFMX}
+   {$IFDEF RESTDWFMX}
     If JSONValue[InitStrPos] = '[' then
-      vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue(JSONValue)
-        as TJSONArray)
+     vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue(JSONValue) as TJSONArray)
     Else If JSONValue[InitStrPos] = '{' then
-      vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue(JSONValue)
-        as TJSONObject)
+     vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue(JSONValue) as TJSONObject)
     Else
-      vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue('{}')
-        as TJSONObject)
-      {$ELSE}
+     vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue('{}')      as TJSONObject)
+   {$ELSE}
     If JSONValue[InitStrPos] = '[' then
-      vJSONObject := TJSONBaseClass(TJSONArray.Create(JSONValue))
+     vJSONObject := TJSONBaseClass(TJSONArray.Create(JSONValue))
     Else If JSONValue[InitStrPos] = '{' then
-      vJSONObject := TJSONBaseClass(TJSONObject.Create(JSONValue))
+     vJSONObject := TJSONBaseClass(TJSONObject.Create(JSONValue))
     Else
-      vJSONObject := TJSONBaseClass(TJSONObject.Create('{}'))
-      {$ENDIF}
+     vJSONObject := TJSONBaseClass(TJSONObject.Create('{}'))
+   {$ENDIF}
   End;
 End;
 
@@ -582,10 +581,21 @@ Begin
   End
   Else If Uppercase(vClassName) = Uppercase('TJSONArray') Then
   Begin
-    If LowerCase(TJSONArray(vJSONObject).Get(index).ClassName)
-      = LowerCase('_String') Then
+    If LowerCase(TJSONArray(vJSONObject).Get(index).ClassName) = LowerCase('_String') Then
     Begin
       result.ClassName := '_String';
+      result.Name := 'arrayobj' + IntToStr(Index);
+      result.Value := TJSONArray(vJSONObject).Get(index).toString;
+    End
+    Else If LowerCase(TJSONArray(vJSONObject).Get(index).ClassName) = LowerCase('_Integer') Then
+    Begin
+      result.ClassName := '_Integer';
+      result.Name := 'arrayobj' + IntToStr(Index);
+      result.Value := TJSONArray(vJSONObject).Get(index).toString;
+    End
+    Else If LowerCase(TJSONArray(vJSONObject).Get(index).ClassName) = LowerCase('_Double') Then
+    Begin
+      result.ClassName := '_Double';
       result.Name := 'arrayobj' + IntToStr(Index);
       result.Value := TJSONArray(vJSONObject).Get(index).toString;
     End
@@ -743,7 +753,8 @@ end;
 
 Destructor TRESTDWJSONInterfaceBase.Destroy;
 Begin
-
+  If Assigned(vJSONObject) Then
+    FreeAndNil(TJSONBaseClass(vJSONObject));
   inherited;
 End;
 

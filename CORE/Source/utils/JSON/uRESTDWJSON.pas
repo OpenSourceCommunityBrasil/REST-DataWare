@@ -768,6 +768,7 @@ var
   c, b : char;
   s , sb: string;
 begin
+ result := Nil;
   c := nextClean();
 
         case (c) of
@@ -781,8 +782,13 @@ begin
                 exit;
             end;
             '[': begin
+                b := nextClean();
                 back();
-                result := TJSONArray.create(self);
+                back();
+                if b <> ']' then
+                 result := TJSONArray.create(self)
+                Else
+                 c := nextClean();
                 exit;
             end;
         end;
@@ -844,6 +850,9 @@ begin
                                                             16));
                         exit;
                     Except
+                      on e:Exception do begin
+                        ///* Ignore the error */
+                      end;
                     end;
                 end else begin
                           If Not((Pos(',', s) > 0) or (Pos('.', s) > 0)) Then
@@ -853,12 +862,18 @@ begin
                                                             8));
                                 exit;
                             Except
+                             on e:Exception do begin
+                              ///* Ignore the error */
+                             end;
                             end;
                            End;
                           try
                               result := _Double.create(s);
                               exit;
                           Except
+                            on e:Exception do begin
+                             ///* Ignore the error */
+                            end;
                           end;
                 end;
             end;
@@ -871,12 +886,18 @@ begin
                    result := _Int64.create(s);
                   exit;
               Except
+               on e:Exception do begin
+                ///* Ignore the error */
+               end;
               end;
              End;
             try
                 result := _Double.create(s);
                 exit;
             Except
+             on e:Exception do begin
+              ///* Ignore the error */
+             end;
             end;
         end;
         result := _String.create(s);
@@ -1023,7 +1044,8 @@ begin
           with x.nextValue() do
           begin
             key := toString();
-            Free; //Fix memory leak. By creation_zy
+            If Assigned(Self) Then
+             Free; //Fix memory leak. By creation_zy
           end;
       end
       end; //fim do case
@@ -1057,7 +1079,7 @@ begin
           exit;
       end
       else begin
-          raise x.syntaxError('Expected a "," or "}"');
+//          raise x.syntaxError('Expected a "," or "}"');
       end
       end;
   end; //while
@@ -1303,9 +1325,9 @@ var
  i : integer;
 begin
   result := TStringList.Create;
-  for i := 0 to myHashMap.Count -1 do begin
+  If myHashMap <> Nil Then
+   for i := 0 to myHashMap.Count -1 do
     result.add (myHashMap[i]);
-  end;
 end;
 
 function TJSONObject.length: integer;
@@ -2258,28 +2280,31 @@ begin
   FreeAndNil(token);
 end;
 
-destructor TJSONArray.destroy;
-var
+Destructor TJSONArray.destroy;
+Var
  obj : TObject;
-begin
-  while myArrayList.Count > 0 do begin
-    obj := TObject(myArrayList[0]);
-    if    (obj <> CONST_FALSE)
-      and (obj <> CONST_TRUE)
-      and (obj <> CNULL)
-      and (Assigned(obj)) then
-     Begin
-//      {$IFNDEF FPC}
-//      Dispose(myArrayList[0]);
-//      {$ELSE}
-      FreeAndNil(obj);
-//      {$ENDIF}
+Begin
+ If Assigned(myArrayList) Then
+ While myArrayList.Count > 0 do
+  Begin
+   obj := TObject(myArrayList[0]);
+   If    (obj <> CONST_FALSE)
+     And (obj <> CONST_TRUE)
+     And (obj <> CNULL)
+     And (Assigned(obj)) Then
+    Begin
+     Try
+      obj.Free;
+     Except
+//    Dispose(myArrayList[0]);
      End;
+    End;
     myArrayList.Delete(0);
-  end;
+   End;
+ If Assigned(myArrayList) Then
   FreeAndNil(myArrayList);
-  inherited;
-end;
+ Inherited;
+End;
 
 (**
      * Get the object value associated with an index.
@@ -3052,13 +3077,16 @@ begin
          Begin
           If UpperCase(myHashMap.Objects[0].classname) = 'TJSONARRAY' Then
            Begin
-            vTempString     := TJSONArray(myHashMap.Objects[0]).toString;
-            vTempStringSize := StrDWLength(vTempString);
-            If ((vTempString[InitStrPos] = '[') or
-                (vTempString[InitStrPos] = '{')) And
-               ((vTempString[vTempStringSize - FinalStrPos] = ']') or
-                (vTempString[vTempStringSize - FinalStrPos] = '}')) Then
-              myHashMap.Objects[0].Free;
+            If TJSONArray(myHashMap.Objects[0]).length > 0 Then
+             Begin
+              vTempString     := TJSONArray(myHashMap.Objects[0]).toString;
+              vTempStringSize := StrDWLength(vTempString);
+              If ((vTempString[InitStrPos] = '[') or
+                  (vTempString[InitStrPos] = '{')) And
+                 ((vTempString[vTempStringSize - FinalStrPos] = ']') or
+                  (vTempString[vTempStringSize - FinalStrPos] = '}')) Then
+                myHashMap.Objects[0].Free;
+             End;
            End
           Else
            myHashMap.Objects[0].Free;
@@ -3072,6 +3100,7 @@ begin
      Except
       Exit;
      End;
+     vTempString := '';
     End;
   End;
 End;
