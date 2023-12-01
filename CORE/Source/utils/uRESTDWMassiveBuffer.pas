@@ -1591,7 +1591,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
          Except
          End;
          vTagkey := IntToStr(vLastOpen) + '|' + EncodeStrings(vBookmark{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-         MassiveLineBuff.vMassiveValues.Items[MassiveLineBuff.vMassiveValues.Count -1].Value := EncodeStrings(vTagKey{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+         TMassiveValue(MassiveLineBuff.vMassiveValues.Items[MassiveLineBuff.vMassiveValues.Count -1]).Value := EncodeStrings(vTagKey{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
         End;
       End
      Else If Dataset is TRESTDWTable Then
@@ -1603,7 +1603,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
          Except
          End;
          vTagkey := IntToStr(vLastOpen) + '|' + EncodeStrings(vBookmark{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-         MassiveLineBuff.vMassiveValues.Items[MassiveLineBuff.vMassiveValues.Count -1].Value := EncodeStrings(vTagKey{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+         TMassiveValue(MassiveLineBuff.vMassiveValues.Items[MassiveLineBuff.vMassiveValues.Count -1]).Value := EncodeStrings(vTagKey{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
         End;
       End;
     End;

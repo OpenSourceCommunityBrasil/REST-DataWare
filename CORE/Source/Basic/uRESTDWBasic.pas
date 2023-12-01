@@ -5514,6 +5514,7 @@ Begin
        vTagService := False;
        For B := 0 To TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.Count -1 Do
         Begin
+         Error   := False;  //29/11/2023 - roniery ajuste para uso de mais de um ServerContext		
          If LowerCase(urlContext) = LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList[B].BaseURL) Then
           vTagService := LowerCase(TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList[B].ContextName) = LowerCase(Pooler);
          If vTagService Then
