@@ -88,7 +88,19 @@ Begin
    lPropType := lPropInfo^.PropType;
    If lPropInfo^.SetProc = Nil      Then Continue;
    If lPropType^.Kind    = tkMethod Then Continue;
-   PropName  := lPropInfo^.Name;
+   {$IFNDEF FPC}
+    {$IF CompilerVersion < 34}
+     {$IFDEF RESTDWANDROID}
+      PropName  := lPropInfo^.Name.ToString;
+     {$ELSE}
+      PropName  := lPropInfo^.Name;
+     {$ENDIF}
+    {$ELSE}
+     PropName  := lPropInfo^.Name;
+    {$IFEND}
+   {$ELSE}
+    PropName  := lPropInfo^.Name;
+   {$ENDIF}
    PropValue := GetPropValue(Self, PropName);
    Writer.WriteString(PropName);
    Writer.WriteString(PropValue);

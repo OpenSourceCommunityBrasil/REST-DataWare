@@ -1,4 +1,5 @@
 object ServerMethodDataModule: TServerMethodDataModule
-  Height = 253
-  Width = 297
+  OldCreateOrder = True
+  Height = 279
+  Width = 328
 end

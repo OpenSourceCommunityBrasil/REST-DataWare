@@ -24,6 +24,10 @@ unit uRESTDWIOHandlerStream;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
  Classes, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWTools, uRESTDWConsts,
  uRESTDWIOHandler, uRESTDWAbout;

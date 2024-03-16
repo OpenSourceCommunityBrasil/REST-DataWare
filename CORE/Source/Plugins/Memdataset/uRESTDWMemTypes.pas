@@ -23,7 +23,11 @@ unit uRESTDWMemTypes;
  Roniery                    - Devel.
 }
 
-interface
+Interface
+
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
 
 uses
   SysUtils, Classes,
@@ -37,7 +41,7 @@ const
 {$HPPEMIT '#endif'}
 {$ENDIF !COMPILER12_UP}
 type
-  TJvBytes = Pointer;
+  TRESTDWBytes = Pointer;
   IntPtr = Pointer;
 type
   {$IFNDEF FPC}
@@ -77,7 +81,7 @@ type
   { JvExVCL classes }
   TInputKey = (ikAll, ikArrows, ikChars, ikButton, ikTabs, ikEdit, ikNative{, ikNav, ikEsc});
   TInputKeys = set of TInputKey;
-  TJvRGBTriple = packed record
+  TRESTDWRGBTriple = packed record
     rgbBlue: Byte;
     rgbGreen: Byte;
     rgbRed: Byte;
@@ -91,10 +95,10 @@ type
   // Base class for persistent properties that can show events.
   // By default, Delphi and BCB don't show the events of a class
   // derived from TPersistent unless it also derives from
-  // TComponent. 
-  // The design time editor associated with TJvPersistent will display
+  // TComponent.
+  // The design time editor associated with TRESTDWPersistent will display
   // the events, thus mimicking a Sub Component.
-  TJvPersistent = class(TComponent)
+  TRESTDWPersistent = class(TComponent)
   private
     FOwner: TPersistent;
     function _GetOwner: TPersistent;
@@ -102,21 +106,21 @@ type
     function GetOwner: TPersistent; override;
   public
     constructor Create(AOwner: TPersistent); reintroduce; virtual;
-    function GetNamePath: string; override;
+    function GetNamePath: string; {$IFNDEF FPC}override;{$ENDIF}
     property Owner: TPersistent read _GetOwner;
   end;
   // Added by dejoy (2005-04-20)
-  // A lot of TJVxxx control persistent properties used TPersistent,
-  // So and a TJvPersistentProperty to do this job. make to support batch-update mode
+  // A lot of TRESTDWxxx control persistent properties used TPersistent,
+  // So and a TRESTDWPersistentProperty to do this job. make to support batch-update mode
   // and property change notify.
-  TJvPropertyChangeEvent = procedure(Sender: TObject; const PropName: string) of object;
-  TJvPersistentProperty = class(TJvPersistent)//TPersistent => TJvPersistent
+  TRESTDWPropertyChangeEvent = procedure(Sender: TObject; const PropName: string) of object;
+  TRESTDWPersistentProperty = class(TRESTDWPersistent)//TPersistent => TRESTDWPersistent
   private
     FUpdateCount: Integer;
     FOnChanging: TNotifyEvent;
     FOnChanged: TNotifyEvent;
-    FOnChangingProperty: TJvPropertyChangeEvent;
-    FOnChangedProperty: TJvPropertyChangeEvent;
+    FOnChangingProperty: TRESTDWPropertyChangeEvent;
+    FOnChangedProperty: TRESTDWPropertyChangeEvent;
   protected
     procedure Changed; virtual;
     procedure Changing; virtual;
@@ -128,40 +132,40 @@ type
     procedure EndUpdate; virtual;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
-    property OnChangedProperty: TJvPropertyChangeEvent read FOnChangedProperty write FOnChangedProperty;
-    property OnChangingProperty: TJvPropertyChangeEvent read FOnChangingProperty write FOnChangingProperty;
+    property OnChangedProperty: TRESTDWPropertyChangeEvent read FOnChangedProperty write FOnChangedProperty;
+    property OnChangingProperty: TRESTDWPropertyChangeEvent read FOnChangingProperty write FOnChangingProperty;
   end;
-  TJvRegKey = (hkClassesRoot, hkCurrentUser, hkLocalMachine, hkUsers,
+  TRESTDWRegKey = (hkClassesRoot, hkCurrentUser, hkLocalMachine, hkUsers,
     hkPerformanceData, hkCurrentConfig, hkDynData);
-  TJvRegKeys = set of TJvRegKey;
+  TRESTDWRegKeys = set of TRESTDWRegKey;
   // base JVCL Exception class to derive from
   EJVCLException = class(Exception);
-  TJvLinkClickEvent = procedure(Sender: TObject; Link: string) of object;
+  TRESTDWLinkClickEvent = procedure(Sender: TObject; Link: string) of object;
   //  TOnRegistryChangeKey = procedure(Sender: TObject; RootKey: HKEY; Path: string) of object;
   //  TAngle = 0..360;
-  TJvOutputMode = (omFile, omStream);
+  TRESTDWOutputMode = (omFile, omStream);
   //  TLabelDirection = (sdLeftToRight, sdRightToLeft); // JvScrollingLabel
-  TJvDoneFileEvent = procedure(Sender: TObject; FileName: string; FileSize: Integer; Url: string) of object;
-  TJvDoneStreamEvent = procedure(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string) of object;
-  TJvHTTPProgressEvent = procedure(Sender: TObject; UserData, Position: Integer; TotalSize: Integer; Url: string; var Continue: Boolean) of object;
-  TJvFTPProgressEvent = procedure(Sender: TObject; Position: Integer; Url: string) of object;
-  TJvErrorEvent = procedure(Sender: TObject; ErrorMsg: string) of object;
-  TJvWaveLocation = (frFile, frResource, frRAM);
-  TJvPopupPosition = (ppNone, ppForm, ppApplication);
-  TJvProgressEvent = procedure(Sender: TObject; Current, Total: Integer) of object;
-  TJvNextPageEvent = procedure(Sender: TObject; PageNumber: Integer) of object;
-  TJvBitmapStyle = (bsNormal, bsCentered, bsStretched);
-  TJvGradientStyle = (grFilled, grEllipse, grHorizontal, grVertical, grPyramid, grMount);
-  TJvParentEvent = procedure(Sender: TObject; ParentWindow: THandle) of object;
-  TJvDiskRes = (dsSuccess, dsCancel, dsSkipfile, dsError);
-  TJvDiskStyle = (idfCheckFirst, idfNoBeep, idfNoBrowse, idfNoCompressed, idfNoDetails,
+  TRESTDWDoneFileEvent = procedure(Sender: TObject; FileName: string; FileSize: Integer; Url: string) of object;
+  TRESTDWDoneStreamEvent = procedure(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string) of object;
+  TRESTDWHTTPProgressEvent = procedure(Sender: TObject; UserData, Position: Integer; TotalSize: Integer; Url: string; var Continue: Boolean) of object;
+  TRESTDWFTPProgressEvent = procedure(Sender: TObject; Position: Integer; Url: string) of object;
+  TRESTDWErrorEvent = procedure(Sender: TObject; ErrorMsg: string) of object;
+  TRESTDWWaveLocation = (frFile, frResource, frRAM);
+  TRESTDWPopupPosition = (ppNone, ppForm, ppApplication);
+  TRESTDWProgressEvent = procedure(Sender: TObject; Current, Total: Integer) of object;
+  TRESTDWNextPageEvent = procedure(Sender: TObject; PageNumber: Integer) of object;
+  TRESTDWBitmapStyle = (bsNormal, bsCentered, bsStretched);
+  TRESTDWGradientStyle = (grFilled, grEllipse, grHorizontal, grVertical, grPyramid, grMount);
+  TRESTDWParentEvent = procedure(Sender: TObject; ParentWindow: THandle) of object;
+  TRESTDWDiskRes = (dsSuccess, dsCancel, dsSkipfile, dsError);
+  TRESTDWDiskStyle = (idfCheckFirst, idfNoBeep, idfNoBrowse, idfNoCompressed, idfNoDetails,
     idfNoForeground, idfNoSkip, idfOemDisk, idfWarnIfSkip);
-  TJvDiskStyles = set of TJvDiskStyle;
-  TJvDeleteStyle = (idNoBeep, idNoForeground);
-  TJvDeleteStyles = set of TJvDeleteStyle;
-  TJvNotifyParamsEvent = procedure(Sender: TObject; Params: Pointer) of object;
-  TJvAnimation = (anLeftRight, anRightLeft, anRightAndLeft, anLeftVumeter, anRightVumeter);
-  TJvAnimations = set of TJvAnimation;
+  TRESTDWDiskStyles = set of TRESTDWDiskStyle;
+  TRESTDWDeleteStyle = (idNoBeep, idNoForeground);
+  TRESTDWDeleteStyles = set of TRESTDWDeleteStyle;
+  TRESTDWNotifyParamsEvent = procedure(Sender: TObject; Params: Pointer) of object;
+  TRESTDWAnimation = (anLeftRight, anRightLeft, anRightAndLeft, anLeftVumeter, anRightVumeter);
+  TRESTDWAnimations = set of TRESTDWAnimation;
   //   TOnFound = procedure(Sender: TObject; Path: string) of object; // JvSearchFile
   //  TOnChangedDir = procedure(Sender: TObject; Directory: string) of object; // JvSearchFile
   //  TOnAlarm = procedure(Sender: TObject; Keyword: string) of object; // JvAlarm
@@ -171,16 +175,16 @@ type
     end;
   } // JvAlarm
   // Bianconi - Moved from JvAlarms.pas
-  TJvTriggerKind =
+  TRESTDWTriggerKind =
     (tkOneShot, tkEachSecond, tkEachMinute, tkEachHour, tkEachDay, tkEachMonth, tkEachYear);
   // End of Bianconi
-  TJvFourCC = array [0..3] of DWChar;
-  PJvAniTag = ^TJvAniTag;
-  TJvAniTag = packed record
-    ckID: TJvFourCC;
+  TRESTDWFourCC = array [0..3] of DWChar;
+  PJvAniTag = ^TRESTDWAniTag;
+  TRESTDWAniTag = packed record
+    ckID: TRESTDWFourCC;
     ckSize: Longint;
   end;
-  TJvAniHeader = packed record
+  TRESTDWAniHeader = packed record
     dwSizeof: Longint;
     dwFrames: Longint;
     dwSteps: Longint;
@@ -191,8 +195,8 @@ type
     dwJIFRate: Longint;
     dwFlags: Longint;
   end;
-  TJvLayout = (lTop, lCenter, lBottom);
-  TJvBevelStyle = (bsShape, bsLowered, bsRaised);
+  TRESTDWLayout = (lTop, lCenter, lBottom);
+  TRESTDWBevelStyle = (bsShape, bsLowered, bsRaised);
   // JvJCLUtils
   TTickCount = Cardinal;
   {**** string handling routines}
@@ -207,12 +211,12 @@ const
   NullDate: TDateTime = 0; {-693594}
 type
   // JvDriveCtrls / JvLookOut
-  TJvImageSize = (isSmall, isLarge);
-  TJvImageAlign = (iaLeft, iaCentered);
-  TJvDriveType = (dtUnknown, dtRemovable, dtFixed, dtRemote, dtCDROM, dtRamDisk);
-  TJvDriveTypes = set of TJvDriveType;
+  TRESTDWImageSize = (isSmall, isLarge);
+  TRESTDWImageAlign = (iaLeft, iaCentered);
+  TRESTDWDriveType = (dtUnknown, dtRemovable, dtFixed, dtRemote, dtCDROM, dtRamDisk);
+  TRESTDWDriveTypes = set of TRESTDWDriveType;
   // Defines how a property (like a HotTrackFont) follows changes in the component's normal Font
-  TJvTrackFontOption = (
+  TRESTDWTrackFontOption = (
     hoFollowFont,  // makes HotTrackFont follow changes to the normal Font
     hoPreserveCharSet,  // don't change HotTrackFont.Charset
     hoPreserveColor,    // don't change HotTrackFont.Color
@@ -227,18 +231,18 @@ type
     , hoPreserveQuality // don't change HotTrackFont.Quality
     {$ENDIF COMPILER15_UP}
   );
-  TJvTrackFontOptions = set of TJvTrackFontOption;
+  TRESTDWTrackFontOptions = set of TRESTDWTrackFontOption;
 const
   DefaultTrackFontOptions = [hoFollowFont, hoPreserveColor, hoPreserveStyle];
   DefaultHotTrackColor = $00D2BDB6;
   DefaultHotTrackFrameColor = $006A240A;
 type
   // from JvListView.pas
-  TJvSortMethod = (smAutomatic, smAlphabetic, smNonCaseSensitive, smNumeric, smDate, smTime, smDateTime, smCurrency);
-  TJvListViewColumnSortEvent = procedure(Sender: TObject; Column: Integer; var AMethod: TJvSortMethod) of object;
-  TJvClickColorType =
+  TRESTDWSortMethod = (smAutomatic, smAlphabetic, smNonCaseSensitive, smNumeric, smDate, smTime, smDateTime, smCurrency);
+  TRESTDWListViewColumnSortEvent = procedure(Sender: TObject; Column: Integer; var AMethod: TRESTDWSortMethod) of object;
+  TRESTDWClickColorType =
     (cctColors, cctNoneColor, cctDefaultColor, cctCustomColor, cctAddInControl, cctNone);
-  TJvColorQuadLayOut = (cqlNone, cqlLeft, cqlRight, cqlClient);
+  TRESTDWColorQuadLayOut = (cqlNone, cqlLeft, cqlRight, cqlClient);
   // from JvColorProvider.pas
   TColorType = (ctStandard, ctSystem, ctCustom);
 const
@@ -251,7 +255,7 @@ const
    {$IFEND}
   {$ENDIF COMPILER6}
 type
-  TJvCustomThread = class(TThread)
+  TRESTDWCustomThread = class(TThread)
   private
     FThreadName: String;
     function GetThreadName: String; virtual;
@@ -289,8 +293,8 @@ const
   );
 {$ENDIF UNITVERSIONING}
 implementation
-{ TJvPersistent }
-constructor TJvPersistent.Create(AOwner: TPersistent);
+{ TRESTDWPersistent }
+constructor TRESTDWPersistent.Create(AOwner: TPersistent);
 begin
   if AOwner is TComponent then
     inherited Create(AOwner as TComponent)
@@ -301,7 +305,7 @@ begin
 end;
 type
   TPersistentAccessProtected = class(TPersistent);
-function TJvPersistent.GetNamePath: string;
+function TRESTDWPersistent.GetNamePath: string;
 var
   S: string;
   lOwner: TPersistent;
@@ -319,45 +323,45 @@ begin
       Result := S + '.' + Result;
   end;
 end;
-function TJvPersistent.GetOwner: TPersistent;
+function TRESTDWPersistent.GetOwner: TPersistent;
 begin
   Result := FOwner;
 end;
-function TJvPersistent._GetOwner: TPersistent;
+function TRESTDWPersistent._GetOwner: TPersistent;
 begin
   Result := GetOwner;
 end;
-{ TJvPersistentProperty }
-procedure TJvPersistentProperty.BeginUpdate;
+{ TRESTDWPersistentProperty }
+procedure TRESTDWPersistentProperty.BeginUpdate;
 begin
   Inc(FUpdateCount);
 end;
-procedure TJvPersistentProperty.Changed;
+procedure TRESTDWPersistentProperty.Changed;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChanged) then
     FOnChanged(Self);
 end;
-procedure TJvPersistentProperty.ChangedProperty(const PropName: string);
+procedure TRESTDWPersistentProperty.ChangedProperty(const PropName: string);
 begin
   if Assigned(FOnChangedProperty) then
     FOnChangedProperty(Self, PropName);
 end;
-procedure TJvPersistentProperty.Changing;
+procedure TRESTDWPersistentProperty.Changing;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChanging) then
     FOnChanging(Self);
 end;
-procedure TJvPersistentProperty.ChangingProperty(const PropName: string);
+procedure TRESTDWPersistentProperty.ChangingProperty(const PropName: string);
 begin
   if Assigned(FOnChangingProperty) then
     FOnChangingProperty(Self, PropName);
 end;
-procedure TJvPersistentProperty.EndUpdate;
+procedure TRESTDWPersistentProperty.EndUpdate;
 begin
   Dec(FUpdateCount);
 end;
 {$IFNDEF DELPHI2009UP}
-procedure TJvCustomThread.NameThreadForDebugging(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
+procedure TRESTDWCustomThread.NameThreadForDebugging(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
 type
   TThreadNameInfo = record
     FType: LongWord;     // must be 0x1000
@@ -381,14 +385,14 @@ begin
   end;
 end;
 {$ENDIF DELPHI2009UP}
-function TJvCustomThread.GetThreadName: String;
+function TRESTDWCustomThread.GetThreadName: String;
 begin
   if FThreadName = '' then
     Result := ClassName
   else
     Result := FThreadName+' {'+ClassName+'}';
 end;
-procedure TJvCustomThread.NameThread(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
+procedure TRESTDWCustomThread.NameThread(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
 begin
   if AThreadID = $FFFFFFFF then
     AThreadID := ThreadID;
@@ -397,7 +401,7 @@ begin
     JvCustomThreadNamingProc(aThreadName, AThreadID);
 end;
 
-procedure TJvCustomThread.SetThreadName(const Value: String);
+procedure TRESTDWCustomThread.SetThreadName(const Value: String);
 begin
   FThreadName := Value;
 end;

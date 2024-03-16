@@ -25,6 +25,11 @@
 unit DWDCPblockciphers;
 
 interface
+
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 uses
   Classes, Sysutils, DWDCPtypes, DWDCPcrypt2;
 

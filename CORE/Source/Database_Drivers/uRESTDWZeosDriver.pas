@@ -1,7 +1,11 @@
 unit uRESTDWZeosDriver;
 
 {$I ..\Includes\uRESTDW.inc}
-{$IFNDEF RESTDWLAZARUS}{$I ZComponent.inc}{$ENDIF}
+{$IFNDEF RESTDWLAZARUS}
+ {$IFNDEF FPC}
+  {$I ZComponent.inc}
+ {$ENDIF}
+{$ENDIF}
 
 {
   REST Dataware .
@@ -23,6 +27,12 @@ unit uRESTDWZeosDriver;
  Roniery                    - Devel.
  Fernando Banhos            - Refactor Drivers REST Dataware.
 }
+
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
 
 interface
 

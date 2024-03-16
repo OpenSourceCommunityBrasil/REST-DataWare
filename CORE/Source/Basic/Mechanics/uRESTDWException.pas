@@ -24,6 +24,10 @@ unit uRESTDWException;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
  SysUtils;
 

@@ -1,4 +1,4 @@
-unit uRESTDWZDbcStatement;
+﻿unit uRESTDWZDbcStatement;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
@@ -199,7 +199,7 @@ var
   vParams : TParams;
   vError : boolean;
   vMessageError : string;
-  vDataSetList : TJSONValue;
+  vDataSetList : TRESTDWJSONValue;
   vRowsAffected : integer;
   vPoolermethod : TRESTDWPoolerMethodClient;
   vExec : boolean;

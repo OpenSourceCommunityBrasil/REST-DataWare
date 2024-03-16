@@ -24,6 +24,10 @@ unit uRESTDWMessageCoderQuotedPrintable;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
  Classes,
  uRESTDWMessageCoder,

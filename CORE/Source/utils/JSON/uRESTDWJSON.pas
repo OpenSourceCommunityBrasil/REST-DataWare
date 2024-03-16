@@ -2,8 +2,31 @@ unit uRESTDWJSON;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
+{
+  REST Dataware .
+  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
+  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
+  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  Pascal e com compatibilidade entre sistemas operacionais.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
+  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+
+  Membros do Grupo :
+
+  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
+  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
+  Flávio Motta               - Member Tester and DEMO Developer.
+  Mobius One                 - Devel, Tester and Admin.
+  Gustavo                    - Criptografia and Devel.
+  Eloy                       - Devel.
+  Roniery                    - Devel.
+}
+
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
 Uses
  {$IF Defined(RESTDWLAZARUS) AND not Defined(RESTDWLAMW)}
    LCL,
@@ -768,7 +791,6 @@ var
   c, b : char;
   s , sb: string;
 begin
- result := Nil;
   c := nextClean();
 
         case (c) of
@@ -782,13 +804,12 @@ begin
                 exit;
             end;
             '[': begin
-                b := nextClean();
+                //b := nextClean();
                 back();
-                back();
-                if b <> ']' then
-                 result := TJSONArray.create(self)
-                Else
-                 c := nextClean();
+                //if b <> '{' then
+                 result := TJSONArray.create(self);
+                //Else
+                // c := nextClean();
                 exit;
             end;
         end;
@@ -1044,8 +1065,8 @@ begin
           with x.nextValue() do
           begin
             key := toString();
-            If Assigned(Self) Then
-             Free; //Fix memory leak. By creation_zy
+			If Assigned(Self) Then
+            Free; //Fix memory leak. By creation_zy
           end;
       end
       end; //fim do case
@@ -1079,7 +1100,7 @@ begin
           exit;
       end
       else begin
-//          raise x.syntaxError('Expected a "," or "}"');
+          //raise x.syntaxError('Expected a "," or "}"');
       end
       end;
   end; //while
@@ -1326,8 +1347,9 @@ var
 begin
   result := TStringList.Create;
   If myHashMap <> Nil Then
-   for i := 0 to myHashMap.Count -1 do
+  for i := 0 to myHashMap.Count -1 do 
     result.add (myHashMap[i]);
+
 end;
 
 function TJSONObject.length: integer;
@@ -2234,11 +2256,13 @@ end;
 destructor TJSONObject.destroy;
 begin
   clean;
-//  myHashMap.Clear;
-  if Assigned(myHashMap) then
-   FreeAndNil(myHashMap);
-  if Assigned(ja) then
-   FreeAndNil(ja);
+  If Assigned(myHashMap) Then
+   Begin
+    myHashMap.Clear;
+    FreeAndNil(myHashMap);
+   End;
+ if Assigned(ja) then
+  FreeAndNil(ja);
   inherited;
 end;
 
@@ -2280,10 +2304,10 @@ begin
   FreeAndNil(token);
 end;
 
-Destructor TJSONArray.destroy;
-Var
+destructor TJSONArray.destroy;
+var
  obj : TObject;
-Begin
+begin
  If Assigned(myArrayList) Then
  While myArrayList.Count > 0 do
   Begin
@@ -2293,18 +2317,21 @@ Begin
      And (obj <> CNULL)
      And (Assigned(obj)) Then
     Begin
-     Try
-      obj.Free;
-     Except
-//    Dispose(myArrayList[0]);
-     End;
+     {$IFNDEF FPC} //TODO Json XyberX Lazarus
+      Try
+       If Assigned(obj) Then
+        obj.Free;
+      Except
+//       Dispose(myArrayList[0]);
+      End;
+     {$ENDIF}
     End;
     myArrayList.Delete(0);
    End;
  If Assigned(myArrayList) Then
   FreeAndNil(myArrayList);
- Inherited;
-End;
+  inherited;
+end;
 
 (**
      * Get the object value associated with an index.
@@ -2522,7 +2549,10 @@ end;
  *)
 function TJSONArray.length: integer;
 begin
-  result := myArrayList.Count ;
+ If myArrayList <> Nil Then
+  Result := myArrayList.Count
+ Else
+  Result := 0;
 end;
 
  {
@@ -3058,9 +3088,52 @@ Begin
  Result := Format('%s <%p>', [ClassName, addr(Self)]);
 End;
 
+Function IsValidClass(Cls : TClass ): Boolean;
+Var
+ i : Integer;
+Begin
+ For i := 0 To 99 Do
+  Begin
+   Result := (Cls = TObject); // note that other modules may have a different root TObject!
+   if Result then Exit;
+   {$IFNDEF FPC}
+    {$IFNDEF RESTDWANDROID}
+     {$IFNDEF RESTDWAPPLE}
+      If IsBadReadPtr(Cls, Sizeof(Pointer)) Then Break;
+       If IsBadReadPtr(Pointer(Integer(Cls) + vmtParent), Sizeof(Pointer)) Then Break;
+     {$ENDIF}
+    {$ENDIF}
+   {$ENDIF}
+   Cls := Cls.ClassParent;
+  End;
+ Result := False;
+end;
+
+Function IsValidObject( Obj: TObject ): Boolean;
+Begin
+ {$IFNDEF FPC}
+  {$IFNDEF RESTDWLINUX}
+   {$IFNDEF RESTDWANDROID}
+    {$IFNDEF RESTDWAPPLE}
+     Result := not IsBadReadPtr( Obj, sizeof( Pointer ) ) and IsValidClass( Obj.ClassType ) and not IsBadReadPtr( Obj, Obj.InstanceSize );
+    {$ELSE}
+     Result := IsValidClass(Obj.ClassType);
+    {$ENDIF}
+   {$ELSE}
+    Result := IsValidClass(Obj.ClassType);
+   {$ENDIF}
+  {$ELSE}
+   Result := IsValidClass(Obj.ClassType);
+  {$ENDIF}
+ {$ELSE}
+  Result := IsValidClass(Obj.ClassType);
+ {$ENDIF}
+End;
+
 Procedure TJSONObject.clean;
 Var
- vTempString : String;
+ vClassName,
+ vTempString     : String;
  vTempStringSize : Integer;
 begin
  If Assigned(myHashMap) Then
@@ -3072,24 +3145,28 @@ begin
         (Assigned(myHashMap.Objects[0]))      Then
       Begin
        Try
-        If (UpperCase(myHashMap.Objects[0].classname) <> 'NULL') And
-           (myHashMap.Objects[0] <> CNULL) Then
+        If IsValidObject(myHashMap.Objects[0]) Then
          Begin
-          If UpperCase(myHashMap.Objects[0].classname) = 'TJSONARRAY' Then
+          vClassName := myHashMap.Objects[0].classname;
+          If (UpperCase(vClassName) <> 'NULL') And
+             (myHashMap.Objects[0] <> CNULL) Then
            Begin
-            If TJSONArray(myHashMap.Objects[0]).length > 0 Then
+            If UpperCase(vClassName) = 'TJSONARRAY' Then
              Begin
-              vTempString     := TJSONArray(myHashMap.Objects[0]).toString;
-              vTempStringSize := StrDWLength(vTempString);
-              If ((vTempString[InitStrPos] = '[') or
-                  (vTempString[InitStrPos] = '{')) And
-                 ((vTempString[vTempStringSize - FinalStrPos] = ']') or
-                  (vTempString[vTempStringSize - FinalStrPos] = '}')) Then
-                myHashMap.Objects[0].Free;
-             End;
-           End
-          Else
-           myHashMap.Objects[0].Free;
+              If TJSONArray(myHashMap.Objects[0]).length > 0 Then
+               Begin
+                vTempString     := TJSONArray(myHashMap.Objects[0]).toString;
+                vTempStringSize := StrDWLength(vTempString);
+                If ((vTempString[InitStrPos] = '[') or
+                    (vTempString[InitStrPos] = '{')) And
+                   ((vTempString[vTempStringSize - FinalStrPos] = ']') or
+                    (vTempString[vTempStringSize - FinalStrPos] = '}')) Then
+                  myHashMap.Objects[0].Free;
+               End;
+             End
+            Else If Assigned(myHashMap.Objects[0]) Then
+              myHashMap.Objects[0].Free;
+           End;
          End;
        Except
 
@@ -3098,9 +3175,8 @@ begin
      Try
       myHashMap.Delete(0);
      Except
-      Exit;
      End;
-     vTempString := '';
+	   vTempString := '';
     End;
   End;
 End;

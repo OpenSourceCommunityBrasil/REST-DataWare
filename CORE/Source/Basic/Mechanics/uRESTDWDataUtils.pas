@@ -22,6 +22,12 @@ unit uRESTDWDataUtils;
  Roniery                    - Devel.
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 interface
 
 Uses
@@ -493,7 +499,15 @@ Var
  CharCode : Integer;
  c        : Char;
 Begin
- sAnsi := PChar(s);
+ {$IFNDEF FPC}
+  sAnsi := PChar(s);
+ {$ELSE}
+  {$IFDEF RESTDWLAZARUS}
+   sAnsi := PChar(s);
+  {$ELSE}
+   sAnsi := PChar(@s);
+  {$ENDIF}
+ {$ENDIF}
  SetLength(sUtf8, Length(sAnsi));
  i   := InitStrPos;
  len := InitStrPos;
@@ -1639,7 +1653,7 @@ Var
  iBar1,
  IBar2, Count : Integer;
  aNewParam    : Boolean;
- JSONParam    : TJSONParam;
+ JSONParam    : TRESTDWJSONParam;
 Begin
  JSONParam    := Nil;
  vArrayValues := '';
@@ -1703,7 +1717,7 @@ Begin
           If JSONParam = Nil Then
            Begin
             aNewParam := True;
-            JSONParam := TJSONParam.Create(Result.Encoding);
+            JSONParam := TRESTDWJSONParam.Create(Result.Encoding);
             JSONParam.ObjectDirection := odIN;
             JSONParam.ParamName := Copy(vTempData, 1, Pos('=', vTempData) - 1);
             Delete(vTempData, 1, Pos('=', vTempData));
@@ -1719,7 +1733,7 @@ Begin
           If JSONParam = Nil Then
            Begin
             aNewParam := True;
-            JSONParam := TJSONParam.Create(Result.Encoding);
+            JSONParam := TRESTDWJSONParam.Create(Result.Encoding);
             JSONParam.ParamName := cUndefined;//Format('PARAM%d', [0]);
             JSONParam.ObjectDirection := odIN;
             JSONParam.SetValue(vTempData);
@@ -1744,7 +1758,7 @@ Var
  A, I,
  IndexS,
  Count     : Integer;
- JSONParam : TJSONParam;
+ JSONParam : TRESTDWJSONParam;
 Begin
  JSONParam    := Nil;
  A            := 0;
@@ -1772,7 +1786,7 @@ Begin
       vValue := vValue + vTempData[I];
      If Pos('=', vValue) > 0 Then
       Begin
-       JSONParam := TJSONParam.Create(Result.Encoding);
+       JSONParam := TRESTDWJSONParam.Create(Result.Encoding);
        JSONParam.ObjectDirection := odIN;
        JSONParam.ParamName := Copy(vValue, InitStrPos, Pos('=', vValue) - 1);
        Delete(vValue, 1, Pos('=', vValue));
@@ -1784,7 +1798,7 @@ Begin
        JSONParam := Result.ItemsString[IntToStr(A)];
        If JSONParam = Nil Then
         Begin
-         JSONParam := TJSONParam.Create(Result.Encoding);
+         JSONParam := TRESTDWJSONParam.Create(Result.Encoding);
          JSONParam.ParamName := IntToStr(A);
          JSONParam.ObjectDirection := odIN;
          Result.Add(JSONParam);
@@ -1802,7 +1816,7 @@ Begin
      JSONParam := Result.ItemsString[IntToStr(A)];
      If JSONParam = Nil Then
       Begin
-       JSONParam := TJSONParam.Create(Result.Encoding);
+       JSONParam := TRESTDWJSONParam.Create(Result.Encoding);
        JSONParam.ParamName := IntToStr(A);
        JSONParam.ObjectDirection := odIN;
        Result.Add(JSONParam);
@@ -1833,13 +1847,14 @@ Class Procedure TRESTDWDataUtils.ParseWebFormsParams(Params             : TStrin
 Var
  aParamsIndex,
  I, IBar    : Integer;
- JSONParam  : TJSONParam;
+ JSONParam  : TRESTDWJSONParam;
  vParams    : TStringList;
  vTempValue,
  Cmd,
  vParamName,
  vTempData,
  vValue     : String;
+ encodestrings,
  vNewParam,
  vCreateParam,
  aNewParam  : Boolean;
@@ -1890,7 +1905,7 @@ Begin
        If Pos('{"ObjectType":"toParam", "Direction":"', Params[I]) > 0 Then
         Begin
          vCreateParam := True;
-         JSONParam := TJSONParam.Create(Result.Encoding);
+         JSONParam := TRESTDWJSONParam.Create(Result.Encoding);
          {$IFDEF RESTDWLAZARUS}
          JSONParam.DatabaseCharSet := DatabaseCharSet;
          {$ENDIF}
@@ -1909,7 +1924,7 @@ Begin
            If JSONParam = Nil Then
             Begin
              vCreateParam := True;
-             JSONParam := TJSONParam.Create(Result.Encoding);
+             JSONParam := TRESTDWJSONParam.Create(Result.Encoding);
              {$IFDEF RESTDWLAZARUS}
              JSONParam.DatabaseCharSet := DatabaseCharSet;
              {$ENDIF}
@@ -1926,7 +1941,7 @@ Begin
            If JSONParam = Nil Then
             Begin
              vCreateParam := True;
-             JSONParam := TJSONParam.Create(Result.Encoding);
+             JSONParam := TRESTDWJSONParam.Create(Result.Encoding);
              {$IFDEF RESTDWLAZARUS}
              JSONParam.DatabaseCharSet := DatabaseCharSet;
              {$ENDIF}
@@ -1985,6 +2000,7 @@ Begin
       vParams.DelimitedText := StringReplace(Cmd, sLineBreak, '&', [rfReplaceAll]); //Alterações enviadas por "joaoantonio19"
       //vParams.Add(Cmd);
    Finally
+    encodestrings  := False;
     For I := 0 To vParams.Count - 1 Do
      Begin
       If Pos('dwmark:', vParams[I]) > 0 Then
@@ -2003,24 +2019,50 @@ Begin
           If JSONParam = Nil Then
            Begin
             vNewParam := True;
-            JSONParam               := TJSONParam.Create(Result.Encoding);
+            JSONParam               := TRESTDWJSONParam.Create(Result.Encoding);
             JSONParam.ObjectDirection := odIN;
             If (vParams.names[I] <> '') And
                (Trim(Query)      <> '') Then
              Begin
               JSONParam.ParamName       := Trim(Copy(vParams[I], 1, Pos('=', vParams[I]) - 1));
               JSONParam.AsString        := Trim(Copy(vParams[I],    Pos('=', vParams[I]) + 1, Length(vParams[I])));
+              If pos('dwencodestrings', lowercase(JSONParam.ParamName)) > 0 Then
+               encodestrings  := StringToBoolean(JSONParam.AsString)
+              Else If (encodestrings) And
+                      (pos('dwwelcomemessage',  lowercase(JSONParam.ParamName)) = 0) And
+                      (pos('dwaccesstag',  lowercase(JSONParam.ParamName)) = 0)      And
+                      (pos('datacompression',  lowercase(JSONParam.ParamName)) = 0)  And
+                      (pos('dwencodestrings',  lowercase(JSONParam.ParamName)) = 0)  And
+                      (pos('dwusecript',  lowercase(JSONParam.ParamName)) = 0)       And
+                      (pos('dwassyncexec',  lowercase(JSONParam.ParamName)) = 0)     And
+                      (pos('binaryrequest',  lowercase(JSONParam.ParamName)) = 0)    And
+                      (pos('dwconnectiondefs',  lowercase(JSONParam.ParamName)) = 0) And
+                      (pos('dwservereventname', lowercase(JSONParam.ParamName)) = 0) Then
+              JSONParam.AsString       := DecodeStrings(JSONParam.AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
              End
             Else
              Begin
               JSONParam.ParamName       := IntToStr(I);
               JSONParam.AsString        := vParams[I];
+              If pos('dwencodestrings', lowercase(JSONParam.ParamName)) > 0 Then
+               encodestrings  := StringToBoolean(JSONParam.AsString)
+              Else If (encodestrings) And
+                      (pos('dwwelcomemessage',  lowercase(JSONParam.ParamName)) = 0) And
+                      (pos('dwaccesstag',  lowercase(JSONParam.ParamName)) = 0)      And
+                      (pos('datacompression',  lowercase(JSONParam.ParamName)) = 0)  And
+                      (pos('dwencodestrings',  lowercase(JSONParam.ParamName)) = 0)  And
+                      (pos('dwusecript',  lowercase(JSONParam.ParamName)) = 0)       And
+                      (pos('dwassyncexec',  lowercase(JSONParam.ParamName)) = 0)     And
+                      (pos('binaryrequest',  lowercase(JSONParam.ParamName)) = 0)    And
+                      (pos('dwconnectiondefs',  lowercase(JSONParam.ParamName)) = 0) And
+                      (pos('dwservereventname', lowercase(JSONParam.ParamName)) = 0) Then
+              JSONParam.AsString       := DecodeStrings(JSONParam.AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
              End;
             {$IFDEF RESTDWLAZARUS}
             JSONParam.DatabaseCharSet := DatabaseCharSet;
             {$ENDIF}
-//          If vNewParam Then
-            Result.Add(JSONParam);
+            If vNewParam Then
+             Result.Add(JSONParam);
            End;
          End;
        End;
@@ -2039,7 +2081,7 @@ Class Procedure TRESTDWDataUtils.ParseWebFormsParams (Var DWParams: TRESTDWParam
                                                 MethodType        : TRequestType = rtPost);
 Var
  I          : Integer;
- JSONParam  : TJSONParam;
+ JSONParam  : TRESTDWJSONParam;
  vParams    : TStringList;
  vParamName : String;
 Begin
@@ -2052,7 +2094,7 @@ Begin
     Begin
      If Pos('{"ObjectType":"toParam", "Direction":"', WebParams[I]) > 0 Then
       Begin
-       JSONParam := TJSONParam.Create(DWParams.Encoding);
+       JSONParam := TRESTDWJSONParam.Create(DWParams.Encoding);
        JSONParam.ObjectDirection := odIN;
        If Pos('=', WebParams[I]) > 0 Then
         JSONParam.FromJSON(Trim(Copy(WebParams[I], Pos('=', WebParams[I]) + 1, Length(WebParams[I]))))
@@ -2064,7 +2106,7 @@ Begin
        vParamName := Copy(WebParams[I], 1, Pos('=', WebParams[I]) - 1);
        JSONParam  := DWParams.ItemsString[vParamName];
        If Not Assigned(JSONParam) Then
-        JSONParam := TJSONParam.Create(DWParams.Encoding)
+        JSONParam := TRESTDWJSONParam.Create(DWParams.Encoding)
        Else
         Continue;
        JSONParam.ObjectDirection := odIN;
@@ -2094,7 +2136,7 @@ Var
  vArrayValues : String;
  ArraySize,
  IBar2, Cont  : Integer;
- JSONParam    : TJSONParam;
+ JSONParam    : TRESTDWJSONParam;
  vParamList   : TStringList;
 Begin
  vArrayValues         := Cmd;
@@ -2135,7 +2177,7 @@ Begin
        If Pos('=', vTempData) > 0 Then
         Begin
          vTempName := Copy(vTempData, 1, Pos('=', vTempData) - 1);
-         JSONParam := ResultPR.ItemsString[vTempName]; //TJSONParam.Create(ResultPR.Encoding);
+         JSONParam := ResultPR.ItemsString[vTempName]; //TRESTDWJSONParam.Create(ResultPR.Encoding);
          If JSONParam  = Nil Then
           Begin
            JSONParam.ObjectDirection := odIN;
@@ -2150,7 +2192,7 @@ Begin
          JSONParam := ResultPR.ItemsString[cUndefined];
          If JSONParam = Nil Then
           Begin
-           JSONParam                 := TJSONParam.Create(ResultPR.Encoding);
+           JSONParam                 := TRESTDWJSONParam.Create(ResultPR.Encoding);
            JSONParam.ObjectDirection := odIN;
            JSONParam.ParamName       := cUndefined;//Format('PARAM%d', [0]);
            JSONParam.SetValue(URLDecode(StringReplace(vTempData, '+', ' ', [rfReplaceAll])));
@@ -2168,7 +2210,7 @@ Begin
    vArrayValues := StringReplace(vArrayValues, sLineBreak,   '', [rfReplaceAll]);
    If (vArrayValues[InitStrPos] = '[') or (vArrayValues[InitStrPos] = '{') then
     Begin
-     JSONParam := TJSONParam.Create(ResultPR.Encoding);
+     JSONParam := TRESTDWJSONParam.Create(ResultPR.Encoding);
      JSONParam.ParamName       := cUndefined;
      JSONParam.ObjectDirection := odIN;
      JSONParam.SetValue(vArrayValues, True);
@@ -2183,7 +2225,7 @@ Begin
          JSONParam := ResultPR.ItemsString[cUndefined];
          If JSONParam = Nil Then
           Begin
-           JSONParam := TJSONParam.Create(ResultPR.Encoding);
+           JSONParam := TRESTDWJSONParam.Create(ResultPR.Encoding);
            JSONParam.ParamName := cUndefined;
            JSONParam.ObjectDirection := odIN;
            JSONParam.SetValue(vParamList[cont]);
@@ -2195,7 +2237,7 @@ Begin
          JSONParam := ResultPR.ItemsString[vParamList.Names[cont]];
          If JSONParam = Nil Then
           Begin
-           JSONParam := TJSONParam.Create(ResultPR.Encoding);
+           JSONParam := TRESTDWJSONParam.Create(ResultPR.Encoding);
            JSONParam.ObjectDirection := odIN;
            JSONParam.ParamName := vParamList.Names[cont];
            JSONParam.SetValue(vParamList.Values[vParamList.Names[cont]]);
@@ -2215,7 +2257,7 @@ Class Function TRESTDWDataUtils.ParseBodyRawToDWParam(Const BodyRaw    : String;
                                                       ;DatabaseCharSet : TDatabaseCharSet
                                                       {$ENDIF})        : Boolean;
 Var
- JSONParam: TJSONParam;
+ JSONParam: TRESTDWJSONParam;
 Begin
  If (BodyRaw <> EmptyStr) Then
   Begin
@@ -2227,7 +2269,7 @@ Begin
      ResultPR.DatabaseCharSet := DatabaseCharSet;
      {$ENDIF}
     End;
-   JSONParam                 := TJSONParam.Create(ResultPR.Encoding);
+   JSONParam                 := TRESTDWJSONParam.Create(ResultPR.Encoding);
    JSONParam.ObjectDirection := odIN;
    If Assigned(ResultPR.ItemsString['dwNameParamBody']) And (ResultPR.ItemsString['dwNameParamBody'].AsString<>'') Then
     JSONParam.ParamName       := ResultPR.ItemsString['dwNameParamBody'].AsString
@@ -2245,7 +2287,7 @@ Class Function TRESTDWDataUtils.ParseBodyRawToDWParam(Const BodyRaw    : TStream
                                                       ;DatabaseCharSet : TDatabaseCharSet
                                                       {$ENDIF})        : Boolean;
 Var
- JSONParam: TJSONParam;
+ JSONParam: TRESTDWJSONParam;
 Begin
  If (BodyRaw.Size > 0) Then
   Begin
@@ -2258,7 +2300,7 @@ Begin
      ResultPR.DatabaseCharSet := DatabaseCharSet;
      {$ENDIF}
     End;
-   JSONParam                 := TJSONParam.Create(ResultPR.Encoding);
+   JSONParam                 := TRESTDWJSONParam.Create(ResultPR.Encoding);
    JSONParam.ObjectDirection := odIN;
    If Assigned(ResultPR.ItemsString['dwNameParamBody']) And (ResultPR.ItemsString['dwNameParamBody'].AsString<>'') Then
     JSONParam.ParamName       := ResultPR.ItemsString['dwNameParamBody'].AsString
@@ -2276,7 +2318,7 @@ Class Function TRESTDWDataUtils.ParseBodyBinToDWParam(Const BodyBin    : String;
                                                       ;DatabaseCharSet : TDatabaseCharSet
                                                       {$ENDIF})        : Boolean;
 Var
- JSONParam    : TJSONParam;
+ JSONParam    : TRESTDWJSONParam;
  vContentType : String;
 Begin
  If (BodyBin <> EmptyStr) then
@@ -2289,7 +2331,7 @@ Begin
      ResultPR.DatabaseCharSet := DatabaseCharSet;
      {$ENDIF}
     End;
-   JSONParam                 := TJSONParam.Create(ResultPR.Encoding);
+   JSONParam                 := TRESTDWJSONParam.Create(ResultPR.Encoding);
    JSONParam.ObjectDirection := odIN;
    If Assigned(ResultPR.ItemsString['dwParamNameBody']) And (ResultPR.ItemsString['dwParamNameBody'].AsString<>'') Then
     JSONParam.ParamName       := ResultPR.ItemsString['dwParamNameBody'].AsString
@@ -2299,7 +2341,7 @@ Begin
    ResultPR.Add(JSONParam);
    If Assigned(ResultPR.ItemsString['dwFileNameBody']) And (ResultPR.ItemsString['dwFileNameBody'].AsString<>'') Then
     Begin
-     JSONParam   := TJSONParam.Create(ResultPR.Encoding);
+     JSONParam   := TRESTDWJSONParam.Create(ResultPR.Encoding);
      JSONParam.ObjectDirection := odIN;
      JSONParam.ParamName := 'dwfilename';
      JSONParam.SetValue(ResultPR.ItemsString['dwFileNameBody'].AsString, JSONParam.Encoded);
@@ -2309,7 +2351,7 @@ Begin
        vContentType:= TRESTDWMimeType.GetMIMEType(ResultPR.ItemsString['dwFileNameBody'].AsString);
        If vContentType <> '' then
         Begin
-         JSONParam   := TJSONParam.Create(ResultPR.Encoding);
+         JSONParam   := TRESTDWJSONParam.Create(ResultPR.Encoding);
          JSONParam.ObjectDirection := odIN;
          JSONParam.ParamName := 'Content-Type';
          JSONParam.SetValue(vContentType, JSONParam.Encoded);
@@ -2327,7 +2369,7 @@ Class Function TRESTDWDataUtils.ParseFormParamsToDWParam(Const FormParams : Stri
                                                          ;DatabaseCharSet : TDatabaseCharSet
                                                          {$ENDIF})        : Boolean;
 Var
- JSONParam: TJSONParam;
+ JSONParam: TRESTDWJSONParam;
  i            : Integer;
  vTempValue,
  vObjectName,
@@ -2376,7 +2418,7 @@ begin
         Inc(I);
         Continue;
        End;
-      JSONParam                 := TJSONParam.Create(ResultPR.Encoding);
+      JSONParam                 := TRESTDWJSONParam.Create(ResultPR.Encoding);
       JSONParam.ObjectDirection := odIN;
       JSONParam.ParamName       := vObjectName;
       vTempValue := FindValue(vParamList, I);

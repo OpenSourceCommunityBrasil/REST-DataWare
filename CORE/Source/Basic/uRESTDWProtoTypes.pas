@@ -1,4 +1,5 @@
 unit uRESTDWProtoTypes;
+
 {$I ..\..\Source\Includes\uRESTDW.inc}
 {
   REST Dataware .
@@ -18,12 +19,19 @@ unit uRESTDWProtoTypes;
  Eloy                       - Devel.
  Roniery                    - Devel.
 }
+
 interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 uses
-  {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXE3UP)}
-  DbTables,
-  {$IFEND}
+  {$IFNDEF FPC}
+   {$IF CompilerVersion < 21}
+    DbTables,
+   {$IFEND}
+  {$ENDIF}
   SysUtils,  Classes, Db, FMTBcd;
  Const
   dwftColor       = Integer(255);
@@ -76,7 +84,7 @@ uses
   dwftLongWord        = Integer(DB.ftLongWord); //42
   dwftShortint        = Integer(DB.ftShortint); //43
   dwftByte            = Integer(DB.ftByte); //44
-  dwftExtended        = Integer(DB.ftExtended); //45
+  dwftExtended        = Integer(DB.ftFloat); //45
   dwftStream          = Integer(DB.ftStream); //48
   dwftTimeStampOffset = Integer(DB.ftTimeStampOffset); //49
   dwftSingle          = Integer(DB.ftSingle); //51

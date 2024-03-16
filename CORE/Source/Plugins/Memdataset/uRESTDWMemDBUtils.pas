@@ -1,6 +1,6 @@
 unit uRESTDWMemDBUtils;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I ..\..\Includes\uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
@@ -22,7 +22,12 @@ unit uRESTDWMemDBUtils;
  Roniery                    - Devel.
 }
 
-interface
+Interface
+
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 uses
   {$IFDEF MSWINDOWS}
   Windows,
@@ -30,20 +35,24 @@ uses
   Variants, Classes, SysUtils, DB, DateUtils,
   uRESTDWTools;
 
+Type
+ TBookmarkType = {$IFDEF FPC}TBookmark
+                 {$ELSE}
+                 {$IFDEF RTL200_UP}TBookmark{$ELSE}TBookmarkStr{$ENDIF RTL200_UP}
+                 {$ENDIF};
+
 type
-
-
-  IJvDataControl = interface
+  IRESTDWDataControl = interface
     ['{8B6910C8-D5FD-40BA-A427-FC54FE7B85E5}']
     function GetDataLink: TDataLink;
   end;
-  TJvDataLink = class(TDataLink)
+  TRESTDWDataLink = class(TDataLink)
   protected
     procedure FocusControl(Field: TFieldRef); overload; override;
     procedure FocusControl(const Field: TField); reintroduce; overload; virtual;
   end;
   TCommit = (ctNone, ctStep, ctAll);
-  TJvDBProgressEvent = procedure(UserData: Integer; var Cancel: Boolean; Line: Integer) of object;
+  TRESTDWDBProgressEvent = procedure(UserData: Integer; var Cancel: Boolean; Line: Integer) of object;
   EJvScriptError = class(Exception)
   private
     FErrPos: Integer;
@@ -54,7 +63,7 @@ type
     constructor Create(const AMessage: string; AErrPos: Integer; DummyForBCB: Integer = 0); overload;
     property ErrPos: Integer read FErrPos;
   end;
-  TJvLocateObject = class(TObject)
+  TRESTDWLocateObject = class(TObject)
   private
     FDataSet: TDataSet;
     FLookupField: TField;
@@ -84,10 +93,10 @@ type
     property DataSet: TDataSet read FDataSet write SetDataSet;
     property IndexSwitch: Boolean read FIndexSwitch write FIndexSwitch;
   end;
-  TCreateLocateObject = function: TJvLocateObject;
+  TCreateLocateObject = function: TRESTDWLocateObject;
 var
   CreateLocateObject: TCreateLocateObject = nil;
-function CreateLocate(DataSet: TDataSet): TJvLocateObject;
+function CreateLocate(DataSet: TDataSet): TRESTDWLocateObject;
 { Utility routines }
 function IsDataSetEmpty(DataSet: TDataSet): Boolean;
 procedure RefreshQuery(Query: TDataSet);
@@ -156,12 +165,12 @@ uses
   {$IFDEF RESTDWVCL}uRESTDWMemVCLUtils, {$ENDIF}
   uRESTDWMemTypes, uRESTDWMemConsts, uRESTDWMemResources;
 
-{ TJvDataLink }
-procedure TJvDataLink.FocusControl(Field: TFieldRef);
+{ TRESTDWDataLink }
+procedure TRESTDWDataLink.FocusControl(Field: TFieldRef);
 begin
   FocusControl(Field^);
 end;
-procedure TJvDataLink.FocusControl(const Field: TField);
+procedure TRESTDWDataLink.FocusControl(const Field: TField);
 begin
 end;
 { Utility routines }
@@ -217,12 +226,12 @@ begin
     Query.EnableControls;
   end;
 end;
-procedure TJvLocateObject.SetDataSet(Value: TDataSet);
+procedure TRESTDWLocateObject.SetDataSet(Value: TDataSet);
 begin
   ActiveChanged;
   FDataSet := Value;
 end;
-function TJvLocateObject.LocateFull: Boolean;
+function TRESTDWLocateObject.LocateFull: Boolean;
 begin
   Result := False;
   DataSet.First;
@@ -236,18 +245,18 @@ begin
     DataSet.Next;
   end;
 end;
-function TJvLocateObject.LocateKey: Boolean;
+function TRESTDWLocateObject.LocateKey: Boolean;
 begin
   Result := False;
 end;
-function TJvLocateObject.FilterApplicable: Boolean;
+function TRESTDWLocateObject.FilterApplicable: Boolean;
 begin
   Result := FLookupField.FieldKind in [fkData, fkInternalCalc];
 end;
-procedure TJvLocateObject.CheckFieldType(Field: TField);
+procedure TRESTDWLocateObject.CheckFieldType(Field: TField);
 begin
 end;
-//function TJvLocateObject.Locate(const KeyField, KeyValue: string;
+//function TRESTDWLocateObject.Locate(const KeyField, KeyValue: string;
 //  Exact, CaseSensitive: Boolean; DisableControls: Boolean; RightTrimmedLookup: Boolean): Boolean;
 //var
 //  LookupKey: TField;
@@ -318,14 +327,14 @@ end;
 //      DataSet.EnableControls;
 //  end;
 //end;
-function TJvLocateObject.UseKey: Boolean;
+function TRESTDWLocateObject.UseKey: Boolean;
 begin
   Result := False;
 end;
-procedure TJvLocateObject.ActiveChanged;
+procedure TRESTDWLocateObject.ActiveChanged;
 begin
 end;
-function TJvLocateObject.MatchesLookup(Field: TField): Boolean;
+function TRESTDWLocateObject.MatchesLookup(Field: TField): Boolean;
 var
   Temp: string;
 begin
@@ -337,7 +346,7 @@ begin
   else
     Result := AnsiSameText(Temp, LookupValue);
 end;
-function CreateLocate(DataSet: TDataSet): TJvLocateObject;
+function CreateLocate(DataSet: TDataSet): TRESTDWLocateObject;
 begin
   if Assigned(CreateLocateObject) then
    Begin
@@ -348,7 +357,7 @@ begin
     {$ENDIF}
    End
   else
-    Result := TJvLocateObject.Create;
+    Result := TRESTDWLocateObject.Create;
   if (Result <> nil) and (DataSet <> nil) then
     Result.DataSet := DataSet;
 end;
@@ -358,10 +367,7 @@ function DataSetLocateThrough(DataSet: TDataSet; const KeyFields: string;
 var
   FieldCount: Integer;
   Fields: TList{$IFDEF RTL240_UP}<TField>{$ENDIF RTL240_UP};
-  Bookmark: {$IFDEF FPC}TBookmark
-            {$ELSE}
-            {$IFDEF RTL200_UP}TBookmark{$ELSE}TBookmarkStr{$ENDIF RTL200_UP}
-            {$ENDIF};
+  Bookmark: TBookmarkType;
   function CompareField(Field: TField; const Value: Variant): Boolean;
   var
     S: string;
@@ -412,7 +418,7 @@ begin
       Exit;
     DataSet.DisableControls;
     try
-      Bookmark := DataSet.Bookmark;
+      Bookmark := TBookmarkType(DataSet.Bookmark);
       try
         DataSet.First;
         while not DataSet.Eof do
@@ -424,7 +430,17 @@ begin
         end;
       finally
         if not Result and DataSet.BookmarkValid(TBookmark(Bookmark)) then
-          DataSet.Bookmark := Bookmark;
+         Begin
+          {$IFNDEF FPC}
+            {$IF CompilerVersion > 21}
+             DataSet.Bookmark := TBookmark(Bookmark);
+            {$ELSE}
+             DataSet.Bookmark := TBookmarkSTR(Bookmark);
+            {$IFEND}
+          {$ELSE}
+           DataSet.Bookmark := TBookmark(Bookmark);
+          {$ENDIF}
+         End;
       end;
     finally
       DataSet.EnableControls;

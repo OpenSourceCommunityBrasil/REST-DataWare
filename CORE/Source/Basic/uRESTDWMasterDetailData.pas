@@ -25,8 +25,11 @@ unit uRESTDWMasterDetailData;
  Ico Menezes                - Member Tester and DEMO Developer.
 }
 
-
 Interface
+
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
 
 Uses
   SysUtils, Classes;
@@ -86,15 +89,19 @@ Begin
    If Assigned(TList(Self).Items[Index]) Then
     Begin
      {$IFDEF RESTDWLAZARUS}
-     FreeAndNil(TList(Self).Items[Index]^);
-     Dispose(PMasterDetailItem(TList(Self).Items[Index]));
+      FreeAndNil(TList(Self).Items[Index]^);
+      Dispose(PMasterDetailItem(TList(Self).Items[Index]));
      {$ELSE}
        {$IFDEF DELPHI10_4UP}
          FreeAndNil(TMasterDetailItem(TList(Self).Items[Index]^));
        {$ELSE}
          FreeAndNil(TList(Self).Items[Index]^);
        {$ENDIF}
-       Dispose(TList(Self).Items[Index]);
+       {$IFDEF FPC}
+        Dispose(PMasterDetailItem(TList(Self).Items[Index]));
+       {$ELSE}
+        Dispose(TList(Self).Items[Index]);
+       {$ENDIF}
      {$ENDIF}
     End;
    TList(Self).Delete(Index);

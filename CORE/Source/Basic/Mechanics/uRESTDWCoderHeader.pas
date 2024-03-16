@@ -24,6 +24,10 @@ unit uRESTDWCoderHeader;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 uses
   Classes, uRESTDWProtoTypes, uRESTDWTools;
 

@@ -24,6 +24,10 @@ unit uRESTDWBasicClass;
 
 interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
   SysUtils, Classes,
   uRESTDWAbout, uRESTDWConsts, uRESTDWDataUtils, uRESTDWComponentEvents,

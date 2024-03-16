@@ -23,6 +23,12 @@ unit uRESTDWDriverBase;
  Fernando Banhos            - Refactor Drivers REST Dataware.
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 Interface
 
 Uses
@@ -245,7 +251,7 @@ Type
                               Params                : TRESTDWParams;
                               Var Error             : Boolean;
                               Var MessageError      : String;
-                              Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
+                              Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
   Function isMinimumVersion(major, minor, sub: Integer): Boolean; Overload;
   Function isMinimumVersion(major, minor: Integer): Boolean; Overload;
 
@@ -277,36 +283,36 @@ Type
                               Params                : TRESTDWParams;
                               Var Error             : Boolean;
                               Var MessageError      : String;
-                              Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
+                              Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
   Function ApplyUpdates      (Massive,
                               SQL                   : String;
                               Params                : TRESTDWParams;
                               Var Error             : Boolean;
                               Var MessageError      : String;
-                              Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
+                              Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
   Function ApplyUpdatesTB    (MassiveStream         : TStream;
                               SQL                   : String;
                               Params                : TRESTDWParams;
                               Var Error             : Boolean;
                               Var MessageError      : String;
-                              Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
+                              Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
   Function ApplyUpdatesTB    (Massive               : String;
                               Params                : TRESTDWParams;
                               Var Error             : Boolean;
                               Var MessageError      : String;
-                              Var RowsAffected      : Integer)   : TJSONValue;Overload;Virtual;
+                              Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
   Function ApplyUpdates_MassiveCache  (MassiveStream         : TStream;
                                        Var Error             : Boolean;
-                                       Var MessageError      : String) : TJSONValue;Overload;Virtual;
+                                       Var MessageError      : String) : TRESTDWJSONValue;Overload;Virtual;
   Function ApplyUpdates_MassiveCache  (MassiveCache          : String;
                                        Var Error             : Boolean;
-                                       Var MessageError      : String) : TJSONValue;Overload;Virtual;
+                                       Var MessageError      : String) : TRESTDWJSONValue;Overload;Virtual;
   Function ApplyUpdates_MassiveCacheTB(MassiveStream         : TStream;
                                        Var Error             : Boolean;
-                                       Var MessageError      : String) : TJSONValue;Overload;Virtual;
+                                       Var MessageError      : String) : TRESTDWJSONValue;Overload;Virtual;
   Function ApplyUpdates_MassiveCacheTB(MassiveCache          : String;
                                        Var Error             : Boolean;
-                                       Var MessageError      : String) : TJSONValue;Overload;Virtual;
+                                       Var MessageError      : String) : TRESTDWJSONValue;Overload;Virtual;
   Function ExecuteCommand     (SQL                   : String;
                                Var Error             : Boolean;
                                Var MessageError      : String;
@@ -378,7 +384,7 @@ Type
   Function OpenDatasets       (DatasetsLine          : String;
                                Var Error             : Boolean;
                                Var MessageError      : String;
-                               Var BinaryBlob        : TMemoryStream)   : TJSONValue; Overload;Virtual;
+                               Var BinaryBlob        : TMemoryStream)   : TRESTDWJSONValue; Overload;Virtual;
   Function OpenDatasets       (DatapackStream        : TStream;
                                Var Error             : Boolean;
                                Var MessageError      : String;
@@ -390,7 +396,7 @@ Type
   Procedure PrepareConnection     (Var AConnectionDefs    : TConnectionDefs);Virtual;
   Function  ProcessMassiveSQLCache(MassiveSQLCache        : String;
                                    Var Error              : Boolean;
-                                   Var MessageError       : String)     : TJSONValue; Virtual;
+                                   Var MessageError       : String)     : TRESTDWJSONValue; Virtual;
   Procedure BuildDatasetLine      (Var Query              : TRESTDWDrvDataset;
                                    Massivedataset         : TMassivedatasetBuffer;
                                    MassiveCache           : Boolean = False);
@@ -1520,7 +1526,7 @@ Begin
  End;
 End;
 
-function TRESTDWDriverBase.ApplyUpdates(MassiveStream : TStream; SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates(MassiveStream : TStream; SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TRESTDWJSONValue;
 Var
  MassiveDataset : TMassiveDatasetBuffer;
 Begin
@@ -1534,7 +1540,7 @@ Begin
 End;
 
 
-function TRESTDWDriverBase.ApplyUpdates(Massive, SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates(Massive, SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TRESTDWJSONValue;
 Var
  MassiveDataset : TMassiveDatasetBuffer;
 Begin
@@ -1547,7 +1553,7 @@ Begin
  End;
 End;
 
-function TRESTDWDriverBase.ApplyUpdatesTB(MassiveStream : TStream; SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TJSONValue;
+function TRESTDWDriverBase.ApplyUpdatesTB(MassiveStream : TStream; SQL : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TRESTDWJSONValue;
 Var
   vTempQuery         : TRESTDWDrvTable;
   vResultReflection  : String;
@@ -1696,7 +1702,7 @@ Begin
           vTempQuery.Open;
           vTempQuery.FetchAll;
           If Result = Nil Then
-            Result := TJSONValue.Create;
+            Result := TRESTDWJSONValue.Create;
           Result.Encoding := Encoding;
           Result.Encoded := EncodeStringsJSON;
           {$IFDEF RESTDWLAZARUS}
@@ -1711,7 +1717,7 @@ Begin
               Error := True;
               MessageError := E.Message;
               If Result = Nil Then
-                Result := TJSONValue.Create;
+                Result := TRESTDWJSONValue.Create;
               Result.Encoded := True;
               {$IFDEF RESTDWLAZARUS}
               Result.DatabaseCharSet := DatabaseCharSet;
@@ -1725,7 +1731,7 @@ Begin
       end
       else If (vResultReflection <> '') Then Begin
         If Result = Nil Then
-          Result := TJSONValue.Create;
+          Result := TRESTDWJSONValue.Create;
         Result.Encoding := Encoding;
         Result.Encoded := EncodeStringsJSON;
         {$IFDEF RESTDWLAZARUS}
@@ -1748,7 +1754,7 @@ function TRESTDWDriverBase.ApplyUpdates(MassiveDataset: TMassiveDatasetBuffer;
                                         Params: TRESTDWParams;
                                         var Error: Boolean;
                                         var MessageError: String;
-                                        var RowsAffected: Integer): TJSONValue;
+                                        var RowsAffected: Integer): TRESTDWJSONValue;
 var
   vTempQuery: TRESTDWDrvQuery;
   vResultReflection: string;
@@ -1883,7 +1889,7 @@ begin
           vTempQuery.Open;
 
           if Result = nil then
-            Result := TJSONValue.Create;
+            Result := TRESTDWJSONValue.Create;
           Result.Encoding := Encoding;
           Result.Encoded := EncodeStringsJSON;
           Result.Utf8SpecialChars := True;
@@ -1897,7 +1903,7 @@ begin
               Error := True;
               MessageError := E.Message;
               if Result = nil then
-                Result := TJSONValue.Create;
+                Result := TRESTDWJSONValue.Create;
               Result.Encoded := True;
               Result.SetValue(GetPairJSONStr('NOK', MessageError));
               if connInTransaction then
@@ -1911,7 +1917,7 @@ begin
       end
       else if (vResultReflection <> '') then begin
         if Result = nil then
-          Result := TJSONValue.Create;
+          Result := TRESTDWJSONValue.Create;
         Result.Encoding := Encoding;
         Result.Encoded := EncodeStringsJSON;
         Result.SetValue('[' + vResultReflection + ']');
@@ -1926,7 +1932,7 @@ begin
   end;
 end;
 
-function TRESTDWDriverBase.ApplyUpdatesTB(Massive : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TJSONValue;
+function TRESTDWDriverBase.ApplyUpdatesTB(Massive : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TRESTDWJSONValue;
 var
   vTempQuery: TRESTDWDrvTable;
   vResultReflection : string;
@@ -2070,7 +2076,7 @@ begin
           vTempQuery.Open;
           vTempQuery.FetchAll;
           if Result = nil then
-            Result := TJSONValue.Create;
+            Result := TRESTDWJSONValue.Create;
           Result.Encoding := Encoding;
           Result.Encoded := EncodeStringsJSON;
           {$IFDEF RESTDWLAZARUS}
@@ -2085,7 +2091,7 @@ begin
               Error := True;
               MessageError := E.Message;
               if Result = nil then
-                Result := TJSONValue.Create;
+                Result := TRESTDWJSONValue.Create;
               Result.Encoded := True;
               {$IFDEF RESTDWLAZARUS}
                 Result.DatabaseCharSet := DatabaseCharSet;
@@ -2099,7 +2105,7 @@ begin
       end
       else if (vResultReflection <> '') then begin
         if Result = nil then
-          Result := TJSONValue.Create;
+          Result := TRESTDWJSONValue.Create;
         Result.Encoding := Encoding;
         Result.Encoded := EncodeStringsJSON;
         {$IFDEF RESTDWLAZARUS}
@@ -2117,7 +2123,7 @@ begin
   end;
 end;
 
-function TRESTDWDriverBase.ApplyUpdates_MassiveCache(MassiveStream : TStream; var Error : Boolean; var MessageError : String) : TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates_MassiveCache(MassiveStream : TStream; var Error : Boolean; var MessageError : String) : TRESTDWJSONValue;
 Var
  MassiveDataset : TMassiveDatasetBuffer;
  aMassive       : TStream;
@@ -2178,7 +2184,7 @@ Begin
     End;
   End;
  Finally
-  Result := TJSONValue.Create;
+  Result := TRESTDWJSONValue.Create;
   If (vLineString <> '') Then
    Begin
     Result.Encoding := Encoding;
@@ -2301,7 +2307,7 @@ Begin
   End;
 end;
 
-function TRESTDWDriverBase.ApplyUpdates_MassiveCache(MassiveCache : String; var Error : Boolean; var MessageError : String) : TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates_MassiveCache(MassiveCache : String; var Error : Boolean; var MessageError : String) : TRESTDWJSONValue;
 var
   vTempQuery: TRESTDWDrvQuery;
   vStateResource, vMassiveLine: boolean;
@@ -2427,7 +2433,7 @@ begin
 
     LoadMassive(vTempQuery);
 
-    Result := TJSONValue.Create;
+    Result := TRESTDWJSONValue.Create;
     if (vResultReflection <> '') then begin
       Result.Encoding := Encoding;
       Result.Encoded := EncodeStringsJSON;
@@ -2445,17 +2451,17 @@ begin
   end;
 end;
 
-function TRESTDWDriverBase.ApplyUpdates_MassiveCacheTB(MassiveStream : TStream; var Error : Boolean; var MessageError : String) : TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates_MassiveCacheTB(MassiveStream : TStream; var Error : Boolean; var MessageError : String) : TRESTDWJSONValue;
 Begin
 
 End;
 
-function TRESTDWDriverBase.ApplyUpdates_MassiveCacheTB(MassiveCache : String; var Error : Boolean; var MessageError : String) : TJSONValue;
+function TRESTDWDriverBase.ApplyUpdates_MassiveCacheTB(MassiveCache : String; var Error : Boolean; var MessageError : String) : TRESTDWJSONValue;
 Begin
 
 End;
 
-function TRESTDWDriverBase.ProcessMassiveSQLCache(MassiveSQLCache : String; var Error : Boolean; var MessageError : String) : TJSONValue;
+function TRESTDWDriverBase.ProcessMassiveSQLCache(MassiveSQLCache : String; var Error : Boolean; var MessageError : String) : TRESTDWJSONValue;
 Var
  vTempQuery        : TRESTDWDrvQuery;
  vStateResource    : Boolean;
@@ -2542,7 +2548,7 @@ Begin
     vTempQuery.SQL.Clear;
     LoadMassive(vTempQuery);
     If Result = Nil Then
-      Result := TJSONValue.Create;
+      Result := TRESTDWJSONValue.Create;
     If (vResultReflection <> '') Then Begin
       Result.Encoding := Encoding;
       Result.Encoded  := EncodeStringsJSON;
@@ -2572,12 +2578,12 @@ var
   vTempQuery: TRESTDWDrvQuery;
   vDataSet: TDataSet;
   vStateResource: boolean;
-  aResult: TJSONValue;
+  aResult: TRESTDWJSONValue;
 begin
  {$IFNDEF RESTDWLAZARUS}inherited;{$ENDIF}
   Error := False;
   Result := '';
-  aResult := TJSONValue.Create;
+  aResult := TRESTDWJSONValue.Create;
   vTempQuery := getQuery(not Execute);
   vDataSet := TDataSet(vTempQuery.Owner);
   try
@@ -2600,7 +2606,7 @@ begin
         connCommit;
 
       if aResult = nil then
-        aResult := TJSONValue.Create;
+        aResult := TRESTDWJSONValue.Create;
 
       aResult.Encoding := Encoding;
       try
@@ -2625,7 +2631,7 @@ begin
 
           try
             vTempQuery.FStorageDataType := FStorageDataType;
-            {$IFDEF FPC}
+            {$IFDEF RESTDWLAZARUS}
              vTempQuery.DatabaseCharSet       := DatabaseCharSet;
             {$ENDIF}
             vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
@@ -2642,7 +2648,7 @@ begin
         Self.OnQueryBeforeOpen(vDataSet, Params);
       vTempQuery.ExecSQL;
       if aResult = nil then
-        aResult := TJSONValue.Create;
+        aResult := TRESTDWJSONValue.Create;
       if connInTransaction then
         connCommit;
       aResult.SetValue('COMMANDOK');
@@ -2658,7 +2664,7 @@ begin
         MessageError := E.Message;
 
         if aResult = nil then
-          aResult := TJSONValue.Create;
+          aResult := TRESTDWJSONValue.Create;
         aResult.Encoded := True;
         aResult.SetValue(GetPairJSONStr('NOK', MessageError));
         Result := aResult.ToJSON;
@@ -2693,12 +2699,12 @@ function TRESTDWDriverBase.ExecuteCommandTB(
 var
   vTempQuery     : TRESTDWDrvTable;
   vDataset       : TDataset;
-  aResult        : TJSONValue;
+  aResult        : TRESTDWJSONValue;
   vStateResource : Boolean;
 begin
   {$IFNDEF RESTDWLAZARUS}Inherited;{$ENDIF}
   Error  := False;
-  aResult := TJSONValue.Create;
+  aResult := TRESTDWJSONValue.Create;
   vTempQuery := getTable;
   vDataset := TDataset(vTempQuery.Owner);
   try
@@ -2713,7 +2719,7 @@ begin
     vTempQuery.Open;
 
     if aResult = nil Then
-      aResult := TJSONValue.Create;
+      aResult := TRESTDWJSONValue.Create;
 
     aResult.Encoded         := EncodeStringsJSON;
     aResult.Encoding        := Encoding;
@@ -2741,7 +2747,7 @@ begin
           BinaryBlob := TMemoryStream.Create;
         try
           vTempQuery.FStorageDataType := FStorageDataType;
-          {$IFDEF FPC}
+          {$IFDEF RESTDWLAZARUS}
            vTempQuery.DatabaseCharSet       := DatabaseCharSet;
           {$ENDIF}
           vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
@@ -2765,7 +2771,7 @@ begin
         Error                   := True;
         MessageError            := E.Message;
         if aResult = Nil then
-          aResult := TJSONValue.Create;
+          aResult := TRESTDWJSONValue.Create;
 
         aResult.Encoded         := True;
         aResult.Encoding        := Encoding;
@@ -3674,10 +3680,10 @@ Begin
  FreeAndNil(vTempQuery);
 End;
 
-function TRESTDWDriverBase.OpenDatasets(DatasetsLine : String; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream) : TJSONValue;
+function TRESTDWDriverBase.OpenDatasets(DatasetsLine : String; var Error : Boolean; var MessageError : String; var BinaryBlob : TMemoryStream) : TRESTDWJSONValue;
 Var
  vTempQuery      : TRESTDWDrvQuery;
- vTempJSON       : TJSONValue;
+ vTempJSON       : TRESTDWJSONValue;
  vJSONLine       : String;
  I               : Integer;
  vMetaData,
@@ -3723,7 +3729,7 @@ Begin
       End;
      End;
     vTempQuery.Open;
-    vTempJSON  := TJSONValue.Create;
+    vTempJSON  := TRESTDWJSONValue.Create;
     vTempJSON.Encoding := Encoding;
     vTempJSON.Utf8SpecialChars := True;
     If Not vBinaryEvent Then
@@ -3735,7 +3741,7 @@ Begin
       vStream := TMemoryStream.Create;
       Try
        vTempQuery.FStorageDataType := FStorageDataType;
-       {$IFDEF FPC}
+       {$IFDEF RESTDWLAZARUS}
         vTempQuery.DatabaseCharSet       := DatabaseCharSet;
        {$ENDIF}
        vTempQuery.SaveToStreamCompatibleMode(vStream);
@@ -3790,7 +3796,7 @@ Begin
     End;
    End;
  End;
- Result             := TJSONValue.Create;
+ Result             := TRESTDWJSONValue.Create;
  Result.Encoding    := Encoding;
  Result.ObjectValue := ovString;
  Try
@@ -3866,7 +3872,7 @@ Begin
     vTempQuery.Open;
     vStream := TMemoryStream.Create;
     Try
-     {$IFDEF FPC}
+     {$IFDEF RESTDWLAZARUS}
       vTempQuery.DatabaseCharSet       := DatabaseCharSet;
      {$ENDIF}
      vTempQuery.SaveToStreamCompatibleMode(vStream);

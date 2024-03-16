@@ -24,6 +24,10 @@ unit uRESTDWAttachmentFile;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
  Classes,
  uRESTDWAttachment, uRESTDWMessageParts, uRESTDWTools, uRESTDWMimeTypes;

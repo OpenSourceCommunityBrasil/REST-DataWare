@@ -15,6 +15,11 @@ unit uRESTDWServerContext;
  https://github.com/OpenSourceCommunityBrasil/REST-DataWare
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
 
 interface
 
@@ -34,8 +39,8 @@ Const
 
 Type
  TRESTDWReplyRequest       = Procedure(Const Params         : TRESTDWParams;
-                                       Var   ContentType,
-                                             Result         : String;
+                                       Var   ContentType    : String;
+                                       Const Result         : TStringList;
                                        Const RequestType    : TRequestType)    Of Object;
  TRESTDWAuthRequest        = Procedure(Const Params         : TRESTDWParams;
                                        Var   Rejected       : Boolean;
@@ -54,13 +59,11 @@ Type
  TObjectEvent              = Procedure(aSelf                : TComponent;
                                        Const Params         : TRESTDWParams)   Of Object;
  TObjectExecute            = Procedure(Const aSelf          : TCollectionItem) Of Object;
-
-
  TRESTDWReplyRequestStream = Procedure(Const Params       : TRESTDWParams;
-                                   Var   ContentType  : String;
-                                   Const Result       : TMemoryStream;
-                                   Const RequestType  : TRequestType;
-                                   Var   StatusCode     : Integer) Of Object;
+                                       Var   ContentType  : String;
+                                       Const Result       : TMemoryStream;
+                                       Const RequestType  : TRequestType;
+                                       Var   StatusCode     : Integer) Of Object;
 
 Type
  TRESTDWReplyRequestData = Class(TComponent)
@@ -91,9 +94,9 @@ Type
   vOwnerCollection     : TCollection;
   Procedure SetContextScript(Value : TStrings);
  Public
-  Function    GetDisplayName                  : String;             Override;
-  Procedure   SetDisplayName    (Const Value  : String);            Override;
-  Function    GetNamePath      : String;                            Override;
+  Function    GetDisplayName                  : String;       {$IFNDEF FPC}Override;{$ENDIF}
+  Procedure   SetDisplayName    (Const Value  : String);      {$IFNDEF FPC}Override;{$ENDIF}
+  Function    GetNamePath      : String;                      {$IFNDEF FPC}Override;{$ENDIF}
   Procedure   Assign            (Source       : TPersistent);       Override;
   Constructor Create            (aCollection  : TCollection);       Override;
   Destructor  Destroy;           Override;
@@ -206,9 +209,9 @@ Type
   Procedure SetBeforeRenderer (Value     : TRESTDWBeforeRenderer);
   Procedure SetBaseURL(Value : String);
  Public
-  Function    GetDisplayName             : String;       Override;
-  Procedure   SetDisplayName(Const Value : String);      Override;
-  Function    GetNamePath                : String;       Override;
+  Function    GetDisplayName             : String;  {$IFNDEF FPC}Override;{$ENDIF}
+  Procedure   SetDisplayName(Const Value : String); {$IFNDEF FPC}Override;{$ENDIF}
+  Function    GetNamePath                : String;  {$IFNDEF FPC}Override;{$ENDIF}
   Procedure   Assign        (Source      : TPersistent); Override;
   Procedure   CompareParams (Var Dest    : TRESTDWParams);
   Constructor Create        (aCollection : TCollection); Override;
@@ -250,6 +253,14 @@ Type
 //  Procedure   Editable  (Value : Boolean);
  Public
   Function    Add                    : TCollectionItem;
+  Function    AddContext (Const ContextName : String;
+                          BaseURL           : String                    = '/';
+                          OnReplyRequest    : TRESTDWReplyRequest       = Nil;
+                          ContentType       : String                    = cDefaultContext) : TRESTDWContext;Overload;
+  Function    AddContext (Const ContextName : String;
+                          BaseURL           : String                    = '/';
+                          OnReplyRequest    : TRESTDWReplyRequestStream = Nil;
+                          ContentType       : String                    = cDefaultContext) : TRESTDWContext;Overload;
   Constructor Create     (AOwner     : TPersistent;
                           aItemClass : TCollectionItemClass);
   Destructor  Destroy; Override;
@@ -417,7 +428,7 @@ Begin
    DWReplyRequestData.Name := FName;
    If vContextName = '' Then
     vContextName  := DWReplyRequestData.Name;
-   Inherited;
+   Inherited SetDisplayName(Value);
   End;
 End;
 
@@ -430,6 +441,36 @@ procedure TRESTDWContext.SetReplyRequest(Value: TRESTDWReplyRequest);
 begin
  DWReplyRequestData.OnReplyRequest := Value;
 end;
+
+Function TRESTDWContextList.AddContext (Const ContextName : String;
+                                        BaseURL           : String                    = '/';
+                                        OnReplyRequest    : TRESTDWReplyRequest       = Nil;
+                                        ContentType       : String                    = cDefaultContext) : TRESTDWContext;
+Var
+ Context : TRESTDWContext;
+Begin
+ Context                := TRESTDWContext(Add);
+ Context.ContextName    := ContextName;
+ Context.BaseUrl        := BaseUrl;
+ Context.ContentType    := ContentType;
+ Context.OnReplyRequest := OnReplyRequest;
+ Result                 := Context;
+End;
+
+Function TRESTDWContextList.AddContext (Const ContextName : String;
+                                        BaseURL           : String                    = '/';
+                                        OnReplyRequest    : TRESTDWReplyRequestStream = Nil;
+                                        ContentType       : String                    = cDefaultContext) : TRESTDWContext;
+Var
+ Context : TRESTDWContext;
+Begin
+ Context                      := TRESTDWContext(Add);
+ Context.ContextName          := ContextName;
+ Context.BaseUrl              := BaseUrl;
+ Context.ContentType          := ContentType;
+ Context.OnReplyRequestStream := OnReplyRequest;
+ Result                       := Context;
+End;
 
 Function TRESTDWContextList.Add : TCollectionItem;
 Begin
@@ -595,7 +636,7 @@ Begin
             vDWParamMethod.ParamName       := bJsonOBJc.get('paramname').toString;
             vDWParamMethod.Encoded         := StringToBoolean(bJsonOBJc.get('encoded').toString);
             If Trim(bJsonOBJc.get('default').toString) <> '' Then
-             vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.get('default').toString{$IFDEF FPC}, csUndefined{$ENDIF});
+             vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.get('default').toString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
            End;
          Finally
           bJsonArrayC.Free;
@@ -727,7 +768,7 @@ Procedure TRESTDWServerContext.CreateDWParams(ContextName  : String;
                                           Var DWParams : TRESTDWParams);
 Var
  vParamName : String;
- dwParam : TJSONParam;
+ dwParam : TRESTDWJSONParam;
  I       : Integer;
  vFound  : Boolean;
 Begin
@@ -751,7 +792,7 @@ Begin
       End;
      If Not(vFound) Then
       Begin
-       dwParam                 := TJSONParam.Create(DWParams.Encoding);
+       dwParam                 := TRESTDWJSONParam.Create(DWParams.Encoding);
        dwParam.ParamName       := vEventList.ContextByName[ContextName].vDWParams.Items[I].ParamName;
        dwParam.Alias           := vEventList.ContextByName[ContextName].vDWParams.Items[I].Alias;
        dwParam.ObjectDirection := vEventList.ContextByName[ContextName].vDWParams.Items[I].ObjectDirection;
@@ -891,7 +932,7 @@ begin
  Else
   Begin
    FName := Value;
-   Inherited;
+   Inherited SetDisplayName(Value);
   End;
 end;
 

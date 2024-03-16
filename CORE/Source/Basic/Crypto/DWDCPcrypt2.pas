@@ -24,6 +24,12 @@ unit DWDCPcrypt2;
 
 interface
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 uses
   Classes, Sysutils, DWDCPtypes, DWDCPbase64;
 

@@ -24,6 +24,10 @@ Unit uRESTDWMessageCoderMIME;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
  Classes, SysUtils,
  uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWException, uRESTDWMessage,

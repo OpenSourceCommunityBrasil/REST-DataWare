@@ -24,6 +24,10 @@ unit uRESTDWIOHandler;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
  Classes, uRESTDWException, uRESTDWBuffer, uRESTDWProtoTypes, uRESTDWTools,
  uRESTDWAbout, uRESTDWConsts;
@@ -39,7 +43,7 @@ Const
   eRESTDWIOHandlerRequiresLargeStream = Class(eRESTDWIOHandler);
   eRESTDWIOHandlerStreamDataTooLarge  = Class(eRESTDWIOHandler);
   TRESTDWIOHandlerClass               = Class of TRESTDWIOHandler;
-  TRESTDWIOHandler                    = class(TRESTDWComponent)
+  TRESTDWIOHandler                    = Class(TRESTDWComponent)
  Private
   FLargeStream,
   FReadLnTimedout,

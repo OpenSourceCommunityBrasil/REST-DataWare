@@ -1,4 +1,4 @@
-﻿Unit uRESTDWConsts;
+Unit uRESTDWConsts;
 
 {$I ..\..\Source\Includes\uRESTDW.inc}
 
@@ -22,11 +22,19 @@
  Roniery                    - Devel.
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 Interface
 
 Uses
  {$IFDEF FPC}
-  {$IFNDEF RESTDWLAMW}LCL,{$ENDIF}
+  {$IFDEF RESTDWLAZARUS}
+   {$IFNDEF RESTDWLAMW}LCL,{$ENDIF}
+  {$ENDIF}
   zstream, base64,
  {$ELSE}
   {$IFDEF POSIX}Posix.Unistd,{$ENDIF}
@@ -51,7 +59,7 @@ Const
  monthnames       : Array [1..12] Of string = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', {do not localize}
                                                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'); {do not localize}
  GOffsetFromUTC   : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
- 
+
  // controle de versão
  RESTDWVersionINFO               = 'v2.1.0-';
  RESTDWRelease                   = '792';
@@ -91,6 +99,7 @@ Const
  cCORSPreflightCODE              = 200;
  cCreatedToken                   = '201 Created';
  cDefaultAccept                  = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+ cDefaultContext                 = 'text/html';
  cDefaultBasicAuthUser           = 'testserver';
  cDefaultBasicAuthPassword       = 'testserver';
  cDefaultContentType             = 'application/json';
@@ -226,7 +235,8 @@ Const
  TValueFormatJSONValueS          = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s"}';
  UrlBase                         = '%s://%s:%d/%s';
  UrlBaseA                        = '%s://%s:%d%s';
- Resourcestring                  
+ cBaseRedirect                   = '127.0.0.1';
+ Resourcestring
  cBufferIsEmpty                  = 'No bytes in buffer.';
  cBufferRangeError               = 'Index out of bounds.';
  sNoMapString                    = 'No mapping for the Unicode character exists in the target multi-byte code page';

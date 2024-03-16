@@ -23,6 +23,12 @@ unit uRESTDWBasicDB;
  Roniery                    - Devel.
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 interface
 
 Uses
@@ -225,9 +231,9 @@ Type
   vClientConnectionDefs : TClientConnectionDefs;
   Function    GetPoolerList     : TStringList;
  Public
-  Function    GetDisplayName             : String;      Override;
-  Procedure   SetDisplayName(Const Value : String);     Override;
-  Constructor Create        (aCollection : TCollection);Override;
+  Function    GetDisplayName             : String; {$IFNDEF FPC}Override;{$ENDIF}
+  Procedure   SetDisplayName(Const Value : String);{$IFNDEF FPC}Override;{$ENDIF}
+  Constructor Create        (aCollection : TCollection);{$IFNDEF FPC}Override;{$ENDIF}
   Destructor  Destroy;Override;//Destroy a Classe
   Property    PoolerList        : TStringList                 Read GetPoolerList;
  Published
@@ -386,7 +392,7 @@ Type
                                      Var Params             : TParams;
                                      Var Error              : Boolean;
                                      Var MessageError       : String;
-                                     Var Result             : TJSONValue;
+                                     Var Result             : TRESTDWJSONValue;
                                      Var RowsAffected       : Integer;
                                      Execute                : Boolean = False;
                                      BinaryRequest          : Boolean = False;
@@ -398,7 +404,7 @@ Type
                                      Var Params             : TParams;
                                      Var Error              : Boolean;
                                      Var MessageError       : String;
-                                     Var Result             : TJSONValue;
+                                     Var Result             : TRESTDWJSONValue;
                                      Var RowsAffected       : Integer;
                                      BinaryRequest          : Boolean = False;
                                      BinaryCompatibleMode   : Boolean = False;
@@ -422,7 +428,7 @@ Type
                                      Var Error,
                                      hBinaryRequest         : Boolean;
                                      Var MessageError       : String;
-                                     Var Result             : TJSONValue;
+                                     Var Result             : TRESTDWJSONValue;
                                      Var RowsAffected       : Integer;
                                      RESTClientPooler       : TRESTClientPoolerBase = Nil);Overload;
   Procedure ApplyUpdatesTB          (Var PoolerMethodClient : TRESTDWPoolerMethodClient;
@@ -431,7 +437,7 @@ Type
                                      Var Error,
                                      hBinaryRequest         : Boolean;
                                      Var MessageError       : String;
-                                     Var Result             : TJSONValue;
+                                     Var Result             : TRESTDWJSONValue;
                                      Var RowsAffected       : Integer;
                                      RESTClientPooler       : TRESTClientPoolerBase = Nil);Overload;
   Function    GetServerEvents                               : TStringList;
@@ -689,7 +695,7 @@ Type
   Procedure   CreateParams;                                 //Cria os Parametros na lista de Dataset
   Procedure   SetDataBase        (Value     : TRESTDWDatabasebaseBase); //Diz o REST Database
   Procedure   ExecuteOpen;
-  Function    GetData            (DataSet   : TJSONValue = Nil) : Boolean;//Recebe os Dados da Internet vindo do Servidor REST
+  Function    GetData            (DataSet   : TRESTDWJSONValue = Nil) : Boolean;//Recebe os Dados da Internet vindo do Servidor REST
   Procedure   SetUpdateTableName (Value     : String);        //Diz qual a tabela que será feito Update no Banco
   Procedure   OldAfterPost       (DataSet   : TDataSet);      //Eventos do Dataset para realizar o AfterPost
   Procedure   OldAfterDelete     (DataSet   : TDataSet);      //Eventos do Dataset para realizar o AfterDelete
@@ -742,7 +748,7 @@ Type
   procedure   InternalOpen; override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Open
   Function    GetRecordCount : Integer; Override;
   procedure   InternalRefresh; overload; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Refresh
-  procedure   CloseCursor; override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Close
+  procedure   CloseCursor; //override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Close //TODO XyberX
   Procedure   Notification(AComponent: TComponent; Operation: TOperation); override;
   Procedure   ThreadStart(ExecuteData : TOnExecuteData);
   Procedure   ThreadDestroy;
@@ -795,8 +801,8 @@ Type
                             InText  : Boolean;
                             AndOrOR : String);
   Procedure   Refresh;
-  Procedure   SaveToStream    (Var Stream : TMemoryStream);
-  Procedure   LoadFromStream      (Stream : TMemoryStream);
+  Procedure   SaveToStream    (Var Stream : TStream);
+  Procedure   LoadFromStream      (Stream : TStream);
   Procedure   ClearMassive;
   Function    MassiveCount  : Integer;
   Function    MassiveToJSON : String; //Transporte de MASSIVE em formato JSON
@@ -944,7 +950,7 @@ Type
   vLastOpen             : Integer;
   Procedure   SetActiveDB        (Value     : Boolean);       //Seta o Estado do Dataset
   Procedure   SetDataBase        (Value     : TRESTDWDatabasebaseBase); //Diz o REST Database
-  Function    GetData            (DataSet   : TJSONValue = Nil) : Boolean;//Recebe os Dados da Internet vindo do Servidor REST
+  Function    GetData            (DataSet   : TRESTDWJSONValue = Nil) : Boolean;//Recebe os Dados da Internet vindo do Servidor REST
   Procedure   OldAfterPost       (DataSet   : TDataSet);      //Eventos do Dataset para realizar o AfterPost
   Procedure   OldAfterDelete     (DataSet   : TDataSet);      //Eventos do Dataset para realizar o AfterDelete
   Procedure   SetMasterDataSet   (Value     : TRESTDWClientSQLBase);
@@ -1115,8 +1121,8 @@ Type
   vFieldConfig     : TDWFieldType;
   vOnFieldGetValue : TOnFieldGetValue;
  Public
-  Function    GetDisplayName             : String;      Override;
-  Procedure   SetDisplayName(Const Value : String);     Override;
+  Function    GetDisplayName             : String;{$IFNDEF FPC}Override;{$ENDIF}
+  Procedure   SetDisplayName(Const Value : String);{$IFNDEF FPC}Override;{$ENDIF}
   Constructor Create        (aCollection : TCollection);Override;
   Destructor  Destroy;Override;//Destroy a Classe
  Published
@@ -1415,7 +1421,7 @@ Uses uRESTDWJSONInterface;
 Function GeTRESTDWParams(Params : TParams; Encondig : TEncodeSelect) : TRESTDWParams;
 Var
  I, A      : Integer;
- JSONParam : TJSONParam;
+ JSONParam : TRESTDWJSONParam;
 Begin
  Result := Nil;
  If Params <> Nil Then
@@ -1426,7 +1432,7 @@ Begin
      Result.Encoding := Encondig;
      For I := 0 To Params.Count -1 Do
       Begin
-       JSONParam         := TJSONParam.Create(Result.Encoding);
+       JSONParam         := TRESTDWJSONParam.Create(Result.Encoding);
        JSONParam.ParamName := Params[I].Name;
        JSONParam.Encoded   := True;
        JSONParam.LoadFromParam(Params[I]);
@@ -1483,7 +1489,7 @@ Begin
  Else
   Begin
    vListName := Trim(Value);
-   Inherited;
+   Inherited SetDisplayName(Value);
   End;
 End;
 
@@ -1532,8 +1538,8 @@ Begin
 End;
 
 Function TRESTDWPoolerDB.InsertMySQLReturnID(SQL              : String;
-                                           Var Error        : Boolean;
-                                           Var MessageError : String) : Integer;
+                                             Var Error        : Boolean;
+                                             Var MessageError : String) : Integer;
 Begin
  Result := -1;
  If vRESTDriver <> Nil Then
@@ -1825,7 +1831,7 @@ Begin
  vConnection.AccessTag        := vAccessTag;
  vConnection.CriptOptions.Use := vCripto.Use;
  vConnection.CriptOptions.Key := vCripto.Key;
- vConnection.DataRoute        := DataRoute;
+ vConnection.DataRoute        := vDataRoute;
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
  {$IFNDEF RESTDWLAZARUS}
   vConnection.Encoding      := vEncoding;
@@ -2110,12 +2116,12 @@ Procedure TRESTDWDatabasebaseBase.ApplyUpdatesTB(Var PoolerMethodClient : TRESTD
                                          Var Error,
                                          hBinaryRequest         : Boolean;
                                          Var MessageError       : String;
-                                         Var Result             : TJSONValue;
+                                         Var Result             : TRESTDWJSONValue;
                                          Var RowsAffected       : Integer;
                                          RESTClientPooler       : TRESTClientPoolerBase = Nil);
 Var
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
- LDataSetList         : TJSONValue;
+ LDataSetList         : TRESTDWJSONValue;
  DWParams             : TRESTDWParams;
  SocketError          : Boolean;
  I                    : Integer;
@@ -2274,7 +2280,7 @@ Begin
        (Not (Error))        Then
      Begin
       Try
-       Result          := TJSONValue.Create;
+       Result          := TRESTDWJSONValue.Create;
        Result.Encoding := LDataSetList.Encoding;
        Result.SetValue(LDataSetList.value);
       Finally
@@ -2321,12 +2327,12 @@ Procedure TRESTDWDatabasebaseBase.ApplyUpdates(Var PoolerMethodClient : TRESTDWP
                                                Var Error,
                                                hBinaryRequest         : Boolean;
                                                Var MessageError       : String;
-                                               Var Result             : TJSONValue;
+                                               Var Result             : TRESTDWJSONValue;
                                                Var RowsAffected       : Integer;
                                                RESTClientPooler       : TRESTClientPoolerBase = Nil);
 Var
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
- LDataSetList         : TJSONValue;
+ LDataSetList         : TRESTDWJSONValue;
  DWParams             : TRESTDWParams;
  SocketError          : Boolean;
  I                    : Integer;
@@ -2485,7 +2491,7 @@ Begin
        (Not (Error))        Then
      Begin
       Try
-       Result          := TJSONValue.Create;
+       Result          := TRESTDWJSONValue.Create;
        Result.Encoding := LDataSetList.Encoding;
        Result.SetValue(LDataSetList.value);
       Finally
@@ -2718,7 +2724,11 @@ Begin
       If Assigned(vOnEventConnection) then
        vOnEventConnection(False, MessageError)
       Else
-       Raise Exception.Create(PChar(MessageError));
+       {$IFDEF FPC}
+        Raise Exception.Create(MessageError);
+       {$ELSE}
+        Raise Exception.Create(PChar(MessageError));
+       {$ENDIF}
      End;
    End
   Else
@@ -3057,7 +3067,11 @@ Var
 Begin
  OpenDatasets(Datasets, Error, MessageError, True, BinaryCompatible);
  If Error Then
-  Raise Exception.Create(PChar(MessageError));
+  {$IFDEF FPC}
+   Raise Exception.Create(MessageError);
+  {$ELSE}
+   Raise Exception.Create(PChar(MessageError));
+  {$ENDIF}
 End;
 
 Procedure TRESTDWDatabasebaseBase.OpenDatasets(Datasets         : Array of {$IFDEF RESTDWLAZARUS}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
@@ -3072,7 +3086,7 @@ Var
  I                    : Integer;
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
- vJSONValue           : TJSONValue;
+ vJSONValue           : TRESTDWJSONValue;
  vJsonValueB          : TRESTDWJSONInterfaceBase;
  vJsonArray           : TRESTDWJSONInterfaceArray;
  vJsonOBJ             : TRESTDWJSONInterfaceObject;
@@ -3311,7 +3325,7 @@ Begin
    Begin
     If Not BinaryRequest Then
      Begin
-      vJSONValue := TJSONValue.Create;
+      vJSONValue := TRESTDWJSONValue.Create;
       Try
        vJSONValue.Encoded  := True;
        vJSONValue.Encoding := vEncoding;
@@ -3327,7 +3341,7 @@ Begin
         Begin
          vJsonValueB := vJsonArray.GetObject(I);
          vJsonCount  := 0;
-         vJSONValue  := TJSONValue.Create;
+         vJSONValue  := TRESTDWJSONValue.Create;
          vJSONValue.Utf8SpecialChars := True;
          Try
           vJSONValue.Encoding := vEncoding;
@@ -3338,10 +3352,10 @@ Begin
             vJSONValue.OnWriterProcess := TRESTDWClientSQL(Datasets[I]).OnWriterProcess;
             vJSONValue.ServerFieldList := TRESTDWClientSQL(Datasets[I]).ServerFieldList;
             {$IFDEF RESTDWLAZARUS}
-             vJSONValue.DatabaseCharSet := TRESTDWClientSQL(Datasets[I]).DatabaseCharSet;
-             vJSONValue.NewFieldList    := @TRESTDWClientSQL(Datasets[I]).NewFieldList;
-             vJSONValue.NewDataField    := @TRESTDWClientSQL(Datasets[I]).NewDataField;
-             vJSONValue.SetInitDataset  := @TRESTDWClientSQL(Datasets[I]).SetInitDataset;
+             vJSONValue.DatabaseCharSet    := TRESTDWClientSQL(Datasets[I]).DatabaseCharSet;
+             vJSONValue.NewFieldList       := @TRESTDWClientSQL(Datasets[I]).NewFieldList;
+             vJSONValue.NewDataField       := @TRESTDWClientSQL(Datasets[I]).NewDataField;
+             vJSONValue.SetInitDataset     := @TRESTDWClientSQL(Datasets[I]).SetInitDataset;
              vJSONValue.SetRecordCount     := @TRESTDWClientSQL(Datasets[I]).SetRecordCount;
              vJSONValue.Setnotrepage       := @TRESTDWClientSQL(Datasets[I]).Setnotrepage;
              vJSONValue.SetInDesignEvents  := @TRESTDWClientSQL(Datasets[I]).SetInDesignEvents;
@@ -3352,19 +3366,34 @@ Begin
              vJSONValue.PrepareDetailsNew  := @TRESTDWClientSQL(Datasets[I]).PrepareDetailsNew;
              vJSONValue.PrepareDetails     := @TRESTDWClientSQL(Datasets[I]).PrepareDetails;
             {$ELSE}
-             vJSONValue.NewFieldList    := TRESTDWClientSQL(Datasets[I]).NewFieldList;
-             vJSONValue.CreateDataSet   := TRESTDWClientSQL(Datasets[I]).CreateDataSet;
-             vJSONValue.NewDataField    := TRESTDWClientSQL(Datasets[I]).NewDataField;
-             vJSONValue.SetInitDataset  := TRESTDWClientSQL(Datasets[I]).SetInitDataset;
-             vJSONValue.SetRecordCount     := TRESTDWClientSQL(Datasets[I]).SetRecordCount;
-             vJSONValue.Setnotrepage       := TRESTDWClientSQL(Datasets[I]).Setnotrepage;
-             vJSONValue.SetInDesignEvents  := TRESTDWClientSQL(Datasets[I]).SetInDesignEvents;
-             vJSONValue.SetInBlockEvents   := TRESTDWClientSQL(Datasets[I]).SetInBlockEvents;
-             vJSONValue.SetInactive        := TRESTDWClientSQL(Datasets[I]).SetInactive;
-             vJSONValue.FieldListCount     := TRESTDWClientSQL(Datasets[I]).FieldListCount;
-             vJSONValue.GetInDesignEvents  := TRESTDWClientSQL(Datasets[I]).GetInDesignEvents;
-             vJSONValue.PrepareDetailsNew  := TRESTDWClientSQL(Datasets[I]).PrepareDetailsNew;
-             vJSONValue.PrepareDetails     := TRESTDWClientSQL(Datasets[I]).PrepareDetails;
+             {$IFDEF FPC}
+              vJSONValue.NewFieldList       := @TRESTDWClientSQL(Datasets[I]).NewFieldList;
+              vJSONValue.NewDataField       := @TRESTDWClientSQL(Datasets[I]).NewDataField;
+              vJSONValue.SetInitDataset     := @TRESTDWClientSQL(Datasets[I]).SetInitDataset;
+              vJSONValue.SetRecordCount     := @TRESTDWClientSQL(Datasets[I]).SetRecordCount;
+              vJSONValue.Setnotrepage       := @TRESTDWClientSQL(Datasets[I]).Setnotrepage;
+              vJSONValue.SetInDesignEvents  := @TRESTDWClientSQL(Datasets[I]).SetInDesignEvents;
+              vJSONValue.SetInBlockEvents   := @TRESTDWClientSQL(Datasets[I]).SetInBlockEvents;
+              vJSONValue.SetInactive        := @TRESTDWClientSQL(Datasets[I]).SetInactive;
+              vJSONValue.FieldListCount     := @TRESTDWClientSQL(Datasets[I]).FieldListCount;
+              vJSONValue.GetInDesignEvents  := @TRESTDWClientSQL(Datasets[I]).GetInDesignEvents;
+              vJSONValue.PrepareDetailsNew  := @TRESTDWClientSQL(Datasets[I]).PrepareDetailsNew;
+              vJSONValue.PrepareDetails     := @TRESTDWClientSQL(Datasets[I]).PrepareDetails;
+             {$ELSE}
+              vJSONValue.NewFieldList       := TRESTDWClientSQL(Datasets[I]).NewFieldList;
+              vJSONValue.CreateDataSet      := TRESTDWClientSQL(Datasets[I]).CreateDataSet;
+              vJSONValue.NewDataField       := TRESTDWClientSQL(Datasets[I]).NewDataField;
+              vJSONValue.SetInitDataset     := TRESTDWClientSQL(Datasets[I]).SetInitDataset;
+              vJSONValue.SetRecordCount     := TRESTDWClientSQL(Datasets[I]).SetRecordCount;
+              vJSONValue.Setnotrepage       := TRESTDWClientSQL(Datasets[I]).Setnotrepage;
+              vJSONValue.SetInDesignEvents  := TRESTDWClientSQL(Datasets[I]).SetInDesignEvents;
+              vJSONValue.SetInBlockEvents   := TRESTDWClientSQL(Datasets[I]).SetInBlockEvents;
+              vJSONValue.SetInactive        := TRESTDWClientSQL(Datasets[I]).SetInactive;
+              vJSONValue.FieldListCount     := TRESTDWClientSQL(Datasets[I]).FieldListCount;
+              vJSONValue.GetInDesignEvents  := TRESTDWClientSQL(Datasets[I]).GetInDesignEvents;
+              vJSONValue.PrepareDetailsNew  := TRESTDWClientSQL(Datasets[I]).PrepareDetailsNew;
+              vJSONValue.PrepareDetails     := TRESTDWClientSQL(Datasets[I]).PrepareDetails;
+             {$ENDIF}
             {$ENDIF}
             vJSONValue.WriteToDataset(dtFull, vJSONValue.ToJSON, TRESTDWClientSQL(Datasets[I]),
                                      vJsonCount, TRESTDWClientSQL(Datasets[I]).Datapacks);
@@ -3488,7 +3517,7 @@ Procedure TRESTDWDatabasebaseBase.ExecuteCommandTB(Var PoolerMethodClient : TRES
                                            Var Params             : TParams;
                                            Var Error              : Boolean;
                                            Var MessageError       : String;
-                                           Var Result             : TJSONValue;
+                                           Var Result             : TRESTDWJSONValue;
                                            Var RowsAffected       : Integer;
                                            BinaryRequest          : Boolean = False;
                                            BinaryCompatibleMode   : Boolean = False;
@@ -3497,7 +3526,7 @@ Procedure TRESTDWDatabasebaseBase.ExecuteCommandTB(Var PoolerMethodClient : TRES
 Var
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
- LDataSetList         : TJSONValue;
+ LDataSetList         : TRESTDWJSONValue;
  DWParams             : TRESTDWParams;
  vSQL,
  vTempValue           : String;
@@ -3626,7 +3655,7 @@ Begin
    End;
   If (LDataSetList <> Nil) Then
    Begin
-    Result := TJSONValue.Create;
+    Result := TRESTDWJSONValue.Create;
     Result.Encoding := vRESTConnectionDB.Encoding;
     Error  := Trim(MessageError) <> '';
     If Not BinaryRequest Then
@@ -3681,7 +3710,11 @@ Begin
       If Assigned(vOnEventConnection) then
        vOnEventConnection(False, MessageError)
       Else
-       Raise Exception.Create(PChar(MessageError));
+       {$IFDEF FPC}
+        Raise Exception.Create(MessageError);
+       {$ELSE}
+        Raise Exception.Create(PChar(MessageError));
+       {$ENDIF}
      End;
    End
   Else
@@ -3706,7 +3739,7 @@ Procedure TRESTDWDatabasebaseBase.ExecuteCommand(Var PoolerMethodClient : TRESTD
                                                  Var Params             : TParams;
                                                  Var Error              : Boolean;
                                                  Var MessageError       : String;
-                                                 Var Result             : TJSONValue;
+                                                 Var Result             : TRESTDWJSONValue;
                                                  Var RowsAffected       : Integer;
                                                  Execute                : Boolean = False;
                                                  BinaryRequest          : Boolean = False;
@@ -3717,7 +3750,7 @@ Var
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
  vStream              : TStream;
- LDataSetList         : TJSONValue;
+ LDataSetList         : TRESTDWJSONValue;
  DWParams             : TRESTDWParams;
  vSQL,
  vTempValue           : String;
@@ -3863,7 +3896,7 @@ Begin
      End;
     If (LDataSetList <> Nil) Then
      Begin
-      Result := TJSONValue.Create;
+      Result := TRESTDWJSONValue.Create;
       Result.Encoding := vRESTConnectionDB.Encoding;
       Error  := Trim(MessageError) <> '';
       If Not BinaryRequest Then
@@ -3907,8 +3940,8 @@ Begin
        Begin
         vStream := TMemoryStream.Create;
         Try
-         LDataSetList.SaveToStream(vStream);
-         Result.LoadFromStream(vStream);
+         LDataSetList.SaveToStream(TMemoryStream(vStream));
+         Result.LoadFromStream(TMemoryStream(vStream));
         Finally
          vStream.Free;
         End;
@@ -3926,7 +3959,11 @@ Begin
         If Assigned(vOnEventConnection) then
          vOnEventConnection(False, MessageError)
         Else
-         Raise Exception.Create(PChar(MessageError));
+         {$IFDEF FPC}
+          Raise Exception.Create(MessageError);
+         {$ELSE}
+          Raise Exception.Create(PChar(MessageError));
+         {$ENDIF}
        End;
      End
     Else
@@ -3986,7 +4023,7 @@ Begin
  vConnection.AccessTag        := AccessTag;
  vConnection.CriptOptions.Use := CriptOptions.Use;
  vConnection.CriptOptions.Key := CriptOptions.Key;
- vConnection.DataRoute        := DataRoute;
+ vConnection.DataRoute        := vDataRoute;
  vConnection.Accept           := Accept;
  vConnection.AcceptEncoding   := AcceptEncoding;
  vConnection.ContentType      := ContentType;
@@ -4140,7 +4177,7 @@ Var
  vUpdateLine          : String;
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
- ResultData           : TJSONValue;
+ ResultData           : TRESTDWJSONValue;
  SocketError          : Boolean;
 Begin
  SocketError := False;
@@ -4278,7 +4315,7 @@ Var
  vUpdateLine          : String;
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
- ResultData           : TJSONValue;
+ ResultData           : TRESTDWJSONValue;
  SocketError          : Boolean;
 Begin
  SocketError := False;
@@ -4408,7 +4445,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWDatabasebaseBase.ApplyUpdates(Datasets               : Array of {$IFDEF FPC}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
+Procedure TRESTDWDatabasebaseBase.ApplyUpdates(Datasets               : Array of {$IFDEF RESTDWLAZARUS}TRESTDWClientSQLBase{$ELSE}TObject{$ENDIF};
                                                Var Error              : Boolean;
                                                Var MessageError       : String);
 Var
@@ -4418,7 +4455,7 @@ Var
  I                    : Integer;
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
- vJSONValue           : TJSONValue;
+ vJSONValue           : TRESTDWJSONValue;
  vJsonValueB          : TRESTDWJSONInterfaceBase;
  vJsonArray           : TRESTDWJSONInterfaceArray;
  vJsonOBJ             : TRESTDWJSONInterfaceObject;
@@ -4544,7 +4581,7 @@ Begin
    End;
   If Not Error Then
    Begin
-    vJSONValue := TJSONValue.Create;
+    vJSONValue := TRESTDWJSONValue.Create;
     vJSONValue.Encoded  := True;
     vJSONValue.Encoding := vEncoding;
     vJSONValue.LoadFromJSON(vLinesDS);
@@ -4557,7 +4594,7 @@ Begin
       Begin
        vJsonValueB  := vJsonArray.GetObject(I);
        vJsonCount := 0;
-       vJSONValue := TJSONValue.Create;
+       vJSONValue := TRESTDWJSONValue.Create;
        vJSONValue.Utf8SpecialChars := True;
        Try
         vJSONValue.Encoding := vEncoding;
@@ -4568,11 +4605,11 @@ Begin
           vJSONValue.OnWriterProcess := TRESTDWClientSQL(Datasets[I]).OnWriterProcess;
           vJSONValue.ServerFieldList := TRESTDWClientSQL(Datasets[I]).ServerFieldList;
           {$IFDEF RESTDWLAZARUS}
-           vJSONValue.DatabaseCharSet := TRESTDWClientSQL(Datasets[I]).DatabaseCharSet;
-           vJSONValue.NewFieldList    := @TRESTDWClientSQL(Datasets[I]).NewFieldList;
-           vJSONValue.CreateDataSet   := @TRESTDWClientSQL(Datasets[I]).CreateDataSet;
-           vJSONValue.NewDataField    := @TRESTDWClientSQL(Datasets[I]).NewDataField;
-           vJSONValue.SetInitDataset  := @TRESTDWClientSQL(Datasets[I]).SetInitDataset;
+           vJSONValue.DatabaseCharSet    := TRESTDWClientSQL(Datasets[I]).DatabaseCharSet;
+           vJSONValue.NewFieldList       := @TRESTDWClientSQL(Datasets[I]).NewFieldList;
+           vJSONValue.CreateDataSet      := @TRESTDWClientSQL(Datasets[I]).CreateDataSet;
+           vJSONValue.NewDataField       := @TRESTDWClientSQL(Datasets[I]).NewDataField;
+           vJSONValue.SetInitDataset     := @TRESTDWClientSQL(Datasets[I]).SetInitDataset;
            vJSONValue.SetRecordCount     := @TRESTDWClientSQL(Datasets[I]).SetRecordCount;
            vJSONValue.Setnotrepage       := @TRESTDWClientSQL(Datasets[I]).Setnotrepage;
            vJSONValue.SetInDesignEvents  := @TRESTDWClientSQL(Datasets[I]).SetInDesignEvents;
@@ -4583,19 +4620,35 @@ Begin
            vJSONValue.PrepareDetailsNew  := @TRESTDWClientSQL(Datasets[I]).PrepareDetailsNew;
            vJSONValue.PrepareDetails     := @TRESTDWClientSQL(Datasets[I]).PrepareDetails;
           {$ELSE}
-           vJSONValue.NewFieldList    := TRESTDWClientSQL(Datasets[I]).NewFieldList;
-           vJSONValue.CreateDataSet   := TRESTDWClientSQL(Datasets[I]).CreateDataSet;
-           vJSONValue.NewDataField    := TRESTDWClientSQL(Datasets[I]).NewDataField;
-           vJSONValue.SetInitDataset  := TRESTDWClientSQL(Datasets[I]).SetInitDataset;
-           vJSONValue.SetRecordCount     := TRESTDWClientSQL(Datasets[I]).SetRecordCount;
-           vJSONValue.Setnotrepage       := TRESTDWClientSQL(Datasets[I]).Setnotrepage;
-           vJSONValue.SetInDesignEvents  := TRESTDWClientSQL(Datasets[I]).SetInDesignEvents;
-           vJSONValue.SetInBlockEvents   := TRESTDWClientSQL(Datasets[I]).SetInBlockEvents;
-           vJSONValue.SetInactive        := TRESTDWClientSQL(Datasets[I]).SetInactive;
-           vJSONValue.FieldListCount     := TRESTDWClientSQL(Datasets[I]).FieldListCount;
-           vJSONValue.GetInDesignEvents  := TRESTDWClientSQL(Datasets[I]).GetInDesignEvents;
-           vJSONValue.PrepareDetailsNew  := TRESTDWClientSQL(Datasets[I]).PrepareDetailsNew;
-           vJSONValue.PrepareDetails     := TRESTDWClientSQL(Datasets[I]).PrepareDetails;
+           {$IFDEF FPC}
+            vJSONValue.NewFieldList       := @TRESTDWClientSQL(Datasets[I]).NewFieldList;
+            vJSONValue.CreateDataSet      := @TRESTDWClientSQL(Datasets[I]).CreateDataSet;
+            vJSONValue.NewDataField       := @TRESTDWClientSQL(Datasets[I]).NewDataField;
+            vJSONValue.SetInitDataset     := @TRESTDWClientSQL(Datasets[I]).SetInitDataset;
+            vJSONValue.SetRecordCount     := @TRESTDWClientSQL(Datasets[I]).SetRecordCount;
+            vJSONValue.Setnotrepage       := @TRESTDWClientSQL(Datasets[I]).Setnotrepage;
+            vJSONValue.SetInDesignEvents  := @TRESTDWClientSQL(Datasets[I]).SetInDesignEvents;
+            vJSONValue.SetInBlockEvents   := @TRESTDWClientSQL(Datasets[I]).SetInBlockEvents;
+            vJSONValue.SetInactive        := @TRESTDWClientSQL(Datasets[I]).SetInactive;
+            vJSONValue.FieldListCount     := @TRESTDWClientSQL(Datasets[I]).FieldListCount;
+            vJSONValue.GetInDesignEvents  := @TRESTDWClientSQL(Datasets[I]).GetInDesignEvents;
+            vJSONValue.PrepareDetailsNew  := @TRESTDWClientSQL(Datasets[I]).PrepareDetailsNew;
+            vJSONValue.PrepareDetails     := @TRESTDWClientSQL(Datasets[I]).PrepareDetails;
+           {$ELSE}
+            vJSONValue.NewFieldList       := TRESTDWClientSQL(Datasets[I]).NewFieldList;
+            vJSONValue.CreateDataSet      := TRESTDWClientSQL(Datasets[I]).CreateDataSet;
+            vJSONValue.NewDataField       := TRESTDWClientSQL(Datasets[I]).NewDataField;
+            vJSONValue.SetInitDataset     := TRESTDWClientSQL(Datasets[I]).SetInitDataset;
+            vJSONValue.SetRecordCount     := TRESTDWClientSQL(Datasets[I]).SetRecordCount;
+            vJSONValue.Setnotrepage       := TRESTDWClientSQL(Datasets[I]).Setnotrepage;
+            vJSONValue.SetInDesignEvents  := TRESTDWClientSQL(Datasets[I]).SetInDesignEvents;
+            vJSONValue.SetInBlockEvents   := TRESTDWClientSQL(Datasets[I]).SetInBlockEvents;
+            vJSONValue.SetInactive        := TRESTDWClientSQL(Datasets[I]).SetInactive;
+            vJSONValue.FieldListCount     := TRESTDWClientSQL(Datasets[I]).FieldListCount;
+            vJSONValue.GetInDesignEvents  := TRESTDWClientSQL(Datasets[I]).GetInDesignEvents;
+            vJSONValue.PrepareDetailsNew  := TRESTDWClientSQL(Datasets[I]).PrepareDetailsNew;
+            vJSONValue.PrepareDetails     := TRESTDWClientSQL(Datasets[I]).PrepareDetails;
+           {$ENDIF}
           {$ENDIF}
           vJSONValue.WriteToDataset(dtDiff, vJSONValue.ToJSON, TRESTDWClientSQL(Datasets[I]),
                                    vJsonCount, TRESTDWClientSQL(Datasets[I]).Datapacks); //TODO Somente esse Registro
@@ -4649,7 +4702,11 @@ Begin
  vMessageError := '';
  ApplyUpdates(MassiveCache, vError, vMessageError);
  If (vError) Or (vMessageError <> '') Then
-  Raise Exception.Create(PChar(vMessageError));
+  {$IFDEF FPC}
+   Raise Exception.Create(vMessageError);
+  {$ELSE}
+   Raise Exception.Create(PChar(vMessageError));
+  {$ENDIF}
 End;
 
 Procedure TRESTDWDatabasebaseBase.ApplyUpdates(Var MassiveCache       : TRESTDWMassiveCache;
@@ -4660,7 +4717,7 @@ Var
  vUpdateLine          : TStream;
  vRESTConnectionDB    : TRESTDWPoolerMethodClient;
  RESTClientPoolerExec : TRESTClientPoolerBase;
- ResultData           : TJSONValue;
+ ResultData           : TRESTDWJSONValue;
  vLocalClient,
  SocketError          : Boolean;
 Begin
@@ -5264,9 +5321,9 @@ Begin
   vDataRoute := '/'
  Else
   Begin
-   If Copy(vDataRoute, 1, 1) <> '/' Then
+   If Copy(vDataRoute, InitStrPos, 1) <> '/' Then
     vDataRoute := '/' + vDataRoute;
-   If Copy(vDataRoute, Length(vDataRoute), 1) <> '/' Then
+   If Copy(vDataRoute, Length(vDataRoute) - FinalStrPos, 1) <> '/' Then
     vDataRoute := vDataRoute + '/';
   End;
 End;
@@ -5833,46 +5890,67 @@ Begin
  vMasterDataSet                    := Nil;
  vDataSource                       := TDataSource.Create(Nil);
  {$IFDEF RESTDWLAZARUS}
- TDataset(Self).AfterScroll        := @ProcAfterScroll;
- TDataset(Self).BeforeScroll       := @ProcBeforeScroll;
- TDataset(Self).BeforeOpen         := @ProcBeforeOpen;
- TDataset(Self).AfterOpen          := @ProcAfterOpen;
- TDataset(Self).BeforeClose        := @ProcBeforeClose;
- TDataset(Self).AfterClose         := @ProcAfterClose;
- TDataset(Self).BeforeRefresh      := @ProcBeforeRefresh;
- TDataset(Self).AfterRefresh       := @ProcAfterRefresh;
- TDataset(Self).BeforeInsert       := @ProcBeforeInsert;
- TDataset(Self).AfterInsert        := @ProcAfterInsert;
- TDataset(Self).BeforeEdit         := @ProcBeforeEdit;
- TDataset(Self).AfterEdit          := @ProcAfterEdit;
- TDataset(Self).BeforePost         := @ProcBeforePost;
- TDataset(Self).AfterCancel        := @ProcAfterCancel;
- TDataset(Self).BeforeDelete       := @ProcBeforeDelete;
- TDataset(Self).OnNewRecord        := @ProcNewRecord;
- TDataset(Self).OnCalcFields       := @ProcCalcFields;
-// TDataset(Self).Last               := @Last;
- Inherited AfterPost               := @OldAfterPost;
- Inherited AfterDelete             := @OldAfterDelete;
+  TDataset(Self).AfterScroll        := @ProcAfterScroll;
+  TDataset(Self).BeforeScroll       := @ProcBeforeScroll;
+  TDataset(Self).BeforeOpen         := @ProcBeforeOpen;
+  TDataset(Self).AfterOpen          := @ProcAfterOpen;
+  TDataset(Self).BeforeClose        := @ProcBeforeClose;
+  TDataset(Self).AfterClose         := @ProcAfterClose;
+  TDataset(Self).BeforeRefresh      := @ProcBeforeRefresh;
+  TDataset(Self).AfterRefresh       := @ProcAfterRefresh;
+  TDataset(Self).BeforeInsert       := @ProcBeforeInsert;
+  TDataset(Self).AfterInsert        := @ProcAfterInsert;
+  TDataset(Self).BeforeEdit         := @ProcBeforeEdit;
+  TDataset(Self).AfterEdit          := @ProcAfterEdit;
+  TDataset(Self).BeforePost         := @ProcBeforePost;
+  TDataset(Self).AfterCancel        := @ProcAfterCancel;
+  TDataset(Self).BeforeDelete       := @ProcBeforeDelete;
+  TDataset(Self).OnNewRecord        := @ProcNewRecord;
+  TDataset(Self).OnCalcFields       := @ProcCalcFields;
+  Inherited AfterPost               := @OldAfterPost;
+  Inherited AfterDelete             := @OldAfterDelete;
  {$ELSE}
- TDataset(Self).AfterScroll        := ProcAfterScroll;
- TDataset(Self).BeforeScroll       := ProcBeforeScroll;
- TDataset(Self).BeforeOpen         := ProcBeforeOpen;
- TDataset(Self).AfterOpen          := ProcAfterOpen;
- TDataset(Self).BeforeClose        := ProcBeforeClose;
- TDataset(Self).AfterClose         := ProcAfterClose;
- TDataset(Self).BeforeRefresh      := ProcBeforeRefresh;
- TDataset(Self).AfterRefresh       := ProcAfterRefresh;
- TDataset(Self).BeforeInsert       := ProcBeforeInsert;
- TDataset(Self).AfterInsert        := ProcAfterInsert;
- TDataset(Self).BeforeEdit         := ProcBeforeEdit;
- TDataset(Self).AfterEdit          := ProcAfterEdit;
- TDataset(Self).BeforePost         := ProcBeforePost;
- TDataset(Self).BeforeDelete       := ProcBeforeDelete;
- TDataset(Self).AfterCancel        := ProcAfterCancel;
- TDataset(Self).OnNewRecord        := ProcNewRecord;
- TDataset(Self).OnCalcFields       := ProcCalcFields;
- Inherited AfterPost               := OldAfterPost;
- Inherited AfterDelete             := OldAfterDelete;
+  {$IFDEF FPC}
+   TDataset(Self).AfterScroll        := @ProcAfterScroll;
+   TDataset(Self).BeforeScroll       := @ProcBeforeScroll;
+   TDataset(Self).BeforeOpen         := @ProcBeforeOpen;
+   TDataset(Self).AfterOpen          := @ProcAfterOpen;
+   TDataset(Self).BeforeClose        := @ProcBeforeClose;
+   TDataset(Self).AfterClose         := @ProcAfterClose;
+   TDataset(Self).BeforeRefresh      := @ProcBeforeRefresh;
+   TDataset(Self).AfterRefresh       := @ProcAfterRefresh;
+   TDataset(Self).BeforeInsert       := @ProcBeforeInsert;
+   TDataset(Self).AfterInsert        := @ProcAfterInsert;
+   TDataset(Self).BeforeEdit         := @ProcBeforeEdit;
+   TDataset(Self).AfterEdit          := @ProcAfterEdit;
+   TDataset(Self).BeforePost         := @ProcBeforePost;
+   TDataset(Self).AfterCancel        := @ProcAfterCancel;
+   TDataset(Self).BeforeDelete       := @ProcBeforeDelete;
+   TDataset(Self).OnNewRecord        := @ProcNewRecord;
+   TDataset(Self).OnCalcFields       := @ProcCalcFields;
+   Inherited AfterPost               := @OldAfterPost;
+   Inherited AfterDelete             := @OldAfterDelete;
+  {$ELSE}
+   TDataset(Self).AfterScroll        := ProcAfterScroll;
+   TDataset(Self).BeforeScroll       := ProcBeforeScroll;
+   TDataset(Self).BeforeOpen         := ProcBeforeOpen;
+   TDataset(Self).AfterOpen          := ProcAfterOpen;
+   TDataset(Self).BeforeClose        := ProcBeforeClose;
+   TDataset(Self).AfterClose         := ProcAfterClose;
+   TDataset(Self).BeforeRefresh      := ProcBeforeRefresh;
+   TDataset(Self).AfterRefresh       := ProcAfterRefresh;
+   TDataset(Self).BeforeInsert       := ProcBeforeInsert;
+   TDataset(Self).AfterInsert        := ProcAfterInsert;
+   TDataset(Self).BeforeEdit         := ProcBeforeEdit;
+   TDataset(Self).AfterEdit          := ProcAfterEdit;
+   TDataset(Self).BeforePost         := ProcBeforePost;
+   TDataset(Self).BeforeDelete       := ProcBeforeDelete;
+   TDataset(Self).AfterCancel        := ProcAfterCancel;
+   TDataset(Self).OnNewRecord        := ProcNewRecord;
+   TDataset(Self).OnCalcFields       := ProcCalcFields;
+   Inherited AfterPost               := OldAfterPost;
+   Inherited AfterDelete             := OldAfterDelete;
+  {$ENDIF}
  {$ENDIF}
  vMassiveDataset                   := TMassiveDatasetBuffer.Create(Self);
 // vActionCursor                     := crHourGlass;
@@ -5922,8 +6000,13 @@ Begin
   vSQL.OnChanging                  := @OnBeforeChangingSQL;
   vSQL.OnChange                    := @OnChangingSQL;
  {$ELSE}
-  vSQL.OnChanging                  := OnBeforeChangingSQL;
-  vSQL.OnChange                    := OnChangingSQL;
+  {$IFDEF FPC}
+   vSQL.OnChanging                  := @OnBeforeChangingSQL;
+   vSQL.OnChange                    := @OnChangingSQL;
+  {$ELSE}
+   vSQL.OnChanging                  := OnBeforeChangingSQL;
+   vSQL.OnChange                    := OnChangingSQL;
+  {$ENDIF}
  {$ENDIF}
  vParams                           := TParams.Create(Self);
  vUpdateTableName                  := '';
@@ -5933,46 +6016,67 @@ Begin
  vMasterDataSet                    := Nil;
  vDataSource                       := TDataSource.Create(Nil);
  {$IFDEF RESTDWLAZARUS}
- TDataset(Self).AfterScroll        := @ProcAfterScroll;
- TDataset(Self).BeforeScroll       := @ProcBeforeScroll;
- TDataset(Self).BeforeOpen         := @ProcBeforeOpen;
- TDataset(Self).AfterOpen          := @ProcAfterOpen;
- TDataset(Self).BeforeClose        := @ProcBeforeClose;
- TDataset(Self).AfterClose         := @ProcAfterClose;
- TDataset(Self).BeforeRefresh      := @ProcBeforeRefresh;
- TDataset(Self).AfterRefresh       := @ProcAfterRefresh;
- TDataset(Self).BeforeInsert       := @ProcBeforeInsert;
- TDataset(Self).AfterInsert        := @ProcAfterInsert;
- TDataset(Self).BeforeEdit         := @ProcBeforeEdit;
- TDataset(Self).AfterEdit          := @ProcAfterEdit;
- TDataset(Self).BeforePost         := @ProcBeforePost;
- TDataset(Self).AfterCancel        := @ProcAfterCancel;
- TDataset(Self).BeforeDelete       := @ProcBeforeDelete;
- TDataset(Self).OnNewRecord        := @ProcNewRecord;
- TDataset(Self).OnCalcFields       := @ProcCalcFields;
-// TDataset(Self).Last               := @Last;
- Inherited AfterPost               := @OldAfterPost;
- Inherited AfterDelete             := @OldAfterDelete;
+  TDataset(Self).AfterScroll        := @ProcAfterScroll;
+  TDataset(Self).BeforeScroll       := @ProcBeforeScroll;
+  TDataset(Self).BeforeOpen         := @ProcBeforeOpen;
+  TDataset(Self).AfterOpen          := @ProcAfterOpen;
+  TDataset(Self).BeforeClose        := @ProcBeforeClose;
+  TDataset(Self).AfterClose         := @ProcAfterClose;
+  TDataset(Self).BeforeRefresh      := @ProcBeforeRefresh;
+  TDataset(Self).AfterRefresh       := @ProcAfterRefresh;
+  TDataset(Self).BeforeInsert       := @ProcBeforeInsert;
+  TDataset(Self).AfterInsert        := @ProcAfterInsert;
+  TDataset(Self).BeforeEdit         := @ProcBeforeEdit;
+  TDataset(Self).AfterEdit          := @ProcAfterEdit;
+  TDataset(Self).BeforePost         := @ProcBeforePost;
+  TDataset(Self).AfterCancel        := @ProcAfterCancel;
+  TDataset(Self).BeforeDelete       := @ProcBeforeDelete;
+  TDataset(Self).OnNewRecord        := @ProcNewRecord;
+  TDataset(Self).OnCalcFields       := @ProcCalcFields;
+  Inherited AfterPost               := @OldAfterPost;
+  Inherited AfterDelete             := @OldAfterDelete;
  {$ELSE}
- TDataset(Self).AfterScroll        := ProcAfterScroll;
- TDataset(Self).BeforeScroll       := ProcBeforeScroll;
- TDataset(Self).BeforeOpen         := ProcBeforeOpen;
- TDataset(Self).AfterOpen          := ProcAfterOpen;
- TDataset(Self).BeforeClose        := ProcBeforeClose;
- TDataset(Self).AfterClose         := ProcAfterClose;
- TDataset(Self).BeforeRefresh      := ProcBeforeRefresh;
- TDataset(Self).AfterRefresh       := ProcAfterRefresh;
- TDataset(Self).BeforeInsert       := ProcBeforeInsert;
- TDataset(Self).AfterInsert        := ProcAfterInsert;
- TDataset(Self).BeforeEdit         := ProcBeforeEdit;
- TDataset(Self).AfterEdit          := ProcAfterEdit;
- TDataset(Self).BeforePost         := ProcBeforePost;
- TDataset(Self).BeforeDelete       := ProcBeforeDelete;
- TDataset(Self).AfterCancel        := ProcAfterCancel;
- TDataset(Self).OnNewRecord        := ProcNewRecord;
- TDataset(Self).OnCalcFields       := ProcCalcFields;
- Inherited AfterPost               := OldAfterPost;
- Inherited AfterDelete             := OldAfterDelete;
+  {$IFDEF FPC}
+   TDataset(Self).AfterScroll        := @ProcAfterScroll;
+   TDataset(Self).BeforeScroll       := @ProcBeforeScroll;
+   TDataset(Self).BeforeOpen         := @ProcBeforeOpen;
+   TDataset(Self).AfterOpen          := @ProcAfterOpen;
+   TDataset(Self).BeforeClose        := @ProcBeforeClose;
+   TDataset(Self).AfterClose         := @ProcAfterClose;
+   TDataset(Self).BeforeRefresh      := @ProcBeforeRefresh;
+   TDataset(Self).AfterRefresh       := @ProcAfterRefresh;
+   TDataset(Self).BeforeInsert       := @ProcBeforeInsert;
+   TDataset(Self).AfterInsert        := @ProcAfterInsert;
+   TDataset(Self).BeforeEdit         := @ProcBeforeEdit;
+   TDataset(Self).AfterEdit          := @ProcAfterEdit;
+   TDataset(Self).BeforePost         := @ProcBeforePost;
+   TDataset(Self).AfterCancel        := @ProcAfterCancel;
+   TDataset(Self).BeforeDelete       := @ProcBeforeDelete;
+   TDataset(Self).OnNewRecord        := @ProcNewRecord;
+   TDataset(Self).OnCalcFields       := @ProcCalcFields;
+   Inherited AfterPost               := @OldAfterPost;
+   Inherited AfterDelete             := @OldAfterDelete;
+  {$ELSE}
+   TDataset(Self).AfterScroll        := ProcAfterScroll;
+   TDataset(Self).BeforeScroll       := ProcBeforeScroll;
+   TDataset(Self).BeforeOpen         := ProcBeforeOpen;
+   TDataset(Self).AfterOpen          := ProcAfterOpen;
+   TDataset(Self).BeforeClose        := ProcBeforeClose;
+   TDataset(Self).AfterClose         := ProcAfterClose;
+   TDataset(Self).BeforeRefresh      := ProcBeforeRefresh;
+   TDataset(Self).AfterRefresh       := ProcAfterRefresh;
+   TDataset(Self).BeforeInsert       := ProcBeforeInsert;
+   TDataset(Self).AfterInsert        := ProcAfterInsert;
+   TDataset(Self).BeforeEdit         := ProcBeforeEdit;
+   TDataset(Self).AfterEdit          := ProcAfterEdit;
+   TDataset(Self).BeforePost         := ProcBeforePost;
+   TDataset(Self).BeforeDelete       := ProcBeforeDelete;
+   TDataset(Self).AfterCancel        := ProcAfterCancel;
+   TDataset(Self).OnNewRecord        := ProcNewRecord;
+   TDataset(Self).OnCalcFields       := ProcCalcFields;
+   Inherited AfterPost               := OldAfterPost;
+   Inherited AfterDelete             := OldAfterDelete;
+  {$ENDIF}
  {$ENDIF}
  vMassiveDataset                   := TMassiveDatasetBuffer.Create(Self);
 // vActionCursor                     := crHourGlass;
@@ -6125,7 +6229,11 @@ Var
  End;
 Begin
  Result := TStringList.Create;
- FCurrentPos := PChar(SQL);
+ {$IFNDEF FPC}
+  FCurrentPos := PChar(SQL);
+ {$ELSE}
+  FCurrentPos := PChar(@SQL);
+ {$ENDIF}
  bEscape1 := False;
  bEscape2 := False;
  bParam := False;
@@ -6273,7 +6381,7 @@ End;
 
 Procedure TRESTDWTable.ProcAfterScroll(DataSet: TDataSet);
 Var
- JSONValue    : TJSONValue;
+ JSONValue    : TRESTDWJSONValue;
  vRecordCount : Integer;
 Begin
  If vInBlockEvents Then
@@ -6294,7 +6402,7 @@ Begin
            (vRecordCount < vJsonCount))           Then
         Begin
          vOnPacks := True;
-         JSONValue := TJSONValue.Create;
+         JSONValue := TRESTDWJSONValue.Create;
          Try
           JSONValue.Encoding := vRESTDataBase.Encoding;
           JSONValue.Encoded  := vRESTDataBase.EncodedStrings;
@@ -6321,18 +6429,33 @@ Begin
              JSONValue.PrepareDetailsNew  := @PrepareDetailsNew;
              JSONValue.PrepareDetails     := @PrepareDetails;
             {$ELSE}
-             JSONValue.NewFieldList       := NewFieldList;
-             JSONValue.CreateDataSet      := CreateDataSet;
-             JSONValue.NewDataField       := NewDataField;
-             JSONValue.SetInitDataset     := SetInitDataset;
-             JSONValue.SetRecordCount     := SetRecordCount;
-             JSONValue.Setnotrepage       := Setnotrepage;
-             JSONValue.SetInDesignEvents  := SetInDesignEvents;
-             JSONValue.SetInBlockEvents   := SetInBlockEvents;
-             JSONValue.FieldListCount     := FieldListCount;
-             JSONValue.GetInDesignEvents  := GetInDesignEvents;
-             JSONValue.PrepareDetailsNew  := PrepareDetailsNew;
-             JSONValue.PrepareDetails     := PrepareDetails;
+             {$IFDEF FPC}
+             JSONValue.NewFieldList       := @NewFieldList;
+             JSONValue.CreateDataSet      := @CreateDataSet;
+             JSONValue.NewDataField       := @NewDataField;
+             JSONValue.SetInitDataset     := @SetInitDataset;
+             JSONValue.SetRecordCount     := @SetRecordCount;
+             JSONValue.Setnotrepage       := @Setnotrepage;
+             JSONValue.SetInDesignEvents  := @SetInDesignEvents;
+             JSONValue.SetInBlockEvents   := @SetInBlockEvents;
+             JSONValue.FieldListCount     := @FieldListCount;
+             JSONValue.GetInDesignEvents  := @GetInDesignEvents;
+             JSONValue.PrepareDetailsNew  := @PrepareDetailsNew;
+             JSONValue.PrepareDetails     := @PrepareDetails;
+             {$ELSE}
+              JSONValue.NewFieldList       := NewFieldList;
+              JSONValue.CreateDataSet      := CreateDataSet;
+              JSONValue.NewDataField       := NewDataField;
+              JSONValue.SetInitDataset     := SetInitDataset;
+              JSONValue.SetRecordCount     := SetRecordCount;
+              JSONValue.Setnotrepage       := Setnotrepage;
+              JSONValue.SetInDesignEvents  := SetInDesignEvents;
+              JSONValue.SetInBlockEvents   := SetInBlockEvents;
+              JSONValue.FieldListCount     := FieldListCount;
+              JSONValue.GetInDesignEvents  := GetInDesignEvents;
+              JSONValue.PrepareDetailsNew  := PrepareDetailsNew;
+              JSONValue.PrepareDetails     := PrepareDetails;
+             {$ENDIF}
             {$ENDIF}
             JSONValue.WriteToDataset(dtFull, vActualJSON, Self, vJsonCount, vJsonCount - vActualRec, vActualRec);
             vOldRecordCount := vJsonCount;
@@ -6356,18 +6479,33 @@ Begin
              JSONValue.PrepareDetailsNew  := @PrepareDetailsNew;
              JSONValue.PrepareDetails     := @PrepareDetails;
             {$ELSE}
-             JSONValue.NewFieldList   := NewFieldList;
-             JSONValue.CreateDataSet  := CreateDataSet;
-             JSONValue.NewDataField   := NewDataField;
-             JSONValue.SetInitDataset := SetInitDataset;
-             JSONValue.SetRecordCount     := SetRecordCount;
-             JSONValue.Setnotrepage       := Setnotrepage;
-             JSONValue.SetInDesignEvents  := SetInDesignEvents;
-             JSONValue.SetInBlockEvents   := SetInBlockEvents;
-             JSONValue.FieldListCount     := FieldListCount;
-             JSONValue.GetInDesignEvents  := GetInDesignEvents;
-             JSONValue.PrepareDetailsNew  := PrepareDetailsNew;
-             JSONValue.PrepareDetails     := PrepareDetails;
+             {$IFDEF FPC}
+              JSONValue.NewFieldList   := @NewFieldList;
+              JSONValue.CreateDataSet  := @CreateDataSet;
+              JSONValue.NewDataField   := @NewDataField;
+              JSONValue.SetInitDataset := @SetInitDataset;
+              JSONValue.SetRecordCount     := @SetRecordCount;
+              JSONValue.Setnotrepage       := @Setnotrepage;
+              JSONValue.SetInDesignEvents  := @SetInDesignEvents;
+              JSONValue.SetInBlockEvents   := @SetInBlockEvents;
+              JSONValue.FieldListCount     := @FieldListCount;
+              JSONValue.GetInDesignEvents  := @GetInDesignEvents;
+              JSONValue.PrepareDetailsNew  := @PrepareDetailsNew;
+              JSONValue.PrepareDetails     := @PrepareDetails;
+             {$ELSE}
+              JSONValue.NewFieldList   := NewFieldList;
+              JSONValue.CreateDataSet  := CreateDataSet;
+              JSONValue.NewDataField   := NewDataField;
+              JSONValue.SetInitDataset := SetInitDataset;
+              JSONValue.SetRecordCount     := SetRecordCount;
+              JSONValue.Setnotrepage       := Setnotrepage;
+              JSONValue.SetInDesignEvents  := SetInDesignEvents;
+              JSONValue.SetInBlockEvents   := SetInBlockEvents;
+              JSONValue.FieldListCount     := FieldListCount;
+              JSONValue.GetInDesignEvents  := GetInDesignEvents;
+              JSONValue.PrepareDetailsNew  := PrepareDetailsNew;
+              JSONValue.PrepareDetails     := PrepareDetails;
+             {$ENDIF}
             {$ENDIF}
             JSONValue.WriteToDataset(dtFull, vActualJSON, Self, vJsonCount, vDatapacks, vActualRec);
             vOldRecordCount := Recno + vDatapacks;
@@ -6398,7 +6536,7 @@ End;
 
 procedure TRESTDWClientSQL.ProcAfterScroll(DataSet: TDataSet);
 Var
- JSONValue    : TJSONValue;
+ JSONValue    : TRESTDWJSONValue;
  vRecordCount : Integer;
 Begin
  If vInBlockEvents Then
@@ -6419,7 +6557,7 @@ Begin
            (vRecordCount < vJsonCount))           Then
         Begin
          vOnPacks := True;
-         JSONValue := TJSONValue.Create;
+         JSONValue := TRESTDWJSONValue.Create;
          Try
           JSONValue.Encoding := vRESTDataBase.Encoding;
           JSONValue.Encoded  := vRESTDataBase.EncodedStrings;
@@ -6440,19 +6578,35 @@ Begin
            JSONValue.PrepareDetailsNew  := @PrepareDetailsNew;
            JSONValue.PrepareDetails     := @PrepareDetails;
           {$ELSE}
-           JSONValue.NewFieldList   := NewFieldList;
-           JSONValue.CreateDataSet  := CreateDataSet;
-           JSONValue.NewDataField   := NewDataField;
-           JSONValue.SetInitDataset := SetInitDataset;
-           JSONValue.SetRecordCount     := SetRecordCount;
-           JSONValue.Setnotrepage       := Setnotrepage;
-           JSONValue.SetInDesignEvents  := SetInDesignEvents;
-           JSONValue.SetInBlockEvents   := SetInBlockEvents;
-           JSONValue.SetInactive        := SetInactive;
-           JSONValue.FieldListCount     := FieldListCount;
-           JSONValue.GetInDesignEvents  := GetInDesignEvents;
-           JSONValue.PrepareDetailsNew  := PrepareDetailsNew;
-           JSONValue.PrepareDetails     := PrepareDetails;
+           {$IFDEF FPC}
+            JSONValue.NewFieldList    := @NewFieldList;
+            JSONValue.CreateDataSet   := @CreateDataSet;
+            JSONValue.NewDataField    := @NewDataField;
+            JSONValue.SetInitDataset  := @SetInitDataset;
+            JSONValue.SetRecordCount     := @SetRecordCount;
+            JSONValue.Setnotrepage       := @Setnotrepage;
+            JSONValue.SetInDesignEvents  := @SetInDesignEvents;
+            JSONValue.SetInBlockEvents   := @SetInBlockEvents;
+            JSONValue.SetInactive        := @SetInactive;
+            JSONValue.FieldListCount     := @FieldListCount;
+            JSONValue.GetInDesignEvents  := @GetInDesignEvents;
+            JSONValue.PrepareDetailsNew  := @PrepareDetailsNew;
+            JSONValue.PrepareDetails     := @PrepareDetails;
+           {$ELSE}
+            JSONValue.NewFieldList   := NewFieldList;
+            JSONValue.CreateDataSet  := CreateDataSet;
+            JSONValue.NewDataField   := NewDataField;
+            JSONValue.SetInitDataset := SetInitDataset;
+            JSONValue.SetRecordCount     := SetRecordCount;
+            JSONValue.Setnotrepage       := Setnotrepage;
+            JSONValue.SetInDesignEvents  := SetInDesignEvents;
+            JSONValue.SetInBlockEvents   := SetInBlockEvents;
+            JSONValue.SetInactive        := SetInactive;
+            JSONValue.FieldListCount     := FieldListCount;
+            JSONValue.GetInDesignEvents  := GetInDesignEvents;
+            JSONValue.PrepareDetailsNew  := PrepareDetailsNew;
+            JSONValue.PrepareDetails     := PrepareDetails;
+           {$ENDIF}
           {$ENDIF}
           JSONValue.Utf8SpecialChars := True;
           If vInternalLast Then
@@ -6767,10 +6921,12 @@ End;
 procedure TRESTDWClientSQL.ProcBeforeOpen(DataSet: TDataSet);
 Begin
  MasterFields := '';
- If Not((vInBlockEvents) or (vInitDataset) or (vInRefreshData)) Then
+ If Not((vInBlockEvents)  Or
+        (vInitDataset)    Or
+        (vInRefreshData)) Then
   Begin
    If Assigned(vBeforeOpen) Then
-   vBeforeOpen(Dataset);
+    vBeforeOpen(Dataset);
   End;
 End;
 
@@ -7514,7 +7670,7 @@ Begin
                Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftBoolean] Then
                  Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsBoolean := StringToBoolean(vValue)
                Else If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
-                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF})
+                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
                Else
                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
               End;
@@ -7696,7 +7852,7 @@ Begin
                Else If Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).DataType in [ftBoolean] Then
                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).AsBoolean := StringToBoolean(vValue)
                Else If Not TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].isnull Then
-                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF})
+                Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Value := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
                Else
                 Self.FindField(TRESTDWJSONInterfaceObject(bJsonValueC).Pairs[0].Name).Clear;
               End;
@@ -7730,7 +7886,11 @@ Var
 Begin
  ApplyUpdates(vError);
  If vError <> '' Then
-  Raise Exception.Create(PChar(vError));
+  {$IFDEF FPC}
+   Raise Exception.Create(vError);
+  {$ELSE}
+   Raise Exception.Create(PChar(vError));
+  {$ENDIF}
 End;
 
 Procedure TRESTDWClientSQL.ApplyUpdates;
@@ -7739,7 +7899,11 @@ Var
 Begin
  ApplyUpdates(vError);
  If vError <> '' Then
-  Raise Exception.Create(PChar(vError));
+  {$IFDEF FPC}
+   Raise Exception.Create(vError);
+  {$ELSE}
+   Raise Exception.Create(PChar(vError));
+  {$ENDIF}
 End;
 
 Function TRESTDWTable.ApplyUpdates(Var Error: String; ReleaseCache : Boolean = True): Boolean;
@@ -7747,7 +7911,7 @@ Var
  vError        : Boolean;
  vErrorMSG,
  vMassiveJSON  : String;
- vResult       : TJSONValue;
+ vResult       : TRESTDWJSONValue;
  vActualReg    : TBookmark;
 Begin
  Result  := False;
@@ -7852,7 +8016,11 @@ Begin
              If Assigned(vOnGetDataError) Then
               vOnGetDataError(False, vErrorMSG);
              If vRaiseError Then
-              Raise Exception.Create(PChar(vErrorMSG));
+              {$IFDEF FPC}
+               Raise Exception.Create(vErrorMSG);
+              {$ELSE}
+               Raise Exception.Create(PChar(vErrorMSG));
+              {$ENDIF}
             End;
           End;
          If Assigned(vResult) Then
@@ -7876,7 +8044,7 @@ Function TRESTDWClientSQL.ApplyUpdates(Var Error: String; ReleaseCache : Boolean
 Var
  vError         : Boolean;
  vErrorMSG      : String;
- vResult        : TJSONValue;
+ vResult        : TRESTDWJSONValue;
  vActualReg     : TBookmark;
 Begin
  Result  := False;
@@ -7972,7 +8140,11 @@ Begin
            If Assigned(vOnGetDataError) Then
             vOnGetDataError(False, vErrorMSG);
            If vRaiseError Then
-            Raise Exception.Create(PChar(vErrorMSG));
+            {$IFDEF FPC}
+             Raise Exception.Create(vErrorMSG);
+            {$ELSE}
+             Raise Exception.Create(PChar(vErrorMSG));
+            {$ENDIF}
            If ReleaseCache Then
             Begin
              TMassiveDatasetBuffer(vMassiveDataset).ClearBuffer;
@@ -8137,13 +8309,21 @@ Begin
    If Not ExecSQL(vError) Then
     Begin
      If csDesigning in ComponentState Then
-      Raise Exception.Create(PChar(vError))
+      {$IFDEF FPC}
+       Raise Exception.Create(vError)
+      {$ELSE}
+       Raise Exception.Create(PChar(vError))
+      {$ENDIF}
      Else
       Begin
        If Assigned(vOnGetDataError) Then
         vOnGetDataError(False, vError)
        Else
+       {$IFDEF FPC}
+        Raise Exception.Create(vError);
+       {$ELSE}
         Raise Exception.Create(PChar(vError));
+       {$ENDIF}
       End;
     End;
   End;
@@ -8155,14 +8335,18 @@ Var
 Begin
  ExecSQL(vError);
  If vError <> '' Then
-  Raise Exception.Create(PChar(vError));
+  {$IFDEF FPC}
+   Raise Exception.Create(vError);
+  {$ELSE}
+   Raise Exception.Create(PChar(vError));
+  {$ENDIF}
 End;
 
 function TRESTDWClientSQL.ExecSQL(Var Error: String): Boolean;
 Var
  vError        : Boolean;
  vMessageError : String;
- vResult       : TJSONValue;
+ vResult       : TRESTDWJSONValue;
 Begin
  vResult       := Nil;
  vRowsAffected := 0;
@@ -8190,7 +8374,11 @@ Begin
        If Assigned(vResult) Then
         FreeAndNil(vResult);
        If (vRaiseError) And (vError) Then
-        Raise Exception.Create(PChar(vMessageError));
+        {$IFDEF FPC}
+         Raise Exception.Create(vMessageError);
+        {$ELSE}
+         Raise Exception.Create(PChar(vMessageError));
+        {$ENDIF}
       End
      Else
       Begin
@@ -8876,10 +9064,17 @@ Begin
                                                        @AbortData,
                                                        vOnThreadRequestError);
  {$ELSE}
-  vThreadRequest        := TRESTDWThreadRequest.Create(Self,
-                                                       ExecuteData,
-                                                       AbortData,
-                                                       vOnThreadRequestError);
+  {$IFDEF FPC}
+   vThreadRequest        := TRESTDWThreadRequest.Create(Self,
+                                                        ExecuteData,
+                                                        @AbortData,
+                                                        vOnThreadRequestError);
+  {$ELSE}
+   vThreadRequest        := TRESTDWThreadRequest.Create(Self,
+                                                        ExecuteData,
+                                                        AbortData,
+                                                        vOnThreadRequestError);
+  {$ENDIF}
  {$ENDIF}
  vThreadRequest.Resume;
 End;
@@ -9038,7 +9233,7 @@ Begin
  EnableControls;
 End;
 
-Procedure TRESTDWClientSQL.LoadFromStream(Stream : TMemoryStream);
+Procedure TRESTDWClientSQL.LoadFromStream(Stream : TStream);
 begin
  If Not Assigned(Stream) Then
   Exit;
@@ -9359,7 +9554,7 @@ Begin
  Else
   Begin
    vListName := Value;
-   Inherited;
+   Inherited SetDisplayName(Value);
   End;
 End;
 
@@ -9889,7 +10084,7 @@ Function TRESTDWTable.OpenJson(JsonValue              : String = '';
                                Const ElementRoot      : String = '';
                                Const Utf8SpecialChars : Boolean = False) : Boolean;
 Var
- LDataSetList  : TJSONValue;
+ LDataSetList  : TRESTDWJSONValue;
  vMessageError : String;
  oDWResponseTranslator: TRESTDWResponseTranslator;
  vBool: Boolean;
@@ -9906,7 +10101,7 @@ Begin
     oDWResponseTranslator.ElementRootBaseName := ElementRoot;
     Self.ResponseTranslator := oDWResponseTranslator;
    End;
-  LDataSetList := TJSONValue.Create;
+  LDataSetList := TRESTDWJSONValue.Create;
   Try
    If JsonValue <> '' Then
     Begin
@@ -9928,18 +10123,33 @@ Begin
       LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
       LDataSetList.PrepareDetails     := @PrepareDetails;
      {$ELSE}
-      LDataSetList.NewFieldList    := NewFieldList;
-      LDataSetList.CreateDataSet   := CreateDataSet;
-      LDataSetList.NewDataField    := NewDataField;
-      LDataSetList.SetInitDataset  := SetInitDataset;
-      LDataSetList.SetRecordCount     := SetRecordCount;
-      LDataSetList.Setnotrepage       := Setnotrepage;
-      LDataSetList.SetInDesignEvents  := SetInDesignEvents;
-      LDataSetList.SetInBlockEvents   := SetInBlockEvents;
-      LDataSetList.FieldListCount     := FieldListCount;
-      LDataSetList.GetInDesignEvents  := GetInDesignEvents;
-      LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
-      LDataSetList.PrepareDetails     := PrepareDetails;
+      {$IFDEF FPC}
+       LDataSetList.NewFieldList    := @NewFieldList;
+       LDataSetList.CreateDataSet   := @CreateDataSet;
+       LDataSetList.NewDataField    := @NewDataField;
+       LDataSetList.SetInitDataset  := @SetInitDataset;
+       LDataSetList.SetRecordCount     := @SetRecordCount;
+       LDataSetList.Setnotrepage       := @Setnotrepage;
+       LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
+       LDataSetList.SetInBlockEvents   := @SetInBlockEvents;
+       LDataSetList.FieldListCount     := @FieldListCount;
+       LDataSetList.GetInDesignEvents  := @GetInDesignEvents;
+       LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
+       LDataSetList.PrepareDetails     := @PrepareDetails;
+      {$ELSE}
+       LDataSetList.NewFieldList    := NewFieldList;
+       LDataSetList.CreateDataSet   := CreateDataSet;
+       LDataSetList.NewDataField    := NewDataField;
+       LDataSetList.SetInitDataset  := SetInitDataset;
+       LDataSetList.SetRecordCount     := SetRecordCount;
+       LDataSetList.Setnotrepage       := Setnotrepage;
+       LDataSetList.SetInDesignEvents  := SetInDesignEvents;
+       LDataSetList.SetInBlockEvents   := SetInBlockEvents;
+       LDataSetList.FieldListCount     := FieldListCount;
+       LDataSetList.GetInDesignEvents  := GetInDesignEvents;
+       LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
+       LDataSetList.PrepareDetails     := PrepareDetails;
+      {$ENDIF}
      {$ENDIF}
      LDataSetList.Utf8SpecialChars := Utf8SpecialChars;
      Try
@@ -9971,7 +10181,7 @@ Function TRESTDWClientSQL.OpenJson(JsonValue              : String = '';
                                    Const ElementRoot      : String = '';
                                    Const Utf8SpecialChars : Boolean = False) : Boolean;
 Var
- LDataSetList  : TJSONValue;
+ LDataSetList  : TRESTDWJSONValue;
  vMessageError : String;
  oDWResponseTranslator: TRESTDWResponseTranslator;
  vBool: Boolean;
@@ -9988,7 +10198,7 @@ Begin
     oDWResponseTranslator.ElementRootBaseName := ElementRoot;
     Self.ResponseTranslator := oDWResponseTranslator;
    End;
-  LDataSetList := TJSONValue.Create;
+  LDataSetList := TRESTDWJSONValue.Create;
   Try
    If JsonValue <> '' Then
     Begin
@@ -9996,11 +10206,11 @@ Begin
      LDataSetList.Encoding := esUtf8;
      LDataSetList.ServerFieldList := ServerFieldList;
      {$IFDEF RESTDWLAZARUS}
-      LDataSetList.DatabaseCharSet := DatabaseCharSet;
-      LDataSetList.NewFieldList    := @NewFieldList;
-      LDataSetList.CreateDataSet   := @CreateDataSet;
-      LDataSetList.NewDataField    := @NewDataField;
-      LDataSetList.SetInitDataset  := @SetInitDataset;
+      LDataSetList.DatabaseCharSet    := DatabaseCharSet;
+      LDataSetList.NewFieldList       := @NewFieldList;
+      LDataSetList.CreateDataSet      := @CreateDataSet;
+      LDataSetList.NewDataField       := @NewDataField;
+      LDataSetList.SetInitDataset     := @SetInitDataset;
       LDataSetList.SetRecordCount     := @SetRecordCount;
       LDataSetList.Setnotrepage       := @Setnotrepage;
       LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
@@ -10011,19 +10221,35 @@ Begin
       LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
       LDataSetList.PrepareDetails     := @PrepareDetails;
      {$ELSE}
-      LDataSetList.NewFieldList    := NewFieldList;
-      LDataSetList.CreateDataSet   := CreateDataSet;
-      LDataSetList.NewDataField    := NewDataField;
-      LDataSetList.SetInitDataset  := SetInitDataset;
-      LDataSetList.SetRecordCount     := SetRecordCount;
-      LDataSetList.Setnotrepage       := Setnotrepage;
-      LDataSetList.SetInDesignEvents  := SetInDesignEvents;
-      LDataSetList.SetInBlockEvents   := SetInBlockEvents;
-      LDataSetList.SetInactive        := SetInactive;
-      LDataSetList.FieldListCount     := FieldListCount;
-      LDataSetList.GetInDesignEvents  := GetInDesignEvents;
-      LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
-      LDataSetList.PrepareDetails     := PrepareDetails;
+      {$IFDEF FPC}
+       LDataSetList.NewFieldList       := @NewFieldList;
+       LDataSetList.CreateDataSet      := @CreateDataSet;
+       LDataSetList.NewDataField       := @NewDataField;
+       LDataSetList.SetInitDataset     := @SetInitDataset;
+       LDataSetList.SetRecordCount     := @SetRecordCount;
+       LDataSetList.Setnotrepage       := @Setnotrepage;
+       LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
+       LDataSetList.SetInBlockEvents   := @SetInBlockEvents;
+       LDataSetList.SetInactive        := @SetInactive;
+       LDataSetList.FieldListCount     := @FieldListCount;
+       LDataSetList.GetInDesignEvents  := @GetInDesignEvents;
+       LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
+       LDataSetList.PrepareDetails     := @PrepareDetails;
+      {$ELSE}
+       LDataSetList.NewFieldList    := NewFieldList;
+       LDataSetList.CreateDataSet   := CreateDataSet;
+       LDataSetList.NewDataField    := NewDataField;
+       LDataSetList.SetInitDataset  := SetInitDataset;
+       LDataSetList.SetRecordCount     := SetRecordCount;
+       LDataSetList.Setnotrepage       := Setnotrepage;
+       LDataSetList.SetInDesignEvents  := SetInDesignEvents;
+       LDataSetList.SetInBlockEvents   := SetInBlockEvents;
+       LDataSetList.SetInactive        := SetInactive;
+       LDataSetList.FieldListCount     := FieldListCount;
+       LDataSetList.GetInDesignEvents  := GetInDesignEvents;
+       LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
+       LDataSetList.PrepareDetails     := PrepareDetails;
+      {$ENDIF}
      {$ENDIF}
      LDataSetList.Utf8SpecialChars := Utf8SpecialChars;
      Try
@@ -10050,9 +10276,9 @@ Begin
   End;
 End;
 
-Function TRESTDWTable.GetData(DataSet: TJSONValue): Boolean;
+Function TRESTDWTable.GetData(DataSet: TRESTDWJSONValue): Boolean;
 Var
- LDataSetList  : TJSONValue;
+ LDataSetList  : TRESTDWJSONValue;
  vError        : Boolean;
  vValue,
  vMessageError : String;
@@ -10105,7 +10331,7 @@ Begin
  Self.Close;
  If Assigned(vDWResponseTranslator) Then
   Begin
-   LDataSetList          := TJSONValue.Create;
+   LDataSetList          := TRESTDWJSONValue.Create;
    Try
     LDataSetList.Encoded  := False;
     If Assigned(vDWResponseTranslator.ClientREST) Then
@@ -10128,12 +10354,12 @@ Begin
      Begin
       Try
        LDataSetList.ServerFieldList := ServerFieldList;
-       {$IFDEF FPC}
-        LDataSetList.DatabaseCharSet := DatabaseCharSet;
-        LDataSetList.NewFieldList    := @NewFieldList;
-        LDataSetList.CreateDataSet   := @CreateDataSet;
-        LDataSetList.NewDataField    := @NewDataField;
-        LDataSetList.SetInitDataset  := @SetInitDataset;
+       {$IFDEF RESTDWLAZARUS}
+        LDataSetList.DatabaseCharSet    := DatabaseCharSet;
+        LDataSetList.NewFieldList       := @NewFieldList;
+        LDataSetList.CreateDataSet      := @CreateDataSet;
+        LDataSetList.NewDataField       := @NewDataField;
+        LDataSetList.SetInitDataset     := @SetInitDataset;
         LDataSetList.SetRecordCount     := @SetRecordCount;
         LDataSetList.Setnotrepage       := @Setnotrepage;
         LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
@@ -10143,18 +10369,33 @@ Begin
         LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
         LDataSetList.PrepareDetails     := @PrepareDetails;
        {$ELSE}
-        LDataSetList.NewFieldList    := NewFieldList;
-        LDataSetList.CreateDataSet   := CreateDataSet;
-        LDataSetList.NewDataField    := NewDataField;
-        LDataSetList.SetInitDataset  := SetInitDataset;
-        LDataSetList.SetRecordCount     := SetRecordCount;
-        LDataSetList.Setnotrepage       := Setnotrepage;
-        LDataSetList.SetInDesignEvents  := SetInDesignEvents;
-        LDataSetList.SetInBlockEvents   := SetInBlockEvents;
-        LDataSetList.FieldListCount     := FieldListCount;
-        LDataSetList.GetInDesignEvents  := GetInDesignEvents;
-        LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
-        LDataSetList.PrepareDetails     := PrepareDetails;
+        {$IFDEF FPC}
+         LDataSetList.NewFieldList       := @NewFieldList;
+         LDataSetList.CreateDataSet      := @CreateDataSet;
+         LDataSetList.NewDataField       := @NewDataField;
+         LDataSetList.SetInitDataset     := @SetInitDataset;
+         LDataSetList.SetRecordCount     := @SetRecordCount;
+         LDataSetList.Setnotrepage       := @Setnotrepage;
+         LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
+         LDataSetList.SetInBlockEvents   := @SetInBlockEvents;
+         LDataSetList.FieldListCount     := @FieldListCount;
+         LDataSetList.GetInDesignEvents  := @GetInDesignEvents;
+         LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
+         LDataSetList.PrepareDetails     := @PrepareDetails;
+        {$ELSE}
+         LDataSetList.NewFieldList    := NewFieldList;
+         LDataSetList.CreateDataSet   := CreateDataSet;
+         LDataSetList.NewDataField    := NewDataField;
+         LDataSetList.SetInitDataset  := SetInitDataset;
+         LDataSetList.SetRecordCount     := SetRecordCount;
+         LDataSetList.Setnotrepage       := Setnotrepage;
+         LDataSetList.SetInDesignEvents  := SetInDesignEvents;
+         LDataSetList.SetInBlockEvents   := SetInBlockEvents;
+         LDataSetList.FieldListCount     := FieldListCount;
+         LDataSetList.GetInDesignEvents  := GetInDesignEvents;
+         LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
+         LDataSetList.PrepareDetails     := PrepareDetails;
+        {$ENDIF}
        {$ENDIF}
        LDataSetList.OnWriterProcess := OnWriterProcess;
        LDataSetList.Utf8SpecialChars := True;
@@ -10194,7 +10435,7 @@ Begin
      Begin
       If Not DataSet.IsNull Then
        vValue                := DataSet.Value;
-      LDataSetList          := TJSONValue.Create;
+      LDataSetList          := TRESTDWJSONValue.Create;
       LDataSetList.Encoded  := vRESTDataBase.EncodedStrings;
       LDataSetList.Encoding := DataBase.Encoding;
       vError                := False;
@@ -10207,12 +10448,12 @@ Begin
        vJsonCount  := 0;
        LDataSetList.OnWriterProcess := OnWriterProcess;
        LDataSetList.ServerFieldList := ServerFieldList;
-       {$IFDEF FPC}
-        LDataSetList.DatabaseCharSet := DatabaseCharSet;
-        LDataSetList.NewFieldList    := @NewFieldList;
-        LDataSetList.CreateDataSet   := @CreateDataSet;
-        LDataSetList.NewDataField    := @NewDataField;
-        LDataSetList.SetInitDataset  := @SetInitDataset;
+       {$IFDEF RESTDWLAZARUS}
+        LDataSetList.DatabaseCharSet    := DatabaseCharSet;
+        LDataSetList.NewFieldList       := @NewFieldList;
+        LDataSetList.CreateDataSet      := @CreateDataSet;
+        LDataSetList.NewDataField       := @NewDataField;
+        LDataSetList.SetInitDataset     := @SetInitDataset;
         LDataSetList.SetRecordCount     := @SetRecordCount;
         LDataSetList.Setnotrepage       := @Setnotrepage;
         LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
@@ -10222,18 +10463,33 @@ Begin
         LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
         LDataSetList.PrepareDetails     := @PrepareDetails;
        {$ELSE}
-        LDataSetList.NewFieldList    := NewFieldList;
-        LDataSetList.CreateDataSet   := CreateDataSet;
-        LDataSetList.NewDataField    := NewDataField;
-        LDataSetList.SetInitDataset  := SetInitDataset;
-        LDataSetList.SetRecordCount     := SetRecordCount;
-        LDataSetList.Setnotrepage       := Setnotrepage;
-        LDataSetList.SetInDesignEvents  := SetInDesignEvents;
-        LDataSetList.SetInBlockEvents   := SetInBlockEvents;
-        LDataSetList.FieldListCount     := FieldListCount;
-        LDataSetList.GetInDesignEvents  := GetInDesignEvents;
-        LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
-        LDataSetList.PrepareDetails     := PrepareDetails;
+        {$IFDEF FPC}
+         LDataSetList.NewFieldList       := @NewFieldList;
+         LDataSetList.CreateDataSet      := @CreateDataSet;
+         LDataSetList.NewDataField       := @NewDataField;
+         LDataSetList.SetInitDataset     := @SetInitDataset;
+         LDataSetList.SetRecordCount     := @SetRecordCount;
+         LDataSetList.Setnotrepage       := @Setnotrepage;
+         LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
+         LDataSetList.SetInBlockEvents   := @SetInBlockEvents;
+         LDataSetList.FieldListCount     := @FieldListCount;
+         LDataSetList.GetInDesignEvents  := @GetInDesignEvents;
+         LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
+         LDataSetList.PrepareDetails     := @PrepareDetails;
+        {$ELSE}
+         LDataSetList.NewFieldList       := NewFieldList;
+         LDataSetList.CreateDataSet      := CreateDataSet;
+         LDataSetList.NewDataField       := NewDataField;
+         LDataSetList.SetInitDataset     := SetInitDataset;
+         LDataSetList.SetRecordCount     := SetRecordCount;
+         LDataSetList.Setnotrepage       := Setnotrepage;
+         LDataSetList.SetInDesignEvents  := SetInDesignEvents;
+         LDataSetList.SetInBlockEvents   := SetInBlockEvents;
+         LDataSetList.FieldListCount     := FieldListCount;
+         LDataSetList.GetInDesignEvents  := GetInDesignEvents;
+         LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
+         LDataSetList.PrepareDetails     := PrepareDetails;
+        {$ENDIF}
        {$ENDIF}
        LDataSetList.Utf8SpecialChars := True;
        SetInBlockEvents(True);
@@ -10321,13 +10577,21 @@ Begin
    If vError Then
     Begin
      If csDesigning in ComponentState Then
-      Raise Exception.Create(PChar(vMessageError))
+      {$IFDEF FPC}
+       Raise Exception.Create(vMessageError)
+      {$ELSE}
+       Raise Exception.Create(PChar(vMessageError))
+      {$ENDIF}
      Else
       Begin
        If Assigned(vOnGetDataError) Then
         vOnGetDataError(Not(vError), vMessageError)
        Else
-        Raise Exception.Create(PChar(vMessageError));
+        {$IFDEF FPC}
+         Raise Exception.Create(vMessageError);
+        {$ELSE}
+         Raise Exception.Create(PChar(vMessageError));
+        {$ENDIF}
       End;
     End;
   End
@@ -10335,10 +10599,10 @@ Begin
   Raise Exception.Create(PChar(cEmptyDBName));
 End;
 
-Function TRESTDWClientSQL.GetData(DataSet: TJSONValue): Boolean;
+Function TRESTDWClientSQL.GetData(DataSet: TRESTDWJSONValue): Boolean;
 Var
  I             : Integer;
- LDataSetList  : TJSONValue;
+ LDataSetList  : TRESTDWJSONValue;
  vMetadata,
  vError        : Boolean;
  vValue,
@@ -10389,7 +10653,7 @@ Begin
  Self.Close;
  If Assigned(vDWResponseTranslator) Then
   Begin
-   LDataSetList          := TJSONValue.Create;
+   LDataSetList          := TRESTDWJSONValue.Create;
    Try
     LDataSetList.Encoded  := False;
     If Assigned(vDWResponseTranslator.ClientREST) Then
@@ -10413,11 +10677,11 @@ Begin
       Try
        LDataSetList.ServerFieldList := ServerFieldList;
        {$IFDEF RESTDWLAZARUS}
-        LDataSetList.DatabaseCharSet := DatabaseCharSet;
-        LDataSetList.NewFieldList    := @NewFieldList;
-        LDataSetList.CreateDataSet   := @CreateDataSet;
-        LDataSetList.NewDataField    := @NewDataField;
-        LDataSetList.SetInitDataset  := @SetInitDataset;
+        LDataSetList.DatabaseCharSet    := DatabaseCharSet;
+        LDataSetList.NewFieldList       := @NewFieldList;
+        LDataSetList.CreateDataSet      := @CreateDataSet;
+        LDataSetList.NewDataField       := @NewDataField;
+        LDataSetList.SetInitDataset     := @SetInitDataset;
         LDataSetList.SetRecordCount     := @SetRecordCount;
         LDataSetList.Setnotrepage       := @Setnotrepage;
         LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
@@ -10428,19 +10692,35 @@ Begin
         LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
         LDataSetList.PrepareDetails     := @PrepareDetails;
        {$ELSE}
-        LDataSetList.NewFieldList    := NewFieldList;
-        LDataSetList.CreateDataSet   := CreateDataSet;
-        LDataSetList.NewDataField    := NewDataField;
-        LDataSetList.SetInitDataset  := SetInitDataset;
-        LDataSetList.SetRecordCount     := SetRecordCount;
-        LDataSetList.Setnotrepage       := Setnotrepage;
-        LDataSetList.SetInDesignEvents  := SetInDesignEvents;
-        LDataSetList.SetInBlockEvents   := SetInBlockEvents;
-        LDataSetList.SetInactive        := SetInactive;
-        LDataSetList.FieldListCount     := FieldListCount;
-        LDataSetList.GetInDesignEvents  := GetInDesignEvents;
-        LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
-        LDataSetList.PrepareDetails     := PrepareDetails;
+        {$IFDEF FPC}
+         LDataSetList.NewFieldList       := @NewFieldList;
+         LDataSetList.CreateDataSet      := @CreateDataSet;
+         LDataSetList.NewDataField       := @NewDataField;
+         LDataSetList.SetInitDataset     := @SetInitDataset;
+         LDataSetList.SetRecordCount     := @SetRecordCount;
+         LDataSetList.Setnotrepage       := @Setnotrepage;
+         LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
+         LDataSetList.SetInBlockEvents   := @SetInBlockEvents;
+         LDataSetList.SetInactive        := @SetInactive;
+         LDataSetList.FieldListCount     := @FieldListCount;
+         LDataSetList.GetInDesignEvents  := @GetInDesignEvents;
+         LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
+         LDataSetList.PrepareDetails     := @PrepareDetails;
+        {$ELSE}
+         LDataSetList.NewFieldList       := NewFieldList;
+         LDataSetList.CreateDataSet      := CreateDataSet;
+         LDataSetList.NewDataField       := NewDataField;
+         LDataSetList.SetInitDataset     := SetInitDataset;
+         LDataSetList.SetRecordCount     := SetRecordCount;
+         LDataSetList.Setnotrepage       := Setnotrepage;
+         LDataSetList.SetInDesignEvents  := SetInDesignEvents;
+         LDataSetList.SetInBlockEvents   := SetInBlockEvents;
+         LDataSetList.SetInactive        := SetInactive;
+         LDataSetList.FieldListCount     := FieldListCount;
+         LDataSetList.GetInDesignEvents  := GetInDesignEvents;
+         LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
+         LDataSetList.PrepareDetails     := PrepareDetails;
+        {$ENDIF}
        {$ENDIF}
        LDataSetList.OnWriterProcess := OnWriterProcess;
        LDataSetList.Utf8SpecialChars := True;
@@ -10492,7 +10772,7 @@ Begin
      Begin
       If Not DataSet.IsNull Then
        vValue                := DataSet.Value;
-      LDataSetList          := TJSONValue.Create;
+      LDataSetList          := TRESTDWJSONValue.Create;
       LDataSetList.Encoded  := vRESTDataBase.EncodedStrings;
       LDataSetList.Encoding := DataBase.Encoding;
       vError                := False;
@@ -10522,20 +10802,37 @@ Begin
         LDataSetList.PrepareDetails     := @PrepareDetails;
         LDataSetList.ServerFieldList    := ServerFieldList;
        {$ELSE}
-        LDataSetList.NewFieldList       := NewFieldList;
-        LDataSetList.CreateDataSet      := CreateDataSet;
-        LDataSetList.NewDataField       := NewDataField;
-        LDataSetList.SetInitDataset     := SetInitDataset;
-        LDataSetList.SetRecordCount     := SetRecordCount;
-        LDataSetList.Setnotrepage       := Setnotrepage;
-        LDataSetList.SetInDesignEvents  := SetInDesignEvents;
-        LDataSetList.SetInBlockEvents   := SetInBlockEvents;
-        LDataSetList.SetInactive        := SetInactive;
-        LDataSetList.FieldListCount     := FieldListCount;
-        LDataSetList.GetInDesignEvents  := GetInDesignEvents;
-        LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
-        LDataSetList.PrepareDetails     := PrepareDetails;
-        LDataSetList.ServerFieldList    := ServerFieldList;
+        {$IFDEF FPC}
+         LDataSetList.NewFieldList       := @NewFieldList;
+         LDataSetList.CreateDataSet      := @CreateDataSet;
+         LDataSetList.NewDataField       := @NewDataField;
+         LDataSetList.SetInitDataset     := @SetInitDataset;
+         LDataSetList.SetRecordCount     := @SetRecordCount;
+         LDataSetList.Setnotrepage       := @Setnotrepage;
+         LDataSetList.SetInDesignEvents  := @SetInDesignEvents;
+         LDataSetList.SetInBlockEvents   := @SetInBlockEvents;
+         LDataSetList.SetInactive        := @SetInactive;
+         LDataSetList.FieldListCount     := @FieldListCount;
+         LDataSetList.GetInDesignEvents  := @GetInDesignEvents;
+         LDataSetList.PrepareDetailsNew  := @PrepareDetailsNew;
+         LDataSetList.PrepareDetails     := @PrepareDetails;
+         LDataSetList.ServerFieldList    := ServerFieldList;
+        {$ELSE}
+         LDataSetList.NewFieldList       := NewFieldList;
+         LDataSetList.CreateDataSet      := CreateDataSet;
+         LDataSetList.NewDataField       := NewDataField;
+         LDataSetList.SetInitDataset     := SetInitDataset;
+         LDataSetList.SetRecordCount     := SetRecordCount;
+         LDataSetList.Setnotrepage       := Setnotrepage;
+         LDataSetList.SetInDesignEvents  := SetInDesignEvents;
+         LDataSetList.SetInBlockEvents   := SetInBlockEvents;
+         LDataSetList.SetInactive        := SetInactive;
+         LDataSetList.FieldListCount     := FieldListCount;
+         LDataSetList.GetInDesignEvents  := GetInDesignEvents;
+         LDataSetList.PrepareDetailsNew  := PrepareDetailsNew;
+         LDataSetList.PrepareDetails     := PrepareDetails;
+         LDataSetList.ServerFieldList    := ServerFieldList;
+        {$ENDIF}
        {$ENDIF}
        LDataSetList.Utf8SpecialChars := True;
        If Not BinaryRequest Then
@@ -10621,13 +10918,21 @@ Begin
    If vError Then
     Begin
      If csDesigning in ComponentState Then
-      Raise Exception.Create(PChar(vMessageError))
+      {$IFDEF FPC}
+       Raise Exception.Create(vMessageError)
+      {$ELSE}
+       Raise Exception.Create(PChar(vMessageError))
+      {$ENDIF}
      Else
       Begin
        If Assigned(vOnGetDataError) Then
         vOnGetDataError(Not(vError), vMessageError)
        Else
+       {$IFDEF FPC}
+        Raise Exception.Create(vMessageError);
+       {$ELSE}
         Raise Exception.Create(PChar(vMessageError));
+       {$ENDIF}
       End;
     End;
   End
@@ -10738,13 +11043,13 @@ Begin
  End;
 End;
 
-Procedure TRESTDWClientSQL.SaveToStream(Var Stream : TMemoryStream);
+Procedure TRESTDWClientSQL.SaveToStream(Var Stream : TStream);
 Begin
  If Not Assigned(Stream) then
   Exit;
  vInBlockEvents := True;
  Try
-  TRESTDWClientSQLBase(Self).SaveToStream(TStream(Stream));
+  TRESTDWClientSQLBase(Self).SaveToStream(Stream);
  Finally
   vInBlockEvents := False;
  End;
@@ -10771,6 +11076,7 @@ End;
 procedure TRESTDWClientSQL.ExecuteOpen;
 Begin
  Try
+  vInBlockEvents := False;
   If (Not vInDesignEvents) Then
    ProcBeforeOpen(Self);
   vInBlockEvents := True;
@@ -10954,6 +11260,12 @@ Begin
      If (Not(vActive) And (Value)) Or (GetNewData) Or (vInDesignEvents) Then
       Begin
        GetNewData := False;
+//       Try
+//        If vsql.Text = '' Then
+//         If Assigned(vBeforeOpen) Then
+//          vBeforeOpen(Self);
+//       Finally
+//       End;
        If Not (vPropThreadRequest) Then
         ExecuteOpen
        Else
@@ -10961,7 +11273,11 @@ Begin
          {$IFDEF RESTDWLAZARUS}
           ThreadStart(@ExecuteOpen);
          {$ELSE}
-          ThreadStart(ExecuteOpen);
+          {$IFDEF FPC}
+           ThreadStart(@ExecuteOpen);
+          {$ELSE}
+           ThreadStart(ExecuteOpen);
+          {$ENDIF}
          {$ENDIF}
         End;
       End
@@ -10997,7 +11313,8 @@ Begin
   Else
    Begin
     vInDesignEvents := False;
-    Self.Close;
+    SetInBlockEvents(True);
+    TRESTDWMemTable(Self).EmptyTable;
     If Not InLoadFromStream Then
      Begin
       vActive := False;
@@ -11521,7 +11838,7 @@ Function TRESTDWPoolerListBase.GetPoolerList: TStringList;
 Var
  vTempString,
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
 Begin
  Result := Nil;
@@ -11547,7 +11864,7 @@ Begin
  {$ENDIF}
  DWParams  := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPooler.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPooler.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPooler.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovString;

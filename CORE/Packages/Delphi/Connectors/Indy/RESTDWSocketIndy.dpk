@@ -32,8 +32,8 @@ package RESTDWSocketIndy;
 requires
   RESTDWCore,
   IndySystem,
-  IndyProtocols,
-  IndyCore;
+  IndyCore,
+  IndyProtocols;
 
 contains
   uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas';

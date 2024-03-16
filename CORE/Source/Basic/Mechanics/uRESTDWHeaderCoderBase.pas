@@ -24,8 +24,12 @@ unit uRESTDWHeaderCoderBase;
 
 interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 uses
-  Classes, uRESTDWProtoTypes, uRESTDWException, uRESTDWTools;
+ Classes, uRESTDWProtoTypes, uRESTDWException, uRESTDWTools;
 
 Type
   TRESTDWHeaderDecodingNeededEvent = Procedure(Const ACharSet : String;

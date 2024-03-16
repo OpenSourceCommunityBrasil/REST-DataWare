@@ -24,6 +24,10 @@ unit uRESTDWCoderQuotedPrintable;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
   Classes, uRESTDWCoder, SysUtils;
 

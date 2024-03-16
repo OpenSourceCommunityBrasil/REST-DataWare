@@ -24,6 +24,10 @@ unit uRESTDWCoder3to4;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
   Classes, SysUtils, uRESTDWCoder, uRESTDWBasicTypes, uRESTDWProtoTypes;
 

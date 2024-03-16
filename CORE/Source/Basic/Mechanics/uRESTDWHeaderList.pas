@@ -22,6 +22,13 @@ unit uRESTDWHeaderList;
  Roniery                    - Devel.
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
+
 Interface
 
 Uses

@@ -15,6 +15,11 @@ unit uRESTDWServerEvents;
  https://github.com/OpenSourceCommunityBrasil/REST-DataWare
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
 
 interface
 
@@ -28,12 +33,14 @@ Const
 
 Type
  TDWReplyEvent       = Procedure(Var   Params      : TRESTDWParams;
-                                 Var   Result      : String)          Of Object;
+                                 Const Result      : TStringList)      Of Object;
+ PDWReplyEvent       = ^TDWReplyEvent;
  TDWReplyEventByType = Procedure(Var   Params      : TRESTDWParams;
-                                 Var   Result      : String;
+                                 Const Result      : TStringList;
                                  Const RequestType : TRequestType;
                                  Var   StatusCode  : Integer;
-                                 RequestHeader     : TStringList)    Of Object;
+                                 RequestHeader     : TStringList)     Of Object;
+ PDWReplyEventByType = ^TDWReplyEventByType;
  TDWAuthRequest      = Procedure(Const Params      : TRESTDWParams;
                                  Var   Rejected    : Boolean;
                                  Var   ResultError : String;
@@ -86,12 +93,12 @@ Type
   Procedure SetContentType(Value : String);
   Procedure SetDataMode   (Value : TDataMode);
  Public
-  Function    GetDisplayName             : String;       Override;
-  Procedure   SetDisplayName(Const Value : String);      Override;
+  Function    GetDisplayName             : String;       {$IFNDEF FPC}Override;{$ENDIF}
+  Procedure   SetDisplayName(Const Value : String);      {$IFNDEF FPC}Override;{$ENDIF}
   Procedure   CompareParams (Var Dest    : TRESTDWParams);
   Procedure   Assign        (Source      : TPersistent); Override;
   Constructor Create        (aCollection : TCollection); Override;
-  Function    GetNamePath  : String;                     Override;
+  Function    GetNamePath  : String;                     {$IFNDEF FPC}Override;{$ENDIF}
   Destructor  Destroy; Override;
  Published
   Property    Routes               : TRESTDWRoutes        Read vDWRoutes             Write vDWRoutes;
@@ -128,8 +135,18 @@ Type
 //  Procedure   Editable  (Value : Boolean);
  Public
   Function    Add    : TCollectionItem;
-  Constructor Create     (AOwner     : TPersistent;
-                          aItemClass : TCollectionItemClass);
+  Function    AddEvent   (Const EventName : String;
+                          BaseURL         : String              = '/';
+                          OnReplyEvent    : TDWReplyEvent       = Nil;
+                          ContentType     : String              = cApplicationJSON;
+                          Datamode        : TDataMode           = dmRAW) : TRESTDWEvent;Overload;
+  Function    AddEvent   (Const EventName : String;
+                          BaseURL         : String              = '/';
+                          OnReplyEvent    : TDWReplyEventByType = Nil;
+                          ContentType     : String              = cApplicationJSON;
+                          Datamode        : TDataMode           = dmRAW) : TRESTDWEvent;Overload;
+  Constructor Create     (AOwner          : TPersistent;
+                          aItemClass      : TCollectionItemClass);
   Destructor  Destroy; Override;
   Function    ToJSON : String;
   Procedure   FromJSON   (Value      : String );
@@ -331,7 +348,7 @@ Begin
    DWReplyEventData.Name := FName;
    If vEventName = '' Then
     vEventName := DWReplyEventData.Name;
-   Inherited;
+   Inherited SetDisplayName(Value);
   End;
 End;
 
@@ -362,6 +379,40 @@ Begin
       Dest.Delete(I);
     End;
   End;
+End;
+
+Function   TRESTDWEventList.AddEvent(Const EventName : String;
+                                     BaseURL         : String        = '/';
+                                     OnReplyEvent    : TDWReplyEvent = Nil;
+                                     ContentType     : String        = cApplicationJSON;
+                                     Datamode        : TDataMode     = dmRAW) : TRESTDWEvent;
+Var
+ Event : TRESTDWEvent;
+Begin
+ Event                    := TRESTDWEvent(Add);
+ Event.EventName          := EventName;
+ Event.BaseUrl            := BaseUrl;
+ Event.DefaultContentType := ContentType;
+ Event.DataMode           := DataMode;
+ Event.OnReplyEvent       := OnReplyEvent;
+ Result                   := Event;
+End;
+
+Function   TRESTDWEventList.AddEvent(Const EventName : String;
+                                     BaseURL         : String              = '/';
+                                     OnReplyEvent    : TDWReplyEventByType = Nil;
+                                     ContentType     : String              = cApplicationJSON;
+                                     Datamode        : TDataMode           = dmRAW) : TRESTDWEvent;
+Var
+ Event : TRESTDWEvent;
+Begin
+ Event                    := TRESTDWEvent(Add);
+ Event.EventName          := EventName;
+ Event.BaseUrl            := BaseUrl;
+ Event.DefaultContentType := ContentType;
+ Event.DataMode           := DataMode;
+ Event.OnReplyEventByType := OnReplyEvent;
+ Result                   := Event;
 End;
 
 Function TRESTDWEventList.Add : TCollectionItem;
@@ -558,7 +609,7 @@ Begin
   Begin
    vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s", "ContentType":"%s"', [BooleanToString(Items[I].Routes.All.Active),
                                                                                            BooleanToString(Items[I].OnlyPreDefinedParams),
-                                                                                           EncodeStrings(Items[I].DefaultContentType{$IFDEF FPC}, csUndefined{$ENDIF})]);
+                                                                                           EncodeStrings(Items[I].DefaultContentType{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
    vTagEvent    := Format('{"eventname":"%s"', [TRESTDWEvent(Items[I]).EventName]);
    vTagEvent    := vTagEvent + Format(', "DataMode":"%s"', [GetDataModeName(Items[I].vDataMode)]);
    vTagEvent    := vTagEvent + ', "params":[%s], ' + vParamLine2 + '}';
@@ -589,7 +640,7 @@ Procedure TRESTDWServerEvents.CreateDWParams(EventName    : String;
                                          Var DWParams : TRESTDWParams);
 Var
  vParamNameS : String;
- dwParam     : TJSONParam;
+ dwParam     : TRESTDWJSONParam;
  I           : Integer;
  vFound      : Boolean;
 Begin
@@ -613,7 +664,7 @@ Begin
       End;
      If Not(vFound) Then
       Begin
-       dwParam                 := TJSONParam.Create(DWParams.Encoding);
+       dwParam                 := TRESTDWJSONParam.Create(DWParams.Encoding);
        dwParam.Alias           := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
        dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
        dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
@@ -675,16 +726,16 @@ procedure TRESTDWClientEvents.CreateDWParams(EventName: String;
   Var DWParams: TRESTDWParams);
 Var
  vParamName : String;
- dwParam    : TJSONParam;
+ dwParam    : TRESTDWJSONParam;
  I          : Integer;
  vFound     : Boolean;
 Begin
  vParamName := '';
  If vEventList.EventByName[EventName] <> Nil Then
   Begin
-//   If (Not Assigned(DWParams)) or (dwParams = nil) Then
    DWParams := TRESTDWParams.Create;
-   DWParams.Encoding := vRESTClientPooler.Encoding;
+   If Assigned(vRESTClientPooler) Then
+    DWParams.Encoding := vRESTClientPooler.Encoding;
    For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
     Begin
      vParamName := '';
@@ -698,7 +749,7 @@ Begin
         vParamName := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
       End;
      If Not(vFound) Then
-      dwParam                := TJSONParam.Create(DWParams.Encoding)
+      dwParam                := TRESTDWJSONParam.Create(DWParams.Encoding)
      Else
       dwParam                := DWParams.ItemsString[vParamName];
      dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
@@ -730,7 +781,7 @@ Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  vResult,
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
  vRaised              : Boolean;
 Begin
@@ -745,22 +796,22 @@ Begin
  DWParams                        := TRESTDWParams.Create;
  DWParams.CriptOptions.Use       := CriptOptions.Use;
  DWParams.CriptOptions.Key       := CriptOptions.Key;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'dwservereventname';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := vServerEventName;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'BinaryRequest';
  JSONParam.ObjectDirection       := odIn;
  If Assigned(vRESTClientPooler) Then
@@ -768,7 +819,7 @@ Begin
  Else
   JSONParam.AsBoolean            := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOut;
  JSONParam.AsString              := '';
@@ -866,6 +917,13 @@ Begin
     Error        := '';
     NativeResult := vRESTClientPooler.SendEvent(EventName, DWParams, EventType, vDataMode, vServerEventName);
     Result       := (NativeResult = TReplyOK) Or (NativeResult = AssyncCommandMSG);
+   if vDataMode = dmraw then
+   Begin
+     if length(Trim(NativeResult)) >0 then
+       Result:= True
+     else
+       Result:= False;
+   End;
    Except
     On E : Exception Do
      Begin
@@ -906,7 +964,7 @@ End;
 Procedure TRESTDWClientEvents.TokenValidade(Var DWParams : TRESTDWParams;
                                         Var Error    : String);
 Var
- JSONParam     : TJSONParam;
+ JSONParam     : TRESTDWJSONParam;
  vToken        : String;
  vErrorBoolean : Boolean;
 Begin
@@ -916,7 +974,7 @@ Begin
    DWParams                  := TRESTDWParams.Create;
    DWParams.DataMode         := dmDataware;
    DWParams.Encoding         := vRESTClientPooler.Encoding;
-   JSONParam                 := TJSONParam.Create(vRESTClientPooler.Encoding);
+   JSONParam                 := TRESTDWJSONParam.Create(vRESTClientPooler.Encoding);
    JSONParam.ParamName       := 'BinaryRequest';
    JSONParam.ObjectDirection := odIn;
    JSONParam.AsBoolean       := vRESTClientPooler.BinaryRequest;

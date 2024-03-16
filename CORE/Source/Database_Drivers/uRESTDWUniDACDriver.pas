@@ -31,7 +31,7 @@ uses
   {$ENDIF}
   Classes, SysUtils, DB,
   MemDS, DBAccess, Uni, VirtualTable,
-  uRESTDWMemtable, uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWProtoTypes;
+  uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWProtoTypes;
 
 const
   rdwUniDACProtocols : array[0..27] of string = (('access'),('advantage'),

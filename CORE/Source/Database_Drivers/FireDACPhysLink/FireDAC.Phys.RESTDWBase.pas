@@ -618,7 +618,7 @@ var
   vParams: TParams;
   vError: Boolean;
   vMessageError: string;
-  vDataSetList: TJSONValue;
+  vDataSetList: TRESTDWJSONValue;
   vRowsAffected: integer;
   vPoolermethod: TRESTDWPoolerMethodClient;
   vMassiveCache: TRESTDWMassiveCacheSQLValue;
