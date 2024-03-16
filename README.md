@@ -5,9 +5,6 @@
 [![enUS](https://img.shields.io/badge/Translate%20To-enUS-blue)](./README_US.md)[![ptBR](https://img.shields.io/badge/Traduzir%20para-ptBR-blue)](./README.md)[![esES](https://img.shields.io/badge/Traducir%20a-esES-blue)](./README_ES.md)
 <br>
 
->[!WARNING]
-> Projeto Abandonado! Entre em contato pelo Discord acima se quiser assumir o projeto e dar continuidade.
-
 REST DataWare é uma suite de componentes criado para acelerar o desenvolvimento de aplicações 3 camadas com tudo que o RAD tem pra oferecer.
 Funcionando desde o Delphi 7 e também no Lazarus, o RDW como normalmente chamamos, é uma ferramenta completa para aplicações desktop, web e multiplataforma!
 
