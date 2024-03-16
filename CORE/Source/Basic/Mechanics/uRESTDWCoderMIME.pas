@@ -24,6 +24,10 @@ Unit uRESTDWCoderMIME;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
  Classes, uRESTDWCoder3to4, uRESTDWProtoTypes;
 

@@ -25,6 +25,10 @@ unit uRESTDWBufferBase;
 
 interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
   SysUtils, Classes, Variants,
   uRESTDWAbout, uRESTDWProtoTypes;

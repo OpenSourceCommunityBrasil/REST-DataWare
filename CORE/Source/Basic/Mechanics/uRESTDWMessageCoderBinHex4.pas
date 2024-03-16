@@ -22,7 +22,11 @@ unit uRESTDWMessageCoderBinHex4;
  Roniery                    - Devel.
 }
 
-interface
+Interface
+
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
 
 uses
   Classes,

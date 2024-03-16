@@ -22,6 +22,10 @@ unit uRESTDWMD5;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
   SysUtils, Classes;
 
@@ -383,7 +387,15 @@ End;
 
 Function MD5String(const S: string): TRESTDWMD5Digest;
 Begin
- Result:=MD5Buffer(PChar(S)^, Length(S));
+ {$IFNDEF FPC}
+ Result := MD5Buffer(PChar(S)^, Length(S));
+ {$ELSE}
+  {$IFDEF RESTDWLAZARUS}
+   Result := MD5Buffer(PChar(S)^, Length(S));
+  {$ELSE}
+   Result := MD5Buffer(PChar(@S)^, Length(S));
+  {$ENDIF}
+ {$ENDIF}
 End;
 
 Function MD5File(const FileName: string): TRESTDWMD5Digest;

@@ -24,6 +24,10 @@ unit uRESTDWBuffer;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
   Classes, SysUtils, uRESTDWException, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWTools;
 

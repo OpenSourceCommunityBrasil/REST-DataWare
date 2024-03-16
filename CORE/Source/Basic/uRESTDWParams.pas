@@ -22,6 +22,12 @@ unit uRESTDWParams;
  Roniery                    - Devel.
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 
 interface
 
@@ -55,7 +61,7 @@ Type
  TPrepareDetails    = Procedure     (ActiveMode  : Boolean)          Of Object;
 
 Type
- TJSONValue = Class
+ TRESTDWJSONValue = Class
  Private
   vFieldExist      : TFieldExist;
   vCreateDataset,
@@ -260,9 +266,9 @@ Type
   vParamName       : String;
   vEncoded         : Boolean;
  Public
-  Function    GetDisplayName             : String;       Override;
-  Procedure   SetDisplayName(Const Value : String);      Override;
-  Constructor Create        (aCollection : TCollection); Override;
+  Function    GetDisplayName             : String;       {$IFNDEF FPC}Override;{$ENDIF}
+  Procedure   SetDisplayName(Const Value : String);      {$IFNDEF FPC}Override;{$ENDIF}
+  Constructor Create        (aCollection : TCollection); {$IFNDEF FPC}Override;{$ENDIF}
  Published
   Property TypeObject      : TTypeObject      Read vTypeObject      Write vTypeObject;
   Property ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
@@ -295,10 +301,10 @@ Type
 End;
 
 Type
- PJSONParam = ^TJSONParam;
- TJSONParam = Class(TObject)
+ PRESTDWJSONParam = ^TRESTDWJSONParam;
+ TRESTDWJSONParam = Class(TObject)
  Private
-  vJSONValue       : TJSONValue;
+  vJSONValue       : TRESTDWJSONValue;
   vDataMode        : TDataMode;
   vEncoding        : TEncodeSelect;
   vTypeObject      : TTypeObject;
@@ -376,7 +382,7 @@ Type
   Procedure   FromJSON    (json        : String);
   Function    ToJSON  : String;
   Procedure   SaveToFile  (FileName       : String);
-  Procedure   CopyFrom    (JSONParam   : TJSONParam);Overload;
+  Procedure   CopyFrom    (JSONParam   : TRESTDWJSONParam);Overload;
   Procedure   CopyFrom    (JSONParam   : TRESTDWParamMethod);Overload;
   Procedure   SetVariantValue(Value    : Variant);
   Procedure   SetDataValue   (Value    : Variant;
@@ -456,14 +462,14 @@ Type
   vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
   Procedure Assign    (Source : TList);
-  Function  GetRec    (Index  : Integer) : TJSONParam; Overload;
+  Function  GetRec    (Index  : Integer) : TRESTDWJSONParam; Overload;
   Procedure PutRec    (Index  : Integer;
-                       Item   : TJSONParam);           Overload;
-  Function  GetRecName(Index  : String)  : TJSONParam; Overload;
-  Function  GetRawBody        : TJSONParam;
+                       Item   : TRESTDWJSONParam);           Overload;
+  Function  GetRecName(Index  : String)  : TRESTDWJSONParam; Overload;
+  Function  GetRawBody        : TRESTDWJSONParam;
   Procedure PutRecName(Index  : String;
-                       Item   : TJSONParam);           Overload;
-  Procedure PutRawBody(Item  : TJSONParam);
+                       Item   : TRESTDWJSONParam);           Overload;
+  Procedure PutRawBody(Item  : TRESTDWJSONParam);
   Procedure ClearList;
  Public
 //  Procedure   Clear;Override;
@@ -480,8 +486,8 @@ Type
   Procedure   FromJSON   (json      : String; BinaryRequest : Boolean = False);
   Procedure   CopyFrom   (DWParams  : TRESTDWParams);
   Procedure   Delete     (Index     : Integer); Overload;
-  Procedure   Delete     (Param     : TJSONParam); Overload;
-  Function    Add        (Item      : TJSONParam) : Integer; Overload;
+  Procedure   Delete     (Param     : TRESTDWJSONParam); Overload;
+  Function    Add        (Item      : TRESTDWJSONParam) : Integer; Overload;
   Procedure   SaveToStream  (Var Stream     : TStream;
                              Output         : TDWParamExpType = tdwpxt_All);
   Procedure   LoadFromStream(Stream         : TStream;
@@ -490,9 +496,9 @@ Type
   Procedure   LoadFromParams(Params : TParams);
   Procedure   SetCriptOptions(Use   : Boolean;
                               Key   : String);
-  Property    Items      [Index     : Integer]    : TJSONParam Read GetRec        Write PutRec; Default;
-  Property    ItemsString[Index     : String]     : TJSONParam Read GetRecName    Write PutRecName;
-  Property    RawBody               : TJSONParam               Read GetRawBody    Write PutRawBody;
+  Property    Items      [Index     : Integer]    : TRESTDWJSONParam Read GetRec        Write PutRec; Default;
+  Property    ItemsString[Index     : String]     : TRESTDWJSONParam Read GetRecName    Write PutRecName;
+  Property    RawBody               : TRESTDWJSONParam               Read GetRawBody    Write PutRawBody;
   Property    DataMode              : TDataMode                Read vDataMode     Write vDataMode;
   Property    Encoding              : TEncodeSelect            Read vEncoding     Write vEncoding;
   Property    CriptOptions          : TCripto                  Read vCripto       Write vCripto;
@@ -691,7 +697,7 @@ begin
  Else
   Begin
    vParamName := Trim(Value);
-   Inherited;
+   Inherited SetDisplayName(Value);
   End;
 end;
 
@@ -788,7 +794,7 @@ End;
 
 //Aqui vai ler os Parametros, tem que estar syncronizado com o escrita dos parametros
 //Alterado por ABrito
-Function TJSONValue.GetValue(CanConvert : Boolean = True) : Variant;
+Function TRESTDWJSONValue.GetValue(CanConvert : Boolean = True) : Variant;
 Var
  vTempString : String;
 Begin
@@ -817,18 +823,18 @@ Begin
    Else
     Begin //TODO
      If Length(vTempString) > 0 Then
-     Begin
-      {$IFNDEF FPC}
-       {$IFDEF DELPHI2010UP}
-        vTempString:= TEncoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))));
+      Begin
+       {$IFNDEF FPC}
+        {$IFDEF DELPHI2010UP}
+         vTempString:= TEncoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))));
+        {$ELSE}
+         vTempString:= DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        {$ENDIF}
        {$ELSE}
-        vTempString:= DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        vTempString:= TEncoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))));
        {$ENDIF}
-      {$ELSE}
-       vTempString:= TEncoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))));
-      {$ENDIF}
        If (vObjectValue In [ovWideString, ovWidememo, ovMemo]) then
-       Begin
+        Begin
          vTempString:=DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
          {$IFDEF RESTDWLINUX}
            vTempString:= Tencoding.UTF8.Getstring(stringtobytes(vTempString));
@@ -841,8 +847,8 @@ Begin
            vTempString:= utf8tostring(vTempString);
           {$ENDIF}
          {$ENDIF}
-       end;
-     End;
+        End;
+      End;
     End;
   End
  Else
@@ -915,7 +921,7 @@ Begin
   End;
 End;
 
-Procedure TJSONValue.WriteValue(bValue : TStream);
+Procedure TRESTDWJSONValue.WriteValue(bValue : TStream);
 Begin
  vNullValue := False;
  If bValue.Size = 0 Then
@@ -927,7 +933,7 @@ Begin
   aValue := StreamToBytes(bValue);
 End;
 
-Procedure TJSONValue.WriteValue(bValue : Variant);
+Procedure TRESTDWJSONValue.WriteValue(bValue : Variant);
 {$IFNDEF DELPHIXEUP}
 Var
  vValueAnsi : AnsiString;
@@ -1037,7 +1043,7 @@ Begin
   End;
 End;
 
-Function TJSONValue.FormatValue(bValue : String) : String;
+Function TRESTDWJSONValue.FormatValue(bValue : String) : String;
 Var
  aResult    : String;
  vInsertTag : Boolean;
@@ -1138,7 +1144,7 @@ Begin
   Result := aResult;
 End;
 
-Function TJSONValue.GetValueJSON(bValue : String): String;
+Function TRESTDWJSONValue.GetValueJSON(bValue : String): String;
 Begin
  Result := bValue;
  If ((bValue = '') or (bValue = '""')) And (vNullValue) Then
@@ -1147,7 +1153,7 @@ Begin
   bValue := '""';
 End;
 
-Function TJSONValue.DatasetValues(bValue             : TDataset;
+Function TRESTDWJSONValue.DatasetValues(bValue             : TDataset;
                                   DateTimeFormat     : String      = '';
                                   DataModeD          : TDataMode   = dmDataware;
                                   FloatDecimalFormat : String      = '';
@@ -1162,6 +1168,7 @@ Var
  vValueMask,
  vBuildSide : String;
  A, vRecNo  : Integer; //pr-19/08/2020
+ vStringList : TStringList;
  Function GenerateHeader: String;
  Var
   I{$IFDEF RESTDWLAZARUS}, vSize{$ENDIF} : Integer;
@@ -1243,6 +1250,7 @@ Var
   If HeaderLowercase Then
    Result := Lowercase(Result)
  End;
+
  Function GenerateLine: String;
  Var
   I             : Integer;
@@ -1540,14 +1548,16 @@ Begin
  Try
   If Not bValue.Active Then
    bValue.Open;
-
   if not bValue.IsUniDirectional then
     bValue.First;
-
   {$IFDEF RESTDWLAZARUS}
-  vBuildSide := 'L';
+   vBuildSide := 'L';
   {$ELSE}
-  vBuildSide := 'D';
+   {$IFDEF FPC}
+    vBuildSide := 'L';
+   {$ELSE}
+    vBuildSide := 'D';
+   {$ENDIF}
   {$ENDIF}
   Case DataModeD Of
    dmDataware  : Result := '{"fields":[' + GenerateHeader + '], "buildside":"' + vBuildSide + '"}, {"lines":[%s]}';
@@ -1614,9 +1624,9 @@ Begin
                   {$ENDIF}
                  End;
    dmRaw       : Begin
-                  If vtagName <> '' Then
-                   Result := Format('{"%s": [%s]}', [vtagName, vLines])
-                  Else
+//                  If vtagName <> '' Then
+//                   Result := Format('{"%s": [%s]}', [vtagName, vLines])
+//                  Else
                    Result := Format('[%s]', [vLines]);
                  End;
   End;
@@ -1627,7 +1637,10 @@ Begin
  End;
 End;
 
-Function TJSONValue.EncodedString: String;
+
+
+
+Function TRESTDWJSONValue.EncodedString: String;
 Begin
  If vEncoded Then
   Result := 'true'
@@ -1635,7 +1648,7 @@ Begin
   Result := 'false';
 End;
 
-Procedure TJSONValue.SetEncoding(bValue : TEncodeSelect);
+Procedure TRESTDWJSONValue.SetEncoding(bValue : TEncodeSelect);
 Begin
  vEncoding := bValue;
  {$IFDEF RESTDWLAZARUS}
@@ -1646,12 +1659,12 @@ Begin
  {$ENDIF}
 End;
 
-Procedure TJSONValue.aNewFieldList;
+Procedure TRESTDWJSONValue.aNewFieldList;
 Begin
 
 End;
 
-Function TJSONValue.GetNewFieldList : TProcedureEvent;
+Function TRESTDWJSONValue.GetNewFieldList : TProcedureEvent;
 Begin
  Result := Nil;
  If Assigned(vNewFieldList) Then
@@ -1661,12 +1674,16 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aNewFieldList;
    {$ELSE}
-    Result := aNewFieldList;
+    {$IFNDEF FPC}
+     Result := aNewFieldList;
+    {$ELSE}
+     Result := @aNewFieldList;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Function TJSONValue.GetNewDataField : TNewDataField;
+Function TRESTDWJSONValue.GetNewDataField : TNewDataField;
 Begin
  Result := Nil;
  If Assigned(vNewDataField) Then
@@ -1676,17 +1693,21 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aNewDataField;
    {$ELSE}
-    Result := aNewDataField;
+    {$IFDEF FPC}
+     Result := @aNewDataField;
+    {$ELSE}
+     Result := aNewDataField;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Procedure TJSONValue.aNewDataField(FieldDefinition : TFieldDefinition);
+Procedure TRESTDWJSONValue.aNewDataField(FieldDefinition : TFieldDefinition);
 Begin
 
 End;
 
-Function TJSONValue.GetFieldExist : TFieldExist;
+Function TRESTDWJSONValue.GetFieldExist : TFieldExist;
 Begin
  Result := Nil;
  If Assigned(vFieldExist) Then
@@ -1696,12 +1717,16 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aFieldExist;
    {$ELSE}
-    Result := aFieldExist;
+    {$IFDEF FPC}
+     Result := @aFieldExist;
+    {$ELSE}
+     Result := aFieldExist;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Function TJSONValue.aFieldExist(Const Dataset : TDataset;
+Function TRESTDWJSONValue.aFieldExist(Const Dataset : TDataset;
                                 Value         : String) : TField;
 Var
  I : Integer;
@@ -1717,7 +1742,7 @@ Begin
   End;
 End;
 
-Function TJSONValue.GetCreateDataSet : TProcedureEvent;
+Function TRESTDWJSONValue.GetCreateDataSet : TProcedureEvent;
 Begin
  Result := Nil;
  If Assigned(vCreateDataset) Then
@@ -1727,22 +1752,26 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aCreateDataset;
    {$ELSE}
-    Result := aCreateDataset;
+    {$IFDEF FPC}
+     Result := @aCreateDataset;
+    {$ELSE}
+     Result := aCreateDataset;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Procedure TJSONValue.aCreateDataSet;
+Procedure TRESTDWJSONValue.aCreateDataSet;
 Begin
 
 End;
 
-Procedure TJSONValue.aSetInitDataset   (Const Value : Boolean);
+Procedure TRESTDWJSONValue.aSetInitDataset   (Const Value : Boolean);
 Begin
 
 End;
 
-Function  TJSONValue.GetSetInitDataset : TSetInitDataset;
+Function  TRESTDWJSONValue.GetSetInitDataset : TSetInitDataset;
 Begin
  Result := Nil;
  If Assigned(vSetInitDataset) Then
@@ -1752,18 +1781,22 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aSetInitDataset;
    {$ELSE}
-    Result := aSetInitDataset;
+    {$IFDEF FPC}
+     Result := @aSetInitDataset;
+    {$ELSE}
+     Result := aSetInitDataset;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Procedure TJSONValue.aSetRecordCount(aJsonCount,
+Procedure TRESTDWJSONValue.aSetRecordCount(aJsonCount,
                                      aRecordCount : Integer);
 Begin
 
 End;
 
-Function  TJSONValue.GetSetRecordCount            : TSetRecordCount;
+Function  TRESTDWJSONValue.GetSetRecordCount            : TSetRecordCount;
 Begin
  Result := Nil;
  If Assigned(vSetRecordCount) Then
@@ -1773,17 +1806,21 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aSetRecordCount;
    {$ELSE}
-    Result := aSetRecordCount;
+    {$IFDEF FPC}
+     Result := @aSetRecordCount;
+    {$ELSE}
+     Result := aSetRecordCount;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Procedure TJSONValue.aSetnotrepage     (Value       : Boolean);
+Procedure TRESTDWJSONValue.aSetnotrepage     (Value       : Boolean);
 Begin
 
 End;
 
-Function TJSONValue.GetSetnotrepage                : TSetnotrepage;
+Function TRESTDWJSONValue.GetSetnotrepage                : TSetnotrepage;
 Begin
  Result := Nil;
  If Assigned(vSetnotrepage) Then
@@ -1793,17 +1830,21 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aSetnotrepage;
    {$ELSE}
-    Result := aSetnotrepage;
+    {$IFDEF FPC}
+     Result := @aSetnotrepage;
+    {$ELSE}
+     Result := aSetnotrepage;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Procedure TJSONValue.aSetInDesignEvents(Const Value : Boolean);
+Procedure TRESTDWJSONValue.aSetInDesignEvents(Const Value : Boolean);
 Begin
 
 End;
 
-Function  TJSONValue.GetSetInDesignEvents           : TSetInitDataset;
+Function  TRESTDWJSONValue.GetSetInDesignEvents           : TSetInitDataset;
 Begin
  Result := Nil;
  If Assigned(vSetInDesignEvents) Then
@@ -1813,17 +1854,21 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aSetInDesignEvents;
    {$ELSE}
-    Result := aSetInDesignEvents;
+    {$IFDEF FPC}
+     Result := @aSetInDesignEvents;
+    {$ELSE}
+     Result := aSetInDesignEvents;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Procedure TJSONValue.aSetInBlockEvents (Const Value : Boolean);
+Procedure TRESTDWJSONValue.aSetInBlockEvents (Const Value : Boolean);
 Begin
  vInBlockEvents := Value;
 End;
 
-Function  TJSONValue.GetSetInBlockEvents            : TSetInitDataset;
+Function  TRESTDWJSONValue.GetSetInBlockEvents            : TSetInitDataset;
 Begin
  Result := Nil;
  If Assigned(vSetInBlockEvents) Then
@@ -1833,17 +1878,21 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aSetInBlockEvents;
    {$ELSE}
-    Result := aSetInBlockEvents;
+    {$IFDEF FPC}
+     Result := @aSetInBlockEvents;
+    {$ELSE}
+     Result := aSetInBlockEvents;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Procedure TJSONValue.aSetInactive(Const Value : Boolean);
+Procedure TRESTDWJSONValue.aSetInactive(Const Value : Boolean);
 Begin
  vInactive := Value;
 End;
 
-Function  TJSONValue.GetSetInactive                 : TSetInitDataset;
+Function  TRESTDWJSONValue.GetSetInactive                 : TSetInitDataset;
 Begin
  Result := Nil;
  If Assigned(vSetInactive) Then
@@ -1853,17 +1902,21 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aSetInactive;
    {$ELSE}
-    Result := aSetInactive;
+    {$IFDEF FPC}
+     Result := @aSetInactive;
+    {$ELSE}
+     Result := aSetInactive;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Function TJSONValue.aFieldListCount : Integer;
+Function TRESTDWJSONValue.aFieldListCount : Integer;
 Begin
  Result := 0;
 End;
 
-Function  TJSONValue.GetFieldListCount              : TFieldListCount;
+Function  TRESTDWJSONValue.GetFieldListCount              : TFieldListCount;
 Begin
  Result := Nil;
  If Assigned(vFieldListCount) Then
@@ -1873,12 +1926,16 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aFieldListCount;
    {$ELSE}
-    Result := aFieldListCount;
+    {$IFDEF FPC}
+     Result := @aFieldListCount;
+    {$ELSE}
+     Result := aFieldListCount;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Class Function TJSONValue.FieldDefExist(Const Dataset : TDataset;
+Class Function TRESTDWJSONValue.FieldDefExist(Const Dataset : TDataset;
                                         Value         : String)   : TFieldDef;
 Var
  I : Integer;
@@ -1894,12 +1951,12 @@ Begin
   End;
 End;
 
-Function TJSONValue.aGetInDesignEvents : Boolean;
+Function TRESTDWJSONValue.aGetInDesignEvents : Boolean;
 Begin
  Result := False;
 End;
 
-Function  TJSONValue.GetGetInDesignEvents           : TGetInDesignEvents;
+Function  TRESTDWJSONValue.GetGetInDesignEvents           : TGetInDesignEvents;
 Begin
  Result := Nil;
  If Assigned(vGetInDesignEvents) Then
@@ -1909,17 +1966,21 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aGetInDesignEvents;
    {$ELSE}
-    Result := aGetInDesignEvents;
+    {$IFDEF FPC}
+     Result := @aGetInDesignEvents;
+    {$ELSE}
+     Result := aGetInDesignEvents;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Procedure TJSONValue.aPrepareDetailsNew;
+Procedure TRESTDWJSONValue.aPrepareDetailsNew;
 Begin
 
 End;
 
-Function TJSONValue.GetPrepareDetailsNew           : TProcedureEvent;
+Function TRESTDWJSONValue.GetPrepareDetailsNew           : TProcedureEvent;
 Begin
  Result := Nil;
  If Assigned(vPrepareDetailsNew) Then
@@ -1929,17 +1990,21 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aPrepareDetailsNew;
    {$ELSE}
-    Result := aPrepareDetailsNew;
+    {$IFDEF FPC}
+     Result := @aPrepareDetailsNew;
+    {$ELSE}
+     Result := aPrepareDetailsNew;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Procedure TJSONValue.aPrepareDetails(ActiveMode : Boolean);
+Procedure TRESTDWJSONValue.aPrepareDetails(ActiveMode : Boolean);
 Begin
 
 End;
 
-Function TJSONValue.GetPrepareDetails              : TPrepareDetails;
+Function TRESTDWJSONValue.GetPrepareDetails              : TPrepareDetails;
 Begin
  Result := Nil;
  If Assigned(vPrepareDetails) Then
@@ -1949,12 +2014,16 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     Result := @aPrepareDetails;
    {$ELSE}
-    Result := aPrepareDetails;
+    {$IFDEF FPC}
+     Result := @aPrepareDetails;
+    {$ELSE}
+     Result := aPrepareDetails;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
-Procedure TJSONValue.ExecSetInactive  (Value       : Boolean);
+Procedure TRESTDWJSONValue.ExecSetInactive  (Value       : Boolean);
 Var
  vLocSetInactive : TSetInitDataset;
 Begin
@@ -1962,7 +2031,7 @@ Begin
  vLocSetInactive(Value);
 End;
 
-Procedure TJSONValue.SetFieldsList(Value : TFieldsList);
+Procedure TRESTDWJSONValue.SetFieldsList(Value : TFieldsList);
 Var
  I : Integer;
 Begin
@@ -1979,7 +2048,7 @@ Begin
   End;
 End;
 
-Procedure TJSONValue.ClearFieldList;
+Procedure TRESTDWJSONValue.ClearFieldList;
 Var
  I : Integer;
 Begin
@@ -1991,7 +2060,7 @@ Begin
  Setlength(vFieldsList, 0);
 End;
 
-Function  TJSONValue.AsString : String;
+Function  TRESTDWJSONValue.AsString : String;
 Begin
  Result := GetValue(False);
  If VarIsNull(Result) Then
@@ -2005,14 +2074,14 @@ Begin
    {$IFEND}
 End;
 
-Procedure TJSONValue.Clear;
+Procedure TRESTDWJSONValue.Clear;
 Begin
  vNullValue := True;
  Setvalue('');
  ClearFieldList;
 End;
 
-Procedure TJSONValue.ToStream(Var bValue : TMemoryStream);
+Procedure TRESTDWJSONValue.ToStream(Var bValue : TMemoryStream);
 Begin
  If Length(aValue) > 0 Then
   Begin
@@ -2023,7 +2092,7 @@ Begin
   bValue := Nil;
 End;
 
-Procedure TJSONValue.LoadFromDataset(TableName        : String;
+Procedure TRESTDWJSONValue.LoadFromDataset(TableName        : String;
                                      bValue           : TDataset;
                                      EncodedValue     : Boolean = True;
                                      DataModeD        : TDataMode = dmDataware;
@@ -2055,6 +2124,13 @@ Begin
    DatabaseCharSet := CharSet;
  {$ENDIF}
  vTagGeral        := DatasetValues(bValue, DateTimeFormat, DataModeD, DelimiterFormat, HeaderLowercase);
+ If (DataModeD <> dmDataware) then
+ Begin
+  if Length(Trim(TableName))>0 then
+   vTagGeral     := Format('{"%s": %s}', [TableName, vTagGeral])
+   else
+   vTagGeral     := Format('%s', [ vTagGeral])
+ End;
  {$IFDEF RESTDWLAZARUS}
   If vEncodingLazarus = Nil Then
    SetEncoding(vEncoding);
@@ -2077,7 +2153,7 @@ Begin
  vNullValue       := Length(aValue) = 0;
 End;
 
-Procedure TJSONValue.LoadFromDataset(TableName        : String;
+Procedure TRESTDWJSONValue.LoadFromDataset(TableName        : String;
                                      bValue,
                                      bDetail          : TDataset;
                                      DetailType       : TRESTDWJSONType = TRESTDWJSONArrayType;
@@ -2117,6 +2193,13 @@ Begin
  Else
   vVirtualValue := Format('"%s":', [DetailElementName]);
  vTagGeral     := DatasetValues(bValue, DateTimeFormat, DataModeD, DelimiterFormat, HeaderLowercase, vVirtualValue, DetailType, bDetail);
+ If (DataModeD <> dmDataware) then
+ Begin
+   if Length(Trim(TableName))>0 then
+   vTagGeral     := Format('{"%s": %s}', [TableName, vTagGeral])
+   else
+   vTagGeral     := Format('%s', [ vTagGeral])
+ End;
  {$IFDEF RESTDWLAZARUS}
   If vEncodingLazarus = Nil Then
    SetEncoding(vEncoding);
@@ -2146,7 +2229,7 @@ Begin
  vNullValue       := Length(aValue) = 0;
 End;
 
-Procedure TJSONValue.WriteToFieldDefs(JSONValue                : String;
+Procedure TRESTDWJSONValue.WriteToFieldDefs(JSONValue                : String;
                                       Const ResponseTranslator : TRESTDWResponseTranslator);
  Function ReadFieldDefs(JSONObject,
                         ElementRoot      : String;
@@ -2227,7 +2310,7 @@ Begin
  End;
 End;
 
-procedure TJSONValue.WriteToDataset2(JSONValue: String; DestDS: TDataset);
+procedure TRESTDWJSONValue.WriteToDataset2(JSONValue: String; DestDS: TDataset);
 Var
   FieldsValidate: Array of TFieldNotifyEvent;
   FieldsChange: Array of TFieldNotifyEvent;
@@ -2439,7 +2522,7 @@ Begin
   End;
 End;
 
-procedure TJSONValue.WriteToDataset(JSONValue: String; const DestDS: TDataset);
+procedure TRESTDWJSONValue.WriteToDataset(JSONValue: String; const DestDS: TDataset);
 Var
  FieldValidate     : TFieldNotifyEvent;
  bJsonValue,
@@ -2770,7 +2853,7 @@ Begin
  End;
 End;
 
-Procedure TJSONValue.WriteToDataset(JSONValue          : String;
+Procedure TRESTDWJSONValue.WriteToDataset(JSONValue          : String;
                                     Const DestDS       : TDataset;
                                     ResponseTranslator : TRESTDWResponseTranslator;
                                     RequestMode       : TRequestMode);
@@ -2908,7 +2991,7 @@ Var
              vDWFieldDef.FieldName    := vDWFieldDef.ElementName;
              vDWFieldDef.FieldSize    := Length(bJsonValue.pairs[A].Value);
              If vDWFieldDef.FieldSize = 0 Then
-              vDWFieldDef.FieldSize   := 10;
+              vDWFieldDef.FieldSize   := 100;
              vDWFieldDef.DataType     := ovString;
             End;
           End;
@@ -3368,7 +3451,7 @@ Begin
  End;
 End;
 
-Procedure TJSONValue.WriteToDataset(DatasetType   : TDatasetType;
+Procedure TRESTDWJSONValue.WriteToDataset(DatasetType   : TDatasetType;
                                     JSONValue     : String;
                                     Const DestDS  : TDataset;
                                     Var JsonCount : Integer;
@@ -3893,7 +3976,7 @@ Begin
  End;
 End;
 
-Procedure TJSONValue.WriteToDataset (DatasetType    : TDatasetType;
+Procedure TRESTDWJSONValue.WriteToDataset (DatasetType    : TDatasetType;
                                      JSONValue      : String;
                                      Const DestDS   : TDataset;
                                      ClearDataset   : Boolean          = False
@@ -3910,7 +3993,7 @@ Begin
                 ClearDataset{$IFDEF RESTDWLAZARUS}, CharSet{$ENDIF});
 End;
 
-Procedure TJSONValue.LoadFromJSON(bValue: String);
+Procedure TRESTDWJSONValue.LoadFromJSON(bValue: String);
 Var
  bJsonValue    : TRESTDWJSONInterfaceObject;
  vTempValue    : String;
@@ -3971,7 +4054,7 @@ Begin
  End;
 End;
 
-Procedure TJSONValue.LoadFromJSON(bValue         : String;
+Procedure TRESTDWJSONValue.LoadFromJSON(bValue         : String;
                                   DataModeD      : TDataMode);
 Var
  bJsonValue    : TRESTDWJSONInterfaceObject;
@@ -3994,7 +4077,7 @@ Begin
  End;
 End;
 
-Procedure TJSONValue.LoadFromStream(Stream : TStream);
+Procedure TRESTDWJSONValue.LoadFromStream(Stream : TStream);
 Begin
  ObjectValue := ovBlob;
  vBinary     := True;
@@ -4015,7 +4098,7 @@ Begin
   End;
 End;
 
-Procedure TJSONValue.SaveToStream(Const Stream : TStream);
+Procedure TRESTDWJSONValue.SaveToStream(Const Stream : TStream);
 Begin
  Try
   If Length(aValue) > 0 Then
@@ -4026,7 +4109,7 @@ Begin
  End;
 End;
 
-Procedure TJSONValue.SaveToFile(FileName: String);
+Procedure TRESTDWJSONValue.SaveToFile(FileName: String);
 Var
  vStringStream : TStringStream;
  vFileStream   : TFileStream;
@@ -4060,7 +4143,7 @@ Begin
  End;
 End;
 
-Procedure TJSONValue.ToBytes(Value  : String;
+Procedure TRESTDWJSONValue.ToBytes(Value  : String;
                              Encode : Boolean = False);
 Var
  Stream: TStringStream;
@@ -4080,13 +4163,17 @@ Begin
   End;
 End;
 
-Function TJSONValue.ToJSON : String;
+Function TRESTDWJSONValue.ToJSON : String;
 Var
   {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
     vTempValue   : String;
   {$ELSE}
-    vTempValue   : AnsiString;
-    SizeOfString : Integer;
+    {$IFDEF FPC}
+     vTempValue   : String;
+    {$ELSE}
+     vTempValue   : AnsiString;
+    {$ENDIF}
+    SizeOfString  : Integer;
   {$IFEND}
 Begin
  Result     := '';
@@ -4153,7 +4240,7 @@ Begin
   Result := vTempValue;
 End;
 
-Procedure TJSONValue.SetValue(Value  : Variant;
+Procedure TRESTDWJSONValue.SetValue(Value  : Variant;
                               Encode : Boolean);
 Begin
  vEncoded   := Encode;
@@ -4217,7 +4304,7 @@ Begin
   End;
 End;
 
-Procedure TJSONValue.BeginBytes(DataSize : DWInt64);
+Procedure TRESTDWJSONValue.BeginBytes(DataSize : DWInt64);
 Begin
  vNullValue := True;
  If Length(aValue) > 0 Then
@@ -4229,27 +4316,29 @@ Begin
   End;
 End;
 
-Procedure TJSONValue.WriteBytes(bValue : TRESTDWBytes);
+Procedure TRESTDWJSONValue.WriteBytes(bValue : TRESTDWBytes);
 Begin
  aValue := bValue;
 End;
 
-Function  TJSONValue.GetBytes : TRESTDWBytes;
+Function  TRESTDWJSONValue.GetBytes : TRESTDWBytes;
 Begin
  Result := aValue;
 End;
 
-Function TJSONValue.Value : Variant;
+Function TRESTDWJSONValue.Value : Variant;
 Begin
  Result := GetValue;
  If VarIsNull(Result) Then
   Exit;
  {$IFNDEF RESTDWLAZARUS}
-  {$IFNDEF DELPHI2009UP}
-   Result := UTF8Decode(Result);
-   {$IFDEF DELPHI8UP}
-    If vEncoding = esUtf8 Then
-     Result := UTF8Decode(Result);
+  {$IFNDEF FPC}
+   {$IFNDEF DELPHI2009UP}
+    Result := UTF8Decode(Result);
+    {$IFDEF DELPHI8UP}
+     If vEncoding = esUtf8 Then
+      Result := UTF8Decode(Result);
+    {$ENDIF}
    {$ENDIF}
   {$ENDIF}
  {$ELSE}
@@ -4257,7 +4346,7 @@ Begin
  {$ENDIF}
 End;
 
-Constructor TJSONValue.Create;
+Constructor TRESTDWJSONValue.Create;
 Begin
  Inherited;
  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
@@ -4295,19 +4384,19 @@ Begin
  SetLength(vFieldsList, 0);
 End;
 
-Destructor TJSONValue.Destroy;
+Destructor TRESTDWJSONValue.Destroy;
 Begin
  SetLength(aValue, 0);
  Clear;
  Inherited;
 End;
 
-Function TJSONValue.IsNull : Boolean;
+Function TRESTDWJSONValue.IsNull : Boolean;
 Begin
  Result := vNullValue;
 End;
 
-Procedure TJSONParam.WriteValue(bValue : TStream);
+Procedure TRESTDWJSONParam.WriteValue(bValue : TStream);
 Begin
  If TestNilParam Then
   Exit;
@@ -4321,7 +4410,7 @@ Begin
  vNullValue                  := vJSONValue.vNullValue;
 End;
 
-Procedure TJSONParam.WriteValue(bValue : Variant);
+Procedure TRESTDWJSONParam.WriteValue(bValue : Variant);
 Begin
  If TestNilParam Then
   Exit;
@@ -4335,7 +4424,7 @@ Begin
  vNullValue                  := vJSONValue.vNullValue;
 End;
 
-Procedure TJSONParam.SetParamName(bValue : String);
+Procedure TRESTDWJSONParam.SetParamName(bValue : String);
 Begin
  If TestNilParam Then
   Exit;
@@ -4343,21 +4432,21 @@ Begin
  vJSONValue.vtagName := vParamName;
 End;
 
-Procedure TJSONParam.SetParamFileName(bValue : String);
+Procedure TRESTDWJSONParam.SetParamFileName(bValue : String);
 Begin
  If TestNilParam Then
   Exit;
  vParamFileName := bValue;
 End;
 
-Function TJSONParam.GetAsString   : String;
+Function TRESTDWJSONParam.GetAsString   : String;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovString);
 End;
 
-Procedure TJSONParam.SetAsString  (Value : String);
+Procedure TRESTDWJSONParam.SetAsString  (Value : String);
 Begin
  If TestNilParam Then
   Exit;
@@ -4365,17 +4454,17 @@ Begin
 End;
 
 {$IF Defined(RESTDWLAZARUS) and not Defined(RESTDWLINUX)}
-Function TJSONParam.GetAsWideString : WideString;
+Function TRESTDWJSONParam.GetAsWideString : WideString;
 Begin
  Result := GetValue(ovWideString);
 End;
 
-Procedure TJSONParam.SetAsWideString(Value    : WideString);
+Procedure TRESTDWJSONParam.SetAsWideString(Value    : WideString);
 Begin
  SetDataValue(Value, ovWideString);
 End;
 
-Function TJSONParam.GetAsAnsiString: AnsiString;
+Function TRESTDWJSONParam.GetAsAnsiString: AnsiString;
 Begin
   {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
     Result := GetValue(ovString);
@@ -4384,7 +4473,7 @@ Begin
   {$IFEND}
 End;
 
-Procedure TJSONParam.SetAsAnsiString(Value: AnsiString);
+Procedure TRESTDWJSONParam.SetAsAnsiString(Value: AnsiString);
 Begin
   {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
     SetDataValue(Value, ovString);
@@ -4394,189 +4483,189 @@ Begin
 End;
 {$IFEND}
 
-Function TJSONParam.GetAsBCD      : Currency;
+Function TRESTDWJSONParam.GetAsBCD      : Currency;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovBCD);
 End;
 
-Procedure TJSONParam.SetAsBCD     (Value : Currency);
+Procedure TRESTDWJSONParam.SetAsBCD     (Value : Currency);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovBCD);
 End;
 
-Function TJSONParam.GetAsFMTBCD   : Currency;
+Function TRESTDWJSONParam.GetAsFMTBCD   : Currency;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovFMTBcd);
 End;
 
-Procedure TJSONParam.SetAsFMTBCD  (Value : Currency);
+Procedure TRESTDWJSONParam.SetAsFMTBCD  (Value : Currency);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovFMTBcd);
 End;
 
-Function TJSONParam.GetAsCurrency : Currency;
+Function TRESTDWJSONParam.GetAsCurrency : Currency;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovCurrency);
 End;
 
-Procedure TJSONParam.SetAsCurrency(Value : Currency);
+Procedure TRESTDWJSONParam.SetAsCurrency(Value : Currency);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovCurrency);
 End;
 
-Function TJSONParam.GetAsBoolean  : Boolean;
+Function TRESTDWJSONParam.GetAsBoolean  : Boolean;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovBoolean);
 End;
 
-Procedure TJSONParam.SetAsBoolean (Value : Boolean);
+Procedure TRESTDWJSONParam.SetAsBoolean (Value : Boolean);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovBoolean);
 End;
 
-Function TJSONParam.GetAsDateTime : TDateTime;
+Function TRESTDWJSONParam.GetAsDateTime : TDateTime;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovDateTime);
 End;
 
-Procedure TJSONParam.SetAsDateTime(Value : TDateTime);
+Procedure TRESTDWJSONParam.SetAsDateTime(Value : TDateTime);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovDateTime);
 End;
 
-Procedure TJSONParam.SetAsDate    (Value : TDateTime);
+Procedure TRESTDWJSONParam.SetAsDate    (Value : TDateTime);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovDate);
 End;
 
-Procedure TJSONParam.SetAsTime    (Value : TDateTime);
+Procedure TRESTDWJSONParam.SetAsTime    (Value : TDateTime);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovTime);
 End;
 
-Function TJSONParam.GetAsSingle   : Single;
+Function TRESTDWJSONParam.GetAsSingle   : Single;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovSmallInt);
 End;
 
-Procedure TJSONParam.SetAsSingle  (Value : Single);
+Procedure TRESTDWJSONParam.SetAsSingle  (Value : Single);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovSmallInt);
 End;
 
-Function TJSONParam.GetAsFloat    : Double;
+Function TRESTDWJSONParam.GetAsFloat    : Double;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovFloat);
 End;
 
-Procedure TJSONParam.SetAsFloat   (Value : Double);
+Procedure TRESTDWJSONParam.SetAsFloat   (Value : Double);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovFloat);
 End;
 
-Function TJSONParam.GetAsInteger  : Integer;
+Function TRESTDWJSONParam.GetAsInteger  : Integer;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovInteger);
 End;
 
-Procedure TJSONParam.SetAsInteger (Value : Integer);
+Procedure TRESTDWJSONParam.SetAsInteger (Value : Integer);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovInteger);
 End;
 
-Function TJSONParam.GetAsWord       : Word;
+Function TRESTDWJSONParam.GetAsWord       : Word;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovWord);
 End;
 
-Procedure TJSONParam.SetAsWord      (Value    : Word);
+Procedure TRESTDWJSONParam.SetAsWord      (Value    : Word);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovWord);
 End;
 
-Procedure TJSONParam.SetAsSmallInt(Value : Integer);
+Procedure TRESTDWJSONParam.SetAsSmallInt(Value : Integer);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovSmallInt);
 End;
 
-Procedure TJSONParam.SetAsShortInt(Value : Integer);
+Procedure TRESTDWJSONParam.SetAsShortInt(Value : Integer);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovShortInt);
 End;
 
-Function TJSONParam.GetAsLongWord : LongWord;
+Function TRESTDWJSONParam.GetAsLongWord : LongWord;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovLongWord);
 End;
 
-Procedure TJSONParam.SetAsLongWord(Value : LongWord);
+Procedure TRESTDWJSONParam.SetAsLongWord(Value : LongWord);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovLongWord);
 End;
 
-Function TJSONParam.GetAsLargeInt : LargeInt;
+Function TRESTDWJSONParam.GetAsLargeInt : LargeInt;
 Begin
  If TestNilParam Then
   Exit;
  Result := GetValue(ovLargeInt);
 End;
 
-Procedure TJSONParam.SetAsLargeInt(Value : LargeInt);
+Procedure TRESTDWJSONParam.SetAsLargeInt(Value : LargeInt);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovLargeInt);
 End;
 
-Procedure TJSONParam.SetObjectValue (Value  : TObjectValue);
+Procedure TRESTDWJSONParam.SetObjectValue (Value  : TObjectValue);
 Begin
  If TestNilParam Then
   Exit;
@@ -4584,7 +4673,7 @@ Begin
  vBinary := vObjectValue In [ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob];
 End;
 
-procedure TJSONParam.SetObjectDirection(Value: TObjectDirection);
+procedure TRESTDWJSONParam.SetObjectDirection(Value: TObjectDirection);
 begin
  If TestNilParam Then
   Exit;
@@ -4592,7 +4681,7 @@ begin
  vJSONValue.vObjectDirection := vObjectDirection;
 end;
 
-Function TJSONParam.GetByteString   : String;
+Function TRESTDWJSONParam.GetByteString   : String;
 Var
  Stream  : TStringStream;
  Streamb : TMemoryStream;
@@ -4613,14 +4702,14 @@ Begin
  End;
 End;
 
-Procedure TJSONParam.SetAsObject  (Value : String);
+Procedure TRESTDWJSONParam.SetAsObject  (Value : String);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, ovObject);
 End;
 
-Procedure TJSONParam.SetEncoded(Value: Boolean);
+Procedure TRESTDWJSONParam.SetEncoded(Value: Boolean);
 Begin
  If TestNilParam Then
   Exit;
@@ -4628,7 +4717,7 @@ Begin
  vJSONValue.Encoded := vEncoded;
 End;
 
-procedure TJSONParam.SetParamContentType(const bValue: String);
+procedure TRESTDWJSONParam.SetParamContentType(const bValue: String);
 begin
  If TestNilParam Then
   Exit;
@@ -4636,14 +4725,14 @@ begin
 end;
 
 {$IFDEF RESTDWLAZARUS}
-Procedure TJSONParam.SetDatabaseCharSet (Value  : TDatabaseCharSet);
+Procedure TRESTDWJSONParam.SetDatabaseCharSet (Value  : TDatabaseCharSet);
 Begin
  vJSONValue.DatabaseCharSet := Value;
  vDatabaseCharSet           := vJSONValue.DatabaseCharSet;
 End;
 {$ENDIF}
 
-Function TJSONParam.TestNilParam : Boolean;
+Function TRESTDWJSONParam.TestNilParam : Boolean;
 Begin
  Result := False;
  If Not Assigned(Self) Then
@@ -4654,7 +4743,7 @@ Begin
   End;
 End;
 
-Procedure TJSONParam.Clear;
+Procedure TRESTDWJSONParam.Clear;
 Begin
  vNullValue            := True;
  If vJSONValue <> Nil Then
@@ -4664,10 +4753,11 @@ Begin
   End;
 End;
 
-Constructor TJSONParam.Create(Encoding : TEncodeSelect);
+Constructor TRESTDWJSONParam.Create(Encoding : TEncodeSelect);
 Begin
- vJSONValue          := TJSONValue.Create;
+ vJSONValue          := TRESTDWJSONValue.Create;
  vCripto             := TCripto.Create;
+ vCripto.Use         := False;
  vDataMode           := dmDataware;
  vEncoding           := Encoding;
  vTypeObject         := toParam;
@@ -4688,7 +4778,7 @@ Begin
  {$ENDIF}
 End;
 
-Destructor TJSONParam.Destroy;
+Destructor TRESTDWJSONParam.Destroy;
 Begin
  Clear;
  If vJSONValue <> Nil Then
@@ -4698,21 +4788,21 @@ Begin
  Inherited;
 End;
 
-Function TJSONParam.IsEmpty : Boolean;
+Function TRESTDWJSONParam.IsEmpty : Boolean;
 Begin
  If TestNilParam Then
   Exit;
  Result := IsNull;
 End;
 
-Function TJSONParam.IsNull  : Boolean;
+Function TRESTDWJSONParam.IsNull  : Boolean;
 Begin
  If TestNilParam Then
   Exit;
  Result := vNullValue;
 End;
 
-Procedure TJSONParam.FromJSON(json    : String);
+Procedure TRESTDWJSONParam.FromJSON(json    : String);
 Var
  bJsonValue : TRESTDWJSONInterfaceObject;
  vValue     : String;
@@ -4752,14 +4842,14 @@ Begin
  End;
 End;
 
-Procedure TJSONParam.Assign(Source : TObject);
+Procedure TRESTDWJSONParam.Assign(Source : TObject);
 Var
- Src     : TJSONParam;
+ Src     : TRESTDWJSONParam;
  aStream : TStream;
 Begin
- If Source Is TJSONParam Then
+ If Source Is TRESTDWJSONParam Then
   Begin
-   Src                    := TJSONParam(Source);
+   Src                    := TRESTDWJSONParam(Source);
    vDataMode              := Src.DataMode;
    vEncoded               := Src.Encoded;
    vJSONValue.DataMode    := Src.vDataMode;
@@ -4784,7 +4874,7 @@ Begin
   Raise Exception.Create(cInvalidDWParam);
 End;
 
-Function TJSONParam.ToJSON: String;
+Function TRESTDWJSONParam.ToJSON: String;
 Begin
  If TestNilParam Then
   Exit;
@@ -4804,7 +4894,7 @@ Begin
   End;
 End;
 
-Procedure TJSONParam.SaveToFile(FileName: String);
+Procedure TRESTDWJSONParam.SaveToFile(FileName: String);
 Var
  vStringStream : TStream;
  vFileStream   : TFileStream;
@@ -4842,7 +4932,7 @@ Begin
  End;
 End;
 
-Procedure TJSONParam.CopyFrom(JSONParam : TRESTDWParamMethod);
+Procedure TRESTDWJSONParam.CopyFrom(JSONParam : TRESTDWParamMethod);
 Begin
  If TestNilParam Then
   Exit;
@@ -4857,7 +4947,7 @@ Begin
  End;
 End;
 
-Procedure TJSONParam.CopyFrom(JSONParam : TJSONParam);
+Procedure TRESTDWJSONParam.CopyFrom(JSONParam : TRESTDWJSONParam);
 Var
  vValue  : String;
  vStream : TStream;
@@ -4891,14 +4981,14 @@ Begin
  End;
 End;
 
-Procedure TJSONParam.SetVariantValue(Value  : Variant);
+Procedure TRESTDWJSONParam.SetVariantValue(Value  : Variant);
 Begin
  If TestNilParam Then
   Exit;
  SetDataValue(Value, vObjectValue);
 End;
 
-Procedure TJSONParam.SetDataValue   (Value    : Variant;
+Procedure TRESTDWJSONParam.SetDataValue   (Value    : Variant;
                                      DataType : TObjectValue);
 Var
  ms        : TMemoryStream;
@@ -5011,7 +5101,7 @@ Begin
  End;
 End;
 
-Function TJSONParam.GetVariantValue : Variant;
+Function TRESTDWJSONParam.GetVariantValue : Variant;
 Var
  ms       : TMemoryStream;
  MyBuffer : Pointer;
@@ -5155,7 +5245,7 @@ Begin
   End;
 End;
 
-Function TJSONParam.GetNullValue(Value : TObjectValue) : Variant;
+Function TRESTDWJSONParam.GetNullValue(Value : TObjectValue) : Variant;
 Begin
  If TestNilParam Then
   Exit;
@@ -5204,7 +5294,7 @@ Begin
  End;
 End;
 
-Function TJSONParam.GetValue(Value : TObjectValue) : Variant;
+Function TRESTDWJSONParam.GetValue(Value : TObjectValue) : Variant;
 Var
  ms       : TMemoryStream;
  MyBuffer : Pointer;
@@ -5228,9 +5318,9 @@ Begin
                     Result := GetNullValue(Value)
                    Else
                     Begin
-                     If vJSONValue.ObjectValue in [ovString, ovFixedChar, ovWideString] Then
-                      If vCripto.Use Then
-                       Result := vCripto.Decrypt(Result);
+//                     If vJSONValue.ObjectValue in [ovString, ovFixedChar, ovWideString] Then
+//                      If vCripto.Use Then //TODO Crypt XyberX
+//                       Result := vCripto.Decrypt(Result);
                     End;
                   End;
   ovLargeInt,
@@ -5352,7 +5442,7 @@ Begin
  End;
 End;
 
-Procedure TJSONParam.SetValue    (aValue   : TStream);
+Procedure TRESTDWJSONParam.SetValue    (aValue   : TStream);
 Begin
  If TestNilParam Then
   Exit;
@@ -5367,7 +5457,7 @@ Begin
  vJSONValue.vBinary := True;
 End;
 
-Procedure TJSONParam.SetValue    (aValue : String;
+Procedure TRESTDWJSONParam.SetValue    (aValue : String;
                                   Encode : Boolean);
 Begin
  If TestNilParam Then
@@ -5394,7 +5484,7 @@ Begin
  vJSONValue.vBinary := vBinary;
 End;
 
-Procedure TJSONParam.ToBytes  (Value  : String;
+Procedure TRESTDWJSONParam.ToBytes  (Value  : String;
                                Encode : Boolean);
 Begin
  If TestNilParam Then
@@ -5408,7 +5498,7 @@ Begin
  vJSONValue.vEncoded := vEncoded;
 End;
 
-Procedure TJSONParam.LoadFromStream(Stream : TMemoryStream);
+Procedure TRESTDWJSONParam.LoadFromStream(Stream : TMemoryStream);
 Begin
  If TestNilParam Then
   Exit;
@@ -5419,7 +5509,7 @@ Begin
  vJSONValue.Binary := vBinary;
 End;
 
-Procedure TJSONParam.LoadFromStream(Stream : TStringStream);
+Procedure TRESTDWJSONParam.LoadFromStream(Stream : TStringStream);
 Begin
  If TestNilParam Then
   Exit;
@@ -5430,7 +5520,7 @@ Begin
  vJSONValue.Binary := vBinary;
 End;
 
-Procedure TJSONParam.CopyFromStream(Stream   : TStream;
+Procedure TRESTDWJSONParam.CopyFromStream(Stream   : TStream;
                                     Count    : DWInt64);
 Begin
  If Stream.Size > 0 Then
@@ -5440,7 +5530,7 @@ Begin
   End;
 End;
 
-Procedure TJSONParam.LoadFromStream   (Stream   : TStream);
+Procedure TRESTDWJSONParam.LoadFromStream   (Stream   : TStream);
 Begin
  If TestNilParam Then
   Exit;
@@ -5451,7 +5541,7 @@ Begin
  End;
 End;
 
-Procedure TJSONParam.SaveToStream(Var Stream: TStream);
+Procedure TRESTDWJSONParam.SaveToStream(Var Stream: TStream);
 Var
  aValue : TRESTDWBytes;
 Begin
@@ -5469,7 +5559,7 @@ Begin
  End;
 End;
 
-Procedure TJSONParam.SaveToStream(Var Stream   : TStringStream);
+Procedure TRESTDWJSONParam.SaveToStream(Var Stream   : TStringStream);
 Begin
  If TestNilParam Then
   Exit;
@@ -5478,7 +5568,7 @@ Begin
  SaveToStream(TStream(Stream));
 End;
 
-Procedure TJSONParam.SaveToStream(Var Stream   : TMemoryStream);
+Procedure TRESTDWJSONParam.SaveToStream(Var Stream   : TMemoryStream);
 Begin
  If TestNilParam Then
   Exit;
@@ -5490,7 +5580,7 @@ End;
 
 //Aqui Le os parametros tem que estar syncronizado com a escria dos parametros
 //Alterado por Abrito
-Procedure TJSONParam.LoadFromParam(Param : TParam);
+Procedure TRESTDWJSONParam.LoadFromParam(Param : TParam);
 Var
  MemoryStream : TMemoryStream;
  {$IFDEF DELPHIXEUP}
@@ -5557,7 +5647,7 @@ Begin
  vJSONValue.vObjectValue := vObjectValue;
 End;
 
-Procedure TJSONParam.SaveFromParam(Param : TParam);
+Procedure TRESTDWJSONParam.SaveFromParam(Param : TParam);
 Var
  ms : TStream;
 Begin
@@ -5584,7 +5674,7 @@ Procedure TRESTDWParams.Assign(Source : TList);
 Var
  Src        : TRESTDWParams;
  I          : Integer;
- vJSONParam : TJSONParam;
+ vJSONParam : TRESTDWJSONParam;
 Begin
  If Source is TRESTDWParams Then
   Begin
@@ -5594,7 +5684,7 @@ Begin
      vJSONParam := ItemsString[Src[I].ParamName];
      If vJSONParam = Nil Then
       Begin
-       vJSONParam := TJSONParam.Create(Encoding);
+       vJSONParam := TRESTDWJSONParam.Create(Encoding);
        vJSONParam.Assign(Src[I]);
        Add(vJSONParam);
       End
@@ -5606,21 +5696,21 @@ Begin
   Raise Exception.Create(cInvalidDWParams);
 End;
 
-Function TRESTDWParams.GetRec(Index : Integer) : TJSONParam;
+Function TRESTDWParams.GetRec(Index : Integer) : TRESTDWJSONParam;
 Begin
  Result := Nil;
  If (Index < Self.Count) And (Index > -1) Then
-  Result := TJSONParam(TList(Self).Items[Index]^);
+  Result := TRESTDWJSONParam(TList(Self).Items[Index]^);
 End;
 
 Procedure TRESTDWParams.PutRec(Index : Integer;
-                           Item  : TJSONParam);
+                           Item  : TRESTDWJSONParam);
 Begin
  If (Index < Self.Count) And (Index > -1) Then
-  TJSONParam(TList(Self).Items[Index]^) := Item;
+  TRESTDWJSONParam(TList(Self).Items[Index]^) := Item;
 End;
 
-Function TRESTDWParams.GetRecName(Index : String) : TJSONParam;
+Function TRESTDWParams.GetRecName(Index : String) : TRESTDWJSONParam;
 Var
  I         : Integer;
 Begin
@@ -5629,17 +5719,17 @@ Begin
   Begin
    For i := 0 To Self.Count - 1 Do
     Begin
-     If (Uppercase(Index) = Uppercase(TJSONParam(TList(Self).Items[i]^).vParamName)) Or
-        (Lowercase(Index) = Lowercase(TJSONParam(TList(Self).Items[i]^).vAlias))     Then
+     If (Uppercase(Index) = Uppercase(TRESTDWJSONParam(TList(Self).Items[i]^).vParamName)) Or
+        (Lowercase(Index) = Lowercase(TRESTDWJSONParam(TList(Self).Items[i]^).vAlias))     Then
       Begin
-       Result := TJSONParam(TList(Self).Items[i]^);
+       Result := TRESTDWJSONParam(TList(Self).Items[i]^);
        Break;
       End;
     End;
   End;
 End;
 
-Function TRESTDWParams.GetRawBody : TJSONParam;
+Function TRESTDWParams.GetRawBody : TRESTDWJSONParam;
 Var
  I         : Integer;
 Begin
@@ -5649,7 +5739,7 @@ Begin
 End;
 
 Procedure TRESTDWParams.PutRecName(Index : String;
-                                   Item  : TJSONParam);
+                                   Item  : TRESTDWJSONParam);
 Var
  I         : Integer;
  vNotFount : Boolean;
@@ -5659,10 +5749,10 @@ Begin
   Begin
    For i := 0 To Self.Count - 1 Do
     Begin
-     If (Lowercase(Index) = Lowercase(TJSONParam(TList(Self).Items[i]^).vParamName)) Or
-        (Lowercase(Index) = Lowercase(TJSONParam(TList(Self).Items[i]^).vAlias))     Then
+     If (Lowercase(Index) = Lowercase(TRESTDWJSONParam(TList(Self).Items[i]^).vParamName)) Or
+        (Lowercase(Index) = Lowercase(TRESTDWJSONParam(TList(Self).Items[i]^).vAlias))     Then
       Begin
-       TJSONParam(TList(Self).Items[i]^) := Item;
+       TRESTDWJSONParam(TList(Self).Items[i]^) := Item;
        vNotFount := False;
        Break;
       End;
@@ -5670,13 +5760,13 @@ Begin
   End;
  If vNotFount Then
   Begin
-   Item           := TJSONParam.Create(Encoding);
+   Item           := TRESTDWJSONParam.Create(Encoding);
    Item.ParamName := Index;
    Add(Item);
   End;
 End;
 
-Procedure TRESTDWParams.PutRawBody(Item  : TJSONParam);
+Procedure TRESTDWParams.PutRawBody(Item  : TRESTDWJSONParam);
 Var
  I         : Integer;
  vNotFount : Boolean;
@@ -5686,10 +5776,10 @@ Begin
   Begin
    For i := 0 To Self.Count - 1 Do
     Begin
-     If (Lowercase(cUndefined) = Lowercase(TJSONParam(TList(Self).Items[i]^).vParamName)) Or
-        (Lowercase(cUndefined) = Lowercase(TJSONParam(TList(Self).Items[i]^).vAlias))     Then
+     If (Lowercase(cUndefined) = Lowercase(TRESTDWJSONParam(TList(Self).Items[i]^).vParamName)) Or
+        (Lowercase(cUndefined) = Lowercase(TRESTDWJSONParam(TList(Self).Items[i]^).vAlias))     Then
       Begin
-       TJSONParam(TList(Self).Items[i]^) := Item;
+       TRESTDWJSONParam(TList(Self).Items[i]^) := Item;
        vNotFount := False;
        Break;
       End;
@@ -5697,7 +5787,7 @@ Begin
   End;
  If vNotFount Then
   Begin
-   Item           := TJSONParam.Create(Encoding);
+   Item           := TRESTDWJSONParam.Create(Encoding);
    Item.ParamName := cUndefined;
    Add(Item);
   End;
@@ -5745,12 +5835,12 @@ End;
 Procedure   TRESTDWParams.CreateParam(ParamName : String;
                                   Value     : String = '');
 Var
- vItem : TJSONParam;
+ vItem : TRESTDWJSONParam;
 Begin
  vItem := ItemsString[ParamName];
  If vItem = Nil Then
   Begin
-   vItem           := TJSONParam.Create(Encoding);
+   vItem           := TRESTDWJSONParam.Create(Encoding);
    vItem.ParamName := ParamName;
    If Value <> '' Then
     vItem.AsString := Value;
@@ -5786,7 +5876,7 @@ Begin
  Result := 0;
  For i := 0 To Count - 1 Do
   Begin
-   If TJSONParam(TList(Self).Items[i]^).ObjectDirection in [odOUT, odINOUT] Then
+   If TRESTDWJSONParam(TList(Self).Items[i]^).ObjectDirection in [odOUT, odINOUT] Then
     Result := Result + 1;
   End;
 End;
@@ -5798,7 +5888,7 @@ Begin
  Result := 0;
  For i := 0 To Count - 1 Do
   Begin
-   If TJSONParam(TList(Self).Items[i]^).ObjectDirection in [odIN, odINOUT] Then
+   If TRESTDWJSONParam(TList(Self).Items[i]^).ObjectDirection in [odIN, odINOUT] Then
     Result := Result + 1;
   End;
 End;
@@ -5812,13 +5902,13 @@ Begin
   Begin
    For i := 0 To Self.Count - 1 Do
     Begin
-     If TJSONParam(TList(Self).Items[i]^).vObjectValue <> ovUnknown Then
+     If TRESTDWJSONParam(TList(Self).Items[i]^).vObjectValue <> ovUnknown Then
       Begin
-       TJSONParam(TList(Self).Items[i]^).DataMode := DataMode;
+       TRESTDWJSONParam(TList(Self).Items[i]^).vDataMode := DataMode;
        If I = 0 Then
-        Result := TJSONParam(TList(Self).Items[i]^).ToJSON
+        Result := TRESTDWJSONParam(TList(Self).Items[i]^).ToJSON
        Else
-        Result := Result + ', ' + TJSONParam(TList(Self).Items[i]^).ToJSON;
+        Result := Result + ', ' + TRESTDWJSONParam(TList(Self).Items[i]^).ToJSON;
       End;
     End;
   End;
@@ -5842,7 +5932,7 @@ Var
  bJsonOBJ,
  bJsonValue    : TRESTDWJSONInterfaceObject;
  bJsonArray    : TRESTDWJSONInterfaceArray;
- JSONParam     : TJSONParam;
+ JSONParam     : TRESTDWJSONParam;
  I             : Integer;
  vTempString   : String;
  //BinaryRequest
@@ -5890,7 +5980,7 @@ Begin
        Else
         JSONParam.SetValue('null',JSONParam.Encoded);
       Finally
-       bJsonOBJ.Free;
+//       bJsonOBJ.Free;
       End;
      End
     Else
@@ -5905,14 +5995,15 @@ Begin
        Add(JSONParam);
       Finally
        vStringStream.Free;
-       bJsonOBJ.Free;
+//       bJsonOBJ.Free;
       End;
      End;
    End;
  Finally
   If Not BinaryRequest Then
-   bJsonArray.Free;
-  bJsonValue.Free;
+   FreeAndNil(bJsonArray);
+  If Assigned(bJsonValue) Then
+   FreeAndNil(bJsonValue);
   If BinaryRequest Then
    vParam.Free;
  End;
@@ -5922,7 +6013,7 @@ Procedure TRESTDWParams.CopyFrom(DWParams : TRESTDWParams);
 Var
  I         : Integer;
  p,
- JSONParam : TJSONParam;
+ JSONParam : TRESTDWJSONParam;
 Begin
  ClearList;
  If Assigned(DWParams) Then
@@ -5930,7 +6021,7 @@ Begin
    For i := 0 To DWParams.Count - 1 Do
     Begin
      p         := DWParams.Items[i];
-     JSONParam := TJSONParam.Create(DWParams.Encoding);
+     JSONParam := TRESTDWJSONParam.Create(DWParams.Encoding);
      JSONParam.CopyFrom(p);
      Add(JSONParam);
     End;
@@ -5945,11 +6036,11 @@ Begin
     If Assigned(TList(Self).Items[Index])  Then
      Begin
       {$IF Defined(RESTDWLAZARUS) or not(Defined(DELPHI10_4UP))}
-        FreeAndNil(TList(Self).Items[Index]^);
+       FreeAndNil(TList(Self).Items[Index]^);
       {$ELSE}
-        FreeAndNil(TJSONParam(TList(Self).Items[Index]^));
+       FreeAndNil(TRESTDWJSONParam(TList(Self).Items[Index]^));
       {$IFEND}
-      Dispose(PJSONParam(TList(Self).Items[Index]));
+      Dispose(PRESTDWJSONParam(TList(Self).Items[Index]));
      End;
    Except
    End;
@@ -5957,7 +6048,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWParams.Delete(Param : TJSONParam);
+Procedure TRESTDWParams.Delete(Param : TRESTDWJSONParam);
 Var
  I : Integer;
 Begin
@@ -5971,9 +6062,9 @@ Begin
   End;
 End;
 
-Function TRESTDWParams.Add(Item : TJSONParam): Integer;
+Function TRESTDWParams.Add(Item : TRESTDWJSONParam): Integer;
 Var
- vItem : PJSONParam;
+ vItem : PRESTDWJSONParam;
 Begin
  New(vItem);
  vItem^                  := Item;
@@ -6014,7 +6105,7 @@ Var
   P        : TStream;
   T        : DWFieldTypeSize;
   D        : TDateTime;
-  aParam   : TJSONParam;
+  aParam   : TRESTDWJSONParam;
   vBytesString : TRESTDWBytes;
  Begin
   For I := 0 To Count - 1 do
@@ -6031,7 +6122,7 @@ Var
      End;
     aCount := aCount + 1;
     //ParamName
-    S := aParam.ParamName;
+    S := aParam.vParamName;
     L := Length(S);
     Stream.Write(L, Sizeof(DWInt64));
     {$IFNDEF RESTDWLAZARUS}
@@ -6044,7 +6135,7 @@ Var
     Stream.Write(T, Sizeof(DWFieldTypeSize));
     //Encoded
     B := aParam.Encoded;
-    Stream.Write(B, Sizeof(WordBool));
+    Stream.Write(B, Sizeof(Boolean));
     //DataMode
     T := DWFieldTypeSize(aParam.DataMode);
     Stream.Write(T, Sizeof(DWFieldTypeSize));
@@ -6090,7 +6181,7 @@ Var
                      If (aParam.IsEmpty Or aParam.IsNull) Then
                       S := TNullString;
                      J := Length(S);
-                     Stream.Write(J, Sizeof(DWInteger));
+                     Stream.Write(J, Sizeof(DWInt64));
                      Stream.Write(S[InitStrPos], J);
                      If S <> TNullString Then
                       Begin
@@ -6232,8 +6323,17 @@ Begin
   Stream.Write(ParamsHeader, SizeOf(TRESTDWParamsHeader));
   //Write dwParamsBinList
   SaveParamsToStream(Stream);
+
   //Remap Bin size
   EndPos := Stream.Position;
+   //DumPstream
+//   Stream.Position := 0;
+//   TMemoryStream(Stream).SaveToFile('c:\tmp\dump1.rdw');
+
+  //
+
+
+
   ParamsHeader.DataSize    := EndPos - StartPos - SizeOf(TRESTDWParamsHeader);
   ParamsHeader.ParamsCount := aCount;
   //Rewrite init Header
@@ -6291,7 +6391,7 @@ Var
   VC           : Currency;
   VF           : DWFloat;
   vStringBytes : TRESTDWBytes;
-  vItem        : TJSONParam;
+  vItem        : TRESTDWJSONParam;
   vStream      : TStream;
  Begin
   For I := 0 To ParamsCount -1 Do
@@ -6311,7 +6411,7 @@ Var
     vItem := ItemsString[S];
     If Not Assigned(vItem) Then
      Begin
-      vItem := TJSONParam.Create(Encoding);
+      vItem := TRESTDWJSONParam.Create(Encoding);
       Add(vItem);
      End;
     //ParamName
@@ -6320,7 +6420,7 @@ Var
     Stream.Read(T, Sizeof(DWFieldTypeSize));
     vItem.ObjectDirection := TObjectDirection(T);
     //Encoded
-    Stream.Read(B, Sizeof(WordBool));
+    Stream.Read(B, Sizeof(Boolean));
     vItem.Encoded := B;
     //DataMode
     Stream.Read(T, Sizeof(DWFieldTypeSize));
@@ -6368,7 +6468,7 @@ Var
        ovLongWord,
        ovShortint,
        ovLargeint : Begin
-                     Stream.Read(J, Sizeof(DWInteger));
+                     Stream.Read(J, Sizeof(DWInt64));
                      SetLength(S, J);
                      If J <> 0 Then
                       Begin
@@ -6505,6 +6605,9 @@ Begin
  If Not Assigned(Stream) Then
   Exit;
  Stream.Position := 0;
+ //Dump stream
+//  TMemoryStream(Stream).SaveToFile('c:\tmp\dump_dest.rdw');
+//  Stream.Position:=0;
  ParamsHeader.VersionNumber := 0;
  ParamsHeader.RecordCount   := 0;
  ParamsHeader.ParamsCount   := 0;
@@ -6535,14 +6638,14 @@ End;
 Procedure TRESTDWParams.LoadFromParams(Params : TParams);
 Var
  I : Integer;
- vDwParam : TJSONParam;
+ vDwParam : TRESTDWJSONParam;
 Begin
  Clear;
  If Assigned(Params) Then
   Begin
    For I := 0 To Params.Count -1 Do
     Begin
-     vDwParam := TJSONParam.Create(Encoding);
+     vDwParam := TRESTDWJSONParam.Create(Encoding);
      vDwParam.LoadFromParam(Params[I]);
      Add(vDwParam);
     End;

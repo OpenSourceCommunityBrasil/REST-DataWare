@@ -24,6 +24,10 @@ unit uRESTDWMessageCoder;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 uses
   Classes, SysUtils, uRESTDWAbout, uRESTDWMessage, uRESTDWTools, uRESTDWConsts, uRESTDWException;
 

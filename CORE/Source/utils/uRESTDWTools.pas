@@ -27,7 +27,7 @@ Uses
  LConvEncoding, lazutf8,
  {$ELSE}
  {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
- {$IFDEF RESTDWFMX}IOUtils,{$ENDIF}
+ {$IFDEF RESTDWFMX}IOUtils,System.WideStrUtils,{$ENDIF}
  {$IFDEF DELPHIXE6UP}NetEncoding,{$ENDIF}
  EncdDecd,
  {$ENDIF}
@@ -63,6 +63,20 @@ Type
   CHAR32        = #32;
   LWS           = TAB + CHAR32;
 
+ Function ExtractDelimited        (N                    : Integer;
+                                   Const S              : String;
+                                   Const Delims         : TSysCharSet)     : String;
+ Function  MidStr                 (Const AText          : WideString;
+                                   Const AStart,
+                                   ACount               : Int64)           : WideString;
+ Function  RightStr               (Const AText          : WideString;
+                                   Const ACount         : Int64) : WideString;
+ Function  LeftStr                (Const AText          : WideString;
+                                   Const ACount         : Int64)           : WideString;
+ Function  CompareByte            (Const buf1, buf2;
+                                   len                  : Int64)           : Int64;
+ Function  WordCount              (Const S              : String;
+                                   Const WordDelims     : TSysCharSet)     : Int64;
  Function  EncryptSHA256          (Key, Text            : TRESTDWString;
                                    Encrypt              : Boolean)         : String;
  Function  EncodeStrings          (Value                : String
@@ -571,7 +585,7 @@ Begin
     dwftLongWord        : Result := ftLongWord;
     dwftShortint        : Result := ftShortint;
     dwftByte            : Result := ftByte;
-    dwftExtended        : Result := ftExtended;
+    //dwftExtended        : Result := ftExtended; gledston
     dwftConnection      : Result := ftConnection;
     dwftParams          : Result := ftParams;
     dwftStream          : Result := ftStream;
@@ -1220,7 +1234,7 @@ Begin
  If LLength > 0 Then
  Begin
    {$IF Defined(RESTDWLAZARUS) OR not Defined(LINUXFMX)}
-   SetString(Result, PAnsiChar(@AValue[AStartIndex]), LLength);
+   SetString(Result, PWideChar(@AValue[AStartIndex]), LLength);
    {$ELSEIF Defined(LINUXFMX)}
    SetString(Result, PChar(@AValue[AStartIndex]), LLength);
    {$IFEND}
@@ -1688,6 +1702,7 @@ Begin
  LLength := restdwLength(AStr, ALength, AIndex);
  If LLength > 0 Then
   Begin
+
    LBytes := ToBytes(AStr, LLength, AIndex);
    TRESTDWStreamHelper.Write(AStream, LBytes);
   End;
@@ -1723,20 +1738,24 @@ End;
 Function RawToBytes(Const AValue : String;
                     Const ASize  : Integer) : TRESTDWBytes;
 Var
- vSizeChar : Integer;
+// vSizeChar : Integer;
  vString   : String;
 Begin
- vSizeChar := 1;
- If SizeOf(WideChar) > 1 Then
-  vSizeChar := 2;
+// vSizeChar := 1;
+// If SizeOf(WideChar) > 1 Then
+//  vSizeChar := 2;
 // SetLength(Result, ASize * vSizeChar);
  SetLength(Result, ASize);
  If ASize > 0 Then
- Begin
+  Begin
    {$IF Defined(RESTDWLAZARUS) OR not Defined(RESTDWFMX)}
    Move(AnsiString(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
    {$ELSEIF Defined(RESTDWFMX)}
-   Move(Utf8String(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
+    If IsUTF8String(AValue) Then
+     Move(Utf8String(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result))
+    Else
+     Move(AnsiString(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
+  // Move(Utf8String(AValue)[InitStrPos], PRESTDWBytes(Result)^, Length(Result));
    {$IFEND}
   End;
 End;
@@ -3275,7 +3294,7 @@ Begin
   {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
    SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
   {$ELSEIF Defined(DELPHIXEUP)}
-    SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
+    SetString(Result, PWideChar(LBytes), restdwLength(LBytes));
     {$IFDEF MSWINDOWS}
      Result := TEncoding.ANSI.GetString(TBytes(LBytes));
     {$ELSE}
@@ -3337,9 +3356,9 @@ Begin
   {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
    SetString(Result, PAnsiChar(bin), I);
   {$ELSE}
-    SetString(Result, PAnsiChar(bin), I);
+    //SetString(Result, PWideChar(bin), I);       //gledston
     {$IFDEF RESTDWWINDOWS}
-    Result := TEncoding.ANSI.GetString(TBytes(bin));
+    Result :=TEncoding.ANSI.GetString(TBytes(bin));
     {$ELSE}
     Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
     {$ENDIF}
@@ -3446,16 +3465,16 @@ Begin
    SA := S;
    If Pos(sLineBreak, SA) > 0 Then
     SA := StringReplace(SA, sLineBreak, '', [rfReplaceAll]);
-    {$IFDEF RESTDWMOBILE} //Alterado para IOS Brito
-     ne     := TBase64Encoding.Create(-1, '');
-     Try
-      Result := ne.Decode(SA);
-     Finally
-      FreeAndNil(ne);
-     End;
-    {$ELSE}
+//    {$IFDEF RESTDWMOBILE} //Alterado para IOS Brito
+//     ne     := TBase64Encoding.Create(-1, '');
+//     Try
+//      Result := ne.Decode(SA);
+//     Finally
+//      FreeAndNil(ne);
+//     End;
+//    {$ELSE}
      Result := BytesToString(Base64Decode(SA));
-   {$ENDIF}
+//   {$ENDIF}
   End;
 End;
 
@@ -3689,6 +3708,104 @@ Begin
      End;
   End;
  Result := Result + Copy(ALine, LLinePos, MaxInt);
+End;
+
+Function WordCount(Const S          : String;
+                   Const WordDelims : TSysCharSet) : Int64;
+Var
+ P,
+ PE : PChar;
+Begin
+ Result :=0;
+ P      := PChar(Pointer(S));
+ PE     := P + Length(S);
+ While (P < PE) Do
+  Begin
+   While (P<PE)             And
+         (P^ In WordDelims) Do
+    Inc(P);
+   If (P<PE) Then
+    Inc(Result);
+   While (P<PE)                And
+         Not(P^ In WordDelims) Do
+    Inc(P);
+  End;
+End;
+
+Function LeftStr(Const AText  : WideString;
+                 const ACount : Int64)  : WideString;
+Begin
+ Result := Copy(AText, 1, ACount);
+End;
+
+Function RightStr(Const AText  : WideString;
+                  Const ACount : Int64) : WideString;
+Var
+ j, l : Int64;
+Begin
+ l := Length(atext);
+ j := ACount;
+ If j > l Then
+  j  := l;
+ Result := Copy(AText, l-j +1, j);
+End;
+
+Function MidStr(Const AText  : WideString;
+                Const AStart,
+                ACount       : Int64) : WideString;
+Begin
+ Result := Copy(AText, AStart, ACount);
+End;
+
+Function CompareByte(const buf1, buf2; len : Int64): Int64;
+Var
+ vBytes1,
+ vBytes2  : TRESTDWBytes;
+begin
+ Result := 0;
+ SetLength(vBytes1, len);
+ SetLength(vBytes2, len);
+ Try
+  Move(TRESTDWBytes(@buf1)[0], vBytes1[0], len);
+  Move(TRESTDWBytes(@buf2)[0], vBytes2[0], len);
+  If CompareMem(@vBytes1[0], @vBytes2[0], len) Then
+   Result := len;
+ Finally
+  SetLength(vBytes1, 0);
+  SetLength(vBytes2, 0);
+ End;
+end;
+
+Function ExtractDelimited(N           : Integer;
+                         Const S      : String;
+                         Const Delims : TSysCharSet) : String;
+Var
+ w,
+ i,
+ l,
+ len : Int64;
+Begin
+ w   := 0;
+ i   := 1;
+ l   := 0;
+ len := Length(S);
+ SetLength(Result, 0);
+ While (i <= len) And
+       (w <> N)   Do
+  Begin
+   If s[i] In Delims Then
+    Inc(w)
+   Else
+    Begin
+     If (N-1) = w Then
+      Begin
+       Inc(l);
+       SetLength(Result,l);
+       Result[L]:=S[i];
+      End;
+    End;
+   inc(i);
+  End;
 End;
 
 Function EncryptSHA256(Key, Text : TRESTDWString;

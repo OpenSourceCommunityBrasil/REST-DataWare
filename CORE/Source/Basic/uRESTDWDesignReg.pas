@@ -40,9 +40,9 @@ uses
   ToolsApi, DesignEditors, DSDesign, DesignIntf, ColnEdit,
   {$ENDIF}
   Db, SysUtils, Classes, Menus,
-  uRESTDWBasicClass, uRESTDWDatamodule, uRESTDWServerEvents, uRESTDWBasicDB,
-  uRESTDWServerContext, uRESTDWMassiveBuffer, uRESTDWMemoryDataset, uRESTDWBufferDb,
-  uRESTDWAbout, uRESTDWDriverBase, uRESTDWAuthenticators;
+  uRESTDWBasicClass,     uRESTDWDatamodule,   uRESTDWServerEvents,  uRESTDWBasicDB,
+  uRESTDWServerContext,  uRESTDWServerRoutes, uRESTDWMassiveBuffer, uRESTDWMemoryDataset,
+  uRESTDWBufferDb,       uRESTDWAbout,        uRESTDWDriverBase,    uRESTDWAuthenticators;
 
 {$IFNDEF RESTDWDELPHINET}
 Const
@@ -739,13 +739,14 @@ Begin
 //  RegisterProjectFileDescriptor(PDRESTDWDatamodule);
 //  FormEditingHook.RegisterDesignerBaseClass(TServerMethodDataModule);
  {$ENDIF}
-// RegisterComponents('REST Dataware - Service',     [TRESTDWServiceNotification]);
- RegisterComponents('REST Dataware - Client',      [TRESTDWClientEvents]);
- RegisterComponents('REST Dataware - API',         [TRESTDWServerEvents,       TRESTDWServerContext, TRESTDWContextRules]);
- RegisterComponents('REST Dataware - Tools',       [TRESTDWResponseTranslator, TRESTDWBufferDB]);
- RegisterComponents('REST Dataware - DB',          [TRESTDWPoolerDB,           TRESTDWMemTable,      TRESTDWClientSQL,
-                                                    TRESTDWTable,              TRESTDWUpdateSQL,     TRESTDWMassiveSQLCache,
-                                                    TRESTDWStoredProcedure,    TRESTDWMassiveCache,  TRESTDWBatchMove]);
+// RegisterComponents('REST Dataware - Service',      [TRESTDWServiceNotification]);
+ RegisterComponents('REST Dataware - Client',         [TRESTDWClientEvents]);
+ RegisterComponents('REST Dataware - API',            [TRESTDWServerEvents,       TRESTDWServerContext, TRESTDWServerRoutes,
+                                                       TRESTDWContextRules]);
+ RegisterComponents('REST Dataware - Tools',          [TRESTDWResponseTranslator, TRESTDWBufferDB]);
+ RegisterComponents('REST Dataware - DB',             [TRESTDWPoolerDB,           TRESTDWMemTable,      TRESTDWClientSQL,
+                                                       TRESTDWTable,              TRESTDWUpdateSQL,     TRESTDWMassiveSQLCache,
+                                                       TRESTDWStoredProcedure,    TRESTDWMassiveCache,  TRESTDWBatchMove]);
  RegisterComponents('REST Dataware - Authenticators', [TRESTDWAuthBasic,       TRESTDWAuthToken,     TRESTDWAuthOAuth]);
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF RESTDWLAZARUS}

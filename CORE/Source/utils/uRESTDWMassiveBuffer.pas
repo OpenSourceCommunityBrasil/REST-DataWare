@@ -22,6 +22,12 @@ unit uRESTDWMassiveBuffer;
  Roniery                    - Devel.
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 interface
 
 uses
@@ -44,7 +50,7 @@ End;
   vIsNull,
   vModified,
   vBinary     : Boolean;
-  vJSONValue  : TJSONValue;
+  vJSONValue  : TRESTDWJSONValue;
   {$IFDEF RESTDWLAZARUS}
    vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
@@ -142,12 +148,12 @@ End;
  Protected
  Public
   Constructor Create(MassiveDataset : TMassiveDataset);
-  Destructor Destroy;Override;
-  Procedure  Delete(Index : Integer);                          Overload;
-  Procedure  Delete(FieldName : String);                       Overload;
-  Function   Add   (Item  : TMassiveField) : Integer;          Overload;
-  Function   FieldByName(FieldName : String) : TMassiveField;
-  Property   Items[Index  : Integer]       : TMassiveField Read GetRec Write PutRec; Default;
+  Destructor  Destroy;Override;
+  Procedure   Delete(Index : Integer);                          Overload;
+  Procedure   Delete(FieldName : String);                       Overload;
+  Function    Add   (Item  : TMassiveField) : Integer;          Overload;
+  Function    FieldByName(FieldName : String) : TMassiveField;
+  Property    Items[Index  : Integer]       : TMassiveField Read GetRec Write PutRec; Default;
 End;
 
  TMassiveLine          = Class(TObject)
@@ -571,7 +577,8 @@ Begin
    TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].ObjectValue    := vFieldType;
    TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].vJSONValue.ObjectValue := vFieldType;
    If Not TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].isnull Then
-    TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].OldValue      := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].Value
+    TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].OldValue      := TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[
+    vRecNo -1].vMassiveValues.Items[vFieldIndex +1].Value
    Else
     TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].OldValue      := Null;
    TMassiveDatasetBuffer(TMassiveFields(vMassiveFields).vMassiveDataset).vMassiveBuffer.Items[vRecNo -1].vMassiveValues.Items[vFieldIndex +1].Value          := Value;
@@ -651,7 +658,7 @@ Var
 Begin
  New(vItem);
  vItem^ := Item;
- Result := TList(Self).Add(vItem);
+ Result := Inherited Add(vItem);
 End;
 
 Procedure TMassiveFields.Delete(FieldName : String);
@@ -686,7 +693,11 @@ Begin
      {$IFDEF RESTDWLAZARUS}
       Dispose(PMassiveField(TList(Self).Items[Index]));
      {$ELSE}
-      Dispose(TList(Self).Items[Index]);
+      {$IFDEF FPC}
+       Dispose(PMassiveField(TList(Self).Items[Index]));
+      {$ELSE}
+       Dispose(TList(Self).Items[Index]);
+      {$ENDIF}
      {$ENDIF}
     End;
    TList(Self).Delete(Index);
@@ -699,7 +710,7 @@ Var
 Begin
  For I := Count -1 DownTo 0 Do
   Delete(I);
- Self.Clear;
+ Inherited Clear;
 End;
 
 Constructor TMassiveFields.Create(MassiveDataset: TMassiveDataset);
@@ -757,7 +768,7 @@ Begin
  vIsNull    := True;
  vModified  := False;
  vOldValue  := Null;
- vJSONValue := TJSONValue.Create;
+ vJSONValue := TRESTDWJSONValue.Create;
 End;
 
 Function   TMassiveValue.AsString : String;
@@ -934,7 +945,11 @@ Begin
       Begin
        Try
         TMassiveValue(TList(Self).Items[Index]^).Free;
-        Dispose(TList(Self).Items[Index]);
+        {$IFDEF FPC}
+         Dispose(PMassiveValue(TList(Self).Items[Index]));
+        {$ELSE}
+         Dispose(TList(Self).Items[Index]);
+        {$ENDIF}
        Except
        End;
       End;
@@ -1234,7 +1249,11 @@ Begin
       {$IFDEF RESTDWLAZARUS}
        Dispose(PMassiveLine(TList(Self).Items[Index]));
       {$ELSE}
-       Dispose(TList(Self).Items[Index]);
+       {$IFDEF FPC}
+        Dispose(PMassiveLine(TList(Self).Items[Index]));
+       {$ELSE}
+        Dispose(TList(Self).Items[Index]);
+       {$ENDIF}
       {$ENDIF}
      Except
      End;
@@ -1356,7 +1375,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
       Field := Dataset.FindField(vFieldList[I]);
       If Field <> Nil Then
        Begin
-        If (Field.ProviderFlags = []) Then //Or (Field.ReadOnly) Then
+        If (Field.ProviderFlags = []) Then
          Continue;
         MassiveLineBuff.vMassiveValues.Items[I + 1].vJSONValue.ObjectValue := FieldTypeToObjectValue(Field.DataType);
         If MassiveModeBuff = mmDelete Then
@@ -1651,81 +1670,84 @@ Begin
   End;
  vSequenceName     := Dataset.SequenceName;
  vSequenceField    := Dataset.SequenceField;
- For I := 0 To Dataset.Fields.Count -1 Do
+// If vMassiveFields.Count = 0 Then
   Begin
-   If ((Dataset.Fields[I].FieldKind = fkData)             And
-       ((pfInUpdate in Dataset.Fields[I].ProviderFlags)   Or
-        (pfInWhere  in Dataset.Fields[I].ProviderFlags)   Or
-        (pfInKey    in Dataset.Fields[I].ProviderFlags))) Or
-      (vReflectChanges And ((Dataset.Fields[I].ReadOnly)  Or
-       (Not(Dataset.Fields[I].ProviderFlags = []))))      Then
+   For I := 0 To Dataset.Fields.Count -1 Do
     Begin
-     MassiveField                    := vMassiveFields.FieldByName(Dataset.Fields[I].FieldName);
-     If MassiveField = Nil Then
+     If ((Dataset.Fields[I].FieldKind = fkData)             And
+         ((pfInUpdate in Dataset.Fields[I].ProviderFlags)   Or
+          (pfInWhere  in Dataset.Fields[I].ProviderFlags)   Or
+          (pfInKey    in Dataset.Fields[I].ProviderFlags))) Or
+          (vReflectChanges And ((Dataset.Fields[I].ReadOnly)  Or
+         (Not(Dataset.Fields[I].ProviderFlags = []))))      Then
       Begin
-       MassiveField                   := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
-       vMassiveFields.Add(MassiveField);
-      End;
-     MassiveField.vReadOnly          := Dataset.Fields[I].ReadOnly;
-     MassiveField.vRequired          := Dataset.Fields[I].Required;
-     MassiveField.vKeyField          := pfInKey in Dataset.Fields[I].ProviderFlags;
-     MassiveField.vFieldName         := Dataset.Fields[I].FieldName;
-     MassiveField.vFieldType         := FieldTypeToObjectValue(Dataset.Fields[I].DataType);
-     MassiveField.vSize              := Dataset.Fields[I].DataSize;
-     {$IFDEF DELPHIXEUP}
-     MassiveField.vAutoGenerateValue := ((Dataset.Fields[I].AutoGenerateValue = arAutoInc) Or
-                                           (Lowercase(Dataset.Fields[I].FieldName) = Lowercase(vSequenceField)));
-
-     If Not (MassiveField.vAutoGenerateValue) Then
-       MassiveField.vAutoGenerateValue := ((Dataset.Fields[I].FieldKind = fkInternalCalc) Or
-                                            (Lowercase(Dataset.Fields[I].FieldName) = Lowercase(vSequenceField)));
-     {$ELSE}
-     MassiveField.vAutoGenerateValue := ((Dataset.Fields[I].FieldKind = fkInternalCalc) Or
-                                         (Lowercase(Dataset.Fields[I].FieldName) = Lowercase(vSequenceField)));
-     {$ENDIF}
-    End
-   Else
-    Begin
-     If (Not(vReflectChanges) And
-        ((Dataset.Fields[I].ReadOnly) Or (Dataset.Fields[I].ProviderFlags = []))) Or
-        (vReflectChanges And (Dataset.Fields[I].ProviderFlags = [])) Then
-      Begin
-       If vMassiveFields.FieldByName(Dataset.Fields[I].FieldName) <> Nil Then
+       MassiveField                    := vMassiveFields.FieldByName(Dataset.Fields[I].FieldName);
+       If MassiveField = Nil Then
         Begin
-         If Dataset is TRESTDWClientSQL Then
-          TRESTDWClientSQL(Dataset).RebuildMassiveDataset
-         Else If Dataset is TRESTDWTable Then
-          TRESTDWTable(Dataset).RebuildMassiveDataset;
-         Exit;
-         //vMassiveFields.Delete(Dataset.Fields[I].FieldName);
+         MassiveField                   := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
+         vMassiveFields.Add(MassiveField);
+        End;
+       MassiveField.vReadOnly          := Dataset.Fields[I].ReadOnly;
+       MassiveField.vRequired          := Dataset.Fields[I].Required;
+       MassiveField.vKeyField          := pfInKey in Dataset.Fields[I].ProviderFlags;
+       MassiveField.vFieldName         := Dataset.Fields[I].FieldName;
+       MassiveField.vFieldType         := FieldTypeToObjectValue(Dataset.Fields[I].DataType);
+       MassiveField.vSize              := Dataset.Fields[I].DataSize;
+       {$IFDEF DELPHIXEUP}
+        MassiveField.vAutoGenerateValue := ((Dataset.Fields[I].AutoGenerateValue = arAutoInc) Or
+                                            (Lowercase(Dataset.Fields[I].FieldName) = Lowercase(vSequenceField)));
+        If Not (MassiveField.vAutoGenerateValue) Then
+         MassiveField.vAutoGenerateValue := ((Dataset.Fields[I].FieldKind = fkInternalCalc) Or
+                                             (Lowercase(Dataset.Fields[I].FieldName) = Lowercase(vSequenceField)));
+       {$ELSE}
+        MassiveField.vAutoGenerateValue := ((Dataset.Fields[I].FieldKind = fkInternalCalc) Or
+                                            (Lowercase(Dataset.Fields[I].FieldName) = Lowercase(vSequenceField)));
+       {$ENDIF}
+      End
+     Else
+      Begin
+       If (Not(vReflectChanges)                         And
+          ((Dataset.Fields[I].ReadOnly)                 Or
+           (Dataset.Fields[I].ProviderFlags = [])))     Or
+          (vReflectChanges And (Dataset.Fields[I].ProviderFlags = [])) Then
+        Begin
+         If vMassiveFields.FieldByName(Dataset.Fields[I].FieldName) <> Nil Then
+          Begin
+           If Dataset is TRESTDWClientSQL Then
+            TRESTDWClientSQL(Dataset).RebuildMassiveDataset
+           Else If Dataset is TRESTDWTable Then
+            TRESTDWTable(Dataset).RebuildMassiveDataset;
+           Exit;
+           //vMassiveFields.Delete(Dataset.Fields[I].FieldName);
+          End;
         End;
       End;
     End;
-  End;
- If vReflectChanges Then
-  Begin
-   If vMassiveFields.Count > 0 Then
+   If vReflectChanges Then
     Begin
-     vMassiveLine.vMassiveMode       := mmBrowse;
-     MassiveField                    := vMassiveFields.FieldByName(RESTDWFieldBookmark);
-     If MassiveField = Nil Then
+     If vMassiveFields.Count > 0 Then
       Begin
-       MassiveField                  := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
-       vMassiveFields.Add(MassiveField);
+       vMassiveLine.vMassiveMode       := mmBrowse;
+       MassiveField                    := vMassiveFields.FieldByName(RESTDWFieldBookmark);
+       If MassiveField = Nil Then
+        Begin
+         MassiveField                  := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
+         vMassiveFields.Add(MassiveField);
+        End;
+       MassiveField.vRequired          := False;
+       MassiveField.vKeyField          := False;
+       MassiveField.vFieldName         := RESTDWFieldBookmark;
+       MassiveField.vFieldType         := ovString;
+       MassiveField.vSize              := 60;
+       MassiveField.vAutoGenerateValue := True;
       End;
-     MassiveField.vRequired          := False;
-     MassiveField.vKeyField          := False;
-     MassiveField.vFieldName         := RESTDWFieldBookmark;
-     MassiveField.vFieldType         := ovString;
-     MassiveField.vSize              := 60;
-     MassiveField.vAutoGenerateValue := True;
     End;
+   If Dataset      Is TRESTDWClientSQL Then
+    vTableName    := TRESTDWClientSQL(Dataset).UpdateTableName
+   Else If Dataset Is TRESTDWTable Then
+    vTableName    := TRESTDWTable(Dataset).TableName;
+   vSequenceName  := Dataset.SequenceName;
   End;
- If Dataset      Is TRESTDWClientSQL Then
-  vTableName    := TRESTDWClientSQL(Dataset).UpdateTableName
- Else If Dataset Is TRESTDWTable Then
-  vTableName    := TRESTDWTable(Dataset).TableName;
- vSequenceName  := Dataset.SequenceName;
 End;
 
 Procedure TMassiveDatasetBuffer.BuildBuffer(Dataset     : TRESTDWClientSQLBase;
@@ -2144,9 +2166,11 @@ Begin
          Begin
           If vReflectChanges Then
            Begin
-            If (vMassiveLine.vMassiveValues.Items[I +1].Value <> '')               And
-               (Lowercase(vMassiveFields.Items[I].vFieldName) = Lowercase(RESTDWFieldBookmark)) Then
-             MassiveLine.vMassiveValues.Items[I +1].Value := vMassiveLine.vMassiveValues.Items[I +1].Value;
+            If vMassiveLine.vMassiveValues.Items[I +1] <> Nil Then
+//             If vMassiveLine.vMassiveValues.Items[I +1].vValueName <> '' Then
+             If (vMassiveLine.vMassiveValues.Items[I +1].Value <> '')               And
+                (Lowercase(vMassiveFields.Items[I].vFieldName) = Lowercase(RESTDWFieldBookmark)) Then
+              MassiveLine.vMassiveValues.Items[I +1].Value := vMassiveLine.vMassiveValues.Items[I +1].Value;
            End;
          End;
        End;
@@ -3113,7 +3137,11 @@ begin
      {$IFDEF RESTDWLAZARUS}
       Dispose(PMassiveCacheValue(TList(Self).Items[Index]));
      {$ELSE}
-      Dispose(TList(Self).Items[Index]);
+      {$IFDEF FPC}
+       Dispose(PMassiveCacheValue(TList(Self).Items[Index]));
+      {$ELSE}
+       Dispose(TList(Self).Items[Index]);
+      {$ENDIF}
      {$ENDIF}
     End;
    TList(Self).Delete(Index);
@@ -3492,14 +3520,22 @@ Begin
            Begin
             If TRESTDWClientSQL(Dataset).State in [dsEdit, dsInsert] Then
              TRESTDWClientSQL(Dataset).Post;
-            TRESTDWClientSQL(Dataset).GotoBookmark(TBookmark(vBookmarkD));
+            {$IFDEF FPC}
+             TRESTDWClientSQL(Dataset).GotoBookmark(TBytes(@vBookmarkD));
+            {$ELSE}
+             TRESTDWClientSQL(Dataset).GotoBookmark(TBookmark(vBookmarkD));
+            {$ENDIF}
             TRESTDWClientSQL(Dataset).SetInBlockEvents(False);
            End
           Else If Dataset Is TRESTDWTable Then
            Begin
             If TRESTDWTable(Dataset).State in [dsEdit, dsInsert] Then
              TRESTDWTable(Dataset).Post;
-            TRESTDWTable(Dataset).GotoBookmark(TBookmark(vBookmarkD));
+            {$IFDEF FPC}
+             TRESTDWTable(Dataset).GotoBookmark(TBytes(@vBookmarkD));
+            {$ELSE}
+             TRESTDWTable(Dataset).GotoBookmark(TBookmark(vBookmarkD));
+            {$ENDIF}
             TRESTDWTable(Dataset).SetInBlockEvents(False);
            End;
           FreeAndNil(bJsonValueX);
@@ -3628,7 +3664,11 @@ Var
  End;
 Begin
  Result := TStringList.Create;
+ {$IFDEF FPC}
+ FCurrentPos := PChar(@SQL);
+ {$ELSE}
  FCurrentPos := PChar(SQL);
+ {$ENDIF}
  bEscape1 := False;
  bEscape2 := False;
  bParam := False;
@@ -3800,7 +3840,11 @@ Begin
  {$IFDEF RESTDWLAZARUS}
   vSQL.OnChange := @OnChangingSQL;
  {$ELSE}
-  vSQL.OnChange := OnChangingSQL;
+  {$IFDEF FPC}
+   vSQL.OnChange := @OnChangingSQL;
+  {$ELSE}
+   vSQL.OnChange := OnChangingSQL;
+  {$ENDIF}
  {$ENDIF}
 End;
 
@@ -4055,7 +4099,11 @@ Begin
      {$IFDEF RESTDWLAZARUS}
       Dispose(PMassiveReplyValue(TList(Self).Items[Index]));
      {$ELSE}
-      Dispose(TList(Self).Items[Index]);
+      {$IFDEF FPC}
+       Dispose(PMassiveReplyValue(TList(Self).Items[Index]));
+      {$ELSE}
+       Dispose(TList(Self).Items[Index]);
+      {$ENDIF}
      {$ENDIF}
     End;
    TList(Self).Delete(Index);
@@ -4221,7 +4269,11 @@ Begin
      {$IFDEF RESTDWLAZARUS}
       Dispose(PMassiveReplyCache(TList(Self).Items[Index]));
      {$ELSE}
-      Dispose(TList(Self).Items[Index]);
+      {$IFDEF FPC}
+       Dispose(PMassiveReplyCache(TList(Self).Items[Index]));
+      {$ELSE}
+       Dispose(TList(Self).Items[Index]);
+      {$ENDIF}
      {$ENDIF}
     End;
    TList(Self).Delete(Index);
@@ -4324,7 +4376,11 @@ begin
      {$IFDEF RESTDWLAZARUS}
       Dispose(PMassiveCacheDataset(TList(Self).Items[Index]));
      {$ELSE}
-      Dispose(TList(Self).Items[Index]);
+      {$IFDEF FPC}
+       Dispose(PMassiveCacheDataset(TList(Self).Items[Index]));
+      {$ELSE}
+       Dispose(TList(Self).Items[Index]);
+      {$ENDIF}
      {$ENDIF}
     End;
    TList(Self).Delete(Index);

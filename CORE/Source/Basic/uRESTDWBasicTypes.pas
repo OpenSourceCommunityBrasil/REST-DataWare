@@ -23,12 +23,20 @@ unit uRESTDWBasicTypes;
  Roniery                    - Devel.
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 Interface
 
 Uses
-  {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXE3UP)}
-  DbTables,
-  {$IFEND}
+  {$IFNDEF FPC}
+   {$IF CompilerVersion < 21}
+    DbTables,
+   {$IFEND}
+  {$ENDIF}
   SysUtils,  Classes, Db, FMTBcd,
   uRESTDWAbout, uRESTDWMemoryDataset, uRESTDWConsts,
   uRESTDWProtoTypes, uRESTDWTools;
@@ -169,6 +177,30 @@ type
                                      FullRequest           : String;
                                      Var ServerMethodClass : TComponentClass) : Boolean;
     Property    Items [Index : Integer] : TRESTDWDataRoute Read GetRec Write PutRec; Default;
+  End;
+
+  Type
+   TRESTDWClientInfo = Class(TObject)
+  Private
+   vip,
+   vUserAgent,
+   vBaseRequest,
+   vToken         : String;
+   vport          : Integer;
+  Public
+   Procedure  SetClientInfo(ip,
+                            UserAgent,
+                            BaseRequest : String;
+                            port        : Integer);
+  Protected
+   Constructor Create;
+ //  Procedure   Assign(Source : TPersistent); Override;
+  Published
+   Property BaseRequest : String  Read vBaseRequest;
+   Property ip          : String  Read vip;
+   Property UserAgent   : String  Read vUserAgent;
+   Property port        : Integer Read vport;
+   Property Token       : String  Read vToken;
   End;
 
  Type
@@ -675,13 +707,19 @@ Begin
  Result := False;
  If Length(Value) = 0 Then
   Exit;
+ vTempValue := Lowercase(Value);
  For I := 0 To Count -1 Do
   Begin
    vTempRoute := Lowercase(Items[I].DataRoute);
-   vTempValue := Lowercase(Value);
-   Result     := vTempRoute = Copy(vTempValue, 1, Length(vTempRoute));
+   Result     := vTempRoute = Copy(vTempValue, InitStrPos, Length(vTempRoute));
    If Result Then
     Break;
+  End;
+ If Not Result Then
+  Begin
+   Result := ((UpperCase(Value) = UpperCase('/GetPoolerList')))       Or
+             ((UpperCase(Value) = UpperCase('/GetServerEventsList'))) Or
+             ((UpperCase(Value) = UpperCase('/EchoPooler')));
   End;
 End;
 
@@ -706,7 +744,11 @@ Begin
         {$ELSE}
           FreeAndNil(TList(Self).Items[Index]^);
         {$ENDIF}
-        Dispose(TList(Self).Items[Index]);
+        {$IFDEF FPC}
+         Dispose(PRESTDWDataRoute(TList(Self).Items[Index]));
+        {$ELSE}
+         Dispose(TList(Self).Items[Index]);
+        {$ENDIF}
      {$ENDIF}
     End;
    TList(Self).Delete(Index);
@@ -730,7 +772,7 @@ Begin
   Begin
    vTempRoute := Lowercase(TRESTDWDataRoute(TList(Self).Items[I]^).DataRoute);
    vTempValue := Lowercase(DataRoute);
-   Result     := vTempRoute = Copy(vTempValue, 1, Length(vTempRoute));
+   Result     := vTempRoute = Copy(vTempValue, InitStrPos, Length(vTempRoute));
    If (Result) Then
     Begin
      ServerMethodClass := TRESTDWDataRoute(TList(Self).Items[I]^).ServerMethodClass;
@@ -748,6 +790,27 @@ Begin
  New(vItem);
  vItem^ := Item;
  Result := TList(Self).Add(vItem);
+End;
+
+Constructor TRESTDWClientInfo.Create;
+Begin
+ Inherited;
+ vip          := '0.0.0.0';
+ vUserAgent   := 'Undefined';
+ vport        := 0;
+ vToken       := '';
+ vBaseRequest := '';
+End;
+
+Procedure TRESTDWClientInfo.SetClientInfo(ip,
+                                          UserAgent,
+                                          BaseRequest : String;
+                                          port        : Integer);
+Begin
+ vip          := Trim(ip);
+ vUserAgent   := Trim(UserAgent);
+ vport        := Port;
+ vBaseRequest := BaseRequest;
 End;
 
 Initialization
@@ -783,21 +846,39 @@ Initialization
   RESTDWShortDayNames     := TArrayWeek(FormatSettings.ShortDayNames);
   RESTDWLongDayNames      := TArrayWeek(FormatSettings.LongDayNames);
  {$ELSE}
-  RESTDWDecimalSeparator  := DecimalSeparator;
-  RESTDWThousandSeparator := ThousandSeparator;
-  RESTDWCurrencyDecimals  := CurrencyDecimals;
-  RESTDWShortDateFormat   := ShortDateFormat;
-  RESTDWDateSeparator     := DateSeparator;
-  RESTDWTimeSeparator     := TimeSeparator;
-  RESTDWShortTimeFormat   := ShortTimeFormat;
-  RESTDWTimeAMString      := TimeAMString;
-  RESTDWTimePMString      := TimePMString;
-  RESTDWLongMonthNames    := TArrayMonth(LongMonthNames);
-  RESTDWShortMonthNames   := TArrayMonth(ShortMonthNames);
-  RESTDWShortDayNames     := TArrayWeek(ShortDayNames);
-  RESTDWLongDayNames      := TArrayWeek(LongDayNames);
-  RESTDWCurrencyString    := CurrencyString;
+  {$IFDEF FPC}
+   RESTDWDecimalSeparator  := DecimalSeparator;
+   RESTDWThousandSeparator := ThousandSeparator;
+   RESTDWCurrencyDecimals  := CurrencyDecimals;
+   RESTDWShortDateFormat   := ShortDateFormat;
+   RESTDWDateSeparator     := DateSeparator;
+   RESTDWTimeSeparator     := TimeSeparator;
+   RESTDWShortTimeFormat   := ShortTimeFormat;
+   RESTDWTimeAMString      := TimeAMString;
+   RESTDWTimePMString      := TimePMString;
+   RESTDWLongMonthNames    := TArrayMonth(Pointer(@LongMonthNames)^);
+   RESTDWShortMonthNames   := TArrayMonth(Pointer(@ShortMonthNames)^);
+   RESTDWShortDayNames     := TArrayWeek(Pointer(@ShortDayNames)^);
+   RESTDWLongDayNames      := TArrayWeek(Pointer(@LongDayNames)^);
+   RESTDWCurrencyString    := CurrencyString;
+  {$ELSE}
+   RESTDWDecimalSeparator  := DecimalSeparator;
+   RESTDWThousandSeparator := ThousandSeparator;
+   RESTDWCurrencyDecimals  := CurrencyDecimals;
+   RESTDWShortDateFormat   := ShortDateFormat;
+   RESTDWDateSeparator     := DateSeparator;
+   RESTDWTimeSeparator     := TimeSeparator;
+   RESTDWShortTimeFormat   := ShortTimeFormat;
+   RESTDWTimeAMString      := TimeAMString;
+   RESTDWTimePMString      := TimePMString;
+   RESTDWLongMonthNames    := TArrayMonth(LongMonthNames);
+   RESTDWShortMonthNames   := TArrayMonth(ShortMonthNames);
+   RESTDWShortDayNames     := TArrayWeek(ShortDayNames);
+   RESTDWLongDayNames      := TArrayWeek(LongDayNames);
+   RESTDWCurrencyString    := CurrencyString;
+  {$ENDIF}
  {$ENDIF}
 {$ENDIF}
+
 
 end.

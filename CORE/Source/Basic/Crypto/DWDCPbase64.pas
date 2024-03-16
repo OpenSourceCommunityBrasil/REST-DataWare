@@ -24,6 +24,12 @@ unit DWDCPbase64;
 
 interface
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 uses
   DWDCPtypes, Sysutils;
 

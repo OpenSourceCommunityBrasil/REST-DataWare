@@ -1,25 +1,32 @@
 unit uRESTDWAuthenticators;
 
 {$I ..\..\Includes\uRESTDW.inc}
+
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
   de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambï¿½m tem por objetivo levar componentes compatï¿½veis entre o Delphi e outros Compiladores
   Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
-  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal vocï¿½ usuï¿½rio que precisa
+  de produtividade e flexibilidade para produï¿½ï¿½o de Serviï¿½os REST/JSON, simplificando o processo para vocï¿½ programador.
 
   Membros do Grupo :
 
   XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
   Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
-  Flávio Motta               - Member Tester and DEMO Developer.
+  Flï¿½vio Motta               - Member Tester and DEMO Developer.
   Mobius One                 - Devel, Tester and Admin.
   Gustavo                    - Criptografia and Devel.
   Eloy                       - Devel.
   Roniery                    - Devel.
 }
+
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
 
 interface
 
@@ -28,16 +35,16 @@ uses
   uRESTDWConsts, uRESTDWAbout, uRESTDWDataUtils, uRESTDWJSONInterface,
   uRESTDWTools, uRESTDWParams;
 
-type
-  TRESTDWAuthenticatorBase = class(TRESTDWComponent)
-  private
-    FAuthDialog: Boolean;
-  public
-    constructor Create(aOwner: TComponent); override;
-    destructor Destroy; override;
-  published
-    property AuthDialog: Boolean read FAuthDialog write FAuthDialog;
-  end;
+Type
+ TRESTDWAuthenticatorBase = class(TRESTDWComponent)
+ Private
+  FAuthDialog : Boolean;
+ Public
+  Constructor Create(aOwner : TComponent); Override;
+  Destructor Destroy; override;
+ Published
+  Property AuthDialog : Boolean Read FAuthDialog Write FAuthDialog;
+ End;
 
   // Classe Especifica para Autenticacao pelo Server
   TRESTDWServerAuthBase = class(TRESTDWAuthenticatorBase)
@@ -187,40 +194,113 @@ type
                              Var ErrorMessage   : String;
                              Var TokenID        : String;
                              Var Accept         : Boolean) Of Object;
+  TUserBasicAuth  = Procedure(Welcomemsg, AccessTag,
+                              Username, Password : String;
+                              Var Params         : TRESTDWParams;
+                              Var ErrorCode      : Integer;
+                              Var ErrorMessage   : String;
+                              Var Accept         : Boolean) Of Object;
+  TUserTokenAuth  = Procedure(Welcomemsg,
+                              AccessTag          : String;
+                              Params             : TRESTDWParams;
+                              AuthOptions        : TRESTDWAuthToken;
+                              Var ErrorCode      : Integer;
+                              Var ErrorMessage   : String;
+                              Var TokenID        : String;
+                              Var Accept         : Boolean) Of Object;
+  TOnRenewToken   = Procedure of Object;
 
-
-
-  TOnRenewToken = Procedure() of Object;
 
 implementation
 
 uses
-  uRESTDWDatamodule;
+  uRESTDWDatamodule, uRESTDWServerMethodClass;
 
 { TRESTDWAuthBasic }
 
-function TRESTDWAuthBasic.AuthValidate(ADataModuleRESTDW: TObject; AUrlToExec,
-  AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword: String;
-  ARawHeaders: TStrings; ARequestType: TRequestType;
-  var ADWParams: TRESTDWParams; var AGetToken, ATokenValidate: Boolean;
-  var AToken: String; var AErrorCode: Integer; var AErrorMessage: String;
-  var AAcceptAuth: Boolean): Boolean;
-var
-  LAuthenticationString: String;
+function TRESTDWAuthBasic.AuthValidate(ADataModuleRESTDW : TObject; 
+                                      AUrlToExec,
+                                      AWelcomeMessage, 
+                                      AAccessTag, 
+                                      AAuthUsername, 
+                                      AAuthPassword      : String;
+                                      ARawHeaders        : TStrings; 
+                                      ARequestType       : TRequestType;
+                                      Var ADWParams      : TRESTDWParams; 
+                                      Var AGetToken, 
+                                      ATokenValidate     : Boolean;
+                                      Var AToken         : String; 
+                                      Var AErrorCode     : Integer; 
+                                      Var AErrorMessage  : String;
+                                      Var AAcceptAuth    : Boolean) : Boolean;
+Var
+ LAuthenticationString : String;
 begin
   LAuthenticationString := DecodeStrings(StringReplace(ARawHeaders.Values['Authorization'], 'Basic ', '', [rfReplaceAll]){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-
   if (LAuthenticationString <> '') and ((AAuthUsername = '') and (AAuthPassword = '')) then
     Self.PrepareBasicAuth(LAuthenticationString, AAuthUsername, AAuthPassword);
-
-  if Assigned(TServerMethodDataModule(ADataModuleRESTDW).OnUserBasicAuth) then
-    TServerMethodDataModule(ADataModuleRESTDW).OnUserBasicAuth(AWelcomeMessage, AAccessTag, AAuthUsername,
-                                                               AAuthPassword, ADWParams, AErrorCode, AErrorMessage, AAcceptAuth)
-  else
-    AAcceptAuth := Self.ValidateAuth(AAuthUsername, AAuthPassword);
-
+   {$IFNDEF RESTDWLAZARUS}
+    {$IFNDEF FPC}
+    If (ADataModuleRESTDW.InheritsFrom(TServerMethodDatamodule))  Or
+       (ADataModuleRESTDW           Is TServerMethodDatamodule)   Then
+     Begin
+      If Assigned(TServerMethodDataModule(ADataModuleRESTDW).OnUserBasicAuth) then
+       TServerMethodDataModule(ADataModuleRESTDW).OnUserBasicAuth(AWelcomeMessage, AAccessTag, AAuthUsername,
+                                                                  AAuthPassword, ADWParams, AErrorCode, AErrorMessage, AAcceptAuth)
+      Else
+       AAcceptAuth := Self.ValidateAuth(AAuthUsername, AAuthPassword);
+     End
+    Else If (ADataModuleRESTDW.InheritsFrom(TServerBaseMethodClass))   Or
+            (ADataModuleRESTDW           Is TServerBaseMethodClass)    Then
+     Begin
+      If Assigned(TServerBaseMethodClass(ADataModuleRESTDW).OnUserBasicAuth) then
+       TServerBaseMethodClass(ADataModuleRESTDW).OnUserBasicAuth(AWelcomeMessage, AAccessTag, AAuthUsername,
+                                                                 AAuthPassword, ADWParams, AErrorCode, AErrorMessage, AAcceptAuth)
+      Else
+       AAcceptAuth := Self.ValidateAuth(AAuthUsername, AAuthPassword);
+     End;
+    {$ELSE}
+     If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+        (ADataModuleRESTDW            Is TServerMethodDatamodule)   Then
+      Begin
+       If Assigned(TServerMethodDataModule(ADataModuleRESTDW).OnUserBasicAuth) then
+        TServerMethodDataModule(ADataModuleRESTDW).OnUserBasicAuth(AWelcomeMessage, AAccessTag, AAuthUsername,
+                                                                   AAuthPassword, ADWParams, AErrorCode, AErrorMessage, AAcceptAuth)
+       Else
+        AAcceptAuth := Self.ValidateAuth(AAuthUsername, AAuthPassword);
+      End   
+     Else If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+             (ADataModuleRESTDW            Is TServerBaseMethodClass)    Then
+      Begin
+       If Assigned(TServerBaseMethodClass(ADataModuleRESTDW).OnUserBasicAuth) then
+        TServerBaseMethodClass(ADataModuleRESTDW).OnUserBasicAuth(AWelcomeMessage, AAccessTag, AAuthUsername,
+                                                                  AAuthPassword, ADWParams, AErrorCode, AErrorMessage, AAcceptAuth)
+       Else
+        AAcceptAuth := Self.ValidateAuth(AAuthUsername, AAuthPassword);
+      End;
+    {$ENDIF}
+  {$ELSE}
+   If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+      (ADataModuleRESTDW            Is TServerMethodDatamodule)   Then
+    Begin
+     If Assigned(TServerMethodDataModule(ADataModuleRESTDW).OnUserBasicAuth) then
+      TServerMethodDataModule(ADataModuleRESTDW).OnUserBasicAuth(AWelcomeMessage, AAccessTag, AAuthUsername,
+                                                                 AAuthPassword, ADWParams, AErrorCode, AErrorMessage, AAcceptAuth)
+     Else
+      AAcceptAuth := Self.ValidateAuth(AAuthUsername, AAuthPassword);
+    End
+   Else If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+           (ADataModuleRESTDW            Is TServerBaseMethodClass)    Then
+    Begin
+     If Assigned(TServerBaseMethodClass(ADataModuleRESTDW).OnUserBasicAuth) then
+      TServerBaseMethodClass(ADataModuleRESTDW).OnUserBasicAuth(AWelcomeMessage, AAccessTag, AAuthUsername,
+                                                                AAuthPassword, ADWParams, AErrorCode, AErrorMessage, AAcceptAuth)
+     Else
+      AAcceptAuth := Self.ValidateAuth(AAuthUsername, AAuthPassword);   
+    End;
+  {$ENDIF}
   Result := AAcceptAuth;
-end;
+End;
 
 constructor TRESTDWAuthBasic.Create(aOwner: TComponent);
 begin
@@ -267,83 +347,146 @@ begin
     inherited Assign(ASource);
 end;
 
-function TRESTDWAuthToken.AuthValidate(ADataModuleRESTDW: TObject; AUrlToExec,
-  AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword: String;
-  ARawHeaders: TStrings; ARequestType: TRequestType;
-  var ADWParams: TRESTDWParams; var AGetToken, ATokenValidate: Boolean;
-  var AToken: String; var AErrorCode: Integer; var AErrorMessage: String;
-  var AAcceptAuth: Boolean): Boolean;
-var
-  LUrlToken, LToken, LTokenOrig: String;
-  LAuthTokenParam: TRESTDWAuthToken;
-begin
+Function TRESTDWAuthToken.AuthValidate(ADataModuleRESTDW : TObject; 
+                                       AUrlToExec,
+                                       AWelcomeMessage, 
+                                       AAccessTag, 
+                                       AAuthUsername, 
+                                       AAuthPassword     : String;
+                                       ARawHeaders       : TStrings; 
+                                       ARequestType      : TRequestType;
+                                       Var ADWParams     : TRESTDWParams; 
+                                       Var AGetToken, 
+                                       ATokenValidate    : Boolean;
+                                       Var AToken        : String; 
+                                       Var AErrorCode    : Integer; 
+                                       Var AErrorMessage : String;
+                                       Var AAcceptAuth   : Boolean) : Boolean;
+Var
+ LUrlToken, 
+ LToken,
+ LTokenOrig      : String;
+ LAuthTokenParam : TRESTDWAuthToken;
+Begin
   // Se for o Evento Get Token
-  LUrlToken := LowerCase(AUrlToExec);
-
-  if Copy(LUrlToken, InitStrPos, 1) = '/' then
-    Delete(LUrlToken, InitStrPos, 1);
-
-  if LUrlToken = LowerCase(Self.GetTokenEvent) then
-  begin
-    Self.GenerateToken(ADataModuleRESTDW, ARequestType, ADWParams, ARawHeaders,
-                        AWelcomeMessage, AAccessTag, ATokenValidate,
-                        AToken, AGetToken, AErrorCode, AErrorMessage, AAcceptAuth);
+ LUrlToken := LowerCase(AUrlToExec);
+ If Copy(LUrlToken, InitStrPos, 1) = '/' then
+  Delete(LUrlToken, InitStrPos, 1);
+ If LUrlToken = LowerCase(Self.GetTokenEvent) then
+  Begin
+   Self.GenerateToken(ADataModuleRESTDW, ARequestType, ADWParams, ARawHeaders,
+                      AWelcomeMessage,   AAccessTag,   ATokenValidate,
+                      AToken, AGetToken, AErrorCode,   AErrorMessage, AAcceptAuth);
     Exit;
-  end;
-
-  // Se for Validar o Token
-  AErrorCode     := 401;
-  AErrorMessage  := cInvalidAuth;
-  ATokenValidate := True;
-  LTokenOrig     := AToken;
-
-  LAuthTokenParam := TRESTDWAuthToken.Create(self);
-  try
-    LAuthTokenParam.Assign(Self);
-
-    if ADWParams.ItemsString[Self.Key] <> Nil then
-      AToken := ADWParams.ItemsString[Self.Key].AsString
-    else
-    begin
-      if Trim(AToken) = '' then
-        AToken := ARawHeaders.Values['Authorization'];
-
-      if Trim(AToken) <> '' then
-      begin
-        LToken := GetTokenString(AToken);
-
-        if LToken = '' then
-          LToken := GetBearerString(AToken);
-
-        if LToken = '' then
-          LToken := LTokenOrig;
-
-        AToken := LToken;
-      end;
-    end;
-
-    if not LAuthTokenParam.ValidateToken(AToken) then
-    begin
-      AAcceptAuth := False;
-      Exit;
-    end
-    else
-      ATokenValidate := False;
-
-    if Assigned(TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth) then
-    begin
-      TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth(AWelcomeMessage, AAccessTag, ADWParams,
+  End;
+ // Se for Validar o Token
+ AErrorCode      := 401;
+ AErrorMessage   := cInvalidAuth;
+ ATokenValidate  := True;
+ LTokenOrig      := AToken;
+ LAuthTokenParam := TRESTDWAuthToken.Create(self);
+ Try
+  LAuthTokenParam.Assign(Self);
+  If ADWParams.ItemsString[Self.Key] <> Nil Then
+   AToken := ADWParams.ItemsString[Self.Key].AsString
+  Else
+   Begin
+    If Trim(AToken)  = '' Then
+     AToken := ARawHeaders.Values['Authorization'];
+    If Trim(AToken) <> '' Then
+     Begin
+      LToken := GetTokenString(AToken);
+      If LToken = '' Then
+       LToken := GetBearerString(AToken);
+      If LToken = '' Then
+       LToken := LTokenOrig;
+      AToken := LToken;
+     End;
+   End;
+  If Not LAuthTokenParam.ValidateToken(AToken) Then
+   Begin
+    AAcceptAuth := False;
+    Exit;
+   End
+  Else
+   ATokenValidate := False;
+   {$IFNDEF RESTDWLAZARUS}
+    {$IFNDEF FPC}
+    If (ADataModuleRESTDW.InheritsFrom(TServerMethodDatamodule))  Or
+       (ADataModuleRESTDW            Is TServerMethodDatamodule)   Then
+     Begin
+      If Assigned(TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth) Then
+       Begin
+        TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth(AWelcomeMessage, AAccessTag, ADWParams,
+                                                                   TRESTDWAuthToken(LAuthTokenParam),
+                                                                   AErrorCode, AErrorMessage, AToken, AAcceptAuth);
+        ATokenValidate := Not(AAcceptAuth);
+       End;
+     End
+    Else If (ADataModuleRESTDW.InheritsFrom(TServerBaseMethodClass))   Or
+            (ADataModuleRESTDW            Is TServerBaseMethodClass)    Then
+     Begin
+      If Assigned(TServerBaseMethodClass(ADataModuleRESTDW).OnUserTokenAuth) Then
+       Begin
+        TServerBaseMethodClass(ADataModuleRESTDW).OnUserTokenAuth(AWelcomeMessage, AAccessTag, ADWParams,
                                                                   TRESTDWAuthToken(LAuthTokenParam),
                                                                   AErrorCode, AErrorMessage, AToken, AAcceptAuth);
-
-      ATokenValidate := Not(AAcceptAuth);
-    end;
-
-    Result := AAcceptAuth;
-  finally
-    if Assigned(LAuthTokenParam) then
-      FreeAndNil(LAuthTokenParam);
-  end;
+        ATokenValidate := Not(AAcceptAuth);
+       End;
+     End;
+    {$ELSE}
+     If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+        (ADataModuleRESTDW            Is TServerMethodDatamodule)   Then
+      Begin
+       If Assigned(TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth) Then
+        Begin
+         TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth(AWelcomeMessage, AAccessTag, ADWParams,
+                                                                    TRESTDWAuthToken(LAuthTokenParam),
+                                                                    AErrorCode, AErrorMessage, AToken, AAcceptAuth);
+         ATokenValidate := Not(AAcceptAuth);
+        End;
+      End   
+     Else If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+             (ADataModuleRESTDW            Is TServerBaseMethodClass)    Then
+      Begin
+       If Assigned(TServerBaseMethodClass(ADataModuleRESTDW).OnUserTokenAuth) Then
+        Begin
+         TServerBaseMethodClass(ADataModuleRESTDW).OnUserTokenAuth(AWelcomeMessage, AAccessTag, ADWParams,
+                                                                   TRESTDWAuthToken(LAuthTokenParam),
+                                                                   AErrorCode, AErrorMessage, AToken, AAcceptAuth);
+         ATokenValidate := Not(AAcceptAuth);
+        End;     
+      End;
+    {$ENDIF}
+  {$ELSE}
+   If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+      (ADataModuleRESTDW            Is TServerMethodDatamodule)   Then
+    Begin
+     If Assigned(TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth) Then
+      Begin
+       TServerMethodDatamodule(ADataModuleRESTDW).OnUserTokenAuth(AWelcomeMessage, AAccessTag, ADWParams,
+                                                                 TRESTDWAuthToken(LAuthTokenParam),
+                                                                 AErrorCode, AErrorMessage, AToken, AAcceptAuth);
+       ATokenValidate := Not(AAcceptAuth);
+      End;        
+    End
+   Else If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+           (ADataModuleRESTDW            Is TServerBaseMethodClass)    Then
+    Begin
+     If Assigned(TServerBaseMethodClass(ADataModuleRESTDW).OnUserTokenAuth) Then
+      Begin
+       TServerBaseMethodClass(ADataModuleRESTDW).OnUserTokenAuth(AWelcomeMessage, AAccessTag, ADWParams,
+                                                                 TRESTDWAuthToken(LAuthTokenParam),
+                                                                 AErrorCode, AErrorMessage, AToken, AAcceptAuth);
+       ATokenValidate := Not(AAcceptAuth);
+      End;        
+    End;
+  {$ENDIF}
+  Result := AAcceptAuth;
+ Finally
+  If Assigned(LAuthTokenParam) Then
+   FreeAndNil(LAuthTokenParam);
+ End;
 end;
 
 procedure TRESTDWAuthToken.ClearToken;
@@ -375,6 +518,7 @@ begin
   FSecrets := '';
   FAutoGetToken := True;
   FAutoRenewToken := True;
+  FGetTokenRoutes.All.Active := True;
 end;
 
 destructor TRESTDWAuthToken.Destroy;
@@ -384,172 +528,264 @@ begin
 end;
 
 procedure TRESTDWAuthToken.FromToken(ATokenValue: String);
-var
-  LJsonValue: TRESTDWJSONInterfaceObject;
-  LHeader, LBody: String;
-begin
-  FToken := ATokenValue;
+Var
+ LJsonValue : TRESTDWJSONInterfaceObject;
+ LHeader, 
+ LBody      : String;
+Begin
+ FToken := ATokenValue;
+ Try
+  LHeader := Copy(ATokenValue, InitStrPos, Pos('.', ATokenValue) - 1);
+  Delete(ATokenValue, InitStrPos, Pos('.', ATokenValue));
+  LBody := Copy(ATokenValue, InitStrPos, Pos('.', ATokenValue) - 1);
+  // Read Header
+  If Trim(LHeader) <> '' Then
+   Begin
+    LJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+    Try
+     If LJsonValue.PairCount > 0 Then
+      Begin
+       If Not LJsonValue.PairByName['typ'].IsNull Then
+        FTokenType := GetTokenType(LJsonValue.PairByName['typ'].Value);
+      End;
+    Finally
+     If Assigned(LJsonValue) Then
+      FreeAndNil(LJsonValue);
+    End;
+   End;
+   // Read Body
+   If Trim(LBody) <> '' Then
+    Begin
+     LJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(LBody{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+     Try
+      If LJsonValue.PairCount > 0 Then
+       Begin
+        If Not LJsonValue.PairByName['iat'].IsNull Then
+         Begin
+          If FTokenType = rdwTS Then
+           FBeginTime := TTokenValue.DateTimeFromISO8601(LJsonValue.PairByName['iat'].Value)
+          Else
+           FBeginTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['iat'].Value), False);
+         End;
+        If Not LJsonValue.PairByName['exp'].IsNull Then
+         Begin
+          If FTokenType = rdwTS Then
+           FEndTime := TTokenValue.DateTimeFromISO8601(LJsonValue.PairByName['exp'].Value)
+          Else
+           FEndTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['exp'].Value), False);
+         End;
+        If Not LJsonValue.PairByName['secrets'].IsNull Then
+         FSecrets := DecodeStrings(LJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+       End;
+     Finally
+      If Assigned(LJsonValue) Then
+       FreeAndNil(LJsonValue);
+     End;
+    End;
+ Except
 
-  try
-    LHeader := Copy(ATokenValue, InitStrPos, Pos('.', ATokenValue) - 1);
-    Delete(ATokenValue, InitStrPos, Pos('.', ATokenValue));
-    LBody := Copy(ATokenValue, InitStrPos, Pos('.', ATokenValue) - 1);
+ End;
+End;
 
-    // Read Header
-    if Trim(LHeader) <> '' then
-    begin
-      LJsonValue := TRESTDWJSONInterfaceObject.Create
-        (DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
-
-      try
-        if LJsonValue.PairCount > 0 then
-        begin
-          if not LJsonValue.PairByName['typ'].IsNull then
-            FTokenType := GetTokenType(LJsonValue.PairByName['typ'].Value);
-        end;
-      finally
-        if Assigned(LJsonValue) then
-          FreeAndNil(LJsonValue);
-      end;
-
-    end;
-
-    // Read Body
-    if Trim(LBody) <> '' then
-    begin
-      LJsonValue := TRESTDWJSONInterfaceObject.Create
-        (DecodeStrings(LBody{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
-
-      try
-        if LJsonValue.PairCount > 0 then
-        begin
-          if not LJsonValue.PairByName['iat'].IsNull then
-          begin
-            if FTokenType = rdwTS then
-              FBeginTime := TTokenValue.DateTimeFromISO8601
-                (LJsonValue.PairByName['iat'].Value)
-            else
-              FBeginTime := UnixToDateTime
-                (StrToInt64(LJsonValue.PairByName['iat'].Value), False);
-          end;
-
-          if not LJsonValue.PairByName['exp'].IsNull then
-          begin
-            if FTokenType = rdwTS then
-              FEndTime := TTokenValue.DateTimeFromISO8601
-                (LJsonValue.PairByName['exp'].Value)
-            else
-              FEndTime := UnixToDateTime
-                (StrToInt64(LJsonValue.PairByName['exp'].Value), False);
-          end;
-
-          if not LJsonValue.PairByName['secrets'].IsNull Then
-            FSecrets := DecodeStrings(LJsonValue.PairByName['secrets']
-              .Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-        end;
-      finally
-        if Assigned(LJsonValue) then
-          FreeAndNil(LJsonValue);
-      end;
-    end;
-
-  except
-
-  end;
-end;
-
-procedure TRESTDWAuthToken.GenerateToken(ADataModuleRESTDW: TObject;
-  ARequestType: TRequestType; AParams: TRESTDWParams; ARawHeaders: TStrings;
-  AWelcomeMessage, AAccessTag: String; var ATokenValidate: Boolean; var AToken: String;
-  var AGetToken: Boolean; var AErrorCode: Integer; var AErrorMessage: String;
-  var AAcceptAuth: Boolean);
-var
-  LAuthTokenParam: TRESTDWAuthToken;
-  LParams: TRESTDWParams;
-begin
-  AGetToken     := True;
-  AErrorCode    := 404;
-  AErrorMessage := cEventNotFound;
-
-  if (Self.GetTokenRoutes.RouteIsActive(ARequestType)) or
-     (Self.GetTokenRoutes.RouteIsActive(rtAll)) then
-  begin
-    if Assigned(TServerMethodDataModule(ADataModuleRESTDW).OnGetToken) then
-    begin
-      ATokenValidate := True;
-      LAuthTokenParam := TRESTDWAuthToken.Create(Self);
-      try
-        LAuthTokenParam.Assign(Self);
-
-        {$IFNDEF RESTDWLAZARUS}
-        if Trim(AToken) = '' Then
-          AToken := ARawHeaders.Values['Authorization'];
+procedure TRESTDWAuthToken.GenerateToken(ADataModuleRESTDW : TObject;
+                                        ARequestType       : TRequestType; 
+                                        AParams            : TRESTDWParams; 
+                                        ARawHeaders        : TStrings;
+                                        AWelcomeMessage, 
+                                        AAccessTag         : String; 
+                                        Var ATokenValidate : Boolean; 
+                                        Var AToken         : String;
+                                        Var AGetToken      : Boolean; 
+                                        Var AErrorCode     : Integer; 
+                                        Var AErrorMessage  : String;
+                                        Var AAcceptAuth    : Boolean);
+Var
+ LAuthTokenParam : TRESTDWAuthToken;
+ LParams         : TRESTDWParams;
+ vHaveGetToken   : Boolean;
+Begin
+ AGetToken     := True;
+ vHaveGetToken := False;
+ AErrorCode    := 404;
+ AErrorMessage := cEventNotFound;
+ If (Self.GetTokenRoutes.RouteIsActive(ARequestType)) Or
+    (Self.GetTokenRoutes.RouteIsActive(rtAll))        Then
+  Begin
+   {$IFNDEF RESTDWLAZARUS}
+    {$IFNDEF FPC}
+     If (ADataModuleRESTDW.InheritsFrom(TServerMethodDatamodule))  Or
+       (ADataModuleRESTDW           Is TServerMethodDatamodule)   Then
+      vHaveGetToken := Assigned(TServerMethodDataModule(ADataModuleRESTDW).OnGetToken)
+     Else If (ADataModuleRESTDW.InheritsFrom(TServerBaseMethodClass))   Or
+             (ADataModuleRESTDW           Is TServerBaseMethodClass)    Then
+      vHaveGetToken := Assigned(TServerBaseMethodClass(ADataModuleRESTDW).OnGetToken);
+    {$ELSE}
+     If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+        (ADataModuleRESTDW            Is TServerMethodDatamodule)   Then
+      vHaveGetToken := Assigned(TServerMethodDataModule(ADataModuleRESTDW).OnGetToken)
+     Else If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+             (ADataModuleRESTDW            Is TServerBaseMethodClass)    Then
+      vHaveGetToken := Assigned(TServerBaseMethodClass(ADataModuleRESTDW).OnGetToken);
+    {$ENDIF}
+   {$ELSE}
+    If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+       (ADataModuleRESTDW            Is TServerMethodDatamodule)   Then
+     vHaveGetToken := Assigned(TServerMethodDataModule(ADataModuleRESTDW).OnGetToken)
+    Else If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+            (ADataModuleRESTDW            Is TServerBaseMethodClass)    Then
+     vHaveGetToken := Assigned(TServerBaseMethodClass(ADataModuleRESTDW).OnGetToken);
+   {$ENDIF}
+   If vHaveGetToken Then
+    Begin
+     ATokenValidate := True;
+     LAuthTokenParam := TRESTDWAuthToken.Create(Self);
+     Try
+      LAuthTokenParam.Assign(Self);
+//      {$IFNDEF RESTDWLAZARUS}
+      If Trim(AToken) = '' Then
+       AToken := ARawHeaders.Values['Authorization'];
+//      {$ENDIF}
+       {$IFNDEF RESTDWLAZARUS}
+        {$IFNDEF FPC}
+        If (ADataModuleRESTDW.InheritsFrom(TServerMethodDatamodule))  Or
+           (ADataModuleRESTDW            Is TServerMethodDatamodule)   Then
+         Begin
+          If AParams.ItemsString['RDWParams'] <> Nil Then
+           Begin
+            LParams := TRESTDWParams.Create;
+            LParams.FromJSON(AParams.ItemsString['RDWParams'].Value);
+            TServerMethodDataModule(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    LParams, LAuthTokenParam,
+                                                                  AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+            FreeAndNil(LParams);
+           End
+          Else
+           TServerMethodDataModule(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    AParams, LAuthTokenParam,
+                                                                 AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+         End
+        Else If (ADataModuleRESTDW.InheritsFrom(TServerBaseMethodClass))   Or
+                (ADataModuleRESTDW            Is TServerBaseMethodClass)    Then
+         Begin
+          If AParams.ItemsString['RDWParams'] <> Nil Then
+           Begin
+            LParams := TRESTDWParams.Create;
+            LParams.FromJSON(AParams.ItemsString['RDWParams'].Value);
+            TServerBaseMethodClass(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    LParams, LAuthTokenParam,
+                                                                 AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+            FreeAndNil(LParams);
+           End
+          Else
+           TServerBaseMethodClass(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    AParams, LAuthTokenParam,
+                                                                AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+         End;
+        {$ELSE}
+         If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+            (ADataModuleRESTDW            Is TServerMethodDatamodule)   Then
+          Begin
+           If AParams.ItemsString['RDWParams'] <> Nil Then
+            Begin
+             LParams := TRESTDWParams.Create;
+             LParams.FromJSON(AParams.ItemsString['RDWParams'].AsString);
+             TServerMethodDataModule(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    LParams, LAuthTokenParam,
+                                                                   AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+             FreeAndNil(LParams);
+            End
+           Else
+            TServerMethodDataModule(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    AParams, LAuthTokenParam,
+                                                                  AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+          End   
+         Else If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                 (ADataModuleRESTDW            Is TServerBaseMethodClass)    Then
+          Begin
+           If AParams.ItemsString['RDWParams'] <> Nil Then
+            Begin
+             LParams := TRESTDWParams.Create;
+             LParams.FromJSON(AParams.ItemsString['RDWParams'].AsString);
+             TServerBaseMethodClass(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    LParams, LAuthTokenParam,
+                                                                  AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+             FreeAndNil(LParams);
+            End
+           Else
+            TServerBaseMethodClass(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    AParams, LAuthTokenParam,
+                                                                 AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+          End;
         {$ENDIF}
+      {$ELSE}
+       If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+          (ADataModuleRESTDW            Is TServerMethodDatamodule)   Then
+        Begin
+         If AParams.ItemsString['RDWParams'] <> Nil Then
+          Begin
+           LParams := TRESTDWParams.Create;
+           LParams.FromJSON(AParams.ItemsString['RDWParams'].Value);
+           TServerMethodDataModule(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    LParams, LAuthTokenParam,
+                                                                 AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+           FreeAndNil(LParams);
+          End
+         Else
+          TServerMethodDataModule(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    AParams, LAuthTokenParam,
+                                                                AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+        End
+       Else If (ADataModuleRESTDW.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+               (ADataModuleRESTDW            Is TServerBaseMethodClass)    Then
+        Begin
+         If AParams.ItemsString['RDWParams'] <> Nil Then
+          Begin
+           LParams := TRESTDWParams.Create;
+           LParams.FromJSON(AParams.ItemsString['RDWParams'].Value);
+           TServerBaseMethodClass(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    LParams, LAuthTokenParam,
+                                                                AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+           FreeAndNil(LParams);
+          End
+         Else
+          TServerBaseMethodClass(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag,    AParams, LAuthTokenParam,
+                                                               AErrorCode,      AErrorMessage, AToken,  AAcceptAuth);
+        End;
+      {$ENDIF}
+     Finally
+      FreeAndNil(LAuthTokenParam);
+     End;
+    End;
+  End;
+End;
 
-        if AParams.ItemsString['RDWParams'] <> Nil then
-        begin
-         LParams := TRESTDWParams.Create;
-         LParams.FromJSON(AParams.ItemsString['RDWParams'].Value);
+Function TRESTDWAuthToken.GetCryptType(AValue : String) : TRESTDWCryptType;
+Begin
+ Result := rdwAES256;
+ If LowerCase(AValue)      = 'hs256' Then
+  Result := rdwHSHA256
+ Else If LowerCase(AValue) = 'rsa'   Then
+  Result := rdwRSA;
+End;
 
-         TServerMethodDataModule(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag, LParams, LAuthTokenParam,
-                                                                AErrorCode, AErrorMessage, AToken, AAcceptAuth);
+Function TRESTDWAuthToken.GetToken(ASecrets : String): String;
+Var
+ LTokenValue : TTokenValue;
+Begin
+ LTokenValue := TTokenValue.Create;
+ Try
+  LTokenValue.TokenHash := FTokenHash;
+  LTokenValue.TokenType := FTokenType;
+  LTokenValue.CryptType := FCryptType;
+  If Trim(FServerSignature) <> '' Then
+   LTokenValue.Iss := LTokenValue.vCripto.Encrypt(FServerSignature);
+  LTokenValue.Secrets := ASecrets;
+  LTokenValue.BeginTime := Now;
+  If FLifeCycle > 0 Then
+   LTokenValue.EndTime := IncSecond(LTokenValue.BeginTime, FLifeCycle);
+  Result := LTokenValue.ToToken;
+ Finally
+  FreeAndNil(LTokenValue);
+ End;
+End;
 
-         FreeAndNil(LParams);
-        end
-        else
-         TServerMethodDataModule(ADataModuleRESTDW).OnGetToken(AWelcomeMessage, AAccessTag, AParams, LAuthTokenParam,
-                                                                AErrorCode, AErrorMessage, AToken, AAcceptAuth);
-      finally
-        FreeAndNil(LAuthTokenParam);
-      end;
-    end;
-  end;
-end;
-
-function TRESTDWAuthToken.GetCryptType(AValue: String): TRESTDWCryptType;
-begin
-  Result := rdwAES256;
-
-  if LowerCase(AValue) = 'hs256' then
-    Result := rdwHSHA256
-  else if LowerCase(AValue) = 'rsa' then
-    Result := rdwRSA;
-end;
-
-function TRESTDWAuthToken.GetToken(ASecrets: String): String;
-var
-  LTokenValue: TTokenValue;
-begin
-  LTokenValue := TTokenValue.Create;
-  try
-    LTokenValue.TokenHash := FTokenHash;
-    LTokenValue.TokenType := FTokenType;
-    LTokenValue.CryptType := FCryptType;
-
-    if Trim(FServerSignature) <> '' then
-      LTokenValue.Iss := LTokenValue.vCripto.Encrypt(FServerSignature);
-
-    LTokenValue.Secrets := ASecrets;
-    LTokenValue.BeginTime := Now;
-
-    if FLifeCycle > 0 then
-      LTokenValue.EndTime := IncSecond(LTokenValue.BeginTime, FLifeCycle);
-
-    Result := LTokenValue.ToToken;
-  finally
-    FreeAndNil(LTokenValue);
-  end;
-end;
-
-function TRESTDWAuthToken.GetTokenType(AValue: String): TRESTDWTokenType;
-begin
-  Result := rdwTS;
-
-  If LowerCase(AValue) = 'jwt' then
-    Result := rdwJWT
-  else if LowerCase(AValue) = 'rdwcustom' then
-    Result := rdwPersonal;
-end;
+Function TRESTDWAuthToken.GetTokenType(AValue : String): TRESTDWTokenType;
+Begin
+ Result := rdwTS;
+ If LowerCase(AValue) = 'jwt' then
+  Result := rdwJWT
+ Else if LowerCase(AValue) = 'rdwcustom' then
+  Result := rdwPersonal;
+End;
 
 procedure TRESTDWAuthToken.SetGetTokenEvent(AValue: String);
 begin
@@ -568,200 +804,175 @@ begin
     FromToken(FToken)
 end;
 
-function TRESTDWAuthToken.ValidateToken(AValue: String): Boolean;
-var
-  LHeader, LBody, LStringComparer: String;
-  LTokenValue: TTokenValue;
+Function TRESTDWAuthToken.ValidateToken(AValue : String) : Boolean;
+Var
+ LHeader, 
+ LBody, 
+ LStringComparer : String;
+ LTokenValue     : TTokenValue;
+ Function ReadHeader(AValue: String): Boolean;
+ Var
+  LJsonValue : TRESTDWJSONInterfaceObject;
+ Begin
+  LJsonValue := Nil;
+  Result := False;
+  Try
+   LJsonValue := TRESTDWJSONInterfaceObject.Create(AValue);
+   Try
+    If LJsonValue.PairCount = 2 Then
+     Begin
+      Result := (LowerCase(LJsonValue.Pairs[0].Name) = 'alg') And            
+                (LowerCase(LJsonValue.Pairs[1].Name) = 'typ');
+      If Result Then
+       Begin
+        FTokenType := GetTokenType(LJsonValue.Pairs[1].Value);
+        FCryptType := GetCryptType(LJsonValue.Pairs[0].Value);
+       End;
+     End;
+    Finally
+     If Assigned(LJsonValue) Then
+      FreeAndNil(LJsonValue);
+    End;
+  Except
 
-  function ReadHeader(AValue: String): Boolean;
-  var
-    LJsonValue: TRESTDWJSONInterfaceObject;
-  begin
-    LJsonValue := Nil;
-    Result := False;
-
-    try
-      LJsonValue := TRESTDWJSONInterfaceObject.Create(AValue);
-      try
-        if LJsonValue.PairCount = 2 then
-        begin
-          Result := (LowerCase(LJsonValue.Pairs[0].Name) = 'alg') And
-            (LowerCase(LJsonValue.Pairs[1].Name) = 'typ');
-
-          if Result then
-          begin
-            FTokenType := GetTokenType(LJsonValue.Pairs[1].Value);
-            FCryptType := GetCryptType(LJsonValue.Pairs[0].Value);
-          end;
-        end;
-      finally
-        if Assigned(LJsonValue) Then
-          FreeAndNil(LJsonValue);
-      end;
-    except
-
-    end;
-  end;
-
-  function ReadBody(AValue: String): Boolean;
-  var
-    LJsonValue: TRESTDWJSONInterfaceObject;
-  begin
-    LJsonValue := Nil;
-    Result := False;
-
-    LJsonValue := TRESTDWJSONInterfaceObject.Create(AValue);
-    try
-      Result := Trim(LJsonValue.PairByName['iss'].Name) <> '';
-
-      if Result then
-      begin
-        Result := FServerSignature = LTokenValue.vCripto.Decrypt
-          (LJsonValue.PairByName['iss'].Value);
-
-        if Result then
-        begin
-          Result := False;
-          FServerSignature := LTokenValue.vCripto.Decrypt
-            (LJsonValue.PairByName['iss'].Value);
-          Result := Trim(LJsonValue.PairByName['iat'].Name) <> '';
-
-          if Result then
-          Begin
-            Result := False;
-
-            if FTokenType = rdwTS then
-              FBeginTime := TTokenValue.DateTimeFromISO8601
-                (LJsonValue.PairByName['iat'].Value)
-            else
-              FBeginTime :=
-                UnixToDateTime
-                (StrToInt64(LJsonValue.PairByName['iat'].Value), False);
-          end;
-
-          Result := Trim(LJsonValue.PairByName['secrets'].Name) <> '';
-
-          if Result then
-            FSecrets := DecodeStrings(LJsonValue.PairByName['secrets']
-              .Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-
-          if Trim(LJsonValue.PairByName['exp'].Name) <> '' Then
-          begin
-            Result := False;
-
-            if FTokenType = rdwTS then
-              FEndTime := TTokenValue.DateTimeFromISO8601
-                (LJsonValue.PairByName['exp'].Value)
-            else
-              FEndTime := UnixToDateTime
-                (StrToInt64(LJsonValue.PairByName['exp'].Value), False);
-
-            Result := Now < FEndTime;
-          end;
-        end;
-      end
-      else
-        Result := FLifeCycle = 0;
-    finally
-      if Assigned(LJsonValue) Then
-        FreeAndNil(LJsonValue);
-    end;
-  end;
-
-begin
-  LHeader := '';
-  LBody := '';
-  LStringComparer := '';
-  AValue := StringReplace(AValue, ' ', '+', [rfReplaceAll]);
-  // Remove espaços na Token e add os caracteres "+" em seu lugar
-  LHeader := Copy(AValue, InitStrPos, Pos('.', AValue) - 1);
-
-  Delete(AValue, InitStrPos, Pos('.', AValue));
-
-  LBody := Copy(AValue, InitStrPos, Pos('.', AValue) - 1);
-
-  Delete(AValue, InitStrPos, Pos('.', AValue));
-
-  LStringComparer := AValue;
-  Result := (Trim(LHeader) <> '') And (Trim(LBody) <> '') And
-    (Trim(LStringComparer) <> '');
-
-  if Result then
-  begin
-    Result := ReadHeader(DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS},
-      csUndefined{$ENDIF}));
-
-    if Result then
-    begin
-      Result := False;
-      LTokenValue := TTokenValue.Create;
-      try
-        LTokenValue.TokenHash := FTokenHash;
-        LTokenValue.CryptType := FCryptType;
-        LStringComparer := LTokenValue.vCripto.Decrypt(LStringComparer);
-        Result := LStringComparer = LHeader + '.' + LBody;
-
-        if Result then
-        begin
-          Result := False;
-          LHeader := DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS},
-            csUndefined{$ENDIF});
-          LBody := DecodeStrings(LBody{$IFDEF RESTDWLAZARUS},
-            csUndefined{$ENDIF});
-          Secrets := DecodeStrings(GetSecretsValue(LBody){$IFDEF RESTDWLAZARUS},
-            csUndefined{$ENDIF});
-          Secrets := DecodeStrings
-            (GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS},
-            csUndefined{$ENDIF});
-          Result := ReadBody(LBody);
-        end;
-      finally
-        FreeAndNil(LTokenValue);
-      end;
-    end;
-  end;
-end;
+  End;
+ End;
+ Function ReadBody(AValue : String): Boolean;
+ Var
+  LJsonValue : TRESTDWJSONInterfaceObject;
+ Begin
+  LJsonValue := Nil;
+  Result := False;
+  LJsonValue := TRESTDWJSONInterfaceObject.Create(AValue);
+  Try
+   Result := Trim(LJsonValue.PairByName['iss'].Name) <> '';
+   If Result Then
+    Begin
+     Result := FServerSignature = LTokenValue.vCripto.Decrypt(LJsonValue.PairByName['iss'].Value);
+     If Result Then
+      Begin
+       Result           := False;
+       FServerSignature := LTokenValue.vCripto.Decrypt(LJsonValue.PairByName['iss'].Value);
+       Result           := Trim(LJsonValue.PairByName['iat'].Name) <> '';
+       If Result Then
+        Begin
+         Result := False;
+         If FTokenType = rdwTS Then
+          FBeginTime := TTokenValue.DateTimeFromISO8601(LJsonValue.PairByName['iat'].Value)
+         Else
+          FBeginTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['iat'].Value), False);
+        End;
+       Result := Trim(LJsonValue.PairByName['secrets'].Name) <> '';
+       If Result Then
+        FSecrets := DecodeStrings(LJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+       If Trim(LJsonValue.PairByName['exp'].Name) <> '' Then
+        Begin
+         Result := False;
+         If FTokenType = rdwTS Then
+          FEndTime := TTokenValue.DateTimeFromISO8601(LJsonValue.PairByName['exp'].Value)
+         Else
+          FEndTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['exp'].Value), False);
+         Result := Now < FEndTime;
+        End;
+      End;
+    End
+   Else
+    Result := FLifeCycle = 0;
+  Finally
+   If Assigned(LJsonValue) Then
+    FreeAndNil(LJsonValue);
+  End;
+ End;
+Begin
+ LHeader := '';
+ LBody := '';
+ LStringComparer := '';
+ AValue := StringReplace(AValue, ' ', '+', [rfReplaceAll]);
+  // Remove espaï¿½os na Token e add os caracteres "+" em seu lugar
+ LHeader := Copy(AValue, InitStrPos, Pos('.', AValue) - 1);
+ Delete(AValue, InitStrPos, Pos('.', AValue));
+ LBody := Copy(AValue, InitStrPos, Pos('.', AValue) - 1);
+ Delete(AValue, InitStrPos, Pos('.', AValue));
+ LStringComparer := AValue;
+ Result := (Trim(LHeader) <> '') And (Trim(LBody) <> '') And
+           (Trim(LStringComparer) <> '');
+ If Result Then
+  Begin
+   Result := ReadHeader(DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+   If Result then
+    Begin
+     Result := False;
+     LTokenValue := TTokenValue.Create;
+     Try
+      LTokenValue.TokenHash := FTokenHash;
+      LTokenValue.CryptType := FCryptType;
+      LStringComparer       := LTokenValue.vCripto.Decrypt(LStringComparer);
+      Result := LStringComparer = LHeader + '.' + LBody;
+      If Result Then
+       Begin
+        Result := False;
+        LHeader := DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        LBody   := DecodeStrings(LBody{$IFDEF RESTDWLAZARUS},   csUndefined{$ENDIF});
+        Secrets := DecodeStrings(GetSecretsValue(LBody){$IFDEF RESTDWLAZARUS},   csUndefined{$ENDIF});
+        Secrets := DecodeStrings(GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        Result := ReadBody(LBody);
+       End;
+     Finally
+      FreeAndNil(LTokenValue);
+     End;
+    End;
+  End;
+End;
 
 { TRESTDWAuthOAuth }
 
-function TRESTDWAuthOAuth.AuthValidate(ADataModuleRESTDW: TObject; AUrlToExec,
-  AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword: String;
-  ARawHeaders: TStrings; ARequestType: TRequestType;
-  var ADWParams: TRESTDWParams; var AGetToken, ATokenValidate: Boolean;
-  var AToken: String; var AErrorCode: Integer; var AErrorMessage: String;
-  var AAcceptAuth: Boolean): Boolean;
-begin
-  AAcceptAuth := False;
-  Result := False;
-  raise Exception.Create(cErrorOAuthNotImplenented);
-end;
+Function TRESTDWAuthOAuth.AuthValidate(ADataModuleRESTDW : TObject; 
+                                       AUrlToExec,
+                                       AWelcomeMessage, 
+                                       AAccessTag, 
+                                       AAuthUsername, 
+                                       AAuthPassword     : String;
+                                       ARawHeaders       : TStrings; 
+                                       ARequestType      : TRequestType;
+                                       Var ADWParams     : TRESTDWParams; 
+                                       Var AGetToken, 
+                                       ATokenValidate    : Boolean;
+                                       Var AToken        : String; 
+                                       Var AErrorCode    : Integer; 
+                                       Var AErrorMessage : String;
+                                       Var AAcceptAuth   : Boolean) : Boolean;
+Begin
+ AAcceptAuth := False;
+ Result := False;
+ Raise Exception.Create(cErrorOAuthNotImplenented);
+End;
 
-constructor TRESTDWAuthOAuth.Create(aOwner: TComponent);
-begin
-  inherited;
-  FClientID := '';
-  FClientSecret := '';
-  FToken := '';
-  FRedirectURI := '';
-  FGrantType := 'client_credentials';
-  FGetTokenEvent := 'access-token';
-  FGrantCodeEvent := 'authorize';
-  FAutoBuildHex := False;
-  FExpiresIn := 0;
-  FTokenType := rdwOATBasic;
-end;
+Constructor TRESTDWAuthOAuth.Create(aOwner: TComponent);
+Begin
+ Inherited;
+ FClientID       := '';
+ FClientSecret   := '';
+ FToken          := '';
+ FRedirectURI    := '';
+ FGrantType      := 'client_credentials';
+ FGetTokenEvent  := 'access-token';
+ FGrantCodeEvent := 'authorize';
+ FAutoBuildHex   := False;
+ FExpiresIn      := 0;
+ FTokenType      := rdwOATBasic;
+End;
 
 { TRESTDWAuthenticatorBase }
 
-constructor TRESTDWAuthenticatorBase.Create(aOwner: TComponent);
-begin
-  inherited;
-  FAuthDialog := True;
-end;
+Constructor TRESTDWAuthenticatorBase.Create(aOwner: TComponent);
+Begin
+ Inherited;
+ FAuthDialog := True;
+End;
 
-destructor TRESTDWAuthenticatorBase.Destroy;
-begin
-  inherited;
-end;
+Destructor TRESTDWAuthenticatorBase.Destroy;
+Begin
+ Inherited;
+End;
 
-end.
+End.

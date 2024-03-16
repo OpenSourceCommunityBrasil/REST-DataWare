@@ -23,6 +23,9 @@ unit uRESTDWJSONInterface;
 
 interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
 Uses
   SysUtils, Classes, Variants,
   {$IFDEF RESTDWFMX} system.json, {$ELSE} uRESTDWJSON, {$ENDIF}
@@ -69,7 +72,7 @@ Type
     Function PairCount: Integer;
   End;
 
-  TRESTDWJSONValue = Class(TRESTDWJSONInterfaceBase)
+  TRESTDWJSONValueInterface = Class(TRESTDWJSONInterfaceBase)
   Private
     Function GetPair(Index: Integer): TRESTDWJSONPair;
     Procedure PutPair(Index: Integer; Value: TRESTDWJSONPair);
@@ -83,7 +86,7 @@ Type
     Function GetObject(Index: Integer): TRESTDWJSONInterfaceBase;
     Function ToJSON: String;
     Constructor Create;
-    Destructor Destroy; Override;
+    Destructor  Destroy; Override;
   End;
 
   TRESTDWJSONInterfaceObject = Class(TJSONBaseObjectClass)
@@ -94,7 +97,7 @@ Type
     Procedure PutPairN(Index: String; Item: TRESTDWJSONPair); Overload;
   Public
     Constructor Create(JSONValue: String); Overload;
-    Destructor Destroy; Override;
+    Destructor  Destroy; Override;
     Function PairCount: Integer;
     Function ToJSON: String;
     Function ClassType: TClass;
@@ -145,8 +148,6 @@ Var
   {$ENDIF}
 Begin
   result := TRESTDWJSONInterfaceArray.Create;
-  If JSONObject = Nil Then
-    Exit;
   {$IFDEF RESTDWFMX}
   If TJSONObject(JSONObject).ClassName = 'TJSONObject' Then
   Begin
@@ -161,11 +162,12 @@ Begin
   Begin
     aJSONArray := TJSONObject.ParseJSONValue
       (GetElementJSON(TJSONObject(JSONObject), key)) as TJSONArray;
+
     result.vJSONObject := TJSONBaseClass(aJSONArray);
     // (Key).ToJSON) as TJSONArray);
   End;
   {$ELSE}
-  result.vJSONObject := TJSONBaseClass(JSONObject.getJSONArray(key));
+   result.vJSONObject := TJSONBaseClass(JSONObject.getJSONArray(key));
   {$ENDIF}
 End;
 
@@ -179,6 +181,8 @@ Var
   {$ENDIF}
 Begin
   result := TRESTDWJSONInterfaceArray.Create;
+  If Assigned(vJSONObject) Then
+   FreeAndNil(vJSONObject);
   {$IFDEF RESTDWFMX}
   If TJSONObject(JSONObject).ClassName = 'TJSONObject' Then
   Begin
@@ -213,7 +217,7 @@ End;
 Destructor TRESTDWJSONInterfaceArray.Destroy;
 Begin
   If Assigned(vJSONObject) Then
-   FreeAndNil(TJSONBaseClass(vJSONObject));
+   FreeAndNil(vJSONObject);
   inherited;
 End;
 
@@ -238,36 +242,33 @@ End;
 Function TRESTDWJSONInterfaceArray.GetObject(Index: Integer)
   : TRESTDWJSONInterfaceBase;
 Var
-  {$IFDEF RESTDWFMX}
-  aJSONObject: TJSONArray;
-  aJSONValue: TJSONValue;
-  {$ENDIF}
-  vClassName: String;
+ {$IFDEF RESTDWFMX}
+  aJSONObject : TJSONArray;
+  aJSONValue  : TJSONValue;
+ {$ENDIF}
+ vClassName  : String;
 Begin
   result := TRESTDWJSONInterfaceBase.Create(vJSONObject);
-  If (Uppercase(TJSONObject(vJSONObject).ClassName)
-    = Uppercase('TJSONArray')) Then
-  Begin
+  vClassName := TJSONObject(vJSONObject).ClassName;
+  If (Uppercase(TJSONObject(vJSONObject).ClassName) = Uppercase('TJSONArray')) Then
+   Begin
     {$IFDEF RESTDWFMX}
-    aJSONValue := TJSONObject.ParseJSONValue(TJSONObject(JSONObject)
-      .Get(Index).ToJSON);
+    aJSONValue := TJSONObject.ParseJSONValue(TJSONObject(JSONObject).Get(Index).ToJSON);
     If aJSONValue is TJSONObject Then
-      result.vJSONObject := TJSONBaseClass(aJSONValue as TJSONObject)
+     result.vJSONObject := TJSONBaseClass(aJSONValue as TJSONObject)
     Else
-      result.vJSONObject := TJSONBaseClass(aJSONValue);
+     result.vJSONObject := TJSONBaseClass(aJSONValue);
     {$ELSE}
     If TJSONArray(vJSONObject).isnull(Index) Then
-      result.vJSONObject := Nil
+     result.vJSONObject := Nil
     Else
-    Begin
-      result.vJSONObject := TJSONBaseClass(TJSONArray(vJSONObject)
-        .optJSONArray(Index));
+     Begin
+      result.vJSONObject := TJSONBaseClass(TJSONArray(vJSONObject).optJSONArray(Index));
       If result.vJSONObject = Nil then
-        result.vJSONObject := TJSONBaseClass(TJSONArray(vJSONObject)
-          .opt(Index));
-    End;
+       result.vJSONObject := TJSONBaseClass(TJSONArray(vJSONObject).opt(Index));
+     End;
     {$ENDIF}
-  End
+   End
   Else If (Uppercase(TJSONObject(vJSONObject).ClassName)
     = Uppercase('TJSONObject')) Then
   Begin
@@ -291,32 +292,32 @@ End;
 
 Constructor TRESTDWJSONInterfaceObject.Create(JSONValue: String);
 Begin
- Inherited Create;
- If JSONValue <> '' Then
+  Inherited Create;
+  If JSONValue <> '' Then
   Begin
-   {$IFDEF RESTDWFMX}
+    If Assigned(vJSONObject) Then
+     FreeAndNil(vJSONObject);
+    {$IFDEF RESTDWFMX}
     If JSONValue[InitStrPos] = '[' then
-     vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue(JSONValue) as TJSONArray)
+      vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue(JSONValue) as TJSONArray)
     Else If JSONValue[InitStrPos] = '{' then
-     vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue(JSONValue) as TJSONObject)
+      vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue(JSONValue) as TJSONObject)
     Else
-     vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue('{}')      as TJSONObject)
-   {$ELSE}
+      vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue('{}') 	  as TJSONObject)
+    {$ELSE}
     If JSONValue[InitStrPos] = '[' then
-     vJSONObject := TJSONBaseClass(TJSONArray.Create(JSONValue))
+      vJSONObject := TJSONBaseClass(TJSONArray.Create(JSONValue))
     Else If JSONValue[InitStrPos] = '{' then
-     vJSONObject := TJSONBaseClass(TJSONObject.Create(JSONValue))
+      vJSONObject := TJSONBaseClass(TJSONObject.Create(JSONValue))
     Else
-     vJSONObject := TJSONBaseClass(TJSONObject.Create('{}'))
-   {$ENDIF}
+      vJSONObject := TJSONBaseClass(TJSONObject.Create('{}'))
+    {$ENDIF}
   End;
 End;
 
 Destructor TRESTDWJSONInterfaceObject.Destroy;
 Begin
-  If vJSONObject <> Nil Then
-    FreeAndNil(TJSONBaseClass(vJSONObject));
-  Inherited;
+ Inherited;
 End;
 
 Function TRESTDWJSONInterfaceObject.GetPairN(Index: String): TRESTDWJSONPair;
@@ -687,27 +688,31 @@ Begin
   result := TJSONObject(vJSONObject).toString;
 End;
 
-{ TRESTDWJSONValue }
+{ TRESTDWJSONValueInterface }
 
-Function TRESTDWJSONValue.GetPair(Index: Integer): TRESTDWJSONPair;
+Function TRESTDWJSONValueInterface.GetPair(Index: Integer): TRESTDWJSONPair;
 Begin
   result.Name := TJSONObject(Self).toString;
   result.Value := TJSONObject(Self).toString;
   result.ClassName := TJSONObject(Self).ClassName;
 End;
 
-procedure TRESTDWJSONValue.PutPair(Index: Integer; Value: TRESTDWJSONPair);
+procedure TRESTDWJSONValueInterface.PutPair(Index: Integer; Value: TRESTDWJSONPair);
 begin
 
 end;
 
 constructor TJSONBaseArrayClass.Create;
 begin
+  If Assigned(vJSONObject) Then
+   FreeAndNil(vJSONObject);
   inherited;
 end;
 
 destructor TJSONBaseArrayClass.Destroy;
 begin
+  If Assigned(vJSONObject) Then
+   FreeAndNil(vJSONObject);
   inherited;
 end;
 
@@ -718,6 +723,7 @@ End;
 
 procedure TJSONBaseArrayClass.SetObject(Value: TJSONArray);
 begin
+ If Assigned(Value) then
   vJSONObject := TJSONBaseClass(Value);
 end;
 
@@ -725,12 +731,15 @@ end;
 
 constructor TJSONBaseObjectClass.Create;
 begin
-  Inherited Create;
+ Inherited Create;
+ vJSONObject := Nil;
 end;
 
 destructor TJSONBaseObjectClass.Destroy;
 begin
-  inherited;
+  If Assigned(vJSONObject) Then
+   FreeAndNil(vJSONObject);
+ Inherited;
 end;
 
 Function TJSONBaseObjectClass.GetObject: TJSONObject;
@@ -754,7 +763,7 @@ end;
 Destructor TRESTDWJSONInterfaceBase.Destroy;
 Begin
   If Assigned(vJSONObject) Then
-    FreeAndNil(TJSONBaseClass(vJSONObject));
+   FreeAndNil(vJSONObject);
   inherited;
 End;
 

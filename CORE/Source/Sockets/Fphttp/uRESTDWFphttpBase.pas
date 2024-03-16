@@ -23,11 +23,17 @@ unit uRESTDWFphttpBase;
   Roniery                    - Devel.
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 
 interface
 
 uses
-  SysUtils, Classes, DateUtils, SyncObjs, ExtCtrls, sslbase,
+  SysUtils, Classes, DateUtils, SyncObjs, sslbase,
   uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWJSONObject, uRESTDWBasic,
   uRESTDWBasicDB, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
   uRESTDWConsts, uRESTDWDataUtils, uRESTDWTools, uRESTDWAuthenticators,
@@ -35,6 +41,8 @@ uses
 
 type
   TRESTDWFphttpServicePooler = class;
+  TEventType                 = Procedure(Url : string) Of Object;
+  PEventType                 = ^TEventType;
 
   { TRESTDWFpHttpThread }
 
@@ -94,6 +102,9 @@ type
     vBandWidthLimitBytes: cardinal;
     vBandWidthSampleSec: cardinal;
     vListenBacklog: integer;
+  private
+   procedure Redirect(Url: string;
+                      AResponse : TObject);
 
     procedure ExecRequest(var ARequest: TFPHTTPConnectionRequest;
       var AResponse: TFPHTTPConnectionResponse);
@@ -233,6 +244,12 @@ end;
 
 {TRESTDWFphttpServicePooler}
 
+procedure TRESTDWFphttpServicePooler.Redirect(Url       : string;
+                                              AResponse : TObject);
+begin
+// AResponse.SendRedirect(Url);
+end;
+
 procedure TRESTDWFphttpServicePooler.ExecRequest(
   var ARequest: TFPHTTPConnectionRequest;
   var AResponse: TFPHTTPConnectionResponse);
@@ -319,10 +336,6 @@ var
     HeaderList.Free;
   end;
 
-  procedure Redirect(Url: string);
-  begin
-    AResponse.SendRedirect(Url);
-  end;
 
   procedure WriteError;
   begin
@@ -349,13 +362,17 @@ begin
   ResultStream := nil;
   CORSCustomHeaders := nil;
   ContentStringStream := nil;
-
   HeaderList := TStringList.Create;
-
-
   ParseHeader;
-
-  vRedirect := TRedirect(@Redirect);
+  {$IFDEF RESTDWLAZARUS}
+//   vRedirect := TRedirect(Redirect);
+  {$ELSE}
+   {$IFDEF FPC}
+//    vRedirect := TRedirect(@Redirect);
+   {$ELSE}
+//    vRedirect := TRedirect(Redirect);
+   {$ENDIF}
+  {$ENDIF}
   vContentType := ARequest.ContentType;
   vAuthRealm := AResponse.WWWAuthenticate;
   sCharSet := aRequest.AcceptCharset;

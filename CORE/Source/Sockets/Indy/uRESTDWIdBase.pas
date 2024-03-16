@@ -25,6 +25,10 @@ unit uRESTDWIdBase;
 
 interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
   {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
   {$IFNDEF RESTDWLAZARUS}SyncObjs,{$ENDIF}
@@ -42,6 +46,59 @@ Uses
 
 Type
  PIdSSLVersions = ^TIdSSLVersions;
+
+ TRESTDWIdProxyRouter = Class(TRESTDWProxyBase)
+ Private
+  vCipherList,
+  vaSSLRootCertFile,
+  ASSLPrivateKeyFile,
+  ASSLPrivateKeyPassword,
+  ASSLCertFile                     : String;
+  aSSLMethod                       : TIdSSLVersion;
+  HTTPServer                       : TIdHTTPServer;
+  lHandler                         : TIdServerIOHandlerSSLOpenSSL;
+  vSSLVerifyMode                   : TIdSSLVerifyModeSet;
+  vSSLVerifyDepth                  : Integer;
+  vSSLMode                         : TIdSSLMode;
+  aSSLVersions                     : TIdSSLVersions;
+  Procedure aCommandGet             (AContext         : TIdContext;
+                                     ARequestInfo     : TIdHTTPRequestInfo;
+                                     AResponseInfo    : TIdHTTPResponseInfo);
+  Procedure aCommandOther           (AContext         : TIdContext;
+                                     ARequestInfo     : TIdHTTPRequestInfo;
+                                     AResponseInfo    : TIdHTTPResponseInfo);
+  Procedure CustomOnConnect         (AContext         : TIdContext);
+  procedure IdHTTPServerQuerySSLPort(APort            : Word;
+                                     Var VUseSSL      : Boolean);
+  Procedure CreatePostStream        (AContext         : TIdContext;
+                                     AHeaders         : TIdHeaderList;
+                                     Var VPostStream  : TStream);
+  Procedure OnParseAuthentication   (AContext         : TIdContext;
+                                     Const AAuthType,
+                                     AAuthData        : String;
+                                     var VUsername,
+                                     VPassword        : String;
+                                     Var VHandled     : Boolean);
+  Procedure SetActive               (Value            : Boolean);Override;
+  Function  SSLVerifyPeer           (Certificate      : TIdX509;
+                                     AOk              : Boolean;
+                                     ADepth, AError   : Integer) : Boolean;
+  Procedure GetSSLPassWord          (Var Password     : String);
+ Public
+  Constructor Create                (AOwner           : TComponent);Override;
+  Destructor  Destroy; override;
+ Published
+  Property SSLPrivateKeyFile       : String              Read aSSLPrivateKeyFile       Write aSSLPrivateKeyFile;
+  Property SSLPrivateKeyPassword   : String              Read aSSLPrivateKeyPassword   Write aSSLPrivateKeyPassword;
+  Property SSLCertFile             : String              Read aSSLCertFile             Write aSSLCertFile;
+  Property SSLRootCertFile         : String              Read vaSSLRootCertFile        Write vaSSLRootCertFile;
+  Property SSLVerifyMode           : TIdSSLVerifyModeSet Read vSSLVerifyMode           Write vSSLVerifyMode;
+  Property SSLVerifyDepth          : Integer             Read vSSLVerifyDepth          Write vSSLVerifyDepth;
+  Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
+  Property SSLMethod               : TIdSSLVersion       Read aSSLMethod               Write aSSLMethod;
+  Property SSLVersions             : TIdSSLVersions      Read aSSLVersions             Write aSSLVersions;
+  Property CipherList              : String              Read vCipherList              Write vCipherList;
+End;
 
  TRESTDWIdServicePooler = Class(TRESTServicePoolerBase)
  Private
@@ -143,11 +200,13 @@ End;
   Function  GetVerifyCert                         : Boolean;
   Procedure SetVerifyCert     (aValue             : Boolean);
   {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHI10_2UP)}
-  Function IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
-                                                  AOk         : Boolean): Boolean;Overload;
-  Function IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
-                                                  AOk         : Boolean;
-                                                  ADepth      : Integer): Boolean;Overload;
+   {$IFNDEF FPC}
+    Function IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
+                                                    AOk         : Boolean): Boolean;Overload;
+    Function IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
+                                                    AOk         : Boolean;
+                                                    ADepth      : Integer): Boolean;Overload;
+   {$ENDIF}
   {$IFEND}
   Function IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
                                                   AOk         : Boolean;
@@ -320,6 +379,9 @@ End;
                                     aEncoding              : TEncodeSelect;
                                     aAccessTag             : String;
                                     aAuthenticationOptions : TRESTDWClientAuthOptionParams);Override;
+  Function    IsServerLive         (Aip          : String;
+                                    Aport        : Integer;
+                                    AMessageErro : String): Boolean;
   Procedure Abort;Override;
  Published
   Property SSLMode                 : TIdSSLMode               Read vSSLMode                 Write vSSLMode;
@@ -346,8 +408,12 @@ Begin
  if Assigned(HttpRequest) then
  begin
   Try
-   HttpRequest.IOHandler.CloseGracefully;
-   HttpRequest.Disconnect(false);
+   If Assigned(HttpRequest) Then
+    Begin
+     If Assigned(HttpRequest.IOHandler) Then
+      HttpRequest.IOHandler.CloseGracefully;
+     HttpRequest.Disconnect(false);
+    End;
   Except
   End;
   FreeAndNil(HttpRequest);
@@ -357,7 +423,15 @@ End;
 
 Procedure TRESTDWIdClientREST.DestroyClient;
 Begin
- {$IFNDEF RESTDWLAZARUS}Inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}
+  {$IFNDEF FPC}
+   Inherited;
+  {$ENDIF}
+ {$ELSE}
+  {$IFNDEF FPC}
+   Inherited;
+  {$ENDIF}
+ {$ENDIF}
  If Assigned(HttpRequest) Then
   Begin
    HttpRequest.Disconnect(False);
@@ -370,17 +444,25 @@ Begin
  If Assigned(OnWork) Then
   Begin
    {$IFDEF RESTDWLAZARUS}
-   HttpRequest.OnWork := @pOnWork;
+    HttpRequest.OnWork := @pOnWork;
    {$ELSE}
-   HttpRequest.OnWork := pOnWork;
+    {$IFDEF FPC}
+     HttpRequest.OnWork := @pOnWork;
+    {$ELSE}
+     HttpRequest.OnWork := pOnWork;
+    {$ENDIF}
    {$ENDIF}
   End;
  If Assigned(OnWorkBegin) Then
   Begin
    {$IFDEF RESTDWLAZARUS}
-   HttpRequest.OnWorkBegin := @pOnWorkBegin;
+   HttpRequest.OnWorkBegin   := @pOnWorkBegin;
    {$ELSE}
-   HttpRequest.OnWorkBegin := pOnWorkBegin;
+    {$IFDEF FPC}
+     HttpRequest.OnWorkBegin := @pOnWorkBegin;
+    {$ELSE}
+     HttpRequest.OnWorkBegin := pOnWorkBegin;
+    {$ENDIF}
    {$ENDIF}
   End;
  If Assigned(OnWorkEnd) Then
@@ -388,50 +470,61 @@ Begin
    {$IFDEF RESTDWLAZARUS}
    HttpRequest.OnWorkEnd := @pOnWorkEnd;
    {$ELSE}
-   HttpRequest.OnWorkEnd := pOnWorkEnd;
+    {$IFDEF FPC}
+     HttpRequest.OnWorkEnd := @pOnWorkEnd;
+    {$ELSE}
+     HttpRequest.OnWorkEnd := pOnWorkEnd;
+    {$ENDIF}
    {$ENDIF}
   End;
  If Assigned(OnStatus) Then
   Begin
    {$IFDEF RESTDWLAZARUS}
-   HttpRequest.OnStatus := @pOnStatus;
+   HttpRequest.OnStatus   := @pOnStatus;
    {$ELSE}
-   HttpRequest.OnStatus := pOnStatus;
+    {$IFDEF FPC}
+     HttpRequest.OnStatus := @pOnStatus;
+    {$ELSE}
+     HttpRequest.OnStatus := pOnStatus;
+    {$ENDIF}
    {$ENDIF}
   End;
 End;
 
 Procedure TRESTDWIdClientREST.SetParams;
 begin
- If Not Assigned(HttpRequest) Then
-  HttpRequest := TIdHTTP.Create;
- SetInternalEvents;
- If HttpRequest.Request.BasicAuthentication Then
-  Begin
-   If HttpRequest.Request.Authentication = Nil Then
-    HttpRequest.Request.Authentication         := TIdBasicAuthentication.Create;
-  End;
- HttpRequest.ProxyParams.ProxyUsername         := ProxyOptions.ProxyUsername;
- HttpRequest.ProxyParams.ProxyServer           := ProxyOptions.ProxyServer;
- HttpRequest.ProxyParams.ProxyPassword         := ProxyOptions.ProxyPassword;
- HttpRequest.ProxyParams.ProxyPort             := ProxyOptions.ProxyPort;
- HttpRequest.ReadTimeout                       := RequestTimeout;
- HttpRequest.ConnectTimeout                    := ConnectTimeOut;
- HttpRequest.AllowCookies                      := AllowCookies;
- HttpRequest.HandleRedirects                   := HandleRedirects;
- HttpRequest.RedirectMaximum                   := RedirectMaximum;
- HttpRequest.HTTPOptions                       := [hoKeepOrigProtocol];
- If RequestCharset = esUtf8 Then
-  Begin
-   HttpRequest.Request.Charset                  := 'utf-8';
-   HttpRequest.Request.AcceptCharSet            := HttpRequest.Request.Charset;
-  End;
- HttpRequest.Request.Accept                    := Accept;
- HttpRequest.Request.AcceptEncoding            := AcceptEncoding;
- HttpRequest.Request.ContentType               := ContentType;
- HttpRequest.Request.ContentEncoding           := ContentEncoding;
- HttpRequest.Request.UserAgent                 := UserAgent;
- HttpRequest.MaxAuthRetries                    := MaxAuthRetries;
+ Try
+  If Not Assigned(HttpRequest) Then
+   HttpRequest := TIdHTTP.Create;
+ Finally
+  SetInternalEvents;
+  If HttpRequest.Request.BasicAuthentication Then
+   Begin
+    If HttpRequest.Request.Authentication = Nil Then
+     HttpRequest.Request.Authentication         := TIdBasicAuthentication.Create;
+   End;
+  HttpRequest.ProxyParams.ProxyUsername         := ProxyOptions.ProxyUsername;
+  HttpRequest.ProxyParams.ProxyServer           := ProxyOptions.ProxyServer;
+  HttpRequest.ProxyParams.ProxyPassword         := ProxyOptions.ProxyPassword;
+  HttpRequest.ProxyParams.ProxyPort             := ProxyOptions.ProxyPort;
+  HttpRequest.ReadTimeout                       := RequestTimeout;
+  HttpRequest.ConnectTimeout                    := ConnectTimeOut;
+  HttpRequest.AllowCookies                      := AllowCookies;
+  HttpRequest.HandleRedirects                   := HandleRedirects;
+  HttpRequest.RedirectMaximum                   := RedirectMaximum;
+  HttpRequest.HTTPOptions                       := [hoKeepOrigProtocol];
+  If RequestCharset = esUtf8 Then
+   Begin
+    HttpRequest.Request.Charset                  := 'utf-8';
+    HttpRequest.Request.AcceptCharSet            := HttpRequest.Request.Charset;
+   End;
+  HttpRequest.Request.Accept                    := Accept;
+  HttpRequest.Request.AcceptEncoding            := AcceptEncoding;
+  HttpRequest.Request.ContentType               := ContentType;
+  HttpRequest.Request.ContentEncoding           := ContentEncoding;
+  HttpRequest.Request.UserAgent                 := UserAgent;
+  HttpRequest.MaxAuthRetries                    := MaxAuthRetries;
+ End;
 End;
 
 Function TRESTDWIdClientREST.Get(AUrl            : String         = '';
@@ -506,11 +599,13 @@ Begin
      if Assigned(OnHeadersAvailable) then
       OnHeadersAvailable(HttpRequest.Response.RawHeaders, True);
      atempResponse.Position := 0;
-     If RequestCharset = esUtf8 Then
-      aString := utf8Decode(TStringStream(atempResponse).DataString)
-     Else
-      aString := TStringStream(atempResponse).DataString;
-     StringToStream(AResponse, aString);
+     //atempResponse.Position := 0;
+//     If RequestCharset = esUtf8 Then
+//      aString := utf8decode(TStringStream(atempResponse).DataString)
+//     Else
+      //aString := TStringStream(atempResponse).DataString;
+      AResponse.CopyFrom(atempResponse, atempResponse.Size);
+     //StringToStream(AResponse, aString);
      FreeAndNil(atempResponse);
      AResponse.Position := 0;
      If Not IgnoreEvents Then
@@ -619,7 +714,7 @@ Begin
   {$ELSE}
     atempResponse := TStringStream.Create('');
   {$ENDIF}
-  If Not Assigned(CustomBody) Then  
+  If Not Assigned(CustomBody) Then
   {$IFDEF DELPHIXEUP}
    tempResponse  := TStringStream.Create('', TEncoding.UTF8);
   {$ELSE}
@@ -725,6 +820,7 @@ Begin
   vTempHeaders := TStringList.Create;
   {$IFDEF DELPHIXEUP}
    atempResponse  := TStringStream.Create('', TEncoding.UTF8);
+   //atempResponse  := TStringStream.Create('');
   {$ELSE}
     atempResponse := TStringStream.Create('');
   {$ENDIF}
@@ -2596,18 +2692,19 @@ Begin
 End;
 
 {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHI10_2UP)}
-Function TRESTDWIdClientREST.IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
-                                                                    AOk         : Boolean) : Boolean;
-Begin
- Result := IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate, AOk, -1);
-End;
-
-Function TRESTDWIdClientREST.IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
-                                                                    AOk         : Boolean;
-                                                                    ADepth      : Integer) : Boolean;
-Begin
- Result := IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate, AOk, ADepth, -1);
-End;
+ {$IFNDEF FPC}
+  Function TRESTDWIdClientREST.IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
+                                                                      AOk         : Boolean) : Boolean;
+  Begin
+   Result := IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate, AOk, -1);
+  End;
+  Function TRESTDWIdClientREST.IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
+                                                                      AOk         : Boolean;
+                                                                      ADepth      : Integer) : Boolean;
+  Begin
+   Result := IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate, AOk, ADepth, -1);
+  End;
+ {$ENDIF}
 {$IFEND}
 
 Function TRESTDWIdClientREST.IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
@@ -2650,7 +2747,11 @@ Begin
    {$IFDEF RESTDWLAZARUS}
     ssl.OnGetPassword          := @Getpassword;
    {$ELSE}
-    ssl.OnGetPassword          := Getpassword;
+    {$IFDEF FPC}
+     ssl.OnGetPassword         := @Getpassword;
+    {$ELSE}
+     ssl.OnGetPassword         := Getpassword;
+    {$ENDIF}
    {$ENDIF}
    ssl.SSLOptions.CertFile     := vCertFile;
    ssl.SSLOptions.KeyFile      := vKeyFile;
@@ -2768,15 +2869,18 @@ Begin
   Begin
    If ssl = Nil Then
     Begin
-     ssl               := TIdSSLIOHandlerSocketOpenSSL.Create(HttpRequest);
+     ssl                := TIdSSLIOHandlerSocketOpenSSL.Create(HttpRequest);
      {$IFDEF RESTDWLAZARUS}
-      ssl.OnVerifyPeer := @IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
+      ssl.OnVerifyPeer  := @IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
      {$ELSE}
-      ssl.OnVerifyPeer := IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
+      {$IFDEF FPC}
+       ssl.OnVerifyPeer := @IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
+      {$ELSE}
+       ssl.OnVerifyPeer := IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
+      {$ENDIF}
      {$ENDIF}
     End;
     ssl.SSLOptions.SSLVersions := vSSLVersions;
-
    SetCertOptions;
    If Assigned(HttpRequest) Then
     HttpRequest.IOHandler := ssl;
@@ -2794,7 +2898,11 @@ Var
  vmark       : String;
  DWParams    : TRESTDWParams;
 Begin
- {$IFNDEF RESTDWLAZARUS}Inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}
+  {$IFNDEF FPC}
+   Inherited;
+  {$ENDIF}
+ {$ENDIF}
  vmark       := '';
  DWParams    := Nil;
  HttpRequest.Request.AcceptEncoding := AcceptEncoding;
@@ -2967,7 +3075,11 @@ Begin
  vCORSHeader     := TStringList.Create;
  vResponseString := '';
  {$IFNDEF RESTDWLAZARUS}
-  @vRedirect     := @Redirect;
+  {$IFNDEF FPC}
+   @vRedirect    := @Redirect;
+  {$ELSE}
+   vRedirect     := TRedirect(@Redirect);
+  {$ENDIF}
  {$ELSE}
   vRedirect      := TRedirect(@Redirect);
  {$ENDIF}
@@ -3106,12 +3218,21 @@ Begin
  HTTPServer.OnParseAuthentication := @OnParseAuthentication;
  DatabaseCharSet                  := csUndefined;
  {$ELSE}
- HTTPServer.OnQuerySSLPort       := IdHTTPServerQuerySSLPort;
- HTTPServer.OnCommandGet         := aCommandGet;
- HTTPServer.OnCommandOther       := aCommandOther;
- HTTPServer.OnConnect            := CustomOnConnect;
- HTTPServer.OnCreatePostStream   := CreatePostStream;
- HTTPServer.OnParseAuthentication := OnParseAuthentication;
+  {$IFDEF FPC}
+   HTTPServer.OnQuerySSLPort        := @IdHTTPServerQuerySSLPort;
+   HTTPServer.OnCommandGet          := @aCommandGet;
+   HTTPServer.OnCommandOther        := @aCommandOther;
+   HTTPServer.OnConnect             := @CustomOnConnect;
+   HTTPServer.OnCreatePostStream    := @CreatePostStream;
+   HTTPServer.OnParseAuthentication := @OnParseAuthentication;
+  {$ELSE}
+   HTTPServer.OnQuerySSLPort       := IdHTTPServerQuerySSLPort;
+   HTTPServer.OnCommandGet         := aCommandGet;
+   HTTPServer.OnCommandOther       := aCommandOther;
+   HTTPServer.OnConnect            := CustomOnConnect;
+   HTTPServer.OnCreatePostStream   := CreatePostStream;
+   HTTPServer.OnParseAuthentication := OnParseAuthentication;
+  {$ENDIF}
  {$ENDIF}
  HTTPServer.MaxConnections      := -1;
  FSocketKind := 'Indy';
@@ -3143,7 +3264,11 @@ Procedure TRESTDWIdServicePooler.EchoPooler(ServerMethodsClass,
 Var
  I : Integer;
 Begin
- {$IFNDEF RESTDWLAZARUS}Inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}
+  {$IFNDEF FPC}
+   Inherited;
+  {$ENDIF}
+ {$ENDIF}
  InvalidTag := False;
  MyIP       := '';
  If ServerMethodsClass <> Nil Then
@@ -3267,11 +3392,16 @@ Begin
       lHandler.SSLOptions.Method                := aSSLMethod;
       lHandler.SSLOptions.SSLVersions           := PIdSSLVersions(@SSLVersions)^;
       {$IFDEF RESTDWLAZARUS}
-      lHandler.OnGetPassword                    := @GetSSLPassword;
-      lHandler.OnVerifyPeer                     := @SSLVerifyPeer;
+       lHandler.OnGetPassword                   := @GetSSLPassword;
+       lHandler.OnVerifyPeer                    := @SSLVerifyPeer;
       {$ELSE}
-      lHandler.OnGetPassword                    := GetSSLPassword;
-      lHandler.OnVerifyPeer                     := SSLVerifyPeer;
+       {$IFDEF FPC}
+        lHandler.OnGetPassword                  := @GetSSLPassword;
+        lHandler.OnVerifyPeer                   := @SSLVerifyPeer;
+       {$ELSE}
+        lHandler.OnGetPassword                  := GetSSLPassword;
+        lHandler.OnVerifyPeer                   := SSLVerifyPeer;
+       {$ENDIF}
       {$ENDIF}
       lHandler.SSLOptions.CertFile              := ASSLCertFile;
       lHandler.SSLOptions.KeyFile               := ASSLPrivateKeyFile;
@@ -3284,32 +3414,28 @@ Begin
      End
     Else
      HTTPServer.IOHandler  := Nil;
-
     If HTTPServer.Bindings.Count > 0 Then
      HTTPServer.Bindings.Clear;
-
     //Add IPv4 bind
-    if ((ServerIPVersionConfig.ServerIpVersion = sivBoth) or (ServerIPVersionConfig.ServerIpVersion = sivIPv4)) then
-    begin
-      with HTTPServer.Bindings.Add do
-      begin
+    If ((ServerIPVersionConfig.ServerIpVersion = sivBoth) or (ServerIPVersionConfig.ServerIpVersion = sivIPv4)) then
+     Begin
+      With HTTPServer.Bindings.Add do
+       Begin
         IP := ServerIPVersionConfig.IPv4Address;
         IPVersion := Id_IPv4;
         Port := ServicePort;
-      end;
-    end;
-
+       End;
+     End;
     //Add IPv6 bind
-    if ((ServerIPVersionConfig.ServerIpVersion = sivBoth) or (ServerIPVersionConfig.ServerIpVersion = sivIPv6)) then
-    begin
-      with HTTPServer.Bindings.Add do
-      begin
+    If ((ServerIPVersionConfig.ServerIpVersion = sivBoth) or (ServerIPVersionConfig.ServerIpVersion = sivIPv6)) then
+     Begin
+      With HTTPServer.Bindings.Add do
+       Begin
         IP := ServerIPVersionConfig.IPv6Address;
         IPVersion := Id_IPv6;
         Port := ServicePort;
-      end;
-    end;
-
+       End;
+     End;
     HTTPServer.DefaultPort          := ServicePort;
     HTTPServer.Active               := True;
    Except
@@ -3364,7 +3490,11 @@ End;
 
 procedure TRESTDWIdClientPooler.Abort;
 begin
-  {$IFNDEF RESTDWLAZARUS}inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}
+  {$IFNDEF FPC}
+   Inherited;
+  {$ENDIF}
+ {$ENDIF}
 end;
 
 Constructor TRESTDWIdClientPooler.Create(AOwner : TComponent);
@@ -3383,6 +3513,39 @@ Begin
  Inherited;
 End;
 
+function TRESTDWIdClientPooler.IsServerLive(Aip: String; Aport: Integer;
+  AMessageErro: String): Boolean;
+var
+  Ping: TIdTCPClient;
+begin
+  Result := True;
+  Ping := TIdTCPClient.Create(nil);
+  try
+    try
+      with Ping do
+      begin
+        if length(trim(Aip)) > 0 then
+           Host := Aip
+        else
+           Host := Self.Host;
+
+        if Aport > 0 then
+           Port := Aport
+        else
+           Port := Self.Port;
+        ConnectTimeout := 500;
+        Connect;
+        Result := Connected;
+      end;
+    finally
+      FreeAndNil(Ping);
+    end;
+  except
+    Result := False;
+  end;
+
+end;
+
 Procedure TRESTDWIdClientPooler.ReconfigureConnection(aTypeRequest           : Ttyperequest;
                                                       aWelcomeMessage,
                                                       aHost                  : String;
@@ -3393,7 +3556,11 @@ Procedure TRESTDWIdClientPooler.ReconfigureConnection(aTypeRequest           : T
                                                       aAccessTag             : String;
                                                       aAuthenticationOptions : TRESTDWClientAuthOptionParams);
 Begin
- {$IFNDEF RESTDWLAZARUS}Inherited;{$ENDIF}
+ {$IFNDEF RESTDWLAZARUS}
+  {$IFNDEF FPC}
+   Inherited;
+  {$ENDIF}
+ {$ENDIF}
  If (UseSSL) Then
   Begin
    HttpRequest.CertMode    := vSSLMode;
@@ -3416,7 +3583,7 @@ Var
  vTpRequest       : String;
  vErrorCode,
  I                : Integer;
- vDWParam         : TJSONParam;
+ vDWParam         : TRESTDWJSONParam;
  vResultParams    : TStringStream;
  MemoryStream,
  aStringStream,
@@ -3424,7 +3591,7 @@ Var
  StringStream     : TStream;
  SendParams       : TIdMultipartFormDataStream;
  StringStreamList : TStringStreamList;
- JSONValue        : TJSONValue;
+ JSONValue        : TRESTDWJSONValue;
  aBinaryCompatibleMode,
  aBinaryRequest   : Boolean;
  Procedure SetData(Var InputValue : String;
@@ -3435,7 +3602,7 @@ Var
   bJsonValue    : TRESTDWJSONInterfaceObject;
   bJsonOBJTemp  : TRESTDWJSONInterfaceArray;
   JSONParam,
-  JSONParamNew  : TJSONParam;
+  JSONParamNew  : TRESTDWJSONParam;
   A, InitPos    : Integer;
   vValue,
   aValue,
@@ -3447,7 +3614,8 @@ Var
     If (Encoding = esUtf8) Then //NativeResult Correções aqui
      Begin
       {$IF Defined(DELPHIXEUP)}
-      ResultJSON := PWidechar(UTF8Decode(InputValue));
+      //ResultJSON := PWidechar(UTF8Decode(InputValue));
+      ResultJSON := PWidechar(InputValue);
       {$ELSEIF Defined(RESTDWLAZARUS)}
       ResultJSON := GetStringDecode(InputValue, DatabaseCharSet);
       {$ELSE} // delphi velho
@@ -3473,14 +3641,16 @@ Var
    InputValue := Copy(InputValue, InitStrPos, InitPos-1) + ']}';
    If (Params <> Nil) And (InputValue <> '{"PARAMS"]}') And (InputValue <> '') Then
     Begin
-      {$IFDEF DELPHIXEUP}
+     If Pos(', "RESULT":[]}', InputValue) > 0 Then
+      InputValue := StringReplace(InputValue, ', "RESULT":[]}', '}', []);
+     {$IFDEF DELPHIXEUP}
       bJsonValue    := TRESTDWJSONInterfaceObject.Create(InputValue);
-      {$ELSE}
+     {$ELSE}
       If Encoding = esUtf8 Then
        bJsonValue    := TRESTDWJSONInterfaceObject.Create(PWidechar(UTF8Decode(InputValue)))
       Else
        bJsonValue    := TRESTDWJSONInterfaceObject.Create(InputValue);
-      {$ENDIF}
+     {$ENDIF}
      InputValue    := '';
      If bJsonValue.PairCount > 0 Then
       Begin
@@ -3500,7 +3670,7 @@ Var
              FreeAndNil(bJsonOBJ);
              Continue;
             End;
-           JSONParam := TJSONParam.Create(Encoding);
+           JSONParam := TRESTDWJSONParam.Create(Encoding);
            Try
             JSONParam.ParamName       := bJsonOBJ.Pairs[4].name;
             JSONParam.ObjectValue     := GetValueType(bJsonOBJ.Pairs[3].Value);
@@ -3533,7 +3703,7 @@ Var
             //parametro criandos no servidor
             If ParamsData.ItemsString[JSONParam.ParamName] = Nil Then
              Begin
-              JSONParamNew           := TJSONParam.Create(ParamsData.Encoding);
+              JSONParamNew           := TRESTDWJSONParam.Create(ParamsData.Encoding);
               JSONParamNew.ParamName := JSONParam.ParamName;
               JSONParamNew.ObjectDirection := JSONParam.ObjectDirection;
               JSONParamNew.SetValue(JSONParam.Value, JSONParam.Encoded);
@@ -3549,11 +3719,15 @@ Var
            End;
           End;
         End;
+       If Assigned(bJsonOBJTemp) Then
+        FreeAndNil(bJsonOBJTemp);
+       If Assigned(bJsonOBJ) Then
+        FreeAndNil(bJsonOBJ);
       End;
+     {$IFNDEF FPC} //TODO XyberX
      If Assigned(bJsonValue) Then
       FreeAndNil(bJsonValue);
-     If Assigned(bJsonOBJTemp) Then
-      FreeAndNil(bJsonOBJTemp);
+     {$ENDIF}
     End;
   Finally
    If vTempValue <> '' Then
@@ -3583,7 +3757,7 @@ Var
       vDWParam             := DWParams.ItemsString['dwservereventname'];
       If Not Assigned(vDWParam) Then
        Begin
-        vDWParam           := TJSONParam.Create(DWParams.Encoding);
+        vDWParam           := TRESTDWJSONParam.Create(DWParams.Encoding);
         vDWParam.ObjectDirection := odIN;
         DWParams.Add(vDWParam);
        End;
@@ -3597,7 +3771,7 @@ Var
      End
     Else
      Begin
-      JSONValue            := TJSONValue.Create;
+      JSONValue            := TRESTDWJSONValue.Create;
       Try
        JSONValue.Encoding  := DWParams.Encoding;
        JSONValue.Encoded   := True;
@@ -3781,6 +3955,7 @@ Var
   vUrl            := '';
   {$IFDEF DELPHIXEUP}
    vResultParams   := TStringStream.Create('', TEncoding.UTF8);
+   //vResultParams   := TStringStream.Create('');
   {$ELSE}
    vResultParams   := TStringStream.Create('');
   {$ENDIF}
@@ -3823,7 +3998,7 @@ Var
       If Assigned(vCripto) Then
        vURL := vURL + BuildValue('dwusecript',       BooleanToString(vCripto.Use));
       {$IFDEF DELPHIXEUP}
-       aStringStream := TStringStream.Create('', TEncoding.UTF8);
+       aStringStream := TStringStream.Create('',TEncoding.UTF8);
       {$ELSE}
        aStringStream := TStringStream.Create('');
       {$ENDIF}
@@ -3840,10 +4015,20 @@ Var
          Begin
           If Assigned(aStringStream) Then
            Begin
+            aStringStream.Position:=0;
             If aStringStream.Size > 0 Then
              StringStream := ZDecompressStreamNew(aStringStream);
+             Params.LoadFromStream(StringStream);
+             If not (Params.ItemsString['MessageError'] = Nil) Then
+             Begin
+              if Params.ItemsString['MessageError'].AsString = trim('') then
+               ResultData   := TReplyOK
+              else
+               ResultData := Params.ItemsString['MessageError'].AsString;
+
+             end;
             FreeAndNil(aStringStream);
-            ResultData := TStringStream(StringStream).DataString;
+           // ResultData :=TStringStream(StringStream).DataString;
             FreeAndNil(StringStream);
            End;
          End
@@ -3869,9 +4054,10 @@ Var
        Begin
         If Assigned(Params) Then
          Begin
-          vDWParam             := Params.ItemsString['dwservereventname'];
+           vDWParam             := Params.ItemsString['dwservereventname'];
           If Not Assigned(vDWParam) Then
-           vDWParam           := TJSONParam.Create(Params.Encoding);
+           vDWParam           := TRESTDWJSONParam.Create(Params.Encoding);
+
           Try
            vDWParam.Encoded         := True;
            vDWParam.ObjectDirection := odIN;
@@ -3882,7 +4068,7 @@ Var
             Params.Add(vDWParam);
           End;
          End;
-        JSONValue           := TJSONValue.Create;
+        JSONValue           := TRESTDWJSONValue.Create;
         Try
          JSONValue.Encoding := Charset;
          JSONValue.Encoded  := True;
@@ -3911,7 +4097,7 @@ Var
                                                       TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Token);
                               vDWParam             := Params.ItemsString[TRESTDWAuthOptionBearerClient(AuthenticationOptions.OptionParams).Key];
                               If Not Assigned(vDWParam) Then
-                               vDWParam           := TJSONParam.Create(Params.Encoding);
+                               vDWParam           := TRESTDWJSONParam.Create(Params.Encoding);
                               Try
                                vDWParam.Encoded         := True;
                                vDWParam.ObjectDirection := odIN;
@@ -3933,7 +4119,7 @@ Var
                                                       TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Token);
                               vDWParam             := Params.ItemsString[TRESTDWAuthOptionTokenClient(AuthenticationOptions.OptionParams).Key];
                               If Not Assigned(vDWParam) Then
-                               vDWParam           := TJSONParam.Create(Params.Encoding);
+                               vDWParam           := TRESTDWJSONParam.Create(Params.Encoding);
                               Try
                                vDWParam.Encoded         := True;
                                vDWParam.ObjectDirection := odIN;
@@ -3993,6 +4179,7 @@ Var
          Begin
           {$IFDEF DELPHIXEUP}
            aStringStream := TStringStream.Create('', TEncoding.UTF8);
+           //aStringStream := TStringStream.Create('');
           {$ELSE}
            aStringStream := TStringStream.Create('');
           {$ENDIF}
@@ -4006,10 +4193,13 @@ Var
             If Assigned(aStringStream) Then
              Begin
               If (aStringStream.Size > 0) And
-                 (vErrorCode = 200)       Then
+                 ((vErrorCode = 200) or (vErrorCode = 201))      Then
                StringStream := ZDecompressStreamNew(aStringStream)
               Else
                StringStream := TStringStream.Create(TStringStream(aStringStream).DataString);
+
+               //debug
+               //var sss : Trestdwbytes := StreamToBytes(StringStream );
               FreeAndNil(aStringStream);
              End;
            End;
@@ -4069,7 +4259,7 @@ Var
        Begin
         If Not Assyncexec Then
          Begin
-          If (vErrorCode = 200) Then
+          If (vErrorCode = 200) or (vErrorCode = 201) Then
            Begin
             StringStream.Position := 0;
             Params.LoadFromStream(StringStream);
@@ -4085,6 +4275,7 @@ Var
                ResultData   := TReplyOK
               else
                ResultData := Params.ItemsString['MessageError'].AsString;
+
              end;
            End
           Else
@@ -4119,7 +4310,7 @@ Var
            Begin
             SetData(vDataPack, Params, ResultData);
            End;
-          If (vErrorCode <> 200) Then
+          If not (vErrorCode in [200,201]) Then
            Begin
             ErrorMessage := ResultData;
             ResultData   := TReplyNOK;
@@ -4356,7 +4547,8 @@ Begin
 
   If (vErrorMessage <> '') Then
    Begin
-    Result := unescape_chars(vErrorMessage);
+    //Result := unescape_chars(vErrorMessage);
+    Result := vErrorMessage;
     Raise Exception.Create(Result);
    End;
  End;
@@ -4429,5 +4621,423 @@ begin
 
   Inherited;
 end;
+
+{ TRESTDWIdProxyRouter }
+
+Procedure TRESTDWIdProxyRouter.aCommandGet(AContext      : TIdContext;
+                                           ARequestInfo  : TIdHTTPRequestInfo;
+                                           AResponseInfo : TIdHTTPResponseInfo);
+Var
+ sCharSet,
+ vToken,
+ ErrorMessage,
+ vAuthRealm,
+ vContentType,
+ vResponseString : String;
+ I, StatusCode   : Integer;
+ ResultStream    : TStream;
+ vCORSHeader     : TStrings;
+ vResponseHeader : TStringList;
+ mb              : TStringStream;
+ vRedirect       : TRedirect;
+ tmpstr          : String;
+ Procedure WriteError;
+ Begin
+  AResponseInfo.ResponseNo              := StatusCode;
+  {$IFNDEF RESTDWLAZARUS}
+   mb                                   := TStringStream.Create(ErrorMessage{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
+   mb.Position                          := 0;
+   AResponseInfo.FreeContentStream      := True;
+   AResponseInfo.ContentStream          := mb;
+   AResponseInfo.ContentStream.Position := 0;
+   AResponseInfo.ContentLength          := mb.Size;
+   AResponseInfo.WriteContent;
+  {$ELSE}
+   mb                                   := TStringStream.Create(ErrorMessage);
+   mb.Position                          := 0;
+   AResponseInfo.FreeContentStream      := True;
+   AResponseInfo.ContentStream          := mb;
+   AResponseInfo.ContentStream.Position := 0;
+   AResponseInfo.ContentLength          := -1;//mb.Size;
+   AResponseInfo.WriteContent;
+  {$ENDIF}
+ End;
+ Procedure DestroyComponents;
+ Begin
+  If Assigned(vResponseHeader) Then
+   FreeAndNil(vResponseHeader);
+  If Assigned(vCORSHeader) Then
+   FreeAndNil(vCORSHeader);
+ End;
+ Procedure Redirect(Url : String);
+ Begin
+  AResponseInfo.Redirect(Url);
+ End;
+ Procedure SetReplyCORS;
+ Var
+  I : Integer;
+ Begin
+  If CORS Then
+   Begin
+    If CORS_CustomHeaders.Count > 0 Then
+     Begin
+      For I := 0 To CORS_CustomHeaders.Count -1 Do
+       AResponseInfo.CustomHeaders.AddValue(CORS_CustomHeaders.Names[I], CORS_CustomHeaders.ValueFromIndex[I]);
+     End
+    Else
+     AResponseInfo.CustomHeaders.AddValue('Access-Control-Allow-Origin','*');
+    If Assigned(vCORSHeader) Then
+     Begin
+      If vCORSHeader.Count > 0 Then
+       Begin
+        For I := 0 To vCORSHeader.Count -1 Do
+         AResponseInfo.CustomHeaders.AddValue(vCORSHeader.Names[I], vCORSHeader.ValueFromIndex[I]);
+       End;
+     End;
+   End;
+ End;
+Begin
+ vResponseHeader := TStringList.Create;
+ vCORSHeader     := TStringList.Create;
+ vResponseString := '';
+ {$IFNDEF RESTDWLAZARUS}
+  {$IFNDEF FPC}
+   @vRedirect    := @Redirect;
+  {$ELSE}
+   vRedirect     := TRedirect(@Redirect);
+  {$ENDIF}
+ {$ELSE}
+  vRedirect      := TRedirect(@Redirect);
+ {$ENDIF}
+ Try
+   {$IF Defined(RESTDWFMX) AND not Defined(DELPHI10_4UP)}
+   If Assigned(AContext.DataObject) Then
+     vToken       := TRESTDWAuthToken(AContext.DataObject).token;
+   {$ELSE}
+   If Assigned(AContext.Data) Then
+     vToken       := TRESTDWAuthToken(AContext.Data).token;
+   {$IFEND}
+  vAuthRealm   := AResponseInfo.AuthRealm;
+  vContentType := ARequestInfo.ContentType;
+  If CommandExec  (TComponent(AContext),
+                   RemoveBackslashCommands(ARequestInfo.URI),
+                   ARequestInfo.RawHTTPCommand,
+                   vContentType,
+                   AContext.Binding.PeerIP,
+                   ARequestInfo.UserAgent,
+                   ARequestInfo.AuthUsername,
+                   ARequestInfo.AuthPassword,
+                   vToken,
+                   ARequestInfo.CustomHeaders,
+                   AContext.Binding.PeerPort,
+                   ARequestInfo.RawHeaders,
+                   ARequestInfo.Params,
+                   ARequestInfo.QueryParams,
+                   ARequestInfo.PostStream,
+                   vAuthRealm,
+                   sCharSet,
+                   ErrorMessage,
+                   StatusCode,
+                   vResponseHeader,
+                   vResponseString,
+                   ResultStream,
+                   vCORSHeader,
+                   vRedirect) Then
+   Begin
+    SetReplyCORS;
+    AResponseInfo.AuthRealm   := vAuthRealm;
+    AResponseInfo.ContentType := vContentType;
+    If Encoding = esUtf8 Then
+     AResponseInfo.CharSet := 'utf-8'
+    Else
+     AResponseInfo.CharSet := 'ansi';
+    AResponseInfo.ResponseNo               := StatusCode;
+    If (vResponseString <> '')   Or
+       (ErrorMessage    <> '')   Then
+     Begin
+      If Assigned(ResultStream)  Then
+       FreeAndNil(ResultStream);
+      If (vResponseString <> '') Then
+       ResultStream  := TStringStream.Create(vResponseString)
+      Else
+       ResultStream  := TStringStream.Create(ErrorMessage);
+     End;
+    If Assigned(ResultStream)    Then
+     Begin
+      AResponseInfo.FreeContentStream      := True;
+      AResponseInfo.ContentStream          := ResultStream;
+      AResponseInfo.ContentStream.Position := 0;
+     End;
+    {$IFNDEF RESTDWLAZARUS}
+     if Assigned(ResultStream) Then
+      AResponseInfo.ContentLength          := ResultStream.Size
+     Else
+      AResponseInfo.ContentLength          := -1;
+    {$ELSE}
+     AResponseInfo.ContentLength           := -1;
+    {$ENDIF}
+    For I := 0 To vResponseHeader.Count -1 Do
+     AResponseInfo.CustomHeaders.AddValue(vResponseHeader.Names [I],
+                                          vResponseHeader.Values[vResponseHeader.Names[I]]);
+    If vResponseHeader.Count > 0 Then
+     AResponseInfo.WriteHeader;
+    AResponseInfo.WriteContent;
+   End
+  Else //Tratamento de Erros.
+   Begin
+    SetReplyCORS;
+    AResponseInfo.AuthRealm := vAuthRealm;
+    {$IFDEF DELPHIXEUP}
+      If (sCharSet <> '') Then
+       AResponseInfo.CharSet := sCharSet;
+    {$ENDIF}
+    AResponseInfo.ResponseNo               := StatusCode;
+    If ErrorMessage <> '' Then
+     AResponseInfo.ResponseText            := ErrorMessage
+    Else
+     Begin
+      AResponseInfo.FreeContentStream      := True;
+      AResponseInfo.ContentStream          := ResultStream;
+      AResponseInfo.ContentStream.Position := 0;
+      {$IFNDEF RESTDWLAZARUS}
+       AResponseInfo.ContentLength         := ResultStream.Size;
+      {$ELSE}
+       AResponseInfo.ContentLength         := -1;
+      {$ENDIF}
+     End;
+   End;
+ Finally
+  DestroyComponents;
+ End;
+End;
+
+Procedure TRESTDWIdProxyRouter.aCommandOther(AContext     : TIdContext;
+                                             ARequestInfo : TIdHTTPRequestInfo;
+                                             AResponseInfo: TIdHTTPResponseInfo);
+Begin
+ aCommandGet(AContext, ARequestInfo, AResponseInfo);
+End;
+
+Constructor TRESTDWIdProxyRouter.Create(AOwner: TComponent);
+Begin
+ Inherited;
+ HTTPServer                       := TIdHTTPServer.Create(Nil);
+ lHandler                         := TIdServerIOHandlerSSLOpenSSL.Create(Nil);
+ {$IFDEF RESTDWLAZARUS}
+ HTTPServer.OnQuerySSLPort        := @IdHTTPServerQuerySSLPort;
+ HTTPServer.OnCommandGet          := @aCommandGet;
+ HTTPServer.OnCommandOther        := @aCommandOther;
+ HTTPServer.OnConnect             := @CustomOnConnect;
+ HTTPServer.OnCreatePostStream    := @CreatePostStream;
+ HTTPServer.OnParseAuthentication := @OnParseAuthentication;
+ DatabaseCharSet                  := csUndefined;
+ {$ELSE}
+  {$IFDEF FPC}
+   HTTPServer.OnQuerySSLPort        := @IdHTTPServerQuerySSLPort;
+   HTTPServer.OnCommandGet          := @aCommandGet;
+   HTTPServer.OnCommandOther        := @aCommandOther;
+   HTTPServer.OnConnect             := @CustomOnConnect;
+   HTTPServer.OnCreatePostStream    := @CreatePostStream;
+   HTTPServer.OnParseAuthentication := @OnParseAuthentication;
+  {$ELSE}
+   HTTPServer.OnQuerySSLPort       := IdHTTPServerQuerySSLPort;
+   HTTPServer.OnCommandGet         := aCommandGet;
+   HTTPServer.OnCommandOther       := aCommandOther;
+   HTTPServer.OnConnect            := CustomOnConnect;
+   HTTPServer.OnCreatePostStream   := CreatePostStream;
+   HTTPServer.OnParseAuthentication := OnParseAuthentication;
+  {$ENDIF}
+ {$ENDIF}
+ HTTPServer.MaxConnections      := -1;
+ FSocketKind := 'Indy';
+End;
+
+procedure TRESTDWIdProxyRouter.CreatePostStream(AContext        : TIdContext;
+                                                AHeaders        : TIdHeaderList;
+                                                Var VPostStream : TStream);
+Var
+ headerIndex : Integer;
+ vValueAuth  : String;
+ vAuthValue  : TRESTDWAuthToken;
+Begin
+ headerIndex := AHeaders.IndexOfName('Authorization');
+ If (headerIndex = -1) Then
+  Begin
+    {$IF Defined(RESTDWFMX) AND not Defined(DELPHI10_4UP)}
+    AContext.DataObject := Nil;
+    {$ELSE}
+     AContext.Data := Nil;
+    {$IFEND}
+   Exit;
+  End
+ Else
+  Begin
+   vValueAuth  := AHeaders[headerIndex];
+   If (Authenticator is TRESTDWAuthToken)  And
+      (Pos('basic', Lowercase(vValueAuth)) = 0) Then
+    Begin
+     vAuthValue       := TRESTDWAuthToken.Create(self);
+     vAuthValue.Token := vValueAuth;
+     {$IF Defined(RESTDWFMX) AND not Defined(DELPHI10_4UP)}
+     AContext.DataObject := vAuthValue;
+     {$ELSE}
+     AContext.Data := vAuthValue;
+     {$IFEND}
+     AHeaders.Delete(headerIndex);
+    End;
+  End;
+End;
+
+Procedure TRESTDWIdProxyRouter.CustomOnConnect(AContext : TIdContext);
+Begin
+ AContext.Connection.Socket.ReadTimeout := RequestTimeout;
+End;
+
+Destructor TRESTDWIdProxyRouter.Destroy;
+Begin
+ Try
+  If HTTPServer.Active Then
+   HTTPServer.Active := False;
+ Except
+ End;
+ {$IFDEF RESTDWFMX}
+  lHandler.Free;
+  HTTPServer.Free;
+ {$ELSE}
+  FreeAndNil(lHandler);
+  FreeAndNil(HTTPServer);
+ {$ENDIF}
+ Inherited;
+End;
+
+procedure TRESTDWIdProxyRouter.GetSSLPassWord(Var Password : String);
+Begin
+ Password := aSSLPrivateKeyPassword;
+End;
+
+Procedure TRESTDWIdProxyRouter.IdHTTPServerQuerySSLPort(APort       : Word;
+                                                        Var VUseSSL : Boolean);
+Begin
+ VUseSSL := (APort = Self.ServicePort);
+End;
+
+procedure TRESTDWIdProxyRouter.OnParseAuthentication(AContext         : TIdContext;
+                                                     Const AAuthType,
+                                                     AAuthData        : String;
+                                                     Var VUsername,
+                                                     VPassword        : String;
+                                                     Var VHandled     : Boolean);
+Var
+ vAuthValue : TRESTDWAuthToken;
+Begin
+  {$IF Defined(RESTDWFMX) AND not Defined(DELPHI10_4UP)}
+  If (Lowercase(AAuthType) = Lowercase('bearer')) Or
+     (Lowercase(AAuthType) = Lowercase('token'))  And
+     (AContext.DataObject  = Nil) Then
+  Begin
+    vAuthValue          := TRESTDWAuthToken.Create(self);
+    vAuthValue.Token    := AAuthType + ' ' + AAuthData;
+    AContext.DataObject := vAuthValue;
+    VHandled            := Authenticator is TRESTDWAuthToken;
+  End;
+  {$ELSE}
+  If (Lowercase(AAuthType) = Lowercase('bearer')) Or
+     (Lowercase(AAuthType) = Lowercase('token'))  And
+     (AContext.Data        = Nil) Then
+   Begin
+    vAuthValue       := TRESTDWAuthToken.Create(self);
+    vAuthValue.Token := AAuthType + ' ' + AAuthData;
+    AContext.Data    := vAuthValue;
+    VHandled         := Authenticator is TRESTDWAuthToken;
+   End;
+  {$IFEND}
+End;
+
+procedure TRESTDWIdProxyRouter.SetActive(Value : Boolean);
+Begin
+ If (Value)                   And
+    (Not (HTTPServer.Active)) Then
+  Begin
+    if not(Assigned(ServerMethodClass)) and (Self.GetDataRouteCount = 0) then
+      raise Exception.Create(cServerMethodClassNotAssigned);
+
+   Try
+    If (ASSLPrivateKeyFile <> '')     And
+       (ASSLPrivateKeyPassword <> '') And
+       (ASSLCertFile <> '')           Then
+     Begin
+      lHandler.SSLOptions.Method                := aSSLMethod;
+      lHandler.SSLOptions.SSLVersions           := PIdSSLVersions(@SSLVersions)^;
+      {$IFDEF RESTDWLAZARUS}
+       lHandler.OnGetPassword                   := @GetSSLPassword;
+       lHandler.OnVerifyPeer                    := @SSLVerifyPeer;
+      {$ELSE}
+       {$IFDEF FPC}
+        lHandler.OnGetPassword                  := @GetSSLPassword;
+        lHandler.OnVerifyPeer                   := @SSLVerifyPeer;
+       {$ELSE}
+        lHandler.OnGetPassword                  := GetSSLPassword;
+        lHandler.OnVerifyPeer                   := SSLVerifyPeer;
+       {$ENDIF}
+      {$ENDIF}
+      lHandler.SSLOptions.CertFile              := ASSLCertFile;
+      lHandler.SSLOptions.KeyFile               := ASSLPrivateKeyFile;
+      lHandler.SSLOptions.VerifyMode            := vSSLVerifyMode;
+      lHandler.SSLOptions.VerifyDepth           := vSSLVerifyDepth;
+      lHandler.SSLOptions.RootCertFile          := vASSLRootCertFile;
+      lHandler.SSLOptions.Mode                  := vSSLMode;
+      lHandler.SSLOptions.CipherList            := vCipherList;
+      HTTPServer.IOHandler := lHandler;
+     End
+    Else
+     HTTPServer.IOHandler  := Nil;
+    If HTTPServer.Bindings.Count > 0 Then
+     HTTPServer.Bindings.Clear;
+    //Add IPv4 bind
+    If ((ServerIPVersionConfig.ServerIpVersion = sivBoth) or (ServerIPVersionConfig.ServerIpVersion = sivIPv4)) then
+     Begin
+      With HTTPServer.Bindings.Add do
+       Begin
+        IP := ServerIPVersionConfig.IPv4Address;
+        IPVersion := Id_IPv4;
+        Port := ServicePort;
+       End;
+     End;
+    //Add IPv6 bind
+    If ((ServerIPVersionConfig.ServerIpVersion = sivBoth) or (ServerIPVersionConfig.ServerIpVersion = sivIPv6)) then
+     Begin
+      With HTTPServer.Bindings.Add do
+       Begin
+        IP := ServerIPVersionConfig.IPv6Address;
+        IPVersion := Id_IPv6;
+        Port := ServicePort;
+       End;
+     End;
+    HTTPServer.DefaultPort          := ServicePort;
+    HTTPServer.Active               := True;
+   Except
+    On E : Exception do
+     Begin
+      Raise Exception.Create(PChar(E.Message));
+     End;
+   End;
+  End
+ Else If Not(Value) Then
+  Begin
+   HTTPServer.Active := False;
+  End;
+ Inherited SetActive(HTTPServer.Active);
+End;
+
+Function TRESTDWIdProxyRouter.SSLVerifyPeer(Certificate : TIdX509;
+                                            AOk         : Boolean;
+                                            ADepth,
+                                            AError      : Integer): Boolean;
+Begin
+ If ADepth = 0 Then
+  Result := AOk
+ Else
+  Result := True;
+End;
 
 End.

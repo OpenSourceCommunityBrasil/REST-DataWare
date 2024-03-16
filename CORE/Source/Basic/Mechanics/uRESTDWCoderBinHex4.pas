@@ -24,6 +24,10 @@ unit uRESTDWCoderBinHex4;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
  Classes, SysUtils, uRESTDWException, uRESTDWCoder, uRESTDWCoder3to4, uRESTDWTools,
  uRESTDWBasicTypes, uRESTDWProtoTypes;

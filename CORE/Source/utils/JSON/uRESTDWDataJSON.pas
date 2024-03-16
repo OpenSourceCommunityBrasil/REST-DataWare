@@ -4,6 +4,10 @@ unit uRESTDWDataJSON;
 
 Interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
  {$IF Defined(RESTDWLAZARUS) AND not Defined(RESTDWLAMW)}
    LCL,

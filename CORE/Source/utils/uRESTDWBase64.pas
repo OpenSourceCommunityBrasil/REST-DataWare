@@ -22,10 +22,21 @@ unit uRESTDWBase64;
  Roniery                    - Devel.
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 Interface
 
 Uses
  {$IFDEF DELPHIXE7UP}System.NetEncoding,{$ENDIF}
+  {$IFNDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
+    base64,
+   {$ENDIF}
+  {$ENDIF}
   SysUtils,
   uRESTDWTools, uRESTDWProtoTypes, uRESTDWConsts;
 
@@ -161,19 +172,27 @@ begin
   {$IFDEF DELPHIXE7UP}
   Result := TRESTDWBytes(TNetEncoding.Base64.Decode(TBytes(ASource)));
   {$ELSE}
-  Result := DecodeBase64(BytesToString(ASource));
+   {$IFNDEF RESTDWLAZARUS}
+    {$IFDEF FPC}
+     Result := StringToBytes(DecodeStringBase64(BytesToString(ASource)));
+    {$ELSE}
+     Result := DecodeBase64(BytesToString(ASource));
+    {$ENDIF}
+   {$ELSE}
+    Result := DecodeBase64(BytesToString(ASource));
+   {$ENDIF}
   {$ENDIF}
 end;
 
 class function TRESTDWBase64.Encode(const ASource: TRESTDWBytes): TRESTDWBytes;
 begin
-  {$IF Defined(RESTDWLAZARUS)}
+ {$IF Defined(RESTDWLAZARUS)}
   Result := StringToBytes(EncodeStrings(BytesToString(ASource), csUndefined));
-  {$ELSEIF Defined(DELPHIXE7UP)}
+ {$ELSEIF Defined(DELPHIXE7UP)}
   Result := TRESTDWBytes(TNetEncoding.Base64.Encode(TBytes(ASource)));
-  {$ELSE}
+ {$ELSE}
   Result := StringToBytes(EncodeBase64(ASource));
-  {$IFEND}
+ {$IFEND}
 end;
 
 class function TRESTDWBase64.URLDecode(const ASource: TRESTDWBytes): TRESTDWBytes;

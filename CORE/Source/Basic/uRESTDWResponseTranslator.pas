@@ -1,9 +1,6 @@
 unit uRESTDWResponseTranslator;
 
 {$I ..\..\Source\Includes\uRESTDW.inc}
-{$IFDEF RESTDWLAZARUS}
- {$mode objfpc}{$H+}
-{$ENDIF}
 
 {
   REST Dataware .
@@ -26,6 +23,10 @@ unit uRESTDWResponseTranslator;
 }
 
 interface
+
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
 
 Uses
   SysUtils, Classes,
@@ -51,9 +52,9 @@ Type
   vDataType     : TObjectValue;
   vRequired     : Boolean;
  Public
-  Function    GetDisplayName             : String;       Override;
-  Procedure   SetDisplayName(Const Value : String);      Override;
-  Constructor Create        (aCollection : TCollection); Override;
+  Function    GetDisplayName             : String;       {$IFNDEF FPC}Override;{$ENDIF}
+  Procedure   SetDisplayName(Const Value : String);      {$IFNDEF FPC}Override;{$ENDIF}
+  Constructor Create        (aCollection : TCollection); {$IFNDEF FPC}Override;{$ENDIF}
  Published
   Property    FieldName    : String       Read GetDisplayName Write SetDisplayName;
   Property    ElementName  : String       Read vElementName   Write vElementName;
@@ -175,12 +176,12 @@ End;
 Procedure TRESTDWResponseTranslator.GetFieldDefs(JSONBase : String = '');
 Var
  vValue       : String;
- LDataSetList : TJSONValue;
+ LDataSetList : TRESTDWJSONValue;
 Begin
  vValue := JSONBase;
  If Trim(vValue) = '' Then
   vValue := Open(RequestOpen, RequestOpenUrl);
- LDataSetList := TJSONValue.Create;
+ LDataSetList := TRESTDWJSONValue.Create;
  Try
   LDataSetList.Encoded  := False;
   If Assigned(ClientREST) Then
@@ -346,7 +347,7 @@ Begin
  Else
   Begin
    vFieldName := Trim(Value);
-   Inherited;
+   Inherited SetDisplayName(Value);
   End;
 End;
 

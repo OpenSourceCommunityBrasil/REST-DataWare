@@ -25,6 +25,10 @@
 
 interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 uses
   SysUtils, Classes;
 
@@ -76,7 +80,7 @@ var
 implementation
 
 uses
-  Variants, Masks;
+  Variants{$IFNDEF FPC}, Masks{$ENDIF};
 {$IFDEF COMPILER12_UP}
   // Our charsets do not contain any char > 127 what makes it safe because the
   // compiler generates correct code.
@@ -508,7 +512,7 @@ begin
     Lex := LexC();
     if Lex.Token = tkOperator then
     begin
-      if Lex.Chr in ['*', '/', '=', '&', '|', '<', '>', '~',
+      if Lex.chr in ['*', '/', '=', '&', '|', '<', '>', '~',
                      {$IFNDEF FPC}{$IFDEF DELPHI2010UP}'�',{$ENDIF}{$ENDIF}'@', '#'] then
       begin
         LexAccept();
@@ -695,12 +699,14 @@ var
       RightStr := RightValue;
       Wildcard1 := (Pos('*', LeftStr) > 0) or (Pos('?', LeftStr) > 0);
       Wildcard2 := (Pos('*', RightStr) > 0) or (Pos('?', RightStr) > 0);
+      {$IFNDEF FPC}
       if Wildcard1 and not Wildcard2 then
         Result := MatchesMask(RightStr, LeftStr)
       else
       if Wildcard2 then
         Result := MatchesMask(LeftStr, RightStr)
       else
+      {$ENDIF}
         Result := LeftValue = RightValue;
     end;
   end;

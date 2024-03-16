@@ -22,6 +22,12 @@ unit uRESTDWPoolermethod;
  Roniery                    - Devel.
 }
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 Interface
 
 Uses
@@ -148,7 +154,7 @@ Uses
                                    TimeOut                 : Integer = 3000;
                                    ConnectTimeOut          : Integer = 3000;
                                    ConnectionDefs          : TObject           = Nil;
-                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TJSONValue;
+                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TRESTDWJSONValue;
    Function OpenDatasets          (LinesDataset,
                                    Pooler,
                                    Method_Prefix           : String;
@@ -183,7 +189,7 @@ Uses
                                    ConnectTimeOut          : Integer = 3000;
                                    MassiveBuffer           : String  = '';
                                    ConnectionDefs          : TObject           = Nil;
-                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)    : TJSONValue;Overload;
+                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)    : TRESTDWJSONValue;Overload;
    Function ApplyUpdatesTB        (Massive                 : TMassiveDatasetBuffer;
                                    Pooler, Method_Prefix   : String;
                                    Params                  : TRESTDWParams;
@@ -195,7 +201,7 @@ Uses
                                    ConnectTimeOut          : Integer = 3000;
                                    MassiveBuffer           : String  = '';
                                    ConnectionDefs          : TObject           = Nil;
-                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)    : TJSONValue;Overload;
+                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)    : TRESTDWJSONValue;Overload;
    Function ApplyUpdates          (LinesDataset,
                                    Pooler,
                                    Method_Prefix           : String;
@@ -215,7 +221,7 @@ Uses
                                        ConnectTimeOut          : Integer = 3000;
                                        ConnectionDefs          : TObject = Nil;
                                        ReflectChanges          : Boolean = False;
-                                       RESTClientPooler        : TRESTClientPoolerBase = Nil) : TJSONValue;
+                                       RESTClientPooler        : TRESTClientPoolerBase = Nil) : TRESTDWJSONValue;
    Function  ProcessMassiveSQLCache   (MassiveSQLCache,
                                        Pooler, Method_Prefix   : String;
                                        Var Error               : Boolean;
@@ -224,10 +230,10 @@ Uses
                                        TimeOut                 : Integer = 3000;
                                        ConnectTimeOut          : Integer = 3000;
                                        ConnectionDefs          : TObject = Nil;
-                                       RESTClientPooler        : TRESTClientPoolerBase = Nil) : TJSONValue;
+                                       RESTClientPooler        : TRESTClientPoolerBase = Nil) : TRESTDWJSONValue;
    Function ExecuteCommandJSON    (Pooler, Method_Prefix,
                                    SQL                     : String;
-                                   Params                  : TRESTDWParams;
+                                   Const Params            : TRESTDWParams;
                                    Var Error               : Boolean;
                                    Var MessageError        : String;
                                    Var SocketError         : Boolean;
@@ -239,7 +245,7 @@ Uses
                                    TimeOut                 : Integer = 3000;
                                    ConnectTimeOut          : Integer = 3000;
                                    ConnectionDefs          : TObject           = Nil;
-                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TJSONValue;
+                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TRESTDWJSONValue;
   Function ExecuteCommandJSONTB   (Pooler,
                                    Method_Prefix,
                                    Tablename               : String;
@@ -254,7 +260,7 @@ Uses
                                    TimeOut                 : Integer = 3000;
                                    ConnectTimeOut          : Integer = 3000;
                                    ConnectionDefs          : TObject           = Nil;
-                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TJSONValue;
+                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TRESTDWJSONValue;
    Function InsertValuePure       (Pooler, Method_Prefix,
                                    SQL                     : String;
                                    Var Error               : Boolean;
@@ -278,7 +284,7 @@ Uses
                                    TimeOut                 : Integer = 3000;
                                    ConnectTimeOut          : Integer = 3000;
                                    ConnectionDefs          : TObject           = Nil;
-                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TJSONValue;
+                                   RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TRESTDWJSONValue;
    Function ExecuteCommandPureJSONTB(Pooler,
                                      Method_Prefix,
                                      Tablename        : String;
@@ -292,7 +298,7 @@ Uses
                                      TimeOut              : Integer = 3000;
                                      ConnectTimeOut       : Integer = 3000;
                                      ConnectionDefs       : TObject           = Nil;
-                                     RESTClientPooler     : TRESTClientPoolerBase = Nil)   : TJSONValue;
+                                     RESTClientPooler     : TRESTClientPoolerBase = Nil)   : TRESTDWJSONValue;
    //Lista todos os Pooler's do Servidor
    Procedure GetPoolerList        (Method_Prefix           : String;
                                    Var PoolerList          : TStringList;
@@ -388,22 +394,22 @@ implementation
 
 Uses uRESTDWBasicDB, uRESTDWJSONInterface, uRESTDWBufferBase;
 
-Function TRESTDWPoolerMethodClient.ApplyUpdatesTB(Massive             : TMassiveDatasetBuffer;
-                                              Pooler, Method_Prefix   : String;
-                                              Params                  : TRESTDWParams;
-                                              Var Error               : Boolean;
-                                              Var MessageError        : String;
-                                              Var SocketError         : Boolean;
-                                              Var RowsAffected        : Integer;
-                                              TimeOut                 : Integer = 3000;
-                                              ConnectTimeOut          : Integer = 3000;
-                                              MassiveBuffer           : String  = '';
-                                              ConnectionDefs          : TObject           = Nil;
-                                              RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TJSONValue;
+Function TRESTDWPoolerMethodClient.ApplyUpdatesTB(Massive                 : TMassiveDatasetBuffer;
+                                                  Pooler, Method_Prefix   : String;
+                                                  Params                  : TRESTDWParams;
+                                                  Var Error               : Boolean;
+                                                  Var MessageError        : String;
+                                                  Var SocketError         : Boolean;
+                                                  Var RowsAffected        : Integer;
+                                                  TimeOut                 : Integer = 3000;
+                                                  ConnectTimeOut          : Integer = 3000;
+                                                  MassiveBuffer           : String  = '';
+                                                  ConnectionDefs          : TObject           = Nil;
+                                                  RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TRESTDWJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
  bJsonValue           : TRESTDWJSONInterfaceObject;
 Begin
@@ -456,7 +462,7 @@ Begin
  {$ENDIF}
  DWParams                              := TRESTDWParams.Create;
  DWParams.Encoding                     := RESTClientPoolerExec.Encoding;
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Massive';
  JSONParam.ObjectDirection             := odIn;
  If Massive <> Nil Then
@@ -464,7 +470,7 @@ Begin
  Else If MassiveBuffer <> '' Then
   JSONParam.AsString                   := MassiveBuffer;
  DWParams.Add(JSONParam);
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Pooler';
  JSONParam.ObjectDirection             := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -472,14 +478,14 @@ Begin
  Else
   JSONParam.AsString                   := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Method_Prefix';
  JSONParam.ObjectDirection             := odIn;
  JSONParam.AsString                    := Method_Prefix;
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                           := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                           := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                 := 'dwConnectionDefs';
    JSONParam.ObjectDirection           := odIn;
    JSONParam.AsString                  := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -489,7 +495,7 @@ Begin
   Begin
    If Params.Count > 0 Then
     Begin
-     JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+     JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
      JSONParam.ParamName             := 'Params';
      JSONParam.ObjectDirection       := odInOut;
      If RESTClientPoolerExec.CriptOptions.Use Then
@@ -499,24 +505,24 @@ Begin
      DWParams.Add(JSONParam);
     End;
   End;
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Error';
  JSONParam.ObjectDirection             := odInOut;
  JSONParam.AsBoolean                   := False;
  DWParams.Add(JSONParam);
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'MessageError';
  JSONParam.ObjectDirection             := odInOut;
  JSONParam.AsString                    := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Result';
  JSONParam.ObjectDirection             := odOUT;
  JSONParam.ObjectValue                 := ovString;
 // JSONParam.Encoded                     := False;
  JSONParam.AsString                    := '';
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'RowsAffected';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovInteger;
@@ -528,7 +534,7 @@ Begin
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
-     Result          := TJSONValue.Create;
+     Result          := TRESTDWJSONValue.Create;
      Result.Encoding := vEncoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
       Begin
@@ -594,11 +600,11 @@ Function TRESTDWPoolerMethodClient.ApplyUpdates(Massive                 : TMassi
                                                 ConnectTimeOut          : Integer = 3000;
                                                 MassiveBuffer           : String  = '';
                                                 ConnectionDefs          : TObject           = Nil;
-                                                RESTClientPooler        : TRESTClientPoolerBase = Nil) : TJSONValue;
+                                                RESTClientPooler        : TRESTClientPoolerBase = Nil) : TRESTDWJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
  bJsonValue           : TRESTDWJSONInterfaceObject;
  vMassiveStream       : TStream;
@@ -606,7 +612,7 @@ Begin
  Result := Nil;
  RowsAffected  := 0;
  If Not Assigned(RESTClientPooler) Then
-  RESTClientPoolerExec                 := TRESTClientPoolerBase.Create(Nil)
+  RESTClientPoolerExec  := TRESTClientPoolerBase.Create(Nil)
  Else
   Begin
    RESTClientPoolerExec := RESTClientPooler;
@@ -652,7 +658,7 @@ Begin
  {$ENDIF}
  DWParams                              := TRESTDWParams.Create;
  DWParams.Encoding                     := RESTClientPoolerExec.Encoding;
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Massive';
  JSONParam.ObjectDirection             := odIn;
  If Massive <> Nil Then
@@ -673,7 +679,7 @@ Begin
  Else If MassiveBuffer <> '' Then
   JSONParam.AsString                   := MassiveBuffer;
  DWParams.Add(JSONParam);
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Pooler';
  JSONParam.ObjectDirection             := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -681,14 +687,14 @@ Begin
  Else
   JSONParam.AsString                   := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Method_Prefix';
  JSONParam.ObjectDirection             := odIn;
  JSONParam.AsString                    := Method_Prefix;
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                           := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                           := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                 := 'dwConnectionDefs';
    JSONParam.ObjectDirection           := odIn;
    JSONParam.AsString                  := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -696,7 +702,7 @@ Begin
   End;
  If Trim(SQL) <> '' Then
   Begin
-   JSONParam                           := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                           := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                 := 'SQL';
    JSONParam.ObjectDirection           := odIn;
    If RESTClientPoolerExec.CriptOptions.Use Then
@@ -708,7 +714,7 @@ Begin
     Begin
      If Params.Count > 0 Then
       Begin
-       JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+       JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
        JSONParam.ParamName             := 'Params';
        JSONParam.ObjectDirection       := odInOut;
        If RESTClientPoolerExec.CriptOptions.Use Then
@@ -719,27 +725,27 @@ Begin
       End;
     End;
   End;
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Error';
  JSONParam.ObjectDirection             := odInOut;
  JSONParam.AsBoolean                   := False;
  DWParams.Add(JSONParam);
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'MessageError';
  JSONParam.ObjectDirection             := odInOut;
  JSONParam.AsString                    := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Result';
  JSONParam.ObjectDirection             := odOUT;
  JSONParam.ObjectValue                 := ovString;
 // JSONParam.Encoded                     := False;
  JSONParam.AsString                    := '';
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
- JSONParam.ParamName             := 'RowsAffected';
- JSONParam.ObjectDirection       := odOUT;
- JSONParam.ObjectValue           := ovInteger;
+ JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam.ParamName                   := 'RowsAffected';
+ JSONParam.ObjectDirection             := odOUT;
+ JSONParam.ObjectValue                 := ovInteger;
  DWParams.Add(JSONParam);
  Try
   Try
@@ -748,7 +754,7 @@ Begin
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
-     Result          := TJSONValue.Create;
+     Result          := TRESTDWJSONValue.Create;
      Result.Encoding := vEncoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
       Begin
@@ -960,11 +966,11 @@ Function  TRESTDWPoolerMethodClient.ProcessMassiveSQLCache(MassiveSQLCache,
                                                        TimeOut                 : Integer = 3000;
                                                        ConnectTimeOut          : Integer = 3000;
                                                        ConnectionDefs          : TObject = Nil;
-                                                       RESTClientPooler        : TRESTClientPoolerBase = Nil) : TJSONValue;
+                                                       RESTClientPooler        : TRESTClientPoolerBase = Nil) : TRESTDWJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse        : String;
- JSONParam        : TJSONParam;
+ JSONParam        : TRESTDWJSONParam;
  DWParams         : TRESTDWParams;
 Begin
  Result := Nil;
@@ -1015,7 +1021,7 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MassiveSQLCache';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.ObjectValue           := ovString;
@@ -1024,7 +1030,7 @@ Begin
  Else
   JSONParam.SetValue(MassiveSQLCache, JSONParam.Encoded);
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -1032,22 +1038,22 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovString;
@@ -1056,7 +1062,7 @@ Begin
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -1069,7 +1075,7 @@ Begin
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
-     Result          := TJSONValue.Create;
+     Result          := TRESTDWJSONValue.Create;
      Result.Encoding := vEncoding;
      If Not DWParams.ItemsString['MessageError'].IsNull Then
       MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
@@ -1113,11 +1119,11 @@ Function TRESTDWPoolerMethodClient.ApplyUpdates_MassiveCache(MassiveCache       
                                                              ConnectTimeOut          : Integer = 3000;
                                                              ConnectionDefs          : TObject = Nil;
                                                              ReflectChanges          : Boolean = False;
-                                                             RESTClientPooler        : TRESTClientPoolerBase = Nil) : TJSONValue;
+                                                             RESTClientPooler        : TRESTClientPoolerBase = Nil) : TRESTDWJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse        : String;
- JSONParam        : TJSONParam;
+ JSONParam        : TRESTDWJSONParam;
  DWParams         : TRESTDWParams;
 Begin
  Result := Nil;
@@ -1168,13 +1174,13 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MassiveCache';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.ObjectValue           := ovBlob;
  JSONParam.LoadFromStream(MassiveCache);
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -1182,22 +1188,22 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovString;
@@ -1206,7 +1212,7 @@ Begin
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -1219,7 +1225,7 @@ Begin
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
-     Result          := TJSONValue.Create;
+     Result          := TRESTDWJSONValue.Create;
      Result.Encoding := vEncoding;
      If Not DWParams.ItemsString['MessageError'].IsNull Then
       MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
@@ -1299,7 +1305,7 @@ Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  vTempString,
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
 Begin
  Result := Nil;
@@ -1307,22 +1313,21 @@ Begin
   Begin
    RESTClientPoolerExec  := TRESTClientPoolerBase.Create(Nil);
    RESTClientPoolerExec.AuthenticationOptions.Assign(AuthenticationOptions);
+   If Trim(Method_Prefix) <> '' Then
+    vDataRoute           := Method_Prefix;
   End
  Else
   Begin
    RESTClientPoolerExec := RESTClientPooler;
-   DataRoute            := RESTClientPoolerExec.DataRoute;
+   vDataRoute           := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
    vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
    vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
-   If Trim(DataRoute) = '' Then
+   If Trim(Method_Prefix) <> '' Then
     Begin
-     If Trim(Method_Prefix) <> '' Then
-      Begin
-       RESTClientPoolerExec.DataRoute := Method_Prefix;
-       DataRoute                      := Method_Prefix;
-      End;
+     RESTClientPoolerExec.DataRoute := Method_Prefix;
+     vDataRoute                     := Method_Prefix;
     End;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
@@ -1345,13 +1350,13 @@ Begin
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  RESTClientPoolerExec.CriptOptions.Use:= vCripto.Use;
  RESTClientPoolerExec.CriptOptions.Key:= vCripto.Key;
- RESTClientPoolerExec.DataRoute        := DataRoute;
+ RESTClientPoolerExec.DataRoute        := vDataRoute;
  {$IFDEF RESTDWLAZARUS}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams  := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovString;
@@ -1414,7 +1419,7 @@ Var
  vRESTDWBytes         : TRESTDWBytes;
  vStream              : TStream;
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
 Begin
  If Not Assigned(RESTClientPooler) Then
@@ -1474,7 +1479,7 @@ Begin
  RESTClientPoolerExec.DataRoute          := DataRoute;
  DWParams                                := TRESTDWParams.Create;
  DWParams.Encoding                       := RESTClientPoolerExec.Encoding;
- JSONParam                               := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                               := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                     := 'Pooler';
  JSONParam.ObjectDirection               := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -1482,7 +1487,7 @@ Begin
  Else
   JSONParam.AsString                     := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                               := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                               := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                     := 'Result';
  JSONParam.ObjectDirection               := odOUT;
  JSONParam.ObjectValue                   := ovString;
@@ -1554,11 +1559,11 @@ Function TRESTDWPoolerMethodClient.ExecuteCommand(Pooler, Method_Prefix,
                                               TimeOut                 : Integer = 3000;
                                               ConnectTimeOut          : Integer = 3000;
                                               ConnectionDefs          : TObject           = Nil;
-                                              RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TJSONValue;
+                                              RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TRESTDWJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
 Begin
  Result := Nil;
@@ -1610,7 +1615,7 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -1618,12 +1623,12 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -1631,7 +1636,7 @@ Begin
  Else
   JSONParam.AsString             := SQL;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -1639,37 +1644,37 @@ Begin
  Else
   JSONParam.AsString             := Params.ToJSON;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Execute';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Execute;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'BinaryRequest';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryRequest;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'BinaryCompatibleMode';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryCompatibleMode;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MetadataRequest';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Metadata;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  If Not vBinaryRequest Then
@@ -1682,14 +1687,14 @@ Begin
 // JSONParam.Encoded               := False;
  JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'RowsAffected';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovInteger;
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -1702,7 +1707,7 @@ Begin
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
-     Result         := TJSONValue.Create;
+     Result         := TRESTDWJSONValue.Create;
      Result.Encoded := False;
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
@@ -1750,11 +1755,11 @@ Function TRESTDWPoolerMethodClient.ExecuteCommandJSONTB(Pooler,
                                                     TimeOut                 : Integer = 3000;
                                                     ConnectTimeOut          : Integer = 3000;
                                                     ConnectionDefs          : TObject           = Nil;
-                                                    RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TJSONValue;
+                                                    RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TRESTDWJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse        : String;
- JSONParam        : TJSONParam;
+ JSONParam        : TRESTDWJSONParam;
  DWParams         : TRESTDWParams;
 Begin
  RowsAffected  := 0;
@@ -1810,7 +1815,7 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -1818,12 +1823,12 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odInOut;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -1831,37 +1836,37 @@ Begin
  Else
   JSONParam.AsString             := Params.ToJSON;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'BinaryRequest';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryRequest;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'BinaryCompatibleMode';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryCompatibleMode;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MetadataRequest';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Metadata;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'rdwtablename';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Tablename;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  If Not vBinaryRequest Then
@@ -1873,14 +1878,14 @@ Begin
   JSONParam.ObjectValue          := ovBlob;
 // JSONParam.SetValue('', JSONParam.Encoded);
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'RowsAffected';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovInteger;
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -1893,7 +1898,7 @@ Begin
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
-     Result         := TJSONValue.Create;
+     Result         := TRESTDWJSONValue.Create;
      Result.Encoded := False;
      Result.Encoding := RESTClientPoolerExec.Encoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
@@ -1940,24 +1945,24 @@ Begin
 End;
 
 Function TRESTDWPoolerMethodClient.ExecuteCommandJSON(Pooler, Method_Prefix,
-                                                  SQL                     : String;
-                                                  Params                  : TRESTDWParams;
-                                                  Var Error               : Boolean;
-                                                  Var MessageError        : String;
-                                                  Var SocketError         : Boolean;
-                                                  Var RowsAffected        : Integer;
-                                                  Execute                 : Boolean;
-                                                  BinaryRequest           : Boolean;
-                                                  BinaryCompatibleMode    : Boolean;
-                                                  Metadata                : Boolean;
-                                                  TimeOut                 : Integer = 3000;
-                                                  ConnectTimeOut          : Integer = 3000;
-                                                  ConnectionDefs          : TObject           = Nil;
-                                                  RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TJSONValue;
+                                                      SQL                     : String;
+                                                      Const Params            : TRESTDWParams;
+                                                      Var Error               : Boolean;
+                                                      Var MessageError        : String;
+                                                      Var SocketError         : Boolean;
+                                                      Var RowsAffected        : Integer;
+                                                      Execute                 : Boolean;
+                                                      BinaryRequest           : Boolean;
+                                                      BinaryCompatibleMode    : Boolean;
+                                                      Metadata                : Boolean;
+                                                      TimeOut                 : Integer = 3000;
+                                                      ConnectTimeOut          : Integer = 3000;
+                                                      ConnectionDefs          : TObject               = Nil;
+                                                      RESTClientPooler        : TRESTClientPoolerBase = Nil)   : TRESTDWJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
  vStream              : TStream;
 Begin
@@ -2015,7 +2020,7 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -2023,12 +2028,12 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -2036,7 +2041,7 @@ Begin
  Else
   JSONParam.AsString             := SQL;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odInOut;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -2044,37 +2049,37 @@ Begin
  Else
   JSONParam.AsString             := Params.ToJSON;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Execute';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Execute;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'BinaryRequest';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryRequest;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'BinaryCompatibleMode';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryCompatibleMode;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MetadataRequest';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Metadata;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  If Not vBinaryRequest Then
@@ -2086,14 +2091,14 @@ Begin
   JSONParam.ObjectValue          := ovBlob;
 // JSONParam.SetValue('', JSONParam.Encoded);
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'RowsAffected';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovInteger;
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -2106,7 +2111,7 @@ Begin
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
-     Result         := TJSONValue.Create;
+     Result         := TRESTDWJSONValue.Create;
      Result.Encoded := False;
      Result.Encoding := RESTClientPoolerExec.Encoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
@@ -2173,11 +2178,11 @@ Function TRESTDWPoolerMethodClient.ExecuteCommandPureJSONTB(Pooler,
                                                         TimeOut              : Integer = 3000;
                                                         ConnectTimeOut       : Integer = 3000;
                                                         ConnectionDefs       : TObject           = Nil;
-                                                        RESTClientPooler     : TRESTClientPoolerBase = Nil)   : TJSONValue;
+                                                        RESTClientPooler     : TRESTClientPoolerBase = Nil)   : TRESTDWJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse        : String;
- JSONParam        : TJSONParam;
+ JSONParam        : TRESTDWJSONParam;
  DWParams         : TRESTDWParams;
 Begin
  Result        := Nil;
@@ -2231,7 +2236,7 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -2239,42 +2244,42 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'BinaryRequest';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryRequest;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'BinaryCompatibleMode';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryCompatibleMode;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MetadataRequest';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Metadata;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'rdwtablename';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Tablename;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  If Not vBinaryRequest Then
@@ -2288,14 +2293,14 @@ Begin
 // JSONParam.Encoded               := True;
 // JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'RowsAffected';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovInteger;
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -2308,7 +2313,7 @@ Begin
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
-     Result          := TJSONValue.Create;
+     Result          := TRESTDWJSONValue.Create;
      Result.Encoded  := False;
      Result.Encoding := RESTClientPoolerExec.Encoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
@@ -2375,11 +2380,11 @@ Function TRESTDWPoolerMethodClient.ExecuteCommandPureJSON(Pooler,
                                                       TimeOut              : Integer = 3000;
                                                       ConnectTimeOut       : Integer = 3000;
                                                       ConnectionDefs       : TObject           = Nil;
-                                                      RESTClientPooler     : TRESTClientPoolerBase = Nil)   : TJSONValue;
+                                                      RESTClientPooler     : TRESTClientPoolerBase = Nil)   : TRESTDWJSONValue;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse        : String;
- JSONParam        : TJSONParam;
+ JSONParam        : TRESTDWJSONParam;
  DWParams         : TRESTDWParams;
  vStream          : TStream;
 Begin
@@ -2435,7 +2440,7 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -2443,12 +2448,12 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -2456,37 +2461,37 @@ Begin
  Else
   JSONParam.AsString             := SQL;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Execute';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Execute;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'BinaryRequest';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryRequest;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'BinaryCompatibleMode';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := BinaryCompatibleMode;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MetadataRequest';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Metadata;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  If Not vBinaryRequest Then
@@ -2497,14 +2502,14 @@ Begin
  Else
   JSONParam.ObjectValue          := ovBlob;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'RowsAffected';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovInteger;
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -2517,7 +2522,7 @@ Begin
    If (lResponse <> '') And
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
-     Result          := TJSONValue.Create;
+     Result          := TRESTDWJSONValue.Create;
      Result.Encoded  := False;
      Result.Encoding := RESTClientPoolerExec.Encoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
@@ -2588,11 +2593,11 @@ Procedure TRESTDWPoolerMethodClient.ExecuteProcedure(Pooler,
                                                  ConnectionDefs      : TObject           = Nil;
                                                  RESTClientPooler    : TRESTClientPoolerBase = Nil);
 Var
- JSONParam : TJSONParam;
+ JSONParam : TRESTDWJSONParam;
 Begin
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPooler.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPooler.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -2613,7 +2618,7 @@ Function  TRESTDWPoolerMethodClient.GetTableNames(Pooler,
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse        : String;
- JSONParam        : TJSONParam;
+ JSONParam        : TRESTDWJSONParam;
  DWParams         : TRESTDWParams;
 Begin
  Result        := False;
@@ -2666,7 +2671,7 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -2674,22 +2679,22 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.AsString              := '';
@@ -2699,7 +2704,7 @@ Begin
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -2774,7 +2779,7 @@ Function  TRESTDWPoolerMethodClient.GetFieldNames(Pooler,
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse        : String;
- JSONParam        : TJSONParam;
+ JSONParam        : TRESTDWJSONParam;
  DWParams         : TRESTDWParams;
 Begin
  Result        := False;
@@ -2828,7 +2833,7 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -2836,34 +2841,34 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'TableName';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := TableName;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -2938,7 +2943,7 @@ Function  TRESTDWPoolerMethodClient.GetKeyFieldNames(Pooler,
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse        : String;
- JSONParam        : TJSONParam;
+ JSONParam        : TRESTDWJSONParam;
  DWParams         : TRESTDWParams;
 Begin
  Result        := False;
@@ -2992,7 +2997,7 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -3000,34 +3005,34 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'TableName';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := TableName;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.AsString              := '';
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -3097,13 +3102,13 @@ Procedure TRESTDWPoolerMethodClient.ExecuteProcedurePure(Pooler,
                                                      ConnectionDefs      : TObject           = Nil;
                                                      RESTClientPooler    : TRESTClientPoolerBase = Nil);
 Var
- JSONParam : TJSONParam;
+ JSONParam : TRESTDWJSONParam;
  Params    : TRESTDWParams;
 Begin
  Params := Nil;
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPooler.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPooler.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -3129,7 +3134,7 @@ Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  vTempString,
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
 Begin
  Result := Nil;
@@ -3180,7 +3185,7 @@ Begin
  {$ENDIF}
  DWParams  := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovString;
@@ -3243,14 +3248,14 @@ Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  vGetTokenEvent,
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
 Begin
  Result := '';
  RESTClientPoolerExec            := RESTClientPooler;
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -3258,12 +3263,12 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'DataRoute';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := vDataRoute;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'RDWParams';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -3271,12 +3276,12 @@ Begin
  Else
   JSONParam.AsString             := Params.ToJSON;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
@@ -3344,7 +3349,7 @@ Function TRESTDWPoolerMethodClient.InsertValue(Pooler, Method_Prefix,
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
 Begin
  Result := -1;
@@ -3394,7 +3399,7 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -3402,12 +3407,12 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -3415,7 +3420,7 @@ Begin
  Else
   JSONParam.AsString             := SQL;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -3423,17 +3428,17 @@ Begin
  Else
   JSONParam.AsString             := Params.ToJSON;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                     := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                     := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                     := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                     := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovString;
@@ -3442,7 +3447,7 @@ Begin
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -3498,7 +3503,7 @@ Function TRESTDWPoolerMethodClient.InsertValuePure(Pooler, Method_Prefix,
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
  lResponse            : String;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
 Begin
  Result := -1;
@@ -3549,7 +3554,7 @@ Begin
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
  DWParams.Encoding               := RESTClientPoolerExec.Encoding;
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -3557,12 +3562,12 @@ Begin
  Else
   JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsString              := Method_Prefix;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
  If RESTClientPoolerExec.CriptOptions.Use Then
@@ -3570,17 +3575,17 @@ Begin
  Else
   JSONParam.AsString             := SQL;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsBoolean             := False;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'MessageError';
  JSONParam.ObjectDirection       := odInOut;
  JSONParam.AsString              := MessageError;
  DWParams.Add(JSONParam);
- JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+ JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovString;
@@ -3589,7 +3594,7 @@ Begin
  DWParams.Add(JSONParam);
  If Assigned(ConnectionDefs) Then
   Begin
-   JSONParam                       := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName             := 'dwConnectionDefs';
    JSONParam.ObjectDirection       := odIn;
    JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -3650,7 +3655,7 @@ Function TRESTDWPoolerMethodClient.ApplyUpdates(LinesDataset,
                                             RESTClientPooler : TRESTClientPoolerBase = Nil) : String;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
- JSONParam        : TJSONParam;
+ JSONParam        : TRESTDWJSONParam;
  DWParams         : TRESTDWParams;
 Begin
  Result := '';
@@ -3704,7 +3709,7 @@ Begin
    {$ENDIF}
    DWParams                              := TRESTDWParams.Create;
    DWParams.Encoding                     := RESTClientPoolerExec.Encoding;
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'LinesDataset';
    JSONParam.ObjectDirection             := odIn;
    If RESTClientPoolerExec.CriptOptions.Use Then
@@ -3712,7 +3717,7 @@ Begin
    Else
      JSONParam.AsString                  := LinesDataset;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Pooler';
    JSONParam.ObjectDirection             := odIn;
    If RESTClientPoolerExec.CriptOptions.Use Then
@@ -3720,22 +3725,22 @@ Begin
    Else
     JSONParam.AsString                   := Pooler;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Method_Prefix';
    JSONParam.ObjectDirection             := odIn;
    JSONParam.AsString                    := Method_Prefix;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Error';
    JSONParam.ObjectDirection             := odInOut;
    JSONParam.AsBoolean                   := False;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'MessageError';
    JSONParam.ObjectDirection             := odInOut;
    JSONParam.AsString                    := MessageError;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Result';
    JSONParam.ObjectDirection             := odOUT;
    JSONParam.ObjectValue                 := ovString;
@@ -3744,7 +3749,7 @@ Begin
    DWParams.Add(JSONParam);
    If Assigned(ConnectionDefs) Then
     Begin
-     JSONParam                           := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+     JSONParam                           := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
      JSONParam.ParamName                 := 'dwConnectionDefs';
      JSONParam.ObjectDirection           := odIn;
      JSONParam.AsString                  := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -3805,7 +3810,7 @@ Function TRESTDWPoolerMethodClient.OpenDatasets(DatasetStream           : TStrea
                                                 RESTClientPooler        : TRESTClientPoolerBase = Nil) : TStream;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
  vResult              : String;
 Begin
@@ -3860,13 +3865,13 @@ Begin
    {$ENDIF}
    DWParams                              := TRESTDWParams.Create;
    DWParams.Encoding                     := RESTClientPoolerExec.Encoding;
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'DatasetStream';
    JSONParam.ObjectDirection             := odIn;
    JSONParam.ObjectValue                 := ovBlob;
    JSONParam.LoadFromStream(DatasetStream);
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Pooler';
    JSONParam.ObjectDirection             := odIn;
    If RESTClientPoolerExec.CriptOptions.Use Then
@@ -3874,37 +3879,37 @@ Begin
    Else
     JSONParam.AsString                   := Pooler;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Method_Prefix';
    JSONParam.ObjectDirection             := odIn;
    JSONParam.AsString                    := Method_Prefix;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Error';
    JSONParam.ObjectDirection             := odInOut;
    JSONParam.AsBoolean                   := False;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'MessageError';
    JSONParam.ObjectDirection             := odInOut;
    JSONParam.AsString                    := MessageError;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'BinaryRequest';
    JSONParam.ObjectDirection             := odIn;
    JSONParam.AsBoolean                   := BinaryRequest;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'BinaryCompatibleMode';
    JSONParam.ObjectDirection             := odIn;
    JSONParam.AsBoolean                   := BinaryCompatibleMode;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'MetadataRequest';
    JSONParam.ObjectDirection             := odIn;
    JSONParam.AsBoolean                   := True;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Result';
    JSONParam.ObjectDirection             := odOUT;
    If Not vBinaryRequest Then
@@ -3917,7 +3922,7 @@ Begin
    DWParams.Add(JSONParam);
    If Assigned(ConnectionDefs) Then
     Begin
-     JSONParam                           := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+     JSONParam                           := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
      JSONParam.ParamName                 := 'dwConnectionDefs';
      JSONParam.ObjectDirection           := odIn;
      JSONParam.AsString                  := TConnectionDefs(ConnectionDefs).ToJSON;
@@ -3976,7 +3981,7 @@ Function TRESTDWPoolerMethodClient.OpenDatasets(LinesDataset,
                                                 RESTClientPooler        : TRESTClientPoolerBase = Nil) : String;
 Var
  RESTClientPoolerExec : TRESTClientPoolerBase;
- JSONParam            : TJSONParam;
+ JSONParam            : TRESTDWJSONParam;
  DWParams             : TRESTDWParams;
  vStream              : TStringStream;
 Begin
@@ -4031,7 +4036,7 @@ Begin
    {$ENDIF}
    DWParams                              := TRESTDWParams.Create;
    DWParams.Encoding                     := RESTClientPoolerExec.Encoding;
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'LinesDataset';
    JSONParam.ObjectDirection             := odIn;
    If RESTClientPoolerExec.CriptOptions.Use Then
@@ -4039,7 +4044,7 @@ Begin
    Else
      JSONParam.AsString                  := LinesDataset;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Pooler';
    JSONParam.ObjectDirection             := odIn;
    If RESTClientPoolerExec.CriptOptions.Use Then
@@ -4047,27 +4052,27 @@ Begin
    Else
     JSONParam.AsString                   := Pooler;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Method_Prefix';
    JSONParam.ObjectDirection             := odIn;
    JSONParam.AsString                    := Method_Prefix;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Error';
    JSONParam.ObjectDirection             := odInOut;
    JSONParam.AsBoolean                   := False;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'MessageError';
    JSONParam.ObjectDirection             := odInOut;
    JSONParam.AsString                    := MessageError;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'BinaryRequest';
    JSONParam.ObjectDirection             := odIn;
    JSONParam.AsBoolean                   := BinaryRequest;
    DWParams.Add(JSONParam);
-   JSONParam                             := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Result';
    JSONParam.ObjectDirection             := odOUT;
    If Not vBinaryRequest Then
@@ -4081,7 +4086,7 @@ Begin
    DWParams.Add(JSONParam);
    If Assigned(ConnectionDefs) Then
     Begin
-     JSONParam                           := TJSONParam.Create(RESTClientPoolerExec.Encoding);
+     JSONParam                           := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
      JSONParam.ParamName                 := 'dwConnectionDefs';
      JSONParam.ObjectDirection           := odIn;
      JSONParam.AsString                  := TConnectionDefs(ConnectionDefs).ToJSON;
