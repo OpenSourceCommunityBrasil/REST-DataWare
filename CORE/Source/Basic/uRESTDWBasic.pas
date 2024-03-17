@@ -3532,7 +3532,7 @@ Begin
      vUrlToExec    := Url
     Else
      vUrlToExec    := Cmd;
-    If (Cmd <> '/') And (Cmd <> '') Then
+   // If (Cmd <> '/') And (Cmd <> '') Then
      ReadRawHeaders;
     vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
     If Cmd <> '' Then
