@@ -1,4 +1,4 @@
-unit uRESTDWServerMethodClass;
+﻿unit uRESTDWServerMethodClass;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -149,6 +149,7 @@ Var
  vTempValue,
  vTempParamsURI,
  vTempURL,
+ vParamChar,
  ParamsURI     : String;
  vParamMethods : TRESTDWParamsMethods;
  Procedure ParseParams;
@@ -156,36 +157,56 @@ Var
   lst       : TStringList;
   pAux1,
   cAux1     : Integer;
+  ctempURI,
+  sAux,
   sAux1,
   sAux2     : string;
   JSONParam : TRESTDWJSONParam;
  Begin
   lst := TStringList.Create;
   Try
-   pAux1 := Pos('?', ParamsURI);
+   ctempURI := ParamsURI;
+   pAux1    := Pos('?', ctempURI);
    // params com /
-   sAux1 := Copy(ParamsURI, 1, pAux1 - 1);
+   If vIsQuery Then
+    Begin
+     If Pos('/', ctempURI) > 0 Then
+      Begin
+       sAux2 := Copy(ctempURI, pAux1 + 1, Pos('/', ctempURI) -2);
+       Delete(ctempURI, pAux1, Pos('/', ctempURI));
+      End
+     Else
+      Begin
+       sAux2 := Copy(ctempURI, pAux1 + 1, Length(ctempURI));
+       Delete(ctempURI, pAux1, Length(ctempURI));
+      End;
+    End
+   Else
+    sAux2 := '';
    // params com &
-   sAux2 := Copy(ParamsURI, pAux1 + 1, Length(ParamsURI));
+   If ctempURI <> '' Then
+    sAux1 := Copy(ctempURI, InitStrPos, Length(ctempURI))
+   Else
+    sAux1 := '';
+   While (sAux2 <> '') Do
+    Begin
+     pAux1 := Pos('&', sAux2);
+     If pAux1 = 0 then
+      pAux1 := Length(sAux2) + 1;
+     sAux := Copy(sAux2, InitStrPos, pAux1 - 1);
+     If Pos('dwmark:', sAux) = 0 then
+      lst.Add(sAux);
+     Delete(sAux2, InitStrPos, pAux1);
+    End;
    cAux1 := 0;
    While (sAux1 <> '') Do
     Begin
      pAux1 := Pos('/', sAux1);
      If pAux1 = 0 Then
       pAux1 := Length(sAux1) + 1;
-     lst.Add(IntToStr(cAux1) + '=' + Copy(sAux1, 1, pAux1 - 1));
-     cAux1 := cAux1 + 1;
-     Delete(sAux1, 1, pAux1);
-    End;
-   While (sAux2 <> '') Do
-    Begin
-     pAux1 := Pos('&', sAux2);
-     If pAux1 = 0 then
-      pAux1 := Length(sAux2) + 1;
-     sAux1 := Copy(sAux2, 1, pAux1 - 1);
-     If Pos('dwmark:', sAux1) = 0 then
-      lst.Add(sAux1);
-     Delete(sAux2, 1, pAux1);
+     lst.Add(IntToStr(cAux1) + '=' + Copy(sAux1, InitStrPos, pAux1 - 1));
+     Inc(cAux1);
+     Delete(sAux1, InitStrPos, pAux1);
     End;
    While lst.Count > 0 Do
     Begin
@@ -198,7 +219,7 @@ Var
        JSONParam.SetValue(lst.ValueFromIndex[0]);
        Params.Add(JSONParam);
       End
-     Else If JSONParam.IsNull Then
+     Else
       JSONParam.SetValue(lst.ValueFromIndex[0]);
      lst.Delete(0);
     End;
@@ -206,7 +227,6 @@ Var
    FreeAndNil(lst);
   End;
  End;
-
  Procedure CopyParams(SourceParams : TRESTDWParamsMethods);
  Var
   isrc       : Integer;
@@ -225,7 +245,6 @@ Var
      End;
    End;
  End;
-
  Procedure ParseURL;
  Begin
   vPosQuery := Pos('?', URL);
@@ -250,7 +269,6 @@ Var
   If URL = '' Then
    URL := '/';
  End;
-
 Begin
  Result   := False;
  If Length(URL) = 0 Then
@@ -263,8 +281,16 @@ Begin
     Begin
      For A := 0 To TRESTDWServerEvents(Components[I]).Events.Count -1 Do
       Begin
+       If Pos('?', vTempValue) > 0 Then
+        vParamChar := '?'
+       Else
+        vParamChar := '/';
+       If vParamChar = '/' Then
+        If Length(vTempValue) > 0 Then
+         If vTempValue[Length(vTempValue) - FinalStrPos] <> vParamChar Then
+          vTempValue := vTempValue + vParamChar;
        vTempRoute := TRESTDWServerEvents(Components[I]).Events[A].BaseURL   +
-                     TRESTDWServerEvents(Components[I]).Events[A].EventName;
+                      TRESTDWServerEvents(Components[I]).Events[A].EventName + vParamChar;
        If ((vTempValue = '/') or (vTempValue = '')) Then
         Begin
          If TRESTDWServerEvents(Components[I]).DefaultEvent <> '' Then
@@ -274,22 +300,15 @@ Begin
             vTempValue :=  '/' + vTempValue;
           End;
         End;
-       If SameText(vTempRoute, vTempValue) Then
+       If SameText(vTempRoute, Copy(vTempValue, InitStrPos, Length(vTempRoute))) Then
         Begin
          Result         := True;
          vTempURL       := vTempRoute;
-         vTempParamsURI := '';
+         Delete(vTempValue, InitStrPos, Length(vTempRoute));
+         vTempParamsURI := vTempValue;
          vParamMethods  := TRESTDWServerEvents(Components[I]).Events[A].Params;
          BuildCORS(TRESTDWServerEvents(Components[I]).Events[A].Routes, CORS_CustomHeaders);
          Break;
-        End
-       Else If SameText(vTempRoute + '/', Copy(vTempValue + '/', InitStrPos, Length(vTempRoute + '/') - FinalStrPos)) Then
-        Begin
-         Result         := True;
-         vTempURL       := vTempRoute;
-         vTempParamsURI := Copy(vTempValue, Length(vTempRoute) + 2, Length(vTempValue));
-         vParamMethods  := TRESTDWServerEvents(Components[I]).Events[A].Params;
-         BuildCORS(TRESTDWServerEvents(Components[I]).Events[A].Routes, CORS_CustomHeaders);
         End;
       End;
     End
@@ -297,24 +316,25 @@ Begin
     Begin
      For A := 0 To TRESTDWServerContext(Components[I]).ContextList.Count - 1 Do
       Begin
+       If Pos('?', vTempValue) > 0 Then
+        vParamChar := '?'
+       Else
+        vParamChar := '/';
+       If vParamChar = '/' Then
+        If Length(vTempValue) > 0 Then
+         If vTempValue[Length(vTempValue) - FinalStrPos] <> vParamChar Then
+          vTempValue := vTempValue + vParamChar;
        vTempRoute := TRESTDWServerContext(Components[I]).ContextList[A].BaseURL   +
-                     TRESTDWServerContext(Components[I]).ContextList[A].ContextName;
-       If SameText(vTempRoute, vTempValue) Then
+                     TRESTDWServerContext(Components[I]).ContextList[A].ContextName + vParamChar;
+       If SameText(vTempRoute, Copy(vTempValue, InitStrPos, Length(vTempRoute))) Then
         Begin
          Result         := True;
          vTempURL       := vTempRoute;
-         vTempParamsURI := '';
+         Delete(vTempValue, InitStrPos, Length(vTempRoute));
+         vTempParamsURI := vTempValue;
          vParamMethods  := TRESTDWServerContext(Components[I]).ContextList[A].Params;
          BuildCORS(TRESTDWServerContext(Components[I]).ContextList[A].Routes, CORS_CustomHeaders);
          Break;
-        End
-       Else If SameText(vTempRoute+'/', Copy(vTempValue+'/', 1, Length(vTempRoute+'/'))) Then
-        Begin
-         Result         := True;
-         vTempURL       := vTempRoute;
-         vTempParamsURI := Copy(vTempValue, Length(vTempRoute) + 2, Length(vTempValue));
-         vParamMethods  := TRESTDWServerContext(Components[I]).ContextList[A].Params;
-         BuildCORS(TRESTDWServerContext(Components[I]).ContextList[A].Routes, CORS_CustomHeaders);
         End;
       End;
      End;
@@ -322,7 +342,13 @@ Begin
     Begin
      CopyParams(vParamMethods);
      URL       := vTempURL;
-     ParamsURI := '?' + ParamsURI;
+     If Not vIsQuery Then
+      ParamsURI := vParamChar + ParamsURI
+     Else
+      ParamsURI := '?' + ParamsURI;
+     If vTempParamsURI <> '' Then
+      If vTempParamsURI[Length(vTempParamsURI) - FinalStrPos] = '/' Then
+       Delete(vTempParamsURI, Length(vTempParamsURI) - FinalStrPos, 1);
      ParamsURI := vTempParamsURI + ParamsURI;
      ParseParams;
      Break;
