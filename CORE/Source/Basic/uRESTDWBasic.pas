@@ -3418,8 +3418,13 @@ Begin
  vDataBuff             := '';
  vRequestHeader        := TStringList.Create;
  vCompareContext       := False;
+ { TODO 1 -oRoniery -ccorreção : função para fazer decode de url utf8 para ascii }
+ RawHTTPCommand        :=  DecodeURL(RawHTTPCommand);
+ QueryParams           :=  DecodeURL(QueryParams);
  Cmd                   := RemoveBackslashCommands(Trim(RawHTTPCommand));
  vUrlToExec            := '';
+ 
+ 
  Try
   sCharSet := '';
   If (UpperCase(Copy (Cmd, 1, 3)) = 'GET')    Then

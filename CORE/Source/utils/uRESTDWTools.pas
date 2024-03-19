@@ -457,6 +457,8 @@ Type
                                      Const CharSet : TCharSet) : Boolean;Overload;
  Procedure InitializeStrings;
 
+ function DecodeURL(const urlEncoded: string): string;
+
 Implementation
 
 Uses
@@ -4962,6 +4964,29 @@ Begin
   FinalStrPos := 0;
   {$ENDIF}
 End;
+
+function DecodeURL(const urlEncoded: string): string;
+var
+  i: Integer;
+  hexValue: string;
+begin
+  Result := '';
+  i := 1;
+  while i <= Length(urlEncoded) do
+  begin
+    if urlEncoded[i] = '%' then
+    begin
+      hexValue := Copy(urlEncoded, i + 1, 2);
+      Result := Result + Char(StrToInt('$' + hexValue));
+      Inc(i, 3);
+    end
+    else
+    begin
+      Result := Result + urlEncoded[i];
+      Inc(i);
+    end;
+  end;
+end;
 
 initialization
  InitializeStrings;
