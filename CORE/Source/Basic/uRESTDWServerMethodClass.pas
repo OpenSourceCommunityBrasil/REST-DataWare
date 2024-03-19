@@ -1,4 +1,4 @@
-﻿unit uRESTDWServerMethodClass;
+unit uRESTDWServerMethodClass;
 
 {$I ..\Includes\uRESTDW.inc}
 

@@ -4899,6 +4899,10 @@ Var
  vStringStream : TStream;
  {$IFDEF RESTDWLAZARUS}
   vFileStream  : TFileStream;
+ {$ELSE}
+  {$IF CompilerVersion < 21}
+   vFileStream  : TFileStream;
+  {$IFEND}
  {$ENDIF}
 Begin
  vStringStream := Nil;

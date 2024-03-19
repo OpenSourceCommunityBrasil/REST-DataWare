@@ -1,4 +1,4 @@
-﻿unit uRESTDWDatamodule;
+unit uRESTDWDatamodule;
 
 {$I ..\..\Includes\uRESTDW.inc}
 

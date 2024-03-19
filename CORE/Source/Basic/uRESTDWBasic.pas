@@ -435,7 +435,8 @@ End;
                                    baseEventUnit,
                                    vUrlToExec,
                                    aurlContext               : String;
-                                   Var vRequestHeader        : TStringList);
+                                   Var vRequestHeader        : TStringList;
+                                   Var vdwConnectionDefs     : TConnectionDefs);
   Function ReturnRoute            (ServerMethodsClass        : TComponent;
                                    Pooler,
                                    urlContext                : String;
@@ -2153,7 +2154,8 @@ Begin
                   RequestType,  vWelcomeMessage,    vAccessTag,
                   vdwCriptKey,  compresseddata,     encodestrings,
                   dwassyncexec, vdwservereventname, baseEventUnit,
-                  vUrlToExec,   aurlContext,        vRequestHeader);
+                  vUrlToExec,   aurlContext,        vRequestHeader,
+                  vdwConnectionDefs);
      End;
      WelcomeAccept         := True;
      tmp                   := '';
@@ -3636,7 +3638,8 @@ Begin
                   RequestType,  vWelcomeMessage,    vAccessTag,
                   vdwCriptKey,  compresseddata,     encodestrings,
                   dwassyncexec, vdwservereventname, baseEventUnit,
-                  vUrlToExec,   aurlContext,        vRequestHeader);
+                  vUrlToExec,   aurlContext,        vRequestHeader,
+                  vdwConnectionDefs);
      End;
      WelcomeAccept         := True;
      tmp                   := '';
@@ -4697,7 +4700,6 @@ Var
 Begin
  // lazarus iniciando com sujeira de memoria vStrings
  vStrings := nil;
-
  If ServerMethodsClass <> Nil Then
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
@@ -5973,7 +5975,8 @@ Procedure TRESTDWBasicReceptor.ParseParams(Var DWParams              : TRESTDWPa
                                            baseEventUnit,
                                            vUrlToExec,
                                            aurlContext               : String;
-                                           Var vRequestHeader        : TStringList);
+                                           Var vRequestHeader        : TStringList;
+                                           Var vdwConnectionDefs     : TConnectionDefs);
 Var
  I                  : Integer;
  mb                 : TStringStream;
@@ -5994,7 +5997,6 @@ Var
  decoder            : TRESTDWMessageDecoderMIME;
  ms                 : TStream;
  vDecoderHeaderList : TStringList;
- vdwConnectionDefs  : TConnectionDefs;
  JSONValue          : TRESTDWJSONValue;
 Begin
  vDecoderHeaderList := Nil;
@@ -6446,20 +6448,16 @@ Begin
      vUrlToExec := aurlContext;
    End;
  Finally
-//  If Assigned(DWParams)           Then
-//   FreeAndNil(DWParams);
   If Assigned(mb)                 Then
    FreeAndNil(mb);
-//  If Assigned(JSONParam)          Then
-//   FreeAndNil(JSONParam);
   If Assigned(newdecoder)         Then
    FreeAndNil(newdecoder);
   If Assigned(decoder)            Then
    FreeAndNil(decoder);
   If Assigned(vDecoderHeaderList) Then
    FreeAndNil(vDecoderHeaderList);
-  If Assigned(vdwConnectionDefs) Then
-   FreeAndNil(vdwConnectionDefs);
+//  If Assigned(vdwConnectionDefs) Then
+//   FreeAndNil(vdwConnectionDefs);
   If Assigned(JSONValue) Then
    FreeAndNil(JSONValue);
  End;

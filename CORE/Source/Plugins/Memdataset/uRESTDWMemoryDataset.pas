@@ -42,10 +42,8 @@ Const
                    ftDate, ftTime, ftDateTime, ftAutoInc, ftBCD, ftFMTBCD, ftTimestamp,
                    {$IFNDEF FPC}
                      {$IF CompilerVersion >= 20}
-                     //{$IFDEF DELPHI10_0UP}
                       ftOraTimestamp, ftFixedWideChar, ftTimeStampOffset,
                       ftLongWord, ftShortint, ftByte, ftExtended, ftSingle,
-                     //{$ENDIF DELPHI10_0UP}
                      {$IFEND}
                    {$ELSE}
                     ftFixedWideChar,
@@ -414,7 +412,13 @@ Type
    Function GetBufDatasetIndex(AIndex : Integer) : TRESTDWDatasetIndex;
    Function GetBufferIndex(AIndex : Integer)     : TRESTDWIndex;
   Public
-   Constructor Create(aDataset : TDataset); override;
+   Constructor Create(aDataset : TDataset);  {$IFNDEF FPC}
+                                              {$IF CompilerVersion > 21}
+                                                Override;
+                                              {$IFEND}
+                                             {$ELSE}
+                                              Override;
+                                             {$ENDIF}
    // Does not raise an exception if not found.
    Function FindIndex(const IndexName: string)  : TRESTDWDatasetIndex;
    Property RESTDWIndexdefs [AIndex : Integer]  : TRESTDWDatasetIndex Read GetBufDatasetIndex;
@@ -1220,14 +1224,20 @@ End;
 
 Function TRESTDWMemTable.CompareFields(Data1, Data2: Pointer; FieldType: TFieldType;
   CaseInsensitive: Boolean): Integer;
+Var
+ vData1,
+ vData2  : String;
 Begin
   Result := 0;
   case FieldType of
-    ftString:
-      If CaseInsensitive then
-        Result := AnsiCompareText(PDWString(@Data1)^, PDWString(@Data2)^)
-      Else
-        Result := AnsiCompareStr(PDWString(@Data1)^, PDWString(@Data2)^);
+    ftString : Begin
+                vData1 := StrPas(PAnsiChar(Data1));
+                vData2 := StrPas(PAnsiChar(Data2));
+                If CaseInsensitive then
+                 Result := AnsiCompareText(vData1, vData2)
+                Else
+                 Result := AnsiCompareStr(PDWString(@Data1)^, PDWString(@Data2)^);
+               End;
     ftSmallint:
       If Smallint(Data1^) > Smallint(Data2^) then
         Result := 1
@@ -1275,11 +1285,14 @@ Begin
         Result := 1
       Else If TDateTime(Data1^) < TDateTime(Data2^) then
         Result := -1;
-    ftFixedChar:
-      If CaseInsensitive then
-        Result := AnsiCompareText(PDWString(@Data1)^, PDWString(@Data2)^)
-      Else
-        Result := AnsiCompareStr(PDWString(@Data1)^, PDWString(@Data2)^);
+    ftFixedChar : Begin
+                   vData1 := StrPas(PAnsiChar(Data1));
+                   vData2 := StrPas(PAnsiChar(Data2));
+                   If CaseInsensitive then
+                    Result := AnsiCompareText(vData1, vData2)
+                   Else
+                    Result := AnsiCompareStr (vData1, vData2);
+                  End;
 {$IF DEFINED(FPC) OR DEFINED(COMPILER10_UP)}
     ftFixedWideChar:
       If CaseInsensitive then
@@ -1303,8 +1316,11 @@ Begin
         Result := -1;
     ftVariant:
       Result := 0;
-    ftGuid:
-      Result := CompareText(PDWString(Data1)^, PDWString(Data2)^);
+    ftGuid : Begin
+              vData1 := StrPas(PAnsiChar(Data1));
+              vData2 := StrPas(PAnsiChar(Data2));
+              Result := CompareText(vData1, vData2);
+             End;
   End;
 End;
 
@@ -1349,7 +1365,8 @@ End;
 
 Function TRESTDWMemTable.GetMemoryRecord(Index: Integer): TRESTDWMTMemoryRecord;
 Begin
-  Result := TRESTDWMTMemoryRecord(TRecordList(Pointer(@FRecords)^)[Index]);
+  Result := TRESTDWMTMemoryRecord(FRecords[Index]);
+//  Result := TRESTDWMTMemoryRecord(TRecordList(Pointer(@FRecords)^)[Index]);
 End;
 
 Procedure TRESTDWMemTable.InitFieldDefsFromFields;
@@ -2877,8 +2894,14 @@ Begin
      ftString,
      ftFixedChar,
      ftGuid          : ACompareRec.CompareFunc := @DBCompareText;
-     ftWideString,
-     ftFixedWideChar : ACompareRec.CompareFunc := @DBCompareWideText;
+     ftWideString
+     {$IFNDEF FPC}
+      {$IF CompilerVersion >= 20}
+       , ftFixedWideChar
+      {$IFEND}
+     {$ELSE}
+      , ftFixedWideChar
+     {$ENDIF FPC}    : ACompareRec.CompareFunc := @DBCompareWideText;
      ftSmallint      : ACompareRec.CompareFunc := @DBCompareSmallInt;
      ftInteger,
      ftAutoInc       : ACompareRec.CompareFunc := @DBCompareInt;
@@ -2918,7 +2941,15 @@ End;
 Function GetFieldIsNull(NullMask : pbyte;
                         x        : longint) : boolean; //inline;
 Begin
- Result := ord(NullMask[x Div 8]) And (1 Shl (x Mod 8)) > 0
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   Result := ord(NullMask[x Div 8]) And (1 Shl (x Mod 8)) > 0
+  {$ELSE}
+   Result := ord(TRESTDWBytes(NullMask)[x Div 8]) And (1 Shl (x Mod 8)) > 0
+  {$IFEND}
+ {$ELSE}
+  Result := ord(NullMask[x Div 8]) And (1 Shl (x Mod 8)) > 0
+ {$ENDIF}
 End;
 
 Function IndexCompareRecords(Rec1,
@@ -2972,16 +3003,42 @@ Var
   If DblLinkIndex.FFirstRecBuf = Nil Then
    Begin
     DblLinkIndex.FFirstRecBuf := e;
-    e[myIdx].prior            := Nil;
+    {$IFNDEF FPC}
+     {$IF CompilerVersion >= 20}
+       e[myIdx].prior := Nil;
+     {$ELSE}
+      e.prior := Nil;
+     {$IFEND}
+    {$ELSE}
+     e[myIdx].prior := Nil;
+    {$ENDIF}
     l                         := e;
    End
   Else
    Begin
-    l[myIdx].next  := e;
-    e[myIdx].prior := l;
+    {$IFNDEF FPC}
+     {$IF CompilerVersion >= 20}
+      l[myIdx].next  := e;
+      e[myIdx].prior := l;
+     {$ELSE}
+      l.next  := e;
+      e.prior := l;
+     {$IFEND}
+    {$ELSE}
+     l[myIdx].next  := e;
+     e[myIdx].prior := l;
+    {$ENDIF}
     l              := e;
    End;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   e := e[myIdx].next;
+  {$ELSE}
+   e := e.next;
+  {$IFEND}
+ {$ELSE}
   e := e[myIdx].next;
+ {$ENDIF}
   dec(esize);
  End;
 Begin
@@ -3010,17 +3067,47 @@ Begin
    End;
   End;
  // This simply copies the index...
- PCurRecLinkItem:=Index0.FFirstRecBuf;
- PCurRecLinkItem[myIdx].next := PCurRecLinkItem[defIdx].next;
- PCurRecLinkItem[myIdx].prior := PCurRecLinkItem[defIdx].prior;
+ PCurRecLinkItem := Index0.FFirstRecBuf;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   PCurRecLinkItem[myIdx].next := PCurRecLinkItem[defIdx].next;
+   PCurRecLinkItem[myIdx].prior := PCurRecLinkItem[defIdx].prior;
+  {$ELSE}
+   //TODO XyberX
+   PCurRecLinkItem.next  := DblLinkIndex.FFirstRecBuf.next;
+   PCurRecLinkItem.prior := DblLinkIndex.FFirstRecBuf.prior;
+  {$IFEND}
+ {$ELSE}
+  PCurRecLinkItem[myIdx].next := PCurRecLinkItem[defIdx].next;
+  PCurRecLinkItem[myIdx].prior := PCurRecLinkItem[defIdx].prior;
+ {$ENDIF}
  If PCurRecLinkItem <> Index0.FLastRecBuf Then
   Begin
-   While PCurRecLinkItem[defIdx].next<>Index0.FLastRecBuf do
-    Begin
-     PCurRecLinkItem:=PCurRecLinkItem[defIdx].next;
-     PCurRecLinkItem[myIdx].next := PCurRecLinkItem[defIdx].next;
-     PCurRecLinkItem[myIdx].prior := PCurRecLinkItem[defIdx].prior;
-    End;
+   {$IFNDEF FPC}
+    {$IF CompilerVersion >= 20}
+     While PCurRecLinkItem[defIdx].next <> Index0.FLastRecBuf do
+      Begin
+       PCurRecLinkItem:=PCurRecLinkItem[defIdx].next;
+       PCurRecLinkItem[myIdx].next := PCurRecLinkItem[defIdx].next;
+       PCurRecLinkItem[myIdx].prior := PCurRecLinkItem[defIdx].prior;
+      End;
+    {$ELSE}
+     While PCurRecLinkItem.next <> Index0.FLastRecBuf do
+      Begin
+       //TODO XyberX
+       PCurRecLinkItem       := PCurRecLinkItem.next;
+       PCurRecLinkItem.next  := Index0.FLastRecBuf.next;
+       PCurRecLinkItem.prior := Index0.FLastRecBuf.prior;
+      End;
+    {$IFEND}
+   {$ELSE}
+    While PCurRecLinkItem[defIdx].next <> Index0.FLastRecBuf do
+     Begin
+      PCurRecLinkItem:=PCurRecLinkItem[defIdx].next;
+      PCurRecLinkItem[myIdx].next := PCurRecLinkItem[defIdx].next;
+      PCurRecLinkItem[myIdx].prior := PCurRecLinkItem[defIdx].prior;
+     End;
+   {$ENDIF}
   End
  Else // Empty dataset
   Exit;
@@ -3028,8 +3115,19 @@ Begin
  DblLinkIndex.FFirstRecBuf:=Index0.FFirstRecBuf;
  DblLinkIndex.FCurrentRecBuf:=DblLinkIndex.FFirstRecBuf;
  // Link in the FLastRecBuf that belongs to this index
- PCurRecLinkItem[myIdx].next:=DblLinkIndex.FLastRecBuf;
- DblLinkIndex.FLastRecBuf[myIdx].prior:=PCurRecLinkItem;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   PCurRecLinkItem[myIdx].next:=DblLinkIndex.FLastRecBuf;
+   DblLinkIndex.FLastRecBuf[myIdx].prior:=PCurRecLinkItem;
+  {$ELSE}
+   //TODO XyberX
+   PCurRecLinkItem.next:=DblLinkIndex.FLastRecBuf;
+   DblLinkIndex.FLastRecBuf.prior:=PCurRecLinkItem;
+  {$IFEND}
+ {$ELSE}
+  PCurRecLinkItem[myIdx].next:=DblLinkIndex.FLastRecBuf;
+  DblLinkIndex.FLastRecBuf[myIdx].prior:=PCurRecLinkItem;
+ {$ENDIF}
  // Mergesort. Used the algorithm as described here by Simon Tatham
  // http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
  // The comments in the code are from this website.
@@ -3058,7 +3156,16 @@ Begin
     While (i<k) And (q<>DblLinkIndex.FLastRecBuf) Do
      Begin
       inc(i);
-      q := q[myIDx].next;
+      {$IFNDEF FPC}
+       {$IF CompilerVersion >= 20}
+        q := q[myIDx].next;
+       {$ELSE}
+        //TODO XyberX
+        q := q.next;
+       {$IFEND}
+      {$ELSE}
+       q := q[myIDx].next;
+      {$ENDIF}
      End;
     psize := i;
     //  * Let qsize equal K. Now we need to merge a list starting at p, of length
@@ -3102,11 +3209,31 @@ Begin
   // As soon as a pass like this is performed and only needs to do one merge, the
   // algorithm terminates, and the output list L is sorted. Otherwise, double the
   // value of K, and go back to the beginning.
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   l[myIdx].next:=DblLinkIndex.FLastRecBuf;
+  {$ELSE}
+   //TODO XyberX
+   l.next:=DblLinkIndex.FLastRecBuf;
+  {$IFEND}
+ {$ELSE}
   l[myIdx].next:=DblLinkIndex.FLastRecBuf;
-  k:=k*2;
+ {$ENDIF}
+ k:=k*2;
  Until MergeAmount = 1;
- DblLinkIndex.FLastRecBuf[myIdx].next:=DblLinkIndex.FFirstRecBuf;
- DblLinkIndex.FLastRecBuf[myIdx].prior:=l;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   DblLinkIndex.FLastRecBuf[myIdx].next:=DblLinkIndex.FFirstRecBuf;
+   DblLinkIndex.FLastRecBuf[myIdx].prior:=l;
+  {$ELSE}
+   //TODO XyberX
+   DblLinkIndex.FLastRecBuf.next  := DblLinkIndex.FFirstRecBuf;
+   DblLinkIndex.FLastRecBuf.prior := l;
+  {$IFEND}
+ {$ELSE}
+  DblLinkIndex.FLastRecBuf[myIdx].next  := DblLinkIndex.FFirstRecBuf;
+  DblLinkIndex.FLastRecBuf[myIdx].prior := l;
+ {$ENDIF}
 End;
 
 Procedure TRESTDWMemTable.BuildIndexes;
@@ -3129,7 +3256,16 @@ End;
 
 Procedure SetFieldIsNull(NullMask : pbyte;x : longint); //inline;
 Begin
- NullMask[x div 8] := (NullMask[x div 8]) or (1 shl (x mod 8));
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   NullMask[x div 8] := (NullMask[x div 8]) or (1 shl (x mod 8));
+  {$ELSE}
+   //TODO XyberX
+   TRESTDWBytes(NullMask)[x div 8] := (TRESTDWBytes(NullMask)[x div 8]) or (1 shl (x mod 8));
+  {$IFEND}
+ {$ELSE}
+  NullMask[x div 8] := (NullMask[x div 8]) or (1 shl (x mod 8));
+ {$ENDIF}
 End;
 
 Function TRESTDWMemTable.GetNewBlobBuffer : PBlobBuffer;
@@ -3428,25 +3564,61 @@ End;
 
 Function TDoubleLinkedBufIndex.ScrollBackward: TGetResult;
 Begin
- If Not assigned(FCurrentRecBuf[IndNr].prior) Then
+ If Not assigned({$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   FCurrentRecBuf[IndNr]
+  {$ELSE}
+   //TODO XyberX
+   FCurrentRecBuf
+  {$IFEND}
+ {$ELSE}
+  FCurrentRecBuf[IndNr]
+ {$ENDIF}.prior) Then
   Begin
    Result := grBOF;
   End
  Else
   Begin
    Result := grOK;
-   FCurrentRecBuf := FCurrentRecBuf[IndNr].prior;
+   FCurrentRecBuf := {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   FCurrentRecBuf[IndNr]
+  {$ELSE}
+   //TODO XyberX
+   FCurrentRecBuf
+  {$IFEND}
+ {$ELSE}
+  FCurrentRecBuf[IndNr]
+ {$ENDIF}.prior;
   End;
 End;
 
 Function TDoubleLinkedBufIndex.ScrollForward : TGetResult;
 Begin
  If (FCurrentRecBuf = FLastRecBuf)             Or // just opened
-    (FCurrentRecBuf[IndNr].next = FLastRecBuf) Then
+    ({$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   FCurrentRecBuf[IndNr]
+  {$ELSE}
+   //TODO XyberX
+   FCurrentRecBuf
+  {$IFEND}
+ {$ELSE}
+  FCurrentRecBuf[IndNr]
+ {$ENDIF}.next = FLastRecBuf) Then
   Result := grEOF
  Else
   Begin
-   FCurrentRecBuf := FCurrentRecBuf[IndNr].next;
+   FCurrentRecBuf := {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   FCurrentRecBuf[IndNr]
+  {$ELSE}
+   //TODO XyberX
+   FCurrentRecBuf
+  {$IFEND}
+ {$ELSE}
+  FCurrentRecBuf[IndNr]
+ {$ENDIF}.next;
    Result := grOK;
   End;
 End;
@@ -3459,7 +3631,16 @@ Begin
   Begin
    Result := grOK;
    If FCurrentRecBuf = FLastRecBuf Then
-    FCurrentRecBuf  := FLastRecBuf[IndNr].prior;
+    FCurrentRecBuf  := {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   FCurrentRecBuf[IndNr]
+  {$ELSE}
+   //TODO XyberX
+   FCurrentRecBuf
+  {$IFEND}
+ {$ELSE}
+  FCurrentRecBuf[IndNr]
+ {$ENDIF}.prior;
   End;
 End;
 
@@ -3486,7 +3667,16 @@ Begin
  Case GetMode Of
    gmPrior : Begin
               If assigned(ABookmark^.BookmarkData) Then
-               ARecord := ABookmark^.BookmarkData[IndNr].prior
+               ARecord := {$IFNDEF FPC}
+                           {$IF CompilerVersion >= 20}
+                            ABookmark^.BookmarkData[IndNr]
+                           {$ELSE}
+                            //TODO XyberX
+                            ABookmark^.BookmarkData
+                           {$IFEND}
+                          {$ELSE}
+                           ABookmark^.BookmarkData[IndNr]
+                          {$ENDIF}.prior
               Else
                ARecord := Nil;
               If not assigned(ARecord) Then
@@ -3494,7 +3684,16 @@ Begin
              End;
     gmNext : Begin
               If assigned(ABookmark^.BookmarkData) Then
-               ARecord := ABookmark^.BookmarkData[IndNr].next
+               ARecord := {$IFNDEF FPC}
+                           {$IF CompilerVersion >= 20}
+                            ABookmark^.BookmarkData[IndNr]
+                           {$ELSE}
+                            //TODO XyberX
+                            ABookmark^.BookmarkData
+                           {$IFEND}
+                          {$ELSE}
+                           ABookmark^.BookmarkData[IndNr]
+                          {$ENDIF}.next
               Else
                ARecord := FFirstRecBuf;
              End;
@@ -3508,7 +3707,16 @@ End;
 
 Procedure TDoubleLinkedBufIndex.SetToFirstRecord;
 Begin
- FLastRecBuf[IndNr].next:=FFirstRecBuf;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   FLastRecBuf[IndNr]
+  {$ELSE}
+   //TODO XyberX
+   FLastRecBuf
+  {$IFEND}
+ {$ELSE}
+  FLastRecBuf[IndNr]
+ {$ENDIF}.next:=FFirstRecBuf;
  FCurrentRecBuf := FLastRecBuf;
 End;
 
@@ -3530,7 +3738,16 @@ End;
 
 Procedure TDoubleLinkedBufIndex.DoScrollForward;
 Begin
- FCurrentRecBuf := FCurrentRecBuf[IndNr].next;
+ FCurrentRecBuf :=  {$IFNDEF FPC}
+                     {$IF CompilerVersion >= 20}
+                      FCurrentRecBuf[IndNr]
+                     {$ELSE}
+                      //TODO XyberX
+                      FCurrentRecBuf
+                     {$IFEND}
+                    {$ELSE}
+                     FCurrentRecBuf[IndNr]
+                    {$ENDIF}.next;
 End;
 
 Procedure TDoubleLinkedBufIndex.StoreCurrentRecIntoBookmark(const ABookmark: PRESTDWBookmark);
@@ -3555,7 +3772,16 @@ Var
 Begin
  // valid bookmarks expected
  // estimate result using memory addresses of records
- Result := ABookmark1^.BookmarkData - ABookmark2^.BookmarkData;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   Result := ABookmark1^.BookmarkData - ABookmark2^.BookmarkData;
+  {$ELSE}
+   //TODO XyberX
+   Result := 0;
+  {$IFEND}
+ {$ELSE}
+  Result := ABookmark1^.BookmarkData - ABookmark2^.BookmarkData;
+ {$ENDIF}
  If Result = 0 Then
   Exit
  Else If Result < 0 Then
@@ -3575,7 +3801,16 @@ Begin
  While Assigned(ARecord2)         And
        (ARecord2 <> ARecord1)     And
        (ARecord2 <> FFirstRecBuf) Do
-  ARecord2 := ARecord2[IndNr].prior;
+  ARecord2 :=  {$IFNDEF FPC}
+                {$IF CompilerVersion >= 20}
+                 ARecord2[IndNr]
+                {$ELSE}
+                 //TODO XyberX
+                 ARecord2
+                {$IFEND}
+               {$ELSE}
+                ARecord2[IndNr]
+               {$ENDIF}.prior;
  // if we found lower bookmark as first, then estimated position is correct
  If ARecord1 <> ARecord2 Then
   Result := -Result;
@@ -3595,7 +3830,16 @@ End;
 
 Function TDoubleLinkedBufIndex.CanScrollForward: Boolean;
 Begin
- If (FCurrentRecBuf[IndNr].next = FLastRecBuf) then
+ If ({$IFNDEF FPC}
+      {$IF CompilerVersion >= 20}
+       FCurrentRecBuf[IndNr]
+      {$ELSE}
+       //TODO XyberX
+       FCurrentRecBuf
+      {$IFEND}
+     {$ELSE}
+      FCurrentRecBuf[IndNr]
+     {$ENDIF}.next = FLastRecBuf) then
   Result := False
  Else
   Result := True;
@@ -3605,8 +3849,19 @@ Procedure TDoubleLinkedBufIndex.InitialiseSpareRecord(const ASpareRecord : TReco
 Begin
  FFirstRecBuf             := Pointer(ASpareRecord);
  FLastRecBuf              := FFirstRecBuf;
- FLastRecBuf[IndNr].prior := Nil;
- FLastRecBuf[IndNr].next  := FLastRecBuf;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   FLastRecBuf[IndNr].prior := Nil;
+   FLastRecBuf[IndNr].next  := FLastRecBuf;
+  {$ELSE}
+   //TODO XyberX
+   FLastRecBuf.prior := Nil;
+   FLastRecBuf.next  := FLastRecBuf;
+  {$IFEND}
+ {$ELSE}
+  FLastRecBuf[IndNr].prior := Nil;
+  FLastRecBuf[IndNr].next  := FLastRecBuf;
+ {$ENDIF}
  FCurrentRecBuf           := FLastRecBuf;
 End;
 
@@ -3624,7 +3879,16 @@ Begin
  While ARecord <> FFirstRecBuf do
   Begin
    Inc(Result);
-   ARecord := ARecord[IndNr].prior;
+   {$IFNDEF FPC}
+    {$IF CompilerVersion >= 20}
+     ARecord := ARecord[IndNr].prior;
+    {$ELSE}
+     //TODO XyberX
+     ARecord := ARecord.prior;
+    {$IFEND}
+   {$ELSE}
+    ARecord := ARecord[IndNr].prior;
+   {$ENDIF}
   End;
 End;
 
@@ -3637,7 +3901,16 @@ Begin
        (ARecord <> FLastRecBuf) Do
   Begin
    dec(ARecNo);
-   ARecord := ARecord[IndNr].next;
+   {$IFNDEF FPC}
+    {$IF CompilerVersion >= 20}
+     ARecord := ARecord[IndNr].next;
+    {$ELSE}
+     //TODO XyberX
+     ARecord := ARecord.next;
+    {$IFEND}
+   {$ELSE}
+    ARecord := ARecord[IndNr].next;
+   {$ENDIF}
   End;
  FCurrentRecBuf := ARecord;
 End;
@@ -3655,9 +3928,22 @@ Var
  ARecord : TRecordBuffer;
 Begin
  ARecord                              := FDataset.IntAllocRecordBuffer;
- FLastRecBuf[IndNr].next              := Pointer(ARecord);
- FLastRecBuf[IndNr].next[IndNr].prior := FLastRecBuf;
- FLastRecBuf                          := FLastRecBuf[IndNr].next;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   FLastRecBuf[IndNr].next              := Pointer(ARecord);
+   FLastRecBuf[IndNr].next[IndNr].prior := FLastRecBuf;
+   FLastRecBuf                          := FLastRecBuf[IndNr].next;
+  {$ELSE}
+    //TODO XyberX
+   FLastRecBuf.next       := Pointer(ARecord);
+   FLastRecBuf.next.prior := FLastRecBuf;
+   FLastRecBuf            := FLastRecBuf.next;
+  {$IFEND}
+ {$ELSE}
+  FLastRecBuf[IndNr].next              := Pointer(ARecord);
+  FLastRecBuf[IndNr].next[IndNr].prior := FLastRecBuf;
+  FLastRecBuf                          := FLastRecBuf[IndNr].next;
+ {$ENDIF}
 End;
 
 Procedure TDoubleLinkedBufIndex.InsertRecordBeforeCurrentRecord(Const ARecord : TRecordBuffer);
@@ -3665,16 +3951,43 @@ Var
  ANewRecord : PRESTDWRecLinkItem;
 Begin
  ANewRecord              := PRESTDWRecLinkItem(ARecord);
- ANewRecord[IndNr].prior := FCurrentRecBuf[IndNr].prior;
- ANewRecord[IndNr].Next  := FCurrentRecBuf;
- If FCurrentRecBuf=FFirstRecBuf Then
-  Begin
-   FFirstRecBuf:=ANewRecord;
-   ANewRecord[IndNr].prior:=nil;
-  End
- Else
-  ANewRecord[IndNr].Prior[IndNr].next:=ANewRecord;
- ANewRecord[IndNr].next[IndNr].prior:=ANewRecord;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   ANewRecord[IndNr].prior := FCurrentRecBuf[IndNr].prior;
+   ANewRecord[IndNr].Next  := FCurrentRecBuf;
+   If FCurrentRecBuf=FFirstRecBuf Then
+    Begin
+     FFirstRecBuf:=ANewRecord;
+     ANewRecord[IndNr].prior:=nil;
+    End
+   Else
+    ANewRecord[IndNr].Prior[IndNr].next:=ANewRecord;
+   ANewRecord[IndNr].next[IndNr].prior:=ANewRecord;
+  {$ELSE}
+    //TODO XyberX
+   ANewRecord.prior := FCurrentRecBuf.prior;
+   ANewRecord.Next  := FCurrentRecBuf;
+   If FCurrentRecBuf=FFirstRecBuf Then
+    Begin
+     FFirstRecBuf:=ANewRecord;
+     ANewRecord.prior:=nil;
+    End
+   Else
+    ANewRecord.Prior.next:=ANewRecord;
+   ANewRecord.next.prior:=ANewRecord;
+  {$IFEND}
+ {$ELSE}
+  ANewRecord[IndNr].prior := FCurrentRecBuf[IndNr].prior;
+  ANewRecord[IndNr].Next  := FCurrentRecBuf;
+  If FCurrentRecBuf=FFirstRecBuf Then
+   Begin
+    FFirstRecBuf:=ANewRecord;
+    ANewRecord[IndNr].prior:=nil;
+   End
+  Else
+   ANewRecord[IndNr].Prior[IndNr].next:=ANewRecord;
+  ANewRecord[IndNr].next[IndNr].prior:=ANewRecord;
+ {$ENDIF}
 End;
 
 procedure TDoubleLinkedBufIndex.RemoveRecordFromIndex(const ABookmark : TRESTDWBookmark);
@@ -3683,14 +3996,37 @@ Var
 Begin
  ARecord := ABookmark.BookmarkData;
  If ARecord  = FCurrentRecBuf Then DoScrollForward;
- If ARecord <> FFirstRecBuf   Then
-  ARecord[IndNr].prior[IndNr].next := ARecord[IndNr].next
- Else
-  Begin
-   FFirstRecBuf := ARecord[IndNr].next;
-   FLastRecBuf[IndNr].next := FFirstRecBuf;
-  End;
- ARecord[IndNr].next[IndNr].prior := ARecord[IndNr].prior;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   If ARecord <> FFirstRecBuf   Then
+    ARecord[IndNr].prior[IndNr].next := ARecord[IndNr].next
+   Else
+    Begin
+     FFirstRecBuf := ARecord[IndNr].next;
+     FLastRecBuf[IndNr].next := FFirstRecBuf;
+    End;
+   ARecord[IndNr].next[IndNr].prior := ARecord[IndNr].prior;
+  {$ELSE}
+    //TODO XyberX
+   If ARecord <> FFirstRecBuf   Then
+    ARecord.prior.next := ARecord.next
+   Else
+    Begin
+     FFirstRecBuf := ARecord.next;
+     FLastRecBuf.next := FFirstRecBuf;
+    End;
+   ARecord.next.prior := ARecord.prior;
+  {$IFEND}
+ {$ELSE}
+  If ARecord <> FFirstRecBuf   Then
+   ARecord[IndNr].prior[IndNr].next := ARecord[IndNr].next
+  Else
+   Begin
+    FFirstRecBuf := ARecord[IndNr].next;
+    FLastRecBuf[IndNr].next := FFirstRecBuf;
+   End;
+  ARecord[IndNr].next[IndNr].prior := ARecord[IndNr].prior;
+ {$ENDIF}
 End;
 
 Procedure TDoubleLinkedBufIndex.OrderCurrentRecord;
@@ -3701,25 +4037,70 @@ Begin
  // all records except current are already sorted
  // check prior records
  ARecord := FCurrentRecBuf;
- Repeat
-  ARecord := ARecord[IndNr].prior;
- Until Not Assigned(ARecord) Or
-           (IndexCompareRecords(ARecord, FCurrentRecBuf, DBCompareStruct) <= 0);
- If assigned(ARecord) Then
-  ARecord := ARecord[IndNr].next
- Else
-  ARecord := FFirstRecBuf;
- If ARecord = FCurrentRecBuf Then
-  Begin
-   // prior record is less equal than current
-   // check next records
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
    Repeat
-    ARecord := ARecord[IndNr].next;
-   Until (ARecord=FLastRecBuf) Or
-         (IndexCompareRecords(ARecord, FCurrentRecBuf, DBCompareStruct) >= 0);
-   If ARecord = FCurrentRecBuf[IndNr].next Then
-   Exit; // current record is on proper position
-  End;
+    ARecord := ARecord[IndNr].prior;
+   Until Not Assigned(ARecord) Or
+             (IndexCompareRecords(ARecord, FCurrentRecBuf, DBCompareStruct) <= 0);
+   If assigned(ARecord) Then
+    ARecord := ARecord[IndNr].next
+   Else
+    ARecord := FFirstRecBuf;
+   If ARecord = FCurrentRecBuf Then
+    Begin
+     // prior record is less equal than current
+     // check next records
+     Repeat
+      ARecord := ARecord[IndNr].next;
+     Until (ARecord=FLastRecBuf) Or
+           (IndexCompareRecords(ARecord, FCurrentRecBuf, DBCompareStruct) >= 0);
+     If ARecord = FCurrentRecBuf[IndNr].next Then
+     Exit; // current record is on proper position
+    End;
+  {$ELSE}
+    //TODO XyberX
+   Repeat
+    ARecord := ARecord.prior;
+   Until Not Assigned(ARecord) Or
+             (IndexCompareRecords(ARecord, FCurrentRecBuf, DBCompareStruct) <= 0);
+   If assigned(ARecord) Then
+    ARecord := ARecord.next
+   Else
+    ARecord := FFirstRecBuf;
+   If ARecord = FCurrentRecBuf Then
+    Begin
+     // prior record is less equal than current
+     // check next records
+     Repeat
+      ARecord := ARecord.next;
+     Until (ARecord=FLastRecBuf) Or
+           (IndexCompareRecords(ARecord, FCurrentRecBuf, DBCompareStruct) >= 0);
+     If ARecord = FCurrentRecBuf.next Then
+     Exit; // current record is on proper position
+    End;
+  {$IFEND}
+ {$ELSE}
+  Repeat
+   ARecord := ARecord[IndNr].prior;
+  Until Not Assigned(ARecord) Or
+            (IndexCompareRecords(ARecord, FCurrentRecBuf, DBCompareStruct) <= 0);
+  If assigned(ARecord) Then
+   ARecord := ARecord[IndNr].next
+  Else
+   ARecord := FFirstRecBuf;
+  If ARecord = FCurrentRecBuf Then
+   Begin
+    // prior record is less equal than current
+    // check next records
+    Repeat
+     ARecord := ARecord[IndNr].next;
+    Until (ARecord=FLastRecBuf) Or
+          (IndexCompareRecords(ARecord, FCurrentRecBuf, DBCompareStruct) >= 0);
+    If ARecord = FCurrentRecBuf[IndNr].next Then
+    Exit; // current record is on proper position
+   End;
+ {$ENDIF}
  StoreCurrentRecIntoBookmark(@ABookmark);
  RemoveRecordFromIndex(ABookmark);
  FCurrentRecBuf := ARecord;
@@ -3729,7 +4110,16 @@ End;
 
 Procedure TDoubleLinkedBufIndex.EndUpdate;
 Begin
- FLastRecBuf[IndNr].next := FFirstRecBuf;
+ {$IFNDEF FPC}
+  {$IF CompilerVersion >= 20}
+   FLastRecBuf[IndNr].next := FFirstRecBuf;
+  {$ELSE}
+    //TODO XyberX
+   FLastRecBuf.next := FFirstRecBuf;
+  {$IFEND}
+ {$ELSE}
+  FLastRecBuf[IndNr].next := FFirstRecBuf;
+ {$ENDIF}
  If FCursOnFirstRec Then
   FCurrentRecBuf := FLastRecBuf;
 End;
@@ -4265,25 +4655,25 @@ End;
 
 Procedure TRESTDWMemTable.DoAfterOpen;
 Begin
-  If (FDataSet <> nil) and FLoadRecords then
+ If (FDataSet <> nil) and FLoadRecords then
   Begin
-    If not FDataSet.Active then
-      FDataSet.Open;
-    FRowsOriginal := CopyFromDataSet;
-    If FRowsOriginal > 0 then
+   If not FDataSet.Active then
+     FDataSet.Open;
+   FRowsOriginal := CopyFromDataSet;
+   If FRowsOriginal > 0 then
     Begin
-      SortOnFields();
-      If FApplyMode = amAppend then
-        Last
-      Else
-        First;
+     SortOnFields();
+     If FApplyMode = amAppend then
+       Last
+     Else
+       First;
     End;
-    If FDataSet.Active and FDataSetClosed then
-      FDataSet.Close;
+   If FDataSet.Active and FDataSetClosed then
+    FDataSet.Close;
   End
-  Else If not IsEmpty then
-    SortOnFields();
-  inherited DoAfterOpen;
+ Else If Not IsEmpty then
+  SortOnFields();
+ Inherited DoAfterOpen;
 End;
 
 Procedure TRESTDWMemTable.SetFilterText(const Value: string);
@@ -4966,7 +5356,8 @@ Begin
 End;
 
 Procedure TRESTDWMemTable.SortOnFields(const FieldNames: string = '';
-  CaseInsensitive: Boolean = True; Descending: Boolean = False);
+                                       CaseInsensitive : Boolean = True;
+                                       Descending      : Boolean = False);
 Begin
   // Post the table before sorting
   If State in dsEditModes then
@@ -5003,11 +5394,11 @@ Begin
   Begin
     Pos := Bookmark;
     Try
-{$IFDEF FPC}
+     {$IFDEF FPC}
       QuickSort(0, FRecords.Count - 1, @CompareRecords);
-{$ELSE}
+     {$ELSE}
       QuickSort(0, FRecords.Count - 1, CompareRecords);
-{$ENDIF}
+     {$ENDIF}
       SetBufListSize(0);
       InitBufferPointers(False);
       Try
@@ -5032,7 +5423,8 @@ Begin
   repeat
     I := L;
     J := R;
-    P := Records[(L + R) shr 1];
+    P := TRESTDWMTMemoryRecord(FRecords[(L + R) shr 1]);
+//    PRESTDWMTMemBuffer(@Records[(L + R) shr 1]);
     repeat
       while Compare(Records[I], P) < 0 do
         Inc(I);
@@ -5054,7 +5446,8 @@ End;
 Function TRESTDWMemTable.CompareRecords(Item1, Item2: TRESTDWMTMemoryRecord): Integer;
 var
   Data1, Data2: PByte;
-  CData1, CData2, Buffer1, Buffer2: array [0 .. dsMaxStringSize] of Byte;
+  CData1, CData2,
+  Buffer1, Buffer2: array [0 .. dsMaxStringSize] of Byte;
   F: TField;
   I: Integer;
 Begin
@@ -5072,10 +5465,10 @@ Begin
           Data2 := FindFieldData(Item2.Data, F);
           If Data2 <> nil then
           Begin
-            If Boolean(Data1^) and Boolean(Data2^) then
+           If Boolean(Data1^) and Boolean(Data2^) then
             Begin
-              Inc(Data1);
-              Inc(Data2);
+//              Inc(Data1);
+//              Inc(Data2);
               Result := CompareFields(Data1, Data2, F.datatype, FCaseInsensitiveSort);
             End
             Else If Boolean(Data1^) then
@@ -6032,14 +6425,12 @@ End;
 
 Procedure TRESTDWStorageBase.LoadFromStream(Dataset: TDataset; stream: TStream);
 Begin
-  //stream.Position := 0;
-  //if stream.Size > 0 then
-  If Dataset.InheritsFrom(TRESTDWMemTable) then
-    LoadDWMemFromStream(TRESTDWMemTable(Dataset), stream)
-  Else
-    LoadDatasetFromStream(Dataset, stream);
-  //stream := Nil;
-  //stream.Free;
+ If Dataset.InheritsFrom(TRESTDWMemTable) then
+  LoadDWMemFromStream(TRESTDWMemTable(Dataset), stream)
+ Else
+  LoadDatasetFromStream(Dataset, stream);
+ If Dataset.Active then
+  TRESTDWMemTable(Dataset).SortOnFields;
 End;
 
 Procedure TRESTDWStorageBase.SaveDatasetToStream(Dataset: TDataset; Var stream: TStream);

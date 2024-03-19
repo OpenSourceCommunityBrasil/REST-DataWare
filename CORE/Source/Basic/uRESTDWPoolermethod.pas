@@ -2491,6 +2491,14 @@ Begin
  JSONParam.ObjectDirection       := odIn;
  JSONParam.AsBoolean             := Metadata;
  DWParams.Add(JSONParam);
+ If Assigned(ConnectionDefs) Then
+  Begin
+   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
+   JSONParam.ParamName             := 'dwConnectionDefs';
+   JSONParam.ObjectDirection       := odIn;
+   JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
+   DWParams.Add(JSONParam);
+  End;
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Result';
  JSONParam.ObjectDirection       := odOUT;
@@ -2507,14 +2515,6 @@ Begin
  JSONParam.ObjectDirection       := odOUT;
  JSONParam.ObjectValue           := ovInteger;
  DWParams.Add(JSONParam);
- If Assigned(ConnectionDefs) Then
-  Begin
-   JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
-   JSONParam.ParamName             := 'dwConnectionDefs';
-   JSONParam.ObjectDirection       := odIn;
-   JSONParam.AsString              := TConnectionDefs(ConnectionDefs).ToJSON;
-   DWParams.Add(JSONParam);
-  End;
  Try
   Try
    RESTClientPoolerExec.BinaryRequest := vBinaryRequest;
