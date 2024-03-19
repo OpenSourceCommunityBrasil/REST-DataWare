@@ -312,8 +312,6 @@ Begin
   Begin
    If IsHeaderMediaType(LContentType, 'application/mac-binhex40') Then  {Do not Localize}
     LContentTransferEncoding := 'binhex40' {do not localize}
-   Else If Not IsHeaderMediaType(LContentType, 'application/octet-stream') Then  {Do not Localize}
-    LContentTransferEncoding := '7bit'; {do not localize}
   End
  Else If IsHeaderMediaType(LContentType, 'multipart') Then {do not localize}
   Begin

@@ -2661,7 +2661,13 @@ Function ReadBytes(Const AStream : TStream;
   If restdwLength(VBytes) < (AOffset+LActual) Then
    SetLength(VBytes, AOffset+LActual);
   Assert(VBytes <> nil);
-  Result := AStream.Read(VBytes[AOffset], LActual);
+  LActual := 0;
+  Try
+   AStream.ReadBuffer(VBytes[AOffset], ACount);
+   Result := ACount;
+  Except
+
+  End;
  End;
  Procedure CopyRESTDWBytes(Const ASource      : TRESTDWBytes;
                            Const ASourceIndex : Integer;

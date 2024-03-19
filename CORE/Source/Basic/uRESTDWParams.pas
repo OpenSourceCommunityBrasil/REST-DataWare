@@ -4897,7 +4897,9 @@ End;
 Procedure TRESTDWJSONParam.SaveToFile(FileName: String);
 Var
  vStringStream : TStream;
- vFileStream   : TFileStream;
+ {$IFDEF RESTDWLAZARUS}
+  vFileStream  : TFileStream;
+ {$ENDIF}
 Begin
  vStringStream := Nil;
  If TestNilParam Then
