@@ -3837,6 +3837,11 @@ Begin
            vAcceptAuth           := False;
            vErrorCode            := 401;
            vErrorMessage         := cInvalidAuth;
+           //Roniery ajuste para encontrar o evento na lista de eventos,
+           //para assim determinar se passa ou não no validador de permissão
+           if vUrlToExec[Length(vUrlToExec)] = '/' then
+            delete(vUrlToExec, Length(vUrlToExec), 1);
+
            // verifica se precisa autenticação
            vNeedAuthorization := False;
            {$IFNDEF RESTDWLAZARUS}
