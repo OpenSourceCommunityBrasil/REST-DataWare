@@ -200,7 +200,9 @@ begin
       dwftWideMemo,
       dwftStream,
       dwftFmtMemo,
+	  dwftOraClob,
       dwftBlob,
+	  dwftOraBlob,
       dwftBytes : begin
                   S := json.getString(i);
                   if S <> '' then Begin
@@ -439,7 +441,8 @@ Begin
         ftWideMemo,
       {$ENDIF}
       ftFmtMemo,
-      ftBlob,
+	  ftOraBlob,
+      ftBlob,	  
       ftBytes : begin
                   P := TStringStream.Create;
                   try

@@ -557,13 +557,21 @@ end;
 
 function TRESTDWEventList.GetRecName(Index: String): TRESTDWEvent;
 Var
- I : Integer;
+ I      : Integer;
+ aIndex : String;
 Begin
  Result := Nil;
+ aIndex := Index;
+ If aIndex <> '' Then
+  Begin
+   If (aIndex[Length(aIndex) - FinalStrPos] = '/') Or
+      (aIndex[Length(aIndex) - FinalStrPos] = '/') Then
+    DeleteStr(aIndex, Length(aIndex) - FinalStrPos, 1);
+  End;
  For I := 0 To Self.Count - 1 Do
   Begin
-   If (Uppercase(Index) = Uppercase(TRESTDWEvent(Items[I]).EventName))                                  Or
-      (Uppercase(Index) = Uppercase(TRESTDWEvent(Items[I]).BaseURL + TRESTDWEvent(Items[I]).EventName)) Then
+   If (Uppercase(aIndex) = Uppercase(TRESTDWEvent(Items[I]).EventName))                                  Or
+      (Uppercase(aIndex) = Uppercase(TRESTDWEvent(Items[I]).BaseURL + TRESTDWEvent(Items[I]).EventName)) Then
     Begin
      Result := TRESTDWEvent(Self.Items[I]);
      Break;

@@ -81,7 +81,7 @@ Type
   VersionNumber,
   RecordCount,
   ParamsCount    : DWInteger; //new for ver15
-  DataSize       : DWInt64; //new for ver15
+  DataSize       : DWInt64;   //new for ver15
 End;
 
  TTokenValue = Class
@@ -1991,14 +1991,11 @@ Begin
     Cmd := Cmd + URLDecode(Params.Text)
    Else
     Cmd := URLDecode(Query);
-//    Uri := TIdURI.Create(Cmd);
    Try
-//    vParams.Delimiter := '|';
     vParams.Text := StringReplace(Cmd, '&', sLineBreak, [rfReplaceAll]);
     If vParams.count = 0 Then
      If Trim(Cmd) <> '' Then
       vParams.DelimitedText := StringReplace(Cmd, sLineBreak, '&', [rfReplaceAll]); //Alterações enviadas por "joaoantonio19"
-      //vParams.Add(Cmd);
    Finally
     encodestrings  := False;
     For I := 0 To vParams.Count - 1 Do
@@ -2024,28 +2021,37 @@ Begin
             If (vParams.names[I] <> '') And
                (Trim(Query)      <> '') Then
              Begin
-              JSONParam.ParamName       := Trim(Copy(vParams[I], 1, Pos('=', vParams[I]) - 1));
-              JSONParam.AsString        := Trim(Copy(vParams[I],    Pos('=', vParams[I]) + 1, Length(vParams[I])));
+              JSONParam.ParamName       := vParamName;
+              vValue     := Trim(Copy(vParams[I],    Pos('=', vParams[I]) + 1, Length(vParams[I])));
               If pos('dwencodestrings', lowercase(JSONParam.ParamName)) > 0 Then
-               encodestrings  := StringToBoolean(JSONParam.AsString)
+               encodestrings  := StringToBoolean(vValue)
               Else If (encodestrings) And
                       (pos('dwwelcomemessage',  lowercase(JSONParam.ParamName)) = 0) And
-                      (pos('dwaccesstag',  lowercase(JSONParam.ParamName)) = 0)      And
-                      (pos('datacompression',  lowercase(JSONParam.ParamName)) = 0)  And
-                      (pos('dwencodestrings',  lowercase(JSONParam.ParamName)) = 0)  And
-                      (pos('dwusecript',  lowercase(JSONParam.ParamName)) = 0)       And
-                      (pos('dwassyncexec',  lowercase(JSONParam.ParamName)) = 0)     And
-                      (pos('binaryrequest',  lowercase(JSONParam.ParamName)) = 0)    And
+                      (pos('dwaccesstag',       lowercase(JSONParam.ParamName)) = 0) And
+                      (pos('datacompression',   lowercase(JSONParam.ParamName)) = 0) And
+                      (pos('dwencodestrings',   lowercase(JSONParam.ParamName)) = 0) And
+                      (pos('dwusecript',        lowercase(JSONParam.ParamName)) = 0) And
+                      (pos('dwassyncexec',      lowercase(JSONParam.ParamName)) = 0) And
+                      (pos('binaryrequest',     lowercase(JSONParam.ParamName)) = 0) And
                       (pos('dwconnectiondefs',  lowercase(JSONParam.ParamName)) = 0) And
                       (pos('dwservereventname', lowercase(JSONParam.ParamName)) = 0) Then
-              JSONParam.AsString       := DecodeStrings(JSONParam.AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+              Begin
+               JSONParam.Encoded  := False;
+               If MethodType = rtPost Then
+                JSONParam.AsString := DecodeStrings(DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
+                                                                                    {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
+               Else
+                JSONParam.AsString := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+              End;
+              If JSONParam.IsNull Then
+               JSONParam.AsString  := vValue;
              End
             Else
              Begin
-              JSONParam.ParamName       := IntToStr(I);
-              JSONParam.AsString        := vParams[I];
+              JSONParam.ParamName    := IntToStr(I);
+              vValue                 := vParams[I];
               If pos('dwencodestrings', lowercase(JSONParam.ParamName)) > 0 Then
-               encodestrings  := StringToBoolean(JSONParam.AsString)
+               encodestrings  := StringToBoolean(vValue)
               Else If (encodestrings) And
                       (pos('dwwelcomemessage',  lowercase(JSONParam.ParamName)) = 0) And
                       (pos('dwaccesstag',  lowercase(JSONParam.ParamName)) = 0)      And
@@ -2056,7 +2062,16 @@ Begin
                       (pos('binaryrequest',  lowercase(JSONParam.ParamName)) = 0)    And
                       (pos('dwconnectiondefs',  lowercase(JSONParam.ParamName)) = 0) And
                       (pos('dwservereventname', lowercase(JSONParam.ParamName)) = 0) Then
-              JSONParam.AsString       := DecodeStrings(JSONParam.AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+               Begin
+                JSONParam.Encoded := False;
+                If MethodType = rtPost Then
+                 JSONParam.AsString       := DecodeStrings(DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
+                                                                                           {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
+                Else
+                 JSONParam.AsString       := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+               End;
+              If JSONParam.IsNull Then
+               JSONParam.AsString  := vValue;
              End;
             {$IFDEF RESTDWLAZARUS}
             JSONParam.DatabaseCharSet := DatabaseCharSet;
@@ -2437,4 +2452,5 @@ begin
 End;
 
 end.
+
 

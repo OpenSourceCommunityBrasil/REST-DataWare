@@ -90,11 +90,15 @@ begin
 end;
 function MsgYesNo(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
 begin
+{$IFNDEF LINUX}
   Result := MsgBox(Handle, Caption, Msg, MB_YESNO or Flags) = IDYES;
+ {$ENDIF}
 end;
 function MsgRetryCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
 begin
+{$IFNDEF LINUX}
   Result := MsgBox(Handle, Caption, Msg, MB_RETRYCANCEL or Flags) = IDRETRY;
+  {$ENDIF}
 end;
 function MsgAbortRetryIgnore(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Integer;
 begin
@@ -106,7 +110,9 @@ begin
 end;
 function MsgOKCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
 begin
+{$IFNDEF LINUX}
   Result := MsgBox(Handle, Caption, Msg, MB_OKCANCEL or Flags) = IDOK;
+{$ENDIF}
 end;
 procedure MsgOK(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
 begin

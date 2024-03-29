@@ -1640,11 +1640,11 @@ Var
  Function ExcludeTag(Value : String) : String;
  Begin
   Result := Value;
-  If (UpperCase(Copy (Value, InitStrPos, 3)) = 'GET')    or
-     (UpperCase(Copy (Value, InitStrPos, 4)) = 'POST')   or
-     (UpperCase(Copy (Value, InitStrPos, 3)) = 'PUT')    or
-     (UpperCase(Copy (Value, InitStrPos, 6)) = 'DELETE') or
-     (UpperCase(Copy (Value, InitStrPos, 5)) = 'PATCH')  Then
+  If (UpperCase(Copy (Value, 1, 3)) = 'GET')    or
+     (UpperCase(Copy (Value, 1, 4)) = 'POST')   or
+     (UpperCase(Copy (Value, 1, 3)) = 'PUT')    or
+     (UpperCase(Copy (Value, 1, 6)) = 'DELETE') or
+     (UpperCase(Copy (Value, 1, 5)) = 'PATCH')  Then
    Begin
     While (Result <> '') And (Result[InitStrPos] <> '/') Do
      Delete(Result, 1, 1);
@@ -1853,7 +1853,7 @@ Var
      Value := aDefaultUrl
     Else
      Begin
-      vTempValue := Copy(Value, InitStrPos, Length(aDefaultUrl));
+      vTempValue := Copy(Value, 1, Length(aDefaultUrl));
       If Lowercase(vTempValue) <> Lowercase(aDefaultUrl) Then
        Begin
         Value  := aDefaultUrl + Value;
@@ -1864,8 +1864,8 @@ Var
  End;
  Procedure PrepareBasicAuth(AuthenticationString : String; Var AuthUsername, AuthPassword : String);
  Begin
-  AuthUsername := Copy(AuthenticationString, InitStrPos, Pos(':', AuthenticationString) -1);
-  Delete(AuthenticationString, InitStrPos, Pos(':', AuthenticationString));
+  AuthUsername := Copy(AuthenticationString, 1, Pos(':', AuthenticationString) -1);
+  Delete(AuthenticationString, 1, Pos(':', AuthenticationString));
   AuthPassword := AuthenticationString;
  End;
  Function ReturnRouteValidation(ServerMethodsClass : TComponent;
@@ -2055,8 +2055,7 @@ Begin
      vUrlToExec    := Url
     Else
      vUrlToExec    := Cmd;
-    If (Cmd <> '/') And (Cmd <> '') Then
-     ReadRawHeaders;
+    ReadRawHeaders;
     vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
     If Cmd <> '' Then
      TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
@@ -3091,11 +3090,11 @@ Var
  Function ExcludeTag(Value : String) : String;
  Begin
   Result := Value;
-  If (UpperCase(Copy (Value, InitStrPos, 3)) = 'GET')    or
-     (UpperCase(Copy (Value, InitStrPos, 4)) = 'POST')   or
-     (UpperCase(Copy (Value, InitStrPos, 3)) = 'PUT')    or
-     (UpperCase(Copy (Value, InitStrPos, 6)) = 'DELETE') or
-     (UpperCase(Copy (Value, InitStrPos, 5)) = 'PATCH')  Then
+  If (UpperCase(Copy (Value, 1, 3)) = 'GET')    or
+     (UpperCase(Copy (Value, 1, 4)) = 'POST')   or
+     (UpperCase(Copy (Value, 1, 3)) = 'PUT')    or
+     (UpperCase(Copy (Value, 1, 6)) = 'DELETE') or
+     (UpperCase(Copy (Value, 1, 5)) = 'PATCH')  Then
    Begin
     While (Result <> '') And (Result[InitStrPos] <> '/') Do
      Delete(Result, 1, 1);
@@ -3363,7 +3362,7 @@ Var
      Value := aDefaultUrl
     Else
      Begin
-      vTempValue := Copy(Value, InitStrPos, Length(aDefaultUrl));
+      vTempValue := Copy(Value, 1, Length(aDefaultUrl));
       If Lowercase(vTempValue) <> Lowercase(aDefaultUrl) Then
        Begin
         Value  := aDefaultUrl + Value;
@@ -3374,8 +3373,8 @@ Var
  End;
  Procedure PrepareBasicAuth(AuthenticationString : String; Var AuthUsername, AuthPassword : String);
  Begin
-  AuthUsername := Copy(AuthenticationString, InitStrPos, Pos(':', AuthenticationString) -1);
-  Delete(AuthenticationString, InitStrPos, Pos(':', AuthenticationString));
+  AuthUsername := Copy(AuthenticationString, 1, Pos(':', AuthenticationString) -1);
+  Delete(AuthenticationString, 1, Pos(':', AuthenticationString));
   AuthPassword := AuthenticationString;
  End;
 Begin
@@ -3423,8 +3422,6 @@ Begin
  QueryParams           :=  DecodeURL(QueryParams);
  Cmd                   := RemoveBackslashCommands(Trim(RawHTTPCommand));
  vUrlToExec            := '';
- 
- 
  Try
   sCharSet := '';
   If (UpperCase(Copy (Cmd, 1, 3)) = 'GET')    Then
@@ -3544,8 +3541,7 @@ Begin
      vUrlToExec    := Url
     Else
      vUrlToExec    := Cmd;
-   // If (Cmd <> '/') And (Cmd <> '') Then
-     ReadRawHeaders;
+    ReadRawHeaders;
     vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
     If Cmd <> '' Then
      TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
@@ -3637,13 +3633,13 @@ Begin
            vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
          End;
        End;
-      ParseParams(DWParams, Params, QueryParams, ContentStringStream,
-                  vBinaryEvent, vBinaryCompatibleMode,
-                  ContentType,  Url, vmark,
-                  RequestType,  vWelcomeMessage,    vAccessTag,
-                  vdwCriptKey,  compresseddata,     encodestrings,
-                  dwassyncexec, vdwservereventname, baseEventUnit,
-                  vUrlToExec,   aurlContext,        vRequestHeader,
+      ParseParams(DWParams,            Params,             QueryParams,
+                  ContentStringStream, vBinaryEvent,       vBinaryCompatibleMode,
+                  ContentType,         Url,                vmark,
+                  RequestType,         vWelcomeMessage,    vAccessTag,
+                  vdwCriptKey,         compresseddata,     encodestrings,
+                  dwassyncexec,        vdwservereventname, baseEventUnit,
+                  vUrlToExec,          aurlContext,        vRequestHeader,
                   vdwConnectionDefs);
      End;
      WelcomeAccept         := True;
@@ -3839,8 +3835,11 @@ Begin
            vErrorMessage         := cInvalidAuth;
            //Roniery ajuste para encontrar o evento na lista de eventos,
            //para assim determinar se passa ou não no validador de permissão
+           if not (vUrlToExec='') then
+           Begin
            if vUrlToExec[Length(vUrlToExec)] = '/' then
             delete(vUrlToExec, Length(vUrlToExec), 1);
+            end;
 
            // verifica se precisa autenticação
            vNeedAuthorization := False;
@@ -4309,15 +4308,17 @@ Begin
                    Else
                     Begin
                      If Not(((vUrlToExec = '') Or (vUrlToExec = '/')) And (RequestType = rtGet)) Then
-                      If Not (WelcomeAccept) And (vErrorMessage <> '') Then
-                       Begin
-                        If vEncode_Errors then
-                         vReplyString := escape_chars(vErrorMessage)
-                        Else
-                         vReplyString := vErrorMessage;
-                       End
-                      Else
-                       vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+                      Begin
+                       If Not (WelcomeAccept) And (vErrorMessage <> '') Then
+                        Begin
+                         If vEncode_Errors then
+                          vReplyString := escape_chars(vErrorMessage)
+                         Else
+                          vReplyString := vErrorMessage;
+                        End
+                       Else
+                        vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+                      End;
                     End;
                   End;
                 End
@@ -5989,7 +5990,7 @@ Procedure TRESTDWBasicReceptor.ParseParams(Var DWParams              : TRESTDWPa
                                            Var vdwConnectionDefs     : TConnectionDefs);
 Var
  I                  : Integer;
- mb                 : TStringStream;
+ mb                 : TStream;
  JSONParam          : TRESTDWJSONParam;
  msgEnd,
  LBoundaryFound,
@@ -6026,11 +6027,11 @@ Begin
  LBoundaryEnd       := '';
  boundary           := '';
  startboundary      := '';
- if not Assigned(DWParams) then
- Begin
+ If Not Assigned(DWParams) Then
+  Begin
    DWParams           := TRESTDWParams.Create;
    DWParams.Encoding  := vEncoding;
- End;
+  End;
  Try
   If Assigned(ContentStringStream) Then
    Begin
@@ -6038,13 +6039,12 @@ Begin
     If Not aBinaryEvent Then
      Begin
       Try
-       mb := TStringStream.Create(''); //{$IFNDEF FPC}{$if CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+       mb := TMemoryStream.Create;
        Try
         mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
                     ContentStringStream.Position := 0;
         mb.Position := 0;
-        If (pos('--',       TStringStream(mb).DataString) > 0) And
-           (pos('boundary', ContentType) > 0)                  Then
+        If (pos('boundary', ContentType) > 0) Then
          Begin
           msgEnd           := False;
           LBoundaryFound   := False;
@@ -6070,13 +6070,15 @@ Begin
        Finally
         If Assigned(mb) Then
          FreeAndNil(mb);
+        If Assigned(decoder) Then
+         FreeAndNil(decoder);
        End;
       Except
       End;
      End;
     If (ContentStringStream.Size > 0) Then
      Begin
-      mb       := TStringStream.Create('');
+      mb       := TMemoryStream.Create;
       Try
        ContentStringStream.Position := 0;
        mb.CopyFrom(ContentStringStream, ContentStringStream.Size);
@@ -6093,7 +6095,7 @@ Begin
         TRESTDWDataUtils.ParseBodyBinToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
        Else
         Begin
-         If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+         If (pos('boundary', ContentType) > 0) Then
           Begin
            msgEnd   := False;
            boundary := ExtractHeaderSubItem(ContentType, 'boundary', QuoteHTTP);
@@ -6112,9 +6114,8 @@ Begin
              Case Decoder.PartType of
               mcptAttachment:
                Begin
-                ms := TMemoryStream.Create;
-                ms.Position := 0;
-                NewDecoder := Decoder.ReadBody(ms, MsgEnd);
+                ms                 := TMemoryStream.Create;
+                NewDecoder         := Decoder.ReadBody(ms, MsgEnd);
                 vDecoderHeaderList := TStringList.Create;
                 vDecoderHeaderList.Assign(Decoder.Headers);
                 sFile := ExtractFileName(Decoder.FileName);
@@ -6146,7 +6147,7 @@ Begin
                     vObjectName := Copy(lowercase(tmp),
                                         Pos('; name="', lowercase(tmp)) + length('; name="'),
                                         length(lowercase(tmp)));
-                    vObjectName := Copy(vObjectName, InitStrPos, Pos('"', vObjectName) -1);
+                    vObjectName := Copy(vObjectName, 1, Pos('"', vObjectName) -1);
                    End;
                   If Pos('content-type=', lowercase(tmp)) > 0 then
                    Begin
@@ -6159,6 +6160,7 @@ Begin
                 If (lowercase(vObjectName) = 'binarydata') then
                  Begin
                   DWParams.LoadFromStream(ms);
+                  FreeAndNil(decoder);
                   If Assigned(JSONParam) Then
                    FreeAndNil(JSONParam);
                   If (DWParams.ItemsString['dwwelcomemessage']     <> Nil) Then
@@ -6207,11 +6209,8 @@ Begin
                  Begin
                   JSONParam.ParamName        := vObjectName;
                   JSONParam.ParamFileName    := sFile;
-//                   tmp := StringReplace(StringReplace(TStringStream(ms).DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);//ms.DataString;
-//                   If Copy(tmp, Length(tmp) -1, 2) = sLineBreak Then
-//                    Delete(tmp, Length(tmp) -1, 2);
                   ms.Position := 0;
-                  JSONParam.LoadFromStream(TStringStream(ms));
+                  JSONParam.LoadFromStream(ms);
                  End
                 Else
                  Begin
@@ -6222,11 +6221,11 @@ Begin
                   JSONParam.ParamFileName    := sFile;
                   JSONParam.ParamContentType := sContentType;
                   If vEncoding = esUtf8 Then
-                   JSONParam.SetValue(utf8decode(TStringStream(ms).DataString), JSONParam.Encoded)
+                   JSONParam.SetValue(StreamToString(ms), JSONParam.Encoded)
                   Else If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(TStringStream(ms).DataString)) > 0) Then
-                   JSONParam.FromJSON(TStringStream(ms).DataString)
+                   JSONParam.FromJSON(StreamToString(ms))
                   Else
-                   JSONParam.SetValue(TStringStream(ms).DataString, JSONParam.Encoded);
+                   JSONParam.SetValue(StreamToString(ms), JSONParam.Encoded);
                  End;
                 DWParams.Add(JSONParam);
                 FreeAndNil(ms);
@@ -6234,59 +6233,77 @@ Begin
                End;
               mcptText :
                Begin
-                {$IFDEF RESTDWLAZARUS}
-                 ms := TStringStream.Create('');
-                {$ELSE}
-                 ms := TStringStream.Create(''{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
-                {$ENDIF}
-                ms.Position := 0;
-                newdecoder  := Decoder.ReadBody(ms, msgEnd);
-                tmp         := Decoder.Headers.Text;
+                ms                 := TMemoryStream.Create;
+                ms.Position        := 0;
+                newdecoder         := Decoder.ReadBody(ms, msgEnd);
+                vDecoderHeaderList := TStringList.Create;
+                vDecoderHeaderList.Assign(Decoder.Headers);
                 FreeAndNil(Decoder);
+                vObjectName  := '';
+                sContentType := '';
+                For I := 0 to vDecoderHeaderList.Count - 1 do
+                 Begin
+                  tmp := vDecoderHeaderList.Strings[I];
+                  If Pos('; name="', lowercase(tmp)) > 0 then
+                   Begin
+                    vObjectName := Copy(lowercase(tmp),
+                                        Pos('; name="', lowercase(tmp)) + length('; name="'),
+                                        length(lowercase(tmp)));
+                    vObjectName := Copy(vObjectName, 1, Pos('"', vObjectName) -1);
+                   End;
+                  If Pos('content-type=', lowercase(tmp)) > 0 then
+                   Begin
+                    sContentType := Copy(lowercase(tmp),
+                                        Pos('content-type=', lowercase(tmp)) + length('content-type='),
+                                        length(lowercase(tmp)));
+                   End;
+                 End;
                 Decoder     := TRESTDWMessageDecoderMIME(newdecoder);
-                vObjectName := '';
                 If Decoder <> Nil Then
                  TRESTDWMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
-                If pos('dwwelcomemessage', lowercase(tmp)) > 0      Then
-                 vWelcomeMessage := DecodeStrings(TStringStream(ms).DataString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
-                Else If pos('dwaccesstag', lowercase(tmp)) > 0      Then
-                 vAccessTag := DecodeStrings(TStringStream(ms).DataString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
-                Else If Pos('dwusecript', lowercase(tmp)) > 0       Then
-                 vdwCriptKey  := StringToBoolean(TStringStream(ms).DataString)
-                Else If pos('datacompression', lowercase(tmp)) > 0  Then
-                 compresseddata := StringToBoolean(TStringStream(ms).DataString)
-                Else If pos('dwencodestrings', lowercase(tmp)) > 0  Then
-                 encodestrings  := StringToBoolean(TStringStream(ms).DataString)
-                Else If Pos('binaryrequest', lowercase(tmp)) > 0    Then
-                 aBinaryEvent := StringToBoolean(TStringStream(ms).DataString)
-                Else If (Pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
-                 dwassyncexec := StringToBoolean(TStringStream(ms).DataString)
-                Else If pos('dwconnectiondefs', lowercase(tmp)) > 0 Then
+                If pos('dwwelcomemessage', lowercase(vObjectName)) > 0      Then
+                 vWelcomeMessage := DecodeStrings(StreamToString(ms){$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+                Else If pos('dwaccesstag', lowercase(vObjectName)) > 0      Then
+                 vAccessTag := DecodeStrings(StreamToString(ms){$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+                Else If Pos('dwusecript', lowercase(vObjectName)) > 0       Then
+                 vdwCriptKey  := StringToBoolean(StreamToString(ms))
+                Else If pos('datacompression', lowercase(vObjectName)) > 0  Then
+                 compresseddata := StringToBoolean(StreamToString(ms))
+                Else If pos('dwencodestrings', lowercase(vObjectName)) > 0  Then
+                 encodestrings  := StringToBoolean(StreamToString(ms))
+                Else If Pos('binaryrequest', lowercase(vObjectName)) > 0    Then
+                 aBinaryEvent := StringToBoolean(StreamToString(ms))
+                Else If (Pos('dwassyncexec', lowercase(vObjectName)) > 0) And (Not (dwassyncexec)) Then
+                 dwassyncexec := StringToBoolean(StreamToString(ms))
+                Else If pos('dwconnectiondefs', lowercase(vObjectName)) > 0 Then
                  Begin
                   vdwConnectionDefs   := TConnectionDefs.Create;
                   JSONValue           := TRESTDWJSONValue.Create;
                   Try
                    JSONValue.Encoding  := vEncoding;
                    JSONValue.Encoded  := True;
-                   JSONValue.LoadFromJSON(TStringStream(ms).DataString);
+                   JSONValue.LoadFromJSON(StreamToString(ms));
                    vdwConnectionDefs.LoadFromJSON(JSONValue.Value);
                   Finally
                    FreeAndNil(JSONValue);
                   End;
                  End
-                Else If (Pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
-                 dwassyncexec := StringToBoolean(TStringStream(ms).DataString)
-                Else If pos('dwservereventname', lowercase(tmp)) > 0  Then
+                Else If (Pos('dwassyncexec', lowercase(vObjectName)) > 0) And (Not (dwassyncexec)) Then
+                 dwassyncexec := StringToBoolean(StreamToString(ms))
+                Else If pos('dwservereventname', lowercase(vObjectName)) > 0  Then
                  Begin
                   JSONValue            := TRESTDWJSONValue.Create;
                   Try
                    JSONValue.Encoding  := vEncoding;
                    JSONValue.Encoded   := True;
-                   JSONValue.LoadFromJSON(TStringStream(ms).DataString);
+                   ms.Position         := 0;
+                   tmp                 := StreamToString(ms);//TStringStream(ms).DataString;
+                   If tmp <> '' Then
+                    JSONValue.LoadFromJSON(tmp);
                    vdwservereventname := JSONValue.Value;
                    If Pos('.', vdwservereventname) > 0 Then
                     Begin
-                     baseEventUnit       := Copy(vdwservereventname, InitStrPos, Pos('.', vdwservereventname) - 1 - FinalStrPos);
+                     baseEventUnit       := Copy(vdwservereventname, 1, Pos('.', vdwservereventname) - 1);
                      vdwservereventname := Copy(vdwservereventname, Pos('.', vdwservereventname) + 1, Length(vdwservereventname));
                     End;
                   Finally
@@ -6295,19 +6312,22 @@ Begin
                  End
                 Else
                  Begin
-                  vObjectName := Copy(lowercase(tmp), Pos('; name="', lowercase(tmp)) + length('; name="'),  length(lowercase(tmp)));
-                  vObjectName := Copy(vObjectName, InitStrPos, Pos('"', vObjectName) -1);
-                  JSONParam   := TRESTDWJSONParam.Create(DWParams.Encoding);
+//                  vObjectName := Copy(lowercase(tmp), Pos('; name="', lowercase(tmp)) + length('; name="'),  length(lowercase(tmp)));
+//                  vObjectName := Copy(vObjectName, 1, Pos('"', vObjectName) -1);
+                  JSONParam                 := TRESTDWJSONParam.Create(DWParams.Encoding);
+                  JSONParam.ParamName       := vObjectName;
                   JSONParam.ObjectDirection := odIN;
-                  If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(TStringStream(ms).DataString)) > 0) Then
-                   JSONParam.FromJSON(TStringStream(ms).DataString)
+                  tmp                       := StreamToString(ms);
+                  If (Pos(Lowercase('{"ObjectType":"toParam", "Direction":"'), lowercase(tmp)) > 0) Then
+                   JSONParam.FromJSON(tmp)
                   Else
-                   JSONParam.AsString := StringReplace(StringReplace(TStringStream(ms).DataString, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
-                  JSONParam.ParamName := vObjectName;
+                   JSONParam.AsString := StringReplace(StringReplace(tmp, sLineBreak, '', [rfReplaceAll]), #13, '', [rfReplaceAll]);
                   DWParams.Add(JSONParam);
                  End;
                 {$IFNDEF RESTDWLAZARUS}ms.Size := 0;{$ENDIF}
                 FreeAndNil(ms);
+                If Assigned(vDecoderHeaderList) Then
+                 FreeAndNil(vDecoderHeaderList);
                 FreeAndNil(newdecoder);
                End;
               mcptIgnore :
@@ -6341,9 +6361,9 @@ Begin
                      Then
             Begin
              If vEncoding = esUtf8 Then
-              TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+              TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(StreamToString(mb)), vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
              Else
-              TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+              TRESTDWDataUtils.ParseBodyRawToDWParam(StreamToString(mb), vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
             End
            Else
             Begin
@@ -6354,18 +6374,16 @@ Begin
                  If DWParams.ItemsString['undefined'] = nil then
                   TRESTDWDataUtils.ParseBodyRawToDWParam(mb, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
                 End;
-//                     Else
-//                      TRESTDWDataUtils.ParseDWParamsURL(utf8decode(TStringStream(mb).DataString), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
               End
              Else
               Begin
-               If (pos('--', TStringStream(mb).DataString) > 0) and (pos('boundary', ContentType) > 0) Then
+               If (pos('boundary', ContentType) > 0) Then
                 Begin
                  If DWParams.ItemsString['undefined'] = nil then
                   TRESTDWDataUtils.ParseBodyRawToDWParam(mb, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
                 End
                Else
-                TRESTDWDataUtils.ParseDWParamsURL(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                TRESTDWDataUtils.ParseDWParamsURL(StreamToString(mb), vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
               End;
             End;
           End;

@@ -108,7 +108,7 @@ Type
  TLoadMode             = (lmCopy, lmAppend);
  TSaveLoadState        = (slsNone, slsLoading, slsSaving);
  TCompareRecords       = Function(Item1, Item2 : TRESTDWMTMemoryRecord) : Integer Of Object;
- TWordArray            = Array Of Word;
+ TIntArray             = Array Of Integer;
  TRESTDWMTBookmarkData = Integer;
  TRESTDWMemTable       = Class;
  {$IFNDEF FPC}
@@ -135,24 +135,24 @@ Type
   TRESTDWMTRecordBuffer   = TRecordBuffer;
  {$ENDIF}
   PBlobBuffer = ^TBlobBuffer;
-  TBlobBuffer = Record
+  TBlobBuffer = Packed Record
     FieldNo,
     OrgBufID  : Integer;
     Buffer    : Pointer;
     Size      : Int64;
   end;
   PRESTDWBlobField = ^TRESTDWBlobField;
-  TRESTDWBlobField = Record
+  TRESTDWBlobField = Packed Record
    ConnBlobBuffer : Array[0..11] Of Byte; // DB specific data is stored here
    BlobBuffer     : PBlobBuffer;
   End;
   PRESTDWRecLinkItem = ^TRESTDWRecLinkItem;
-  TRESTDWRecLinkItem = Record
+  TRESTDWRecLinkItem = Packed Record
    Prior             : PRESTDWRecLinkItem;
    Next              : PRESTDWRecLinkItem;
   End;
   PRESTDWBookmark       = ^TRESTDWBookmark;
-  TRESTDWBookmark       = Record
+  TRESTDWBookmark       = Packed Record
    BookmarkData      : PRESTDWRecLinkItem;
    BookmarkInt       : Integer; // Was used by TArrayBufIndex
    BookmarkFlag      : TBookmarkFlag;
@@ -438,7 +438,7 @@ Type
     FRowsOriginal,
     FRowsChanged,
     FRowsAffected     : Integer;
-    FOffsets          : TWordArray;
+    FOffsets          : TIntArray;
     FAutoInc          : Longint;
     FDeletedValues,
     FIndexList        : TList;
@@ -1372,7 +1372,7 @@ End;
 Procedure TRESTDWMemTable.InitFieldDefsFromFields;
 var
   I        : Integer;
-  Offset   : Word;
+  Offset   : Integer;
   Field    : TField;
   FieldDefsUpdated : Boolean;
   FieldLen : Word;

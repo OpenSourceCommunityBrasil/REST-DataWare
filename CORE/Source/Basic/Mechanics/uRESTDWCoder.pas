@@ -76,9 +76,9 @@ uses
   Procedure Decode(Const AIn    : String); Overload;
   Procedure Decode(ASrcStream   : TStream;
                    Const ABytes : Integer = -1); Overload; Virtual; Abstract;
-  Class Function DecodeString (Const AIn   : String) : String;
-  Class Function DecodeBytes  (Const AIn   : String) : TRESTDWBytes;
-  Class procedure DecodeStream(Const AIn   : String;
+  Class Function DecodeString (Const AIn   : AnsiString) : String;
+  Class Function DecodeBytes  (Const AIn   : AnsiString) : TRESTDWBytes;
+  Class procedure DecodeStream(Const AIn   : AnsiString;
                                ADestStream : TStream);
  End;
  TRESTDWDecoderClass = Class Of TRESTDWDecoder;
@@ -114,7 +114,7 @@ Begin
  End;
 End;
 
-Class Function TRESTDWDecoder.DecodeString(Const AIn : String) : String;
+Class Function TRESTDWDecoder.DecodeString(Const AIn : AnsiString) : String;
 Var
  LStream : TMemoryStream;
 Begin
@@ -128,7 +128,7 @@ Begin
  End;
 End;
 
-Class Function TRESTDWDecoder.DecodeBytes(const AIn : String) : TRESTDWBytes;
+Class Function TRESTDWDecoder.DecodeBytes(const AIn : AnsiString) : TRESTDWBytes;
 Var
  LStream : TMemoryStream;
 Begin
@@ -143,7 +143,7 @@ Begin
  End;
 End;
 
-Class Procedure TRESTDWDecoder.DecodeStream(Const AIn   : String;
+Class Procedure TRESTDWDecoder.DecodeStream(Const AIn   : AnsiString;
                                             ADestStream : TStream);
 Var
  LDecoder : TRESTDWDecoder;

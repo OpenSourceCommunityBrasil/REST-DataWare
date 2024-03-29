@@ -72,6 +72,8 @@ Type
                               AByteCount    : Integer = -1;
                               AAppend       : Boolean = True;
                               AIndex        : Integer = -1);
+  Procedure  ExtractToBytesB (Var VBytes : TRESTDWBytes;
+                              AByteCount : Integer);
   Function   IndexOf         (Const AByte   : Byte;
                               AStartPos     : Integer = 0)  : Integer; Overload;
   Function   IndexOf         (Const ABytes  : TRESTDWBytes;
@@ -209,6 +211,25 @@ Begin
     End
    Else
     CopyBytes(FBytes, AIndex, VBytes, LOldSize, AByteCount);
+  End;
+End;
+
+Procedure TRESTDWBuffer.ExtractToBytesB(Var VBytes : TRESTDWBytes;
+                                        AByteCount : Integer);
+Var
+ LOldPosition,
+ LOldSize : Integer;
+Begin
+ If AByteCount < 0 Then
+  AByteCount := Size;
+ If AByteCount > 0 Then
+  Begin
+   LOldSize := 0;
+   If Length(FBytes) > 0 Then
+    Begin
+     SetLength(VBytes, Length(FBytes));
+     Move(FBytes[0], VBytes[0], Length(FBytes));
+    End;
   End;
 End;
 

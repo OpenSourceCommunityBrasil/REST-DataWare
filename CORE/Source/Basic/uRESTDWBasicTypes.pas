@@ -320,17 +320,17 @@ Var
 Begin
  Assert(AStream<>nil);
  Result := 0;
- If VBytes = Nil Then
-  SetLength(VBytes, 0);
+// If VBytes = Nil Then
+ SetLength(VBytes, 0);
  LActual := ACount;
  If LActual < 0 Then
   LActual := AStream.Size - AStream.Position;
  If LActual = 0 Then
   Exit;
  If Length(VBytes) < (AOffset+LActual) Then
-  SetLength(VBytes, AOffset+LActual);
+  SetLength(VBytes, LActual);
  Assert(VBytes<>nil);
- Result := AStream.Read(VBytes[AOffset], LActual);
+ Result := AStream.Read(VBytes[0], LActual);
 End;
 
 Class Function TRESTDWStreamHelper.Write(Const AStream : TStream;

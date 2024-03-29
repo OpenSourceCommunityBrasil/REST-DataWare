@@ -9732,7 +9732,11 @@ Begin
       Priority              := 1;
     {$IFEND}
   {$ELSE}
+  {$IFNDEF LINUX}
   Priority              := tpLowest;
+  {$ELSE}
+   Priority              := 1;
+  {$ENDIF}
   {$IFEND}
  {$ENDIF}
 End;

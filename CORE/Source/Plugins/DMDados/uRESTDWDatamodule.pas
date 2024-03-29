@@ -66,7 +66,7 @@ Uses
                              Var CORS_CustomHeaders : TStrings) : Boolean;
    Constructor Create(Sender : TComponent);Override;
    Destructor  Destroy;override;
-   Property ServerAuthOptions              : TRESTDWAuthOptionParam Read vServerAuthOptions              Write vServerAuthOptions;
+   Property    ServerAuthOptions           : TRESTDWAuthOptionParam Read vServerAuthOptions              Write vServerAuthOptions;
   Published
    Property ClientWelcomeMessage           : String              Read vClientWelcomeMessage;
    Property ClientInfo                     : TRESTDWClientInfo   Read vRESTDWClientInfo;
@@ -94,7 +94,7 @@ implementation
 {$R *.dfm}
 {$ENDIF}
 
-Uses uRESTDWServerEvents, uRESTDWServerContext;
+Uses uRESTDWServerEvents, uRESTDWServerContext, uRESTDWTools;
 { TServerMethodDataModule }
 
 Destructor TServerMethodDataModule.Destroy;
@@ -186,8 +186,13 @@ Var
        JSONParam.SetValue(lst.ValueFromIndex[0]);
        Params.Add(JSONParam);
       End
-     Else
-      JSONParam.SetValue(lst.ValueFromIndex[0]);
+     Else If JSONParam.IsNull Then
+      Begin
+       If JSONParam.Encoded Then
+        JSONParam.SetValue(DecodeStrings(lst.ValueFromIndex[0]{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
+       Else
+        JSONParam.SetValue(lst.ValueFromIndex[0]);
+      End;
      lst.Delete(0);
     End;
   Finally

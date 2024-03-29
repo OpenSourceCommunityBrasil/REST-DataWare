@@ -669,13 +669,21 @@ end;
 
 function TRESTDWContextList.GetRecName(Index: String): TRESTDWContext;
 Var
- I : Integer;
+ I      : Integer;
+ aIndex : String;
 Begin
  Result := Nil;
+ aIndex := Index;
+ If aIndex <> '' Then
+  Begin
+   If (aIndex[Length(aIndex) - FinalStrPos] = '/') Or
+      (aIndex[Length(aIndex) - FinalStrPos] = '/') Then
+    DeleteStr(aIndex, Length(aIndex) - FinalStrPos, 1);
+  End;
  For I := 0 To Self.Count - 1 Do
   Begin
-   If (Uppercase(Index) = Uppercase(Self.Items[I].ContextName))                          Or
-      (Uppercase(Index) = Uppercase(Self.Items[I].BaseURL + Self.Items[I].ContextName))  Then
+   If (Uppercase(aIndex) = Uppercase(Self.Items[I].ContextName))                          Or
+      (Uppercase(aIndex) = Uppercase(Self.Items[I].BaseURL + Self.Items[I].ContextName))  Then
     Begin
      Result := TRESTDWContext(Self.Items[I]);
      Break;
