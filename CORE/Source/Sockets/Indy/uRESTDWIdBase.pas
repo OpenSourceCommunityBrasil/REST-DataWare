@@ -3311,6 +3311,7 @@ End;
 Constructor TRESTDWIdServicePooler.Create(AOwner: TComponent);
 Begin
  Inherited;
+ SetSocketKind('Standalone - Indy');
  HTTPServer                       := TIdHTTPServer.Create(Nil);
  lHandler                         := TIdServerIOHandlerSSLOpenSSL.Create(Nil);
  {$IFDEF RESTDWLAZARUS}

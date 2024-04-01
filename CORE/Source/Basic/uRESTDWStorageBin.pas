@@ -1,4 +1,4 @@
-unit uRESTDWStorageBin;
+﻿unit uRESTDWStorageBin;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -502,7 +502,7 @@ Begin
                                   vString := '';
                                   If vInt64 > 0 Then
                                    Begin
-                                    SetLength(vString, sizeOf(vInt64));
+                                    SetLength(vString, vInt64);
                                     {$IFDEF FPC}
                                      stream.Read(Pointer(vString)^, vInt64);
                                      If EncodeStrs Then
@@ -515,9 +515,9 @@ Begin
                                      stream.Read(vString[InitStrPos], vInt64);
                                      If EncodeStrs Then
                                       vString := DecodeStrings(vString);
-                                     vInt64 := (Length(vString) + 1) * SizeOf(WideChar);
+                                     //vInt64 := (Length(vString) + 1) * SizeOf(WideChar);
                                      If aField <> Nil Then
-                                      Move(DWWideString(vString)[InitStrPos], pData^, vInt64);
+                                      Move(vString[InitStrPos], pData^, vInt64);
                                     {$ENDIF}
                                    End;
                                  End;
@@ -913,6 +913,8 @@ Begin
      {$ENDIF}
      //{$ELSE}
      //  FreeMem(PRESTDWMTMemBuffer(@PActualRecord));
+    {$ELSE}
+     FreeMem(PRESTDWMTMemBuffer(@PActualRecord));
     {$ENDIF}
    End;
   End;
@@ -1359,8 +1361,31 @@ Begin
        Case vDWFieldType Of
         dwftFixedChar,
         dwftWideString,
-        dwftString,
         dwftFixedWideChar  : Begin
+                              {$IFDEF RESTDWANDROID}
+                               vString := MarshaledAString(PData);
+                              {$ELSE}
+                               SetLength(vRESTDWBytes, vDataSet.Fields[B].Size);
+                               Try
+                                Move(PRESTDWBytes(@Pdata)^[0], vRESTDWBytes[0], vDataSet.Fields[B].Size);
+                                vString := StringReplace(BytesToString(vRESTDWBytes, false), #0, '', [rfReplaceAll]);
+                               Finally
+                                SetLength(vRESTDWBytes, 0);
+                               End;
+                              {$ENDIF}
+                              If EncodeStrs Then
+                               vString := EncodeStrings(vString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+                              vInt64   := Length(vString)* SizeOf(vString[1]);
+                              Stream.Write(vInt64, Sizeof(vInt64));
+                              {$IFNDEF FPC}
+                               If vInt64 <> 0 Then
+                                Stream.Write(vString[InitStrPos], vInt64);
+                              {$ELSE}
+                               If vInt64 <> 0 Then
+                                Stream.Write(vString[1], vInt64);
+                              {$ENDIF}
+                             End;
+        dwftString         : Begin
                               {$IFDEF RESTDWANDROID}
                                vString := MarshaledAString(PData);
                               {$ELSE}
@@ -1575,7 +1600,7 @@ Begin
                            If DatabaseCharSet <> csUndefined Then
                             vWideString := GetStringDecode(vString, DatabaseCharSet);
                           {$ENDIF}
-                          vInt64       := Length(vWideString);
+                          vInt64       := Length(vWideString)* sizeof(vWideString[1]);
                           AStream.Write(vInt64, SizeOf(vInt64));
                           If vInt64 <> 0 Then
                            AStream.Write(vWideString[InitStrPos], vInt64);

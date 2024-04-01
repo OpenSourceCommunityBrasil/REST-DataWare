@@ -6968,15 +6968,10 @@ Begin
            Begin
             If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer <> Nil Then
              Begin
-              If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer.UpdateFieldChanges <> Nil Then
-               Begin
-                If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer.UpdateFieldChanges.Count = 0 Then
-                 TMassiveDatasetBuffer(vMassiveDataset).ClearLine
-                Else
-                 TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
-               End
+              If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer.UpdateFieldChangesCount = 0 Then
+               TMassiveDatasetBuffer(vMassiveDataset).ClearLine
               Else
-               TMassiveDatasetBuffer(vMassiveDataset).ClearLine;
+               TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
              End
             Else
              TMassiveDatasetBuffer(vMassiveDataset).ClearLine;
@@ -7052,15 +7047,10 @@ Begin
            Begin
             If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer <> Nil Then
              Begin
-              If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer.UpdateFieldChanges <> Nil Then
-               Begin
-                If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer.UpdateFieldChanges.Count = 0 Then
-                 TMassiveDatasetBuffer(vMassiveDataset).ClearLine
-                Else
-                 TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
-               End
+              If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer.UpdateFieldChangesCount = 0 Then
+               TMassiveDatasetBuffer(vMassiveDataset).ClearLine
               Else
-               TMassiveDatasetBuffer(vMassiveDataset).ClearLine;
+               TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
              End
             Else
              TMassiveDatasetBuffer(vMassiveDataset).ClearLine;
@@ -11318,7 +11308,7 @@ Begin
    Begin
     vInDesignEvents := False;
     SetInBlockEvents(True);
-    TRESTDWMemTable(Self).EmptyTable;
+    Inherited Active := False;
     If Not InLoadFromStream Then
      Begin
       vActive := False;

@@ -124,7 +124,7 @@ Var
    End;
  End;
 Begin
- ResultStream    := TStringStream.Create('');
+// ResultStream    := TStringStream.Create('');
  vResponseHeader := TStringList.Create;
  vCORSHeader     := TStringList.Create;
  vResponseString := '';
@@ -260,6 +260,7 @@ End;
 Constructor TRESTDWShellService.Create(AOwner: TComponent);
 Begin
  Inherited Create(AOwner);
+ SetSocketKind('CGI/ISAPI - FPC/Lazarus');
 End;
 
 Destructor TRESTDWShellService.Destroy;

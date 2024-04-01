@@ -4291,34 +4291,6 @@ Begin
                                            ovFixedWideChar]);
        Exit;
       End;
-     {$IFDEF RESTDWLAZARUS}
-     If vEncodingLazarus = Nil Then
-      SetEncoding(vEncoding);
-     If vEncoded Then
-      Begin
-       If vEncoding = esUtf8 Then
-        aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
-       Else
-        aValue := StringToBytes(Format(TJsonStringValue, [bValue]))
-      End
-     Else
-      Begin
-       If ((DataMode = dmDataware) And (vEncoded)) Or Not(vObjectValue = ovObject) Then
-        Begin
-         If vEncoding = esUtf8 Then
-          aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
-         Else
-          aValue := StringToBytes(Format(TJsonStringValue, [bValue]));
-        End
-       Else
-        Begin
-         If vEncoding = esUtf8 Then
-          aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(bValue))
-         Else
-          aValue := StringToBytes(String(bValue));
-        End;
-      End;
-     {$ELSE}
      If vEncoded Then
       aValue := StringToBytes(Format(TJsonStringValue, [bValue]))
      Else
@@ -4329,7 +4301,6 @@ Begin
        Else
         aValue := StringToBytes(String(bValue));
       End;
-     {$ENDIF}
     End
    Else If vObjectValue in [ovDate, ovTime, ovDateTime, ovTimeStamp, ovOraTimeStamp, ovTimeStampOffset] Then
     Begin
