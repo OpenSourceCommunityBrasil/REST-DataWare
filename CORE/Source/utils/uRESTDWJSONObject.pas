@@ -52,7 +52,7 @@ End;
 Type
  TOnWriterProcess   = Procedure (DataSet : TDataSet; RecNo, RecordCount : Integer;Var AbortProcess : Boolean) Of Object;
  TDWParamExpType    = (tdwpxt_All, tdwpxt_IN, tdwpxt_OUT, tdwpxt_INOUT);
- TProcedureEvent    = Procedure Of Object;
+ TProcedureEvent    = Procedure (Const aSelf     : TObject)          Of Object;
  TNewDataField      = Procedure (FieldDefinition : TFieldDefinition) Of Object;
  TFieldExist        = Function  (Const Dataset   : TDataset;
                                  Value           : String) : TField  Of Object;
@@ -119,14 +119,14 @@ Type
   Procedure SetEncoding  (bValue             : TEncodeSelect);
   //Desacoplamento Iniciado
   Function  GetNewFieldList                  : TProcedureEvent;
-  Procedure aNewFieldList;
+  Procedure aNewFieldList     (Const aSelf   : TObject);
   Function  GetNewDataField                  : TNewDataField;
   Procedure aNewDataField     (FieldDefinition : TFieldDefinition);
   Function  GetFieldExist                    : TFieldExist;
   Function  aFieldExist       (Const Dataset : TDataset;
                                Value         : String) : TField;
-  Function  GetCreateDataSet                   : TProcedureEvent;
-  Procedure aCreateDataSet;
+  Function  GetCreateDataSet                 : TProcedureEvent;
+  Procedure aCreateDataSet    (Const aSelf   : TObject);
   Procedure aSetInitDataset   (Const Value   : Boolean);
   Function  GetSetInitDataset : TSetInitDataset;
   Procedure aSetRecordCount    (aJsonCount,
@@ -146,7 +146,7 @@ Type
                                 Value         : String) : TFieldDef;
   Function  aGetInDesignEvents                : Boolean;
   Function  GetGetInDesignEvents              : TGetInDesignEvents;
-  Procedure aPrepareDetailsNew;
+  Procedure aPrepareDetailsNew   (Const aSelf : TObject);
   Function  GetPrepareDetailsNew              : TProcedureEvent;
   Procedure aPrepareDetails      (ActiveMode  : Boolean);
   Function  GetPrepareDetails                 : TPrepareDetails;
@@ -858,7 +858,7 @@ Begin
   SetLength(vFieldsList, 0);
 End;
 
-Procedure TRESTDWJSONValue.aCreateDataSet;
+Procedure TRESTDWJSONValue.aCreateDataSet(Const aSelf     : TObject);
 Begin
 
 End;
@@ -2232,7 +2232,7 @@ Begin
      ReadFieldDefs(vTempValueJSON, JSONValue,
                    ResponseTranslator.ElementRootBaseName,
                    ResponseTranslator.ElementRootBaseIndex);
-    vLocNewFieldList;
+    vLocNewFieldList(DestDS);
     vFieldDefinition := TFieldDefinition.Create;
     If DestDS.Fields.Count = 0 Then
      DestDS.FieldDefs.Clear;
@@ -2329,7 +2329,7 @@ Begin
      vLocSetInBlockEvents(True);
      Inactive := True;
      If Assigned(vLocCreateDataSet) Then
-      vLocCreateDataSet();
+      vLocCreateDataSet(DestDS);
      If Not DestDS.Active Then
       DestDS.Open;
      If Not DestDS.Active Then
@@ -3074,13 +3074,14 @@ Begin
     bJsonOBJ    := bJsonArray.GetObject(0);
     bJsonArrayB := TRESTDWJSONInterfaceObject(bJsonOBJ).openArray(TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[0].Name);
     vBuildSide  := TRESTDWJSONInterfaceObject(bJsonOBJ).pairs[1].Value;
-    if Assigned(bJsonOBJ) then
-      FreeAndNil(bJsonOBJ);
+    If Assigned(bJsonOBJ) Then
+     FreeAndNil(bJsonOBJ);
    End
   Else
    Begin
     DestDS.Close;
     Raise Exception.Create(cErrorInvalidJSONData);
+    Exit;
    End;
   If ActualRec = 0 Then
    Begin
@@ -3088,13 +3089,15 @@ Begin
     vObjectDirection := GetDirectionName(bJsonValue.pairs[1].Value);
     vEncoded         := GetBooleanFromString(bJsonValue.pairs[2].Value);
     vObjectValue     := GetValueType(bJsonValue.pairs[3].Value);
-    vtagName         := Lowercase(bJsonValue.pairs[4].Name);
+    vtagName         := '';
+    If bJsonValue.PairCount > 4 Then
+     vtagName         := Lowercase(bJsonValue.pairs[4].Name);
     vLocSetInBlockEvents(True);
     DestDS.DisableControls;
     If DestDS.Active Then
      DestDS.Close;
     DestDS.FieldDefs.BeginUpdate;
-    vLocNewFieldList;
+    vLocNewFieldList(DestDS);
     vFieldDefinition := TFieldDefinition.Create;
     DestDS.FieldDefs.Clear;
     If (DestDS.Fields.Count = 0) And
@@ -3188,7 +3191,7 @@ Begin
      vLocSetInBlockEvents(True);
      Inactive := True;
      If Assigned(vLocCreateDataSet) Then
-      vLocCreateDataSet();
+      vLocCreateDataSet(DestDS);
      If Not DestDS.Active Then
       DestDS.Open;
      If Not DestDS.Active Then
@@ -3201,7 +3204,10 @@ Begin
       End;
     Except
      On E : Exception Do
-      Raise Exception.Create(E.Message);
+      Begin
+       Raise Exception.Create(E.Message);
+       Exit;
+      End;
     End;
    If csDesigning in DestDS.ComponentState Then
     Begin
@@ -3286,8 +3292,6 @@ Begin
       If Not vFindFlag Then
        ListFields.Add('-1');
      End;
-//    If Assigned(ListFields) then
-//     FreeAndNil(ListFields);
     If vLocGetInDesignEvents() Then
      Begin
       vSetInDesignEvents := SetInDesignEvents;
@@ -3477,10 +3481,10 @@ Begin
    FreeAndNil(bJsonArrayB);
   If Assigned(bJsonArray)   Then
    FreeAndNil(bJsonArray);
-  If Assigned(bJsonValue)   Then
-   FreeAndNil(bJsonValue);
-  If Assigned(bJsonOBJ)     Then   //Tem que ser o Ultimo a ser destruido
+  If Assigned(bJsonOBJ)     Then
    FreeAndNil(bJsonOBJ);
+  If Assigned(bJsonValue)   Then //Tem que ser o Ultimo a ser destruido
+   FreeAndNil(bJsonValue);
   Try
    vLocSetInBlockEvents(False);
    vLocSetInitDataset(True);
@@ -3503,7 +3507,7 @@ Begin
    If DestDS.State = dsBrowse Then
     Begin
      If DestDS.RecordCount = 0 Then
-      vPrepareDetailsNew
+      vPrepareDetailsNew(DestDS)
      Else
       vPrepareDetails(True);
     End;
@@ -3883,7 +3887,7 @@ Begin
 
 End;
 
-Procedure TRESTDWJSONValue.aNewFieldList;
+Procedure TRESTDWJSONValue.aNewFieldList(Const aSelf     : TObject);
 Begin
 
 End;
@@ -3912,7 +3916,7 @@ Begin
 
 End;
 
-Procedure TRESTDWJSONValue.aPrepareDetailsNew;
+Procedure TRESTDWJSONValue.aPrepareDetailsNew(Const aSelf     : TObject);
 Begin
 
 End;

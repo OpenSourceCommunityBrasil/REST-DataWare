@@ -132,6 +132,11 @@ Type
                         Const AResponse : TStream        = Nil;
                         IgnoreEvents    : Boolean        = False):Integer;Overload;Virtual;
   Function   Put       (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        CustomBody      : TStringList    = Nil;
+                        Const AResponse : TStringStream  = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;Virtual;
+  Function   Put       (AUrl            : String         = '';
                         CustomHeaders    : TStringList    = Nil;
                         Const CustomBody : TStream        = Nil;
                         Const AResponse  : TStream        = Nil;
@@ -483,11 +488,20 @@ Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;
 
-Function TRESTDWClientRESTBase.Put   (AUrl              : String;
-                                      CustomHeaders     : TStringList;
-                                      Const CustomBody,
-                                      AResponse         : TStream;
-                                      IgnoreEvents      : Boolean): Integer;
+Function TRESTDWClientRESTBase.Put(AUrl            : String         = '';
+                                   CustomHeaders   : TStringList    = Nil;
+                                   CustomBody      : TStringList    = Nil;
+                                   Const AResponse : TStringStream  = Nil;
+                                   IgnoreEvents    : Boolean        = False):Integer;
+Begin
+ Raise Exception.Create(cMethodNotImplemented);
+End;
+
+Function TRESTDWClientRESTBase.Put(AUrl              : String;
+                                   CustomHeaders     : TStringList;
+                                   Const CustomBody,
+                                   AResponse         : TStream;
+                                   IgnoreEvents      : Boolean): Integer;
 Begin
  Raise Exception.Create(cMethodNotImplemented);
 End;

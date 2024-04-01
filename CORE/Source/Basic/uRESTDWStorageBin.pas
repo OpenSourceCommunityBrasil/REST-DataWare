@@ -273,7 +273,10 @@ Begin
  vNoFields :=  (ADataSet.Fields.Count = 0);
  ADataSet.Close;
  If vNoFields Then
+ begin
   ADataSet.FieldDefs.Clear;
+ end;
+
  For I := 0 To vFieldsCount-1 Do
   Begin
    // field kind
@@ -389,6 +392,7 @@ Var
                        dwftWideString,
                        dwftFixedChar,
                        dwftString,
+                       dwftOraClob,
                        dwftWideMemo,
                        dwftFmtMemo,
                        dwftMemo]) Then
@@ -491,7 +495,7 @@ Begin
        If (pData <> Nil) Or (aField = Nil) Then
         Begin
          // N Bytes - WideString
-          case vDWFieldType Of 
+          case vDWFieldType Of
           dwftWideString,
           dwftFixedWideChar    :Begin
                                   stream.Read(vInt64, SizeOf(vInt64));
@@ -818,6 +822,7 @@ Begin
            //N Bytes - String Blobs
           dwftWideMemo,
           dwftFmtMemo,
+          dwftOraClob,
           dwftMemo                :Begin
                                      stream.Read(vInt64, SizeOf(vInt64));
                                      vString := '';
@@ -847,6 +852,7 @@ Begin
                                    End;
            // N Bytes - Others Blobs
           dwftStream,
+          dwftOraBlob,
           dwftBlob,
           dwftBytes               :Begin
                                      SetLength(vBytes, 0);
@@ -1069,9 +1075,11 @@ Begin
     // N Bytes - Blobs
    Else If (FFieldTypes[i] In [dwftStream,
                                dwftBlob,
+                               dwftOraBlob,
                                dwftBytes,
                                dwftMemo,
                                dwftWideMemo,
+                               dwftOraClob,
                                dwftFmtMemo]) Then
     Begin
      AStream.Read(vInt64, Sizeof(vInt64));
@@ -1478,7 +1486,9 @@ Begin
 //       dwftMemo,
        dwftStream,
        dwftBlob,
+       dwftOraBlob,
        dwftBytes,
+       dwftOraClob,
        dwftMemo,
        dwftWideMemo,
        dwftFmtMemo           : Begin
@@ -1662,7 +1672,9 @@ Begin
     // N Bytes - Blobs
    dwftStream,
    dwftBlob,
+   dwftOraBlob,
    dwftBytes,
+   dwftOraClob,
    dwftMemo,
    dwftWideMemo,
    dwftFmtMemo         : Begin

@@ -230,9 +230,9 @@ Uses
 
 Function TrashRemove(Value : String) : String;
 Begin
- Result := StringReplace(Value,  #13, '', [rfReplaceAll]);
- Result := StringReplace(Result, #10, '', [rfReplaceAll]);
- Result := StringReplace(Result, #9,  '', [rfReplaceAll]);
+ Result := StringReplace(Value,  sLineBreak, '', [rfReplaceAll]);
+// Result := StringReplace(Result, #10, '', [rfReplaceAll]);
+// Result := StringReplace(Result, #9,  '', [rfReplaceAll]);
 End;
 
 Function DateTimeFromISO8601(Value : String)    : TDateTime;

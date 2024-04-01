@@ -893,9 +893,12 @@ Begin
    If (Result <> '')                And
       (Lowercase(Result) <> 'null') Then
     Begin
-     If (Pos('/', Result) = 0) And
-        (Pos('-', Result) <= 1) Then
-      Result := StrToFloat(Result);
+     If (Pos('/', Result)  = 0) And
+        (Pos('-', Result) <= 1) And
+        (Pos('D', Result)  = 0) Then
+      Result := StrToFloat(Result)
+     Else
+      Result := BuildFloatString(Result);
     End
    Else
     Result := 0;
@@ -2492,9 +2495,11 @@ Begin
           End;
         Finally
           vTempValue := '';
+          FreeAndNil(bJsonOBJTemp);
+          FreeAndNil(bJsonOBJB);
+          FreeAndNil(bJsonOBJ);
+          FreeAndNil(FieldJson);
         End;
-        FreeAndNil(bJsonOBJTemp);
-        FreeAndNil(bJsonOBJB);
         DestDS.Post;
         If Assigned(vOnWriterProcess) Then
          vOnWriterProcess(DestDS, J +1, LinesJson.ElementCount, AbortProcess);
@@ -2828,8 +2833,8 @@ Begin
            End;
          Finally
           vTempValue := '';
+          FreeAndNil(bJsonOBJB);
          End;
-         FreeAndNil(bJsonOBJB);
          DestDS.Post;
          If Assigned(vOnWriterProcess) Then
           vOnWriterProcess(DestDS, J +1, bJsonArrayB.ElementCount, AbortProcess);
@@ -3426,8 +3431,8 @@ Begin
            End;
          Finally
           vTempValue := '';
+          FreeAndNil(bJsonOBJB);
          End;
-         FreeAndNil(bJsonOBJB);
          DestDS.Post;
          If Assigned(vOnWriterProcess) Then
           vOnWriterProcess(DestDS, J +1, bJsonArrayB.ElementCount, AbortProcess);
@@ -5087,7 +5092,7 @@ Begin
   ovOraTimeStamp,
   ovTimeStampOffset : Begin
                        vEncoded     := False;
-                       vObjectValue := ovFloat;
+//                       vObjectValue := ovFloat;
                        SetValue(BuildStringFloat(FloatToStr(Value), DataMode, vFloatDecimalFormat), vEncoded);
                       End;
   ovString,
@@ -5986,7 +5991,7 @@ Begin
        Else
         JSONParam.SetValue('null',JSONParam.Encoded);
       Finally
-//       bJsonOBJ.Free;
+       bJsonOBJ.Free;
       End;
      End
     Else
@@ -6001,7 +6006,7 @@ Begin
        Add(JSONParam);
       Finally
        vStringStream.Free;
-//       bJsonOBJ.Free;
+       bJsonOBJ.Free;
       End;
      End;
    End;

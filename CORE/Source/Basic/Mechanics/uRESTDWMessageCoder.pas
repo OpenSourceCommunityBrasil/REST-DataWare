@@ -29,7 +29,7 @@ Interface
 {$ENDIF}
 
 uses
-  Classes, SysUtils, uRESTDWAbout, uRESTDWMessage, uRESTDWTools, uRESTDWConsts, uRESTDWException;
+  Classes, SysUtils, uRESTDWAbout, uRESTDWMessage, uRESTDWTools, uRESTDWConsts, uRESTDWException, uRESTDWProtoTypes;
 
   Type
    TRESTDWMessageCoderPartType = (mcptText, mcptAttachment, mcptIgnore, mcptEOF);
@@ -41,16 +41,20 @@ uses
    FPartType         : TRESTDWMessageCoderPartType;
    FSourceStream     : TStream;
   Public
-   Constructor Create  (AOwner      : TComponent);Override;
+   Constructor Create  (AOwner      : TComponent); Override;
+   Destructor  Destroy; Override;
    Function    ReadBody(ADestStream : TStream;
                         Var AMsgEnd : Boolean)  : TRESTDWMessageDecoder; Virtual; Abstract;
    Procedure   ReadHeader; Virtual;
    Function    ReadLn   (Const ATerminator      : String = LF)  : String;
-   Function    ReadLnRFC(Var   VMsgEnd          : Boolean)      : String; Overload;
+   Function    ReadLnB  (Const ATerminator      : String = LF)  : TRESTDWBytes;
+   Function    ReadLnRFC(Var   VMsgEnd          : Boolean)      : String;       Overload;
    Function    ReadLnRFC(Var   VMsgEnd          : Boolean;
                          Const ALineTerminator  : String;
                          Const ADelim           : String = '.') : String; Overload;
-   Destructor  Destroy;  Override;
+   Function    ReadLnRFCB(Var   VMsgEnd          : Boolean;
+                          Const ALineTerminator  : String;
+                          Const ADelim           : String = '.') : TRESTDWBytes;
    Property Filename         : String                      Read FFilename;
    Property FreeSourceStream : Boolean                     Read FFreeSourceStream Write FFreeSourceStream;
    Property Headers          : TStrings                    Read FHeaders;
@@ -62,6 +66,7 @@ uses
    Function    CheckForStart(ASender     : TRESTDWMessage;
                              Const ALine : String) : TRESTDWMessageDecoder; Virtual; Abstract;
    Constructor Create; Virtual;
+   Destructor  Destroy; Override;
   End;
   TRESTDWMessageDecoderList = Class
   Protected
@@ -81,6 +86,7 @@ uses
    FPermissionCode : Integer;
   Public
    Constructor Create(AOwner          : TComponent);Override;
+   Destructor  Destroy; Override;
    Procedure   Encode(Const AFilename : String;
                       ADest           : TStream);   Overload;
    Procedure   Encode(ASrc            : TStream;
@@ -97,6 +103,7 @@ uses
    FMessageEncoderClass : TRESTDWMessageEncoderClass;
   Public
    Constructor Create; Virtual;
+   Destructor  Destroy; Override;
    Procedure InitializeHeaders(AMsg : TRESTDWMessage); Virtual;
    Property  MessageEncoderClass    : TRESTDWMessageEncoderClass Read FMessageEncoderClass;
   End;
@@ -113,7 +120,7 @@ uses
 
 Implementation
 
-Uses uRESTDWMessageCoderMIME, uRESTDWBuffer, uRESTDWBasicTypes, uRESTDWProtoTypes;
+Uses uRESTDWBuffer, uRESTDWBasicTypes;
 
 var
   GMessageDecoderList: TRESTDWMessageDecoderList = nil;
@@ -186,7 +193,7 @@ End;
 
 Constructor TRESTDWMessageDecoder.Create(AOwner : TComponent);
 Begin
- Inherited;
+ Inherited Create(AOwner);
  FFreeSourceStream := True;
  FHeaders := TStringList.Create;
 End;
@@ -198,11 +205,93 @@ Begin
   FreeAndNil(FSourceStream)
  Else
   FSourceStream := nil;
- Inherited Destroy;
+ Inherited;
 End;
 
 Procedure TRESTDWMessageDecoder.ReadHeader;
 Begin
+End;
+
+Function DoReadLnFromStreamB(AStream        : TStream;
+                             ATerminator    : String;
+                             AMaxLineLength : Integer = -1) : TRESTDWBytes;
+Const
+ LBUFMAXSIZE = 2048;
+Var
+ LBuffer        : TRESTDWBuffer;
+ LSize,
+ LStartPos,
+ LTermPos       : Integer;
+ LTerm, LTemp   : TRESTDWBytes;
+ LStrmStartPos,
+ LStrmPos,
+ LStrmSize      : TRESTDWStreamSize;
+Begin
+ Assert(AStream<>nil);
+ LTerm         := Nil;
+ LStrmStartPos := AStream.Position;
+ LStrmPos      := LStrmStartPos;
+ LStrmSize     := AStream.Size;
+ If LStrmPos   >= LStrmSize Then
+  Begin
+   SetLength(Result, 0);
+   Exit;
+  End;
+ SetLength(LTemp, LBUFMAXSIZE);
+ LBuffer := TRESTDWBuffer.Create;
+ Try
+  If AMaxLineLength < 0 Then
+   AMaxLineLength := MaxInt;
+  If ATerminator = '' Then
+   ATerminator := LF;
+  LTerm := ToBytes(ATerminator);
+  LTermPos := -1;
+  LStartPos := 0;
+  Repeat
+   LSize := restdwMin(LStrmSize - LStrmPos, LBUFMAXSIZE);
+   LSize := ReadBytesFromStream(AStream, LTemp, LSize);
+   If LSize < 1 Then
+    Begin
+     LStrmPos := LStrmStartPos + LBuffer.Size;
+     Break;
+    End;
+   Inc(LStrmPos, LSize);
+   LBuffer.Write(LTemp, LSize, 0);
+//   LTermPos := LBuffer.IndexOf(LTerm, LStartPos);
+   If LSize > 0 Then
+    Begin
+     If (AMaxLineLength > 0)        And
+        (LTermPos > AMaxLineLength) Then
+      Begin
+       LStrmPos := LStrmStartPos + AMaxLineLength;
+       LTermPos := AMaxLineLength;
+      End
+     Else
+      LStrmPos := LStrmStartPos + LSize + restdwLength(LTerm);
+     Break;
+    End;
+   LStartPos := restdwMax(LBuffer.Size-(restdwLength(LTerm)-1), 0);
+   If (AMaxLineLength > 0) And
+      (LStartPos >= AMaxLineLength) Then
+    Begin
+     LStrmPos := LStrmStartPos + AMaxLineLength;
+     LTermPos := AMaxLineLength;
+     Break;
+    End;
+  Until LStrmPos >= LStrmSize;
+  If (ATerminator = LF) And
+     (LTermPos > 0)     And
+     (LTermPos < LBuffer.Size) Then
+   Begin
+    If (LBuffer.PeekByte(LTermPos) = Ord(LF))   And
+       (LBuffer.PeekByte(LTermPos-1) = Ord(CR)) Then
+     Dec(LTermPos);
+   End;
+//  AStream.Position := LStrmPos;
+  LBuffer.ExtractToBytesB(Result, LSize);
+ Finally
+  LBuffer.Free;
+ End;
 End;
 
 Function DoReadLnFromStream(AStream        : TStream;
@@ -287,6 +376,11 @@ Begin
  End;
 End;
 
+Function TRESTDWMessageDecoder.ReadLnB(Const ATerminator : String = LF) : TRESTDWBytes;
+Begin
+ Result := DoReadLnFromStreamB(SourceStream, ATerminator, -1);
+End;
+
 Function TRESTDWMessageDecoder.ReadLn(Const ATerminator : String = LF) : String;
 Begin
  Result := DoReadLnFromStream(SourceStream, ATerminator, -1);
@@ -295,6 +389,18 @@ End;
 Function TRESTDWMessageDecoder.ReadLnRFC(Var VMsgEnd : Boolean): String;
 Begin
  Result := ReadLnRFC(VMsgEnd, LF, '.');
+End;
+
+Function TRESTDWMessageDecoder.ReadLnRFCB(Var   VMsgEnd          : Boolean;
+                                          Const ALineTerminator  : String;
+                                          Const ADelim           : String = '.') : TRESTDWBytes;
+Begin
+ Result := ReadLnB(ALineTerminator);
+ If Length(Result) = 0 Then {do not localize}
+  Begin
+   VMsgEnd := True;
+   Exit;
+  end;
 End;
 
 Function TRESTDWMessageDecoder.ReadLnRFC(Var VMsgEnd           : Boolean;
@@ -316,6 +422,11 @@ Constructor TRESTDWMessageEncoderInfo.Create;
 Begin
  Inherited Create;
 End;
+
+destructor TRESTDWMessageEncoderInfo.Destroy;
+begin
+  Inherited;
+end;
 
 Procedure TRESTDWMessageEncoderInfo.InitializeHeaders(AMsg: TRESTDWMessage);
 Begin
@@ -399,7 +510,18 @@ Begin
  FPermissionCode := 660;
 End;
 
+destructor TRESTDWMessageEncoder.Destroy;
+begin
+  Inherited;
+end;
+
+destructor TRESTDWMessageDecoderInfo.Destroy;
+begin
+  Inherited;
+end;
+
 Initialization
+
 Finalization
  FreeAndNil(GMessageDecoderList);
  FreeAndNil(GMessageEncoderList);

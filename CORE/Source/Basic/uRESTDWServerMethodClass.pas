@@ -1,4 +1,4 @@
-unit uRESTDWServerMethodClass;
+﻿unit uRESTDWServerMethodClass;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -102,7 +102,7 @@ End;
 
 implementation
 
-Uses uRESTDWServerEvents, uRESTDWServerContext;
+Uses uRESTDWServerEvents, uRESTDWServerContext, uRESTDWTools;
 
 Procedure TServerBaseMethodClass.SetClientWelcomeMessage(Value: String);
 Begin
@@ -219,8 +219,13 @@ Var
        JSONParam.SetValue(lst.ValueFromIndex[0]);
        Params.Add(JSONParam);
       End
-     Else
-      JSONParam.SetValue(lst.ValueFromIndex[0]);
+     Else If JSONParam.IsNull Then
+      Begin
+       If JSONParam.Encoded Then
+        JSONParam.SetValue(DecodeStrings(lst.ValueFromIndex[0]{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
+       Else
+        JSONParam.SetValue(lst.ValueFromIndex[0]);
+      End;
      lst.Delete(0);
     End;
   Finally

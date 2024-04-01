@@ -425,7 +425,9 @@ end;
 {$IFNDEF HAS_FMX}
 procedure RaiseLastOSError;
 begin
+{$IFDEF MSWINDOWS}
   RaiseLastWin32Error;
+{$ENDIF}
 end;
 {$ENDIF ~HAS_FMX}
 {$IFNDEF RTL230_UP}

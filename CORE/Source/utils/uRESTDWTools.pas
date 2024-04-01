@@ -27,7 +27,7 @@ Uses
  LConvEncoding, lazutf8,
  {$ELSE}
  {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
- {$IFDEF RESTDWFMX}IOUtils,System.WideStrUtils,{$ENDIF}
+ {$IF DEFINED(RESTDWFMX) OR DEFINED(LINUX)}IOUtils,System.WideStrUtils,{$IFEND}
  {$IFDEF DELPHIXE6UP}NetEncoding,{$ENDIF}
  EncdDecd,
  {$ENDIF}
@@ -938,7 +938,7 @@ Begin
  {$IFDEF RESTDWLAZARUS}
  Result := CopyFileTo(PChar(Source), PChar(Destination));
  {$ELSE}
-  {$IFDEF RESTDWFMX}
+  {$IF DEFINED(RESTDWFMX) OR DEFINED(LINUX)}
    Result := False;
    Try
     TFile.Copy(Source, Destination, True);
@@ -947,7 +947,7 @@ Begin
    End;
   {$ELSE}
    Result := CopyFile(PChar(Source), PChar(Destination), False);
-  {$ENDIF}
+  {$IFEND}
  {$ENDIF}
 End;
 
@@ -1704,7 +1704,6 @@ Begin
  LLength := restdwLength(AStr, ALength, AIndex);
  If LLength > 0 Then
   Begin
-
    LBytes := ToBytes(AStr, LLength, AIndex);
    TRESTDWStreamHelper.Write(AStream, LBytes);
   End;
@@ -3357,6 +3356,7 @@ End;
 Function BytesToString(Const bin : TRESTDWBytes)   : String;
 Var
  I : Integer;
+ vStringStream : TStringStream;
 Begin
  I := restdwLength(bin);
  If I > 0 Then
@@ -3368,7 +3368,8 @@ Begin
     {$IFDEF RESTDWWINDOWS}
     Result :=TEncoding.ANSI.GetString(TBytes(bin));
     {$ELSE}
-    Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
+     Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
+//     Result := TEncoding.Utf8.GetString(TBytes(bin));
     {$ENDIF}
   {$IFEND}
   End;

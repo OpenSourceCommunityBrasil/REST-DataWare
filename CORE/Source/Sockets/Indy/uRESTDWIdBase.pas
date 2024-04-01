@@ -273,6 +273,13 @@ End;
                         Const CustomBody  : TStream        = Nil;
                         Const AResponse   : TStream        = Nil;
                         IgnoreEvents      : Boolean        = False):Integer;Overload;Override;
+
+  Function   Put       (AUrl            : String         = '';
+                        CustomHeaders   : TStringList    = Nil;
+                        CustomBody      : TStringList    = Nil;
+                        Const AResponse : TStringStream  = Nil;
+                        IgnoreEvents    : Boolean        = False):Integer;Overload;Override;
+
   Function   Put       (AUrl              : String         = '';
                         CustomHeaders     : TStringList    = Nil;
                         FileName          : String         = '';
@@ -416,6 +423,8 @@ Begin
     End;
   Except
   End;
+  If Assigned(ssl) Then
+   FreeAndNil(ssl);
   FreeAndNil(HttpRequest);
  end;
  Inherited;
@@ -1570,7 +1579,6 @@ Begin
    End;
   vAUrl := AUrl;
   Try
-//   If Assigned(CustomHeaders) Then
    SetHeaders(CustomHeaders);
    If Not IgnoreEvents Then
    If Assigned(OnBeforePut) then
@@ -1630,6 +1638,102 @@ Begin
    End;
  End;
  DestroyClient;
+End;
+
+Function TRESTDWIdClientREST.Put(AUrl      : String        = '';
+                           CustomHeaders   : TStringList   = Nil;
+                           CustomBody      : TStringList   = Nil;
+                           Const AResponse : TStringStream = Nil;
+                           IgnoreEvents    : Boolean       = False):Integer;
+Var
+ temp         : TStringStream;
+ vTempHeaders : TStringList;
+ atempResponse,
+ tempResponse : TStringStream;
+ SendParams   : TIdMultipartFormDataStream;
+Begin
+ Result:= 200;
+ Try
+  temp         := Nil;
+  tempResponse := Nil;
+  SendParams   := Nil;
+  SetParams;
+  SetUseSSL(UseSSL);
+  vTempHeaders := TStringList.Create;
+
+  {$IFDEF DELPHIXEUP}
+    atempResponse  := TStringStream.Create('', TEncoding.UTF8);
+  {$ELSE}
+    atempResponse := TStringStream.Create('');
+  {$ENDIF}
+
+  If Not Assigned(AResponse) Then
+   Begin
+     {$IFDEF DELPHIXEUP}
+      tempResponse  := TStringStream.Create('', TEncoding.UTF8);
+     {$ELSE}
+      tempResponse := TStringStream.Create('');
+     {$ENDIF}
+   End;
+  vAUrl := AUrl;
+  Try
+   SetHeaders(CustomHeaders);
+   If Not IgnoreEvents Then
+   If Assigned(OnBeforePut) then
+    If Not Assigned(CustomHeaders) Then
+     OnBeforePut(AUrl, vTempHeaders)
+    Else
+     OnBeforePut(AUrl, CustomHeaders);
+   If Assigned(CustomBody) Then
+    temp         := TStringStream.Create(CustomBody.Text);
+   HttpRequest.Put(AUrl, temp, atempResponse);
+   Result:= HttpRequest.ResponseCode;
+   If Assigned(temp) Then
+    FreeAndNil(temp);
+   atempResponse.Position := 0;
+   If atempResponse.Size = 0 Then
+    Begin
+     If RequestCharset = esUtf8 Then
+      AResponse.WriteString(utf8Decode(HttpRequest.Response.RawHeaders.Text))
+     Else
+      AResponse.WriteString(HttpRequest.Response.RawHeaders.Text);
+    End
+   Else
+    Begin
+     If RequestCharset = esUtf8 Then
+      AResponse.WriteString(utf8Decode(atempResponse.DataString))
+     Else
+      AResponse.WriteString(atempResponse.DataString);
+    End;
+   FreeAndNil(atempResponse);
+   AResponse.Position := 0;
+   If Not IgnoreEvents Then
+   If Assigned(OnAfterRequest) then
+    OnAfterRequest(AUrl, rtPut, AResponse);
+  Finally
+   vTempHeaders.Free;
+   If Assigned(tempResponse) Then
+    tempResponse.Free;
+   If Assigned(atempResponse) Then
+    atempResponse.Free;
+  End;
+ Except
+  On E: EIdHTTPProtocolException Do
+   Begin
+    If (Length(E.ErrorMessage) > 0) or (E.ErrorCode <> 0) Then
+     Begin
+      Result:= E.ErrorCode;
+      temp := TStringStream.Create(E.ErrorMessage{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
+      AResponse.CopyFrom(temp, temp.Size);
+      temp.Free;
+     End;
+   End;
+  On E: EIdSocketError Do
+   Begin
+    HttpRequest.Disconnect(false);
+    Raise;
+   End;
+ End;
 End;
 
 Function   TRESTDWIdClientREST.Put(AUrl             : String         = '';
@@ -3818,7 +3922,7 @@ Var
        Begin
         If DWParams.Items[I].ObjectValue in [ovSmallint, ovInteger, ovWord, ovBoolean, ovByte,
                                              ovAutoInc, ovLargeint, ovLongWord, ovShortint, ovSingle] Then
-         Result := Result + Format('&%s=%s', [DWParams.Items[I].ParamName, DWParams.Items[I].Value])
+         Result := Result + Format('&%s=%s', [DWParams.Items[I].ParamName, EncodeStrings(DWParams.Items[I].Value{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})])
         Else
          Begin
           If vCripto.Use Then
@@ -4002,6 +4106,10 @@ Var
       {$ELSE}
        aStringStream := TStringStream.Create('');
       {$ENDIF}
+//      TStringList(HttpRequest.DefaultCustomHeader).AddPair('datacompression',   BooleanToString(Datacompress));
+//      TStringList(HttpRequest.DefaultCustomHeader).AddPair('dwassyncexec',      BooleanToString(Assyncexec));
+//      TStringList(HttpRequest.DefaultCustomHeader).AddPair('dwencodestrings',   BooleanToString(EncodedStrings));
+//      TStringList(HttpRequest.DefaultCustomHeader).AddPair('binaryrequest',     BooleanToString(BinaryRequest));
       Case EventType Of
        seGET    : vErrorCode := HttpRequest.Get(vURL, TStringList(HttpRequest.DefaultCustomHeader), aStringStream);
        seDELETE : Begin
@@ -4018,15 +4126,19 @@ Var
             aStringStream.Position:=0;
             If aStringStream.Size > 0 Then
              StringStream := ZDecompressStreamNew(aStringStream);
-             Params.LoadFromStream(StringStream);
-             If not (Params.ItemsString['MessageError'] = Nil) Then
-             Begin
-              if Params.ItemsString['MessageError'].AsString = trim('') then
-               ResultData   := TReplyOK
-              else
-               ResultData := Params.ItemsString['MessageError'].AsString;
-
-             end;
+             If aBinaryRequest Then
+              Begin
+               Params.LoadFromStream(StringStream);
+               If not (Params.ItemsString['MessageError'] = Nil) Then
+                Begin
+                 If trim(Params.ItemsString['MessageError'].AsString) = '' Then
+                  ResultData   := TReplyOK
+                 Else
+                  ResultData := Params.ItemsString['MessageError'].AsString;
+                End;
+              End
+             Else
+              ResultData := TStringStream(aStringStream).DataString;
             FreeAndNil(aStringStream);
            // ResultData :=TStringStream(StringStream).DataString;
             FreeAndNil(StringStream);
