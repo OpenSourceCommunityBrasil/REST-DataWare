@@ -2947,6 +2947,9 @@ Function BookmarkToHex(Value : TRESTDWBytes) : String;
 {$IFDEF RESTDWFMX}
 Var
  bytes: TBytes;
+{$ELSE IF FPC}
+Var
+ bytes: TBytes;
 {$ENDIF}
 Begin
  Result := '';
@@ -2958,7 +2961,13 @@ Begin
     HexToBin(PwideChar(value), 0, bytes, 0, Length(bytes));
     Result := TEncoding.UTF8.GetString(bytes);
    {$ELSE}
-     BinToHex(PAnsiChar(Value), PChar(Result), restdwLength(Value));
+     {$IFDEF FPC}
+      SetLength(bytes, restdwLength(value) div 2);
+      HexToBin(PChar(value), PChar(bytes), Length(bytes));
+      Result := BytesToString(bytes);
+     {$ELSE}
+      BinToHex(PAnsiChar(Value), PChar(Result), restdwLength(Value));
+     {$ENDIF}
    {$ENDIF}
   End;
 End;
@@ -3299,7 +3308,8 @@ Begin
    Else
     LBytes := Copy(AValue, AStartIndex, LLength);
   {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
-   SetString(Result, PAnsiChar(LBytes), restdwLength(LBytes));
+   SetString(Result, PWideChar(LBytes), restdwLength(LBytes));
+   Result := TEncoding.ANSI.GetString(TBytes(LBytes));
   {$ELSEIF Defined(DELPHIXEUP)}
     SetString(Result, PWideChar(LBytes), restdwLength(LBytes));
     {$IFDEF MSWINDOWS}

@@ -472,6 +472,7 @@ End;
                                    BinaryCompatibleMode      : Boolean;
                                    CompareContext            : Boolean) : Boolean;
  Public
+  Procedure   SetSocketKind       (SocketKind                : String);
   Procedure   SetActive           (Value                     : Boolean);Virtual;
   Procedure   ClearDataRoute;
   Procedure   AddDataRoute        (DataRoute                 : String;
@@ -3418,8 +3419,8 @@ Begin
  vRequestHeader        := TStringList.Create;
  vCompareContext       := False;
  { TODO 1 -oRoniery -ccorreção : função para fazer decode de url utf8 para ascii }
- RawHTTPCommand        :=  DecodeURL(RawHTTPCommand);
- QueryParams           :=  DecodeURL(QueryParams);
+ RawHTTPCommand        := DecodeURL(RawHTTPCommand);
+ QueryParams           := DecodeURL(QueryParams);
  Cmd                   := RemoveBackslashCommands(Trim(RawHTTPCommand));
  vUrlToExec            := '';
  Try
@@ -3827,7 +3828,7 @@ Begin
            End;
          {$ENDIF}
          If vAuthenticator <> Nil Then
-         Begin
+          Begin
            If vToken = '' Then
             vToken := Token;
            vAcceptAuth           := False;
@@ -3835,12 +3836,11 @@ Begin
            vErrorMessage         := cInvalidAuth;
            //Roniery ajuste para encontrar o evento na lista de eventos,
            //para assim determinar se passa ou não no validador de permissão
-           if not (vUrlToExec='') then
-           Begin
-           if vUrlToExec[Length(vUrlToExec)] = '/' then
-            delete(vUrlToExec, Length(vUrlToExec), 1);
-            end;
-
+           If Not (vUrlToExec='') Then
+            Begin
+             If vUrlToExec[Length(vUrlToExec)] = '/' Then
+              Delete(vUrlToExec, Length(vUrlToExec), 1);
+            End;
            // verifica se precisa autenticação
            vNeedAuthorization := False;
            {$IFNDEF RESTDWLAZARUS}
@@ -3975,7 +3975,7 @@ Begin
              PCustomHeaders := @ResponseHeaders;
              BuildCORS(TRESTDWAuthToken(vAuthenticator).GetTokenRoutes, TStrings(PCustomHeaders^));
             End;
-         End
+          End
          Else
           Begin
            {$IFNDEF RESTDWLAZARUS}
@@ -4524,6 +4524,8 @@ Begin
      End;
    End;
  Finally
+  If Not (Assigned(ResultStream)) Then
+   ResultStream := TStringStream.Create(vDefaultPage.Text);
   DestroyComponents;
  End;
 End;
@@ -4631,6 +4633,12 @@ Begin
     End;
   End;
 End;
+
+Procedure TRESTDWBasicReceptor.SetSocketKind(SocketKind : String);
+Begin
+ FSocketKind := SocketKind;
+End;
+
 
 Procedure TRESTDWBasicReceptor.SetActive(Value : Boolean);
 Begin

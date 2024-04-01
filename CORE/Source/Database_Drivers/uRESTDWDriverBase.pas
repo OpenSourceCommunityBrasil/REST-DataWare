@@ -1,4 +1,4 @@
-unit uRESTDWDriverBase;
+﻿unit uRESTDWDriverBase;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -1310,16 +1310,20 @@ begin
                   vParam.AsInteger := StrToInt(MassiveReplyValue.NewValue);
               end;
             end;
-
-            if (MassiveReplyValue = nil) and
-               (not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) then begin
-              if vParam.RESTDWDataTypeParam in [dwftLongWord,dwftLargeint] then
-                vParam.AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-              else if vParam.DataType = ftSmallInt then
-                vParam.AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
-              else
-                vParam.AsInteger := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
-            end;
+            If vParam.IsNull Then
+             Begin
+              If (MassiveReplyValue = Nil) And
+                 (MassiveDataset.AtualRec.PrimaryValues[X] <> Nil) And
+                 (Not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) Then
+               Begin
+                If vParam.RESTDWDataTypeParam in [dwftLongWord,dwftLargeint] Then
+                 vParam.AsLargeInt := StrToInt64(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                Else If vParam.DataType = ftSmallInt Then
+                 vParam.AsSmallInt := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value)
+                Else
+                 vParam.AsInteger := StrToInt(MassiveDataset.AtualRec.PrimaryValues[X].Value);
+               End;
+             End;
           end
           else if vParam.RESTDWDataTypeParam in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
             if (not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) then
@@ -4030,7 +4034,7 @@ begin
       else
         vLineSQL := Format('UPDATE %s ',[MassiveDataset.TableName + ' SET %s %s']);
       if not MassiveDataset.ReflectChanges then  begin
-        for I := 0 to MassiveDataset.AtualRec.UpdateFieldChanges.Count - 1 do begin
+        for I := 0 to MassiveDataset.AtualRec.UpdateFieldChangesCount - 1 do begin
           if Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(RESTDWFieldBookmark) then begin
             if vFields = '' then
               vFields := MassiveDataset.AtualRec.UpdateFieldChanges[I] + ' = :' + MassiveDataset.AtualRec.UpdateFieldChanges[I]
@@ -4439,13 +4443,15 @@ Begin
  vStringStream := Nil;
  If Massivedataset.MassiveMode = mmUpdate Then
   Begin
-   For I := 0 To Massivedataset.AtualRec.UpdateFieldChanges.Count -1 Do
+   For I := 0 To Massivedataset.AtualRec.UpdateFieldChangesCount -1 Do
     Begin
      MassiveField  := MassiveDataset.Fields.FieldByName(Massivedataset.AtualRec.UpdateFieldChanges[I]);
-     If (Lowercase(MassiveField.FieldName) = Lowercase(RESTDWFieldBookmark)) then
-      Continue;
-     If (MassiveField <> Nil) Then
+     If MassiveField = Nil Then
+      Continue
+     Else
       Begin
+       If (Lowercase(MassiveField.FieldName) = Lowercase(RESTDWFieldBookmark)) then
+        Continue;
        If MassiveField.IsNull Then
         vTempValue := ''
        Else
@@ -4469,8 +4475,10 @@ Begin
               End;
              If Not MassiveField.IsNull Then
               vTempValue                   := MassiveReplyValue.NewValue
+             Else If MassiveReplyValue.OldValue <> Null Then
+              vTempValue                   := MassiveReplyValue.OldValue
              Else
-              vTempValue                   := MassiveReplyValue.OldValue;
+               vTempValue                  := '';
             End
            Else
             Begin

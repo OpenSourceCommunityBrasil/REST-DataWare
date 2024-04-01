@@ -1115,7 +1115,11 @@ Begin
       Finalize(FBlobs[0], FMemoryData.BlobFieldCount);
      FMemoryData.FRecords.Remove(Self);
      SetLength(FBlobs, 0);
-     FreeMem(FData, SizeOf(FData));
+     {$IFDEF FPC}
+      ReallocMem(FData, 0);
+     {$ELSE}
+      FreeMem(FData, SizeOf(FData));
+     {$ENDIF}
      FMemoryData := Nil;
     End;
    If Value <> nil then
@@ -1531,11 +1535,15 @@ End;
 
 Function TRESTDWMemTable.AllocRecordBuffer: TRecordBuffer;
 Begin
- {$IFDEF DELPHI10_0UP}
+ {$IFDEF FPC}
   GetMem(Result, FRecBufSize);
  {$ELSE}
-  Result := StrAlloc(FRecBufSize);
- {$ENDIF DELPHI10_0UP}
+  {$IFDEF DELPHI10_0UP}
+   GetMem(Result, FRecBufSize);
+  {$ELSE}
+   Result := StrAlloc(FRecBufSize);
+  {$ENDIF DELPHI10_0UP}
+ {$ENDIF}
  SetLength(FBlobs, 0);
  If BlobFieldCount > 0 Then
   SetLength(FBlobs, BlobFieldCount);
@@ -1545,11 +1553,15 @@ Procedure TRESTDWMemTable.FreeRecordBuffer(Var Buffer: TRecordBuffer);
 Begin
  If BlobFieldCount > 0 Then
   SetLength(FBlobs, 0);
- {$IFDEF DELPHI10_0UP}
-  FreeMem(Buffer, 0);
+ {$IFDEF FPC}
+  FreeMem(Buffer);
  {$ELSE}
-  StrDispose(Buffer);
- {$ENDIF DELPHI10_0UP}
+  {$IFDEF DELPHI10_0UP}
+   FreeMem(Buffer, 0);
+  {$ELSE}
+   StrDispose(Buffer);
+  {$ENDIF DELPHI10_0UP}
+ {$ENDIF}
  Buffer := nil;
 End;
 
@@ -2179,20 +2191,20 @@ End;
  {$ENDIF RTL240_UP}
 {$ENDIF ~NEXTGEN}
 
-Procedure TRESTDWMemTable.InternalSetFieldData(Field			          : TField;
-                        											 Buffer			          : Pointer;
-											                         Const ValidateBuffer : TRESTDWMTValueBuffer);
+Procedure TRESTDWMemTable.InternalSetFieldData(Field                : TField;
+                        		       Buffer               : Pointer;
+					       Const ValidateBuffer : TRESTDWMTValueBuffer);
 Var
-  PActualRecord	: PRESTDWMTMemBuffer;
-  Data			    : {$IFDEF FPC}PAnsiChar{$ELSE}PByte{$ENDIF};
-  aBytes		    : TRESTDWBytes;
-  pBytes		    : PRESTDWBytes;
-  VarData		    : Variant;
+  PActualRecord	          : PRESTDWMTMemBuffer;
+  Data			  : {$IFDEF FPC}PAnsiChar{$ELSE}PByte{$ENDIF};
+  aBytes		  : TRESTDWBytes;
+  pBytes		  : PRESTDWBytes;
+  VarData		  : Variant;
   aResult,
   vBoolean,
-  IsData		    : Boolean;
+  IsData		  : Boolean;
   aIndex,
-  cLen			    : Integer;
+  cLen	   	          : Integer;
   aDataType		  : TFieldType;
   Procedure GetDataValue;
   Begin
@@ -4416,6 +4428,7 @@ var
 Begin
   Move(Buffer^, Rec.Data^, FRecordSize);
   For I := 0 to BlobFieldCount - 1 do
+   If Assigned(FBlobs[I]) Then
     Rec.FBlobs[I] := FBlobs[I];
 End;
 
@@ -6368,8 +6381,10 @@ Begin
 End;
 
 Procedure TRecordList.Delete(Index: Integer);
+Var
+  vItem : PRESTDWMTMemoryRecord;
 Begin
-  If (Index > -1) Then
+ If (Index > -1) Then
   Begin
     Try
      If Assigned(TList(Self).Items[Index]) Then
@@ -6377,7 +6392,8 @@ Begin
        If Assigned(TRESTDWMTMemoryRecord(TList(Self).Items[Index]^)) Then
         Begin
          {$IFDEF FPC}
-          FreeAndNil(TList(Self).Items[Index]^);
+          vItem := TList(Self).Items[Index];
+          vItem^.Free;
          {$ELSE}
           {$IF CompilerVersion > 33}
            FreeAndNil(TRESTDWMTMemoryRecord(TList(Self).Items[Index]^));

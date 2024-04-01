@@ -209,9 +209,9 @@ Type
   Procedure SetBeforeRenderer (Value     : TRESTDWBeforeRenderer);
   Procedure SetBaseURL(Value : String);
  Public
-  Function    GetDisplayName             : String;  {$IFNDEF FPC}Override;{$ENDIF}
-  Procedure   SetDisplayName(Const Value : String); {$IFNDEF FPC}Override;{$ENDIF}
-  Function    GetNamePath                : String;  {$IFNDEF FPC}Override;{$ENDIF}
+  Function    GetDisplayName             : String;  Override;
+  Procedure   SetDisplayName(Const Value : String); Override;
+  Function    GetNamePath                : String;  Override;
   Procedure   Assign        (Source      : TPersistent); Override;
   Procedure   CompareParams (Var Dest    : TRESTDWParams);
   Constructor Create        (aCollection : TCollection); Override;

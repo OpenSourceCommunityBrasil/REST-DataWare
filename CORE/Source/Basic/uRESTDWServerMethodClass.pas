@@ -167,18 +167,16 @@ Var
   Try
    ctempURI := ParamsURI;
    pAux1    := Pos('?', ctempURI);
+   vIsQuery :=  pAux1 > 0;
    // params com /
    If vIsQuery Then
     Begin
+     sAux2 := Copy(ctempURI, pAux1 + 1, Length(ctempURI));
+     Delete(ctempURI, pAux1, Length(ctempURI));
      If Pos('/', ctempURI) > 0 Then
       Begin
        sAux2 := Copy(ctempURI, pAux1 + 1, Pos('/', ctempURI) -2);
        Delete(ctempURI, pAux1, Pos('/', ctempURI));
-      End
-     Else
-      Begin
-       sAux2 := Copy(ctempURI, pAux1 + 1, Length(ctempURI));
-       Delete(ctempURI, pAux1, Length(ctempURI));
       End;
     End
    Else

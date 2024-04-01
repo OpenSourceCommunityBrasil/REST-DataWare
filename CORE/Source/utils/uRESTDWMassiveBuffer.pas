@@ -169,17 +169,21 @@ End;
   Procedure  PutRec  (Index : Integer;  Item  : TMassiveValue);
   Function   GetRecPK(Index : Integer)        : TMassiveValue;
   Procedure  PutRecPK(Index : Integer;  Item  : TMassiveValue);
+  Function   GetChanges(Index : Integer)      : String;
+  Procedure  SetChanges(Index : Integer;
+                        Item  : String);
  Protected
  Public
   Constructor Create;
   Destructor  Destroy;Override;
   Procedure   ClearAll;
+  Function    UpdateFieldChangesCount         : Integer;
   Procedure   LoadFromStream      (Source     : TStream);
   Procedure   SaveToStream        (Var Dest      : TStream;
                                    MassiveBuffer : TObject = Nil);
   Property    Changes                         : TStringList    Read vChanges;
   Property    MassiveMode                     : TMassiveMode   Read vMassiveMode Write vMassiveMode;
-  Property    UpdateFieldChanges              : TStringList    Read vChanges     Write vChanges;
+  Property    UpdateFieldChanges[Index  : Integer] : String    Read GetChanges   Write SetChanges;
   Property    MassiveType                     : TMassiveType   Read vMassiveType Write vMassiveType;
   Property    Params                          : TRESTDWParams  Read vDWParams    Write vDWParams;
   Property    DataExec                        : TStringList    Read vDataExec    Write vDataExec;
@@ -727,13 +731,37 @@ End;
 
 Function TMassiveFields.FieldByName(FieldName : String): TMassiveField;
 Var
- I : Integer;
+ I           : Integer;
+ vFieldName,
+ vFieldNameB : String;
+ vResult     : Boolean;
+ Function StrCompField(A, B : String) : Boolean;
+ Var
+  I,  X : Integer;
+ Begin
+  Result := Length(A) > 0;
+  X      := 0;
+  For I := 1 To Length(A) Do
+   Begin
+    Result := I <= Length(B);
+    If Result Then
+     Begin
+      Result := A[I] = B[X];
+      If Not Result Then
+       Break;
+     End
+    Else
+     Break;
+   End;
+ End;
 Begin
- Result := Nil;
+ Result      := Nil;
+ vFieldNameB := UpperCase(Trim(FieldName));
  For I := 0 To Self.Count -1 Do
   Begin
-   If LowerCase(TMassiveField(TList(Self).Items[I]^).vFieldName) =
-      LowerCase(FieldName) Then
+   vFieldName := UpperCase(Trim(Items[I].vFieldName));
+   vResult    := vFieldName = vFieldNameB;
+   If vResult Then
     Begin
      Result := TMassiveField(TList(Self).Items[I]^);
      Break;
@@ -1012,12 +1040,34 @@ Begin
   Result := TMassiveValue(TList(vMassiveValues).Items[Index]^);
 End;
 
+Function   TMassiveLine.GetChanges(Index : Integer)      : String;
+Begin
+ Result := '';
+ If vChanges <> Nil Then
+  If (Index < vChanges.Count) And (Index > -1) Then
+   Result := vChanges[Index];
+End;
+
+Procedure  TMassiveLine.SetChanges(Index : Integer;
+                                   Item  : String);
+Begin
+ If (Index < vChanges.Count) And (Index > -1) Then
+  vChanges[Index] := Item;
+End;
+
 Function TMassiveLine.GetRecPK(Index : Integer) : TMassiveValue;
 Begin
  Result := Nil;
  If vPrimaryValues <> Nil Then
   If (Index < vPrimaryValues.Count) And (Index > -1) Then
    Result := TMassiveValue(TList(vPrimaryValues).Items[Index]^);
+End;
+
+Function  TMassiveLine.UpdateFieldChangesCount : Integer;
+Begin
+ Result := 0;
+ If vChanges <> Nil Then
+  Result := vChanges.Count;
 End;
 
 Procedure TMassiveLine.ClearAll;
@@ -1128,7 +1178,7 @@ Begin
    Begin
     BufferStream.InputBytes(VarToBytes(Changes.Count > 0, varBoolean));
     If Changes.Count > 0 Then
-     BufferStream.InputBytes(VarToBytes(EncodeStrings(Changes.Text{$IFDEF RESTDWLAZARUS}, TDatabaseCharSet.csUTF8{$ENDIF}), varString));
+     BufferStream.InputBytes(VarToBytes(EncodeStrings(Changes.Text{$IFDEF RESTDWLAZARUS}, TDatabaseCharSet.csUndefined{$ENDIF}), varString));
     If vPrimaryValues = Nil Then
      BufferStream.InputBytes(VarToBytes(False, varBoolean))
     Else
@@ -1305,7 +1355,7 @@ Begin
     Begin
      MassiveValue          := TMassiveValue.Create;
      MassiveValue.Encoding := vEncoding;
-     If (vMassiveFields.Count > I) And (I > 0) Then
+     If (I > 0) Then
       Begin
        MassiveValue.ValueName              := vMassiveFields.Items[I -1].FieldName;
        MassiveValue.ObjectValue            := vMassiveFields.Items[I -1].vFieldType;
@@ -1316,7 +1366,10 @@ Begin
      {$ENDIF}
      If I = 0 Then
       MassiveValue.Value := MassiveModeToString(MassiveModeData);
-     MassiveLineBuff.vMassiveValues.Add(MassiveValue);
+     If ((MassiveValue.ValueName <> '') Or (I = 0)) Then
+      MassiveLineBuff.vMassiveValues.Add(MassiveValue)
+     Else
+      FreeAndNil(MassiveValue);
     End;
   End;
 End;
@@ -1377,7 +1430,15 @@ Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQL
        Begin
         If (Field.ProviderFlags = []) Then
          Continue;
-        MassiveLineBuff.vMassiveValues.Items[I + 1].vJSONValue.ObjectValue := FieldTypeToObjectValue(Field.DataType);
+        If MassiveLineBuff.vMassiveValues.Count > (I + 1) Then
+         Begin
+          If MassiveLineBuff.vMassiveValues.Items[I + 1] <> Nil Then
+           MassiveLineBuff.vMassiveValues.Items[I + 1].vJSONValue.ObjectValue := FieldTypeToObjectValue(Field.DataType)
+          Else
+           Continue;
+         End
+        Else
+         Continue;
         If MassiveModeBuff = mmDelete Then
          If Not(pfInKey in Field.ProviderFlags) Then
           Continue;
@@ -2338,7 +2399,7 @@ Var
          End;
         aBool := BytesToVar(BufferStream.ReadBytes, varBoolean);
         If aBool Then
-         MassiveLine.vChanges.Text := DecodeStrings(BytesToVar(BufferStream.ReadBytes, varString){$IFDEF RESTDWLAZARUS}, TDatabaseCharSet.csUTF8{$ENDIF});
+         MassiveLine.vChanges.Text := DecodeStrings(BytesToVar(BufferStream.ReadBytes, varString){$IFDEF RESTDWLAZARUS}, TDatabaseCharSet.csUndefined{$ENDIF});
         aBool := BytesToVar(BufferStream.ReadBytes, varBoolean);
         If aBool Then
          Begin

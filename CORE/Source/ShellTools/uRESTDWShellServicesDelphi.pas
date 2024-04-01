@@ -156,7 +156,7 @@ Var
    End;
  End;
 Begin
- ResultStream    := TStringStream.Create('');
+// ResultStream    := TStringStream.Create('');
  vCORSHeader     := TStringList.Create;
  vResponseHeader := TStringList.Create;
  vResponseString := '';
@@ -310,6 +310,7 @@ End;
 Constructor TRESTDWShellService.Create(AOwner: TComponent);
 Begin
  Inherited Create(AOwner);
+ SetSocketKind('CGI/ISAPI - Delphi');
 End;
 
 Destructor TRESTDWShellService.Destroy;

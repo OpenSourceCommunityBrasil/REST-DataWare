@@ -93,12 +93,12 @@ Type
   Procedure SetContentType(Value : String);
   Procedure SetDataMode   (Value : TDataMode);
  Public
-  Function    GetDisplayName             : String;       {$IFNDEF FPC}Override;{$ENDIF}
-  Procedure   SetDisplayName(Const Value : String);      {$IFNDEF FPC}Override;{$ENDIF}
+  Function    GetDisplayName             : String;       Override;
+  Procedure   SetDisplayName(Const Value : String);      Override;
   Procedure   CompareParams (Var Dest    : TRESTDWParams);
   Procedure   Assign        (Source      : TPersistent); Override;
   Constructor Create        (aCollection : TCollection); Override;
-  Function    GetNamePath  : String;                     {$IFNDEF FPC}Override;{$ENDIF}
+  Function    GetNamePath  : String;                     Override;
   Destructor  Destroy; Override;
  Published
   Property    Routes               : TRESTDWRoutes        Read vDWRoutes             Write vDWRoutes;
