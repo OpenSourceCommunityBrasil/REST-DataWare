@@ -6245,7 +6245,7 @@ Var
                      Else
                       S := TNullString;
                      J := Length(S);
-                     Stream.Write(J, Sizeof(DWInteger));
+                     Stream.Write(J, Sizeof(DWInt64));
                      Stream.Write(S[InitStrPos], J);
                     End;
        ovWord    : Begin
@@ -6538,7 +6538,7 @@ Var
        ovFMTBcd,
        ovFloat,
        ovExtended : Begin
-                     Stream.Read(J, Sizeof(DWInteger));
+                     Stream.Read(J, Sizeof(DWInt64));
                      SetLength(S, J);
                      If J <> 0 Then
                       Begin

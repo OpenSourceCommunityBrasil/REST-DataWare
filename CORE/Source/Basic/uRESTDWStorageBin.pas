@@ -220,24 +220,40 @@ Procedure TRESTDWStorageBin.LoadDWMemFromStream(IDataset : IRESTDWMemTable;
                            Index   : Integer);
  Var
   vFDef : TFieldDef;
+  Function FindDef(aName : String) : Boolean;
+  Var
+   I : Integer;
+  Begin
+   Result := False;
+   For I := 0 To DataSet.FieldDefs.Count -1 Do
+    Begin
+     Result := Lowercase(DataSet.FieldDefs[I].Name) = Lowercase(aName);
+     If Result Then
+      Break;
+    End;
+  End;
  Begin
   If Trim(FFieldNames[Index]) <> '' Then
    Begin
-    VFDef          := DataSet.FieldDefs.AddFieldDef;
-    VFDef.Name     := FFieldNames[Index];
-    VFDef.DataType := DWFieldTypeToFieldType(FFieldTypes[Index]);
-    VFDef.Size     := FFieldSize[Index];
-    VFDef.Required := FFieldAttrs[Index] and 1 > 0;
-    Case FFieldTypes[Index] of
-      dwftFloat,
-      dwftCurrency,
-      dwftSingle    : VFDef.Precision := FFieldPrecision[Index];
-      dwftBCD,
-      dwftFMTBcd    : Begin
-                       VFDef.Size := 0;
-                       VFDef.Precision := 0;
-                      End;
-    End;
+    If (Not (Assigned(DataSet.FindField(FFieldNames[Index]))) And
+       Not(FindDef(FFieldNames[Index]))) Then
+     Begin
+      VFDef          := DataSet.FieldDefs.AddFieldDef;
+      VFDef.Name     := FFieldNames[Index];
+      VFDef.DataType := DWFieldTypeToFieldType(FFieldTypes[Index]);
+      VFDef.Size     := FFieldSize[Index];
+      VFDef.Required := FFieldAttrs[Index] and 1 > 0;
+      Case FFieldTypes[Index] of
+        dwftFloat,
+        dwftCurrency,
+        dwftSingle    : VFDef.Precision := FFieldPrecision[Index];
+        dwftBCD,
+        dwftFMTBcd    : Begin
+                         VFDef.Size := 0;
+                         VFDef.Precision := 0;
+                        End;
+      End;
+     End;
    End;
  End;
 Var

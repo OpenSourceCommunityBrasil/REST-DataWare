@@ -427,8 +427,10 @@ Type
   TRESTDWMemTable = Class(TDataset, IRESTDWMemTable)
   Private
     FSaveLoadState    : TSaveLoadState;
+    aFilterRecs,
     FMaxIndexesCount,
     FPacketRecords,
+    FRecordFilterPos,
     FRecordPos,
     FRecordSize,
     FBookmarkOfs,
@@ -1168,6 +1170,8 @@ constructor TRESTDWMemTable.Create(AOwner: TComponent);
 Begin
  Inherited Create(AOwner);
  FRecordPos         := -1;
+ FRecordFilterPos   := -1;
+ aFilterRecs        := FRecordFilterPos;
  FLastID            := Low(Integer);
  FAutoInc           := 1;
  FRecords           := TRecordList.Create;
@@ -1530,7 +1534,9 @@ Begin
   FClearing := False;
  End;
  FLastID := Low(Integer);
- FRecordPos := -1;
+ FRecordPos       := -1;
+ FRecordFilterPos := FRecordPos;
+ aFilterRecs      := FRecordFilterPos;
 End;
 
 Function TRESTDWMemTable.AllocRecordBuffer: TRecordBuffer;
@@ -1710,7 +1716,7 @@ Begin
   End;
 End;
 
-Function TRESTDWMemTable.GetRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}; 
+Function TRESTDWMemTable.GetRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF};
 							      GetMode: TGetMode;
 								  DoCheck: Boolean): TGetResult;
 var
@@ -1723,20 +1729,29 @@ Begin
              If FRecordPos <= 0 then
               Begin
                Result := grBOF;
-               FRecordPos := -1;
+               FRecordPos       := -1;
+               FRecordFilterPos := FRecordPos;
               End
              Else
               Begin
+//               aFilterRecs := RecordCount;
                Repeat
                 Dec(FRecordPos);
                 If Filtered then
-                 Accept := RecordFilter;
+                 Begin
+                  Accept := RecordFilter;
+                  If Accept Then
+                    Dec(aFilterRecs);
+                 End
+                Else
+                 FRecordFilterPos := FRecordPos;
                Until Accept Or (FRecordPos < 0);
                If Not Accept Then
                 Begin
                  Result := grBOF;
                  FRecordPos := -1;
                 End;
+               FRecordFilterPos := aFilterRecs;
               End;
             End;
   gmCurrent : Begin
@@ -1756,13 +1771,18 @@ Begin
                  Repeat
                   Inc(FRecordPos);
                   If Filtered Then
-                   Accept := RecordFilter;
+                   Begin
+                    Accept := RecordFilter;
+                    If Accept Then
+                     Inc(aFilterRecs);
+                   End;
                  Until Accept or (FRecordPos > FRecords.Count - 1);
                  If Not Accept Then
                   Begin
                    Result := grEOF;
-                   FRecordPos := RecordCount - 1;
+                   FRecordPos       := RecordCount - 1;
                   End;
+                 FRecordFilterPos := aFilterRecs;
                 End;
               End;
   End;
@@ -2428,6 +2448,7 @@ Begin
   If Active then
   Begin
     CheckBrowseMode;
+    aFilterRecs := 0;
     If Filtered <> Value then
       inherited SetFiltered(Value);
     First;
@@ -2461,8 +2482,8 @@ Begin
     Begin
       SaveState := SetTempState(dsFilter);
       Try
-        RecordToBuffer(Records[FRecordPos], PRESTDWMTMemBuffer(TempBuffer));
-      {$IFDEF FPC}
+       RecordToBuffer(Records[FRecordPos], PRESTDWMTMemBuffer(TempBuffer));
+       {$IFDEF FPC}
         If (FFilterParser <> nil) and FFilterParser.Eval() then
         Begin
           FFilterParser.EnableWildcardMatching :=
@@ -2470,11 +2491,10 @@ Begin
           FFilterParser.CaseInsensitive := foCaseInsensitive in FilterOptions;
           Result := FFilterParser.Value;
         End;
-{$ELSE}
-         If FFilterExpression <> nil then
-          Result := FFilterExpression.Evaluate();
-
-{$ENDIF}
+       {$ELSE}
+        If FFilterExpression <> nil then
+         Result := FFilterExpression.Evaluate();
+       {$ENDIF}
         If Assigned(OnFilterRecord) then
           OnFilterRecord(Self, Result);
       Except
@@ -2642,12 +2662,16 @@ End;
 
 Procedure TRESTDWMemTable.InternalFirst;
 Begin
-  FRecordPos := -1;
+ FRecordPos       := -1;
+ FRecordFilterPos := 0;
+ aFilterRecs      := FRecordFilterPos;
 End;
 
 Procedure TRESTDWMemTable.InternalLast;
 Begin
-  FRecordPos := FRecords.Count;
+ FRecordPos       := FRecords.Count;
+ FRecordFilterPos := RecordCount;
+ aFilterRecs      := FRecordFilterPos;
 End;
 
 Function TRESTDWMemTable.GetDataset: TDataset;
@@ -4810,7 +4834,15 @@ Function TRESTDWMemTable.GetRecNo: Integer;
 Begin
   CheckActive;
   UpdateCursorPos;
-  If (FRecordPos = -1) and (RecordCount > 0) then
+  If (filtered) And
+     (TRESTDWMemTableEx(Self).GetFilteredRecordCount > 0) Then
+   Begin
+    If (FRecordFilterPos = -1) Then
+     Result := 1
+    Else
+     Result := FRecordFilterPos;
+   End
+  Else If (FRecordPos = -1) and (RecordCount > 0) then
     Result := 1
   Else
     Result := FRecordPos + 1;
@@ -6652,6 +6684,7 @@ Begin
       fFilteredRecordCount := i;
 
     Finally
+      aFilterRecs := 0;
       If (fFilteredRecordCount > 0) and assigned(savePlace) and BookmarkValid(savePlace) then
         GotoBookmark(savePlace);
       FreeBookmark(savePlace);
