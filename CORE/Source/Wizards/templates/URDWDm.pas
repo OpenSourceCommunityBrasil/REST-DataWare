@@ -3,15 +3,18 @@ Unit %0:s;
 interface
 
 uses
+  uRESTDWComponentBase,
   uRESTDWParams,
   uRESTDWServerEvents,
   uRESTDWDatamodule,
-  uRESTDWJSONObject,
   System.Classes,
   System.SysUtils;
 
 type
   T%1:s = class(%2:s)
+    RESTDWServerEvents1: TRESTDWServerEvents;
+    procedure RESTDWServerEvents1EventshelloworldReplyEvent(
+      var Params: TRESTDWParams; var Result: string);
   private
     { Private declarations }
   public
@@ -26,5 +29,8 @@ implementation
 
 {$R *.dfm}
 
-
-end.
+procedure T%1:s.RESTDWServerEvents1EventshelloworldReplyEvent(
+  var Params: TRESTDWParams; var Result: string);
+begin
+  Result := ('{"Message":"'+Params.Itemsstring['entrada'].Asstring+'"}');
+end;
