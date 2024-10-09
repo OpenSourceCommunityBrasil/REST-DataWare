@@ -85,7 +85,6 @@ Var
  mb              : TStringStream;
  vStream         : TStream;
  vRedirect       : TRedirect;
- vUrlMontada: string;
  Procedure WriteError;
  Begin
    AResponse.StatusCode             := StatusCode;
@@ -191,13 +190,9 @@ Begin
    vStream         := TMemoryStream.Create;
   vStream.Position := 0;
   vContentType     := ARequest.ContentType;
-  if ARequest.Query <> EmptyStr then
-    vUrlMontada := ARequest.Method + ' ' + ARequest.{$IFNDEF DELPHIXEUP}PathInfo{$ELSE}RawPathInfo{$ENDIF} + '?' +  ARequest.Query
-  else
-    vUrlMontada := ARequest.Method + ' ' + ARequest.{$IFNDEF DELPHIXEUP}PathInfo{$ELSE}RawPathInfo{$ENDIF};
   If CommandExec  (TComponent(AResponse),
                    RemoveBackslashCommands(ARequest.PathInfo),
-                   vUrlMontada,
+                   ARequest.Method + ' ' + ARequest.{$IFNDEF DELPHIXEUP}PathInfo{$ELSE}RawPathInfo{$ENDIF},
                    vContentType,
                    ARequest.{$IFNDEF DELPHIXEUP}RemoteAddr{$ELSE}RemoteIP{$ENDIF},
                    ARequest.UserAgent,

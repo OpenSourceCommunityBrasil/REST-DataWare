@@ -87,7 +87,7 @@ End;
 
 Procedure Register;
 Begin
- RegisterComponents    ('REST Dataware - Service', [TRESTDWIdServicePooler, TRESTDWIdProxyRequest, TRESTDWIdPoolerList]);
+ RegisterComponents    ('REST Dataware - Service', [TRESTDWIdServicePooler, TRESTDWIdProxyRouter, TRESTDWIdPoolerList]);
  RegisterComponents    ('REST Dataware - Client',  [TRESTDWIdClientREST,    TRESTDWIdClientPooler]);
  RegisterComponents    ('REST Dataware - DB',      [TRESTDWIdDatabase]);
  RegisterPropertyEditor(TypeInfo(String),           TRESTDWIdDatabase,      'PoolerName',         TPoolersList);

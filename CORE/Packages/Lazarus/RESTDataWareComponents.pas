@@ -28,9 +28,7 @@ uses
   uRESTDWJSONInterface, uRESTDWSerialize, uRESTDWMimeTypes, uRESTDWAbout, 
   uRESTDWZlib, uRESTDWMemoryDataset, uRESTDWDesignReg, uRESTDWProtoTypes, 
   uRESTDWSelfSigned, uRESTDWExprParser, uRESTDWAuthenticators, 
-  uRESTDWStorageBin, OpenSSL.Api_11, uRESTDW.BinaryCoding, uRESTDW.Bson.IO, 
-  uRESTDW.Bson, uRESTDW.DateUtils, uRESTDW.OAuth2, uRESTDW.OpenSsl_11, 
-  uRESTDW.System, uRESTDW.SysUtils, LazarusPackageIntf;
+  uRESTDWStorageBin, LazarusPackageIntf;
 
 implementation
 

@@ -4,7 +4,7 @@ Unit uRESTDWSerialize;
 
 Interface
 
-Uses Classes, {$IFNDEF RESTDWANDROID} Messages, {$ENDIF}SysUtils, Variants, TypInfo, uRESTDWDataJSON;
+Uses Classes, Messages, SysUtils, Variants, TypInfo, uRESTDWDataJSON;
 
 //Const
 // varObject = $0049;

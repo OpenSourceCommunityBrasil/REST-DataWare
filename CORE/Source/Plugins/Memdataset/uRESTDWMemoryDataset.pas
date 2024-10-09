@@ -427,10 +427,8 @@ Type
   TRESTDWMemTable = Class(TDataset, IRESTDWMemTable)
   Private
     FSaveLoadState    : TSaveLoadState;
-    aFilterRecs,
     FMaxIndexesCount,
     FPacketRecords,
-    FRecordFilterPos,
     FRecordPos,
     FRecordSize,
     FBookmarkOfs,
@@ -624,7 +622,6 @@ Type
                                      Rec           : TRESTDWMTMemoryRecord) : TMemBlobData;
     Function GetCalcFieldLen        (FieldType     : TFieldType;
                                      Size          : Word)       : Word;
-    procedure ClearIndexes;
     Function  GetDataset       : TDataset;
     Procedure SetIndexName(AValue : String);
     Property Records [Index   : Integer] : TRESTDWMTMemoryRecord Read GetMemoryRecord;
@@ -1171,8 +1168,6 @@ constructor TRESTDWMemTable.Create(AOwner: TComponent);
 Begin
  Inherited Create(AOwner);
  FRecordPos         := -1;
- FRecordFilterPos   := -1;
- aFilterRecs        := FRecordFilterPos;
  FLastID            := Low(Integer);
  FAutoInc           := 1;
  FRecords           := TRecordList.Create;
@@ -1220,9 +1215,8 @@ Begin
   End;
  FreeIndexList;
  // ClearRecords;
- ClearIndexes;
- FreeAndNil(FIndexes);
  FRecords.Free;
+ FreeAndNil(FIndexes);
  FOffsets := nil;
  //FreeFieldBuffers;
  FActive := False;
@@ -1536,9 +1530,7 @@ Begin
   FClearing := False;
  End;
  FLastID := Low(Integer);
- FRecordPos       := -1;
- FRecordFilterPos := FRecordPos;
- aFilterRecs      := FRecordFilterPos;
+ FRecordPos := -1;
 End;
 
 Function TRESTDWMemTable.AllocRecordBuffer: TRecordBuffer;
@@ -1718,7 +1710,7 @@ Begin
   End;
 End;
 
-Function TRESTDWMemTable.GetRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF};
+Function TRESTDWMemTable.GetRecord(Buffer: {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}; 
 							      GetMode: TGetMode;
 								  DoCheck: Boolean): TGetResult;
 var
@@ -1731,29 +1723,20 @@ Begin
              If FRecordPos <= 0 then
               Begin
                Result := grBOF;
-               FRecordPos       := -1;
-               FRecordFilterPos := FRecordPos;
+               FRecordPos := -1;
               End
              Else
               Begin
-//               aFilterRecs := RecordCount;
                Repeat
                 Dec(FRecordPos);
                 If Filtered then
-                 Begin
-                  Accept := RecordFilter;
-                  If Accept Then
-                    Dec(aFilterRecs);
-                 End
-                Else
-                 FRecordFilterPos := FRecordPos;
+                 Accept := RecordFilter;
                Until Accept Or (FRecordPos < 0);
                If Not Accept Then
                 Begin
                  Result := grBOF;
                  FRecordPos := -1;
                 End;
-               FRecordFilterPos := aFilterRecs;
               End;
             End;
   gmCurrent : Begin
@@ -1773,18 +1756,13 @@ Begin
                  Repeat
                   Inc(FRecordPos);
                   If Filtered Then
-                   Begin
-                    Accept := RecordFilter;
-                    If Accept Then
-                     Inc(aFilterRecs);
-                   End;
+                   Accept := RecordFilter;
                  Until Accept or (FRecordPos > FRecords.Count - 1);
                  If Not Accept Then
                   Begin
                    Result := grEOF;
-                   FRecordPos       := RecordCount - 1;
+                   FRecordPos := RecordCount - 1;
                   End;
-                 FRecordFilterPos := aFilterRecs;
                 End;
               End;
   End;
@@ -2450,7 +2428,6 @@ Begin
   If Active then
   Begin
     CheckBrowseMode;
-    aFilterRecs := 0;
     If Filtered <> Value then
       inherited SetFiltered(Value);
     First;
@@ -2484,8 +2461,8 @@ Begin
     Begin
       SaveState := SetTempState(dsFilter);
       Try
-       RecordToBuffer(Records[FRecordPos], PRESTDWMTMemBuffer(TempBuffer));
-       {$IFDEF FPC}
+        RecordToBuffer(Records[FRecordPos], PRESTDWMTMemBuffer(TempBuffer));
+      {$IFDEF FPC}
         If (FFilterParser <> nil) and FFilterParser.Eval() then
         Begin
           FFilterParser.EnableWildcardMatching :=
@@ -2493,10 +2470,11 @@ Begin
           FFilterParser.CaseInsensitive := foCaseInsensitive in FilterOptions;
           Result := FFilterParser.Value;
         End;
-       {$ELSE}
-        If FFilterExpression <> nil then
-         Result := FFilterExpression.Evaluate();
-       {$ENDIF}
+{$ELSE}
+         If FFilterExpression <> nil then
+          Result := FFilterExpression.Evaluate();
+
+{$ENDIF}
         If Assigned(OnFilterRecord) then
           OnFilterRecord(Self, Result);
       Except
@@ -2664,30 +2642,17 @@ End;
 
 Procedure TRESTDWMemTable.InternalFirst;
 Begin
- FRecordPos       := -1;
- FRecordFilterPos := 0;
- aFilterRecs      := FRecordFilterPos;
+  FRecordPos := -1;
 End;
 
 Procedure TRESTDWMemTable.InternalLast;
 Begin
- FRecordPos       := FRecords.Count;
- FRecordFilterPos := RecordCount;
- aFilterRecs      := FRecordFilterPos;
+  FRecordPos := FRecords.Count;
 End;
 
 Function TRESTDWMemTable.GetDataset: TDataset;
 Begin
   Result := TDataset(Self);
-End;
-
-Procedure TRESTDWMemTable.ClearIndexes;
-Var
- i : integer;
-Begin
- CheckInactive;
- For I:=0 to FIndexes.Count-1 do
-  RESTDWIndexDefs[i].Clearindex;
 End;
 
 Function TRESTDWMemTable.GetCalcFieldLen(FieldType: TFieldType; Size: Word): Word;
@@ -2789,8 +2754,7 @@ Function TRESTDWMemTable.DefaultIndex: TRESTDWDatasetIndex;
 Begin
  Result := FDefaultIndex;
  If Result = Nil then
-  If FIndexes <> Nil Then
-   Result:=FIndexes.FindIndex(SDefaultIndex);
+  Result:=FIndexes.FindIndex(SDefaultIndex);
 end;
 
 Function TRESTDWMemTable.DefaultBufferIndex: TRESTDWIndex;
@@ -2934,7 +2898,6 @@ Var
  AField      : TField;
  ACompareRec : TDBCompareRec;
 Begin
- vDataSize := 0;
  SetLength(ACompareStruct, AFields.Count);
  For i := 0 To high(ACompareStruct) Do
   Begin
@@ -3291,10 +3254,7 @@ Var
 Begin
  For i := 0 To FIndexes.Count -1 Do
   If RESTDWIndexDefs[i].MustBuild(FCurrentIndexDef) Then
-   If Assigned(RESTDWIndexes[i]) Then
-    BuildIndex(RESTDWIndexes[i])
-   Else If RESTDWIndexDefs[i].Fields <> '' Then
-    InternalAddIndex(SCustomIndex, RESTDWIndexDefs[i].Fields, [], '', '');
+   BuildIndex(RESTDWIndexes[i]);
 End;
 
 Function TRESTDWMemTable.LoadField(FieldDef       : TFieldDef;
@@ -3374,31 +3334,27 @@ Var
  pb : TRecordBuffer;
  T  : TRESTDWIndex;
 Begin
- Result := 0;
  If FAllPacketsFetched Then
   Begin
    Result := 0;
    Exit;
   End;
  T := GetCurrentIndexBuf;
- If T <> Nil Then
+ T.BeginUpdate;
+ I := 0;
+ pb := DefaultBufferIndex.SpareBuffer;
+ While ((i < FPacketRecords) or (FPacketRecords = -1)) and (LoadBuffer(pb) = grOk) do
   Begin
-   T.BeginUpdate;
-   I := 0;
-   pb := DefaultBufferIndex.SpareBuffer;
-   While ((i < FPacketRecords) or (FPacketRecords = -1)) and (LoadBuffer(pb) = grOk) do
+   With DefaultBufferIndex Do
     Begin
-     With DefaultBufferIndex Do
-      Begin
-       AddRecord;
-       pb := SpareBuffer;
-      End;
-     Inc(i);
+     AddRecord;
+     pb := SpareBuffer;
     End;
-   T.EndUpdate;
-  // FBRecordCount := FBRecordCount + i; //Todo XyberX
-   Result := i;
+   Inc(i);
   End;
+ T.EndUpdate;
+// FBRecordCount := FBRecordCount + i; //Todo XyberX
+ Result := i;
 End;
 
 procedure TRESTDWMemTable.FetchAll;
@@ -4215,7 +4171,7 @@ End;
 
 Function TRESTDWDatasetIndexDefs.GetBufDatasetIndex(AIndex : Integer): TRESTDWDatasetIndex;
 Begin
- Result := TRESTDWDatasetIndex(Items[Aindex]);
+ Result := Items[Aindex] As TRESTDWDatasetIndex;
 End;
 
 Function TRESTDWDatasetIndexDefs.GetBufferIndex(AIndex : Integer) : TRESTDWIndex;
@@ -4286,16 +4242,14 @@ Function TRESTDWMemTable.InternalAddIndex(Const AName,
 Var
  F : TRESTDWDatasetIndex;
 Begin
- F := TRESTDWDatasetIndex(FIndexes.AddIndexDef);
+ F := FIndexes.AddIndexDef As TRESTDWDatasetIndex;
  F.Name:=AName;
  F.Fields:=AFields;
  F.Options:=AOptions;
  F.DescFields:=ADescFields;
  F.CaseInsFields:=ACaseInsFields;
-// BuildIndexes;
-// InitDefaultIndexes;
- Result := F;
  InternalCreateIndex(F);
+ Result := F;
 End;
 
 Procedure TRESTDWMemTable.InitDefaultIndexes;
@@ -4387,17 +4341,17 @@ Begin
   if (Length(DescFields)>0) and (DescFields[1]=Limiter) then
     system.Delete(DescFields,1,1);
   F.Fields:=SortFields;
-  F.Options:=[ixCaseInsensitive];
+  F.Options:=[];
   F.DescFields:=DescFields;
   FCurrentIndexDef:=F;
   F.SetIndexProperties;
-  If Active Then
-   Begin
+  if Active then
+    begin
     FetchAll;
     BuildIndex(F.BufferIndex);
     Resync([rmCenter]);
-   End;
-  FPacketRecords := -1;
+    end;
+  FPacketRecords:=-1;
 end;
 
 Procedure TRESTDWMemTable.SetIndexFieldNames(const AValue: String);
@@ -4856,15 +4810,7 @@ Function TRESTDWMemTable.GetRecNo: Integer;
 Begin
   CheckActive;
   UpdateCursorPos;
-  If (filtered) And
-     (TRESTDWMemTableEx(Self).GetFilteredRecordCount > 0) Then
-   Begin
-    If (FRecordFilterPos = -1) Then
-     Result := 1
-    Else
-     Result := FRecordFilterPos;
-   End
-  Else If (FRecordPos = -1) and (RecordCount > 0) then
+  If (FRecordPos = -1) and (RecordCount > 0) then
     Result := 1
   Else
     Result := FRecordPos + 1;
@@ -6706,7 +6652,6 @@ Begin
       fFilteredRecordCount := i;
 
     Finally
-      aFilterRecs := 0;
       If (fFilteredRecordCount > 0) and assigned(savePlace) and BookmarkValid(savePlace) then
         GotoBookmark(savePlace);
       FreeBookmark(savePlace);

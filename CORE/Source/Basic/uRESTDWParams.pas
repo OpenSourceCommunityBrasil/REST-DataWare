@@ -638,11 +638,9 @@ Begin
                        (Pos(':', vTempValue) > 0) Or
                        (Pos('/', vTempValue) > 0) Or
                        (Pos('\', vTempValue) > 0) Or
-                       //(Pos('-', vTempValue) > 0)
-                       (vTempValue.CountChar('-')>1)
-                       Then
+                       (Pos('-', vTempValue) > 0) Then
                      Field.AsDateTime := StrToDateTime(vTempValue)
-                    Else If StrToInt64(vTempValue) <> 0 Then
+                    Else If StrToInt64(vTempValue) > 0 Then
                      Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
                    End;
                  End;
@@ -6247,7 +6245,7 @@ Var
                      Else
                       S := TNullString;
                      J := Length(S);
-                     Stream.Write(J, Sizeof(DWInt64));
+                     Stream.Write(J, Sizeof(DWInteger));
                      Stream.Write(S[InitStrPos], J);
                     End;
        ovWord    : Begin
@@ -6540,7 +6538,7 @@ Var
        ovFMTBcd,
        ovFloat,
        ovExtended : Begin
-                     Stream.Read(J, Sizeof(DWInt64));
+                     Stream.Read(J, Sizeof(DWInteger));
                      SetLength(S, J);
                      If J <> 0 Then
                       Begin

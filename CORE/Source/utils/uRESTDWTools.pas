@@ -89,8 +89,6 @@ Type
                                   {$ENDIF}) : String;
  Function  EncodeStream           (Value                : TStream)         : String;
  Function  DecodeStream           (Value                : String)          : TMemoryStream;
- Function  Base64Encode           (Const S              : String)          : String;
- Function  BytesToStringUtf8      (Const bin            : TRESTDWBytes)    : String;Overload;
  Function  BytesToString          (Const bin            : TRESTDWBytes)    : String;Overload;
  Function  BytesToString          (Const bin            : TRESTDWBytes;
                                    aUnicode             : Boolean)         : String;Overload;
@@ -110,7 +108,6 @@ Type
                                    AValueTwo            : Int64)           : Int64;
  Function  restdwMin              (Const AValueOne,
                                    AValueTwo            : Int64)           : Int64;
- Function  StringUtf8ToBytes      (AStr                 : String)          : TRESTDWBytes;
  Function  StringToBytes          (AStr                 : String)          : TRESTDWBytes;Overload;
  Function  StringToBytes          (AStr                 : String;
                                    aUnicode             : Boolean)         : TRESTDWBytes;Overload;
@@ -2950,8 +2947,7 @@ Function BookmarkToHex(Value : TRESTDWBytes) : String;
 {$IFDEF RESTDWFMX}
 Var
  bytes: TBytes;
-{$ENDIF}
-{$IFDEF FPC}
+{$ELSE IF FPC}
 Var
  bytes: TBytes;
 {$ENDIF}
@@ -3284,7 +3280,7 @@ Begin
  SetLength(Result, 0);
  If AStr <> '' Then
   Begin
-   {$IF Defined(DELPHIXEUP)}
+   {$IF Defined(RESTDWLAZARUS) OR Defined(DELPHIXEUP)}
     Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
    {$ELSE}
      SetLength(Result, Length(AStr));
@@ -3292,21 +3288,6 @@ Begin
    {$IFEND}
   End;
 End;
-
-Function StringUtf8ToBytes(AStr: String): TRESTDWBytes;
-Begin
- SetLength(Result, 0);
- If AStr <> '' Then
-  Begin
-   {$IF Defined(DELPHIXEUP)}
-    Result := TRESTDWBytes(TEncoding.Utf8.GetBytes(Astr));
-   {$ELSE}
-     SetLength(Result, Length(AStr) * 2);
-     Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr) * 2);
-   {$IFEND}
-  End;
-End;
-
 Function BytesToString(Const AValue      : TRESTDWBytes;
                        Const AStartIndex : Integer;
                        Const ALength     : Integer = -1) : String;
@@ -3328,11 +3309,7 @@ Begin
     LBytes := Copy(AValue, AStartIndex, LLength);
   {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
    SetString(Result, PWideChar(LBytes), restdwLength(LBytes));
-   {$IFNDEF RESTDWLAZARUS}
-    Result := BytesToString(LBytes);
-   {$ELSE}
-    Result := TEncoding.ANSI.GetString(TBytes(LBytes));
-   {$ENDIF}
+   Result := TEncoding.ANSI.GetString(TBytes(LBytes));
   {$ELSEIF Defined(DELPHIXEUP)}
     SetString(Result, PWideChar(LBytes), restdwLength(LBytes));
     {$IFDEF MSWINDOWS}
@@ -3383,22 +3360,6 @@ Begin
      {$ENDIF}
      End;
    {$IFEND}
-  End;
-End;
-
-Function BytesToStringUtf8(Const bin : TRESTDWBytes)   : String;
-Var
- I : Integer;
- vStringStream : TStringStream;
-Begin
- I := restdwLength(bin);
- If I > 0 Then
-  Begin
-  {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
-   SetString(Result, PAnsiChar(bin), I * 2);
-  {$ELSE}
-   SetString(Result, PWideChar(bin), I);       //gledston
-  {$IFEND}
   End;
 End;
 
@@ -3510,32 +3471,29 @@ Begin
   {$ENDIF}
 End;
 
-Function Decode64(const S: String): String;
+Function Decode64(const S: string): string;
 Var
- SA: String;
+ sa : String;
  {$IFDEF RESTDWMOBILE}
-  ne: TBase64Encoding;
+   ne: TBase64Encoding;
  {$ENDIF}
 Begin
- If (Trim(S) <> '') AND (Trim(S) <> '""') Then
+ If (Trim(S) <> '')   And
+    (Trim(S) <> '""') Then
   Begin
-   SA:= S;
+   SA := S;
    If Pos(sLineBreak, SA) > 0 Then
-    SA:= StringReplace(SA, sLineBreak, '', [rfReplaceAll]);
-   {$IFDEF RESTDWMOBILE} //Alterado para IOS Brito
-    ne:= TBase64Encoding.Create(-1, '');
-    Try
-     Result:= ne.Decode(SA);
-    Finally
-     FreeAndNil(ne);
-    End;
-   {$ELSE}
-    {$IFNDEF FPC} //Alterado para IOS Brito
-     Result:= TNetEncoding.Base64.Decode(SA); // Alterado por Alison Wolf
-    {$ELSE}
-     Result:= BytesToString(Base64Decode(SA));
-    {$ENDIF}
-   {$ENDIF}
+    SA := StringReplace(SA, sLineBreak, '', [rfReplaceAll]);
+//    {$IFDEF RESTDWMOBILE} //Alterado para IOS Brito
+//     ne     := TBase64Encoding.Create(-1, '');
+//     Try
+//      Result := ne.Decode(SA);
+//     Finally
+//      FreeAndNil(ne);
+//     End;
+//    {$ELSE}
+     Result := BytesToString(Base64Decode(SA));
+//   {$ENDIF}
   End;
 End;
 
@@ -3606,14 +3564,14 @@ Begin
   End;
   {$ENDIF}
   {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXE6UP)}
-   Result := Base64Encode(Value);
+  Result := Base64Encode(Value);
   {$ELSE}
-   Ne      := TBase64Encoding.Create(-1, '');
-   Try
+  Ne      := TBase64Encoding.Create(-1, '');
+  Try
     Result := Ne.Encode(Value);
-   Finally
+  Finally
     FreeAndNil(Ne);
-   End;
+  End;
  {$IFEND}
 End;
 

@@ -220,40 +220,24 @@ Procedure TRESTDWStorageBin.LoadDWMemFromStream(IDataset : IRESTDWMemTable;
                            Index   : Integer);
  Var
   vFDef : TFieldDef;
-  Function FindDef(aName : String) : Boolean;
-  Var
-   I : Integer;
-  Begin
-   Result := False;
-   For I := 0 To DataSet.FieldDefs.Count -1 Do
-    Begin
-     Result := Lowercase(DataSet.FieldDefs[I].Name) = Lowercase(aName);
-     If Result Then
-      Break;
-    End;
-  End;
  Begin
   If Trim(FFieldNames[Index]) <> '' Then
    Begin
-    If (Not (Assigned(DataSet.FindField(FFieldNames[Index]))) And
-       Not(FindDef(FFieldNames[Index]))) Then
-     Begin
-      VFDef          := DataSet.FieldDefs.AddFieldDef;
-      VFDef.Name     := FFieldNames[Index];
-      VFDef.DataType := DWFieldTypeToFieldType(FFieldTypes[Index]);
-      VFDef.Size     := FFieldSize[Index];
-      VFDef.Required := FFieldAttrs[Index] and 1 > 0;
-      Case FFieldTypes[Index] of
-        dwftFloat,
-        dwftCurrency,
-        dwftSingle    : VFDef.Precision := FFieldPrecision[Index];
-        dwftBCD,
-        dwftFMTBcd    : Begin
-                         VFDef.Size := 0;
-                         VFDef.Precision := 0;
-                        End;
-      End;
-     End;
+    VFDef          := DataSet.FieldDefs.AddFieldDef;
+    VFDef.Name     := FFieldNames[Index];
+    VFDef.DataType := DWFieldTypeToFieldType(FFieldTypes[Index]);
+    VFDef.Size     := FFieldSize[Index];
+    VFDef.Required := FFieldAttrs[Index] and 1 > 0;
+    Case FFieldTypes[Index] of
+      dwftFloat,
+      dwftCurrency,
+      dwftSingle    : VFDef.Precision := FFieldPrecision[Index];
+      dwftBCD,
+      dwftFMTBcd    : Begin
+                       VFDef.Size := 0;
+                       VFDef.Precision := 0;
+                      End;
+    End;
    End;
  End;
 Var
@@ -531,7 +515,7 @@ Begin
                                      stream.Read(vString[InitStrPos], vInt64);
                                      If EncodeStrs Then
                                       vString := DecodeStrings(vString);
-                                     vInt64 := (Length(vString) + 1) * SizeOf(WideChar);
+                                     //vInt64 := (Length(vString) + 1) * SizeOf(WideChar);
                                      If aField <> Nil Then
                                       Move(vString[InitStrPos], pData^, vInt64);
                                     {$ENDIF}
@@ -1359,15 +1343,7 @@ Begin
      If (aIndex >= 0) And (PActualRecord <> Nil) Then
       Begin
        vDataType := vDataSet.FieldDefs[aIndex].DataType;
-       {$IFNDEF FPC}
-        {$IF compilerversion < 21}
-         vBoolean  := vDataSet.Fields[B].Size > 0;
-        {$ELSE}
-         vBoolean  := vDataSet.Fields[B].IsNull;
-        {$IFEND}
-       {$ELSE}
-        vBoolean  := vDataSet.Fields[B].IsNull;
-       {$ENDIF}
+       vBoolean  := vDataSet.Fields[B].IsNull;
        If vBoolean Then
         Begin
          Stream.Write(vBoolean, SizeOf(boolean));

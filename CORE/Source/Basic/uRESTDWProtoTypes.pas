@@ -180,7 +180,7 @@ Type
   DWCurrency      = Currency;
   DWCardinal      = Cardinal;
   DWFieldTypeSize = Integer;
-  DWBufferSize    = Integer;
+  DWBufferSize    = Longint;
   DWUInt16        = Word;
   DWUInt32        = LongWord;
   DWBCD           = TBCD;

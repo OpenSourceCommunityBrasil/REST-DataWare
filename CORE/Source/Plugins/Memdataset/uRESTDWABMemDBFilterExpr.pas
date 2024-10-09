@@ -173,10 +173,7 @@ var
       iClass:NODEClass;
       iOperator:TCANOperator;
       pArg1,pArg2:PByte;
-      sFunc,
-      sArg1,
-      sArg2,
-      sLike :string;
+      sFunc,sArg1,sArg2:string;
       Arg1,Arg2:variant;
 
       //     FieldNo:integer;
@@ -609,8 +606,7 @@ var
                                 end;
                                 pArg1:=PByte(PChar(VarToStr(ParseNode(pfdStart,pArg1))));
                                 pArg2:=PByte(PChar(VarToStr(ParseNode(pfdStart,pArg2))));
-                                sLike := StringReplace(string(PChar(pArg2)), '%', '*', [rfReplaceAll]);
-                                b:=MatchesMask(string(PChar(pArg1)), sLike);
+                                b:=MatchesMask(string(PChar(pArg1)),string(PChar(pArg2)));
                                 Result:=Variant(b);
                                 exit;
                            end;
