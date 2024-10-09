@@ -81,7 +81,6 @@ Uses
   TRESTDWMessageEncoderInfoMIME = Class(TRESTDWMessageEncoderInfo)
  Public
   Constructor Create; Override;
-  Destructor  Destroy; Override;
   Procedure InitializeHeaders(AMsg : TRESTDWMessage); Override;
  End;
 
@@ -284,158 +283,149 @@ end;
 
 Function TRESTDWMessageDecoderMIME.ReadBody(ADestStream : TStream;
                                             Var VMsgEnd : Boolean) : TRESTDWMessageDecoder;
-var
-  LContentType, LContentTransferEncoding: string;
-  LDecoder: TRESTDWDecoder;
-  LBytes : TRESTDWBytes;
-  LLine: string;
-  LBuffer: string;  //Needed for binhex4 because cannot decode line-by-line.
-  LIsThisTheFirstLine: Boolean; //Needed for binary encoding
-  BoundaryStart, BoundaryEnd: string;
-  IsBinaryContentTransferEncoding: Boolean;
-begin
-  LIsThisTheFirstLine := True;
-  VMsgEnd := False;
-  Result := nil;
-  if FBodyEncoded then begin
-    LContentType := TRESTDWMessage(Owner).ContentType;
-    LContentTransferEncoding := TRESTDWMessage(Owner).ContentTransferEncoding;
-  end else begin
-    LContentType := FHeaders.Values['Content-Type']; {Do not Localize}
-    LContentTransferEncoding := FHeaders.Values['Content-Transfer-Encoding']; {Do not Localize}
-  end;
-  if LContentTransferEncoding = '' then begin
-    if IsHeaderMediaType(LContentType, 'application/mac-binhex40') then begin  {Do not Localize}
-      LContentTransferEncoding := 'binhex40'; {do not localize}
-    end;
-  end;
-
-  // RLebeau 08/17/09 - According to RFC 2045 Section 6.4:
-  // "If an entity is of type "multipart" the Content-Transfer-Encoding is not
-  // permitted to have any value other than "7bit", "8bit" or "binary"."
-  //
-  // However, came across one message where the "Content-Type" was set to
-  // "multipart/related" and the "Content-Transfer-Encoding" was set to
-  // "quoted-printable".  Outlook and Thunderbird were apparently able to parse
-  // the message correctly, but Indy was not.  So let's check for that scenario
-  // and ignore illegal "Content-Transfer-Encoding" values if present...
-
-  if IsHeaderMediaType(LContentType, 'multipart') and (LContentTransferEncoding <> '') then {do not localize}
-  begin
-    if PosInStrArray(LContentTransferEncoding, ['7bit', '8bit', 'binary'], False) = -1 then begin {do not localize}
-      LContentTransferEncoding := '';
-    end;
-  end;
-
-  if TextIsSame(LContentTransferEncoding, 'base64') then begin {Do not Localize}
-    LDecoder := TRESTDWDecoderMIMELineByLine.Create(nil);
-  end else if TextIsSame(LContentTransferEncoding, 'quoted-printable') then begin {Do not Localize}
-    LDecoder := TRESTDWDecoderQuotedPrintable.Create(nil);
-  end else if TextIsSame(LContentTransferEncoding, 'binhex40') then begin {Do not Localize}
-    LDecoder := TRESTDWDecoderBinHex4.Create(nil);
-  end else begin
-    LDecoder := nil;
-  end;
-  Try
-    if LDecoder <> nil then begin
-      LDecoder.DecodeBegin(ADestStream);
-    end;
-
-    if MIMEBoundary <> '' then begin
-      BoundaryStart := '--' + MIMEBoundary; {Do not Localize}
-      BoundaryEnd := BoundaryStart + '--'; {Do not Localize}
-    end;
-
-    case PosInStrArray(LContentTransferEncoding, ['7bit', 'quoted-printable', 'base64', '8bit', 'binary'], False) of {do not localize}
-      0..2: IsBinaryContentTransferEncoding := False;
-      3..4: IsBinaryContentTransferEncoding := True;
-    else
-      // According to RFC 2045 Section 6.4:
-      // "Any entity with an unrecognized Content-Transfer-Encoding must be
-      // treated as if it has a Content-Type of "application/octet-stream",
-      // regardless of what the Content-Type header field actually says."
-      IsBinaryContentTransferEncoding := True;
-    end;
-    Repeat
-      if not FProcessFirstLine then begin
-        if IsBinaryContentTransferEncoding then
-          LBytes := ReadLnRFCB(VMsgEnd, EOL, '.') {do not localize}
-        Else
-          LLine := ReadLnRFC(VMsgEnd);
-      end else begin
-        LLine := FFirstLine;
-        FFirstLine := '';    {Do not Localize}
-        FProcessFirstLine := False;
-        // Do not use ADELIM since always ends with . (standard)
-        if LLine = '.' then begin {Do not Localize}
-          VMsgEnd := True;
-          Break;
-        end;
-        if TextStartsWith(LLine, '..') then begin
-          Delete(LLine, 1, 1);
-        end;
-      end;
-      If (IsBinaryContentTransferEncoding) Then
-       Begin
-        If Length(LBytes) > 0 Then
-         ADestStream.WriteBuffer(LBytes[0], Length(LBytes));
-        SetLength(LBytes, 0);
-        If (VMsgEnd) Then
-         Break;
-       End;
-      // New boundary - end self and create new coder
-      if MIMEBoundary <> '' then begin
-        if TextIsSame(LLine, BoundaryStart) then begin
-          Result := TRESTDWMessageDecoderMIME.Create(Owner);
-          Break;
-          // End of all coders (not quite ALL coders)
-        end;
-        if TextIsSame(LLine, BoundaryEnd) then begin
-          // POP the boundary
-          if Owner is TRESTDWMessage then begin
-            TRESTDWMessage(Owner).MIMEBoundary.Pop;
-          end;
-          Break;
-        end;
-      end;
-      if Not Assigned(LDecoder) then
-       Begin
-        // Data to save, but not decode
-         If Not IsBinaryContentTransferEncoding then
-          If Assigned(ADestStream) then
-            WriteStringToStream(ADestStream, LLine + EOL);
-       end
-      else
-      begin
-        // Data to decode
-        // For TIdDecoderQuotedPrintable, we have to make sure all EOLs are
-        // intact
-        if LDecoder is TRESTDWDecoderQuotedPrintable then begin
-          // For TIdDecoderQuotedPrintable, we have to make sure all EOLs are intact
-//         LLine := LLine + EOF;
-         LDecoder.Decode(LLine);
-        end else if LDecoder is TRESTDWDecoderBinHex4 then begin
-          //We cannot decode line-by-line because lines don't have a whole
-          //number of 4-byte blocks due to the : inserted at the start of
-          //the first line, so buffer the file...
-          LBuffer := LBuffer + LLine;
-        end else if LLine <> '' then begin
-          LDecoder.Decode(LLine);
-        end;
-      end;
-    Until False;
-   If LDecoder <> Nil Then
-    Begin
-     If LDecoder Is TRESTDWDecoderBinHex4 Then
-      Begin
-       //Now decode the complete block...
-       LDecoder.Decode(LBuffer);
-      End;
-     LDecoder.DecodeEnd;
-    End;
-  Finally
-   FreeAndNil(LDecoder);
+Var
+ LContentType,
+ LContentTransferEncoding,
+ LLine,
+ LBinaryLineBreak,
+ LBuffer,                       //Needed for binhex4 because cannot decode line-by-line.
+ LBoundaryStart,
+ LBoundaryEnd              : String;
+ LIsThisTheFirstLine,           //Needed for binary encoding
+ LIsBinaryContentTransferEncoding : Boolean;
+ LDecoder                  : TRESTDWDecoder;
+Begin
+ LIsThisTheFirstLine := True;
+ VMsgEnd := False;
+ Result  := Nil;
+ If FBodyEncoded Then
+  Begin
+   LContentType             := TRESTDWMessage(Owner).ContentType;
+   LContentTransferEncoding := TRESTDWMessage(Owner).ContentTransferEncoding;
+  End
+ Else
+  Begin
+   LContentType             := FHeaders.Values['Content-Type']; {Do not Localize}
+   LContentTransferEncoding := FHeaders.Values['Content-Transfer-Encoding']; {Do not Localize}
   End;
+ If LContentTransferEncoding = '' Then
+  Begin
+   If IsHeaderMediaType(LContentType, 'application/mac-binhex40') Then  {Do not Localize}
+    LContentTransferEncoding := 'binhex40' {do not localize}
+  End
+ Else If IsHeaderMediaType(LContentType, 'multipart') Then {do not localize}
+  Begin
+   If PosInStrArray(LContentTransferEncoding, ['7bit', '8bit', 'binary'], False) = -1 Then {do not localize}
+    LContentTransferEncoding := '';
+  End;
+ If TextIsSame(LContentTransferEncoding, 'base64')                Then {Do not Localize}
+  LDecoder := TRESTDWDecoderMIMELineByLine.Create(Nil)
+ Else If TextIsSame(LContentTransferEncoding, 'quoted-printable') Then {Do not Localize}
+  LDecoder := TRESTDWDecoderQuotedPrintable.Create(Nil)
+ Else If TextIsSame(LContentTransferEncoding, 'binhex40')         Then {Do not Localize}
+  LDecoder := TRESTDWDecoderBinHex4.Create      (Nil)
+ Else
+  LDecoder := nil;
+ Try
+  If LDecoder <> Nil Then
+   LDecoder.DecodeBegin(ADestStream);
+  If MIMEBoundary <> '' Then
+   Begin
+    LBoundaryStart := '--' + MIMEBoundary; {Do not Localize}
+    LBoundaryEnd := LBoundaryStart + '--'; {Do not Localize}
+   End;
+  If LContentTransferEncoding <> '' Then
+   Begin
+    Case PosInStrArray(LContentTransferEncoding, ['7bit', 'quoted-printable', 'base64', '8bit', 'binary'], False) Of {do not localize}
+     0..2: LIsBinaryContentTransferEncoding := False;
+     3..4: LIsBinaryContentTransferEncoding := True;
+    Else
+     LIsBinaryContentTransferEncoding := True;
+     LContentTransferEncoding         := '';
+    End;
+   End
+  Else
+   LIsBinaryContentTransferEncoding := True;
+  Repeat
+   If Not FProcessFirstLine Then
+    Begin
+     If LIsBinaryContentTransferEncoding Then
+      Begin
+       LLine            := ReadLnRFC(VMsgEnd, EOL, '.'); {do not localize}
+       LBinaryLineBreak := EOL;
+      End
+     Else
+      LLine := ReadLnRFC(VMsgEnd, LF, '.'); {do not localize}
+    End
+   Else
+    Begin
+     LLine := FFirstLine;
+     FFirstLine := '';    {Do not Localize}
+     FProcessFirstLine := False;
+     // Do not use ADELIM since always ends with . (standard)
+     If LLine = '.' Then
+      Begin {Do not Localize}
+       VMsgEnd := True;
+       Break;
+      End;
+     If TextStartsWith(LLine, '..') Then
+      Delete(LLine, 1, 1);
+    End;
+   If VMsgEnd Then
+    Break;
+   If MIMEBoundary <> '' Then
+    Begin
+     If TextIsSame(LLine, LBoundaryStart) Then
+      Begin
+       Result := TRESTDWMessageDecoderMIME.Create(Owner);
+       Break;
+      End;
+     If TextIsSame(LLine, LBoundaryEnd) Then
+      Begin
+       If Owner is TRESTDWMessage Then
+        TRESTDWMessage(Owner).MIMEBoundary.Pop;
+       Break;
+      End;
+    End;
+   If LDecoder = Nil Then
+    Begin
+     If LIsBinaryContentTransferEncoding Then
+      Begin {do not localize}
+       If LIsThisTheFirstLine Then
+        LIsThisTheFirstLine := False
+       Else
+        Begin
+         If Assigned(ADestStream) Then
+          WriteStringToStream(ADestStream, LBinaryLineBreak, -1, 1);
+        End;
+       If Assigned(ADestStream) Then
+        WriteStringToStream(ADestStream, LLine, -1, 1);
+      End
+     Else
+      Begin
+       If Assigned(ADestStream) Then
+        WriteStringToStream(ADestStream, LLine + EOL, -1, 1);
+      End;
+    End
+   Else
+    Begin
+     If LDecoder Is TRESTDWDecoderQuotedPrintable Then
+      LDecoder.Decode(LLine + EOL)
+     Else If LDecoder Is TRESTDWDecoderBinHex4 Then
+      LBuffer := LBuffer + LLine
+     Else If LLine <> '' Then
+      LDecoder.Decode(LLine);
+    End;
+  Until False;
+  If LDecoder <> Nil Then
+   Begin
+    If LDecoder Is TRESTDWDecoderBinHex4 Then
+     LDecoder.Decode(LBuffer);
+    LDecoder.DecodeEnd;
+   End;
+ Finally
+  FreeAndNil(LDecoder);
+ End;
 End;
 
 Function TRESTDWMessageDecoderMIME.GetAttachmentFilename(Const AContentType,
@@ -564,11 +554,6 @@ Begin
  Inherited;
  FMessageEncoderClass := TRESTDWMessageEncoderMIME;
 End;
-
-destructor TRESTDWMessageEncoderInfoMIME.Destroy;
-begin
-  Inherited;
-end;
 
 Procedure TRESTDWMessageEncoderInfoMIME.InitializeHeaders(AMsg : TRESTDWMessage);
 Begin

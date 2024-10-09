@@ -40,7 +40,7 @@ uses
   OverbyteIcsWinSock, OverbyteIcsWSocket, OverbyteIcsWndControl,
   OverbyteIcsHttpAppServer, OverbyteIcsUtils, OverbyteIcsFormDataDecoder,
   OverbyteIcsMimeUtils, OverbyteIcsSSLEAY, OverbyteIcsHttpSrv,
-  OverbyteIcsWSocketS, OverbyteIcsSslX509Utils;
+  OverbyteIcsWSocketS, OverbyteIcsSslX509Utils, OverbyteIcsSslBase;
 
 type
   TPoolerHttpConnection = class(THttpAppSrvConnection)

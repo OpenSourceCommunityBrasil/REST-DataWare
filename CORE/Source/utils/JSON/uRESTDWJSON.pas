@@ -855,23 +855,29 @@ begin
                     end;
                 end;
             end;
-            try
-                result := _Integer.create(s);
-                exit;
-            Except
+            if Not((pos('.', s) > 0) or
+                   (pos(',', s) > 0)) then
+             Begin
+              try
+               result := _Integer.create(s);
+               exit;
+              Except
+               on e:Exception do begin
+                      ///* Ignore the error */
+               end;
+              end;
+             End
+            Else
+             Begin
+              try
+               result := _Double.create(s);
+               exit;
+              Except
                     on e:Exception do begin
                       ///* Ignore the error */
-                    end;
-            end;
-
-            try
-                result := _Double.create(s);
-                exit;
-            Except
-                    on e:Exception do begin
-                      ///* Ignore the error */
-                    end;
-            end;
+               end;
+              end;
+             End;
         end;
         result := _String.create(s);
 end;
@@ -1490,7 +1496,7 @@ var
   o : TZAbstractObject;
 begin
   o := opt(key);
-  if (o <> null) then begin
+  if (o <> null) and (o <> nil) then begin
       if (o is _Number) then begin
           result :=  (_Number(o)).intValue();
           exit;

@@ -36,7 +36,7 @@ Uses
  uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWJSONObject,
  uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWDataUtils,
  uRESTDWTools, uRESTDWConsts, uRESTDWMessageCoderMIME,
- uRESTDWZlib, uRESTDWMimeTypes, uRESTDWAbout, uRESTDWAuthenticators;
+ uRESTDWZlib, uRESTDWMimeTypes, uRESTDWAbout, uRESTDWAuthenticators, uRESTDWBasicClass;
 
 type
   TRedirect          = Procedure(Url       : String;
@@ -387,6 +387,7 @@ End;
     vCriticalSection   : TCriticalSection;
    {$ENDIF}
   {$ENDIF}
+  vClientHttpBase      : TComponentClass;
   vBeforeUseCriptKey   : TBeforeUseCriptKey;
   vCORSCustomHeaders,
   vDefaultPage         : TStringList;
@@ -471,7 +472,9 @@ End;
                                    Metadata                  : Boolean;
                                    BinaryCompatibleMode      : Boolean;
                                    CompareContext            : Boolean) : Boolean;
+  Procedure SetClientHttpBase(Value : TComponentClass);
  Public
+  Property    ClientHttpBase      : TComponentClass          Read vClientHttpBase  Write SetClientHttpBase;
   Procedure   SetSocketKind       (SocketKind                : String);
   Procedure   SetActive           (Value                     : Boolean);Virtual;
   Procedure   ClearDataRoute;
@@ -484,20 +487,20 @@ End;
                                    Url,
                                    RawHTTPCommand            : String;
                                    Var ContentType           : String;
-                                   ClientIP,
-                                   UserAgent,
-                                   AuthUsername,
-                                   AuthPassword,
-                                   Token                     : String;
-                                   RequestHeaders            : TStringList;
-                                   ClientPort                : Integer;
-                                   RawHeaders,
-                                   Params                    : TStrings;
-                                   QueryParams               : String;
-                                   ContentStringStream       : TStream;
-                                   Var AuthRealm,
-                                   sCharSet,
-                                   ErrorMessage              : String;
+                                       ClientIP,
+                                       UserAgent,
+                                       AuthUsername,
+                                       AuthPassword,
+                                       Token                 : String;
+                                   Const RequestHeaders      : TStringList;
+                                   Const ClientPort          : Integer;
+                                   Const RawHeaders,
+                                         Params              : TStrings;
+                                         QueryParams         : String;
+                                   Const ContentStringStream : TStream;
+                                   Var   AuthRealm,
+                                         sCharSet,
+                                         ErrorMessage        : String;
                                    Var StatusCode            : Integer;
                                    Var ResponseHeaders       : TStringList;
                                    Var ResponseString        : String;
@@ -696,60 +699,60 @@ End;
                             Var Pooler, MyIP      : String;
                             AccessTag             : String;
                             Var InvalidTag        : Boolean);Virtual;Abstract;
-  Function CommandExec     (Const AContext        : TComponent;
+  Function CommandExec     (Const AContext            : TComponent;
                             Url,
-                            RawHTTPCommand        : String;
-                            Var ContentType       : String;
-                            ClientIP,
-                            UserAgent,
-                            AuthUsername,
-                            AuthPassword,
-                            Token                 : String;
-                            RequestHeaders        : TStringList;
-                            ClientPort            : Integer;
-                            RawHeaders,
-                            Params                : TStrings;
-                            QueryParams           : String;
-                            ContentStringStream   : TStream;
-                            Var AuthRealm,
-                            sCharSet,
-                            ErrorMessage          : String;
-                            Var StatusCode        : Integer;
-                            Var ResponseHeaders   : TStringList;
-                            Var ResponseString    : String;
-                            Var ResultStream      : TStream;
-                            Var CORSCustomHeaders : TStrings;
-                            Redirect              : TRedirect) : Boolean;Override;
+                            RawHTTPCommand            : String;
+                            Var ContentType           : String;
+                                ClientIP,
+                                UserAgent,
+                                AuthUsername,
+                                AuthPassword,
+                                Token                 : String;
+                            Const RequestHeaders      : TStringList;
+                            Const ClientPort          : Integer;
+                            Const RawHeaders,
+                                  Params              : TStrings;
+                                  QueryParams         : String;
+                            Const ContentStringStream : TStream;
+                            Var   AuthRealm,
+                                  sCharSet,
+                                  ErrorMessage              : String;
+                            Var StatusCode            : Integer;
+                            Var ResponseHeaders       : TStringList;
+                            Var ResponseString        : String;
+                            Var ResultStream          : TStream;
+                            Var CORSCustomHeaders     : TStrings;
+                            Redirect                  : TRedirect) : Boolean;Override;
 End;
 
  TRESTDWProxyBase = Class(TRESTDWBasicReceptor)
  Private
  Protected
  Public
-  Function CommandExec     (Const AContext        : TComponent;
+  Function CommandExec     (Const AContext            : TComponent;
                             Url,
-                            RawHTTPCommand        : String;
-                            Var ContentType       : String;
-                            ClientIP,
-                            UserAgent,
-                            AuthUsername,
-                            AuthPassword,
-                            Token                 : String;
-                            RequestHeaders        : TStringList;
-                            ClientPort            : Integer;
-                            RawHeaders,
-                            Params                : TStrings;
-                            QueryParams           : String;
-                            ContentStringStream   : TStream;
-                            Var AuthRealm,
-                            sCharSet,
-                            ErrorMessage          : String;
-                            Var StatusCode        : Integer;
-                            Var ResponseHeaders   : TStringList;
-                            Var ResponseString    : String;
-                            Var ResultStream      : TStream;
-                            Var CORSCustomHeaders : TStrings;
-                            Redirect              : TRedirect) : Boolean;Override;
+                            RawHTTPCommand            : String;
+                            Var ContentType           : String;
+                                ClientIP,
+                                UserAgent,
+                                AuthUsername,
+                                AuthPassword,
+                                Token                 : String;
+                            Const RequestHeaders      : TStringList;
+                            Const ClientPort          : Integer;
+                            Const RawHeaders,
+                                  Params              : TStrings;
+                                  QueryParams         : String;
+                            Const ContentStringStream : TStream;
+                            Var   AuthRealm,
+                                  sCharSet,
+                                  ErrorMessage              : String;
+                            Var StatusCode            : Integer;
+                            Var ResponseHeaders       : TStringList;
+                            Var ResponseString        : String;
+                            Var ResultStream          : TStream;
+                            Var CORSCustomHeaders     : TStrings;
+                            Redirect                  : TRedirect) : Boolean;Override;
 End;
 //Heranças para Servidores Standalone
  TRESTServicePoolerBase   = Class(TRESTServiceBase)
@@ -1552,1479 +1555,30 @@ Begin
  Inherited;
 End;
 
-Function TRESTDWProxyBase.CommandExec(Const AContext        : TComponent;
+Function TRESTDWProxyBase.CommandExec(Const AContext            : TComponent;
                                       Url,
-                                      RawHTTPCommand        : String;
-                                      Var ContentType       : String;
-                                      ClientIP,
-                                      UserAgent,
-                                      AuthUsername,
-                                      AuthPassword,
-                                      Token                 : String;
-                                      RequestHeaders        : TStringList;
-                                      ClientPort            : Integer;
-                                      RawHeaders,
-                                      Params                : TStrings;
-                                      QueryParams           : String;
-                                      ContentStringStream   : TStream;
-                                      Var AuthRealm,
-                                      sCharSet,
-                                      ErrorMessage          : String;
-                                      Var StatusCode        : Integer;
-                                      Var ResponseHeaders   : TStringList;
-                                      Var ResponseString    : String;
-                                      Var ResultStream      : TStream;
-                                      Var CORSCustomHeaders : TStrings;
-                                      Redirect              : TRedirect) : Boolean;
-Var
- I, vErrorCode      : Integer;
- DataMode           : TDataMode;
- DWParams           : TRESTDWParams;
- vOldMethod,
- vBasePath,
- vObjectName,
- vAccessTag,
- vWelcomeMessage,
- vReplyString,
- baseEventUnit,
- Cmd,
- vmark,
- aurlContext,
- JSONStr,
- vTempText,
- sFile,
- sContentType,
- vContentType,
- LocalDoc,
- vErrorMessage,
- vToken,
- vDataBuff,
- vUrlToExec,
- vOldRequest,
- vdwservereventname,
- vUrlRedirect,
- vAuthenticationString,
- tmp                   : String;
- vAuthTokenParam       : TRESTDWAuthToken;
- vdwConnectionDefs     : TConnectionDefs;
- vTempServerMethods    : TObject;
- ContentStream         : TStream;
- JSONParam             : TRESTDWJSONParam;
- JSONValue             : TRESTDWJSONValue;
- vAcceptAuth,
- vMetadata,
- vBinaryCompatibleMode,
- vBinaryEvent,
- dwassyncexec,
- vFileExists,
- vSpecialServer,
- vServerContextCall,
- vTagReply,
- WelcomeAccept,
- encodestrings,
- compresseddata,
- vdwCriptKey,
- vGettoken,
- vTokenValidate,
- vNeedAuthorization,
- vCompareContext,
- vIsQueryParam       : Boolean;
- vServerMethod       : TComponentClass;
- ServerContextStream : TMemoryStream;
- RequestType         : TRequestType;
- ms,
- mb                  : TStream;
- vRequestHeader,
- vDecoderHeaderList  : TStringList;
- PCustomHeaders      : ^TStrings;
- vTempRoute          : TRESTDWRoute;
- Function ExcludeTag(Value : String) : String;
- Begin
-  Result := Value;
-  If (UpperCase(Copy (Value, 1, 3)) = 'GET')    or
-     (UpperCase(Copy (Value, 1, 4)) = 'POST')   or
-     (UpperCase(Copy (Value, 1, 3)) = 'PUT')    or
-     (UpperCase(Copy (Value, 1, 6)) = 'DELETE') or
-     (UpperCase(Copy (Value, 1, 5)) = 'PATCH')  Then
-   Begin
-    While (Result <> '') And (Result[InitStrPos] <> '/') Do
-     Delete(Result, 1, 1);
-   End;
-  If Result <> '' Then
-   If Result[InitStrPos] = '/' Then
-    Delete(Result, 1, 1);
-  Result := Trim(Result);
- End;
- Function GetFileOSDir(Value : String) : String;
- Begin
-  {$IFDEF RESTDWFMX}
-  Result := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath, Value);
-  {$ELSE}
-  Result := vBasePath + Value;
-  {$ENDIF}
-  {$IFDEF RESTDWWINDOWS}
-   Result := StringReplace(Result, '/', '\', [rfReplaceAll]);
-  {$ENDIF}
- End;
- Function GetLastMethod(Value : String) : String;
- Var
-  I : Integer;
- Begin
-  Result := '';
-  If Value <> '' Then
-   Begin
-    If Value[Length(Value) - FinalStrPos] <> '/' Then
-     Begin
-      For I := (Length(Value) - FinalStrPos) Downto InitStrPos Do
-       Begin
-        If Value[I] <> '/' Then
-         Result := Value[I] + Result
-        Else
-         Break;
-       End;
-     End;
-   End;
- End;
- procedure ReadRawHeaders;
- var
-  I: Integer;
-  JSONParam : TRESTDWJSONParam;
- begin
-  If Not Assigned(RawHeaders) Then
-   Exit;
-  Try
-   If RawHeaders.Count > 0 Then
-    Begin
-     RawHeaders.NameValueSeparator := ':';
-     vRequestHeader.Add(RawHeaders.Text);
-     For I := 0 To RawHeaders.Count -1 Do
-      Begin
-       tmp       := RawHeaders.Names[I];
-       vTempText := RawHeaders.Values[tmp];
-       If (vTempText <> '') And (vTempText[InitStrPos] = ' ') then
-        Delete(vTempText,1,1);
-       If pos('dwwelcomemessage', lowercase(tmp)) > 0 Then
-        vWelcomeMessage := DecodeStrings(vTempText{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
-       Else If pos('dwaccesstag', lowercase(tmp)) > 0 Then
-        vAccessTag := DecodeStrings(vTempText{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
-       Else If pos('datacompression', lowercase(tmp)) > 0 Then
-        compresseddata := StringToBoolean(vTempText)
-       Else If pos('dwencodestrings', lowercase(tmp)) > 0 Then
-        encodestrings  := StringToBoolean(vTempText)
-       Else If pos('dwusecript', lowercase(tmp)) > 0 Then
-        vdwCriptKey    := StringToBoolean(vTempText)
-       Else If (pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
-        dwassyncexec   := StringToBoolean(vTempText)
-       Else if pos('binaryrequest', lowercase(tmp)) > 0 Then
-        vBinaryEvent   := StringToBoolean(vTempText)
-       Else If pos('dwconnectiondefs', lowercase(tmp)) > 0 Then
-        Begin
-         vdwConnectionDefs   := TConnectionDefs.Create;
-         JSONValue           := TRESTDWJSONValue.Create;
-         Try
-          JSONValue.Encoding  := vEncoding;
-          JSONValue.Encoded  := True;
-          JSONValue.LoadFromJSON(vTempText);
-          vdwConnectionDefs.LoadFromJSON(JSONValue.Value);
-         Finally
-          FreeAndNil(JSONValue);
-         End;
-        End
-       Else If pos('dwservereventname', lowercase(tmp)) > 0  Then
-        Begin
-         JSONValue           := TRESTDWJSONValue.Create;
-         Try
-          JSONValue.Encoding  := vEncoding;
-          JSONValue.Encoded  := True;
-          {$IFDEF RESTDWLAZARUS}
-          JSONValue.DatabaseCharSet := vDatabaseCharSet;
-          {$ENDIF}
-          JSONValue.LoadFromJSON(vTempText);
-          vdwservereventname := JSONValue.AsString;
-         Finally
-          FreeAndNil(JSONValue);
-         End;
-        End
-       Else
-        Begin
-         If Not Assigned(DWParams) Then
-          TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
-                                          QueryParams,
-                                          vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
-         Try
-          If Trim(lowercase(tmp)) <> '' Then
-           Begin
-            JSONParam                 := DWParams.ItemsString[lowercase(tmp)];
-            If JSONParam = Nil Then
-             Begin
-              JSONParam := TRESTDWJSONParam.Create(DWParams.Encoding);
-              JSONParam.ObjectDirection := odIN;
-              JSONParam.ParamName       := lowercase(tmp);
-              {$IFDEF RESTDWLAZARUS}
-              JSONParam.DatabaseCharSet := vDatabaseCharSet;
-              {$ENDIF}
-              If (Pos(LowerCase('{"ObjectType":"toParam", "Direction":"'), LowerCase(vTempText)) > 0) Then
-               JSONParam.FromJSON(vTempText)
-              Else
-               JSONParam.AsString  := vTempText;
-              DWParams.Add(JSONParam);
-             End;
-           End;
-         Finally
-         End;
-        End;
-      End;
-    End;
-  Finally
-   If RawHeaders <> Nil Then
-    If RawHeaders.Text <> '' Then
-     DWParams.RequestHeaders.Input.Assign(RawHeaders);
-   tmp := '';
-  End;
- End;
- Procedure WriteError;
- Begin
-  {$IFDEF RESTDWLAZARUS}
-   If vEncoding = esUtf8 Then
-    mb := TStringStream.Create(Utf8Encode(vErrorMessage))
-   Else
-    mb := TStringStream.Create(vErrorMessage);
-  {$ELSE}
-   mb := TStringStream.Create(vErrorMessage{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
-  {$ENDIF}
-  mb.Position := 0;
-  StatusCode := vErrorCode;
-  If Not (Assigned(ResultStream)) Then
-   ResultStream := TStringStream.Create('');
-  ResultStream.Position := 0;
-  ResultStream.CopyFrom(mb, mb.Size);
-  ResultStream.Position := 0;
-  If Assigned(mb) Then
-   FreeAndNil(mb);
- End;
- Procedure DestroyComponents;
- Begin
-  If Assigned(DWParams) Then
-   FreeAndNil(DWParams);
-  If Assigned(vdwConnectionDefs) Then
-   FreeAndNil(vdwConnectionDefs);
-  If Assigned(vRequestHeader)    Then
-   FreeAndNil(vRequestHeader);
-  If Assigned(vAuthTokenParam)   Then
-   FreeAndNil(vAuthTokenParam);
-  If Assigned(vAuthTokenParam) Then
-   FreeAndNil(vAuthTokenParam);
-  If Assigned(vServerMethod) Then
-   If Assigned(vTempServerMethods) Then
-    Begin
-     Try
-      {$IFNDEF POSIX} //no linux nao precisa libertar porque é [weak]
-      FreeAndNil(vTempServerMethods); //.free;
-      {$ENDIF}
-     Except
-     End;
-    End;
- End;
- Function ClearRequestType(Value : String) : String;
- Begin
-  Result := Value;
-  If (Pos('GET ', UpperCase(Result)) > 0)   Then
-   Result := StringReplace(Result, 'GET ', '', [rfReplaceAll, rfIgnoreCase])
-  Else If (Pos('POST ', UpperCase(Result)) > 0)   Then
-   Result := StringReplace(Result, 'POST ', '', [rfReplaceAll, rfIgnoreCase])
-  Else If (Pos('PUT ', UpperCase(Result)) > 0)   Then
-   Result := StringReplace(Result, 'PUT ', '', [rfReplaceAll, rfIgnoreCase])
-  Else If (Pos('DELETE ', UpperCase(Result)) > 0)   Then
-   Result := StringReplace(Result, 'DELETE ', '', [rfReplaceAll, rfIgnoreCase])
-  Else If (Pos('PATCH ', UpperCase(Result)) > 0)   Then
-   Result := StringReplace(Result, 'PATCH ', '', [rfReplaceAll, rfIgnoreCase])
-  Else If (Pos('OPTION ', UpperCase(Result)) > 0)   Then
-   Result := StringReplace(Result, 'OPTION ', '', [rfReplaceAll, rfIgnoreCase])
-  Else If (Pos('OPTIONS ', UpperCase(Result)) > 0)   Then
-   Result := StringReplace(Result, 'OPTIONS ', '', [rfReplaceAll, rfIgnoreCase]);
- End;
- Function CompareBaseURL(Var Value : String) : Boolean;
- Var
-  vTempValue : String;
- Begin
-  Result := False;
-  If aDefaultUrl <> '' Then
-   Begin
-    If Value = '/' Then
-     Value := aDefaultUrl
-    Else
-     Begin
-      vTempValue := Copy(Value, 1, Length(aDefaultUrl));
-      If Lowercase(vTempValue) <> Lowercase(aDefaultUrl) Then
-       Begin
-        Value  := aDefaultUrl + Value;
-        Result := True;
-       End;
-     End;
-   End;
- End;
- Procedure PrepareBasicAuth(AuthenticationString : String; Var AuthUsername, AuthPassword : String);
- Begin
-  AuthUsername := Copy(AuthenticationString, 1, Pos(':', AuthenticationString) -1);
-  Delete(AuthenticationString, 1, Pos(':', AuthenticationString));
-  AuthPassword := AuthenticationString;
- End;
- Function ReturnRouteValidation(ServerMethodsClass : TComponent;
-                                urlContext         : String) : TRESTDWRoute;
- Var
-  vTagService : Boolean;
-  I           : Integer;
-  Pooler      : String;
- Begin
-  Result        := Nil;
-  vTagService   := False;
-  If ServerMethodsClass <> Nil Then
-   Begin
-    Pooler := urlContext;
-    If Pos('?', Pooler) > 0 Then
-     Pooler := Copy(Pooler, 1, Pos('?', Pooler) -1);
-    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
-     Begin
-      If ServerMethodsClass.Components[i] is TRESTDWServerRoutes Then
-       Begin
-        Result   := TRESTDWServerRoutes(ServerMethodsClass.Components[i]).Routes.RouteByName[Pooler];
-        If Assigned(Result) Then
-          Break;
-       End;
-     End;
-   End;
- End;
-Begin
- ResultStream          := Nil;
- Result                := True;
- mb                    := Nil;
- vAuthTokenParam       := Nil;
- tmp                   := '';
- DataMode              := dmDataware;
- baseEventUnit         := '';
- vAccessTag            := '';
- vErrorMessage         := '';
- vServerMethod         := Nil;
- vTempRoute            := Nil;
- {$IFDEF RESTDWFMX}
- vBasePath             := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath, '/');
- {$ELSE}
- vBasePath             := ExtractFilePath(ParamStr(0));
- {$ENDIF}
- vContentType          := vContentType;
- vdwConnectionDefs     := Nil;
- vTempServerMethods    := Nil;
- DWParams              := Nil;
- ServerContextStream   := Nil;
- mb                    := Nil;
- ms                    := Nil;
- compresseddata        := False;
- encodestrings         := False;
- vTagReply             := False;
- vServerContextCall    := False;
- dwassyncexec          := False;
- vBinaryEvent          := False;
- vBinaryCompatibleMode := False;
- vMetadata             := False;
- vdwCriptKey           := False;
- vGettoken             := False;
- vTokenValidate        := False;
- vErrorCode            := 200;
- vIsQueryParam         := False;
- vToken                := Token;
- vDataBuff             := '';
- vRequestHeader        := TStringList.Create;
- vCompareContext       := False;
- Cmd                   := RemoveBackslashCommands(Trim(RawHTTPCommand));
- vUrlToExec            := '';
- Try
-  sCharSet := '';
-  If (UpperCase(Copy (Cmd, 1, 3)) = 'GET')    Then
-   Begin
-    If     (Pos('.HTML', UpperCase(Cmd)) > 0) Then
-     Begin
-      sContentType:='text/html';
-      sCharSet := 'utf-8';
-     End
-    Else If (Pos('.PNG', UpperCase(Cmd)) > 0) Then
-     sContentType := 'image/png'
-    Else If (Pos('.ICO', UpperCase(Cmd)) > 0) Then
-     sContentType := 'image/ico'
-    Else If (Pos('.GIF', UpperCase(Cmd)) > 0) Then
-     sContentType := 'image/gif'
-    Else If (Pos('.JPG', UpperCase(Cmd)) > 0) Then
-     sContentType := 'image/jpg'
-    Else If (Pos('.JS',  UpperCase(Cmd)) > 0) Then
-     sContentType := 'application/javascript'
-    Else If (Pos('.PDF', UpperCase(Cmd)) > 0) Then
-     sContentType := 'application/pdf'
-    Else If (Pos('.CSS', UpperCase(Cmd)) > 0) Then
-     sContentType:='text/css';
-    sFile := Url;
-    If Pos(vTempText, sFile) >= InitStrPos Then
-     Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
-    sFile := IncludeTrailingPathDelimiter(FRootPath) + sFile;
-    {$IFDEF RESTDWWINDOWS}
-     sFile := StringReplace(sFile, '/', '\', [rfReplaceAll]);
-     sFile := StringReplace(sFile, '\\', '\', [rfReplaceAll]);
-    {$ELSE}
-     sFile := StringReplace(sFile, '//', '/', [rfReplaceAll]);
-    {$ENDIF}
-    If (vPathTraversalRaiseError) And
-       (RESTDWFileExists(sFile, FRootPath)) And
-       (SystemProtectFiles(sFile)) Then
-     Begin
-      StatusCode               := 404;
-      If compresseddata Then
-       mb                                  := TStringStream(ZCompressStreamNew(cEventNotFound))
-      Else
-       mb                                  := TStringStream.Create(cEventNotFound{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
-      mb.Position                          := 0;
-      If Not (Assigned(ResultStream)) Then
-       ResultStream := TStringStream.Create('');
-      ResultStream.CopyFrom(mb, mb.Size);
-      FreeAndNil(mb);
-      DestroyComponents;
-      Exit;
-     End;
-    If RESTDWFileExists(sFile, FRootPath) then
-     Begin
-      StatusCode    := 200;
-      ContentType   := TRESTDWMIMEType.GetMIMEType(sFile);
-      ServerContextStream := TMemoryStream.Create;
-      ServerContextStream.LoadFromFile(sFile);
-      ServerContextStream.Position := 0;
-      If Not (Assigned(ResultStream)) Then
-       ResultStream := TMemoryStream.Create;
-      ResultStream.CopyFrom(ServerContextStream, ServerContextStream.Size);
-      FreeAndNil(ServerContextStream);
-      DestroyComponents;
-      Exit;
-     End;
-   End;
-  If (vPathTraversalRaiseError) And (TravertalPathFind(Trim(RawHTTPCommand))) Then
-   Begin
-    StatusCode                            := 404;
-    If compresseddata Then
-     mb                                  := TStringStream(ZCompressStreamNew(cEventNotFound))
-    Else
-     mb                                  := TStringStream.Create(cEventNotFound{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
-    mb.Position                          := 0;
-    If Not (Assigned(ResultStream)) Then
-     ResultStream := TStringStream.Create('');
-    ResultStream.CopyFrom(mb, mb.Size);
-    FreeAndNil(mb);
-    DestroyComponents;
-    Exit;
-   End;
-  Cmd := RemoveBackslashCommands(Trim(RawHTTPCommand));
-  vRequestHeader.Add(Cmd);
-  Cmd := StringReplace(Cmd, ' HTTP/1.0', '', [rfReplaceAll]);
-  Cmd := StringReplace(Cmd, ' HTTP/1.1', '', [rfReplaceAll]);
-  Cmd := StringReplace(Cmd, ' HTTP/2.0', '', [rfReplaceAll]);
-  Cmd := StringReplace(Cmd, ' HTTP/2.1', '', [rfReplaceAll]);
-  If (UpperCase(Copy (Cmd, 1, 3)) = 'GET' )   OR
-     (UpperCase(Copy (Cmd, 1, 4)) = 'POST')   OR
-     (UpperCase(Copy (Cmd, 1, 3)) = 'PUT')    OR
-     (UpperCase(Copy (Cmd, 1, 4)) = 'DELE')   OR
-     (UpperCase(Copy (Cmd, 1, 4)) = 'PATC')   OR
-     (UpperCase(Copy (Cmd, 1, 4)) = 'OPTI')   Then
-   Begin
-    RequestType := rtGet;
-    If (UpperCase(Copy (Cmd, 1, 4))      = 'POST') Then
-     RequestType := rtPost
-    Else If (UpperCase(Copy (Cmd, 1, 3)) = 'PUT')  Then
-     RequestType := rtPut
-    Else If (UpperCase(Copy (Cmd, 1, 4)) = 'DELE') Then
-     RequestType := rtDelete
-    Else If (UpperCase(Copy (Cmd, 1, 4)) = 'PATC') Then
-     RequestType := rtPatch
-    Else If (UpperCase(Copy (Cmd, 1, 4)) = 'OPTI') Then
-     RequestType := rtOption;
-    If Url = '/favicon.ico' Then
-     Exit;
-    Cmd := ClearRequestType(Cmd);
-    vIsQueryParam := (Pos('?', Lowercase(Url)) > 0) And
-                     (Pos('=', Lowercase(Url)) > 0);
-    If Not vIsQueryParam Then
-     vIsQueryParam := (Pos('?', Lowercase(RawHTTPCommand)) > 0);
-    If (cmd = '') or (cmd = '/') Then
-     vOldRequest   := aDefaultUrl
-    Else
-     vOldRequest   := Cmd;
-    If vIsQueryParam Then
-     vUrlToExec    := Url
-    Else
-     vUrlToExec    := Cmd;
-    ReadRawHeaders;
-    vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
-    If Cmd <> '' Then
-     TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
-    If ((Params.Count > 0) And (RequestType In [rtGet, rtDelete])) Then
-     Begin
-      vRequestHeader.Add(Url);
-      vRequestHeader.Add(Params.Text);
-      vRequestHeader.Add(QueryParams);
-      TRESTDWDataUtils.ParseWebFormsParams(Params, Url, QueryParams,
-                                           vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF},
-                                           DWParams,    RequestType);
-      If DWParams <> Nil Then
-       Begin
-        If (DWParams.ItemsString['dwwelcomemessage']     <> Nil)    Then
-         vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-        If (DWParams.ItemsString['dwaccesstag']          <> Nil)    Then
-         vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-        If (DWParams.ItemsString['datacompression']      <> Nil)    Then
-         compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
-        If (DWParams.ItemsString['dwencodestrings']      <> Nil)    Then
-         encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
-        If (DWParams.ItemsString['dwusecript']           <> Nil)    Then
-         vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
-        If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil)    Then
-         vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
-        If (DWParams.ItemsString['dwservereventname']    <> Nil)    Then
-         Begin
-          If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
-           vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-         End;
-       End;
-     End
-    Else
-     Begin
-      If (RequestType In [rtGet, rtDelete]) Then
-       Begin
-        aurlContext  := vUrlToExec;
-        If Not Assigned(DWParams) Then
-         TRESTDWDataUtils.ParseRESTURL (Url, vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
-        vOldMethod := vUrlToExec;
-        If DWParams <> Nil Then
-         Begin
-          If DWParams.ItemsString['dwwelcomemessage']      <> Nil  Then
-           vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-          If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
-           vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-          If (DWParams.ItemsString['datacompression']      <> Nil) Then
-           compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
-          If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
-           encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
-          If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
-           Begin
-            If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
-             vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-           End;
-          If (DWParams.ItemsString['dwusecript']           <> Nil) Then
-           vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
-          If (DWParams.ItemsString['dwassyncexec']         <> Nil) And (Not (dwassyncexec)) Then
-           dwassyncexec          := StringToBoolean(DWParams.ItemsString['dwassyncexec'].AsString);
-          If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil) Then
-           vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
-         End;
-        If (vUrlToExec = '') And (aurlContext <> '') Then
-         vUrlToExec := aurlContext;
-       End;
-      If (RequestType In [rtPut, rtPatch, rtDelete]) Then //New Code to Put
-       Begin
-        If QueryParams <> '' Then
-         Begin
-          TRESTDWDataUtils.ParseFormParamsToDWParam(QueryParams, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-          If (DWParams.ItemsString['dwwelcomemessage']     <> Nil) Then
-           vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-          If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
-           vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-          If (DWParams.ItemsString['datacompression']      <> Nil) Then
-           compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
-          If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
-           encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
-          If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
-           Begin
-            If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
-             vdwservereventname := DWParams.ItemsString['dwservereventname'].AsString;
-           End;
-          If (DWParams.ItemsString['dwusecript']           <> Nil) Then
-           vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
-          If (DWParams.ItemsString['dwassyncexec']         <> Nil) And (Not (dwassyncexec)) Then
-           dwassyncexec          := StringToBoolean(DWParams.ItemsString['dwassyncexec'].AsString);
-          If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil) Then
-           vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
-         End;
-       End;
-      ParseParams(DWParams, Params, QueryParams, ContentStringStream,
-                  vBinaryEvent, vBinaryCompatibleMode,
-                  ContentType,  Url, vmark,
-                  RequestType,  vWelcomeMessage,    vAccessTag,
-                  vdwCriptKey,  compresseddata,     encodestrings,
-                  dwassyncexec, vdwservereventname, baseEventUnit,
-                  vUrlToExec,   aurlContext,        vRequestHeader,
-                  vdwConnectionDefs);
-     End;
-     WelcomeAccept         := True;
-     tmp                   := '';
-     vAuthenticationString := '';
-     vToken                := '';
-     vGettoken             := False;
-     vAcceptAuth           := False;
-     If (vDataRouteList.Count > 0) Then
-      Begin
-       If Not vDataRouteList.RouteExists(vUrlToExec) Then
-        Begin
-         vErrorCode := 400;
-         JSONStr    := GetPairJSONInt(-5, cInvalidRequest);
-        End
-       Else
-        Begin
-         If (vUrlToExec <> '') Then
-          Begin
-           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
-            Begin
-             vErrorCode := 400;
-             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
-            End;
-          End
-         Else
-          Begin
-           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
-            Begin
-             vErrorCode := 400;
-             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
-            End;
-          End;
-        End;
-      End
-     Else
-      vServerMethod := aServerMethod;
-     If Assigned(vServerMethod) Then
-      Begin
-       If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
-        vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-       If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
-        vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-       Try // identificando o evento a ser chamado no datamodule
-        vTempServerMethods  := vServerMethod.Create(Nil);
-        If Not vCORS Then
-         FreeAndNil(CORSCustomHeaders);
-        {$IFNDEF RESTDWLAZARUS}
-         {$IFNDEF FPC}
-          If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
-             (vTempServerMethods            Is TServerMethodDatamodule)   Then
-           Begin
-            If TServerMethodDatamodule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
-             Begin
-              If ((vCORS) And (RequestType = rtOption)) Then
-               vErrorCode := 200;
-             End;
-           End
-          Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
-                  (vTempServerMethods            Is TServerBaseMethodClass)    Then
-           Begin
-            If TServerBaseMethodClass(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
-             Begin
-              If ((vCORS) And (RequestType = rtOption)) Then
-               vErrorCode := 200;
-             End;
-           End;
-          {$ELSE}
-           If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-              (vTempServerMethods            Is TServerMethodDatamodule)   Then
-            Begin
-             If TServerMethodDatamodule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
-              Begin
-               If ((vCORS) And (RequestType = rtOption)) Then
-                vErrorCode := 200;
-              End;
-            End
-           Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                   (vTempServerMethods            Is TServerBaseMethodClass)    Then
-            Begin
-             If TServerBaseMethodClass(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
-              Begin
-               If ((vCORS) And (RequestType = rtOption)) Then
-                vErrorCode := 200;
-              End;
-            End;
-          {$ENDIF}
-        {$ELSE}
-         If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-            (vTempServerMethods            Is TServerMethodDatamodule)   Then
-          Begin
-           If TServerMethodDatamodule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
-            Begin
-             If ((vCORS) And (RequestType = rtOption)) Then
-              vErrorCode := 200;
-            End;
-          End
-         Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                 (vTempServerMethods            Is TServerBaseMethodClass)    Then
-          Begin
-           If TServerBaseMethodClass(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
-            Begin
-             If ((vCORS) And (RequestType = rtOption)) Then
-              vErrorCode := 200;
-            End;
-          End;
-        {$ENDIF}
-        vUrlToExec := vOldRequest;
-       Finally
-       End;
-       If (Assigned(vTempServerMethods)) Then
-        Begin
-         {$IFNDEF RESTDWLAZARUS}
-          {$IFNDEF FPC}
-           If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
-              (vTempServerMethods            Is TServerMethodDatamodule)   Then
-            Begin
-             TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-             If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
-              Begin
-               If Not Assigned(vCriticalSection) Then
-                vCriticalSection := TCriticalSection.Create;
-               vCriticalSection.Acquire;
-              End;
-             TServerMethodDatamodule(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
-            End
-           Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
-                   (vTempServerMethods            Is TServerBaseMethodClass)    Then
-            Begin
-             TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-             If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
-              Begin
-               If Not Assigned(vCriticalSection) Then
-                vCriticalSection := TCriticalSection.Create;
-               vCriticalSection.Acquire;
-              End;
-             TServerBaseMethodClass(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
-            End;
-           {$ELSE}
-            If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-               (vTempServerMethods            Is TServerMethodDatamodule)   Then
-             Begin
-              TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-              If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
-               Begin
-                InitCriticalSection(vCriticalSection);
-                EnterCriticalSection(vCriticalSection);
-               End;
-              TServerMethodDatamodule(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
-             End
-            Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                    (vTempServerMethods            Is TServerBaseMethodClass)    Then
-             Begin
-              TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-              If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
-               Begin
-                InitCriticalSection(vCriticalSection);
-                EnterCriticalSection(vCriticalSection);
-               End;
-              TServerBaseMethodClass(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
-             End;
-           {$ENDIF}
-         {$ELSE}
-          If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-             (vTempServerMethods            Is TServerMethodDatamodule)   Then
-           Begin
-            TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-            If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
-             Begin
-              InitCriticalSection(vCriticalSection);
-              EnterCriticalSection(vCriticalSection);
-             End;
-            TServerMethodDatamodule(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
-           End
-          Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                  (vTempServerMethods            Is TServerBaseMethodClass)    Then
-           Begin
-            TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-            If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
-             Begin
-              InitCriticalSection(vCriticalSection);
-              EnterCriticalSection(vCriticalSection);
-             End;
-            TServerBaseMethodClass(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
-           End;
-         {$ENDIF}
-         If vAuthenticator <> Nil Then
-         Begin
-           If vToken = '' Then
-            vToken := Token;
-           vAcceptAuth           := False;
-           vErrorCode            := 401;
-           vErrorMessage         := cInvalidAuth;
-		   //Roniery ajuste para encontrar o evento na lista de eventos, 
-		   //para assim determinar se passa ou não no validador de permissão
-           if vUrlToExec[Length(vUrlToExec)] = '/' then
-            delete(vUrlToExec, Length(vUrlToExec), 1);		   
-		   
-           // verifica se precisa autenticação
-           vNeedAuthorization := False;
-           {$IFNDEF RESTDWLAZARUS}
-            {$IFNDEF FPC}
-             If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
-                (vTempServerMethods            Is TServerMethodDatamodule)   Then
-              Begin
-               vTempRoute   := ReturnRouteValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
-               If Assigned(vTempRoute) Then
-                vNeedAuthorization := vTempRoute.Routes.RouteNeedAuthorization(RequestType)
-               Else
-                vNeedAuthorization := True;
-              End
-             Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
-                     (vTempServerMethods            Is TServerBaseMethodClass)    Then
-              Begin
-               vTempRoute   := ReturnRouteValidation(TServerBaseMethodClass(vTempServerMethods), vUrlToExec);
-               If Assigned(vTempRoute) Then
-                vNeedAuthorization := vTempRoute.Routes.RouteNeedAuthorization(RequestType)
-               Else
-                vNeedAuthorization := True;
-              End;
-             {$ELSE}
-              If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-                 (vTempServerMethods            Is TServerMethodDatamodule)   Then
-               Begin
-                vTempRoute   := ReturnRouteValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
-                If Assigned(vTempRoute) Then
-                 vNeedAuthorization := vTempRoute.Routes.RouteNeedAuthorization(RequestType)
-                Else
-                 vNeedAuthorization := True;
-               End
-              Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                      (vTempServerMethods            Is TServerBaseMethodClass)    Then
-               Begin
-                vTempRoute   := ReturnRouteValidation(TServerBaseMethodClass(vTempServerMethods), vUrlToExec);
-                If Assigned(vTempRoute) Then
-                 vNeedAuthorization := vTempRoute.Routes.RouteNeedAuthorization(RequestType)
-                Else
-                 vNeedAuthorization := True;
-               End;
-             {$ENDIF}
-           {$ELSE}
-            If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-               (vTempServerMethods            Is TServerMethodDatamodule)   Then
-             Begin
-              vTempRoute   := ReturnRouteValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
-              If Assigned(vTempRoute) Then
-               vNeedAuthorization := vTempRoute.Routes.RouteNeedAuthorization(RequestType)
-              Else
-               vNeedAuthorization := True;
-             End
-            Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                    (vTempServerMethods            Is TServerBaseMethodClass)    Then
-             Begin
-              vTempRoute   := ReturnRouteValidation(TServerBaseMethodClass(vTempServerMethods), vUrlToExec);
-              If Assigned(vTempRoute) Then
-               vNeedAuthorization := vTempRoute.Routes.RouteNeedAuthorization(RequestType)
-              Else
-               vNeedAuthorization := True;
-             End;
-           {$ENDIF}
-           If vNeedAuthorization Then
-            Begin
-              // Aqui que Valida a Autenticação
-              vAuthenticator.AuthValidate(vTempServerMethods,
-                                          vUrlToExec,
-                                          vWelcomeMessage,
-                                          vAccessTag,
+                                      RawHTTPCommand            : String;
+                                      Var ContentType           : String;
+                                          ClientIP,
+                                          UserAgent,
                                           AuthUsername,
                                           AuthPassword,
-                                          RawHeaders,
-                                          RequestType,
-                                          DWParams,
-                                          vGettoken,
-                                          vTokenValidate,
-                                          vToken,
-                                          vErrorCode, vErrorMessage, vAcceptAuth);
-              If Not vAcceptAuth and not ((vCORS) And (RequestType = rtOption)) Then  //Roniery
-               Begin
-                 //Eloy
-                 if vAuthenticator is TRESTDWAuthBasic then
-                   AuthRealm  := cAuthRealm;
-                 StatusCode   := vErrorCode;
-                 ErrorMessage := vErrorMessage;
-                 //
-                 WriteError;
-                 DestroyComponents;
-                 Exit;
-               End;
-            End;
-           vErrorCode            := 200;
-           vErrorMessage         := '';
-           If vGettoken and CORS Then
-            Begin
-             PCustomHeaders := @ResponseHeaders;
-             BuildCORS(TRESTDWAuthToken(vAuthenticator).GetTokenRoutes, TStrings(PCustomHeaders^));
-            End;
-         End
-         Else
-          Begin
-           {$IFNDEF RESTDWLAZARUS}
-            {$IFNDEF FPC}
-             If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
-                (vTempServerMethods            Is TServerMethodDatamodule)   Then
-              Begin
-               If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
-                TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
-              End
-             Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
-                     (vTempServerMethods            Is TServerBaseMethodClass)    Then
-              Begin
-               If Assigned(TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage) then
-                TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
-              End;
-             {$ELSE}
-              If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-                 (vTempServerMethods            Is TServerMethodDatamodule)   Then
-               Begin
-                If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
-                 TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
-               End
-              Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                      (vTempServerMethods            Is TServerBaseMethodClass)    Then
-               Begin
-                If Assigned(TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage) then
-                 TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
-               End;
-             {$ENDIF}
-           {$ELSE}
-            If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-               (vTempServerMethods            Is TServerMethodDatamodule)   Then
-             Begin
-              If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
-               TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
-             End
-            Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                    (vTempServerMethods            Is TServerBaseMethodClass)    Then
-             Begin
-              If Assigned(TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage) then
-               TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
-             End;
-           {$ENDIF}
-          End;
-        End;
-      End
-     Else
-      Begin
-       If vErrorCode <> 400 Then
-        Begin
-         vErrorCode := 401;
-         JSONStr    := GetPairJSONInt(-5, cServerMethodClassNotAssigned);
-        End;
-      End;
-     Try
-      If Assigned(vLastRequest) Then
-       Begin
-        Try
-         If Assigned(vLastRequest) Then
-          vLastRequest(UserAgent + sLineBreak +
-                      RawHTTPCommand);
-        Finally
-        End;
-       End;
-      If (vUrlToExec = '') And (Cmd <> '/') Then
-       vUrlToExec := vOldMethod;
-      vSpecialServer := False;
-      If vTempServerMethods <> Nil Then
-       Begin
-        ContentType   := cDefaultContentType; //'text';//'application/octet-stream';
-        If (vUrlToExec = '')  Or
-           (vUrlToExec = '/') Then
-         Begin
-          If vDefaultPage.Count > 0 Then
-           vReplyString  := vDefaultPage.Text
-          Else
-           vReplyString  := Format(cServerStatusHTML, [FSocketKind]);
-          vErrorCode   := 200;
-          ContentType  := 'text/html';
-         End
-        Else
-         Begin
-          If vEncoding = esUtf8 Then
-           sCharSet       := 'utf-8'
-          Else
-           sCharSet       := 'ansi';
-          If DWParams <> Nil Then
-           Begin
-            If (DWParams.ItemsString['dwassyncexec'] <> Nil) And (Not (dwassyncexec)) Then
-             dwassyncexec := DWParams.ItemsString['dwassyncexec'].AsBoolean;
-            If DWParams.ItemsString['dwusecript'] <> Nil Then
-             vdwCriptKey  := DWParams.ItemsString['dwusecript'].AsBoolean;
-           End;
-          If dwassyncexec Then
-           Begin
-            StatusCode               := 200;
-            vReplyString                           := AssyncCommandMSG;
-            If compresseddata Then
-             mb := TStringStream(ZCompressStreamNew(vReplyString))
-            Else
-             mb := TStringStream.Create(vReplyString{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
-            mb.Position := 0;
-            If Not (Assigned(ResultStream)) Then
-             ResultStream := TStringStream.Create('');
-            WriteStream(mb, ResultStream);
-            FreeAndNil(mb);
-           End;
-          If DWParams.itemsstring['binaryRequest']        <> Nil Then
-           vBinaryEvent := DWParams.itemsstring['binaryRequest'].Value;
-          If DWParams.itemsstring['BinaryCompatibleMode'] <> Nil Then
-           vBinaryCompatibleMode := DWParams.itemsstring['BinaryCompatibleMode'].Value;
-          If DWParams.itemsstring['MetadataRequest']      <> Nil Then
-           vMetadata := DWParams.itemsstring['MetadataRequest'].value;
-          If (Assigned(DWParams)) And (Assigned(vCripto))        Then
-           DWParams.SetCriptOptions(vdwCriptKey, vCripto.Key);
-          If Assigned(vTempServerMethods) Then
-           Begin
-            {$IFNDEF RESTDWLAZARUS}
-             {$IFNDEF FPC}
-              If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
-                 (vTempServerMethods            Is TServerMethodDatamodule)   Then
-               Begin
-                TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-               End
-              Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
-                      (vTempServerMethods            Is TServerBaseMethodClass)    Then
-               Begin
-                TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-               End;
-              {$ELSE}
-               If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-                  (vTempServerMethods            Is TServerMethodDatamodule)   Then
-                Begin
-                 TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-                End
-               Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                       (vTempServerMethods            Is TServerBaseMethodClass)    Then
-                Begin
-                 TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-                End;
-              {$ENDIF}
-            {$ELSE}
-             If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-                (vTempServerMethods            Is TServerMethodDatamodule)   Then
-              Begin
-               TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-              End
-             Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                     (vTempServerMethods            Is TServerBaseMethodClass)    Then
-              Begin
-               TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
-              End;
-            {$ENDIF}
-           End;
-          If (Not (vGettoken)) And (Not (vTokenValidate)) Then
-           Begin
-            If Not ServiceExec(TComponent(vTempServerMethods), AContext,    vUrlToExec,     vdwservereventname,
-                               DWParams, JSONStr, DataMode,    vErrorCode,  vContentType,   vServerContextCall,
-                               ServerContextStream,  vdwConnectionDefs,     EncodeStrings,  vAccessTag,   WelcomeAccept,
-                               RequestType, vMark,   vRequestHeader,        vBinaryEvent,   vMetadata,    vBinaryCompatibleMode, vCompareContext)    Then
-             Begin
-              Result := False;
-              If Not dwassyncexec Then
-               Begin
-                If Not vSpecialServer Then
-                 Begin
-                  If Url <> '' Then
-                   sFile := GetFileOSDir(ExcludeTag(tmp + Url))
-                  Else
-                   sFile := GetFileOSDir(ExcludeTag(Cmd));
-                  vFileExists := RESTDWFileExists(sFile, FRootPath);
-                  If Not vFileExists Then
-                   Begin
-                    tmp := '';
-//                      If Referer <> '' Then
-//                       tmp := GetLastMethod(Referer);
-                    If Url <> '' Then
-                     sFile := GetFileOSDir(ExcludeTag(tmp + Url))
-                    Else
-                     sFile := GetFileOSDir(ExcludeTag(Cmd));
-                    vFileExists := RESTDWFileExists(sFile, FRootPath);
-                   End;
-                  vTagReply := vFileExists or scripttags(ExcludeTag(Cmd));
-                  If vTagReply Then
-                   Begin
-                    ContentType            := TRESTDWMIMEType.GetMIMEType(sFile);
-                    If scripttags(ExcludeTag(Cmd)) and Not vFileExists Then
-                     ContentStream         := TMemoryStream.Create
-                    Else
-                     ContentStream         := TRESTDWReadFileExclusiveStream.Create(sFile);
-                    ContentStream.Position := 0;
-                    StatusCode             := 200;
-                    If Not (Assigned(ResultStream)) Then
-                     ResultStream := TStringStream.Create('');
-                    WriteStream(ContentStream, ResultStream);
-                    FreeAndNil(ContentStream);
-                    Result                 := True;
-                   End;
-                 End;
-               End;
-             End;
-           End
-          Else
-           Begin
-            JSONStr    := vToken;
-            DataMode   := dmRAW;
-            vErrorCode := 200;
-            Result     := True;
-           End;
-         End;
-       End;
-      Try
-       If Assigned(vRequestHeader) Then
-        Begin
-         vRequestHeader.Clear;
-         FreeAndNil(vRequestHeader);
-        End;
-       If Assigned(vServerMethod) Then
-        If Assigned(vTempServerMethods) Then
-         Begin
-          {$IFNDEF RESTDWLAZARUS}
-           {$IFNDEF FPC}
-            If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
-               (vTempServerMethods            Is TServerMethodDatamodule)   Then
-             Begin
-              If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
-               Begin
-                If Assigned(vCriticalSection) Then
-                 Begin
-                  vCriticalSection.Release;
-                  FreeAndNil(vCriticalSection);
-                 End;
-               End;
-             End
-            Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
-                    (vTempServerMethods            Is TServerBaseMethodClass)    Then
-             Begin
-              If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
-               Begin
-                If Assigned(vCriticalSection) Then
-                 Begin
-                  vCriticalSection.Release;
-                  FreeAndNil(vCriticalSection);
-                 End;
-               End;
-             End;
-            {$ELSE}
-             If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-                (vTempServerMethods            Is TServerMethodDatamodule)   Then
-              Begin
-               If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
-                Begin
-                 LeaveCriticalSection(vCriticalSection);
-                 DoneCriticalSection(vCriticalSection);
-                End;
-              End
-             Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                     (vTempServerMethods            Is TServerBaseMethodClass)    Then
-              Begin
-               If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
-                Begin
-                 LeaveCriticalSection(vCriticalSection);
-                 DoneCriticalSection(vCriticalSection);
-                End;
-              End;
-            {$ENDIF}
-          {$ELSE}
-           If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-              (vTempServerMethods            Is TServerMethodDatamodule)   Then
-            Begin
-             If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
-              Begin
-               LeaveCriticalSection(vCriticalSection);
-               DoneCriticalSection(vCriticalSection);
-              End;
-            End
-           Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                   (vTempServerMethods            Is TServerBaseMethodClass)    Then
-            Begin
-             If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
-              Begin
-               LeaveCriticalSection(vCriticalSection);
-               DoneCriticalSection(vCriticalSection);
-              End;
-            End;
-          {$ENDIF}
-          Try
-           vTempServerMethods.free;
-           vTempServerMethods := Nil;
-          Except
-          End;
-         End;
-       If Not dwassyncexec Then
-        Begin
-         If (Not (vTagReply)) Then
-          Begin
-           If vEncoding = esUtf8 Then
-            sCharSet := 'utf-8'
-           Else
-            sCharSet := 'ansi';
-           If vContentType <> '' Then
-            ContentType := vContentType;
-           If Not vServerContextCall Then
-            Begin
-             If (vUrlToExec <> '') Then
-              Begin
-               If DataMode in [dmDataware] Then
-                Begin
-                 If Trim(JSONStr) <> '' Then
-                  Begin
-                   If Not(((Pos('{', JSONStr) > 0)   And
-                           (Pos('}', JSONStr) > 0))  Or
-                          ((Pos('[', JSONStr) > 0)   And
-                           (Pos(']', JSONStr) > 0))) Then
-                    Begin
-                     If Not (WelcomeAccept) And (vErrorMessage <> '') Then
-                       JSONStr := escape_chars(vErrorMessage)
-                     Else If Not((JSONStr[InitStrPos] = '"')  And
-                            (JSONStr[Length(JSONStr)] = '"')) Then
-                      JSONStr := '"' + JSONStr + '"';
-                    End;
-                  End;
-//                 vErrorCode   := 200;
-                 If (RequestType <> rtOption) Then
-                  Begin
-                   If vBinaryEvent Then
-                    vReplyString := JSONStr
-                   Else
-                    Begin
-                     If Not(((vUrlToExec = '') Or (vUrlToExec = '/')) And (RequestType = rtGet)) Then
-                      If Not (WelcomeAccept) And (vErrorMessage <> '') Then
-                       Begin
-                        If vEncode_Errors then
-                         vReplyString := escape_chars(vErrorMessage)
-                        Else
-                         vReplyString := vErrorMessage;
-                       End
-                      Else
-                       vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
-                    End;
-                  End;
-                End
-               Else If DataMode = dmRAW Then
-                Begin
-                 If (Trim(JSONStr) = '') And (WelcomeAccept) Then
-                  vReplyString := '{}'
-                 Else If Not (WelcomeAccept) And (vErrorMessage <> '') Then
-                  vReplyString := escape_chars(vErrorMessage)
-                 Else
-                  vReplyString := JSONStr;
-                End;
-              End;
-             If Assigned(DWParams) Then
-              Begin
-               If DWParams.RequestHeaders.Output.Count > 0 Then
-                Begin
-                 For I := 0 To DWParams.RequestHeaders.Output.Count -1 Do
-                  RequestHeaders.Add(DWParams.RequestHeaders.Output[I]);
-                End;
-              End;
-             StatusCode                 := vErrorCode;
-             If Assigned(DWParams) And
-               (Pos(DWParams.Url_Redirect, Cmd) = 0) And
-               (DWParams.Url_Redirect <> '') Then
-              Begin
-               vUrlRedirect := DWParams.Url_Redirect;
-               If Assigned(Redirect) Then
-                Redirect(vUrlRedirect, AContext);
-              End;
-             If compresseddata Then
-              Begin
-               If vBinaryEvent Then
-                Begin
-                 ms := TMemoryStream.Create;
-                 If vGettoken Then
-                  Begin
-                   DWParams.Clear;
-                   DWParams.CreateParam('token', vReplyString);
-                  End;
-                 Try
-                  If DWParams.ItemsString['MessageError'] = Nil Then
-                  Begin
-                   DWParams.CreateParam('MessageError');
-                   DWParams.ItemsString['MessageError'].ObjectDirection := odOut;
-                  End;
-                  If ((JSONStr <> TReplyOK) and (JSONStr <> Trim(''))) then
-                   Begin
-                    If DWParams.ItemsString['MessageError'].AsString = '' Then
-                     DWParams.ItemsString['MessageError'].AsString := JSONStr;
-                   End
-                  Else
-                   DWParams.ItemsString['MessageError'].AsString := '';
-                   DWParams.SaveToStream(TStream(ms), tdwpxt_OUT);
-                  ZCompressStreamD(ms, ResultStream);
-                 Finally
-                  FreeAndNil(ms);
-                 End;
-                End
-               Else
-                Begin
-                 If Assigned(ResultStream) Then
-                  FreeAndNil(ResultStream);
-                 ResultStream            := TStringStream(ZCompressStreamNew(vReplyString));
-                End;
-               If vErrorCode <> 200 Then
-                ResponseString           := escape_chars(vReplyString)
-              End
-             Else
-              Begin
-               {$IFNDEF FPC}
-                {$IFDEF DELPHIXEUP}
-                 If vBinaryEvent Then
-                  Begin
-                   mb := TStringStream.Create('');
-                   Try
-                    DWParams.SaveToStream(mb, tdwpxt_OUT);
-                   Finally
-                   End;
-                  End
-                 Else
-                  mb := TStringStream.Create(vReplyString{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
-                 mb.Position                          := 0;
-                 If Not (Assigned(ResultStream)) Then
-                  ResultStream := TStringStream.Create('');
-                 WriteStream(mb, ResultStream);
-                 FreeAndNil(mb);
-                {$ELSE}
-                 If vBinaryEvent Then
-                  Begin
-                   mb := TStringStream.Create('');
-                   Try
-                    DWParams.SaveToStream(mb, tdwpxt_OUT);
-                   Finally
-                   End;
-                   If Not (Assigned(ResultStream)) Then
-                    ResultStream := TStringStream.Create('');
-                   WriteStream(mb, ResultStream);
-                   FreeAndNil(mb);
-                  End
-                 Else
-                  ResponseString := vReplyString;
-                {$ENDIF}
-               {$ELSE}
-                If vBinaryEvent Then
-                 Begin
-                  mb := TStringStream.Create('');
-                  Try
-                   DWParams.SaveToStream(mb, tdwpxt_OUT);
-                  Finally
-                  End;
-                  If Not (Assigned(ResultStream)) Then
-                   ResultStream := TStringStream.Create('');
-                  WriteStream(mb, ResultStream);
-                  FreeAndNil(mb);
-                 End
-                Else
-                 Begin
-                  If vEncoding = esUtf8 Then
-                   mb := TStringStream.Create(Utf8Encode(vReplyString))
-                  Else
-                   mb := TStringStream.Create(vReplyString);
-                  mb.Position                           := 0;
-                  If Not (Assigned(ResultStream)) Then
-                   ResultStream := TStringStream.Create('');
-                  WriteStream(mb, ResultStream);
-                  FreeAndNil(mb);
-                 End;
-               {$ENDIF}
-              End;
-            End
-           Else
-            Begin
-             LocalDoc := '';
-             If TEncodeSelect(vEncoding) = esUtf8 Then
-              sCharset := 'utf-8'
-             Else If TEncodeSelect(vEncoding) in [esANSI, esASCII] Then
-              sCharset := 'ansi';
-             If Not vSpecialServer Then
-              Begin
-               StatusCode             := vErrorCode;
-               If ServerContextStream <> Nil Then
-                Begin
-                 If Not (Assigned(ResultStream)) Then
-                  ResultStream := TStringStream.Create('');
-                 WriteStream(ServerContextStream, ResultStream);
-                 FreeAndNil(ServerContextStream);
-                End
-               Else
-                Begin
-                 {$IFDEF FPC}
-                  If vEncoding = esUtf8 Then
-                   mb                                  := TStringStream.Create(Utf8Encode(JSONStr))
-                  Else
-                   mb                                  := TStringStream.Create(JSONStr);
-                  mb.Position                           := 0;
-                  If Not (Assigned(ResultStream)) Then
-                   ResultStream := TStringStream.Create('');                  WriteStream(mb, ResultStream);
-                  FreeAndNil(mb);
-                 {$ELSE}
-                  {$IF CompilerVersion > 21}
-                   mb                                   := TStringStream.Create(JSONStr{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
-                   mb.Position                          := 0;
-                   If Not (Assigned(ResultStream)) Then
-                    ResultStream := TStringStream.Create('');
-                   WriteStream(mb, ResultStream);
-                   FreeAndNil(mb);
-                  {$ELSE}
-                   ResponseString            := JSONStr;
-                  {$IFEND}
-                 {$ENDIF}
-                End;
-              End;
-            End;
-          End;
-        End;
-      Finally
-//        FreeAndNil(mb);
-      End;
-      If Assigned(vLastResponse) Then
-       Begin
-        Try
-         If vReplyString = '' Then
-          vLastResponse(JSONStr)
-         Else
-          vLastResponse(vReplyString);
-        Finally
-        End;
-       End;
-     Finally
-      If Assigned(vServerMethod) Then
-       If Assigned(vTempServerMethods) Then
-        Begin
-         Try
-          {$IFDEF POSIX} //no linux nao precisa libertar porque é [weak]
-          {$ELSE}
-          FreeAndNil(vTempServerMethods); //.free;
-          {$ENDIF}
-          vTempServerMethods := Nil;
-         Except
-         End;
-        End;
-     End;
-   End;
- Finally
-  DestroyComponents;
- End;
-End;
-
-Function TRESTServiceBase.CommandExec(Const AContext        : TComponent;
-                                      Url,
-                                      RawHTTPCommand        : String;
-                                      Var ContentType       : String;
-                                      ClientIP,
-                                      UserAgent,
-                                      AuthUsername,
-                                      AuthPassword,
-                                      Token                 : String;
-                                      RequestHeaders        : TStringList;
-                                      ClientPort            : Integer;
-                                      RawHeaders,
-                                      Params                : TStrings;
-                                      QueryParams           : String;
-                                      ContentStringStream   : TStream;
-                                      Var AuthRealm,
-                                      sCharSet,
-                                      ErrorMessage          : String;
-                                      Var StatusCode        : Integer;
-                                      Var ResponseHeaders   : TStringList;
-                                      Var ResponseString    : String;
-                                      Var ResultStream      : TStream;
-                                      Var CORSCustomHeaders : TStrings;
-                                      Redirect              : TRedirect) : Boolean;
+                                          Token                 : String;
+                                      Const RequestHeaders      : TStringList;
+                                      Const ClientPort          : Integer;
+                                      Const RawHeaders,
+                                            Params              : TStrings;
+                                            QueryParams         : String;
+                                      Const ContentStringStream : TStream;
+                                      Var   AuthRealm,
+                                            sCharSet,
+                                            ErrorMessage        : String;
+                                      Var StatusCode            : Integer;
+                                      Var ResponseHeaders       : TStringList;
+                                      Var ResponseString        : String;
+                                      Var ResultStream          : TStream;
+                                      Var CORSCustomHeaders     : TStrings;
+                                      Redirect                  : TRedirect) : Boolean;
 Var
  I, vErrorCode      : Integer;
  DataMode           : TDataMode;
@@ -3088,6 +1642,7 @@ Var
  PCustomHeaders      : ^TStrings;
  vTempContext        : TRESTDWContext;
  vTempEvent          : TRESTDWEvent;
+ vRESTDWBytes        : TRESTDWBytes;
  Function ExcludeTag(Value : String) : String;
  Begin
   Result := Value;
@@ -3137,8 +1692,10 @@ Var
  End;
  procedure ReadRawHeaders;
  var
-  I: Integer;
+  I, A      : Integer;
   JSONParam : TRESTDWJSONParam;
+  aName,
+  aValue    : String;
  begin
   If Not Assigned(RawHeaders) Then
    Exit;
@@ -3149,25 +1706,36 @@ Var
      vRequestHeader.Add(RawHeaders.Text);
      For I := 0 To RawHeaders.Count -1 Do
       Begin
-       tmp       := RawHeaders.Names[I];
-       vTempText := RawHeaders.Values[tmp];
+       tmp       := RawHeaders[I];
+       A         := Pos(':', tmp);
+       If A > 0 Then
+        Begin
+         aName     := Copy(tmp, 1, Pos(':', tmp) -1);
+         Delete(tmp, 1, Pos(':', tmp));
+         vTempText := Trim(tmp);
+        End
+       Else
+        Begin
+         aName     := Copy(tmp, 1, Length(tmp));
+         vTempText := '';
+        End;
        If (vTempText <> '') And (vTempText[InitStrPos] = ' ') then
         Delete(vTempText,1,1);
-       If pos('dwwelcomemessage', lowercase(tmp)) > 0 Then
+       If pos('dwwelcomemessage', lowercase(aName)) > 0 Then
         vWelcomeMessage := DecodeStrings(vTempText{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
-       Else If pos('dwaccesstag', lowercase(tmp)) > 0 Then
+       Else If pos('dwaccesstag', lowercase(aName)) > 0 Then
         vAccessTag := DecodeStrings(vTempText{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
-       Else If pos('datacompression', lowercase(tmp)) > 0 Then
+       Else If pos('datacompression', lowercase(aName)) > 0 Then
         compresseddata := StringToBoolean(vTempText)
-       Else If pos('dwencodestrings', lowercase(tmp)) > 0 Then
+       Else If pos('dwencodestrings', lowercase(aName)) > 0 Then
         encodestrings  := StringToBoolean(vTempText)
-       Else If pos('dwusecript', lowercase(tmp)) > 0 Then
+       Else If pos('dwusecript', lowercase(aName)) > 0 Then
         vdwCriptKey    := StringToBoolean(vTempText)
-       Else If (pos('dwassyncexec', lowercase(tmp)) > 0) And (Not (dwassyncexec)) Then
+       Else If (pos('dwassyncexec', lowercase(aName)) > 0) And (Not (dwassyncexec)) Then
         dwassyncexec   := StringToBoolean(vTempText)
-       Else if pos('binaryrequest', lowercase(tmp)) > 0 Then
+       Else if pos('binaryrequest', lowercase(aName)) > 0 Then
         vBinaryEvent   := StringToBoolean(vTempText)
-       Else If pos('dwconnectiondefs', lowercase(tmp)) > 0 Then
+       Else If pos('dwconnectiondefs', lowercase(aName)) > 0 Then
         Begin
          vdwConnectionDefs   := TConnectionDefs.Create;
          JSONValue           := TRESTDWJSONValue.Create;
@@ -3180,7 +1748,7 @@ Var
           FreeAndNil(JSONValue);
          End;
         End
-       Else If pos('dwservereventname', lowercase(tmp)) > 0  Then
+       Else If pos('dwservereventname', lowercase(aName)) > 0  Then
         Begin
          JSONValue           := TRESTDWJSONValue.Create;
          Try
@@ -3202,14 +1770,14 @@ Var
                                           QueryParams,
                                           vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
          Try
-          If Trim(lowercase(tmp)) <> '' Then
+          If Trim(lowercase(aName)) <> '' Then
            Begin
-            JSONParam                 := DWParams.ItemsString[lowercase(tmp)];
+            JSONParam                 := DWParams.ItemsString[lowercase(aName)];
             If JSONParam = Nil Then
              Begin
               JSONParam := TRESTDWJSONParam.Create(DWParams.Encoding);
               JSONParam.ObjectDirection := odIN;
-              JSONParam.ParamName       := lowercase(tmp);
+              JSONParam.ParamName       := lowercase(aName);
               {$IFDEF RESTDWLAZARUS}
               JSONParam.DatabaseCharSet := vDatabaseCharSet;
               {$ENDIF}
@@ -3504,7 +2072,7 @@ Begin
     Exit;
    End;
   Cmd := RemoveBackslashCommands(Trim(RawHTTPCommand));
-  vRequestHeader.Add(Cmd);
+//  vRequestHeader.Add(Cmd);
   Cmd := StringReplace(Cmd, ' HTTP/1.0', '', [rfReplaceAll]);
   Cmd := StringReplace(Cmd, ' HTTP/1.1', '', [rfReplaceAll]);
   Cmd := StringReplace(Cmd, ' HTTP/2.0', '', [rfReplaceAll]);
@@ -3580,30 +2148,32 @@ Begin
       If (RequestType In [rtGet, rtDelete]) Then
        Begin
         aurlContext  := vUrlToExec;
-        If Not Assigned(DWParams) Then
-         TRESTDWDataUtils.ParseRESTURL (Url, vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
         vOldMethod := vUrlToExec;
-        If DWParams <> Nil Then
+        If Not Assigned(DWParams) Then
          Begin
-          If DWParams.ItemsString['dwwelcomemessage']      <> Nil  Then
-           vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-          If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
-           vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-          If (DWParams.ItemsString['datacompression']      <> Nil) Then
-           compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
-          If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
-           encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
-          If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
+          TRESTDWDataUtils.ParseRESTURL (Url, vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
+          If DWParams <> Nil Then
            Begin
-            If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
-             vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+            If DWParams.ItemsString['dwwelcomemessage']      <> Nil  Then
+             vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+            If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
+             vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+            If (DWParams.ItemsString['datacompression']      <> Nil) Then
+             compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+            If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
+             encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+            If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
+             Begin
+              If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
+               vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+             End;
+            If (DWParams.ItemsString['dwusecript']           <> Nil) Then
+             vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
+            If (DWParams.ItemsString['dwassyncexec']         <> Nil) And (Not (dwassyncexec)) Then
+             dwassyncexec          := StringToBoolean(DWParams.ItemsString['dwassyncexec'].AsString);
+            If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil) Then
+             vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
            End;
-          If (DWParams.ItemsString['dwusecript']           <> Nil) Then
-           vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
-          If (DWParams.ItemsString['dwassyncexec']         <> Nil) And (Not (dwassyncexec)) Then
-           dwassyncexec          := StringToBoolean(DWParams.ItemsString['dwassyncexec'].AsString);
-          If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil) Then
-           vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
          End;
         If (vUrlToExec = '') And (aurlContext <> '') Then
          vUrlToExec := aurlContext;
@@ -3649,87 +2219,43 @@ Begin
      vToken                := '';
      vGettoken             := False;
      vAcceptAuth           := False;
-     If (vDataRouteList.Count > 0) Then
-      Begin
-       If Not vDataRouteList.RouteExists(vUrlToExec) Then
-        Begin
-         vErrorCode := 400;
-         JSONStr    := GetPairJSONInt(-5, cInvalidRequest);
-        End
-       Else
-        Begin
-         If (vUrlToExec <> '') Then
-          Begin
-           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
-            Begin
-             vErrorCode := 400;
-             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
-            End;
-          End
-         Else
-          Begin
-           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
-            Begin
-             vErrorCode := 400;
-             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
-            End;
-          End;
-        End;
-      End
-     Else
-      vServerMethod := aServerMethod;
+//     If (vDataRouteList.Count > 0) Then
+//      Begin
+//       If Not vDataRouteList.RouteExists(vUrlToExec) Then
+//        Begin
+//         vErrorCode := 400;
+//         JSONStr    := GetPairJSONInt(-5, cInvalidRequest);
+//        End
+//       Else
+//        Begin
+//         If (vUrlToExec <> '') Then
+//          Begin
+//           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
+//            Begin
+//             vErrorCode := 400;
+//             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
+//            End;
+//          End
+//         Else
+//          Begin
+//           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
+//            Begin
+//             vErrorCode := 400;
+//             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
+//            End;
+//          End;
+//        End;
+//      End
+//     Else
+     vServerMethod := aServerMethod;
      If Assigned(vServerMethod) Then
       Begin
-       If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
-        vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-       If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
-        vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
-       Try // identificando o evento a ser chamado no datamodule
-        vTempServerMethods  := vServerMethod.Create(Nil);
-        If Not vCORS Then
-         FreeAndNil(CORSCustomHeaders);
-        {$IFNDEF RESTDWLAZARUS}
-         {$IFNDEF FPC}
-          If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
-             (vTempServerMethods            Is TServerMethodDatamodule)   Then
-           Begin
-            If TServerMethodDatamodule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
-             Begin
-              If ((vCORS) And (RequestType = rtOption)) Then
-               vErrorCode := 200;
-             End;
-           End
-          Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
-                  (vTempServerMethods            Is TServerBaseMethodClass)    Then
-           Begin
-            If TServerBaseMethodClass(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
-             Begin
-              If ((vCORS) And (RequestType = rtOption)) Then
-               vErrorCode := 200;
-             End;
-           End;
-          {$ELSE}
-           If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-              (vTempServerMethods            Is TServerMethodDatamodule)   Then
-            Begin
-             If TServerMethodDatamodule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
-              Begin
-               If ((vCORS) And (RequestType = rtOption)) Then
-                vErrorCode := 200;
-              End;
-            End
-           Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                   (vTempServerMethods            Is TServerBaseMethodClass)    Then
-            Begin
-             If TServerBaseMethodClass(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
-              Begin
-               If ((vCORS) And (RequestType = rtOption)) Then
-                vErrorCode := 200;
-              End;
-            End;
-          {$ENDIF}
-        {$ELSE}
-         If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+       vTempServerMethods  := vServerMethod.Create(Nil);
+       If Not vCORS Then
+        FreeAndNil(CORSCustomHeaders);
+       {$IFNDEF RESTDWLAZARUS}
+        {$IFNDEF FPC}
+         If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
             (vTempServerMethods            Is TServerMethodDatamodule)   Then
           Begin
            If TServerMethodDatamodule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
@@ -3738,7 +2264,7 @@ Begin
               vErrorCode := 200;
             End;
           End
-         Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+         Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
                  (vTempServerMethods            Is TServerBaseMethodClass)    Then
           Begin
            If TServerBaseMethodClass(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
@@ -3747,10 +2273,47 @@ Begin
               vErrorCode := 200;
             End;
           End;
-        {$ENDIF}
-        vUrlToExec := vOldRequest;
-       Finally
-       End;
+         {$ELSE}
+          If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+             (vTempServerMethods            Is TServerMethodDatamodule)   Then
+           Begin
+            If TServerMethodDatamodule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
+             Begin
+              If ((vCORS) And (RequestType = rtOption)) Then
+               vErrorCode := 200;
+             End;
+           End
+          Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                  (vTempServerMethods            Is TServerBaseMethodClass)    Then
+           Begin
+            If TServerBaseMethodClass(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
+             Begin
+              If ((vCORS) And (RequestType = rtOption)) Then
+               vErrorCode := 200;
+            End;
+           End;
+         {$ENDIF}
+       {$ELSE}
+        If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+           (vTempServerMethods            Is TServerMethodDatamodule)   Then
+         Begin
+          If TServerMethodDatamodule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
+           Begin
+            If ((vCORS) And (RequestType = rtOption)) Then
+             vErrorCode := 200;
+           End;
+         End
+        Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                (vTempServerMethods            Is TServerBaseMethodClass)    Then
+         Begin
+          If TServerBaseMethodClass(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
+           Begin
+            If ((vCORS) And (RequestType = rtOption)) Then
+             vErrorCode := 200;
+           End;
+         End;
+       {$ENDIF}
+       vUrlToExec := vOldRequest;
        If (Assigned(vTempServerMethods)) Then
         Begin
          {$IFNDEF RESTDWLAZARUS}
@@ -3941,32 +2504,29 @@ Begin
            {$ENDIF}
            If vNeedAuthorization Then
             Begin
-              // Aqui que Valida a Autenticação
-              vAuthenticator.AuthValidate(vTempServerMethods,
-                                          vUrlToExec,
-                                          vWelcomeMessage,
-                                          vAccessTag,
-                                          AuthUsername,
-                                          AuthPassword,
-                                          RawHeaders,
-                                          RequestType,
-                                          DWParams,
-                                          vGettoken,
-                                          vTokenValidate,
-                                          vToken,
-                                          vErrorCode, vErrorMessage, vAcceptAuth);
-              If Not vAcceptAuth and not ((vCORS) And (RequestType = rtOption)) Then  //Roniery
-               Begin
-                 //Eloy
-                 if vAuthenticator is TRESTDWAuthBasic then
-                   AuthRealm  := cAuthRealm;
-                 StatusCode   := vErrorCode;
-                 ErrorMessage := vErrorMessage;
-                 //
-                 WriteError;
-                 DestroyComponents;
-                 Exit;
-               End;
+             vAuthenticator.AuthValidate(vTempServerMethods,
+                                         vUrlToExec,
+                                         vWelcomeMessage,
+                                         vAccessTag,
+                                         AuthUsername,
+                                         AuthPassword,
+                                         RawHeaders,
+                                         RequestType,
+                                         DWParams,
+                                         vGettoken,
+                                         vTokenValidate,
+                                         vToken,
+                                         vErrorCode, vErrorMessage, vAcceptAuth);
+             If Not vAcceptAuth and not ((vCORS) And (RequestType = rtOption)) Then  //Roniery
+              Begin
+               If vAuthenticator is TRESTDWAuthBasic Then
+                AuthRealm  := cAuthRealm;
+               StatusCode   := vErrorCode;
+               ErrorMessage := vErrorMessage;
+               WriteError;
+               DestroyComponents;
+               Exit;
+              End;
             End;
            vErrorCode            := 200;
            vErrorMessage         := '';
@@ -3978,48 +2538,60 @@ Begin
           End
          Else
           Begin
-           {$IFNDEF RESTDWLAZARUS}
-            {$IFNDEF FPC}
-             If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
-                (vTempServerMethods            Is TServerMethodDatamodule)   Then
-              Begin
-               If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
-                TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
-              End
-             Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
-                     (vTempServerMethods            Is TServerBaseMethodClass)    Then
-              Begin
-               If Assigned(TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage) then
-                TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
-              End;
-             {$ELSE}
-              If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+           Try
+            {$IFNDEF RESTDWLAZARUS}
+             {$IFNDEF FPC}
+              If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
                  (vTempServerMethods            Is TServerMethodDatamodule)   Then
                Begin
                 If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
                  TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
                End
-              Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+              Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
                       (vTempServerMethods            Is TServerBaseMethodClass)    Then
                Begin
                 If Assigned(TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage) then
                  TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
                End;
-             {$ENDIF}
-           {$ELSE}
-            If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-               (vTempServerMethods            Is TServerMethodDatamodule)   Then
+              {$ELSE}
+               If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+                  (vTempServerMethods            Is TServerMethodDatamodule)   Then
+                Begin
+                 If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
+                  TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+                End
+               Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                       (vTempServerMethods            Is TServerBaseMethodClass)    Then
+                Begin
+                 If Assigned(TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage) then
+                  TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+                End;
+              {$ENDIF}
+            {$ELSE}
+             If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+                (vTempServerMethods            Is TServerMethodDatamodule)   Then
+              Begin
+               If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
+                TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+              End
+             Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                     (vTempServerMethods            Is TServerBaseMethodClass)    Then
+              Begin
+               If Assigned(TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage) then
+                TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+              End;
+            {$ENDIF}
+           Except
+            On E : Exception do
              Begin
-              If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
-               TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
-             End
-            Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                    (vTempServerMethods            Is TServerBaseMethodClass)    Then
-             Begin
-              If Assigned(TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage) then
-               TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+              If Assigned(ResultStream) Then
+               FreeAndNil(ResultStream);
+              StatusCode   := 500;
+              ResultStream := TStringStream.Create('OnWelcomeMessage raise error: ' + E.Message);
+              Result       := False;
+              Exit;
              End;
-           {$ENDIF}
+           End;
           End;
         End;
       End
@@ -4034,12 +2606,8 @@ Begin
      Try
       If Assigned(vLastRequest) Then
        Begin
-        Try
-         If Assigned(vLastRequest) Then
-          vLastRequest(UserAgent + sLineBreak +
-                      RawHTTPCommand);
-        Finally
-        End;
+        If Assigned(vLastRequest) Then
+         vLastRequest(UserAgent + sLineBreak + RawHTTPCommand);
        End;
       If (vUrlToExec = '') And (Cmd <> '/') Then
        vUrlToExec := vOldMethod;
@@ -4063,33 +2631,1547 @@ Begin
            sCharSet       := 'utf-8'
           Else
            sCharSet       := 'ansi';
-          If DWParams <> Nil Then
-           Begin
-            If (DWParams.ItemsString['dwassyncexec'] <> Nil) And (Not (dwassyncexec)) Then
-             dwassyncexec := DWParams.ItemsString['dwassyncexec'].AsBoolean;
-            If DWParams.ItemsString['dwusecript'] <> Nil Then
-             vdwCriptKey  := DWParams.ItemsString['dwusecript'].AsBoolean;
-           End;
           If dwassyncexec Then
            Begin
-            StatusCode               := 200;
-            vReplyString                           := AssyncCommandMSG;
+            StatusCode    := 200;
+            vReplyString  := AssyncCommandMSG;
             If compresseddata Then
              mb := TStringStream(ZCompressStreamNew(vReplyString))
             Else
              mb := TStringStream.Create(vReplyString{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
-            mb.Position := 0;
+            mb.Position   := 0;
             If Not (Assigned(ResultStream)) Then
              ResultStream := TStringStream.Create('');
             WriteStream(mb, ResultStream);
             FreeAndNil(mb);
            End;
-          If DWParams.itemsstring['binaryRequest']        <> Nil Then
-           vBinaryEvent := DWParams.itemsstring['binaryRequest'].Value;
-          If DWParams.itemsstring['BinaryCompatibleMode'] <> Nil Then
-           vBinaryCompatibleMode := DWParams.itemsstring['BinaryCompatibleMode'].Value;
-          If DWParams.itemsstring['MetadataRequest']      <> Nil Then
-           vMetadata := DWParams.itemsstring['MetadataRequest'].value;
+          If (Assigned(DWParams)) And (Assigned(vCripto))        Then
+           DWParams.SetCriptOptions(vdwCriptKey, vCripto.Key);
+          If Assigned(vTempServerMethods) Then
+           Begin
+            {$IFNDEF RESTDWLAZARUS}
+             {$IFNDEF FPC}
+              If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
+                 (vTempServerMethods            Is TServerMethodDatamodule)   Then
+               Begin
+                TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+               End
+              Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
+                      (vTempServerMethods            Is TServerBaseMethodClass)    Then
+               Begin
+                TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+               End;
+              {$ELSE}
+               If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+                  (vTempServerMethods            Is TServerMethodDatamodule)   Then
+                Begin
+                 TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+                End
+               Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                       (vTempServerMethods            Is TServerBaseMethodClass)    Then
+                Begin
+                 TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+                End;
+              {$ENDIF}
+            {$ELSE}
+             If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+                (vTempServerMethods            Is TServerMethodDatamodule)   Then
+              Begin
+               TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+              End
+             Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                     (vTempServerMethods            Is TServerBaseMethodClass)    Then
+              Begin
+               TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+              End;
+            {$ENDIF}
+           End;
+          If (Not (vGettoken)) And (Not (vTokenValidate)) Then
+           Begin
+//            If Not ServiceMethods(TComponent(vTempServerMethods), AContext,      vUrlToExec,   vdwservereventname,    DWParams,
+//                                  JSONStr, DataMode,  vErrorCode,    vContentType, vServerContextCall,    ServerContextStream,
+//                                  vdwConnectionDefs,  EncodeStrings, vAccessTag,   WelcomeAccept,         RequestType, vMark,
+//                                  vRequestHeader,     vBinaryEvent,   vMetadata,   vBinaryCompatibleMode, vCompareContext) Or
+//                                 (lowercase(vContentType) = 'application/php') Then
+//             Begin
+//              Result := False;
+//              If Not dwassyncexec Then
+//               Begin
+//                If Not vSpecialServer Then
+//                 Begin
+//                  If Url <> '' Then
+//                   sFile := GetFileOSDir(ExcludeTag(tmp + Url))
+//                  Else
+//                   sFile := GetFileOSDir(ExcludeTag(Cmd));
+//                  vFileExists := RESTDWFileExists(sFile, FRootPath);
+//                  If Not vFileExists Then
+//                   Begin
+//                    tmp := '';
+//                    If Url <> '' Then
+//                     sFile := GetFileOSDir(ExcludeTag(tmp + Url))
+//                    Else
+//                     sFile := GetFileOSDir(ExcludeTag(Cmd));
+//                    vFileExists := RESTDWFileExists(sFile, FRootPath);
+//                   End;
+//                  vTagReply := vFileExists or scripttags(ExcludeTag(Cmd));
+//                  If vTagReply Then
+//                   Begin
+//                    ContentType            := TRESTDWMIMEType.GetMIMEType(sFile);
+//                    If scripttags(ExcludeTag(Cmd)) and Not vFileExists Then
+//                     ContentStream         := TMemoryStream.Create
+//                    Else
+//                     ContentStream         := TRESTDWReadFileExclusiveStream.Create(sFile);
+//                    ContentStream.Position := 0;
+//                    StatusCode             := 200;
+//                    If Not (Assigned(ResultStream)) Then
+//                     ResultStream := TStringStream.Create('');
+//                    WriteStream(ContentStream, ResultStream);
+//                    FreeAndNil(ContentStream);
+//                    Result                 := True;
+//                   End;
+//                 End;
+//               End;
+//             End;
+           End
+          Else
+           Begin
+            JSONStr    := vToken;
+            DataMode   := dmRAW;
+            vErrorCode := 200;
+            Result     := True;
+           End;
+         End;
+       End;
+      If Assigned(vRequestHeader) Then
+       Begin
+        vRequestHeader.Clear;
+        FreeAndNil(vRequestHeader);
+       End;
+      If Assigned(vServerMethod) Then
+      If Assigned(vTempServerMethods) Then
+       Begin
+        {$IFNDEF RESTDWLAZARUS}
+         {$IFNDEF FPC}
+          If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
+             (vTempServerMethods            Is TServerMethodDatamodule)   Then
+           Begin
+            If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
+             Begin
+              If Assigned(vCriticalSection) Then
+               Begin
+                vCriticalSection.Release;
+                FreeAndNil(vCriticalSection);
+               End;
+             End;
+           End
+          Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
+                  (vTempServerMethods            Is TServerBaseMethodClass)    Then
+           Begin
+             If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
+              Begin
+               If Assigned(vCriticalSection) Then
+               Begin
+                vCriticalSection.Release;
+                FreeAndNil(vCriticalSection);
+               End;
+             End;
+           End;
+          {$ELSE}
+          If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+             (vTempServerMethods            Is TServerMethodDatamodule)   Then
+           Begin
+            If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
+             Begin
+              LeaveCriticalSection(vCriticalSection);
+              DoneCriticalSection(vCriticalSection);
+             End;
+           End
+          Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                  (vTempServerMethods            Is TServerBaseMethodClass)    Then
+           Begin
+            If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
+             Begin
+              LeaveCriticalSection(vCriticalSection);
+              DoneCriticalSection(vCriticalSection);
+             End;
+           End;
+         {$ENDIF}
+        {$ELSE}
+         If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+            (vTempServerMethods            Is TServerMethodDatamodule)   Then
+          Begin
+           If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
+            Begin
+             LeaveCriticalSection(vCriticalSection);
+             DoneCriticalSection(vCriticalSection);
+            End;
+          End
+         Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                 (vTempServerMethods            Is TServerBaseMethodClass)    Then
+          Begin
+           If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
+            Begin
+             LeaveCriticalSection(vCriticalSection);
+             DoneCriticalSection(vCriticalSection);
+            End;
+          End;
+        {$ENDIF}
+        Try
+         vTempServerMethods.free;
+         vTempServerMethods := Nil;
+        Except
+        End;
+       End;
+      If Not dwassyncexec Then
+       Begin
+        If (Not (vTagReply)) Then
+         Begin
+          If vEncoding = esUtf8 Then
+           sCharSet := 'utf-8'
+          Else
+           sCharSet := 'ansi';
+          If vContentType <> '' Then
+           ContentType := vContentType;
+          If Not vServerContextCall Then
+           Begin
+            If (vUrlToExec <> '') Then
+             Begin
+              If DataMode in [dmDataware] Then
+               Begin
+                If Trim(JSONStr) <> '' Then
+                 Begin
+                  If Not(((Pos('{', JSONStr) > 0)   And
+                          (Pos('}', JSONStr) > 0))  Or
+                         ((Pos('[', JSONStr) > 0)   And
+                          (Pos(']', JSONStr) > 0))) Then
+                   Begin
+                    If Not (WelcomeAccept)                        And
+                           (vErrorMessage <> '')                  Then
+                     JSONStr := escape_chars(vErrorMessage)
+                    Else If Not((JSONStr[InitStrPos] = '"')       And
+                                (JSONStr[Length(JSONStr)] = '"')) Then
+                     JSONStr := '"' + JSONStr + '"';
+                   End;
+                 End;
+                If (RequestType <> rtOption) Then
+                 Begin
+                  If vBinaryEvent Then
+                   vReplyString := JSONStr
+                  Else
+                   Begin
+                    If Not(((vUrlToExec = '') Or (vUrlToExec = '/')) And (RequestType = rtGet)) Then
+                     Begin
+                      If Not (WelcomeAccept) And (vErrorMessage <> '') Then
+                       Begin
+                        If vEncode_Errors then
+                         vReplyString := escape_chars(vErrorMessage)
+                        Else
+                         vReplyString := vErrorMessage;
+                       End
+                      Else
+                       vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+                     End;
+                   End;
+                 End;
+               End
+              Else If DataMode = dmRAW Then
+               Begin
+                If (Trim(JSONStr) = '') And (WelcomeAccept) Then
+                 vReplyString := '{}'
+                Else If Not (WelcomeAccept) And (vErrorMessage <> '') Then
+                 vReplyString := escape_chars(vErrorMessage)
+                Else
+                 vReplyString := JSONStr;
+               End;
+             End;
+            If Assigned(DWParams) Then
+             Begin
+              If DWParams.RequestHeaders.Output.Count > 0 Then
+               Begin
+                For I := 0 To DWParams.RequestHeaders.Output.Count -1 Do
+                 RequestHeaders.Add(DWParams.RequestHeaders.Output[I]);
+               End;
+             End;
+            StatusCode                 := vErrorCode;
+            If Assigned(DWParams) And
+              (Pos(DWParams.Url_Redirect, Cmd) = 0) And
+              (DWParams.Url_Redirect <> '') Then
+             Begin
+              vUrlRedirect := DWParams.Url_Redirect;
+              If Assigned(Redirect) Then
+               Redirect(vUrlRedirect, AContext);
+             End;
+            If compresseddata Then
+             Begin
+              If vBinaryEvent Then
+               Begin
+                ms := TMemoryStream.Create;
+                If vGettoken Then
+                 Begin
+                  DWParams.Clear;
+                  DWParams.CreateParam('token', vReplyString);
+                 End;
+                Try
+                 If DWParams.ItemsString['MessageError'] = Nil Then
+                  Begin
+                   DWParams.CreateParam('MessageError');
+                   DWParams.ItemsString['MessageError'].ObjectDirection := odOut;
+                  End;
+                 If ((JSONStr <> TReplyOK) and (JSONStr <> Trim(''))) then
+                  Begin
+                   If DWParams.ItemsString['MessageError'].AsString = '' Then
+                    DWParams.ItemsString['MessageError'].AsString := JSONStr;
+                  End
+                 Else
+                  DWParams.ItemsString['MessageError'].AsString := '';
+                 DWParams.SaveToStream(TStream(ms), tdwpxt_OUT);
+                 ZCompressStreamD(ms, ResultStream);
+                Finally
+                 FreeAndNil(ms);
+                End;
+               End
+              Else
+               Begin
+                If Assigned(ResultStream) Then
+                 FreeAndNil(ResultStream);
+                ResultStream            := TStringStream(ZCompressStreamNew(vReplyString));
+               End;
+              If not (vErrorCode in [200,201]) Then
+               ResponseString           := escape_chars(vReplyString)
+             End
+            Else
+             Begin
+              {$IFNDEF FPC}
+               {$IFDEF DELPHIXEUP}
+                If vBinaryEvent Then
+                 Begin
+                  ResultStream := TMemoryStream.Create;
+                  DWParams.SaveToStream(ResultStream, tdwpxt_OUT);
+//                  WriteStream(mb, ResultStream);
+                 End
+                Else
+                 Begin
+//                  If Not (vErrorCode in [200, 201]) Then
+                  ResultStream := TStringStream.Create(Utf8Encode(vReplyString));
+//                  Else
+//                   ResultStream := TStringStream.Create(vReplyString);
+                 End;
+                ResultStream.Position := 0;
+               {$ELSE}
+                If vBinaryEvent Then
+                 Begin
+                  ResultStream := TMemoryStream.Create;
+                  DWParams.SaveToStream(ResultStream, tdwpxt_OUT);
+                 End
+                Else
+                 ResponseString := vReplyString;
+               {$ENDIF}
+              {$ELSE}
+               If vBinaryEvent Then
+                Begin
+                 ResultStream := TMemoryStream.Create;
+                 DWParams.SaveToStream(ResultStream, tdwpxt_OUT);
+                End
+               Else
+                Begin
+                 If vEncoding = esUtf8 Then
+                  mb := TStringStream.Create(Utf8Encode(vReplyString))
+                 Else
+                  mb := TStringStream.Create(vReplyString);
+                 mb.Position                           := 0;
+                 If Not (Assigned(ResultStream)) Then
+                  ResultStream := TStringStream.Create('');
+                 WriteStream(mb, ResultStream);
+                 FreeAndNil(mb);
+                End;
+              {$ENDIF}
+             End;
+           End
+          Else
+           Begin
+            LocalDoc := '';
+            If TEncodeSelect(vEncoding) = esUtf8 Then
+             sCharset := 'utf-8'
+            Else If TEncodeSelect(vEncoding) in [esANSI, esASCII] Then
+             sCharset := 'ansi';
+            If Not vSpecialServer Then
+             Begin
+              StatusCode             := vErrorCode;
+              If ServerContextStream <> Nil Then
+               Begin
+                If Not (Assigned(ResultStream)) Then
+                 ResultStream := TStringStream.Create('');
+                WriteStream(ServerContextStream, ResultStream);
+                FreeAndNil(ServerContextStream);
+               End
+              Else
+               Begin
+                {$IFDEF FPC}
+                 If vEncoding = esUtf8 Then
+                  mb                                  := TStringStream.Create(Utf8Encode(JSONStr))
+                 Else
+                  mb                                  := TStringStream.Create(JSONStr);
+                 mb.Position                           := 0;
+                 If Not (Assigned(ResultStream)) Then
+                  ResultStream := TStringStream.Create('');                  WriteStream(mb, ResultStream);
+                 FreeAndNil(mb);
+                {$ELSE}
+                 {$IF CompilerVersion > 21}
+                  mb                                   := TStringStream.Create(JSONStr{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+                  mb.Position                          := 0;
+                  If Not (Assigned(ResultStream)) Then
+                   ResultStream := TStringStream.Create('');
+                  WriteStream(mb, ResultStream);
+                  FreeAndNil(mb);
+                 {$ELSE}
+                  ResponseString            := JSONStr;
+                  {$IFEND}
+                {$ENDIF}
+               End;
+             End;
+           End;
+         End;
+       End;
+      If Assigned(vLastResponse) Then
+       Begin
+        Try
+         If vReplyString = '' Then
+          vLastResponse(JSONStr)
+         Else
+          vLastResponse(vReplyString);
+        Finally
+        End;
+       End;
+     Finally
+      If Assigned(vServerMethod) Then
+       If Assigned(vTempServerMethods) Then
+        Begin
+         Try
+          {$IFDEF POSIX} //no linux nao precisa libertar porque é [weak]
+          {$ELSE}
+          FreeAndNil(vTempServerMethods); //.free;
+          {$ENDIF}
+          vTempServerMethods := Nil;
+         Except
+         End;
+        End;
+     End;
+   End;
+ Finally
+  If Not (Assigned(ResultStream)) Then
+   ResultStream := TStringStream.Create(vDefaultPage.Text);
+  DestroyComponents;
+ End;
+End;
+
+Function TRESTServiceBase.CommandExec(Const AContext            : TComponent;
+                                      Url,
+                                      RawHTTPCommand            : String;
+                                      Var ContentType           : String;
+                                      ClientIP,
+                                      UserAgent,
+                                      AuthUsername,
+                                      AuthPassword,
+                                      Token                     : String;
+                                      Const RequestHeaders      : TStringList;
+                                      Const ClientPort          : Integer;
+                                      Const RawHeaders,
+                                            Params              : TStrings;
+                                            QueryParams         : String;
+                                      Const ContentStringStream : TStream;
+                                      Var AuthRealm,
+                                      sCharSet,
+                                      ErrorMessage              : String;
+                                      Var StatusCode            : Integer;
+                                      Var ResponseHeaders       : TStringList;
+                                      Var ResponseString        : String;
+                                      Var ResultStream          : TStream;
+                                      Var CORSCustomHeaders     : TStrings;
+                                      Redirect                  : TRedirect) : Boolean;
+Var
+ I, vErrorCode      : Integer;
+ DataMode           : TDataMode;
+ DWParams           : TRESTDWParams;
+ vOldMethod,
+ vBasePath,
+ vObjectName,
+ vAccessTag,
+ vWelcomeMessage,
+ vReplyString,
+ baseEventUnit,
+ Cmd,
+ vmark,
+ aurlContext,
+ JSONStr,
+ vTempText,
+ sFile,
+ sContentType,
+ vContentType,
+ LocalDoc,
+ vErrorMessage,
+ vToken,
+ vDataBuff,
+ vUrlToExec,
+ vOldRequest,
+ vdwservereventname,
+ vUrlRedirect,
+ vAuthenticationString,
+ tmp                   : String;
+ vAuthTokenParam       : TRESTDWAuthToken;
+ vdwConnectionDefs     : TConnectionDefs;
+ vTempServerMethods    : TObject;
+ ContentStream         : TStream;
+ JSONParam             : TRESTDWJSONParam;
+ JSONValue             : TRESTDWJSONValue;
+ vAcceptAuth,
+ vMetadata,
+ vBinaryCompatibleMode,
+ vBinaryEvent,
+ dwassyncexec,
+ vFileExists,
+ vSpecialServer,
+ vServerContextCall,
+ vTagReply,
+ WelcomeAccept,
+ encodestrings,
+ compresseddata,
+ vdwCriptKey,
+ vGettoken,
+ vTokenValidate,
+ vNeedAuthorization,
+ vCompareContext,
+ vIsQueryParam       : Boolean;
+ vServerMethod       : TComponentClass;
+ ServerContextStream : TMemoryStream;
+ RequestType         : TRequestType;
+ ms,
+ mb                  : TStream;
+ vRequestHeader,
+ vDecoderHeaderList  : TStringList;
+ PCustomHeaders      : ^TStrings;
+ vTempContext        : TRESTDWContext;
+ vTempEvent          : TRESTDWEvent;
+ vRESTDWBytes        : TRESTDWBytes;
+ Function ExcludeTag(Value : String) : String;
+ Begin
+  Result := Value;
+  If (UpperCase(Copy (Value, 1, 3)) = 'GET')    or
+     (UpperCase(Copy (Value, 1, 4)) = 'POST')   or
+     (UpperCase(Copy (Value, 1, 3)) = 'PUT')    or
+     (UpperCase(Copy (Value, 1, 6)) = 'DELETE') or
+     (UpperCase(Copy (Value, 1, 5)) = 'PATCH')  Then
+   Begin
+    While (Result <> '') And (Result[InitStrPos] <> '/') Do
+     Delete(Result, 1, 1);
+   End;
+  If Result <> '' Then
+   If Result[InitStrPos] = '/' Then
+    Delete(Result, 1, 1);
+  Result := Trim(Result);
+ End;
+ Function GetFileOSDir(Value : String) : String;
+ Begin
+  {$IFDEF RESTDWFMX}
+  Result := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath, Value);
+  {$ELSE}
+  Result := vBasePath + Value;
+  {$ENDIF}
+  {$IFDEF RESTDWWINDOWS}
+   Result := StringReplace(Result, '/', '\', [rfReplaceAll]);
+  {$ENDIF}
+ End;
+ Function GetLastMethod(Value : String) : String;
+ Var
+  I : Integer;
+ Begin
+  Result := '';
+  If Value <> '' Then
+   Begin
+    If Value[Length(Value) - FinalStrPos] <> '/' Then
+     Begin
+      For I := (Length(Value) - FinalStrPos) Downto InitStrPos Do
+       Begin
+        If Value[I] <> '/' Then
+         Result := Value[I] + Result
+        Else
+         Break;
+       End;
+     End;
+   End;
+ End;
+ procedure ReadRawHeaders;
+ var
+  I, A      : Integer;
+  JSONParam : TRESTDWJSONParam;
+  aName,
+  aValue    : String;
+ begin
+  If Not Assigned(RawHeaders) Then
+   Exit;
+  Try
+   If RawHeaders.Count > 0 Then
+    Begin
+     RawHeaders.NameValueSeparator := ':';
+     vRequestHeader.Add(RawHeaders.Text);
+     For I := 0 To RawHeaders.Count -1 Do
+      Begin
+       tmp       := RawHeaders[I];
+       A         := Pos(':', tmp);
+       If A > 0 Then
+        Begin
+         aName     := Copy(tmp, 1, Pos(':', tmp) -1);
+         Delete(tmp, 1, Pos(':', tmp));
+         vTempText := Trim(tmp);
+        End
+       Else
+        Begin
+         aName     := Copy(tmp, 1, Length(tmp));
+         vTempText := '';
+        End;
+       If (vTempText <> '') And (vTempText[InitStrPos] = ' ') then
+        Delete(vTempText,1,1);
+       If pos('dwwelcomemessage', lowercase(aName)) > 0 Then
+        vWelcomeMessage := DecodeStrings(vTempText{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+       Else If pos('dwaccesstag', lowercase(aName)) > 0 Then
+        vAccessTag := DecodeStrings(vTempText{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+       Else If pos('datacompression', lowercase(aName)) > 0 Then
+        compresseddata := StringToBoolean(vTempText)
+       Else If pos('dwencodestrings', lowercase(aName)) > 0 Then
+        encodestrings  := StringToBoolean(vTempText)
+       Else If pos('dwusecript', lowercase(aName)) > 0 Then
+        vdwCriptKey    := StringToBoolean(vTempText)
+       Else If (pos('dwassyncexec', lowercase(aName)) > 0) And (Not (dwassyncexec)) Then
+        dwassyncexec   := StringToBoolean(vTempText)
+       Else if pos('binaryrequest', lowercase(aName)) > 0 Then
+        vBinaryEvent   := StringToBoolean(vTempText)
+       Else If pos('dwconnectiondefs', lowercase(aName)) > 0 Then
+        Begin
+         vdwConnectionDefs   := TConnectionDefs.Create;
+         JSONValue           := TRESTDWJSONValue.Create;
+         Try
+          JSONValue.Encoding  := vEncoding;
+          JSONValue.Encoded  := True;
+          JSONValue.LoadFromJSON(vTempText);
+          vdwConnectionDefs.LoadFromJSON(JSONValue.Value);
+         Finally
+          FreeAndNil(JSONValue);
+         End;
+        End
+       Else If pos('dwservereventname', lowercase(aName)) > 0  Then
+        Begin
+         JSONValue           := TRESTDWJSONValue.Create;
+         Try
+          JSONValue.Encoding  := vEncoding;
+          JSONValue.Encoded  := True;
+          {$IFDEF RESTDWLAZARUS}
+          JSONValue.DatabaseCharSet := vDatabaseCharSet;
+          {$ENDIF}
+          JSONValue.LoadFromJSON(vTempText);
+          vdwservereventname := JSONValue.AsString;
+         Finally
+          FreeAndNil(JSONValue);
+         End;
+        End
+       Else
+        Begin
+         If Not Assigned(DWParams) Then
+          TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
+                                          QueryParams,
+                                          vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
+         Try
+          If Trim(lowercase(aName)) <> '' Then
+           Begin
+            JSONParam                 := DWParams.ItemsString[lowercase(aName)];
+            If JSONParam = Nil Then
+             Begin
+              JSONParam := TRESTDWJSONParam.Create(DWParams.Encoding);
+              JSONParam.ObjectDirection := odIN;
+              JSONParam.ParamName       := lowercase(aName);
+              {$IFDEF RESTDWLAZARUS}
+              JSONParam.DatabaseCharSet := vDatabaseCharSet;
+              {$ENDIF}
+              If (Pos(LowerCase('{"ObjectType":"toParam", "Direction":"'), LowerCase(vTempText)) > 0) Then
+               JSONParam.FromJSON(vTempText)
+              Else
+               JSONParam.AsString  := vTempText;
+              DWParams.Add(JSONParam);
+             End;
+           End;
+         Finally
+         End;
+        End;
+      End;
+    End;
+  Finally
+   If RawHeaders <> Nil Then
+    If RawHeaders.Text <> '' Then
+     DWParams.RequestHeaders.Input.Assign(RawHeaders);
+   tmp := '';
+  End;
+ End;
+ Procedure WriteError;
+ Begin
+  {$IFDEF RESTDWLAZARUS}
+   If vEncoding = esUtf8 Then
+    mb := TStringStream.Create(Utf8Encode(vErrorMessage))
+   Else
+    mb := TStringStream.Create(vErrorMessage);
+  {$ELSE}
+   mb := TStringStream.Create(vErrorMessage{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
+  {$ENDIF}
+  mb.Position := 0;
+  StatusCode := vErrorCode;
+  If Not (Assigned(ResultStream)) Then
+   ResultStream := TStringStream.Create('');
+  ResultStream.Position := 0;
+  ResultStream.CopyFrom(mb, mb.Size);
+  ResultStream.Position := 0;
+  If Assigned(mb) Then
+   FreeAndNil(mb);
+ End;
+ Procedure DestroyComponents;
+ Begin
+  If Assigned(DWParams) Then
+   FreeAndNil(DWParams);
+  If Assigned(vdwConnectionDefs) Then
+   FreeAndNil(vdwConnectionDefs);
+  If Assigned(vRequestHeader)    Then
+   FreeAndNil(vRequestHeader);
+  If Assigned(vAuthTokenParam)   Then
+   FreeAndNil(vAuthTokenParam);
+  If Assigned(vAuthTokenParam) Then
+   FreeAndNil(vAuthTokenParam);
+  If Assigned(vServerMethod) Then
+   If Assigned(vTempServerMethods) Then
+    Begin
+     Try
+      {$IFNDEF POSIX} //no linux nao precisa libertar porque é [weak]
+      FreeAndNil(vTempServerMethods); //.free;
+      {$ENDIF}
+     Except
+     End;
+    End;
+ End;
+ Function ReturnEventValidation(ServerMethodsClass : TComponent;
+                                urlContext         : String) : TRESTDWEvent;
+ Var
+  vTagService : Boolean;
+  I           : Integer;
+  Pooler      : String;
+ Begin
+  Result        := Nil;
+  vTagService   := False;
+  If ServerMethodsClass <> Nil Then
+   Begin
+    Pooler := urlContext;
+    If Pos('?', Pooler) > 0 Then
+     Pooler := Copy(Pooler, 1, Pos('?', Pooler) -1);
+    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+     Begin
+      If ServerMethodsClass.Components[i] is TRESTDWServerEvents Then
+       Begin
+        Result   := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler];
+        If Assigned(Result) Then
+          Break;
+       End;
+     End;
+   End;
+ End;
+ Function ReturnContextValidation(ServerMethodsClass : TComponent;
+                                  urlContext         : String) : TRESTDWContext;
+ Var
+  I            : Integer;
+  aEventName,
+  aServerEvent,
+  vRootContext : String;
+ Begin
+  Result        := Nil;
+  vRootContext  := '';
+  If (aServerEvent = '') Then
+   Begin
+    aServerEvent := urlContext;
+    If Pos('?', aServerEvent) > 0 Then
+     aServerEvent := Copy(aServerEvent, 1, Pos('?', aServerEvent) -1);
+    aEventName   := '';
+   End;
+  If ServerMethodsClass <> Nil Then
+   Begin
+    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
+     Begin
+      If ServerMethodsClass.Components[i] is TRESTDWServerContext Then
+       Begin
+        If (TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent] <> Nil)   Then
+         Begin
+          vRootContext := '';
+          Result := TRESTDWServerContext(ServerMethodsClass.Components[i]).ContextList.ContextByName[aServerEvent];
+          If Assigned(Result) Then
+           Break;
+         End;
+       End;
+     End;
+   End;
+ End;
+ Function ClearRequestType(Value : String) : String;
+ Begin
+  Result := Value;
+  If (Pos('GET ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'GET ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('POST ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'POST ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('PUT ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'PUT ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('DELETE ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'DELETE ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('PATCH ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'PATCH ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('OPTION ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'OPTION ', '', [rfReplaceAll, rfIgnoreCase])
+  Else If (Pos('OPTIONS ', UpperCase(Result)) > 0)   Then
+   Result := StringReplace(Result, 'OPTIONS ', '', [rfReplaceAll, rfIgnoreCase]);
+ End;
+ Function CompareBaseURL(Var Value : String) : Boolean;
+ Var
+  vTempValue : String;
+ Begin
+  Result := False;
+  If aDefaultUrl <> '' Then
+   Begin
+    If Value = '/' Then
+     Value := aDefaultUrl
+    Else
+     Begin
+      vTempValue := Copy(Value, 1, Length(aDefaultUrl));
+      If Lowercase(vTempValue) <> Lowercase(aDefaultUrl) Then
+       Begin
+        Value  := aDefaultUrl + Value;
+        Result := True;
+       End;
+     End;
+   End;
+ End;
+ Procedure PrepareBasicAuth(AuthenticationString : String; Var AuthUsername, AuthPassword : String);
+ Begin
+  AuthUsername := Copy(AuthenticationString, 1, Pos(':', AuthenticationString) -1);
+  Delete(AuthenticationString, 1, Pos(':', AuthenticationString));
+  AuthPassword := AuthenticationString;
+ End;
+Begin
+ ResultStream          := Nil;
+ Result                := True;
+ mb                    := Nil;
+ vAuthTokenParam       := Nil;
+ tmp                   := '';
+ DataMode              := dmDataware;
+ baseEventUnit         := '';
+ vAccessTag            := '';
+ vErrorMessage         := '';
+ vServerMethod         := Nil;
+ {$IFDEF RESTDWFMX}
+ vBasePath             := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath, '/');
+ {$ELSE}
+ vBasePath             := ExtractFilePath(ParamStr(0));
+ {$ENDIF}
+ vContentType          := vContentType;
+ vdwConnectionDefs     := Nil;
+ vTempServerMethods    := Nil;
+ DWParams              := Nil;
+ ServerContextStream   := Nil;
+ mb                    := Nil;
+ ms                    := Nil;
+ compresseddata        := False;
+ encodestrings         := False;
+ vTagReply             := False;
+ vServerContextCall    := False;
+ dwassyncexec          := False;
+ vBinaryEvent          := False;
+ vBinaryCompatibleMode := False;
+ vMetadata             := False;
+ vdwCriptKey           := False;
+ vGettoken             := False;
+ vTokenValidate        := False;
+ vErrorCode            := 200;
+ vIsQueryParam         := False;
+ vToken                := Token;
+ vDataBuff             := '';
+ vRequestHeader        := TStringList.Create;
+ vCompareContext       := False;
+ { TODO 1 -oRoniery -ccorreção : função para fazer decode de url utf8 para ascii }
+ RawHTTPCommand        := DecodeURL(RawHTTPCommand);
+ QueryParams           := DecodeURL(QueryParams);
+ Cmd                   := RemoveBackslashCommands(Trim(RawHTTPCommand));
+ vUrlToExec            := '';
+ Try
+  sCharSet := '';
+  If (UpperCase(Copy (Cmd, 1, 3)) = 'GET')    Then
+   Begin
+    If     (Pos('.HTML', UpperCase(Cmd)) > 0) Then
+     Begin
+      sContentType:='text/html';
+      sCharSet := 'utf-8';
+     End
+    Else If (Pos('.PNG', UpperCase(Cmd)) > 0) Then
+     sContentType := 'image/png'
+    Else If (Pos('.ICO', UpperCase(Cmd)) > 0) Then
+     sContentType := 'image/ico'
+    Else If (Pos('.GIF', UpperCase(Cmd)) > 0) Then
+     sContentType := 'image/gif'
+    Else If (Pos('.JPG', UpperCase(Cmd)) > 0) Then
+     sContentType := 'image/jpg'
+    Else If (Pos('.JS',  UpperCase(Cmd)) > 0) Then
+     sContentType := 'application/javascript'
+    Else If (Pos('.PDF', UpperCase(Cmd)) > 0) Then
+     sContentType := 'application/pdf'
+    Else If (Pos('.CSS', UpperCase(Cmd)) > 0) Then
+     sContentType:='text/css';
+    sFile := Url;
+    If Pos(vTempText, sFile) >= InitStrPos Then
+     Delete(sFile, Pos(vTempText, sFile) - FinalStrPos, Length(vTempText));
+    sFile := IncludeTrailingPathDelimiter(FRootPath) + sFile;
+    {$IFDEF RESTDWWINDOWS}
+     sFile := StringReplace(sFile, '/', '\', [rfReplaceAll]);
+     sFile := StringReplace(sFile, '\\', '\', [rfReplaceAll]);
+    {$ELSE}
+     sFile := StringReplace(sFile, '//', '/', [rfReplaceAll]);
+    {$ENDIF}
+    If (vPathTraversalRaiseError) And
+       (RESTDWFileExists(sFile, FRootPath)) And
+       (SystemProtectFiles(sFile)) Then
+     Begin
+      StatusCode               := 404;
+      If compresseddata Then
+       mb                                  := TStringStream(ZCompressStreamNew(cEventNotFound))
+      Else
+       mb                                  := TStringStream.Create(cEventNotFound{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+      mb.Position                          := 0;
+      If Not (Assigned(ResultStream)) Then
+       ResultStream := TStringStream.Create('');
+      ResultStream.CopyFrom(mb, mb.Size);
+      FreeAndNil(mb);
+      DestroyComponents;
+      Exit;
+     End;
+    If RESTDWFileExists(sFile, FRootPath) then
+     Begin
+      StatusCode    := 200;
+      ContentType   := TRESTDWMIMEType.GetMIMEType(sFile);
+      ServerContextStream := TMemoryStream.Create;
+      ServerContextStream.LoadFromFile(sFile);
+      ServerContextStream.Position := 0;
+      If Not (Assigned(ResultStream)) Then
+       ResultStream := TMemoryStream.Create;
+      ResultStream.CopyFrom(ServerContextStream, ServerContextStream.Size);
+      FreeAndNil(ServerContextStream);
+      DestroyComponents;
+      Exit;
+     End;
+   End;
+  If (vPathTraversalRaiseError) And (TravertalPathFind(Trim(RawHTTPCommand))) Then
+   Begin
+    StatusCode                            := 404;
+    If compresseddata Then
+     mb                                  := TStringStream(ZCompressStreamNew(cEventNotFound))
+    Else
+     mb                                  := TStringStream.Create(cEventNotFound{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+    mb.Position                          := 0;
+    If Not (Assigned(ResultStream)) Then
+     ResultStream := TStringStream.Create('');
+    ResultStream.CopyFrom(mb, mb.Size);
+    FreeAndNil(mb);
+    DestroyComponents;
+    Exit;
+   End;
+  Cmd := RemoveBackslashCommands(Trim(RawHTTPCommand));
+//  vRequestHeader.Add(Cmd);
+  Cmd := StringReplace(Cmd, ' HTTP/1.0', '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, ' HTTP/1.1', '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, ' HTTP/2.0', '', [rfReplaceAll]);
+  Cmd := StringReplace(Cmd, ' HTTP/2.1', '', [rfReplaceAll]);
+  If (UpperCase(Copy (Cmd, 1, 3)) = 'GET' )   OR
+     (UpperCase(Copy (Cmd, 1, 4)) = 'POST')   OR
+     (UpperCase(Copy (Cmd, 1, 3)) = 'PUT')    OR
+     (UpperCase(Copy (Cmd, 1, 4)) = 'DELE')   OR
+     (UpperCase(Copy (Cmd, 1, 4)) = 'PATC')   OR
+     (UpperCase(Copy (Cmd, 1, 4)) = 'OPTI')   Then
+   Begin
+    RequestType := rtGet;
+    If (UpperCase(Copy (Cmd, 1, 4))      = 'POST') Then
+     RequestType := rtPost
+    Else If (UpperCase(Copy (Cmd, 1, 3)) = 'PUT')  Then
+     RequestType := rtPut
+    Else If (UpperCase(Copy (Cmd, 1, 4)) = 'DELE') Then
+     RequestType := rtDelete
+    Else If (UpperCase(Copy (Cmd, 1, 4)) = 'PATC') Then
+     RequestType := rtPatch
+    Else If (UpperCase(Copy (Cmd, 1, 4)) = 'OPTI') Then
+     RequestType := rtOption;
+    If Url = '/favicon.ico' Then
+     Exit;
+    Cmd := ClearRequestType(Cmd);
+    vIsQueryParam := (Pos('?', Lowercase(Url)) > 0) And
+                     (Pos('=', Lowercase(Url)) > 0);
+    If Not vIsQueryParam Then
+     vIsQueryParam := (Pos('?', Lowercase(Cmd)) > 0);
+    If (cmd = '') or (cmd = '/') Then
+     vOldRequest   := aDefaultUrl
+    Else
+     vOldRequest   := Cmd;
+    If vIsQueryParam Then
+     vUrlToExec    := Url
+    Else
+     vUrlToExec    := Cmd;
+    ReadRawHeaders;
+    vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
+    If Cmd <> '' Then
+     TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
+    If ((Params.Count > 0) And (RequestType In [rtGet, rtDelete])) Then
+     Begin
+      vRequestHeader.Add(Url);
+      vRequestHeader.Add(Params.Text);
+      vRequestHeader.Add(QueryParams);
+      TRESTDWDataUtils.ParseWebFormsParams(Params, Url, QueryParams,
+                                           vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF},
+                                           DWParams,    RequestType);
+      If DWParams <> Nil Then
+       Begin
+        If (DWParams.ItemsString['dwwelcomemessage']     <> Nil)    Then
+         vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+        If (DWParams.ItemsString['dwaccesstag']          <> Nil)    Then
+         vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+        If (DWParams.ItemsString['datacompression']      <> Nil)    Then
+         compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+        If (DWParams.ItemsString['dwencodestrings']      <> Nil)    Then
+         encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+        If (DWParams.ItemsString['dwusecript']           <> Nil)    Then
+         vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
+        If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil)    Then
+         vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
+        If (DWParams.ItemsString['dwservereventname']    <> Nil)    Then
+         Begin
+          If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
+           vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+         End;
+       End;
+     End
+    Else
+     Begin
+      If (RequestType In [rtGet, rtDelete]) Then
+       Begin
+        aurlContext  := vUrlToExec;
+        vOldMethod := vUrlToExec;
+        If Not Assigned(DWParams) Then
+         Begin
+          TRESTDWDataUtils.ParseRESTURL (Url, vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
+          If DWParams <> Nil Then
+           Begin
+            If DWParams.ItemsString['dwwelcomemessage']      <> Nil  Then
+             vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+            If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
+             vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+            If (DWParams.ItemsString['datacompression']      <> Nil) Then
+             compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+            If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
+             encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+            If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
+             Begin
+              If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
+               vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+             End;
+            If (DWParams.ItemsString['dwusecript']           <> Nil) Then
+             vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
+            If (DWParams.ItemsString['dwassyncexec']         <> Nil) And (Not (dwassyncexec)) Then
+             dwassyncexec          := StringToBoolean(DWParams.ItemsString['dwassyncexec'].AsString);
+            If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil) Then
+             vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
+           End;
+         End;
+        If (vUrlToExec = '') And (aurlContext <> '') Then
+         vUrlToExec := aurlContext;
+       End;
+      If (RequestType In [rtPut, rtPatch, rtDelete]) Then //New Code to Put
+       Begin
+        If QueryParams <> '' Then
+         Begin
+          TRESTDWDataUtils.ParseFormParamsToDWParam(QueryParams, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+          If (DWParams.ItemsString['dwwelcomemessage']     <> Nil) Then
+           vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+          If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
+           vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+          If (DWParams.ItemsString['datacompression']      <> Nil) Then
+           compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
+          If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
+           encodestrings         := StringToBoolean(DWParams.ItemsString['dwencodestrings'].AsString);
+          If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
+           Begin
+            If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
+             vdwservereventname := DWParams.ItemsString['dwservereventname'].AsString;
+           End;
+          If (DWParams.ItemsString['dwusecript']           <> Nil) Then
+           vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
+          If (DWParams.ItemsString['dwassyncexec']         <> Nil) And (Not (dwassyncexec)) Then
+           dwassyncexec          := StringToBoolean(DWParams.ItemsString['dwassyncexec'].AsString);
+          If (DWParams.ItemsString['BinaryCompatibleMode'] <> Nil) Then
+           vBinaryCompatibleMode := DWParams.ItemsString['BinaryCompatibleMode'].Value;
+         End;
+       End;
+      ParseParams(DWParams,            Params,             QueryParams,
+                  ContentStringStream, vBinaryEvent,       vBinaryCompatibleMode,
+                  ContentType,         Url,                vmark,
+                  RequestType,         vWelcomeMessage,    vAccessTag,
+                  vdwCriptKey,         compresseddata,     encodestrings,
+                  dwassyncexec,        vdwservereventname, baseEventUnit,
+                  vUrlToExec,          aurlContext,        vRequestHeader,
+                  vdwConnectionDefs);
+     End;
+     WelcomeAccept         := True;
+     tmp                   := '';
+     vAuthenticationString := '';
+     vToken                := '';
+     vGettoken             := False;
+     vAcceptAuth           := False;
+     If (vDataRouteList.Count > 0) Then
+      Begin
+       If Not vDataRouteList.RouteExists(vUrlToExec) Then
+        Begin
+         vErrorCode := 400;
+         JSONStr    := GetPairJSONInt(-5, cInvalidRequest);
+        End
+       Else
+        Begin
+         If (vUrlToExec <> '') Then
+          Begin
+           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
+            Begin
+             vErrorCode := 400;
+             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
+            End;
+          End
+         Else
+          Begin
+           If Not vDataRouteList.GetServerMethodClass(vUrlToExec, vOldRequest, vServerMethod) Then
+            Begin
+             vErrorCode := 400;
+             JSONStr    := GetPairJSONInt(-5, cInvalidDataContext);
+            End;
+          End;
+        End;
+      End
+     Else
+      vServerMethod := aServerMethod;
+     If Assigned(vServerMethod) Then
+      Begin
+//       If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
+//        vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//       If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
+//        vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+       vTempServerMethods  := vServerMethod.Create(Nil);
+       If Not vCORS Then
+        FreeAndNil(CORSCustomHeaders);
+       {$IFNDEF RESTDWLAZARUS}
+        {$IFNDEF FPC}
+         If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
+            (vTempServerMethods            Is TServerMethodDatamodule)   Then
+          Begin
+           If TServerMethodDatamodule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
+            Begin
+             If ((vCORS) And (RequestType = rtOption)) Then
+              vErrorCode := 200;
+            End;
+          End
+         Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
+                 (vTempServerMethods            Is TServerBaseMethodClass)    Then
+          Begin
+           If TServerBaseMethodClass(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
+            Begin
+             If ((vCORS) And (RequestType = rtOption)) Then
+              vErrorCode := 200;
+            End;
+          End;
+         {$ELSE}
+          If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+             (vTempServerMethods            Is TServerMethodDatamodule)   Then
+           Begin
+            If TServerMethodDatamodule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
+             Begin
+              If ((vCORS) And (RequestType = rtOption)) Then
+               vErrorCode := 200;
+             End;
+           End
+          Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                  (vTempServerMethods            Is TServerBaseMethodClass)    Then
+           Begin
+            If TServerBaseMethodClass(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
+             Begin
+              If ((vCORS) And (RequestType = rtOption)) Then
+               vErrorCode := 200;
+            End;
+           End;
+         {$ENDIF}
+       {$ELSE}
+        If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+           (vTempServerMethods            Is TServerMethodDatamodule)   Then
+         Begin
+          If TServerMethodDatamodule(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
+           Begin
+            If ((vCORS) And (RequestType = rtOption)) Then
+             vErrorCode := 200;
+           End;
+         End
+        Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                (vTempServerMethods            Is TServerBaseMethodClass)    Then
+         Begin
+          If TServerBaseMethodClass(vTempServerMethods).GetAction(vOldRequest, DWParams, CORSCustomHeaders) Then
+           Begin
+            If ((vCORS) And (RequestType = rtOption)) Then
+             vErrorCode := 200;
+           End;
+         End;
+       {$ENDIF}
+       vUrlToExec := vOldRequest;
+       If (Assigned(vTempServerMethods)) Then
+        Begin
+         {$IFNDEF RESTDWLAZARUS}
+          {$IFNDEF FPC}
+           If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
+              (vTempServerMethods            Is TServerMethodDatamodule)   Then
+            Begin
+             TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+             If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
+              Begin
+               If Not Assigned(vCriticalSection) Then
+                vCriticalSection := TCriticalSection.Create;
+               vCriticalSection.Acquire;
+              End;
+             TServerMethodDatamodule(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
+            End
+           Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
+                   (vTempServerMethods            Is TServerBaseMethodClass)    Then
+            Begin
+             TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+             If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
+              Begin
+               If Not Assigned(vCriticalSection) Then
+                vCriticalSection := TCriticalSection.Create;
+               vCriticalSection.Acquire;
+              End;
+             TServerBaseMethodClass(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
+            End;
+           {$ELSE}
+            If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+               (vTempServerMethods            Is TServerMethodDatamodule)   Then
+             Begin
+              TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+              If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
+               Begin
+                InitCriticalSection(vCriticalSection);
+                EnterCriticalSection(vCriticalSection);
+               End;
+              TServerMethodDatamodule(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
+             End
+            Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                    (vTempServerMethods            Is TServerBaseMethodClass)    Then
+             Begin
+              TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+              If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
+               Begin
+                InitCriticalSection(vCriticalSection);
+                EnterCriticalSection(vCriticalSection);
+               End;
+              TServerBaseMethodClass(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
+             End;
+           {$ENDIF}
+         {$ELSE}
+          If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+             (vTempServerMethods            Is TServerMethodDatamodule)   Then
+           Begin
+            TServerMethodDatamodule(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+            If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
+             Begin
+              InitCriticalSection(vCriticalSection);
+              EnterCriticalSection(vCriticalSection);
+             End;
+            TServerMethodDatamodule(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
+           End
+          Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                  (vTempServerMethods            Is TServerBaseMethodClass)    Then
+           Begin
+            TServerBaseMethodClass(vTempServerMethods).SetClientInfo(ClientIP, UserAgent, vUrlToExec, ClientPort);
+            If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
+             Begin
+              InitCriticalSection(vCriticalSection);
+              EnterCriticalSection(vCriticalSection);
+             End;
+            TServerBaseMethodClass(vTempServerMethods).SetClientWelcomeMessage(vWelcomeMessage);
+           End;
+         {$ENDIF}
+         If vAuthenticator <> Nil Then
+          Begin
+           If vToken = '' Then
+            vToken := Token;
+           vAcceptAuth           := False;
+           vErrorCode            := 401;
+           vErrorMessage         := cInvalidAuth;
+           //Roniery ajuste para encontrar o evento na lista de eventos,
+           //para assim determinar se passa ou não no validador de permissão
+           If Not (vUrlToExec='') Then
+            Begin
+             If vUrlToExec[Length(vUrlToExec)] = '/' Then
+              Delete(vUrlToExec, Length(vUrlToExec), 1);
+            End;
+           // verifica se precisa autenticação
+           vNeedAuthorization := False;
+           {$IFNDEF RESTDWLAZARUS}
+            {$IFNDEF FPC}
+             If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
+                (vTempServerMethods            Is TServerMethodDatamodule)   Then
+              Begin
+               vTempEvent   := ReturnEventValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
+               If vTempEvent = Nil Then
+                Begin
+                 vTempContext := ReturnContextValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
+                 If vTempContext <> Nil Then
+                  vNeedAuthorization := vTempContext.Routes.RouteNeedAuthorization(RequestType)
+                 Else
+                  vNeedAuthorization := True;
+                End
+               Else
+                vNeedAuthorization := vTempEvent.Routes.RouteNeedAuthorization(RequestType);
+              End
+             Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
+                     (vTempServerMethods            Is TServerBaseMethodClass)    Then
+              Begin
+               vTempEvent   := ReturnEventValidation(TServerBaseMethodClass(vTempServerMethods), vUrlToExec);
+               If vTempEvent = Nil Then
+                Begin
+                 vTempContext := ReturnContextValidation(TServerBaseMethodClass(vTempServerMethods), vUrlToExec);
+                 If vTempContext <> Nil Then
+                  vNeedAuthorization := vTempContext.Routes.RouteNeedAuthorization(RequestType)
+                 Else
+                  vNeedAuthorization := True;
+                End
+               Else
+                vNeedAuthorization := vTempEvent.Routes.RouteNeedAuthorization(RequestType);
+              End;
+             {$ELSE}
+              If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+                 (vTempServerMethods            Is TServerMethodDatamodule)   Then
+               Begin
+                vTempEvent   := ReturnEventValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
+                If vTempEvent = Nil Then
+                 Begin
+                  vTempContext := ReturnContextValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
+                  If vTempContext <> Nil Then
+                   vNeedAuthorization := vTempContext.Routes.RouteNeedAuthorization(RequestType)
+                  Else
+                   vNeedAuthorization := True;
+                 End
+                Else
+                 vNeedAuthorization := vTempEvent.Routes.RouteNeedAuthorization(RequestType);
+               End
+              Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                      (vTempServerMethods            Is TServerBaseMethodClass)    Then
+               Begin
+                vTempEvent   := ReturnEventValidation(TServerBaseMethodClass(vTempServerMethods), vUrlToExec);
+                If vTempEvent = Nil Then
+                 Begin
+                  vTempContext := ReturnContextValidation(TServerBaseMethodClass(vTempServerMethods), vUrlToExec);
+                  If vTempContext <> Nil Then
+                   vNeedAuthorization := vTempContext.Routes.RouteNeedAuthorization(RequestType)
+                  Else
+                   vNeedAuthorization := True;
+                 End
+                Else
+                 vNeedAuthorization := vTempEvent.Routes.RouteNeedAuthorization(RequestType);
+               End;
+             {$ENDIF}
+           {$ELSE}
+            If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+               (vTempServerMethods            Is TServerMethodDatamodule)   Then
+             Begin
+              vTempEvent   := ReturnEventValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
+              If vTempEvent = Nil Then
+               Begin
+                vTempContext := ReturnContextValidation(TServerMethodDatamodule(vTempServerMethods), vUrlToExec);
+                If vTempContext <> Nil Then
+                 vNeedAuthorization := vTempContext.Routes.RouteNeedAuthorization(RequestType)
+                Else
+                 vNeedAuthorization := True;
+               End
+              Else
+               vNeedAuthorization := vTempEvent.Routes.RouteNeedAuthorization(RequestType);
+             End
+            Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                    (vTempServerMethods            Is TServerBaseMethodClass)    Then
+             Begin
+              vTempEvent   := ReturnEventValidation(TServerBaseMethodClass(vTempServerMethods), vUrlToExec);
+              If vTempEvent = Nil Then
+               Begin
+                vTempContext := ReturnContextValidation(TServerBaseMethodClass(vTempServerMethods), vUrlToExec);
+                If vTempContext <> Nil Then
+                 vNeedAuthorization := vTempContext.Routes.RouteNeedAuthorization(RequestType)
+                Else
+                 vNeedAuthorization := True;
+               End
+              Else
+               vNeedAuthorization := vTempEvent.Routes.RouteNeedAuthorization(RequestType);
+             End;
+           {$ENDIF}
+           If vNeedAuthorization Then
+            Begin
+             vAuthenticator.AuthValidate(vTempServerMethods,
+                                         vUrlToExec,
+                                         vWelcomeMessage,
+                                         vAccessTag,
+                                         AuthUsername,
+                                         AuthPassword,
+                                         RawHeaders,
+                                         RequestType,
+                                         DWParams,
+                                         vGettoken,
+                                         vTokenValidate,
+                                         vToken,
+                                         vErrorCode, vErrorMessage, vAcceptAuth);
+             If Not vAcceptAuth and not ((vCORS) And (RequestType = rtOption)) Then  //Roniery
+              Begin
+               If vAuthenticator is TRESTDWAuthBasic Then
+                AuthRealm  := cAuthRealm;
+               StatusCode   := vErrorCode;
+               ErrorMessage := vErrorMessage;
+               WriteError;
+               DestroyComponents;
+               Exit;
+              End;
+            End;
+           vErrorCode            := 200;
+           vErrorMessage         := '';
+           If vGettoken and CORS Then
+            Begin
+             PCustomHeaders := @ResponseHeaders;
+             BuildCORS(TRESTDWAuthToken(vAuthenticator).GetTokenRoutes, TStrings(PCustomHeaders^));
+            End;
+          End
+         Else
+          Begin
+           Try
+            {$IFNDEF RESTDWLAZARUS}
+             {$IFNDEF FPC}
+              If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
+                 (vTempServerMethods            Is TServerMethodDatamodule)   Then
+               Begin
+                If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
+                 TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+               End
+              Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
+                      (vTempServerMethods            Is TServerBaseMethodClass)    Then
+               Begin
+                If Assigned(TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage) then
+                 TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+               End;
+              {$ELSE}
+               If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+                  (vTempServerMethods            Is TServerMethodDatamodule)   Then
+                Begin
+                 If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
+                  TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+                End
+               Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                       (vTempServerMethods            Is TServerBaseMethodClass)    Then
+                Begin
+                 If Assigned(TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage) then
+                  TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+                End;
+              {$ENDIF}
+            {$ELSE}
+             If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+                (vTempServerMethods            Is TServerMethodDatamodule)   Then
+              Begin
+               If Assigned(TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage) then
+                TServerMethodDatamodule(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+              End
+             Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                     (vTempServerMethods            Is TServerBaseMethodClass)    Then
+              Begin
+               If Assigned(TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage) then
+                TServerBaseMethodClass(vTempServerMethods).OnWelcomeMessage(vWelcomeMessage, vAccessTag, vdwConnectionDefs, WelcomeAccept, vContentType, vErrorMessage);
+              End;
+            {$ENDIF}
+           Except
+            On E : Exception do
+             Begin
+              If Assigned(ResultStream) Then
+               FreeAndNil(ResultStream);
+              StatusCode   := 500;
+              ResultStream := TStringStream.Create('OnWelcomeMessage raise error: ' + E.Message);
+              Result       := False;
+              Exit;
+             End;
+           End;
+          End;
+        End;
+      End
+     Else
+      Begin
+       If vErrorCode <> 400 Then
+        Begin
+         vErrorCode := 401;
+         JSONStr    := GetPairJSONInt(-5, cServerMethodClassNotAssigned);
+        End;
+      End;
+     Try
+      If Assigned(vLastRequest) Then
+       Begin
+        If Assigned(vLastRequest) Then
+         vLastRequest(UserAgent + sLineBreak + RawHTTPCommand);
+       End;
+      If (vUrlToExec = '') And (Cmd <> '/') Then
+       vUrlToExec := vOldMethod;
+      vSpecialServer := False;
+      If vTempServerMethods <> Nil Then
+       Begin
+        ContentType   := cDefaultContentType; //'text';//'application/octet-stream';
+        If (vUrlToExec = '')  Or
+           (vUrlToExec = '/') Then
+         Begin
+          If vDefaultPage.Count > 0 Then
+           vReplyString  := vDefaultPage.Text
+          Else
+           vReplyString  := Format(cServerStatusHTML, [FSocketKind]);
+          vErrorCode   := 200;
+          ContentType  := 'text/html';
+         End
+        Else
+         Begin
+          If vEncoding = esUtf8 Then
+           sCharSet       := 'utf-8'
+          Else
+           sCharSet       := 'ansi';
+//          If DWParams <> Nil Then
+//           Begin
+//            If (DWParams.ItemsString['dwassyncexec'] <> Nil) And (Not (dwassyncexec)) Then
+//             dwassyncexec := DWParams.ItemsString['dwassyncexec'].AsBoolean;
+//            If DWParams.ItemsString['dwusecript'] <> Nil Then
+//             vdwCriptKey  := DWParams.ItemsString['dwusecript'].AsBoolean;
+//           End;
+          If dwassyncexec Then
+           Begin
+            StatusCode    := 200;
+            vReplyString  := AssyncCommandMSG;
+            If compresseddata Then
+             mb := TStringStream(ZCompressStreamNew(vReplyString))
+            Else
+             mb := TStringStream.Create(vReplyString{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
+            mb.Position   := 0;
+            If Not (Assigned(ResultStream)) Then
+             ResultStream := TStringStream.Create('');
+            WriteStream(mb, ResultStream);
+            FreeAndNil(mb);
+           End;
+           //Remoção de Códigos duplicados XyberX
+//          If DWParams.itemsstring['binaryRequest']        <> Nil Then
+//           vBinaryEvent := DWParams.itemsstring['binaryRequest'].Value;
+//          If DWParams.itemsstring['BinaryCompatibleMode'] <> Nil Then
+//           vBinaryCompatibleMode := DWParams.itemsstring['BinaryCompatibleMode'].Value;
+//          If DWParams.itemsstring['MetadataRequest']      <> Nil Then
+//           vMetadata := DWParams.itemsstring['MetadataRequest'].value;
           If (Assigned(DWParams)) And (Assigned(vCripto))        Then
            DWParams.SetCriptOptions(vdwCriptKey, vCripto.Key);
           If Assigned(vTempServerMethods) Then
@@ -4152,8 +4234,6 @@ Begin
                   If Not vFileExists Then
                    Begin
                     tmp := '';
-//                      If Referer <> '' Then
-//                       tmp := GetLastMethod(Referer);
                     If Url <> '' Then
                      sFile := GetFileOSDir(ExcludeTag(tmp + Url))
                     Else
@@ -4189,315 +4269,296 @@ Begin
            End;
          End;
        End;
-      Try
-       If Assigned(vRequestHeader) Then
-        Begin
-         vRequestHeader.Clear;
-         FreeAndNil(vRequestHeader);
-        End;
-       If Assigned(vServerMethod) Then
-        If Assigned(vTempServerMethods) Then
-         Begin
-          {$IFNDEF RESTDWLAZARUS}
-           {$IFNDEF FPC}
-            If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
-               (vTempServerMethods            Is TServerMethodDatamodule)   Then
+      If Assigned(vRequestHeader) Then
+       Begin
+        vRequestHeader.Clear;
+        FreeAndNil(vRequestHeader);
+       End;
+      If Assigned(vServerMethod) Then
+      If Assigned(vTempServerMethods) Then
+       Begin
+        {$IFNDEF RESTDWLAZARUS}
+         {$IFNDEF FPC}
+          If (vTempServerMethods.InheritsFrom(TServerMethodDatamodule))  Or
+             (vTempServerMethods            Is TServerMethodDatamodule)   Then
+           Begin
+            If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
              Begin
-              If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
+              If Assigned(vCriticalSection) Then
                Begin
-                If Assigned(vCriticalSection) Then
-                 Begin
-                  vCriticalSection.Release;
-                  FreeAndNil(vCriticalSection);
-                 End;
-               End;
-             End
-            Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
-                    (vTempServerMethods            Is TServerBaseMethodClass)    Then
-             Begin
-              If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
-               Begin
-                If Assigned(vCriticalSection) Then
-                 Begin
-                  vCriticalSection.Release;
-                  FreeAndNil(vCriticalSection);
-                 End;
+                vCriticalSection.Release;
+                FreeAndNil(vCriticalSection);
                End;
              End;
-            {$ELSE}
-             If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-                (vTempServerMethods            Is TServerMethodDatamodule)   Then
-              Begin
-               If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
-                Begin
-                 LeaveCriticalSection(vCriticalSection);
-                 DoneCriticalSection(vCriticalSection);
-                End;
-              End
-             Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                     (vTempServerMethods            Is TServerBaseMethodClass)    Then
-              Begin
-               If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
-                Begin
-                 LeaveCriticalSection(vCriticalSection);
-                 DoneCriticalSection(vCriticalSection);
-                End;
-              End;
-            {$ENDIF}
-          {$ELSE}
-           If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
-              (vTempServerMethods            Is TServerMethodDatamodule)   Then
-            Begin
-             If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
-              Begin
-               LeaveCriticalSection(vCriticalSection);
-               DoneCriticalSection(vCriticalSection);
-              End;
-            End
-           Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
-                   (vTempServerMethods            Is TServerBaseMethodClass)    Then
-            Begin
+           End
+          Else If (vTempServerMethods.InheritsFrom(TServerBaseMethodClass))   Or
+                  (vTempServerMethods            Is TServerBaseMethodClass)    Then
+           Begin
              If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
               Begin
-               LeaveCriticalSection(vCriticalSection);
-               DoneCriticalSection(vCriticalSection);
-              End;
-            End;
-          {$ENDIF}
-          Try
-           vTempServerMethods.free;
-           vTempServerMethods := Nil;
-          Except
-          End;
-         End;
-       If Not dwassyncexec Then
-        Begin
-         If (Not (vTagReply)) Then
+               If Assigned(vCriticalSection) Then
+               Begin
+                vCriticalSection.Release;
+                FreeAndNil(vCriticalSection);
+               End;
+             End;
+           End;
+          {$ELSE}
+          If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+             (vTempServerMethods            Is TServerMethodDatamodule)   Then
+           Begin
+            If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
+             Begin
+              LeaveCriticalSection(vCriticalSection);
+              DoneCriticalSection(vCriticalSection);
+             End;
+           End
+          Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                  (vTempServerMethods            Is TServerBaseMethodClass)    Then
+           Begin
+            If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
+             Begin
+              LeaveCriticalSection(vCriticalSection);
+              DoneCriticalSection(vCriticalSection);
+             End;
+           End;
+         {$ENDIF}
+        {$ELSE}
+         If (vTempServerMethods.ClassType.InheritsFrom(TServerMethodDatamodule))  Or
+            (vTempServerMethods            Is TServerMethodDatamodule)   Then
           Begin
-           If vEncoding = esUtf8 Then
-            sCharSet := 'utf-8'
-           Else
-            sCharSet := 'ansi';
-           If vContentType <> '' Then
-            ContentType := vContentType;
-           If Not vServerContextCall Then
+           If TServerMethodDatamodule(vTempServerMethods).QueuedRequest Then
             Begin
-             If (vUrlToExec <> '') Then
-              Begin
-               If DataMode in [dmDataware] Then
-                Begin
-                 If Trim(JSONStr) <> '' Then
-                  Begin
-                   If Not(((Pos('{', JSONStr) > 0)   And
-                           (Pos('}', JSONStr) > 0))  Or
-                          ((Pos('[', JSONStr) > 0)   And
-                           (Pos(']', JSONStr) > 0))) Then
-                    Begin
-                     If Not (WelcomeAccept) And (vErrorMessage <> '') Then
-                       JSONStr := escape_chars(vErrorMessage)
-                     Else If Not((JSONStr[InitStrPos] = '"')  And
-                            (JSONStr[Length(JSONStr)] = '"')) Then
-                      JSONStr := '"' + JSONStr + '"';
-                    End;
-                  End;
-//                 vErrorCode   := 200;
-                 If (RequestType <> rtOption) Then
-                  Begin
-                   If vBinaryEvent Then
-                    vReplyString := JSONStr
-                   Else
-                    Begin
-                     If Not(((vUrlToExec = '') Or (vUrlToExec = '/')) And (RequestType = rtGet)) Then
-                      Begin
-                       If Not (WelcomeAccept) And (vErrorMessage <> '') Then
-                        Begin
-                         If vEncode_Errors then
-                          vReplyString := escape_chars(vErrorMessage)
-                         Else
-                          vReplyString := vErrorMessage;
-                        End
-                       Else
-                        vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
-                      End;
-                    End;
-                  End;
-                End
-               Else If DataMode = dmRAW Then
-                Begin
-                 If (Trim(JSONStr) = '') And (WelcomeAccept) Then
-                  vReplyString := '{}'
-                 Else If Not (WelcomeAccept) And (vErrorMessage <> '') Then
-                  vReplyString := escape_chars(vErrorMessage)
-                 Else
-                  vReplyString := JSONStr;
-                End;
-              End;
-             If Assigned(DWParams) Then
-              Begin
-               If DWParams.RequestHeaders.Output.Count > 0 Then
-                Begin
-                 For I := 0 To DWParams.RequestHeaders.Output.Count -1 Do
-                  RequestHeaders.Add(DWParams.RequestHeaders.Output[I]);
-                End;
-              End;
-             StatusCode                 := vErrorCode;
-             If Assigned(DWParams) And
-               (Pos(DWParams.Url_Redirect, Cmd) = 0) And
-               (DWParams.Url_Redirect <> '') Then
-              Begin
-               vUrlRedirect := DWParams.Url_Redirect;
-               If Assigned(Redirect) Then
-                Redirect(vUrlRedirect, AContext);
-              End;
-             If compresseddata Then
-              Begin
-               If vBinaryEvent Then
-                Begin
-                 ms := TMemoryStream.Create;
-                 If vGettoken Then
-                  Begin
-                   DWParams.Clear;
-                   DWParams.CreateParam('token', vReplyString);
-                  End;
-                 Try
-                  If DWParams.ItemsString['MessageError'] = Nil Then
+             LeaveCriticalSection(vCriticalSection);
+             DoneCriticalSection(vCriticalSection);
+            End;
+          End
+         Else If (vTempServerMethods.ClassType.InheritsFrom(TServerBaseMethodClass))   Or
+                 (vTempServerMethods            Is TServerBaseMethodClass)    Then
+          Begin
+           If TServerBaseMethodClass(vTempServerMethods).QueuedRequest Then
+            Begin
+             LeaveCriticalSection(vCriticalSection);
+             DoneCriticalSection(vCriticalSection);
+            End;
+          End;
+        {$ENDIF}
+        Try
+         vTempServerMethods.free;
+         vTempServerMethods := Nil;
+        Except
+        End;
+       End;
+      If Not dwassyncexec Then
+       Begin
+        If (Not (vTagReply)) Then
+         Begin
+          If vEncoding = esUtf8 Then
+           sCharSet := 'utf-8'
+          Else
+           sCharSet := 'ansi';
+          If vContentType <> '' Then
+           ContentType := vContentType;
+          If Not vServerContextCall Then
+           Begin
+            If (vUrlToExec <> '') Then
+             Begin
+              If DataMode in [dmDataware] Then
+               Begin
+                If Trim(JSONStr) <> '' Then
+                 Begin
+                  If Not(((Pos('{', JSONStr) > 0)   And
+                          (Pos('}', JSONStr) > 0))  Or
+                         ((Pos('[', JSONStr) > 0)   And
+                          (Pos(']', JSONStr) > 0))) Then
+                   Begin
+                    If Not (WelcomeAccept)                        And
+                           (vErrorMessage <> '')                  Then
+                     JSONStr := escape_chars(vErrorMessage)
+                    Else If Not((JSONStr[InitStrPos] = '"')       And
+                                (JSONStr[Length(JSONStr)] = '"')) Then
+                     JSONStr := '"' + JSONStr + '"';
+                   End;
+                 End;
+                If (RequestType <> rtOption) Then
+                 Begin
+                  If vBinaryEvent Then
+                   vReplyString := JSONStr
+                  Else
+                   Begin
+                    If Not(((vUrlToExec = '') Or (vUrlToExec = '/')) And (RequestType = rtGet)) Then
+                     Begin
+                      If Not (WelcomeAccept) And (vErrorMessage <> '') Then
+                       Begin
+                        If vEncode_Errors then
+                         vReplyString := escape_chars(vErrorMessage)
+                        Else
+                         vReplyString := vErrorMessage;
+                       End
+                      Else
+                       vReplyString := Format(TValueDisp, [GetParamsReturn(DWParams), JSONStr]);
+                     End;
+                   End;
+                 End;
+               End
+              Else If DataMode = dmRAW Then
+               Begin
+                If (Trim(JSONStr) = '') And (WelcomeAccept) Then
+                 vReplyString := '{}'
+                Else If Not (WelcomeAccept) And (vErrorMessage <> '') Then
+                 vReplyString := escape_chars(vErrorMessage)
+                Else
+                 vReplyString := JSONStr;
+               End;
+             End;
+            If Assigned(DWParams) Then
+             Begin
+              If DWParams.RequestHeaders.Output.Count > 0 Then
+               Begin
+                For I := 0 To DWParams.RequestHeaders.Output.Count -1 Do
+                 RequestHeaders.Add(DWParams.RequestHeaders.Output[I]);
+               End;
+             End;
+            StatusCode                 := vErrorCode;
+            If Assigned(DWParams) And
+              (Pos(DWParams.Url_Redirect, Cmd) = 0) And
+              (DWParams.Url_Redirect <> '') Then
+             Begin
+              vUrlRedirect := DWParams.Url_Redirect;
+              If Assigned(Redirect) Then
+               Redirect(vUrlRedirect, AContext);
+             End;
+            If compresseddata Then
+             Begin
+              If vBinaryEvent Then
+               Begin
+                ms := TMemoryStream.Create;
+                If vGettoken Then
+                 Begin
+                  DWParams.Clear;
+                  DWParams.CreateParam('token', vReplyString);
+                 End;
+                Try
+                 If DWParams.ItemsString['MessageError'] = Nil Then
                   Begin
                    DWParams.CreateParam('MessageError');
                    DWParams.ItemsString['MessageError'].ObjectDirection := odOut;
                   End;
-                  If ((JSONStr <> TReplyOK) and (JSONStr <> Trim(''))) then
-                   Begin
-                    If DWParams.ItemsString['MessageError'].AsString = '' Then
-                     DWParams.ItemsString['MessageError'].AsString := JSONStr;
-                   End
-                  Else
-                   DWParams.ItemsString['MessageError'].AsString := '';
-                   DWParams.SaveToStream(TStream(ms), tdwpxt_OUT);
-                   ZCompressStreamD(ms, ResultStream);
-                 Finally
-                  FreeAndNil(ms);
+                 If ((JSONStr <> TReplyOK) and (JSONStr <> Trim(''))) then
+                  Begin
+                   If DWParams.ItemsString['MessageError'].AsString = '' Then
+                    DWParams.ItemsString['MessageError'].AsString := JSONStr;
+                  End
+                 Else
+                  DWParams.ItemsString['MessageError'].AsString := '';
+                 DWParams.SaveToStream(TStream(ms), tdwpxt_OUT);
+                 ZCompressStreamD(ms, ResultStream);
+                Finally
+                 FreeAndNil(ms);
+                End;
+               End
+              Else
+               Begin
+                If Assigned(ResultStream) Then
+                 FreeAndNil(ResultStream);
+                ResultStream            := TStringStream(ZCompressStreamNew(vReplyString));
+               End;
+              If not (vErrorCode in [200,201]) Then
+               ResponseString           := escape_chars(vReplyString)
+             End
+            Else
+             Begin
+              {$IFNDEF FPC}
+               {$IFDEF DELPHIXEUP}
+                If vBinaryEvent Then
+                 Begin
+                  ResultStream := TMemoryStream.Create;
+                  DWParams.SaveToStream(ResultStream, tdwpxt_OUT);
+//                  WriteStream(mb, ResultStream);
+                 End
+                Else
+                 Begin
+//                  If Not (vErrorCode in [200, 201]) Then
+                  ResultStream := TStringStream.Create(Utf8Encode(vReplyString));
+//                  Else
+//                   ResultStream := TStringStream.Create(vReplyString);
                  End;
+                ResultStream.Position := 0;
+               {$ELSE}
+                If vBinaryEvent Then
+                 Begin
+                  ResultStream := TMemoryStream.Create;
+                  DWParams.SaveToStream(ResultStream, tdwpxt_OUT);
+                 End
+                Else
+                 ResponseString := vReplyString;
+               {$ENDIF}
+              {$ELSE}
+               If vBinaryEvent Then
+                Begin
+                 ResultStream := TMemoryStream.Create;
+                 DWParams.SaveToStream(ResultStream, tdwpxt_OUT);
                 End
                Else
                 Begin
-                 If Assigned(ResultStream) Then
-                  FreeAndNil(ResultStream);
-                 ResultStream            := TStringStream(ZCompressStreamNew(vReplyString));
-                End;
-               If not (vErrorCode in [200,201]) Then
-                ResponseString           := escape_chars(vReplyString)
-              End
-             Else
-              Begin
-               {$IFNDEF FPC}
-                {$IFDEF DELPHIXEUP}
-                 If vBinaryEvent Then
-                  Begin
-                   mb := TStringStream.Create('');
-                   Try
-                    DWParams.SaveToStream(mb, tdwpxt_OUT);
-                   Finally
-                   End;
-                  End
+                 If vEncoding = esUtf8 Then
+                  mb := TStringStream.Create(Utf8Encode(vReplyString))
                  Else
-                  mb := TStringStream.Create(vReplyString{$IFDEF DELPHIXEUP}, TEncoding.UTF8{$ENDIF});
-                 mb.Position                          := 0;
+                  mb := TStringStream.Create(vReplyString);
+                 mb.Position                           := 0;
                  If Not (Assigned(ResultStream)) Then
                   ResultStream := TStringStream.Create('');
                  WriteStream(mb, ResultStream);
                  FreeAndNil(mb);
-                {$ELSE}
-                 If vBinaryEvent Then
-                  Begin
-                   mb := TStringStream.Create('');
-                   Try
-                    DWParams.SaveToStream(mb, tdwpxt_OUT);
-                   Finally
-                   End;
-                   If Not (Assigned(ResultStream)) Then
-                    ResultStream := TStringStream.Create('');
-                   WriteStream(mb, ResultStream);
-                   FreeAndNil(mb);
-                  End
+                End;
+              {$ENDIF}
+             End;
+           End
+          Else
+           Begin
+            LocalDoc := '';
+            If TEncodeSelect(vEncoding) = esUtf8 Then
+             sCharset := 'utf-8'
+            Else If TEncodeSelect(vEncoding) in [esANSI, esASCII] Then
+             sCharset := 'ansi';
+            If Not vSpecialServer Then
+             Begin
+              StatusCode             := vErrorCode;
+              If ServerContextStream <> Nil Then
+               Begin
+                If Not (Assigned(ResultStream)) Then
+                 ResultStream := TStringStream.Create('');
+                WriteStream(ServerContextStream, ResultStream);
+                FreeAndNil(ServerContextStream);
+               End
+              Else
+               Begin
+                {$IFDEF FPC}
+                 If vEncoding = esUtf8 Then
+                  mb                                  := TStringStream.Create(Utf8Encode(JSONStr))
                  Else
-                  ResponseString := vReplyString;
-                {$ENDIF}
-               {$ELSE}
-                If vBinaryEvent Then
-                 Begin
-                  mb := TStringStream.Create('');
-                  Try
-                   DWParams.SaveToStream(mb, tdwpxt_OUT);
-                  Finally
-                  End;
-                  If Not (Assigned(ResultStream)) Then
-                   ResultStream := TStringStream.Create('');
-                  WriteStream(mb, ResultStream);
-                  FreeAndNil(mb);
-                 End
-                Else
-                 Begin
-                  If vEncoding = esUtf8 Then
-                   mb := TStringStream.Create(Utf8Encode(vReplyString))
-                  Else
-                   mb := TStringStream.Create(vReplyString);
-                  mb.Position                           := 0;
-                  If Not (Assigned(ResultStream)) Then
-                   ResultStream := TStringStream.Create('');
-                  WriteStream(mb, ResultStream);
-                  FreeAndNil(mb);
-                 End;
-               {$ENDIF}
-              End;
-            End
-           Else
-            Begin
-             LocalDoc := '';
-             If TEncodeSelect(vEncoding) = esUtf8 Then
-              sCharset := 'utf-8'
-             Else If TEncodeSelect(vEncoding) in [esANSI, esASCII] Then
-              sCharset := 'ansi';
-             If Not vSpecialServer Then
-              Begin
-               StatusCode             := vErrorCode;
-               If ServerContextStream <> Nil Then
-                Begin
+                  mb                                  := TStringStream.Create(JSONStr);
+                 mb.Position                           := 0;
                  If Not (Assigned(ResultStream)) Then
-                  ResultStream := TStringStream.Create('');
-                 WriteStream(ServerContextStream, ResultStream);
-                 FreeAndNil(ServerContextStream);
-                End
-               Else
-                Begin
-                 {$IFDEF FPC}
-                  If vEncoding = esUtf8 Then
-                   mb                                  := TStringStream.Create(Utf8Encode(JSONStr))
-                  Else
-                   mb                                  := TStringStream.Create(JSONStr);
-                  mb.Position                           := 0;
+                  ResultStream := TStringStream.Create('');                  WriteStream(mb, ResultStream);
+                 FreeAndNil(mb);
+                {$ELSE}
+                 {$IF CompilerVersion > 21}
+                  mb                                   := TStringStream.Create(JSONStr{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
+                  mb.Position                          := 0;
                   If Not (Assigned(ResultStream)) Then
-                   ResultStream := TStringStream.Create('');                  WriteStream(mb, ResultStream);
+                   ResultStream := TStringStream.Create('');
+                  WriteStream(mb, ResultStream);
                   FreeAndNil(mb);
                  {$ELSE}
-                  {$IF CompilerVersion > 21}
-                   mb                                   := TStringStream.Create(JSONStr{$IFNDEF FPC}{$IF CompilerVersion > 21}, TEncoding.UTF8{$IFEND}{$ENDIF});
-                   mb.Position                          := 0;
-                   If Not (Assigned(ResultStream)) Then
-                    ResultStream := TStringStream.Create('');
-                   WriteStream(mb, ResultStream);
-                   FreeAndNil(mb);
-                  {$ELSE}
-                   ResponseString            := JSONStr;
+                  ResponseString            := JSONStr;
                   {$IFEND}
-                 {$ENDIF}
-                End;
-              End;
-            End;
-          End;
-        End;
-      Finally
-//        FreeAndNil(mb);
-      End;
+                {$ENDIF}
+               End;
+             End;
+           End;
+         End;
+       End;
       If Assigned(vLastResponse) Then
        Begin
         Try
@@ -4868,7 +4929,6 @@ Var
 Begin
  // lazarus iniciando com sujeira de memoria vStrings
  vStrings := nil;
-
  If ServerMethodsClass <> Nil Then
   Begin
    For I := 0 To ServerMethodsClass.ComponentCount -1 Do
@@ -5322,7 +5382,7 @@ Begin
        JSONParam.ObjectDirection := odOut;
        Params.Add(JSONParam);
       End;
-     Params.ItemsString['MessageError'].AsString :='';
+//     Params.ItemsString['MessageError'].AsString :='';
      If ReturnEvent(BaseObject, vUrlMethod, vBaseUrl, vResult, Params, DataMode, ErrorCode, ContentType, Accesstag, RequestType, RequestHeader) Then
       Begin
        JSONStr := vResult;
@@ -5965,6 +6025,19 @@ Begin
   End;
 End;
 
+Procedure TRESTDWBasicReceptor.SetClientHttpBase(Value : TComponentClass);
+Begin
+ {$IFNDEF FPC}
+  If (Value.InheritsFrom(TRESTDWClientHttpBase)) Or
+     (Value            = TRESTDWClientHttpBase)  Then
+   aServerMethod := Value;
+ {$ELSE}
+  If (Value.ClassType.InheritsFrom(TRESTDWClientHttpBase)) Or
+     (Value                      = TRESTDWClientHttpBase)  Then
+   aServerMethod := Value;
+ {$ENDIF}
+End;
+
 Procedure TRESTDWBasicReceptor.Notification(AComponent : TComponent;
                                             Operation  : TOperation);
 Begin
@@ -5997,7 +6070,7 @@ Procedure TRESTDWBasicReceptor.ParseParams(Var DWParams              : TRESTDWPa
                                            Var vRequestHeader        : TStringList;
                                            Var vdwConnectionDefs     : TConnectionDefs);
 Var
- I                  : Integer;
+ I, A               : Integer;
  mb                 : TStream;
  JSONParam          : TRESTDWJSONParam;
  msgEnd,
@@ -6249,9 +6322,9 @@ Begin
                 FreeAndNil(Decoder);
                 vObjectName  := '';
                 sContentType := '';
-                For I := 0 to vDecoderHeaderList.Count - 1 do
+                For A := 0 to vDecoderHeaderList.Count - 1 do
                  Begin
-                  tmp := vDecoderHeaderList.Strings[I];
+                  tmp := vDecoderHeaderList.Strings[A];
                   If Pos('; name="', lowercase(tmp)) > 0 then
                    Begin
                     vObjectName := Copy(lowercase(tmp),
@@ -7640,6 +7713,7 @@ Constructor TRESTDWBasicReceptor.Create(AOwner: TComponent);
 Begin
  Inherited;
 // vAuthMessages                          := TRESTDWAuthMessages.Create;
+ vClientHttpBase                        := Nil;
  vProxyOptions                          := TProxyConnectionInfo.Create;
  vDefaultPage                           := TStringList.Create;
 

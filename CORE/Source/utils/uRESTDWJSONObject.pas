@@ -1,4 +1,4 @@
-Unit uRESTDWJSONObject;
+﻿Unit uRESTDWJSONObject;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -575,6 +575,7 @@ Procedure SetValueA(Field : TField;
                     Value : String);
 Var
  vTempValue : String;
+ vNumericValue : Int64;
 Begin
  Case Field.DataType Of
   ftUnknown,
@@ -653,12 +654,14 @@ Begin
                        (Pos(':', vTempValue) > 0) Or
                        (Pos('/', vTempValue) > 0) Or
                        (Pos('\', vTempValue) > 0) Or
-                       (Pos('-', vTempValue) > 0) Then
+                       (Pos('-', vTempValue) > 1) Then
                      Field.AsDateTime := StrToDateTime(vTempValue)
                     Else
                      Begin
-                       If StrToInt64(vTempValue) > 0 Then
-                        Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
+                       if TryStrToInt64(vTempValue, vNumericValue) then
+                        Field.AsDateTime := UnixToDateTime(vNumericValue);
+//                       If StrToInt64(vTempValue) > 0 Then
+//                        Field.AsDateTime := UnixToDateTime(StrToInt64(vTempValue));
                      End;
                    End;
                  End;
@@ -1360,7 +1363,7 @@ Var
   For i := 0 To bValue.Fields.Count - 1 Do
    Begin
     Case DataModeD Of
-     dmDataware,
+     dmDataware : vTempField := '';
      dmRAW       : Begin
                     If HeaderLowercase Then
                      vTempField := Format('"%s": ', [Lowercase(bValue.Fields[i].FieldName)])
@@ -5637,3 +5640,4 @@ Begin
 End;
 
 End.
+
