@@ -47,7 +47,7 @@ Uses
 Type
  PIdSSLVersions = ^TIdSSLVersions;
 
- TRESTDWIdProxyRouter = Class(TRESTDWProxyBase)
+ TRESTDWIdProxyRequest = Class(TRESTDWProxyBase)
  Private
   vCipherList,
   vaSSLRootCertFile,
@@ -157,6 +157,105 @@ End;
   Property SSLVersions             : TIdSSLVersions      Read aSSLVersions             Write aSSLVersions;
   Property CipherList              : String              Read vCipherList              Write vCipherList;
 End;
+
+
+ TRESTDWIdClientHttpBase = Class(TRESTDWClientHttpBase)
+ Private
+  HttpRequest      : TIdHTTP;
+  vVerifyCert      : Boolean;
+  vAUrl,
+  vCertFile,
+  vKeyFile,
+  vRootCertFile,
+  vHostCert        : String;
+  vPortCert        : Integer;
+  vOnGetpassword   : TOnGetpassword;
+  vSSLVersions     : TIdSSLVersions;
+  ssl              : TIdSSLIOHandlerSocketOpenSSL;
+  vCertMode        : TIdSSLMode;
+  Procedure SetParams;
+  Procedure SetUseSSL         (Value              : Boolean);Override;
+  Procedure SetHeaders        (AHeaders           : TStringList);Overload;Override;
+  Procedure SetHeaders        (AHeaders           : TStringList;
+                               Var SendParams     : TIdMultipartFormDataStream);Overload;
+  Procedure SetRawHeaders     (AHeaders           : TStringList;
+                               Var SendParams     : TIdMultipartFormDataStream);
+  Procedure pOnWork           (ASender            : TObject;
+                               AWorkMode          : TWorkMode;
+                               AWorkCount         : Int64);
+  Procedure SetOnWork         (Value              : TOnWork);Override;
+  Procedure pOnWorkBegin      (ASender            : TObject;
+                               AWorkMode          : TWorkMode;
+                               AWorkCount         : Int64);
+  Procedure SetOnWorkBegin    (Value              : TOnWork);   Override;
+  Procedure pOnWorkEnd        (ASender            : TObject;
+                               AWorkMode          : TWorkMode);
+  Procedure SetOnWorkEnd      (Value              : TOnWorkEnd);Override;
+  Procedure pOnStatus         (ASender            : TObject;
+                               Const AStatus      : TIdStatus;
+                               Const AStatusText  : String);
+  Procedure SetOnStatus       (Value              : TOnStatus); Override;
+  Procedure DestroyClient;Override;
+  Procedure SetCertOptions;
+  Procedure Getpassword       (Var Password       : String);
+  Function  GetVerifyCert                         : Boolean;
+  Procedure SetVerifyCert     (aValue             : Boolean);
+  {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHI10_2UP)}
+   {$IFNDEF FPC}
+    Function IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
+                                                    AOk         : Boolean): Boolean;Overload;
+    Function IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
+                                                    AOk         : Boolean;
+                                                    ADepth      : Integer): Boolean;Overload;
+   {$ENDIF}
+  {$IFEND}
+  Function IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
+                                                  AOk         : Boolean;
+                                                  ADepth,
+                                                  AError      : Integer) : Boolean;Overload;
+  Procedure SetInternalEvents;
+ Public
+  Constructor Create(AOwner : TComponent);Override;
+  Destructor  Destroy;Override;
+  Function   Get       (AUrl                 : String          = '';
+                        Const CustomHeaders  : TStringList     = Nil;
+                        Const AResponse      : TStream         = Nil;
+                        Const AResponseError : TStream         = Nil) : Integer;Override;
+  Function   Post      (AUrl                 : String          = '';
+                        Const CustomHeaders  : TStringList     = Nil;
+                        Const CustomParams   : TStringList     = Nil;
+                        Const CustomBody     : TStream         = Nil;
+                        Const AResponse      : TStream         = Nil;
+                        Const AResponseError : TStream         = Nil) : Integer;Override;
+  Function   Put       (AUrl                 : String          = '';
+                        Const CustomHeaders  : TStringList     = Nil;
+                        Const CustomParams   : TStringList     = Nil;
+                        Const CustomBody     : TStream         = Nil;
+                        Const AResponse      : TStream         = Nil;
+                        Const AResponseError : TStream         = Nil) : Integer;Override;
+  Function   Patch     (AUrl                 : String          = '';
+                        Const CustomHeaders  : TStringList     = Nil;
+                        Const CustomParams   : TStringList     = Nil;
+                        Const CustomBody     : TStream         = Nil;
+                        Const AResponse      : TStream         = Nil;
+                        Const AResponseError : TStream         = Nil) : Integer;Override;
+  Function   Delete    (AUrl                 : String;
+                        Const CustomHeaders  : TStringList     = Nil;
+                        Const CustomParams   : TStringList     = Nil;
+                        Const AResponse      : TStream         = Nil;
+                        Const AResponseError : TStream         = Nil) : Integer;Override;
+ Published
+  Property VerifyCert               : Boolean                     Read GetVerifyCert             Write SetVerifyCert;
+  Property SSLVersions              : TIdSSLVersions              Read vSSLVersions              Write vSSLVersions;
+  Property CertMode                 : TIdSSLMode                  Read vCertMode                 Write vCertMode;
+  Property CertFile                 : String                      Read vCertFile                 Write vCertFile;
+  Property KeyFile                  : String                      Read vKeyFile                  Write vKeyFile;
+  Property RootCertFile             : String                      Read vRootCertFile             Write vRootCertFile;
+  Property HostCert                 : String                      Read vHostCert                 Write vHostCert;
+  Property PortCert                 : Integer                     Read vPortCert                 Write vPortCert;
+  Property OnGetpassword            : TOnGetpassword              Read vOnGetpassword            Write vOnGetpassword;
+End;
+
 
  TRESTDWIdClientREST = Class(TRESTDWClientRESTBase)
  Private
@@ -412,21 +511,21 @@ Uses uRESTDWJSONInterface;
 
 Destructor TRESTDWIdClientREST.Destroy;
 Begin
- if Assigned(HttpRequest) then
- begin
-  Try
-   If Assigned(HttpRequest) Then
-    Begin
-     If Assigned(HttpRequest.IOHandler) Then
-      HttpRequest.IOHandler.CloseGracefully;
-     HttpRequest.Disconnect(false);
-    End;
-  Except
+ If Assigned(HttpRequest) then
+  Begin
+   Try
+    If Assigned(HttpRequest) Then
+     Begin
+      If Assigned(HttpRequest.IOHandler) Then
+       HttpRequest.IOHandler.CloseGracefully;
+      HttpRequest.Disconnect(false);
+     End;
+   Except
+   End;
+   If Assigned(ssl) Then
+    FreeAndNil(ssl);
+   FreeAndNil(HttpRequest);
   End;
-  If Assigned(ssl) Then
-   FreeAndNil(ssl);
-  FreeAndNil(HttpRequest);
- end;
  Inherited;
 End;
 
@@ -2988,6 +3087,18 @@ Begin
    SetCertOptions;
    If Assigned(HttpRequest) Then
     HttpRequest.IOHandler := ssl;
+   If sslvSSLv2 in vSSLVersions Then
+    ssl.SSLOptions.Method := sslvSSLv2
+   Else If sslvSSLv23 in vSSLVersions Then
+    ssl.SSLOptions.Method := sslvSSLv23
+   Else If sslvSSLv3 in vSSLVersions Then
+    ssl.SSLOptions.Method := sslvSSLv3
+   Else If sslvTLSv1 in vSSLVersions Then
+    ssl.SSLOptions.Method := sslvTLSv1
+   Else If sslvTLSv1_1 in vSSLVersions Then
+    ssl.SSLOptions.Method := sslvTLSv1_1
+   Else If sslvTLSv1_2 in vSSLVersions Then
+    ssl.SSLOptions.Method := sslvTLSv1_2;
   End
  Else
   Begin
@@ -3064,14 +3175,14 @@ Begin
                     FreeAndNil(DWParams);
                      Case TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).TokenType Of
                       rdwOATBasic  : Begin
-                                      If TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).AutoBuildHex Then
-                                       HttpRequest.Request.CustomHeaders.Add(Format('Authorization: Basic %s', [EncodeStrings(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientID + ':' +
-                                                                                                                              TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientSecret
-                                                                                                                              {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]))
-                                      Else
-                                       HttpRequest.Request.CustomHeaders.Add(Format('Authorization: Basic %s', [EncodeStrings(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientID + ':' +
-                                                                                                                              TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientSecret
-                                                                                                                              {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]));
+//                                      If TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).AutoBuildHex Then
+//                                       HttpRequest.Request.CustomHeaders.Add(Format('Authorization: Basic %s', [EncodeStrings(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientID + ':' +
+//                                                                                                                              TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientSecret
+//                                                                                                                              {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]))
+//                                      Else
+//                                       HttpRequest.Request.CustomHeaders.Add(Format('Authorization: Basic %s', [EncodeStrings(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientID + ':' +
+//                                                                                                                              TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientSecret
+//                                                                                                                              {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]));
                                      End;
                       rdwOATBearer : HttpRequest.Request.CustomHeaders.Add('Authorization: Bearer ' + TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).Token);
                       rdwOATToken  : HttpRequest.Request.CustomHeaders.Add('Authorization: Token ' + Format('token="%s"', [TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).Token]));
@@ -4735,9 +4846,9 @@ begin
   Inherited;
 end;
 
-{ TRESTDWIdProxyRouter }
+{ TRESTDWIdProxyRequest }
 
-Procedure TRESTDWIdProxyRouter.aCommandGet(AContext      : TIdContext;
+Procedure TRESTDWIdProxyRequest.aCommandGet(AContext      : TIdContext;
                                            ARequestInfo  : TIdHTTPRequestInfo;
                                            AResponseInfo : TIdHTTPResponseInfo);
 Var
@@ -4924,17 +5035,18 @@ Begin
  End;
 End;
 
-Procedure TRESTDWIdProxyRouter.aCommandOther(AContext     : TIdContext;
+Procedure TRESTDWIdProxyRequest.aCommandOther(AContext     : TIdContext;
                                              ARequestInfo : TIdHTTPRequestInfo;
                                              AResponseInfo: TIdHTTPResponseInfo);
 Begin
  aCommandGet(AContext, ARequestInfo, AResponseInfo);
 End;
 
-Constructor TRESTDWIdProxyRouter.Create(AOwner: TComponent);
+Constructor TRESTDWIdProxyRequest.Create(AOwner: TComponent);
 Begin
  Inherited;
  HTTPServer                       := TIdHTTPServer.Create(Nil);
+ ClientHttpBase                   := TRESTDWClientHttpBase;
  lHandler                         := TIdServerIOHandlerSSLOpenSSL.Create(Nil);
  {$IFDEF RESTDWLAZARUS}
  HTTPServer.OnQuerySSLPort        := @IdHTTPServerQuerySSLPort;
@@ -4965,7 +5077,7 @@ Begin
  FSocketKind := 'Indy';
 End;
 
-procedure TRESTDWIdProxyRouter.CreatePostStream(AContext        : TIdContext;
+procedure TRESTDWIdProxyRequest.CreatePostStream(AContext        : TIdContext;
                                                 AHeaders        : TIdHeaderList;
                                                 Var VPostStream : TStream);
 Var
@@ -5001,12 +5113,12 @@ Begin
   End;
 End;
 
-Procedure TRESTDWIdProxyRouter.CustomOnConnect(AContext : TIdContext);
+Procedure TRESTDWIdProxyRequest.CustomOnConnect(AContext : TIdContext);
 Begin
  AContext.Connection.Socket.ReadTimeout := RequestTimeout;
 End;
 
-Destructor TRESTDWIdProxyRouter.Destroy;
+Destructor TRESTDWIdProxyRequest.Destroy;
 Begin
  Try
   If HTTPServer.Active Then
@@ -5023,18 +5135,18 @@ Begin
  Inherited;
 End;
 
-procedure TRESTDWIdProxyRouter.GetSSLPassWord(Var Password : String);
+procedure TRESTDWIdProxyRequest.GetSSLPassWord(Var Password : String);
 Begin
  Password := aSSLPrivateKeyPassword;
 End;
 
-Procedure TRESTDWIdProxyRouter.IdHTTPServerQuerySSLPort(APort       : Word;
+Procedure TRESTDWIdProxyRequest.IdHTTPServerQuerySSLPort(APort       : Word;
                                                         Var VUseSSL : Boolean);
 Begin
  VUseSSL := (APort = Self.ServicePort);
 End;
 
-procedure TRESTDWIdProxyRouter.OnParseAuthentication(AContext         : TIdContext;
+procedure TRESTDWIdProxyRequest.OnParseAuthentication(AContext         : TIdContext;
                                                      Const AAuthType,
                                                      AAuthData        : String;
                                                      Var VUsername,
@@ -5066,7 +5178,7 @@ Begin
   {$IFEND}
 End;
 
-procedure TRESTDWIdProxyRouter.SetActive(Value : Boolean);
+procedure TRESTDWIdProxyRequest.SetActive(Value : Boolean);
 Begin
  If (Value)                   And
     (Not (HTTPServer.Active)) Then
@@ -5142,7 +5254,7 @@ Begin
  Inherited SetActive(HTTPServer.Active);
 End;
 
-Function TRESTDWIdProxyRouter.SSLVerifyPeer(Certificate : TIdX509;
+Function TRESTDWIdProxyRequest.SSLVerifyPeer(Certificate : TIdX509;
                                             AOk         : Boolean;
                                             ADepth,
                                             AError      : Integer): Boolean;
@@ -5151,6 +5263,209 @@ Begin
   Result := AOk
  Else
   Result := True;
+End;
+
+{ TRESTDWIdClientHttpBase }
+
+Constructor TRESTDWIdClientHttpBase.Create(AOwner : TComponent);
+Begin
+ Inherited;
+ ContentType                    := cContentTypeFormUrl;
+ ContentEncoding                := cDefaultContentEncoding;
+ Accept                         := cDefaultAccept;
+ AcceptEncoding                 := '';
+ MaxAuthRetries                 := 0;
+ UserAgent                      := cUserAgent;
+ AccessControlAllowOrigin       := '*';
+ ActiveRequest                  := '';
+ RedirectMaximum                := 1;
+ RequestTimeOut                 := 5000;
+ ConnectTimeOut                 := 5000;
+ ssl                            := Nil;
+End;
+
+Function TRESTDWIdClientHttpBase.Delete(AUrl                 : String;
+                                        Const CustomHeaders  : TStringList     = Nil;
+                                        Const CustomParams   : TStringList     = Nil;
+                                        Const AResponse      : TStream         = Nil;
+                                        Const AResponseError : TStream         = Nil): Integer;
+Begin
+
+End;
+
+Destructor TRESTDWIdClientHttpBase.Destroy;
+Begin
+ If Assigned(HttpRequest) then
+  Begin
+   Try
+    If Assigned(HttpRequest) Then
+     Begin
+      If Assigned(HttpRequest.IOHandler) Then
+       HttpRequest.IOHandler.CloseGracefully;
+      HttpRequest.Disconnect(false);
+     End;
+   Except
+   End;
+   If Assigned(ssl) Then
+    FreeAndNil(ssl);
+   FreeAndNil(HttpRequest);
+  End;
+ Inherited;
+End;
+
+Procedure TRESTDWIdClientHttpBase.DestroyClient;
+Begin
+ //
+End;
+
+Function TRESTDWIdClientHttpBase.Get(AUrl                 : String          = '';
+                                     Const CustomHeaders  : TStringList     = Nil;
+                                     Const AResponse      : TStream         = Nil;
+                                     Const AResponseError : TStream         = Nil) : Integer;
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.Getpassword(var Password : String);
+Begin
+
+End;
+
+Function TRESTDWIdClientHttpBase.GetVerifyCert : Boolean;
+Begin
+
+End;
+
+Function TRESTDWIdClientHttpBase.IdSSLIOHandlerSocketOpenSSL1VerifyPeer(Certificate : TIdX509;
+                                                                        AOk         : Boolean;
+                                                                        ADepth,
+                                                                        AError      : Integer): Boolean;
+Begin
+
+End;
+
+Function TRESTDWIdClientHttpBase.Patch(AUrl                 : String          = '';
+                                       Const CustomHeaders  : TStringList     = Nil;
+                                       Const CustomParams   : TStringList     = Nil;
+                                       Const CustomBody     : TStream         = Nil;
+                                       Const AResponse      : TStream         = Nil;
+                                       Const AResponseError : TStream         = Nil) : Integer;
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.pOnStatus(ASender           : TObject;
+                                            Const AStatus     : TIdStatus;
+                                            Const AStatusText : String);
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.pOnWork(ASender    : TObject;
+                                          AWorkMode  : TWorkMode;
+                                          AWorkCount : Int64);
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.pOnWorkBegin(ASender    : TObject;
+                                               AWorkMode  : TWorkMode;
+                                               AWorkCount : Int64);
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.pOnWorkEnd(ASender   : TObject;
+                                             AWorkMode : TWorkMode);
+Begin
+
+End;
+
+Function TRESTDWIdClientHttpBase.Post(AUrl                 : String          = '';
+                                      Const CustomHeaders  : TStringList     = Nil;
+                                      Const CustomParams   : TStringList     = Nil;
+                                      Const CustomBody     : TStream         = Nil;
+                                      Const AResponse      : TStream         = Nil;
+                                      Const AResponseError : TStream         = Nil) : Integer;
+Begin
+
+End;
+
+Function TRESTDWIdClientHttpBase.Put(AUrl                 : String          = '';
+                                     Const CustomHeaders  : TStringList     = Nil;
+                                     Const CustomParams   : TStringList     = Nil;
+                                     Const CustomBody     : TStream         = Nil;
+                                     Const AResponse      : TStream         = Nil;
+                                     Const AResponseError : TStream         = Nil) : Integer;
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetCertOptions;
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetHeaders(AHeaders       : TStringList;
+                                             Var SendParams : TIdMultipartFormDataStream);
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetHeaders(AHeaders : TStringList);
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetInternalEvents;
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetOnStatus(Value : TOnStatus);
+Begin
+ Inherited;
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetOnWork(Value : TOnWork);
+Begin
+ Inherited;
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetOnWorkBegin(Value : TOnWork);
+Begin
+ Inherited;
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetOnWorkEnd(Value : TOnWorkEnd);
+Begin
+ Inherited;
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetParams;
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetRawHeaders(AHeaders       : TStringList;
+                                                Var SendParams : TIdMultipartFormDataStream);
+Begin
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetUseSSL    (Value    : Boolean);
+Begin
+ Inherited;
+
+End;
+
+Procedure TRESTDWIdClientHttpBase.SetVerifyCert(aValue   : Boolean);
+Begin
+
 End;
 
 End.

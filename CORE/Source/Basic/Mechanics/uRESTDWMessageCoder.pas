@@ -54,6 +54,7 @@ uses
                          Const ADelim           : String = '.') : String; Overload;
    Function    ReadLnRFCB(Var   VMsgEnd          : Boolean;
                           Const ALineTerminator  : String;
+                          Const BoundaryEnd      : String = '';
                           Const ADelim           : String = '.') : TRESTDWBytes;
    Property Filename         : String                      Read FFilename;
    Property FreeSourceStream : Boolean                     Read FFreeSourceStream Write FFreeSourceStream;
@@ -393,10 +394,22 @@ End;
 
 Function TRESTDWMessageDecoder.ReadLnRFCB(Var   VMsgEnd          : Boolean;
                                           Const ALineTerminator  : String;
+                                          Const BoundaryEnd      : String = '';
                                           Const ADelim           : String = '.') : TRESTDWBytes;
+Var
+ vline  : String;
+ vBytes : TRESTDWBytes;
 Begin
  Result := ReadLnB(ALineTerminator);
- If Length(Result) = 0 Then {do not localize}
+ vLine  := BytesToString(Result);
+ If Pos(BoundaryEnd, vLine) > 0 Then
+  Begin
+   vBytes := StringToBytes(Copy(vLine, 1, Pos(BoundaryEnd, vLine) -1));
+   Result := vBytes;
+   SetLength(vBytes, 0);
+   VMsgEnd := True;
+  End
+ Else If Length(Result) = 0 Then {do not localize}
   Begin
    VMsgEnd := True;
    Exit;

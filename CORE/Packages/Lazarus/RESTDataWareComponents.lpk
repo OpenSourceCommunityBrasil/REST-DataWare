@@ -10,7 +10,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\..\Source;..\..\Source\Basic\Crypto;..\..\Source\Includes;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\SQLEditor;..\..\Source\Wizards\lazarus"/>
-        <OtherUnitFiles Value="..\..\Source;..\..\Source\Basic;..\..\Source\Basic\Crypto;..\..\Source\Basic\Dialogs;..\..\Source\Basic\Mechanics;..\..\Source\Consts;..\..\Source\utils;..\..\Source\utils\JSON;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\Memdataset;..\..\Source\Plugins\SQLEditor;..\..\Source\Wizards\lazarus;..\..\Source\Database_Drivers;..\..\Source\Plugins\SelfSigned"/>
+        <OtherUnitFiles Value="..\..\Source;..\..\Source\Basic;..\..\Source\Basic\Crypto;..\..\Source\Basic\Dialogs;..\..\Source\Basic\Mechanics;..\..\Source\Consts;..\..\Source\utils;..\..\Source\utils\JSON;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\Memdataset;..\..\Source\Plugins\SQLEditor;..\..\Source\Wizards\lazarus;..\..\Source\Database_Drivers;..\..\Source\Plugins\SelfSigned;..\..\Source\utils\SSL"/>
         <UnitOutputDirectory Value="..\..\compiledlaz"/>
       </SearchPaths>
       <CodeGeneration>
@@ -32,7 +32,7 @@
     <Description Value="The proposal was fulfilled. REST DW was created to facilitate the creation of CRUDs in the same model that we created applications for Client / Server Database. Today, being able to write data to a bank via WebService is too complex for simple operations, making scheduling of simple screens time-consuming. With REST Dataware, you no longer have to worry about creating SQL Insertion, Deletion, Read, and Execution methods via Webservice; Simply add a RESTDataBase connection component and add a RESTClientSQL component that will already have your SQL solution fully functional as you did back in the day and with all the power of modern REST / JSON technology with data compression and everything the language can offer. Have fun."/>
     <License Value="GPL- 3.0"/>
     <Version Major="2" Minor="1"/>
-    <Files Count="82">
+    <Files Count="91">
       <Item1>
         <Filename Value="RESTDataWareComponents.lrs"/>
         <Type Value="LRS"/>
@@ -362,6 +362,42 @@
         <Filename Value="..\..\Source\Basic\uRESTDWStorageBin.pas"/>
         <UnitName Value="uRESTDWStorageBin"/>
       </Item82>
+      <Item83>
+        <Filename Value="..\..\Source\utils\SSL\OpenSSL.Api_11.pas"/>
+        <UnitName Value="OpenSSL.Api_11"/>
+      </Item83>
+      <Item84>
+        <Filename Value="..\..\Source\utils\SSL\uRESTDW.BinaryCoding.pas"/>
+        <UnitName Value="uRESTDW.BinaryCoding"/>
+      </Item84>
+      <Item85>
+        <Filename Value="..\..\Source\utils\SSL\uRESTDW.Bson.IO.pas"/>
+        <UnitName Value="uRESTDW.Bson.IO"/>
+      </Item85>
+      <Item86>
+        <Filename Value="..\..\Source\utils\SSL\uRESTDW.Bson.pas"/>
+        <UnitName Value="uRESTDW.Bson"/>
+      </Item86>
+      <Item87>
+        <Filename Value="..\..\Source\utils\SSL\uRESTDW.DateUtils.pas"/>
+        <UnitName Value="uRESTDW.DateUtils"/>
+      </Item87>
+      <Item88>
+        <Filename Value="..\..\Source\utils\SSL\uRESTDW.OAuth2.pas"/>
+        <UnitName Value="uRESTDW.OAuth2"/>
+      </Item88>
+      <Item89>
+        <Filename Value="..\..\Source\utils\SSL\uRESTDW.OpenSsl_11.pas"/>
+        <UnitName Value="uRESTDW.OpenSsl_11"/>
+      </Item89>
+      <Item90>
+        <Filename Value="..\..\Source\utils\SSL\uRESTDW.System.pas"/>
+        <UnitName Value="uRESTDW.System"/>
+      </Item90>
+      <Item91>
+        <Filename Value="..\..\Source\utils\SSL\uRESTDW.SysUtils.pas"/>
+        <UnitName Value="uRESTDW.SysUtils"/>
+      </Item91>
     </Files>
     <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="3">

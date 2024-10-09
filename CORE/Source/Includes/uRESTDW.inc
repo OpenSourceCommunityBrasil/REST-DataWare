@@ -5,6 +5,9 @@
   {$IF CompilerVersion > 23}
     {$LEGACYIFEND ON}
   {$IFEND}
+ {$IF Defined(ANDROID) or Defined(IOS)}
+  {$DEFINE MOBILE}
+ {$IFEND}
 {$ENDIF}
 
 {$IFDEF CLR}
