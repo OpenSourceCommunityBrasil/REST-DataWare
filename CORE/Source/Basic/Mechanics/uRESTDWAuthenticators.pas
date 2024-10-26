@@ -1,4 +1,4 @@
-unit uRESTDWAuthenticators;
+﻿unit uRESTDWAuthenticators;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
@@ -32,8 +32,20 @@ interface
 
 uses
   Classes, SysUtils, DateUtils,
-  uRESTDWConsts, uRESTDWAbout, uRESTDWDataUtils, uRESTDWJSONInterface,
-  uRESTDWTools, uRESTDWParams;
+  uRESTDWConsts, uRESTDWAbout,  uRESTDWDataUtils,  uRESTDWJSONInterface,
+  uRESTDWTools,  uRESTDWParams, uRESTDWProtoTypes, uRESTDW.OpenSsl_11;
+
+Type
+ TRESTDWCertOptions = Record
+  Country,
+  State,
+  Locality,
+  Organization,
+  OrgUnit,
+  CommonName,
+  ServerName     : String;
+  ExpiresDays    : Integer;
+End;
 
 Type
  TRESTDWAuthenticatorBase = class(TRESTDWComponent)
@@ -138,36 +150,63 @@ Type
     property AutoRenewToken: Boolean read FAutoRenewToken write FAutoRenewToken;
   end;
 
-  TRESTDWAuthOAuth = class(TRESTDWServerAuthBase)
+  TRESTDWAuthOAuth = Class(TRESTDWServerAuthBase)
   private
-    FTokenType: TRESTDWAuthOptionTypes;
-    FAutoBuildHex: Boolean;
-    FToken: String;
-    FGrantCodeEvent: String;
-    FGrantType: String;
-    FGetTokenEvent: String;
-    FClientID: String;
-    FClientSecret: String;
-    FRedirectURI: String;
-    FExpiresIn: TDateTime;
+    FTokenType    : TRESTDWAuthOptionTypes;
+    FBeginTime,
+    FEndTime      : TDateTime;
+    FRSASHA256_Validation,
+    FServerValidationCert,
+    FAutoBuildHex : Boolean;
+    FLifeCycle    : Integer;
+    FToken,
+    FGrantCodeEvent,
+    FGrantType,
+    FGetTokenEvent,
+    FHeader,
+    FPayLoad,
+    FSignature,
+    FPublicKey,
+    FPrivateKey,
+    FRedirectURI  : String;
   public
-    constructor Create(aOwner: TComponent); override;
-    function AuthValidate(ADataModuleRESTDW: TObject;
-                          AUrlToExec, AWelcomeMessage, AAccessTag, AAuthUsername, AAuthPassword: String;
-                          ARawHeaders: TStrings; ARequestType: TRequestType; var ADWParams: TRESTDWParams;
-                          var AGetToken: Boolean; var ATokenValidate: Boolean; var AToken: String;
-                          var AErrorCode: Integer; var AErrorMessage: String; var AAcceptAuth: Boolean): Boolean; override;
+    Constructor Create                   (aOwner             : TComponent);             Override;
+    Function    CreateSelfSignedCert_X509(CertOptions        : TRESTDWCertOptions;
+                                          Var Certificate,
+                                          PrivateKey         : TRESTDWBytes) : Boolean;
+    Function    AuthValidate             (ADataModuleRESTDW  : TObject;
+                                          AUrlToExec,
+                                          AWelcomeMessage,
+                                          AAccessTag,
+                                          AAuthUsername,
+                                          AAuthPassword      : String;
+                                          ARawHeaders        : TStrings;
+                                          ARequestType       : TRequestType;
+                                          Var ADWParams      : TRESTDWParams;
+                                          Var AGetToken      : Boolean;
+                                          Var ATokenValidate : Boolean;
+                                          Var AToken         : String;
+                                          Var AErrorCode     : Integer;
+                                          Var AErrorMessage  : String;
+                                          Var AAcceptAuth    : Boolean)      : Boolean; Override;
   published
-    property TokenType: TRESTDWAuthOptionTypes read FTokenType write FTokenType;
-    property AutoBuildHex: Boolean read FAutoBuildHex write FAutoBuildHex;
-    property Token: String read FToken write FToken;
-    property GrantCodeEvent: String read FGrantCodeEvent write FGrantCodeEvent;
-    property GrantType: String read FGrantType write FGrantType;
-    property GetTokenEvent: String read FGetTokenEvent write FGetTokenEvent;
-    property ClientID: String read FClientID write FClientID;
-    property ClientSecret: String read FClientSecret write FClientSecret;
-    property RedirectURI: String read FRedirectURI write FRedirectURI;
-    property ExpiresIn: TDateTime read FExpiresIn;
+    Property TokenType            : TRESTDWAuthOptionTypes Read FTokenType            Write FTokenType;
+    Property AutoBuildHex         : Boolean                Read FAutoBuildHex         Write FAutoBuildHex;
+    Property RSASHA256_Validation : Boolean                Read FRSASHA256_Validation Write FRSASHA256_Validation;
+    Property LifeCycle            : Integer                Read FLifeCycle            Write FLifeCycle;
+    Property BeginTime            : TDateTime              Read FBeginTime            Write FBeginTime; //iat
+    Property EndTime              : TDateTime              Read FEndTime              Write FEndTime;//exp
+    Property ServerValidationCert : Boolean                Read FServerValidationCert Write FServerValidationCert;
+    Property Token                : String                 Read FToken                Write FToken;
+    Property GrantCodeEvent       : String                 Read FGrantCodeEvent       Write FGrantCodeEvent;
+    Property GrantType            : String                 Read FGrantType            Write FGrantType;
+    Property GetTokenEvent        : String                 Read FGetTokenEvent        Write FGetTokenEvent;
+    Property Header               : String                 Read FHeader;
+    Property PayLoad              : String                 Read FPayLoad              Write FPayLoad;
+    Property Signature            : String                 Read FSignature            Write FSignature;
+    Property PublicKey            : String                 Read FPublicKey            Write FPublicKey;
+    Property PrivateKey           : String                 Read FPrivateKey           Write FPrivateKey;
+    Property RedirectURI          : String                 Read FRedirectURI          Write FRedirectURI;
   end;
 
   TOnUserBasicAuth = Procedure(Welcomemsg, AccessTag,
@@ -177,14 +216,14 @@ Type
                                Var ErrorMessage   : String;
                                Var Accept         : Boolean) Of Object;
 
-  TOnGetToken = Procedure(Welcomemsg,
-                          AccessTag        : String;
-                          Params           : TRESTDWParams;
-                          AuthOptions      : TRESTDWAuthToken;
-                          Var ErrorCode    : Integer;
-                          Var ErrorMessage : String;
-                          Var TokenID      : String;
-                          Var Accept       : Boolean) Of Object;
+  TOnGetToken      = Procedure(Welcomemsg,
+                               AccessTag        : String;
+                               Params           : TRESTDWParams;
+                               AuthOptions      : TRESTDWAuthToken;
+                               Var ErrorCode    : Integer;
+                               Var ErrorMessage : String;
+                               Var TokenID      : String;
+                               Var Accept       : Boolean) Of Object;
 
   TOnUserTokenAuth = Procedure(Welcomemsg,
                              AccessTag          : String;
@@ -926,7 +965,22 @@ End;
 
 { TRESTDWAuthOAuth }
 
-Function TRESTDWAuthOAuth.AuthValidate(ADataModuleRESTDW : TObject; 
+Function TRESTDWAuthOAuth.CreateSelfSignedCert_X509(CertOptions      : TRESTDWCertOptions;
+                                                    Var Certificate,
+                                                    PrivateKey       : TRESTDWBytes) : Boolean;
+begin
+ Result := TRESTDWOpenSSLHelper.CreateSelfSignedCert_X509(CertOptions.Country,
+                                                          CertOptions.State,
+                                                          CertOptions.Locality,
+                                                          CertOptions.Organization,
+                                                          CertOptions.OrgUnit,
+                                                          CertOptions.CommonName,
+                                                          CertOptions.ServerName,
+                                                          CertOptions.ExpiresDays,
+                                                          Certificate, PrivateKey);
+End;
+
+Function TRESTDWAuthOAuth.AuthValidate(ADataModuleRESTDW : TObject;
                                        AUrlToExec,
                                        AWelcomeMessage, 
                                        AAccessTag, 
@@ -950,16 +1004,24 @@ End;
 Constructor TRESTDWAuthOAuth.Create(aOwner: TComponent);
 Begin
  Inherited;
- FClientID       := '';
- FClientSecret   := '';
- FToken          := '';
- FRedirectURI    := '';
- FGrantType      := 'client_credentials';
- FGetTokenEvent  := 'access-token';
- FGrantCodeEvent := 'authorize';
- FAutoBuildHex   := False;
- FExpiresIn      := 0;
- FTokenType      := rdwOATBasic;
+ FRSASHA256_Validation := True;
+ FServerValidationCert := True;
+ FToken                := '';
+ FRedirectURI          := '';
+ FGrantType            := 'client_credentials';
+ FGetTokenEvent        := 'access-token';
+ FGrantCodeEvent       := 'authorize';
+ FHeader               := '{"alg": "RS256", "typ": "JWT"}';
+ FLifeCycle            := 1800; // 30 Minutos
+ FPayLoad              := '';
+ FSignature            := '';
+ FPublicKey            := '';
+ FPrivateKey           := '';
+ FRedirectURI          := '';
+ FBeginTime            := 0;
+ FEndTime              := 0;
+ FAutoBuildHex         := False;
+ FTokenType            := rdwOATBasic;
 End;
 
 { TRESTDWAuthenticatorBase }

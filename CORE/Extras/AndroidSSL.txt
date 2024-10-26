@@ -1,0 +1,3 @@
+Extrair os arquivos compactados na sua pasta do Delphi
+
+EX : C:\Program Files (x86)\Embarcadero\Studio\23.0\lib\android64\release

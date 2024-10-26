@@ -36,7 +36,6 @@ uses
 
   { ****************************************************************** }
   { The base class from which all hash algorithms are to be derived }
-
 type
   EDWDCP_hash = class(Exception);
 
@@ -106,6 +105,7 @@ type
   { Block ciphers will have a further foundation class TDWDCP_blockcipher. }
 
 type
+  TDWDCP_ciphermode = (cmCBC, cmCFB8bit, cmCFBblock, cmOFB, cmCTR);
   EDWDCP_cipher = class(Exception);
 
   TDWDCP_cipher = class(TComponent)
@@ -200,7 +200,6 @@ type
   { extra class takes care of the different block encryption modes. }
 
 type
-  TDWDCP_ciphermode = (cmCBC, cmCFB8bit, cmCFBblock, cmOFB, cmCTR);
   // cmCFB8bit is equal to DWDCPcrypt v1.xx's CFB mode
   EDWDCP_blockcipher = class(EDWDCP_cipher);
 
@@ -268,7 +267,7 @@ type
 
   published
     property BlockSize: integer read _GetBlockSize write DeadInt;
-    property CipherMode: TDWDCP_ciphermode read fCipherMode write fCipherMode default cmCBC;
+    property CipherMode: TDWDCP_ciphermode read fCipherMode write fCipherMode default TDWDCP_ciphermode.cmCBC;
   end;
 
   TDWDCP_blockcipherclass = class of TDWDCP_blockcipher;
@@ -703,15 +702,15 @@ end;
 procedure TDWDCP_blockcipher.Encrypt(const Indata; var Outdata; Size: longword);
 begin
   case fCipherMode of
-    cmCBC:
+    TDWDCP_ciphermode.cmCBC:
       EncryptCBC(Indata, Outdata, Size);
-    cmCFB8bit:
+    TDWDCP_ciphermode.cmCFB8bit:
       EncryptCFB8bit(Indata, Outdata, Size);
-    cmCFBblock:
+    TDWDCP_ciphermode.cmCFBblock:
       EncryptCFBblock(Indata, Outdata, Size);
-    cmOFB:
+    TDWDCP_ciphermode.cmOFB:
       EncryptOFB(Indata, Outdata, Size);
-    cmCTR:
+    TDWDCP_ciphermode.cmCTR:
       EncryptCTR(Indata, Outdata, Size);
   end;
 end;
@@ -750,15 +749,15 @@ end;
 procedure TDWDCP_blockcipher.Decrypt(const Indata; var Outdata; Size: longword);
 begin
   case fCipherMode of
-    cmCBC:
+    TDWDCP_ciphermode.cmCBC:
       DecryptCBC(Indata, Outdata, Size);
-    cmCFB8bit:
+    TDWDCP_ciphermode.cmCFB8bit:
       DecryptCFB8bit(Indata, Outdata, Size);
-    cmCFBblock:
+    TDWDCP_ciphermode.cmCFBblock:
       DecryptCFBblock(Indata, Outdata, Size);
-    cmOFB:
+    TDWDCP_ciphermode.cmOFB:
       DecryptOFB(Indata, Outdata, Size);
-    cmCTR:
+    TDWDCP_ciphermode.cmCTR:
       DecryptCTR(Indata, Outdata, Size);
   end;
 end;
@@ -814,7 +813,7 @@ end;
 constructor TDWDCP_blockcipher.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  fCipherMode := cmCBC;
+  fCipherMode := TDWDCP_ciphermode.cmCBC;
 end;
 
 // Version 2.1 : Partial Stream Read capability.

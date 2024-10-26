@@ -199,12 +199,23 @@ End;
   vRedirectURI,
   vGetTokenName,
   vGrantCodeName,
-  vClientID,
   vToken,
-  vGrantType,
-  vClientSecret : String;
+  vGrantType    : String;
+  FRSA256,
+  FAutoBuildHex,
   vAutoBuildHex : Boolean;
-  vExpiresin    : TDatetime;
+  FGrantCodeEvent,
+  FGrantType,
+  FGetTokenEvent,
+  FHeader,
+  FPayLoad,
+  FSignature,
+  FPublicKey,
+  FPrivateKey,
+  FRedirectURI  : String;
+  FBeginTime,
+  FEndTime      : TDateTime;
+  FLifeCycle    : Integer;
   vRDWTokenType : TRESTDWAuthOptionTypes;
  Protected
  Public
@@ -214,15 +225,20 @@ End;
   Procedure   GetGetToken;
  Published
   Property    TokenType      : TRESTDWAuthOptionTypes Read vRDWTokenType  Write vRDWTokenType;
-  Property    AutoBuildHex   : Boolean             Read vAutoBuildHex  Write vAutoBuildHex;
-  Property    Token          : String              Read vToken         Write vToken;
-  Property    GrantCodeEvent : String              Read vGrantCodeName Write vGrantCodeName;
-  Property    GrantType      : String              Read vGrantType     Write vGrantType;
-  Property    GetTokenEvent  : String              Read vGetTokenName  Write vGetTokenName;
-  Property    ClientID       : String              Read vClientID      Write vClientID;
-  Property    ClientSecret   : String              Read vClientSecret  Write vClientSecret;
-  Property    RedirectURI    : String              Read vRedirectURI   Write vRedirectURI;
-  Property    Expires_in     : TDateTime           Read vExpiresin;
+  Property    AutoBuildHex   : Boolean                Read vAutoBuildHex  Write vAutoBuildHex;
+  Property    LifeCycle      : Integer                Read FLifeCycle     Write FLifeCycle;
+  Property    BeginTime      : TDateTime              Read FBeginTime     Write FBeginTime; //iat
+  Property    EndTime        : TDateTime              Read FEndTime       Write FEndTime;//exp
+  Property    Token          : String                 Read vToken         Write vToken;
+  Property    GrantCodeEvent : String                 Read vGrantCodeName Write vGrantCodeName;
+  Property    GrantType      : String                 Read vGrantType     Write vGrantType;
+  Property    GetTokenEvent  : String                 Read vGetTokenName  Write vGetTokenName;
+  Property    Header         : String                 Read FHeader;
+  Property    PayLoad        : String                 Read FPayLoad       Write FPayLoad;
+  Property    Signature      : String                 Read FSignature     Write FSignature;
+  Property    PublicKey      : String                 Read FPublicKey     Write FPublicKey;
+  Property    PrivateKey     : String                 Read FPrivateKey    Write FPrivateKey;
+  Property    RedirectURI    : String                 Read FRedirectURI   Write FRedirectURI;
 End;
 
  TRESTDWAuthOptionBearerClient = Class(TRESTDWAuthOptionParam)
@@ -781,8 +797,14 @@ Begin
   Begin
    Src                := TRESTDWAuthOAuth(Source);
    vAutoBuildHex      := Src.AutoBuildHex;
-   vClientID          := Src.ClientID;
-   vClientSecret      := Src.ClientSecret;
+   FHeader            := Src.FHeader;
+   FPayLoad           := Src.FPayLoad;
+   FSignature         := Src.FSignature;
+   FPublicKey         := Src.FPublicKey;
+   FPrivateKey        := Src.FPrivateKey;
+   FRedirectURI       := Src.FRedirectURI;
+   FBeginTime         := Src.FBeginTime;
+   FEndTime           := Src.FEndTime;
    vGrantCodeName     := Src.GrantCodeEvent;
    vGetTokenName      := Src.GetTokenEvent;
   End
@@ -1360,15 +1382,21 @@ End;
 Constructor TRESTDWAuthOAuth.Create;
 Begin
  inherited;
- vClientID      := '';
- vClientSecret  := '';
  vToken         := '';
  vRedirectURI   := '';
  vGrantType     := 'client_credentials';
  vGetTokenName  := 'access-token';
  vGrantCodeName := 'authorize';
  vAutoBuildHex  := False;
- vExpiresin     := 0;
+ FHeader        := '{"alg": "RS256", "typ": "JWT"}';
+ FPayLoad       := '';
+ FSignature     := '';
+ FPublicKey     := '';
+ FPrivateKey    := '';
+ FRedirectURI   := '';
+ FBeginTime     := 0;
+ FEndTime       := 0;
+ FLifeCycle     := 1800;//30 Minutos
  vRDWTokenType  := rdwOATBasic;
 End;
 

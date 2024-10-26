@@ -1,4 +1,4 @@
-Unit uRESTDWConsts;
+﻿Unit uRESTDWConsts;
 
 {$I ..\..\Source\Includes\uRESTDW.inc}
 
@@ -62,7 +62,7 @@ Const
 
  // controle de versão
  RESTDWVersionINFO               = 'v2.1.0-';
- RESTDWRelease                   = '792';
+ RESTDWRelease                   = '3857';
  RESTDWCodeProject               = 'Galaga - SourceForge';
  RESTDWVersao                    = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWDialogoTitulo             = 'REST DataWare Components ' + RESTDWVersao;
