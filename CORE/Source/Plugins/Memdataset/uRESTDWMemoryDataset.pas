@@ -1,4 +1,4 @@
-Unit uRESTDWMemoryDataset;
+    Unit uRESTDWMemoryDataset;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
@@ -31,7 +31,7 @@ Interface
 {$ENDIF}
 uses
   SysUtils, Classes, DB, Variants, uRESTDWProtoTypes, uRESTDWMemDBUtils,
-  uRESTDWMemExprParser{$IFNDEF FPC}, uRESTDWABMemDBFilterExpr, SqlTimSt{$ENDIF},
+  uRESTDWMemExprParser, {$IFNDEF FPC}uRESTDWABMemDBFilterExpr,{$ENDIF}
   uRESTDWAbout, uRESTDWConsts;
 
 Const
@@ -183,7 +183,7 @@ Type
     Procedure AfterLoad;
     Function  GetDataset                  : TDataset;
     Function  GetBlob           (RecNo, Index    : Integer) : PMemBlobData;
-    {$IFDEF RESTDWLAZARUS}
+    {$IFDEF FPC}
     Function  GetDatabaseCharSet          : TDatabaseCharSet;
     {$ENDIF}
   End;
@@ -479,7 +479,7 @@ Type
     {$IFNDEF FPC}
     FFilterExpression : TRDWABExprParser;
     {$ENDIF}
-    {$IFDEF RESTDWLAZARUS}
+    {$IFDEF FPC}
     vDatabaseCharSet                   : TDatabaseCharSet;
     Procedure SetDatabaseCharSet(Value : TDatabaseCharSet);
     Function  GetDatabaseCharSet       : TDatabaseCharSet;
@@ -745,7 +745,7 @@ Type
     {$IFNDEF FPC}
      Property ObjectView default False;
     {$ENDIF}
-    {$IFDEF RESTDWLAZARUS}
+    {$IFDEF FPC}
     Property DatabaseCharSet    : TDatabaseCharSet   Read GetDatabaseCharSet Write SetDatabaseCharSet;
     {$ENDIF}
     Property  DatasetClosed     : Boolean            Read FDataSetClosed     Write FDataSetClosed    Default False;
@@ -888,14 +888,15 @@ Type
 Implementation
 
 Uses
-  Types, Math,
+  Types, Math, DateUtils,
   {$IFDEF RTL240_UP}
    System.Generics.Collections,
   {$ENDIF RTL240_UP}
   FMTBcd,
   {$IFDEF RESTDWVCL}uRESTDWMemVCLUtils,{$ENDIF}
   uRESTDWMemResources,
-  uRESTDWTools, uRESTDWBasicTypes, uRESTDWStorageBin;
+  uRESTDWTools, uRESTDWBasicTypes, uRESTDWStorageBin
+  {$IFNDEF FPC}, SqlTimSt{$ENDIF};
 
 Const
  GuidSize = 38;
@@ -989,20 +990,22 @@ Begin
      dwftFloat     : Result := SizeOf(Double);
      {$IFNDEF FPC}
       {$IF CompilerVersion > 21}
-      dwftSingle    : Result := SizeOf(Single) + 5;
+       dwftSingle  : Result := SizeOf(Single) + 5;
       {$IFEND}
+     {$ELSE}
+      dwftSingle   : Result := SizeOf(Double);
      {$ENDIF}
      dwftCurrency  : Result := SizeOf(Currency);
      dwftDate,
      dwftTime      : Result := SizeOf(LongInt)+ 8;
-     dwftDateTime  : Result := {$IFDEF FPC}SizeOf(TDateTime){$ELSE}SizeOf(TSQLTimeStamp){$ENDIF};
+     dwftDateTime,
+     dwftTimeStamp : Begin
+                      Result := SizeOf(Double);
+                     End;
      dwftAutoInc   : Result := SizeOf(Longint);
      dwftLargeint  : Result := {$IFDEF FPC}8{$ELSE}{$IF CompilerVersion <= 22}8{$ELSE}64{$IFEND}{$ENDIF}; //Field Size é 64 Bits
      dwftBCD,                                                                           //Result := SizeOf(TBcd);
      dwftFMTBCD    : Result := SizeOf(DWBCD);
-     dwftTimeStamp : Begin
-                      Result := {$IFDEF FPC}SizeOf(TTimeStamp){$ELSE}SizeOf(TSQLTimeStamp){$ENDIF};
-                     End;
      dwftTimeStampOffset : Begin
                             Inc(Result,SizeOf(Double));
                             Inc(Result,SizeOf(Byte));
@@ -1200,6 +1203,7 @@ var
 Begin
  If Active then
   Close;
+ Inherited Destroy;
  If FFilterParser <> nil then
   FreeAndNil(FFilterParser);
  {$IFNDEF FPC}
@@ -1223,13 +1227,12 @@ Begin
  ClearIndexes;
  FreeAndNil(FIndexes);
  FRecords.Free;
- FOffsets := nil;
+ SetLength(FOffsets, 0);
  //FreeFieldBuffers;
  FActive := False;
  //FBlobOfs := 0;
- FDataSet := Nil;
- FDataSet.Free;
- inherited Destroy;
+ If Assigned(FDataSet) Then
+  FreeAndNil(FDataSet);
 End;
 
 Function TRESTDWMemTable.CompareFields(Data1, Data2: Pointer; FieldType: TFieldType;
@@ -1641,7 +1644,7 @@ Begin
      Begin
       If Not DataTypeIsBlobTypes(aDataType) Then
        PData := Pointer(PActualRecord + GetOffSets(aIndex))
-      Else
+      Else If Length(FBlobs) > 0 Then
        PData := Pointer(@FBlobs[Fld.Offset]);
       If (PData <> Nil) Then
        Begin
@@ -1867,7 +1870,11 @@ Begin
   // For I := 0 to BlobFieldCount - 1 do
   // PMemBlobArray(Rec.FBlobs)^[I] := PMemBlobArray(Buffer)^[I];
   For I := 0 To BlobFieldCount - 1 Do
-   FBlobs[I] := Rec.FBlobs[I];
+   Begin
+    If Length(FBlobs) < Length(Rec.FBlobs) Then
+     SetLength(FBlobs, Length(Rec.FBlobs));
+    FBlobs[I] := Rec.FBlobs[I];
+   End;
   GetCalcFields({$IFNDEF FPC}{$IFDEF NEXTGEN}TRecBuf{$ELSE}
                              {$IF CompilerVersion <= 22}Pointer{$ELSE}
                              TRecordBuffer{$IFEND}{$ENDIF}
@@ -1911,6 +1918,13 @@ Var
  aDataBytes,
  aBytes       : TRESTDWBytes;
  pBytes       : PRESTDWBytes;
+ vSingle      : DWSingle;
+ vDateTimeInt : DWInteger;
+ vDataType    : Byte;
+ vBCD         : Real;
+ vDouble      : DWFloat;
+ vTimeStamp   : TSQLTimeStamp;
+ vDateTimeRec : TDateTimeRec;
  vDWFieldType : Byte;
 Begin
  Result := False;
@@ -1927,6 +1941,12 @@ Begin
      If Not Result Then
       Result := Data <> Nil;
      cLen      := GetCalcFieldLen(Field.datatype, Field.Size);
+    {$IFNDEF FPC}
+      {$IF CompilerVersion >= 22}
+       If Field.datatype = ftSingle Then
+        cLen  := SizeOf(Single) + 1;
+      {$IFEND}
+    {$ENDIF}
      Case Field.datatype Of
       ftGuid      : Result := Result and (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
 
@@ -1940,7 +1960,8 @@ Begin
       {$IFEND}    : Begin
                      SetLength(aDataBytes, cLen);
                      Move(Data^, aDataBytes[0], cLen);
-                     Result := Result and (not (Char(aDataBytes[0]) = #0));
+                     Result    := Result and (not (Char(aDataBytes[0]) = #0));
+                     aNullData := Not Result;
                     End;
       ftBoolean : Begin
                    {$IFNDEF FPC}
@@ -1994,19 +2015,25 @@ Begin
       ftDate,
       ftTime,
       ftDateTime : Begin
-                    SetLength(aDataBytes, cLen);
-                    Move(Data^, aDataBytes[0], cLen);
+                    //TODO XyberX O dado DateTime deve ser convertido em DateTimeREC no ponteiro
+                    SetLength(aDataBytes, 1);
+                    Move(Data^, aDataBytes[0], Length(aDataBytes));
                     aNullData := IsNullData(aDataBytes);
                     If Not aNullData then
                      Begin
+                      SetLength(aDataBytes, cLen);
+                      Move(Data^, aDataBytes[0], cLen);
                       Move(aDataBytes[0], Pointer(@aNullData)^, SizeOf(Boolean));
-                      Result := Not(aNullData);
+                      Result    := aNullData;
+                      aNullData := False;
                      End
                     Else
-                     Result := Not aNullData;
+                     Begin
+                      Result := Not aNullData;
+                      aNullData := Result;
+                     End;
                    End;
      End;
-     aNullData := Not Result;
      If Result Then
       Begin
        If Field.datatype = ftVariant Then
@@ -2084,33 +2111,145 @@ Begin
            If (Field.datatype In [ftLargeint, ftInteger, ftSmallint, ftFloat,
                                   ftFMTBCD, ftBCD, ftCurrency, ftDate, ftTime]) Then
             Result := PRESTDWBytes(@Data)^[1] > 0;
-           If Result Then
+           If (Field.datatype In [ftAutoInc, ftLargeint, ftInteger, ftSmallint, ftFloat, 
+                                  ftFMTBCD, ftBCD, ftCurrency]) Then
             Begin
-             If (Field.datatype In [ftLargeint, ftInteger, ftSmallint, ftFloat, ftFMTBCD, ftBCD,
-                                    ftCurrency, ftDate, ftTime, ftDateTime, ftTimestamp]) Then
-              Move(PRESTDWBytes(@Data)^[1], Pointer(Buffer)^, cLen-1)
-             Else
-              Move(PRESTDWBytes(@Data)^[0], Pointer(Buffer)^, cLen);
+             If Length(TRESTDWBytes(Buffer)) = 0 Then
+              SetLength(TRESTDWBytes(Buffer), cLen);
+             Move(PRESTDWBytes(@Data)^[1], Pointer(Buffer)^, cLen-1);
+            End
+           Else If (Field.datatype In [ftDateTime, ftTimestamp, ftDate, ftTime]) Then
+            Begin
+             If Length(TRESTDWBytes(Buffer)) = 0 Then
+              SetLength(TRESTDWBytes(Buffer), cLen);
+             cLen := SizeOf(TDateTimeRec);
+             Move(PRESTDWBytes(@Data)^[1], Pointer(@vDouble)^, SizeOf(DWDouble));
+             Case Field.datatype Of
+              ftTime     : Begin
+                            vDateTimeRec.Time := DateTimeToTimeStamp(vDouble).Time;
+                            Move(Pointer(@vDateTimeRec)^, Pointer(Buffer)^, cLen);
+                           End;
+              ftDate     : Begin
+                            vDateTimeRec.Date := Round(vDouble);
+                            Move(Pointer(@vDateTimeRec)^, Pointer(Buffer)^, cLen);
+                           End;
+              ftDateTime : Begin
+                            vDateTimeRec.DateTime := TimeStampToMSecs(DateTimeToTimeStamp(vDouble));
+                            Move(Pointer(@vDateTimeRec)^, Pointer(Buffer)^, cLen);
+                           End;
+              Else
+               Begin
+                vTimeStamp := DateTimeToSQLTimeStamp(vDouble);
+                cLen := SizeOf(vTimeStamp);
+                Move(Pointer(@vTimeStamp)^, Pointer(Buffer)^, cLen);
+               End;
+             End;
+            End
+           Else
+            Begin
+             If Length(TRESTDWBytes(Buffer)) = 0 Then
+              SetLength(TRESTDWBytes(Buffer), cLen);
+             Move(PRESTDWBytes(@Data)^[0], Pointer(Buffer)^, cLen);
             End;
            {$ELSE}
-            If Length(TRESTDWBytes(Buffer)) = 0 Then
-             SetLength(TRESTDWBytes(Buffer), cLen);
             Result := ((Not(aNullData)) and Not(VarIsNull(Data^)));
             If (Field.datatype In [ftAutoInc, ftLargeint, ftInteger, ftSmallint, ftFloat, ftSingle,
-                                   ftFMTBCD, ftBCD, ftCurrency, ftDate, ftTime, ftDateTime, ftTimestamp]) Then
-             Move(aDataBytes[1], Pointer(Buffer)^, cLen-1)
+                                   ftFMTBCD, ftBCD, ftCurrency]) Then
+             Begin
+              If Length(TRESTDWBytes(Buffer)) = 0 Then
+               SetLength(TRESTDWBytes(Buffer), cLen);
+              If Field.datatype = ftSingle Then
+               Move(aDataBytes[1], Pointer(Buffer)^, SizeOf(Single))
+              Else
+               Move(aDataBytes[1], Pointer(Buffer)^, cLen-1);
+             End
+            Else If (Field.datatype In [ftDateTime, ftTimestamp, ftDate, ftTime]) Then
+             Begin
+              If Length(TRESTDWBytes(Buffer)) = 0 Then
+               SetLength(TRESTDWBytes(Buffer), cLen);
+              cLen := SizeOf(TDateTimeRec);
+              Move(aDataBytes[1], Pointer(@vDouble)^, SizeOf(DWDouble));
+              Case Field.datatype Of
+               ftTime     : Begin
+                             vDateTimeRec.Time := DateTimeToTimeStamp(vDouble).Time;
+                             Move(Pointer(@vDateTimeRec)^, Pointer(Buffer)^, cLen);
+                            End;
+               ftDate     : Begin
+                             vDateTimeRec.Date := Round(vDouble);
+                             Move(Pointer(@vDateTimeRec)^, Pointer(Buffer)^, cLen);
+                            End;
+               ftDateTime : Begin
+                             vDateTimeRec.DateTime := TimeStampToMSecs(DateTimeToTimeStamp(vDouble));
+                             Move(Pointer(@vDateTimeRec)^, Pointer(Buffer)^, cLen);
+                            End;
+               Else
+                Begin
+                 vTimeStamp := DateTimeToSQLTimeStamp(vDouble);
+                 cLen := SizeOf(vTimeStamp);
+                 Move(Pointer(@vTimeStamp)^, Pointer(Buffer)^, cLen);
+                End;
+              End;
+             End
             Else
-             Move(aDataBytes[0], Pointer(Buffer)^, cLen);
+             Begin
+              If Length(TRESTDWBytes(Buffer)) = 0 Then
+               SetLength(TRESTDWBytes(Buffer), cLen);
+              Move(aDataBytes[0], Pointer(Buffer)^, cLen);
+             End;
            {$IFEND}
           {$ELSE}
            If Length(TRESTDWBytes(Buffer)) = 0 Then
             SetLength(TRESTDWBytes(Buffer), cLen);
            Result := ((Not(aNullData)) and Not(VarIsNull(Data^)));
-           If (Field.datatype In [ftAutoInc, ftLargeint, ftInteger, ftSmallint, ftFloat{$IFNDEF FPC}, ftSingle {$ENDIF}, ftFMTBCD, ftBCD, ftCurrency, ftDate,
-                                    ftTime, ftDateTime, ftTimestamp]) Then
-            Move(aDataBytes[1], Buffer^, cLen-1)
+           If (Field.datatype In [ftAutoInc, ftLargeint, ftInteger, ftSmallint, ftFloat,
+                                  ftFMTBCD, ftBCD, ftCurrency]) Then
+            Begin
+             vDataType := FieldTypeToDWFieldType(Field.DataType);
+             If Length(TRESTDWBytes(Buffer)) = 0 Then
+              SetLength(TRESTDWBytes(Buffer), cLen);
+             If vDataType = dwftSingle Then
+              Begin
+               Move(aDataBytes[1], Pointer(@vSingle)^, SizeOf(DWSingle));
+               vBCD := vSingle;
+               cLen := SizeOf(vBCD);
+               Move(Pointer(@vBCD)^, Pointer(Buffer)^, cLen);
+              End
+             Else
+              Move(aDataBytes[1], Pointer(Buffer)^, cLen-1);
+            End
+           Else If (Field.datatype In [ftDateTime, ftTimestamp, ftDate, ftTime]) Then
+            Begin
+             If Length(TRESTDWBytes(Buffer)) = 0 Then
+              SetLength(TRESTDWBytes(Buffer), cLen);
+             cLen := SizeOf(TDateTimeRec);
+             Move(aDataBytes[1], Pointer(@vDouble)^, SizeOf(vDouble));
+             Case Field.datatype Of
+              ftTime     : Begin
+                            vDateTimeRec.Time := DateTimeToTimeStamp(vDouble).Time;
+                            Move(Pointer(@vDateTimeRec)^, Pointer(Buffer)^, cLen);
+                           End;
+              ftDate     : Begin
+                            vDateTimeRec.Date := Round(vDouble);
+                            Move(Pointer(@vDateTimeRec)^, Pointer(Buffer)^, cLen);
+                           End;
+              ftDateTime : Begin
+                            vDateTimeRec.DateTime := TimeStampToMSecs(DateTimeToTimeStamp(vDouble));
+                            Move(Pointer(@vDateTimeRec)^, Pointer(Buffer)^, cLen);
+                           End;
+              Else
+               Begin
+                vTimeStamp := DateTimeToSQLTimeStamp(vDouble);
+                cLen := SizeOf(vTimeStamp);
+                Move(Pointer(@vTimeStamp)^, Pointer(Buffer)^, cLen);
+               End;
+             End;
+            End
            Else
-            Move(aDataBytes[0], Buffer^, cLen);
+            Begin
+             If Length(TRESTDWBytes(Buffer)) = 0 Then
+              SetLength(TRESTDWBytes(Buffer), cLen);
+             Move(aDataBytes[0], Pointer(Buffer)^, cLen);
+            End;
           {$ENDIF}
          SetLength(aDataBytes, 0);
         End;
@@ -2217,16 +2356,21 @@ Procedure TRESTDWMemTable.InternalSetFieldData(Field                : TField;
                         		       Buffer               : Pointer;
 					       Const ValidateBuffer : TRESTDWMTValueBuffer);
 Var
-  PActualRecord	          : PRESTDWMTMemBuffer;
+  PActualRecord  : PRESTDWMTMemBuffer;
   Data			  : {$IFDEF FPC}PAnsiChar{$ELSE}PByte{$ENDIF};
-  aBytes		  : TRESTDWBytes;
-  pBytes		  : PRESTDWBytes;
+  aBytes		     : TRESTDWBytes;
+  pBytes		     : PRESTDWBytes;
   VarData		  : Variant;
   aResult,
   vBoolean,
-  IsData		  : Boolean;
+  IsData		     : Boolean;
   aIndex,
-  cLen	   	          : Integer;
+  cLen	   	  : Integer;
+  vDateTimeInt   : DWInteger;
+  vDateFloat     : DWFloat;
+  vDateTimeStamp : TTimeStamp;
+  vDateTime      : TDateTime;
+  vDateTimeRec   : TDateTimeRec;
   aDataType		  : TFieldType;
   Procedure GetDataValue;
   Begin
@@ -2330,23 +2474,19 @@ Var
                dwftFMTBCD,
                dwftBCD,
                dwftCurrency,
-               dwftDate,
-               dwftTime,
-               dwftDateTime,
-               dwftTimestamp,
                dwftBoolean : Begin
-                              vBoolean := Length(TRESTDWBytes(Buffer)) = 0;
+//                              vBoolean := Length(TRESTDWBytes(Buffer)) > 0;
                               {$IFNDEF FPC}
                                {$IF CompilerVersion > 21}
                                 If Not (Field.datatype in  [ftByte, ftShortint]) then
                                  Begin
                                {$IFEND}
                               {$ENDIF}
-                                  SetLength(aBytes, cLen);
-                                  Move(vBoolean, aBytes[0], SizeOf(Boolean));
-                                  Move(TRESTDWBytes(Buffer)[0], aBytes[1], cLen-1);
-                                  Move(aBytes[0], data^, cLen);
-                                  SetLength(aBytes, 0);
+                              SetLength(aBytes, cLen);
+                              Move(vBoolean, aBytes[0], SizeOf(Boolean));
+                              Move(TRESTDWBytes(Buffer)[0], aBytes[1], cLen-1);
+                              Move(aBytes[0], data^, cLen);
+                              SetLength(aBytes, 0);
                               {$IFNDEF FPC}
                                {$IF CompilerVersion > 21}
                                  End
@@ -2355,6 +2495,46 @@ Var
                                {$IFEND}
                               {$ENDIF}
                              End;
+               dwftDate,
+               dwftTime,
+               dwftDateTime,
+               dwftTimestamp : Begin
+//                                vBoolean := Length(TRESTDWBytes(Buffer)) = 0;
+                                SetLength(aBytes, SizeOf(DWFloat) + 1);
+                                If aDataType in [ftDate, ftTime] Then
+                                 Begin
+                                  Move(vBoolean, aBytes[0], SizeOf(Boolean));
+                                  Move(TRESTDWBytes(Buffer)[0], Pointer(@vDateTimeInt)^, SizeOf(DWInteger));
+                                  If aDataType = ftDate Then
+                                   Begin
+                                    vDateTimeStamp.Date := vDateTimeInt;
+                                    vDateFloat          := TimeStampToDateTime(vDateTimeStamp);
+                                    vDateFloat          := vDateTimeInt;
+                                   End
+                                  Else
+                                   Begin
+                                    vDateTime           := IncMillisecond(vDateTime, vDateTimeInt);
+                                    vDateFloat          := vDateTime;
+                                   End;
+                                  Move(Pointer(@vDateFloat)^, aBytes[1], SizeOf(DWFloat));
+                                 End
+                                Else
+                                 Begin
+                                  Move(vBoolean, aBytes[0], SizeOf(Boolean));
+                                  Move(TRESTDWBytes(Buffer)[0], Pointer(@vDateFloat)^, SizeOf(DWFloat));
+                                  {$IFDEF FPC}
+                                   vDateTimeStamp.Date := Trunc(vDateFloat / msecsperday);
+                                   vDateFloat          := vDateFloat - comp(vDateTimeStamp.Date) * msecsperday;
+                                   vDateTimeStamp.Time := Round(vDateFloat);
+                                  {$ELSE}
+                                   vDateTimeStamp := MSecsToTimeStamp(vDateFloat);
+                                  {$ENDIF}
+                                  vDateFloat     := TimeStampToDateTime(vDateTimeStamp);
+                                  Move(Pointer(@vDateFloat)^, aBytes[1], SizeOf(DWFloat));
+                                 End;
+                                Move(aBytes[0], data^, Length(aBytes));
+                                SetLength(aBytes, 0);
+                               End;
               Else
                Move(buffer^, data^, cLen);
              End;
@@ -2389,17 +2569,19 @@ End;
 
 Function  TRESTDWMemTable.GetBlob(aRecNo, Index    : Integer) : PMemBlobData;
 Begin
+ Result := Nil;
  If aRecNo > 0 Then
   Begin
    If State in [dsEdit, dsBrowse] then
     Begin
      If Length(frecords[arecNo -1].fblobs) > 0 Then
       Result := @frecords[arecNo -1].fblobs[Index]
-     Else
+     Else If Length(fblobs) > Index Then
       Result := @fblobs[Index];
     End
    Else If State in [dsInsert] then
-    Result := @fblobs[Index];
+    If Length(fblobs) > Index Then
+     Result := @fblobs[Index];
   End
  Else
   Result := @fblobs[Index];
@@ -2546,6 +2728,8 @@ Begin
      If Length(frecords[recNo -1].fblobs) > 0 Then
       Begin
        frecords[recNo -1].fblobs[Field.Offset] := Value;
+       If Field.Offset > Length(fblobs) Then
+        SetLength(fblobs, Field.Offset+1);
        fblobs[Field.Offset]                    := Value;
       End
      Else
@@ -2563,7 +2747,8 @@ Begin
 //   SetLength(Records[FRecordPos].FBlobs[Field.Offset], 0);
 //   SetLength(FBlobs[Field.Offset], 0);
 //  End
- SetLength(FBlobs[Field.Offset], 0);
+ If Length(FBlobs) > Field.Offset +1 Then
+  SetLength(FBlobs[Field.Offset], 0);
 End;
 
 Function TRESTDWMemTable.CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
@@ -4813,8 +4998,8 @@ Begin
   FBlobOfs := 0;
   FDataSetClosed := True;
   DataEvent(deUpdateRecord, 0);
-  FDataSet := Nil;
-  FDataSet.Free;
+  If Assigned(FDataSet) Then
+   FreeAndNil(FDataSet);
 End;
 
 Procedure TRESTDWMemTable.InternalHandleException;
@@ -4886,7 +5071,7 @@ Begin
   Result := not Filtered;
 End;
 
-{$IFDEF RESTDWLAZARUS}
+{$IFDEF FPC}
 Function  TRESTDWMemTable.GetDatabaseCharSet : TDatabaseCharSet;
 Begin
  Result := vDatabaseCharSet;
@@ -5891,7 +6076,7 @@ var
       Result := False;
     End;
   End;
-  
+
   Function InsertRec: Boolean;
   Begin
     Try
@@ -6237,7 +6422,7 @@ Begin
     Except
       AppHandleException(Self);
     End;
-  FDataSet := Nil;  
+  FDataSet := Nil;
   //FDataSet.Free;
   inherited Destroy;
 End;
@@ -6772,3 +6957,4 @@ Begin
 End;
 
 end.
+

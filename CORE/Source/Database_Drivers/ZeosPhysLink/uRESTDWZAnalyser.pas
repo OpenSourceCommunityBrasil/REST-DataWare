@@ -2,8 +2,10 @@ unit uRESTDWZAnalyser;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
-{$IFNDEF RESTDWLAZARUS}
+{$IFNDEF FPC}
   {$I ZDbc.inc}
+{$ELSE}
+ {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
 {

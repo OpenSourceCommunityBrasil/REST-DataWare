@@ -3,12 +3,23 @@ unit uRESTDWTimespan;
 {$WEAKPACKAGEUNIT OFF}
 
 interface
-{$IFNDEF CPUX86}
-{$WARN LOST_EXTENDED_PRECISION OFF}
-{$ENDIF !CPUX86}
-{$HPPEMIT LEGACYHPP}
 
-{$IFDEF FPC}
+
+{$IFNDEF FPC}
+ {$IF CompilerVersion > 21}
+  {$IFNDEF CPUX86}
+   {$WARN LOST_EXTENDED_PRECISION OFF}
+  {$ENDIF !CPUX86}
+  {$HPPEMIT LEGACYHPP}
+ {$IFEND}
+{$ELSE}
+ {$IFNDEF CPUX86}
+  {$WARN LOST_EXTENDED_PRECISION OFF}
+ {$ENDIF !CPUX86}
+ {$HPPEMIT LEGACYHPP}
+{$ENDIF}
+
+{$IFNDEF FPC}
 Resourcestring
  sInvalidTimespanFormat    = 'Invalid Timespan format';
  sTimespanTooLong          = 'Timespan too long';

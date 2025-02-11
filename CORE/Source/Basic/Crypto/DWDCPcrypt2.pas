@@ -267,7 +267,7 @@ type
 
   published
     property BlockSize: integer read _GetBlockSize write DeadInt;
-    property CipherMode: TDWDCP_ciphermode read fCipherMode write fCipherMode default TDWDCP_ciphermode.cmCBC;
+    property CipherMode: TDWDCP_ciphermode read fCipherMode write fCipherMode;
   end;
 
   TDWDCP_blockcipherclass = class of TDWDCP_blockcipher;
@@ -702,15 +702,15 @@ end;
 procedure TDWDCP_blockcipher.Encrypt(const Indata; var Outdata; Size: longword);
 begin
   case fCipherMode of
-    TDWDCP_ciphermode.cmCBC:
+    cmCBC:
       EncryptCBC(Indata, Outdata, Size);
-    TDWDCP_ciphermode.cmCFB8bit:
+    cmCFB8bit:
       EncryptCFB8bit(Indata, Outdata, Size);
-    TDWDCP_ciphermode.cmCFBblock:
+    cmCFBblock:
       EncryptCFBblock(Indata, Outdata, Size);
-    TDWDCP_ciphermode.cmOFB:
+    cmOFB:
       EncryptOFB(Indata, Outdata, Size);
-    TDWDCP_ciphermode.cmCTR:
+    cmCTR:
       EncryptCTR(Indata, Outdata, Size);
   end;
 end;
@@ -749,15 +749,15 @@ end;
 procedure TDWDCP_blockcipher.Decrypt(const Indata; var Outdata; Size: longword);
 begin
   case fCipherMode of
-    TDWDCP_ciphermode.cmCBC:
+    cmCBC:
       DecryptCBC(Indata, Outdata, Size);
-    TDWDCP_ciphermode.cmCFB8bit:
+    cmCFB8bit:
       DecryptCFB8bit(Indata, Outdata, Size);
-    TDWDCP_ciphermode.cmCFBblock:
+    cmCFBblock:
       DecryptCFBblock(Indata, Outdata, Size);
-    TDWDCP_ciphermode.cmOFB:
+    cmOFB:
       DecryptOFB(Indata, Outdata, Size);
-    TDWDCP_ciphermode.cmCTR:
+    cmCTR:
       DecryptCTR(Indata, Outdata, Size);
   end;
 end;
@@ -813,7 +813,7 @@ end;
 constructor TDWDCP_blockcipher.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  fCipherMode := TDWDCP_ciphermode.cmCBC;
+  fCipherMode := cmCBC;
 end;
 
 // Version 2.1 : Partial Stream Read capability.

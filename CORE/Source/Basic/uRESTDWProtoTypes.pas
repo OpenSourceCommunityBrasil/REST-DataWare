@@ -159,6 +159,7 @@ Type
   DWFloat         = Real;
   DWSingle        = Single;
   DWDouble        = Double;
+  DWLongDouble    = Extended;
   DWWord          = Word;
   DWCurrency      = Currency;
   DWCardinal      = Cardinal;
@@ -176,6 +177,7 @@ Type
   DWFloat         = Real;
   DWSingle        = Single;
   DWDouble        = Double;
+  DWLongDouble    = Extended;
   DWWord          = Word;
   DWCurrency      = Currency;
   DWCardinal      = Cardinal;
@@ -278,6 +280,7 @@ Type
                                 dbtAdo);
  TWideChars                  = Array of WideChar;
  TRESTDWBytes                = Array of Byte;
+ TRESTDWArrayOfChar          = Array of Char;
  PRESTDWBytes                = ^TRESTDWBytes;
  TOnWriterProcess            = Procedure(DataSet               : TDataSet;
                                          RecNo, RecordCount    : Integer;

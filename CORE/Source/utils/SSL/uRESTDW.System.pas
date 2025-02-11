@@ -14,8 +14,8 @@ type
   { Abstract base class for classes that can implement interfaces, but are not
     reference counted (unless on ARC systems of course). If you want your class
     to be reference counted, derive from TInterfacedObject instead. }
-  TRESTDWNonRefCountedObject = {$IFNDEF FPC}class abstract(TObject){$ELSE}class(TInterfacedObject){$ENDIF}
-  {$REGION 'Internal Declarations'}
+  TRESTDWNonRefCountedObject = {$IFNDEF FPC}class{$IF CompilerVersion > 21}abstract{$IFEND}(TObject){$ELSE}class(TInterfacedObject){$ENDIF}
+  {$IFNDEF FPC}{$IF CompilerVersion > 21}{$REGION 'Internal Declarations'}{$IFEND}{$ENDIF}
   protected
     { IInterface }
    {$IFNDEF FPC}
@@ -27,7 +27,7 @@ type
     function _AddRef : longint;{$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
     function _Release : longint;{$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
    {$ENDIF}
-  {$ENDREGION 'Internal Declarations'}
+  {$IFNDEF FPC}{$IF CompilerVersion > 21}{$ENDREGION 'Internal Declarations'}{$IFEND}{$ENDIF}
   end;
 
 implementation

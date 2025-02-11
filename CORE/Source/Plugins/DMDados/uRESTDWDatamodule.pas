@@ -1,4 +1,4 @@
-﻿unit uRESTDWDatamodule;
+unit uRESTDWDatamodule;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
@@ -188,7 +188,7 @@ Var
      Else If JSONParam.IsNull Then
       Begin
        If JSONParam.Encoded Then
-        JSONParam.SetValue(DecodeStrings(lst.ValueFromIndex[0]{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
+        JSONParam.SetValue(DecodeStrings(lst.ValueFromIndex[0]{$IFDEF FPC}, csUndefined{$ENDIF}))
        Else
         JSONParam.SetValue(lst.ValueFromIndex[0]);
       End;

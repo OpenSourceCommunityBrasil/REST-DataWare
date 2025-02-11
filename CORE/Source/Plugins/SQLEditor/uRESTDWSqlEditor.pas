@@ -42,6 +42,7 @@ Const
 
  Type
   TOnTrhFimBusca = procedure(Sender : TObject; evento : string; lstString : TStringList) of object;
+  PointerString  = ^String;
 
   { TThrBancoDados }
 
@@ -130,6 +131,7 @@ Const
   RESTDWClientSQLB   : TRESTDWClientSQL;
   vLastSelect,
   vOldSQL            : String;
+  pNewSQL            : PointerString;
   FThrBancoDados     : TThrBancoDados;
   FResModal          : Cardinal;
   Procedure SetFields;
@@ -143,6 +145,7 @@ Const
   { Public declarations }
   Procedure SetClientSQL(Value : TRESTDWClientSQL);
   Property  Database : TRESTDWDatabasebaseBase Read RESTDWDatabase Write SetDatabase;
+  Property  NewSQL   : PointerString Read pNewSQL Write pNewSQL;
  End;
 
  Type
@@ -184,19 +187,19 @@ end;
 Procedure TRESTDWSQLEditor.Edit;
 Var
   objObj : TRESTDWClientSQL;
-  vModal : cardinal;
+  vPointerString : String;
 Begin
   FrmDWSqlEditor := TFrmDWSqlEditor.Create(Application);
   Try
     objObj        := TRESTDWClientSQL(GetComponent(0));
     FrmDWSqlEditor.SetClientSQL(objObj);
-    vModal := FrmDWSqlEditor.ShowModal;
-
-    if vModal = mrOk then
-      SetValue(FrmDWSqlEditor.Memo.Text);
-
-    objObj        := Nil;
-    FrmDWSqlEditor.Free;
+    FrmDWSqlEditor.pNewSQL := @vPointerString;
+    vPointerString := '';
+    FrmDWSqlEditor.ShowModal;
+    if vPointerString <> '' then
+      SetValue(vPointerString);
+//    objObj        := Nil;
+    FreeAndNil(FrmDWSqlEditor);
   Except
 
   End;
@@ -237,6 +240,7 @@ End;
 
 procedure TFrmDWSqlEditor.BtnOkClick(Sender: TObject);
 begin
+  pNewSQL^  := Trim(Memo.Lines.Text);
   FResModal := mrOk;
   Close;
 end;
@@ -270,28 +274,26 @@ begin
      End;
   {$ENDIF}
  End;
-
  BtnCancelar.Tag := 2;
-
- if FThrBancoDados <> nil then begin
+ if FThrBancoDados <> nil then
+  Begin
    FThrBancoDados.threadDie;
    tmClose.Enabled := True;
    {$IFDEF FPC}
-     CloseAction:=caNone;
+    CloseAction := caNone;
    {$ELSE}
-     Action:=caNone;
+    Action := caNone;
    {$ENDIF}
    Exit;
- end;
-
+  End;
  ModalResult := FResModal; // devido o clock (passa duas vezes)
-
  RESTDWClientSQLB.Active := False;
  FreeAndNil(RESTDWClientSQLB);
  If Assigned(RESTDWDatabase) Then
   RESTDWDatabase.Active   := False;
  FreeAndNil(DataSource);
- Release;
+// FrmDWSqlEditor := Nil;
+// Release;
 end;
 
 procedure TFrmDWSqlEditor.FormCreate(Sender: TObject);

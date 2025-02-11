@@ -1,6 +1,12 @@
 unit uRESTDW.Bson.IO;
 
-{$SCOPEDENUMS ON}
+{$IFNDEF FPC}
+ {$IF CompilerVersion >= 21}
+  {$SCOPEDENUMS ON}
+ {$IFEND}
+{$ELSE}
+ {$SCOPEDENUMS ON}
+{$ENDIF}
 
 (*< JSON and BSON reading and writing.
 
@@ -57,8 +63,13 @@ interface
 
 uses
   {$IFNDEF FPC}
-   System.Classes,
-   System.SysUtils,
+   {$IF CompilerVersion >= 21}
+    System.Classes,
+    System.SysUtils,
+   {$ELSE}
+    Classes,
+    SysUtils,
+   {$IFEND}
   {$ELSE}
    Classes,
    SysUtils,

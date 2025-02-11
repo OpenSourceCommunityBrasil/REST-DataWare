@@ -1,4 +1,4 @@
-﻿unit uRESTDWDriverBase;
+unit uRESTDWDriverBase;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -210,7 +210,7 @@ Type
   vCompression         : Boolean;
   vEncoding            : TEncodeSelect;
   vCommitRecords       : Integer;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
    vDatabaseCharSet    : TDatabaseCharSet;
   {$ENDIF}
   vParamCreate         : Boolean;
@@ -413,7 +413,7 @@ Type
   Property EncodeStringsJSON   : Boolean                 Read vEncodeStrings         Write vEncodeStrings;
   Property Encoding            : TEncodeSelect           Read vEncoding              Write vEncoding;
   Property ParamCreate         : Boolean                 Read vParamCreate           Write vParamCreate;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   Property DatabaseCharSet     : TDatabaseCharSet        Read vDatabaseCharSet       Write vDatabaseCharSet;
   {$ENDIF}
   Property CommitRecords       : Integer                 Read vCommitRecords         Write vCommitRecords;
@@ -614,19 +614,19 @@ begin
               Begin
                 {$IFNDEF FPC}
                  {$IFDEF DELPHI2010UP}
-                  if vParam.RESTDWDataTypeParam in [dwftMemo] then
-                   vParam.Value := utf8tostring(DecodeStrings(DWParams[I].AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
+                  if vParam.RESTDWDataTypeParam in [dwftMemo, dwftFmtMemo] then
+                   vParam.Value := DecodeStrings(DWParams[I].AsString)
                   else
                    vParam.Value := utf8tostring(DWParams[I].AsString);
                  {$ELSE}
-                  if vParam.RESTDWDataTypeParam in [dwftMemo] then
-                   vParam.Value := DecodeStrings(DWParams[I].AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
+                  if vParam.RESTDWDataTypeParam in [dwftMemo, dwftFmtMemo] then
+                   vParam.Value := DecodeStrings(DWParams[I].AsString)
                   else
                    vParam.Value := DWParams[I].AsString;
                  {$ENDIF}
                 {$ELSE}
                  if vParam.RESTDWDataTypeParam in [dwftMemo] then
-                  vParam.Value := utf8tostring(DecodeStrings(DWParams[I].AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
+                  vParam.Value := DecodeStrings(DWParams[I].AsString, csUndefined)
                  else
                   vParam.Value := utf8tostring(DWParams[I].AsString);
                 {$ENDIF}
@@ -1709,7 +1709,7 @@ Begin
             Result := TRESTDWJSONValue.Create;
           Result.Encoding := Encoding;
           Result.Encoded := EncodeStringsJSON;
-          {$IFDEF RESTDWLAZARUS}
+          {$IFDEF FPC}
           Result.DatabaseCharSet := DatabaseCharSet;
           {$ENDIF}
           Result.Utf8SpecialChars := True;
@@ -1723,7 +1723,7 @@ Begin
               If Result = Nil Then
                 Result := TRESTDWJSONValue.Create;
               Result.Encoded := True;
-              {$IFDEF RESTDWLAZARUS}
+              {$IFDEF FPC}
               Result.DatabaseCharSet := DatabaseCharSet;
               {$ENDIF}
               Result.SetValue(GetPairJSONStr('NOK', MessageError));
@@ -1738,7 +1738,7 @@ Begin
           Result := TRESTDWJSONValue.Create;
         Result.Encoding := Encoding;
         Result.Encoded := EncodeStringsJSON;
-        {$IFDEF RESTDWLAZARUS}
+        {$IFDEF FPC}
           Result.DatabaseCharSet := DatabaseCharSet;
         {$ENDIF}
         Result.SetValue('[' + vResultReflection + ']');
@@ -2083,7 +2083,7 @@ begin
             Result := TRESTDWJSONValue.Create;
           Result.Encoding := Encoding;
           Result.Encoded := EncodeStringsJSON;
-          {$IFDEF RESTDWLAZARUS}
+          {$IFDEF FPC}
             Result.DatabaseCharSet := DatabaseCharSet;
           {$ENDIF}
           Result.Utf8SpecialChars := True;
@@ -2097,7 +2097,7 @@ begin
               if Result = nil then
                 Result := TRESTDWJSONValue.Create;
               Result.Encoded := True;
-              {$IFDEF RESTDWLAZARUS}
+              {$IFDEF FPC}
                 Result.DatabaseCharSet := DatabaseCharSet;
               {$ENDIF}
               Result.SetValue(GetPairJSONStr('NOK', MessageError));
@@ -2112,7 +2112,7 @@ begin
           Result := TRESTDWJSONValue.Create;
         Result.Encoding := Encoding;
         Result.Encoded := EncodeStringsJSON;
-        {$IFDEF RESTDWLAZARUS}
+        {$IFDEF FPC}
           Result.DatabaseCharSet := DatabaseCharSet;
         {$ENDIF}
         Result.SetValue('[' + vResultReflection + ']');
@@ -2497,8 +2497,8 @@ Var
      vDWParams.Encoding := Encoding;
      Try
       vMassiveSQLMode := MassiveSQLMode(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[0].Value);
-      vSQL            := StringReplace(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[1].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), #$B, ' ', [rfReplaceAll]);
-      vParamsString   := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[2].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      vSQL            := StringReplace(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF}), #$B, ' ', [rfReplaceAll]);
+      vParamsString   := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[2].Value{$IFDEF FPC}, csUndefined{$ENDIF});
       vBookmark       := TRESTDWJSONInterfaceObject(bJsonValueB).pairs[3].Value;
       vBinaryRequest  := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonValueB).pairs[4].Value);
 
@@ -2635,7 +2635,7 @@ begin
 
           try
             vTempQuery.FStorageDataType := FStorageDataType;
-            {$IFDEF RESTDWLAZARUS}
+            {$IFDEF FPC}
              vTempQuery.DatabaseCharSet       := DatabaseCharSet;
             {$ENDIF}
             vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
@@ -2727,7 +2727,7 @@ begin
 
     aResult.Encoded         := EncodeStringsJSON;
     aResult.Encoding        := Encoding;
-    {$IFDEF RESTDWLAZARUS}
+    {$IFDEF FPC}
       aResult.DatabaseCharSet := DatabaseCharSet;
     {$ENDIF}
     try
@@ -2751,7 +2751,7 @@ begin
           BinaryBlob := TMemoryStream.Create;
         try
           vTempQuery.FStorageDataType := FStorageDataType;
-          {$IFDEF RESTDWLAZARUS}
+          {$IFDEF FPC}
            vTempQuery.DatabaseCharSet       := DatabaseCharSet;
           {$ENDIF}
           vTempQuery.SaveToStreamCompatibleMode(BinaryBlob);
@@ -2779,7 +2779,7 @@ begin
 
         aResult.Encoded         := True;
         aResult.Encoding        := Encoding;
-        {$IFDEF RESTDWLAZARUS}
+        {$IFDEF FPC}
           aResult.DatabaseCharSet := DatabaseCharSet;
         {$ENDIF}
         aResult.SetValue(GetPairJSONStr('NOK', MessageError));
@@ -3718,7 +3718,7 @@ Begin
     bJsonArray  := bJsonValue.OpenArray(I);
     vTempQuery.Close;
     vTempQuery.SQL.Clear;
-    vTempQuery.SQL.Add(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+    vTempQuery.SQL.Add(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
     vBinaryEvent    := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[2].Value);
     vMetaData       := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[3].Value);
     vCompatibleMode := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[4].Value);
@@ -3726,7 +3726,7 @@ Begin
      Begin
       DWParams := TRESTDWParams.Create;
       Try
-       DWParams.FromJSON(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[1].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+       DWParams.FromJSON(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
        vTempQuery.ImportParams(DWParams);
       Finally
        DWParams.Free;
@@ -3745,7 +3745,7 @@ Begin
       vStream := TMemoryStream.Create;
       Try
        vTempQuery.FStorageDataType := FStorageDataType;
-       {$IFDEF RESTDWLAZARUS}
+       {$IFDEF FPC}
         vTempQuery.DatabaseCharSet       := DatabaseCharSet;
        {$ENDIF}
        vTempQuery.SaveToStreamCompatibleMode(vStream);
@@ -3876,7 +3876,7 @@ Begin
     vTempQuery.Open;
     vStream := TMemoryStream.Create;
     Try
-     {$IFDEF RESTDWLAZARUS}
+     {$IFDEF FPC}
       vTempQuery.DatabaseCharSet       := DatabaseCharSet;
      {$ENDIF}
      vTempQuery.SaveToStreamCompatibleMode(vStream);
@@ -3913,7 +3913,7 @@ constructor TRESTDWDriverBase.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   vEncodeStrings       := True;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
     vDatabaseCharSet   := csUndefined;
   {$ENDIF}
   vDatabaseType        := dbtUndefined;
@@ -4959,10 +4959,10 @@ Begin
                     vTempValue := cNullvalue;
                 If vReflectionLine = '' Then
                   vReflectionLine := Format('{"%s":"%s"}',[MassiveField.FieldName,
-                                     EncodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})])
+                                     EncodeStrings(vTempValue{$IFDEF FPC}, csUndefined{$ENDIF})])
                 Else
                   vReflectionLine := vReflectionLine + Format(', {"%s":"%s"}',
-                                    [MassiveField.FieldName, EncodeStrings(vTempValue{$IFDEF RESTDWLAZARUS},csUndefined{$ENDIF})]);
+                                    [MassiveField.FieldName, EncodeStrings(vTempValue{$IFDEF FPC},csUndefined{$ENDIF})]);
               End
               Else Begin
                 vStringStream := TMemoryStream.Create;

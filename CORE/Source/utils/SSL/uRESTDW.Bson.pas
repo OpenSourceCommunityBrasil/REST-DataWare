@@ -1,6 +1,12 @@
 unit uRESTDW.Bson;
 
-{$SCOPEDENUMS ON}
+{$IFNDEF FPC}
+ {$IF CompilerVersion >= 21}
+  {$SCOPEDENUMS ON}
+ {$IFEND}
+{$ELSE}
+ {$SCOPEDENUMS ON}
+{$ENDIF}
 
 (*< A light-weight and fast BSON and JSON object model, with support for
   efficiently parsing and writing in JSON and BSON format.
@@ -398,10 +404,16 @@ interface
 
 uses
  {$IFNDEF FPC}
-  System.Classes,
-  System.SysUtils,
-  System.SyncObjs,
-  System.Generics.Collections,
+  {$IF CompilerVersion >= 21}
+   System.Classes,
+   System.SysUtils,
+   System.SyncObjs,
+   System.Generics.Collections,
+  {$ELSE}
+   Classes,
+   SysUtils,
+   SyncObjs,
+  {$IFEND}
  {$ELSE}
   Classes,
   SysUtils,
@@ -428,13 +440,13 @@ type
     Double              = $01,
 
     { A BSON string }
-    &String             = $02,
+    {$IFNDEF FPC}{$IF CompilerVersion >= 21}&String{$ELSE}String1{$IFEND}{$ELSE}&String{$ENDIF} = $02,
 
     { A BSON document (see TRESTDWBsonDocument) }
     Document            = $03,
 
     { A BSON array (see TRESTDWBsonArray) }
-    &Array              = $04,
+    {$IFNDEF FPC}{$IF CompilerVersion >= 21}&Array{$ELSE}Array1{$IFEND}{$ELSE}&Array{$ENDIF} = $04,
 
     { BSON binary data (see TRESTDWBsonBinaryData) }
     Binary              = $05,
@@ -487,10 +499,10 @@ type
     Tech note: Ordinal values must match BSON spec (http://bsonspec.org) }
   TRESTDWBsonBinarySubType = (
     { Binary data in an arbitrary format }
-    Binary       = $00,
+    {$IFNDEF FPC}{$IF CompilerVersion >= 21}&Binary{$ELSE}Binary1{$IFEND}{$ELSE}&Binary{$ENDIF} = $00,
 
     { A function }
-    &Function    = $01,
+    {$IFNDEF FPC}{$IF CompilerVersion >= 21}&Function{$ELSE}Function1{$IFEND}{$ELSE}&Function{$ENDIF} = $01,
 
     { Obsolete binary type }
     OldBinary    = $02,
@@ -509,30 +521,66 @@ type
 
 type
   { The output mode of a IgoJsonWriter, as set using TRESTDWJsonWriterSettings. }
-  TRESTDWJsonOutputMode = (
-    { Outputs strict JSON }
-    Strict,
-
-    { Outputs a format that can be used by the MongoDB shell }
-    Shell);
+  TRESTDWJsonOutputMode = ({ Outputs strict JSON }
+                           Strict,
+                           { Outputs a format that can be used by the MongoDB shell }
+                          Shell);
+Type
+ TRESTDWJsonWriterSettingsB = Class
+End;
 
 type
   { Settings for a IgoJsonWriter }
-  TRESTDWJsonWriterSettings = {$IFNDEF FPC}Record{$ELSE}Class{$ENDIF}
-  {$REGION 'Internal Declarations'}
-  private class var
-    FDefault: TRESTDWJsonWriterSettings;
-    FShell: TRESTDWJsonWriterSettings;
-    FPretty: TRESTDWJsonWriterSettings;
-  private
-    FPrettyPrint: Boolean;
-    FIndent: String;
-    FLineBreak: String;
-    FOutputMode: TRESTDWJsonOutputMode;
+  TRESTDWJsonWriterSettings = {$IFNDEF FPC}{$IF CompilerVersion >= 21}Record{$ELSE}Class{$IFEND}{$ELSE}Class{$ENDIF}
+  {$IFNDEF FPC}
+   {$IF CompilerVersion >= 21}
+    {$REGION 'Internal Declarations'}
+   {$IFEND}
+  {$ELSE}
+   {$REGION 'Internal Declarations'}
+  {$ENDIF}
+  {$IFNDEF FPC}
+   {$IF CompilerVersion >= 21}
+    private class var
+     FDefault : TRESTDWJsonWriterSettings;
+     FShell   : TRESTDWJsonWriterSettings;
+     FPretty  : TRESTDWJsonWriterSettings;
+    private
+    FPrettyPrint : Boolean;
+    FIndent      : String;
+    FLineBreak   : String;
+    FOutputMode  : TRESTDWJsonOutputMode;
+   {$ELSE}
+    private
+     FDefault,
+     FShell,
+     FPretty      : TRESTDWJsonWriterSettingsB;
+     FPrettyPrint : Boolean;
+     FIndent,
+     FLineBreak   : String;
+     FOutputMode  : TRESTDWJsonOutputMode;
+   {$IFEND}
+  {$ELSE}
+   private class var
+    FDefault : TRESTDWJsonWriterSettings;
+    FShell   : TRESTDWJsonWriterSettings;
+    FPretty  : TRESTDWJsonWriterSettings;
+   private
+    FPrettyPrint : Boolean;
+    FIndent      : String;
+    FLineBreak   : String;
+    FOutputMode  : TRESTDWJsonOutputMode;
+  {$ENDIF}
   public
     { @exclude }
-    {$IFNDEF FPC}Class {$ENDIF}constructor Create;
-  {$ENDREGION 'Internal Declarations'}
+   {$IFNDEF FPC}{$IF CompilerVersion < 21}Class{$IFEND}{$ELSE}Class{$ENDIF}constructor Create;
+   {$IFNDEF FPC}
+    {$IF CompilerVersion >= 21}
+     {$ENDREGION 'Internal Declarations'}
+    {$IFEND}
+   {$ELSE}
+    {$ENDREGION 'Internal Declarations'}
+   {$ENDIF}
   public
     { Creates a settings record using the default settings:
       * PrettyPrint: False
@@ -5030,7 +5078,7 @@ end;
 
 { TRESTDWJsonWriterSettings }
 
-{$IFNDEF FPC}Class {$ENDIF}constructor TRESTDWJsonWriterSettings.Create;
+{$IFNDEF FPC}{$IF CompilerVersion < 21}Class {$IFEND}{$ELSE}Class {$ENDIF}constructor TRESTDWJsonWriterSettings.Create;
 begin
   {$IFDEF FPC}FDefault := TRESTDWJsonWriterSettings.Create;{$ENDIF}
   FShell := TRESTDWJsonWriterSettings.aCreate(TRESTDWJsonOutputMode.Shell);
