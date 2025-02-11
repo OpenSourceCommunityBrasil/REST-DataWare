@@ -636,7 +636,7 @@ Begin
             vDWParamMethod.ParamName       := bJsonOBJc.get('paramname').toString;
             vDWParamMethod.Encoded         := StringToBoolean(bJsonOBJc.get('encoded').toString);
             If Trim(bJsonOBJc.get('default').toString) <> '' Then
-             vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.get('default').toString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+             vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.get('default').toString{$IFDEF FPC}, csUndefined{$ENDIF});
            End;
          Finally
           bJsonArrayC.Free;
@@ -737,7 +737,7 @@ Begin
                            GetValueType(Items[I].vDWParams[A].ObjectValue),
                            Items[I].vDWParams[A].ParamName,
                            BooleanToString(Items[I].vDWParams[A].Encoded),
-                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
+                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF FPC}, csUndefined{$ENDIF})]);
      If vParamsLines = '' Then
       vParamsLines := vParamLine
      Else

@@ -7,8 +7,13 @@ interface
 
 uses
 {$IFNDEF FPC}
- System.Types,
- System.SysUtils;
+ {$IF CompilerVersion > 21}
+  System.Types,
+  System.SysUtils;
+ {$ELSE}
+  Types,
+  SysUtils;
+ {$IFEND}
 {$ELSE}
  Types,
  SysUtils;
@@ -48,8 +53,10 @@ const
   LIB_SSL = 'libssl.so';
   _PU = '';
   {$ELSE}
+   {$IF CompilerVersion > 21}
     {$MESSAGE Error 'Unsupported platform'}
-  {$ENDIF}
+   {$IFEND}
+  {$IFEND}
 
 const
   OPENSSL_VER_1100 = $1010000f; // 1.1.0
@@ -8740,7 +8747,7 @@ const
 
 type
   // Forward declarations
-  PPUTF8Char = ^PUTF8Char;
+  PPUTF8Char = {$IFNDEF FPC}{$IF CompilerVersion > 21}^PUTF8Char{$ELSE}^PWideChar{$IFEND}{$ELSE}^PUTF8Char{$ENDIF};
   PPPUTF8Char = ^PPUTF8Char;
   PPByte = ^PByte;
   PPPByte = ^PPByte;
@@ -8750,9 +8757,9 @@ type
   PPointer = ^Pointer;
   PUInt64 = ^UInt64;
   PLongint = ^Longint;
-  PUInt8 = ^UInt8;
+  PUInt8 = {$IFNDEF FPC}{$IF CompilerVersion > 21}^UInt8{$ELSE}^LongInt{$IFEND}{$ELSE}^UInt8{$ENDIF};
   PPUInt8 = ^PUInt8;
-  PUInt32 = ^UInt32;
+  PUInt32 = {$IFNDEF FPC}{$IF CompilerVersion > 21}^UInt32{$ELSE}^LongInt{$IFEND}{$ELSE}^UInt32{$ENDIF};
   Pstack_st = Pointer;
   PPstack_st = ^Pstack_st;
   Pstack_st_OPENSSL_STRING = Pointer;
@@ -9313,23 +9320,29 @@ type
   OPENSSL_sk_freefunc = procedure(p1: Pointer); cdecl;
 
   OPENSSL_sk_copyfunc = function(p1: Pointer): Pointer; cdecl;
-  OPENSSL_STRING = PUTF8Char;
+  {$IFNDEF FPC}
+   {$IF CompilerVersion > 21}
+    OPENSSL_STRING = PUTF8Char;
+   {$ELSE}
+    OPENSSL_STRING = PWideChar;
+   {$IFEND}
+  {$ELSE}
+   OPENSSL_STRING = PUTF8Char;
+  {$ENDIF}
   POPENSSL_STRING = ^OPENSSL_STRING;
   PPOPENSSL_STRING = ^POPENSSL_STRING;
-  OPENSSL_CSTRING = PUTF8Char;
-  POPENSSL_CSTRING = ^OPENSSL_CSTRING;
+  POPENSSL_CSTRING = {$IFNDEF FPC}{$IF CompilerVersion > 21}POPENSSL_STRING{$ELSE}^WideString{$IFEND}{$ELSE}PAnsiChar{$ENDIF};
+  sk_OPENSSL_STRING_compfunc = function(a: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; b: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
 
-  sk_OPENSSL_STRING_compfunc = function(a: PPUTF8Char; b: PPUTF8Char): Integer; cdecl;
+  sk_OPENSSL_STRING_freefunc = procedure(a: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}); cdecl;
 
-  sk_OPENSSL_STRING_freefunc = procedure(a: PUTF8Char); cdecl;
+  sk_OPENSSL_STRING_copyfunc = function(a: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
 
-  sk_OPENSSL_STRING_copyfunc = function(a: PUTF8Char): PUTF8Char; cdecl;
+  sk_OPENSSL_CSTRING_compfunc = function(a: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; b: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
 
-  sk_OPENSSL_CSTRING_compfunc = function(a: PPUTF8Char; b: PPUTF8Char): Integer; cdecl;
+  sk_OPENSSL_CSTRING_freefunc = procedure(a: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}); cdecl;
 
-  sk_OPENSSL_CSTRING_freefunc = procedure(a: PUTF8Char); cdecl;
-
-  sk_OPENSSL_CSTRING_copyfunc = function(a: PUTF8Char): PUTF8Char; cdecl;
+  sk_OPENSSL_CSTRING_copyfunc = function(a: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   OPENSSL_BLOCK = Pointer;
 
   sk_OPENSSL_BLOCK_compfunc = function(a: PPointer; b: PPointer): Integer; cdecl;
@@ -9493,7 +9506,7 @@ type
 
   PCRYPTO_EX_free = procedure(parent: Pointer; ptr: Pointer; ad: PCRYPTO_EX_DATA; idx: Integer; argl: Integer; argp: Pointer); cdecl;
 
-  PCRYPTO_EX_dup = function(&to: PCRYPTO_EX_DATA; from: PCRYPTO_EX_DATA; from_d: Pointer; idx: Integer; argl: Integer; argp: Pointer): Integer; cdecl;
+  PCRYPTO_EX_dup = function(t2: PCRYPTO_EX_DATA; from: PCRYPTO_EX_DATA; from_d: Pointer; idx: Integer; argl: Integer; argp: Pointer): Integer; cdecl;
 
   crypto_threadid_st = record
     dummy: Integer;
@@ -9510,9 +9523,9 @@ type
   PBIO_ADDRINFO = Pointer;
   PPBIO_ADDRINFO = ^PBIO_ADDRINFO;
 
-  BIO_callback_fn = function(b: PBIO; oper: Integer; argp: PUTF8Char; argi: Integer; argl: Integer; ret: Integer): Integer; cdecl;
+  BIO_callback_fn = function(b: PBIO; oper: Integer; argp: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; argi: Integer; argl: Integer; ret: Integer): Integer; cdecl;
 
-  BIO_callback_fn_ex = function(b: PBIO; oper: Integer; argp: PUTF8Char; len: NativeUInt; argi: Integer; argl: Integer; ret: Integer; processed: PNativeUInt): Integer; cdecl;
+  BIO_callback_fn_ex = function(b: PBIO; oper: Integer; argp: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: NativeUInt; argi: Integer; argl: Integer; ret: Integer; processed: PNativeUInt): Integer; cdecl;
   PBIO_METHOD = Pointer;
   PPBIO_METHOD = ^PBIO_METHOD;
 
@@ -9548,7 +9561,7 @@ type
 
   asn1_string_st = record
     length: Integer;
-    &type: Integer;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}t1pe{$IFEND}{$ELSE}&type{$ENDIF}: Integer;
     data: PByte;
     flags: Integer;
   end;
@@ -9664,11 +9677,11 @@ type
 
   _anonymous_type_1 = record
     case Integer of
-      0: (ptr: PUTF8Char);
+      0: (ptr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF});
       1: (boolean: ASN1_BOOLEAN);
       2: (asn1_string: PASN1_STRING);
-      3: (&object: PASN1_OBJECT);
-      4: (&integer: PASN1_INTEGER);
+      3: ({$IFNDEF FPC}{$IF CompilerVersion > 21}&object{$ELSE}object1{$IFEND}{$ELSE}&object{$ENDIF}: PASN1_OBJECT);
+      4: ({$IFNDEF FPC}{$IF CompilerVersion > 21}&integer{$ELSE}integer1{$IFEND}{$ELSE}&integer{$ENDIF}: PASN1_INTEGER);
       5: (enumerated: PASN1_ENUMERATED);
       6: (bit_string: PASN1_BIT_STRING);
       7: (octet_string: PASN1_OCTET_STRING);
@@ -9682,14 +9695,14 @@ type
       15: (generalizedtime: PASN1_GENERALIZEDTIME);
       16: (visiblestring: PASN1_VISIBLESTRING);
       17: (utf8string: PASN1_UTF8STRING);
-      18: (&set: PASN1_STRING);
+      18: ({$IFNDEF FPC}{$IF CompilerVersion > 21}&set{$ELSE}set1{$IFEND}{$ELSE}&set{$ENDIF}: PASN1_STRING);
       19: (sequence: PASN1_STRING);
       20: (asn1_value: PASN1_VALUE);
   end;
   P_anonymous_type_1 = ^_anonymous_type_1;
 
   asn1_type_st = record
-    &type: Integer;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer;
     value: _anonymous_type_1;
   end;
 
@@ -9707,8 +9720,8 @@ type
 
   BIT_STRING_BITNAME_st = record
     bitnum: Integer;
-    lname: PUTF8Char;
-    sname: PUTF8Char;
+    lname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
+    sname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
   end;
 
   BIT_STRING_BITNAME = BIT_STRING_BITNAME_st;
@@ -9726,20 +9739,20 @@ type
     flags: Cardinal;
     tag: Integer;
     offset: Cardinal;
-    field_name: PUTF8Char;
+    field_name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     item: PASN1_ITEM_EXP;
   end;
   ASN1_TEMPLATE = ASN1_TEMPLATE_st;
   PASN1_TEMPLATE = ^ASN1_TEMPLATE;
 
   ASN1_ITEM_st = record
-    itype: UTF8Char;
+    itype: {$IFNDEF FPC}{$IF CompilerVersion > 21}UTF8Char{$ELSE}WideChar{$IFEND}{$ELSE}UTF8Char{$ENDIF};
     utype: Integer;
     templates: PASN1_TEMPLATE;
     tcount: Integer;
     funcs: Pointer;
     size: Integer;
-    sname: PUTF8Char;
+    sname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
   end;
   ASN1_ITEM = ASN1_ITEM_st;
   PASN1_ITEM = ^ASN1_ITEM;
@@ -9765,7 +9778,7 @@ type
   ASN1_ADB = ASN1_ADB_st;
 
   ASN1_TLC_st = record
-    valid: UTF8Char;
+    valid: {$IFNDEF FPC}{$IF CompilerVersion > 21}UTF8Char{$ELSE}WideChar{$IFEND}{$ELSE}UTF8Char{$ENDIF};
     ret: Integer;
     plen: Integer;
     ptag: Integer;
@@ -9775,21 +9788,21 @@ type
   ASN1_TLC = ASN1_TLC_st;
   PASN1_TLC = ^ASN1_TLC;
 
-  PASN1_ex_d2i = function(pval: PPASN1_VALUE; &in: PPByte; len: Integer; it: PASN1_ITEM; tag: Integer; aclass: Integer; opt: UTF8Char; ctx: PASN1_TLC): Integer; cdecl;
+  PASN1_ex_d2i = function(pval: PPASN1_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer; it: PASN1_ITEM; tag: Integer; aclass: Integer; opt: {$IFNDEF FPC}{$IF CompilerVersion > 21}UTF8Char{$ELSE}WideChar{$IFEND}{$ELSE}UTF8Char{$ENDIF}; ctx: PASN1_TLC): Integer; cdecl;
 
-  PASN1_ex_i2d = function(pval: PPASN1_VALUE; &out: PPByte; it: PASN1_ITEM; tag: Integer; aclass: Integer): Integer; cdecl;
+  PASN1_ex_i2d = function(pval: PPASN1_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; it: PASN1_ITEM; tag: Integer; aclass: Integer): Integer; cdecl;
 
   PASN1_ex_new_func = function(pval: PPASN1_VALUE; it: PASN1_ITEM): Integer; cdecl;
 
   PASN1_ex_free_func = procedure(pval: PPASN1_VALUE; it: PASN1_ITEM); cdecl;
 
-  PASN1_ex_print_func = function(&out: PBIO; pval: PPASN1_VALUE; indent: Integer; fname: PUTF8Char; pctx: PASN1_PCTX): Integer; cdecl;
+  PASN1_ex_print_func = function({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; pval: PPASN1_VALUE; indent: Integer; fname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pctx: PASN1_PCTX): Integer; cdecl;
 
   PASN1_primitive_i2c = function(pval: PPASN1_VALUE; cont: PByte; putype: PInteger; it: PASN1_ITEM): Integer; cdecl;
 
-  PASN1_primitive_c2i = function(pval: PPASN1_VALUE; cont: PByte; len: Integer; utype: Integer; free_cont: PUTF8Char; it: PASN1_ITEM): Integer; cdecl;
+  PASN1_primitive_c2i = function(pval: PPASN1_VALUE; cont: PByte; len: Integer; utype: Integer; free_cont: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; it: PASN1_ITEM): Integer; cdecl;
 
-  PASN1_primitive_print = function(&out: PBIO; pval: PPASN1_VALUE; it: PASN1_ITEM; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+  PASN1_primitive_print = function({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; pval: PPASN1_VALUE; it: PASN1_ITEM; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
 
   ASN1_EXTERN_FUNCS_st = record
     app_data: Pointer;
@@ -9816,7 +9829,7 @@ type
 
   ASN1_PRIMITIVE_FUNCS = ASN1_PRIMITIVE_FUNCS_st;
 
-  PASN1_aux_cb = function(operation: Integer; &in: PPASN1_VALUE; it: PASN1_ITEM; exarg: Pointer): Integer; cdecl;
+  PASN1_aux_cb = function(operation: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPASN1_VALUE; it: PASN1_ITEM; exarg: Pointer): Integer; cdecl;
 
   ASN1_AUX_st = record
     app_data: Pointer;
@@ -9830,7 +9843,7 @@ type
   ASN1_AUX = ASN1_AUX_st;
 
   ASN1_PRINT_ARG_st = record
-    &out: PBIO;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO;
     indent: Integer;
     pctx: PASN1_PCTX;
   end;
@@ -9838,7 +9851,7 @@ type
   ASN1_PRINT_ARG = ASN1_PRINT_ARG_st;
 
   ASN1_STREAM_ARG_st = record
-    &out: PBIO;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO;
     ndef_bio: PBIO;
     boundary: PPByte;
   end;
@@ -9865,7 +9878,7 @@ type
 
   buf_mem_st = record
     length: NativeUInt;
-    data: PUTF8Char;
+    data: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     max: NativeUInt;
     flags: Cardinal;
   end;
@@ -9899,17 +9912,17 @@ type
   PCAST_KEY = ^CAST_KEY;
 
   obj_name_st = record
-    &type: Integer;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer;
     alias: Integer;
-    name: PUTF8Char;
-    data: PUTF8Char;
+    name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
+    data: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
   end;
 
   OBJ_NAME = obj_name_st;
   POBJ_NAME = ^OBJ_NAME;
 
   EVP_CTRL_TLS1_1_MULTIBLOCK_PARAM = record
-    &out: PByte;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte;
     inp: PByte;
     len: NativeUInt;
     interleave: Cardinal;
@@ -9923,7 +9936,7 @@ type
   EVP_CIPHER_INFO = evp_cipher_info_st;
   PEVP_CIPHER_INFO = ^EVP_CIPHER_INFO;
 
-  PEVP_PBE_KEYGEN = function(ctx: PEVP_CIPHER_CTX; pass: PUTF8Char; passlen: Integer; param: PASN1_TYPE; cipher: PEVP_CIPHER; md: PEVP_MD; en_de: Integer): Integer; cdecl;
+  PEVP_PBE_KEYGEN = function(ctx: PEVP_CIPHER_CTX; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; param: PASN1_TYPE; cipher: PEVP_CIPHER; md: PEVP_MD; en_de: Integer): Integer; cdecl;
 
   PEVP_PKEY_gen_cb = function(ctx: PEVP_PKEY_CTX): Integer; cdecl;
   PCMAC_CTX = Pointer;
@@ -9955,7 +9968,7 @@ type
   (********************************************************************)
   EC_builtin_curve = record
     nid: Integer;
-    comment: PUTF8Char;
+    comment: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
   end;
 
   PECDSA_SIG = Pointer;
@@ -10118,7 +10131,7 @@ type
     signature: PASN1_BIT_STRING;
     valid: Integer;
     references: Integer;
-    name: MarshaledAString;
+    name: {$IFNDEF FPC}{$IF CompilerVersion > 21}MarshaledAString{$ELSE}String{$IFEND}{$ELSE}MarshaledAString{$ENDIF};
   end;
   PX509  = ^TX509;
   PPX509 = ^PX509;
@@ -10142,7 +10155,7 @@ type
     trust: Integer;
     flags: Integer;
     check_trust: function(p1: Px509_trust_st; p2: PX509; p3: Integer): Integer; cdecl;
-    name: PUTF8Char;
+    name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     arg1: Integer;
     arg2: Pointer;
   end;
@@ -10177,7 +10190,7 @@ type
     enc_pkey: PASN1_OCTET_STRING;
     dec_pkey: PEVP_PKEY;
     key_length: Integer;
-    key_data: PUTF8Char;
+    key_data: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     key_free: Integer;
     cipher: EVP_CIPHER_INFO;
   end;
@@ -10191,7 +10204,7 @@ type
     x_pkey: PX509_PKEY;
     enc_cipher: EVP_CIPHER_INFO;
     enc_len: Integer;
-    enc_data: PUTF8Char;
+    enc_data: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
   end;
 
   X509_INFO = X509_info_st;
@@ -10224,7 +10237,7 @@ type
   PPNETSCAPE_SPKI = ^PNETSCAPE_SPKI;
 
   Netscape_certificate_sequence = record
-    &type: PASN1_OBJECT;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PASN1_OBJECT;
     certs: Pstack_st_X509;
   end;
 
@@ -10355,15 +10368,15 @@ type
 
   X509_STORE_CTX_cleanup_fn = function(ctx: PX509_STORE_CTX): Integer; cdecl;
 
-  X509_LOOKUP_ctrl_fn = function(ctx: PX509_LOOKUP; cmd: Integer; argc: PUTF8Char; argl: Integer; ret: PPUTF8Char): Integer; cdecl;
+  X509_LOOKUP_ctrl_fn = function(ctx: PX509_LOOKUP; cmd: Integer; argc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; argl: Integer; ret: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}): Integer; cdecl;
 
-  X509_LOOKUP_get_by_subject_fn = function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl;
+  X509_LOOKUP_get_by_subject_fn = function(ctx: PX509_LOOKUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl;
 
-  X509_LOOKUP_get_by_issuer_serial_fn = function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; name: PX509_NAME; serial: PASN1_INTEGER; ret: PX509_OBJECT): Integer; cdecl;
+  X509_LOOKUP_get_by_issuer_serial_fn = function(ctx: PX509_LOOKUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; name: PX509_NAME; serial: PASN1_INTEGER; ret: PX509_OBJECT): Integer; cdecl;
 
-  X509_LOOKUP_get_by_fingerprint_fn = function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; bytes: PByte; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
+  X509_LOOKUP_get_by_fingerprint_fn = function(ctx: PX509_LOOKUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; bytes: PByte; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
 
-  X509_LOOKUP_get_by_alias_fn = function(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; str: PUTF8Char; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
+  X509_LOOKUP_get_by_alias_fn = function(ctx: PX509_LOOKUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
 
   pkcs7_issuer_and_serial_st = record
     issuer: PX509_NAME;
@@ -10483,7 +10496,7 @@ type
 
   _anonymous_type_4 = record
     case Integer of
-      0: (ptr: PUTF8Char);
+      0: (ptr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF});
       1: (data: PASN1_OCTET_STRING);
       2: (sign: PPKCS7_SIGNED);
       3: (enveloped: PPKCS7_ENVELOPE);
@@ -10499,7 +10512,7 @@ type
     length: Integer;
     state: Integer;
     detached: Integer;
-    &type: PASN1_OBJECT;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PASN1_OBJECT;
     d: _anonymous_type_4;
   end;
 
@@ -10514,9 +10527,9 @@ type
   sk_PKCS7_copyfunc = function(a: PPKCS7): Ppkcs7_st; cdecl;
 
   CONF_VALUE = record
-    section: PUTF8Char;
-    name: PUTF8Char;
-    value: PUTF8Char;
+    section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
+    name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
+    value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
   end;
 
   sk_CONF_VALUE_compfunc = function(a: PPCONF_VALUE; b: PPCONF_VALUE): Integer; cdecl;
@@ -10537,16 +10550,16 @@ type
   end;
 
   conf_method_st = record
-    name: PUTF8Char;
+    name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     create: function(meth: Pointer{PCONF_METHOD}): Pconf_st; cdecl;
     init: function(conf: PCONF): Integer; cdecl;
     destroy: function(conf: PCONF): Integer; cdecl;
     destroy_data: function(conf: PCONF): Integer; cdecl;
     load_bio: function(conf: PCONF; bp: PBIO; eline: PInteger): Integer; cdecl;
     dump: function(conf: PCONF; bp: PBIO): Integer; cdecl;
-    is_number: function(conf: PCONF; c: UTF8Char): Integer; cdecl;
-    to_int: function(conf: PCONF; c: UTF8Char): Integer; cdecl;
-    load: function(conf: PCONF; name: PUTF8Char; eline: PInteger): Integer; cdecl;
+    is_number: function(conf: PCONF; c: {$IFNDEF FPC}{$IF CompilerVersion > 21}UTF8Char{$ELSE}WideChar{$IFEND}{$ELSE}UTF8Char{$ENDIF}): Integer; cdecl;
+    to_int: function(conf: PCONF; c: {$IFNDEF FPC}{$IF CompilerVersion > 21}UTF8Char{$ELSE}WideChar{$IFEND}{$ELSE}UTF8Char{$ENDIF}): Integer; cdecl;
+    load: function(conf: PCONF; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; eline: PInteger): Integer; cdecl;
   end;
   CONF_METHOD = conf_method_st;
   PCONF_METHOD = ^CONF_METHOD;
@@ -10591,13 +10604,13 @@ type
 
   X509V3_EXT_V2I = function(method: Pv3_ext_method; ctx: Pv3_ext_ctx; values: Pstack_st_CONF_VALUE): Pointer; cdecl;
 
-  X509V3_EXT_I2S = function(method: Pv3_ext_method; ext: Pointer): PUTF8Char; cdecl;
+  X509V3_EXT_I2S = function(method: Pv3_ext_method; ext: Pointer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
 
-  X509V3_EXT_S2I = function(method: Pv3_ext_method; ctx: Pv3_ext_ctx; str: PUTF8Char): Pointer; cdecl;
+  X509V3_EXT_S2I = function(method: Pv3_ext_method; ctx: Pv3_ext_ctx; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Pointer; cdecl;
 
-  X509V3_EXT_I2R = function(method: Pv3_ext_method; ext: Pointer; &out: PBIO; indent: Integer): Integer; cdecl;
+  X509V3_EXT_I2R = function(method: Pv3_ext_method; ext: Pointer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; indent: Integer): Integer; cdecl;
 
-  X509V3_EXT_R2I = function(method: Pv3_ext_method; ctx: Pv3_ext_ctx; str: PUTF8Char): Pointer; cdecl;
+  X509V3_EXT_R2I = function(method: Pv3_ext_method; ctx: Pv3_ext_ctx; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Pointer; cdecl;
 
   v3_ext_method = record
     ext_nid: Integer;
@@ -10617,9 +10630,9 @@ type
   end;
 
   X509V3_CONF_METHOD_st = record
-    get_string: function(db: Pointer; section: PUTF8Char; value: PUTF8Char): PUTF8Char; cdecl;
-    get_section: function(db: Pointer; section: PUTF8Char): Pstack_st_CONF_VALUE; cdecl;
-    free_string: procedure(db: Pointer; &string: PUTF8Char); cdecl;
+    get_string: function(db: Pointer; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
+    get_section: function(db: Pointer; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Pstack_st_CONF_VALUE; cdecl;
+    free_string: procedure(db: Pointer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&string{$ELSE}string1{$IFEND}{$ELSE}&string{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}); cdecl;
     free_section: procedure(db: Pointer; section: Pstack_st_CONF_VALUE); cdecl;
   end;
 
@@ -10686,7 +10699,7 @@ type
 
   _anonymous_type_5 = record
     case Integer of
-      0: (ptr: PUTF8Char);
+      0: (ptr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF});
       1: (otherName: POTHERNAME);
       2: (rfc822Name: PASN1_IA5STRING);
       3: (dNSName: PASN1_IA5STRING);
@@ -10705,7 +10718,7 @@ type
   P_anonymous_type_5 = ^_anonymous_type_5;
 
   GENERAL_NAME_st = record
-    &type: Integer;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer;
     d: _anonymous_type_5;
   end;
 
@@ -10756,7 +10769,7 @@ type
   P_anonymous_type_6 = ^_anonymous_type_6;
 
   DIST_POINT_NAME_st = record
-    &type: Integer;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer;
     name: _anonymous_type_6;
     dpname: PX509_NAME;
   end;
@@ -10952,8 +10965,8 @@ type
     trust: Integer;
     flags: Integer;
     check_purpose: function(p1: Px509_purpose_st; p2: PX509; p3: Integer): Integer; cdecl;
-    name: PUTF8Char;
-    sname: PUTF8Char;
+    name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
+    sname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     usr_data: Pointer;
   end;
 
@@ -10990,7 +11003,7 @@ type
   P_anonymous_type_8 = ^_anonymous_type_8;
 
   ASIdOrRange_st = record
-    &type: Integer;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer;
     u: _anonymous_type_8;
   end;
 
@@ -11014,7 +11027,7 @@ type
   P_anonymous_type_9 = ^_anonymous_type_9;
 
   ASIdentifierChoice_st = record
-    &type: Integer;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer;
     u: _anonymous_type_9;
   end;
 
@@ -11048,7 +11061,7 @@ type
   P_anonymous_type_10 = ^_anonymous_type_10;
 
   IPAddressOrRange_st = record
-    &type: Integer;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer;
     u: _anonymous_type_10;
   end;
 
@@ -11072,7 +11085,7 @@ type
   P_anonymous_type_11 = ^_anonymous_type_11;
 
   IPAddressChoice_st = record
-    &type: Integer;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer;
     u: _anonymous_type_11;
   end;
 
@@ -11240,7 +11253,7 @@ type
   PRAND_DRBG = Pointer;
   PPRAND_DRBG = ^PRAND_DRBG;
 
-  Ppem_password_cb = function(buf: PUTF8Char; size: Integer; rwflag: Integer; userdata: Pointer): Integer; cdecl;
+  Ppem_password_cb = function(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; size: Integer; rwflag: Integer; userdata: Pointer): Integer; cdecl;
   PUI_STRING = Pointer;
   PPUI_STRING = ^PUI_STRING;
 
@@ -11262,9 +11275,9 @@ type
   err_state_st = record
     err_flags: array [0..15] of Integer;
     err_buffer: array [0..15] of Cardinal;
-    err_data: array [0..15] of PUTF8Char;
+    err_data: array [0..15] of {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     err_data_flags: array [0..15] of Integer;
-    err_file: array [0..15] of PUTF8Char;
+    err_file: array [0..15] of {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     err_line: array [0..15] of Integer;
     top: Integer;
     bottom: Integer;
@@ -11275,7 +11288,7 @@ type
 
   ERR_string_data_st = record
     error: Cardinal;
-    &string: PUTF8Char;
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}&string{$ELSE}string1{$IFEND}{$ELSE}&string{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
   end;
 
   ERR_STRING_DATA = ERR_string_data_st;
@@ -11294,8 +11307,8 @@ type
 
   ENGINE_CMD_DEFN_st = record
     cmd_num: Cardinal;
-    cmd_name: PUTF8Char;
-    cmd_desc: PUTF8Char;
+    cmd_name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
+    cmd_desc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     cmd_flags: Cardinal;
   end;
 
@@ -11310,7 +11323,7 @@ type
 
   ENGINE_CTRL_FUNC_PTR = function(p1: PENGINE; p2: Integer; p3: Integer; p4: Pointer; f: ENGINE_CTRL_FUNC_PTR_f): Integer; cdecl;
 
-  ENGINE_LOAD_KEY_PTR = function(p1: PENGINE; p2: PUTF8Char; ui_method: PUI_METHOD; callback_data: Pointer): Pevp_pkey_st; cdecl;
+  ENGINE_LOAD_KEY_PTR = function(p1: PENGINE; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ui_method: PUI_METHOD; callback_data: Pointer): Pevp_pkey_st; cdecl;
 
   ENGINE_SSL_CLIENT_CERT_PTR = function(p1: PENGINE; ssl: PSSL; ca_dn: Pstack_st_X509_NAME; pcert: PPX509; pkey: PPEVP_PKEY; pother: PPstack_st_X509; ui_method: PUI_METHOD; callback_data: Pointer): Integer; cdecl;
 
@@ -11322,11 +11335,11 @@ type
 
   ENGINE_PKEY_ASN1_METHS_PTR = function(p1: PENGINE; p2: PPEVP_PKEY_ASN1_METHOD; p3: PPInteger; p4: Integer): Integer; cdecl;
 
-  dyn_MEM_malloc_fn = function(p1: NativeUInt; p2: PUTF8Char; p3: Integer): Pointer; cdecl;
+  dyn_MEM_malloc_fn = function(p1: NativeUInt; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p3: Integer): Pointer; cdecl;
 
-  dyn_MEM_realloc_fn = function(p1: Pointer; p2: NativeUInt; p3: PUTF8Char; p4: Integer): Pointer; cdecl;
+  dyn_MEM_realloc_fn = function(p1: Pointer; p2: NativeUInt; p3: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p4: Integer): Pointer; cdecl;
 
-  dyn_MEM_free_fn = procedure(p1: Pointer; p2: PUTF8Char; p3: Integer); cdecl;
+  dyn_MEM_free_fn = procedure(p1: Pointer; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p3: Integer); cdecl;
 
   st_dynamic_MEM_fns = record
     malloc_fn: dyn_MEM_malloc_fn;
@@ -11346,7 +11359,7 @@ type
 
   dynamic_v_check_fn = function(ossl_version: Cardinal): Cardinal; cdecl;
 
-  dynamic_bind_engine = function(e: PENGINE; id: PUTF8Char; fns: Pdynamic_fns): Integer; cdecl;
+  dynamic_bind_engine = function(e: PENGINE; id: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; fns: Pdynamic_fns): Integer; cdecl;
   IDEA_INT = Cardinal;
 
   idea_key_st = record
@@ -11394,14 +11407,14 @@ type
 
   MDC2_CTX = mdc2_ctx_st;
   PMDC2_CTX = ^MDC2_CTX;
+  
+  block128_f = procedure({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; key: Pointer); cdecl;
 
-  block128_f = procedure(&in: PByte; &out: PByte; key: Pointer); cdecl;
+  cbc128_f = procedure({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; enc: Integer); cdecl;
 
-  cbc128_f = procedure(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; enc: Integer); cdecl;
+  ctr128_f = procedure({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; blocks: NativeUInt; key: Pointer; ivec: PByte); cdecl;
 
-  ctr128_f = procedure(&in: PByte; &out: PByte; blocks: NativeUInt; key: Pointer; ivec: PByte); cdecl;
-
-  ccm128_f = procedure(&in: PByte; &out: PByte; blocks: NativeUInt; key: Pointer; ivec: PByte; cmac: PByte); cdecl;
+  ccm128_f = procedure({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; blocks: NativeUInt; key: Pointer; ivec: PByte; cmac: PByte); cdecl;
   PGCM128_CONTEXT = Pointer;
   PPGCM128_CONTEXT = ^PGCM128_CONTEXT;
   PCCM128_CONTEXT = Pointer;
@@ -11412,7 +11425,7 @@ type
   PPOCB128_CONTEXT = ^POCB128_CONTEXT;
 
   PArray = Pointer;
-  ocb128_f = procedure(&in: PByte; &out: PByte; blocks: NativeUInt; key: Pointer; start_block_num: NativeUInt; offset_i: PByte; L_: PArray {Parray [0..15] of Byte}; checksum: PByte); cdecl;
+  ocb128_f = procedure({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; blocks: NativeUInt; key: Pointer; start_block_num: NativeUInt; offset_i: PByte; L_: PArray {Parray [0..15] of Byte}; checksum: PByte); cdecl;
   POCSP_CERTID = Pointer;
   PPOCSP_CERTID = ^POCSP_CERTID;
 
@@ -11480,11 +11493,11 @@ type
 
   RAND_DRBG_get_entropy_fn = function(drbg: PRAND_DRBG; pout: PPByte; entropy: Integer; min_len: NativeUInt; max_len: NativeUInt; prediction_resistance: Integer): UInt64; cdecl;
 
-  RAND_DRBG_cleanup_entropy_fn = procedure(ctx: PRAND_DRBG; &out: PByte; outlen: NativeUInt); cdecl;
+  RAND_DRBG_cleanup_entropy_fn = procedure(ctx: PRAND_DRBG; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: NativeUInt); cdecl;
 
   RAND_DRBG_get_nonce_fn = function(drbg: PRAND_DRBG; pout: PPByte; entropy: Integer; min_len: NativeUInt; max_len: NativeUInt): UInt64; cdecl;
 
-  RAND_DRBG_cleanup_nonce_fn = procedure(drbg: PRAND_DRBG; &out: PByte; outlen: NativeUInt); cdecl;
+  RAND_DRBG_cleanup_nonce_fn = procedure(drbg: PRAND_DRBG; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: NativeUInt); cdecl;
   RC2_INT = Cardinal;
 
   rc2_key_st = record
@@ -11526,7 +11539,7 @@ type
   PSEED_KEY_SCHEDULE = ^SEED_KEY_SCHEDULE;
 
   SRP_gN_cache_st = record
-    b64_bn: PUTF8Char;
+    b64_bn: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     bn: PBIGNUM;
   end;
 
@@ -11541,12 +11554,12 @@ type
   sk_SRP_gN_cache_copyfunc = function(a: PSRP_gN_cache): PSRP_gN_cache_st; cdecl;
 
   SRP_user_pwd_st = record
-    id: PUTF8Char;
+    id: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     s: PBIGNUM;
     v: PBIGNUM;
     g: PBIGNUM;
     N: PBIGNUM;
-    info: PUTF8Char;
+    info: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
   end;
 
   SRP_user_pwd = SRP_user_pwd_st;
@@ -11562,7 +11575,7 @@ type
   SRP_VBASE_st = record
     users_pwd: Pstack_st_SRP_user_pwd;
     gN_cache: Pstack_st_SRP_gN_cache;
-    seed_key: PUTF8Char;
+    seed_key: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     default_g: PBIGNUM;
     default_N: PBIGNUM;
   end;
@@ -11571,7 +11584,7 @@ type
   PSRP_VBASE = ^SRP_VBASE;
 
   SRP_gN_st = record
-    id: PUTF8Char;
+    id: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     g: PBIGNUM;
     N: PBIGNUM;
   end;
@@ -11601,7 +11614,7 @@ type
   PPSSL_COMP = ^PSSL_COMP;
 
   srtp_protection_profile_st = record
-    name: PUTF8Char;
+    name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF};
     id: Cardinal;
   end;
 
@@ -11619,37 +11632,37 @@ type
 
   tls_session_secret_cb_fn = function(s: PSSL; secret: Pointer; secret_len: PInteger; peer_ciphers: Pstack_st_SSL_CIPHER; cipher: PPSSL_CIPHER; arg: Pointer): Integer; cdecl;
 
-  custom_ext_add_cb = function(s: PSSL; ext_type: Cardinal; &out: PPByte; outlen: PNativeUInt; al: PInteger; add_arg: Pointer): Integer; cdecl;
+  custom_ext_add_cb = function(s: PSSL; ext_type: Cardinal; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; outlen: PNativeUInt; al: PInteger; add_arg: Pointer): Integer; cdecl;
 
-  custom_ext_free_cb = procedure(s: PSSL; ext_type: Cardinal; &out: PByte; add_arg: Pointer); cdecl;
+  custom_ext_free_cb = procedure(s: PSSL; ext_type: Cardinal; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; add_arg: Pointer); cdecl;
 
-  custom_ext_parse_cb = function(s: PSSL; ext_type: Cardinal; &in: PByte; inlen: NativeUInt; al: PInteger; parse_arg: Pointer): Integer; cdecl;
+  custom_ext_parse_cb = function(s: PSSL; ext_type: Cardinal; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: NativeUInt; al: PInteger; parse_arg: Pointer): Integer; cdecl;
 
-  SSL_custom_ext_add_cb_ex = function(s: PSSL; ext_type: Cardinal; context: Cardinal; &out: PPByte; outlen: PNativeUInt; x: PX509; chainidx: NativeUInt; al: PInteger; add_arg: Pointer): Integer; cdecl;
+  SSL_custom_ext_add_cb_ex = function(s: PSSL; ext_type: Cardinal; context: Cardinal; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; outlen: PNativeUInt; x: PX509; chainidx: NativeUInt; al: PInteger; add_arg: Pointer): Integer; cdecl;
 
-  SSL_custom_ext_free_cb_ex = procedure(s: PSSL; ext_type: Cardinal; context: Cardinal; &out: PByte; add_arg: Pointer); cdecl;
+  SSL_custom_ext_free_cb_ex = procedure(s: PSSL; ext_type: Cardinal; context: Cardinal; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; add_arg: Pointer); cdecl;
 
-  SSL_custom_ext_parse_cb_ex = function(s: PSSL; ext_type: Cardinal; context: Cardinal; &in: PByte; inlen: NativeUInt; x: PX509; chainidx: NativeUInt; al: PInteger; parse_arg: Pointer): Integer; cdecl;
+  SSL_custom_ext_parse_cb_ex = function(s: PSSL; ext_type: Cardinal; context: Cardinal; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: NativeUInt; x: PX509; chainidx: NativeUInt; al: PInteger; parse_arg: Pointer): Integer; cdecl;
 
   SSL_verify_cb = function(preverify_ok: Integer; x509_ctx: PX509_STORE_CTX): Integer; cdecl;
 
   GEN_SESSION_CB = function(ssl: PSSL; id: PByte; id_len: PCardinal): Integer; cdecl;
 
-  SSL_CTX_npn_advertised_cb_func = function(ssl: PSSL; &out: PPByte; outlen: PCardinal; arg: Pointer): Integer; cdecl;
+  SSL_CTX_npn_advertised_cb_func = function(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; outlen: PCardinal; arg: Pointer): Integer; cdecl;
 
-  SSL_CTX_npn_select_cb_func = function(s: PSSL; &out: PPByte; outlen: PByte; &in: PByte; inlen: Cardinal; arg: Pointer): Integer; cdecl;
+  SSL_CTX_npn_select_cb_func = function(s: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; outlen: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: Cardinal; arg: Pointer): Integer; cdecl;
 
-  SSL_CTX_alpn_select_cb_func = function(ssl: PSSL; &out: PPByte; outlen: PByte; &in: PByte; inlen: Cardinal; arg: Pointer): Integer; cdecl;
+  SSL_CTX_alpn_select_cb_func = function(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; outlen: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: Cardinal; arg: Pointer): Integer; cdecl;
 
-  SSL_psk_client_cb_func = function(ssl: PSSL; hint: PUTF8Char; identity: PUTF8Char; max_identity_len: Cardinal; psk: PByte; max_psk_len: Cardinal): Cardinal; cdecl;
+  SSL_psk_client_cb_func = function(ssl: PSSL; hint: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; identity: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; max_identity_len: Cardinal; psk: PByte; max_psk_len: Cardinal): Cardinal; cdecl;
 
-  SSL_psk_server_cb_func = function(ssl: PSSL; identity: PUTF8Char; psk: PByte; max_psk_len: Cardinal): Cardinal; cdecl;
+  SSL_psk_server_cb_func = function(ssl: PSSL; identity: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; psk: PByte; max_psk_len: Cardinal): Cardinal; cdecl;
 
   SSL_psk_find_session_cb_func = function(ssl: PSSL; identity: PByte; identity_len: NativeUInt; sess: PPSSL_SESSION): Integer; cdecl;
 
   SSL_psk_use_session_cb_func = function(ssl: PSSL; md: PEVP_MD; id: PPByte; idlen: PNativeUInt; sess: PPSSL_SESSION): Integer; cdecl;
 
-  SSL_CTX_keylog_cb_func = procedure(ssl: PSSL; line: PUTF8Char); cdecl;
+  SSL_CTX_keylog_cb_func = procedure(ssl: PSSL; line: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}); cdecl;
 
   tls_session_ticket_ext_st = record
     length: Word;
@@ -11749,7 +11762,7 @@ type
   POSSL_STORE_LOADER_CTX = Pointer;
   PPOSSL_STORE_LOADER_CTX = ^POSSL_STORE_LOADER_CTX;
 
-  OSSL_STORE_open_fn = function(loader: POSSL_STORE_LOADER; uri: PUTF8Char; ui_method: PUI_METHOD; ui_data: Pointer): Possl_store_loader_ctx_st; cdecl;
+  OSSL_STORE_open_fn = function(loader: POSSL_STORE_LOADER; uri: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ui_method: PUI_METHOD; ui_data: Pointer): Possl_store_loader_ctx_st; cdecl;
 
   OSSL_STORE_ctrl_fn = function(ctx: POSSL_STORE_LOADER_CTX; cmd: Integer; args: Pointer): Integer; cdecl;
 
@@ -11821,7 +11834,7 @@ type
 
   sk_OPENSSL_PSTRING_freefunc = procedure(a: POPENSSL_STRING); cdecl;
 
-  sk_OPENSSL_PSTRING_copyfunc = function(a: POPENSSL_STRING): PPUTF8Char; cdecl;
+  sk_OPENSSL_PSTRING_copyfunc = function(a: POPENSSL_STRING): {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; cdecl;
 
   txt_db_st = record
     num_fields: Integer;
@@ -11853,7 +11866,7 @@ type
 
 { Crypto Library }
 
-function AES_options(): PUTF8Char; cdecl;
+function AES_options(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'AES_options';
 
 function AES_set_encrypt_key(userKey: PByte; bits: Integer; key: PAES_KEY): Integer; cdecl;
@@ -11862,40 +11875,40 @@ function AES_set_encrypt_key(userKey: PByte; bits: Integer; key: PAES_KEY): Inte
 function AES_set_decrypt_key(userKey: PByte; bits: Integer; key: PAES_KEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'AES_set_decrypt_key';
 
-procedure AES_encrypt(&in: PByte; &out: PByte; key: PAES_KEY); cdecl;
+procedure AES_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; key: PAES_KEY); cdecl;
   external LIB_CRYPTO name _PU + 'AES_encrypt';
 
-procedure AES_decrypt(&in: PByte; &out: PByte; key: PAES_KEY); cdecl;
+procedure AES_decrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; key: PAES_KEY); cdecl;
   external LIB_CRYPTO name _PU + 'AES_decrypt';
 
-procedure AES_ecb_encrypt(&in: PByte; &out: PByte; key: PAES_KEY; enc: Integer); cdecl;
+procedure AES_ecb_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; key: PAES_KEY; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'AES_ecb_encrypt';
 
-procedure AES_cbc_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; enc: Integer); cdecl;
+procedure AES_cbc_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'AES_cbc_encrypt';
 
-procedure AES_cfb128_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
+procedure AES_cfb128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'AES_cfb128_encrypt';
 
-procedure AES_cfb1_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
+procedure AES_cfb1_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'AES_cfb1_encrypt';
 
-procedure AES_cfb8_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
+procedure AES_cfb8_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'AES_cfb8_encrypt';
 
-procedure AES_ofb128_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger); cdecl;
+procedure AES_ofb128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; num: PInteger); cdecl;
   external LIB_CRYPTO name _PU + 'AES_ofb128_encrypt';
 
-procedure AES_ige_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; enc: Integer); cdecl;
+procedure AES_ige_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PAES_KEY; ivec: PByte; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'AES_ige_encrypt';
 
-procedure AES_bi_ige_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PAES_KEY; key2: PAES_KEY; ivec: PByte; enc: Integer); cdecl;
+procedure AES_bi_ige_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PAES_KEY; key2: PAES_KEY; ivec: PByte; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'AES_bi_ige_encrypt';
 
-function AES_wrap_key(key: PAES_KEY; iv: PByte; &out: PByte; &in: PByte; inlen: Cardinal): Integer; cdecl;
+function AES_wrap_key(key: PAES_KEY; iv: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'AES_wrap_key';
 
-function AES_unwrap_key(key: PAES_KEY; iv: PByte; &out: PByte; &in: PByte; inlen: Cardinal): Integer; cdecl;
+function AES_unwrap_key(key: PAES_KEY; iv: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'AES_unwrap_key';
 
 function OPENSSL_sk_num(p1: POPENSSL_STACK): Integer; cdecl;
@@ -11997,19 +12010,19 @@ function CRYPTO_atomic_add(val: PInteger; amount: Integer; ret: PInteger; lock: 
 function CRYPTO_mem_ctrl(mode: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_mem_ctrl';
 
-function OPENSSL_strlcpy(dst: PUTF8Char; src: PUTF8Char; siz: NativeUInt): NativeUInt; cdecl;
+function OPENSSL_strlcpy(dst: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; src: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; siz: NativeUInt): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_strlcpy';
 
-function OPENSSL_strlcat(dst: PUTF8Char; src: PUTF8Char; siz: NativeUInt): NativeUInt; cdecl;
+function OPENSSL_strlcat(dst: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; src: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; siz: NativeUInt): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_strlcat';
 
-function OPENSSL_strnlen(str: PUTF8Char; maxlen: NativeUInt): NativeUInt; cdecl;
+function OPENSSL_strnlen(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; maxlen: NativeUInt): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_strnlen';
 
-function OPENSSL_buf2hexstr(buffer: PByte; len: Integer): PUTF8Char; cdecl;
+function OPENSSL_buf2hexstr(buffer: PByte; len: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_buf2hexstr';
 
-function OPENSSL_hexstr2buf(str: PUTF8Char; len: PInteger): PByte; cdecl;
+function OPENSSL_hexstr2buf(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: PInteger): PByte; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_hexstr2buf';
 
 function OPENSSL_hexchar2int(c: Byte): Integer; cdecl;
@@ -12020,9 +12033,9 @@ function OpenSSL_version_num(): Cardinal; cdecl;
 function SSLeay(): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'OpenSSL_version_num';
 
-function OpenSSL_version(&type: Integer): PUTF8Char; cdecl;
+function OpenSSL_version({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OpenSSL_version';
-function SSLeay_version(&type: Integer): PUTF8Char; cdecl;
+function SSLeay_version({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OpenSSL_version';
 
 function OPENSSL_issetugid(): Integer; cdecl;
@@ -12037,7 +12050,7 @@ function CRYPTO_free_ex_index(class_index: Integer; idx: Integer): Integer; cdec
 function CRYPTO_new_ex_data(class_index: Integer; obj: Pointer; ad: PCRYPTO_EX_DATA): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_new_ex_data';
 
-function CRYPTO_dup_ex_data(class_index: Integer; &to: PCRYPTO_EX_DATA; from: PCRYPTO_EX_DATA): Integer; cdecl;
+function CRYPTO_dup_ex_data(class_index: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PCRYPTO_EX_DATA; from: PCRYPTO_EX_DATA): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_dup_ex_data';
 
 procedure CRYPTO_free_ex_data(class_index: Integer; obj: Pointer; ad: PCRYPTO_EX_DATA); cdecl;
@@ -12050,13 +12063,13 @@ function CRYPTO_get_ex_data(ad: PCRYPTO_EX_DATA; idx: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_get_ex_data';
 
 type
-  CRYPTO_set_mem_functions_m = function(p1: NativeUInt; p2: PUTF8Char; p3: Integer): Pointer; cdecl;
+  CRYPTO_set_mem_functions_m = function(p1: NativeUInt; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p3: Integer): Pointer; cdecl;
 
 type
-  CRYPTO_set_mem_functions_r = function(p1: Pointer; p2: NativeUInt; p3: PUTF8Char; p4: Integer): Pointer; cdecl;
+  CRYPTO_set_mem_functions_r = function(p1: Pointer; p2: NativeUInt; p3: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p4: Integer): Pointer; cdecl;
 
 type
-  CRYPTO_set_mem_functions_f = procedure(p1: Pointer; p2: PUTF8Char; p3: Integer); cdecl;
+  CRYPTO_set_mem_functions_f = procedure(p1: Pointer; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p3: Integer); cdecl;
 
 function CRYPTO_set_mem_functions(m: CRYPTO_set_mem_functions_m; r: CRYPTO_set_mem_functions_r; f: CRYPTO_set_mem_functions_f): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_set_mem_functions';
@@ -12067,31 +12080,31 @@ function CRYPTO_set_mem_debug(flag: Integer): Integer; cdecl;
 procedure CRYPTO_get_mem_functions(m: Integer { TODO : Cannot convert original type "void *(**)(size_t, const char *, int)" }; r: Integer { TODO : Cannot convert original type "void *(**)(void *, size_t, const char *, int)" }; f: Integer { TODO : Cannot convert original type "void (**)(void *, const char *, int)" }); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_get_mem_functions';
 
-function CRYPTO_malloc(num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl;
+function CRYPTO_malloc(num: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_malloc';
 
-function CRYPTO_zalloc(num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl;
+function CRYPTO_zalloc(num: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_zalloc';
 
-function CRYPTO_memdup(str: Pointer; siz: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl;
+function CRYPTO_memdup(str: Pointer; siz: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_memdup';
 
-function CRYPTO_strdup(str: PUTF8Char; &file: PUTF8Char; line: Integer): PUTF8Char; cdecl;
+function CRYPTO_strdup(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_strdup';
 
-function CRYPTO_strndup(str: PUTF8Char; s: NativeUInt; &file: PUTF8Char; line: Integer): PUTF8Char; cdecl;
+function CRYPTO_strndup(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; s: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_strndup';
 
-procedure CRYPTO_free(ptr: Pointer; &file: PUTF8Char; line: Integer); cdecl;
+procedure CRYPTO_free(ptr: Pointer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_free';
 
-procedure CRYPTO_clear_free(ptr: Pointer; num: NativeUInt; &file: PUTF8Char; line: Integer); cdecl;
+procedure CRYPTO_clear_free(ptr: Pointer; num: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_clear_free';
 
-function CRYPTO_realloc(addr: Pointer; num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl;
+function CRYPTO_realloc(addr: Pointer; num: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_realloc';
 
-function CRYPTO_clear_realloc(addr: Pointer; old_num: NativeUInt; num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl;
+function CRYPTO_clear_realloc(addr: Pointer; old_num: NativeUInt; num: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_clear_realloc';
 
 function CRYPTO_secure_malloc_init(sz: NativeUInt; minsize: Integer): Integer; cdecl;
@@ -12100,16 +12113,16 @@ function CRYPTO_secure_malloc_init(sz: NativeUInt; minsize: Integer): Integer; c
 function CRYPTO_secure_malloc_done(): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_secure_malloc_done';
 
-function CRYPTO_secure_malloc(num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl;
+function CRYPTO_secure_malloc(num: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_secure_malloc';
 
-function CRYPTO_secure_zalloc(num: NativeUInt; &file: PUTF8Char; line: Integer): Pointer; cdecl;
+function CRYPTO_secure_zalloc(num: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_secure_zalloc';
 
-procedure CRYPTO_secure_free(ptr: Pointer; &file: PUTF8Char; line: Integer); cdecl;
+procedure CRYPTO_secure_free(ptr: Pointer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_secure_free';
 
-procedure CRYPTO_secure_clear_free(ptr: Pointer; num: NativeUInt; &file: PUTF8Char; line: Integer); cdecl;
+procedure CRYPTO_secure_clear_free(ptr: Pointer; num: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_secure_clear_free';
 
 function CRYPTO_secure_allocated(ptr: Pointer): Integer; cdecl;
@@ -12127,7 +12140,7 @@ function CRYPTO_secure_used(): NativeUInt; cdecl;
 procedure OPENSSL_cleanse(ptr: Pointer; len: NativeUInt); cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_cleanse';
 
-procedure OPENSSL_die(assertion: PUTF8Char; &file: PUTF8Char; line: Integer); cdecl;
+procedure OPENSSL_die(assertion: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_die';
 
 function OPENSSL_isservice(): Integer; cdecl;
@@ -12151,7 +12164,7 @@ function OPENSSL_gmtime(timer: PLongint; result: Ptm): Ptm; cdecl;
 function OPENSSL_gmtime_adj(tm: Ptm; offset_day: Integer; offset_sec: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_gmtime_adj';
 
-function OPENSSL_gmtime_diff(pday: PInteger; psec: PInteger; from: Ptm; &to: Ptm): Integer; cdecl;
+function OPENSSL_gmtime_diff(pday: PInteger; psec: PInteger; from: Ptm; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: Ptm): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_gmtime_diff';
 
 function CRYPTO_memcmp(in_a: Pointer; in_b: Pointer; len: NativeUInt): Integer; cdecl;
@@ -12175,13 +12188,13 @@ procedure OPENSSL_thread_stop(); cdecl;
 function OPENSSL_INIT_new(): POPENSSL_INIT_SETTINGS; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_INIT_new';
 
-function OPENSSL_INIT_set_config_filename(settings: POPENSSL_INIT_SETTINGS; config_filename: PUTF8Char): Integer; cdecl;
+function OPENSSL_INIT_set_config_filename(settings: POPENSSL_INIT_SETTINGS; config_filename: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_INIT_set_config_filename';
 
 procedure OPENSSL_INIT_set_config_file_flags(settings: POPENSSL_INIT_SETTINGS; flags: Cardinal); cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_INIT_set_config_file_flags';
 
-function OPENSSL_INIT_set_config_appname(settings: POPENSSL_INIT_SETTINGS; config_appname: PUTF8Char): Integer; cdecl;
+function OPENSSL_INIT_set_config_appname(settings: POPENSSL_INIT_SETTINGS; config_appname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_INIT_set_config_appname';
 
 procedure OPENSSL_INIT_free(settings: POPENSSL_INIT_SETTINGS); cdecl;
@@ -12241,13 +12254,13 @@ function BIO_get_callback_ex(b: PBIO): BIO_callback_fn_ex; cdecl;
 procedure BIO_set_callback_ex(b: PBIO; callback: BIO_callback_fn_ex); cdecl;
   external LIB_CRYPTO name _PU + 'BIO_set_callback_ex';
 
-function BIO_get_callback_arg(b: PBIO): PUTF8Char; cdecl;
+function BIO_get_callback_arg(b: PBIO): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_get_callback_arg';
 
-procedure BIO_set_callback_arg(b: PBIO; arg: PUTF8Char); cdecl;
+procedure BIO_set_callback_arg(b: PBIO; arg: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}); cdecl;
   external LIB_CRYPTO name _PU + 'BIO_set_callback_arg';
 
-function BIO_method_name(b: PBIO): PUTF8Char; cdecl;
+function BIO_method_name(b: PBIO): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_method_name';
 
 function BIO_method_type(b: PBIO): Integer; cdecl;
@@ -12298,13 +12311,13 @@ function BIO_asn1_get_suffix(b: PBIO; psuffix: PPasn1_ps_func; psuffix_free: PPa
 function BIO_s_file(): PBIO_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_s_file';
 
-function BIO_new_file(filename: PUTF8Char; mode: PUTF8Char): PBIO; cdecl;
+function BIO_new_file(filename: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; mode: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PBIO; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_new_file';
 
 function BIO_new_fp(stream: PPointer; close_flag: Integer): PBIO; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_new_fp';
 
-function BIO_new(&type: PBIO_METHOD): PBIO; cdecl;
+function BIO_new({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PBIO_METHOD): PBIO; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_new';
 
 function BIO_free(a: PBIO): Integer; cdecl;
@@ -12340,7 +12353,7 @@ function BIO_read(b: PBIO; data: Pointer; dlen: Integer): Integer; cdecl;
 function BIO_read_ex(b: PBIO; data: Pointer; dlen: NativeUInt; readbytes: PNativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_read_ex';
 
-function BIO_gets(bp: PBIO; buf: PUTF8Char; size: Integer): Integer; cdecl;
+function BIO_gets(bp: PBIO; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; size: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_gets';
 
 function BIO_write(b: PBIO; data: Pointer; dlen: Integer): Integer; cdecl;
@@ -12349,7 +12362,7 @@ function BIO_write(b: PBIO; data: Pointer; dlen: Integer): Integer; cdecl;
 function BIO_write_ex(b: PBIO; data: Pointer; dlen: NativeUInt; written: PNativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_write_ex';
 
-function BIO_puts(bp: PBIO; buf: PUTF8Char): Integer; cdecl;
+function BIO_puts(bp: PBIO; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_puts';
 
 function BIO_indent(b: PBIO; indent: Integer; max: Integer): Integer; cdecl;
@@ -12394,22 +12407,22 @@ function BIO_get_retry_reason(bio: PBIO): Integer; cdecl;
 procedure BIO_set_retry_reason(bio: PBIO; reason: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'BIO_set_retry_reason';
 
-function BIO_dup_chain(&in: PBIO): PBIO; cdecl;
+function BIO_dup_chain({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO): PBIO; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_dup_chain';
 
-function BIO_nread0(bio: PBIO; buf: PPUTF8Char): Integer; cdecl;
+function BIO_nread0(bio: PBIO; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_nread0';
 
-function BIO_nread(bio: PBIO; buf: PPUTF8Char; num: Integer): Integer; cdecl;
+function BIO_nread(bio: PBIO; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; num: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_nread';
 
-function BIO_nwrite0(bio: PBIO; buf: PPUTF8Char): Integer; cdecl;
+function BIO_nwrite0(bio: PBIO; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_nwrite0';
 
-function BIO_nwrite(bio: PBIO; buf: PPUTF8Char; num: Integer): Integer; cdecl;
+function BIO_nwrite(bio: PBIO; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; num: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_nwrite';
 
-function BIO_debug_callback(bio: PBIO; cmd: Integer; argp: PUTF8Char; argi: Integer; argl: Integer; ret: Integer): Integer; cdecl;
+function BIO_debug_callback(bio: PBIO; cmd: Integer; argp: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; argi: Integer; argl: Integer; ret: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_debug_callback';
 
 function BIO_s_mem(): PBIO_METHOD; cdecl;
@@ -12478,28 +12491,28 @@ function BIO_fd_non_fatal_error(error: Integer): Integer; cdecl;
 type
   BIO_dump_cb_cb = function(data: Pointer; len: NativeUInt; u: Pointer): Integer; cdecl;
 
-function BIO_dump_cb(cb: BIO_dump_cb_cb; u: Pointer; s: PUTF8Char; len: Integer): Integer; cdecl;
+function BIO_dump_cb(cb: BIO_dump_cb_cb; u: Pointer; s: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_dump_cb';
 
 type
   BIO_dump_indent_cb_cb = function(data: Pointer; len: NativeUInt; u: Pointer): Integer; cdecl;
 
-function BIO_dump_indent_cb(cb: BIO_dump_indent_cb_cb; u: Pointer; s: PUTF8Char; len: Integer; indent: Integer): Integer; cdecl;
+function BIO_dump_indent_cb(cb: BIO_dump_indent_cb_cb; u: Pointer; s: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer; indent: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_dump_indent_cb';
 
-function BIO_dump(b: PBIO; bytes: PUTF8Char; len: Integer): Integer; cdecl;
+function BIO_dump(b: PBIO; bytes: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_dump';
 
-function BIO_dump_indent(b: PBIO; bytes: PUTF8Char; len: Integer; indent: Integer): Integer; cdecl;
+function BIO_dump_indent(b: PBIO; bytes: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer; indent: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_dump_indent';
 
-function BIO_dump_fp(fp: PPointer; s: PUTF8Char; len: Integer): Integer; cdecl;
+function BIO_dump_fp(fp: PPointer; s: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_dump_fp';
 
-function BIO_dump_indent_fp(fp: PPointer; s: PUTF8Char; len: Integer; indent: Integer): Integer; cdecl;
+function BIO_dump_indent_fp(fp: PPointer; s: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer; indent: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_dump_indent_fp';
 
-function BIO_hex_string(&out: PBIO; indent: Integer; width: Integer; data: PByte; datalen: Integer): Integer; cdecl;
+function BIO_hex_string({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; indent: Integer; width: Integer; data: PByte; datalen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_hex_string';
 
 function BIO_ADDR_new(): PBIO_ADDR; cdecl;
@@ -12523,13 +12536,13 @@ function BIO_ADDR_rawaddress(ap: PBIO_ADDR; p: Pointer; l: PNativeUInt): Integer
 function BIO_ADDR_rawport(ap: PBIO_ADDR): Word; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_ADDR_rawport';
 
-function BIO_ADDR_hostname_string(ap: PBIO_ADDR; numeric: Integer): PUTF8Char; cdecl;
+function BIO_ADDR_hostname_string(ap: PBIO_ADDR; numeric: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_ADDR_hostname_string';
 
-function BIO_ADDR_service_string(ap: PBIO_ADDR; numeric: Integer): PUTF8Char; cdecl;
+function BIO_ADDR_service_string(ap: PBIO_ADDR; numeric: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_ADDR_service_string';
 
-function BIO_ADDR_path_string(ap: PBIO_ADDR): PUTF8Char; cdecl;
+function BIO_ADDR_path_string(ap: PBIO_ADDR): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_ADDR_path_string';
 
 function BIO_ADDRINFO_next(bai: PBIO_ADDRINFO): PBIO_ADDRINFO; cdecl;
@@ -12550,19 +12563,19 @@ function BIO_ADDRINFO_address(bai: PBIO_ADDRINFO): PBIO_ADDR; cdecl;
 procedure BIO_ADDRINFO_free(bai: PBIO_ADDRINFO); cdecl;
   external LIB_CRYPTO name _PU + 'BIO_ADDRINFO_free';
 
-function BIO_parse_hostserv(hostserv: PUTF8Char; host: PPUTF8Char; service: PPUTF8Char; hostserv_prio: BIO_hostserv_priorities): Integer; cdecl;
+function BIO_parse_hostserv(hostserv: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; host: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; service: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; hostserv_prio: BIO_hostserv_priorities): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_parse_hostserv';
 
-function BIO_lookup(host: PUTF8Char; service: PUTF8Char; lookup_type: BIO_lookup_type; family: Integer; socktype: Integer; res: PPBIO_ADDRINFO): Integer; cdecl;
+function BIO_lookup(host: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; service: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; lookup_type: BIO_lookup_type; family: Integer; socktype: Integer; res: PPBIO_ADDRINFO): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_lookup';
 
-function BIO_lookup_ex(host: PUTF8Char; service: PUTF8Char; lookup_type: Integer; family: Integer; socktype: Integer; protocol: Integer; res: PPBIO_ADDRINFO): Integer; cdecl;
+function BIO_lookup_ex(host: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; service: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; lookup_type: Integer; family: Integer; socktype: Integer; protocol: Integer; res: PPBIO_ADDRINFO): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_lookup_ex';
 
 function BIO_sock_error(sock: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_sock_error';
 
-function BIO_socket_ioctl(fd: Integer; &type: Integer; arg: Pointer): Integer; cdecl;
+function BIO_socket_ioctl(fd: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; arg: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_socket_ioctl';
 
 function BIO_socket_nbio(fd: Integer; mode: Integer): Integer; cdecl;
@@ -12574,25 +12587,25 @@ function BIO_sock_init(): Integer; cdecl;
 function BIO_set_tcp_ndelay(sock: Integer; turn_on: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_set_tcp_ndelay';
 
-function BIO_gethostbyname(name: PUTF8Char): Phostent; cdecl;
+function BIO_gethostbyname(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Phostent; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_gethostbyname';
 
-function BIO_get_port(str: PUTF8Char; port_ptr: PWord): Integer; cdecl;
+function BIO_get_port(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; port_ptr: PWord): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_get_port';
 
-function BIO_get_host_ip(str: PUTF8Char; ip: PByte): Integer; cdecl;
+function BIO_get_host_ip(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ip: PByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_get_host_ip';
 
-function BIO_get_accept_socket(host_port: PUTF8Char; mode: Integer): Integer; cdecl;
+function BIO_get_accept_socket(host_port: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; mode: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_get_accept_socket';
 
-function BIO_accept(sock: Integer; ip_port: PPUTF8Char): Integer; cdecl;
+function BIO_accept(sock: Integer; ip_port: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_accept';
 
 type
   PBIO_sock_info_u = Pointer;
 
-function BIO_sock_info(sock: Integer; &type: BIO_sock_info_type; info: PBIO_sock_info_u): Integer; cdecl;
+function BIO_sock_info(sock: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: BIO_sock_info_type; info: PBIO_sock_info_u): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_sock_info';
 
 function BIO_socket(domain: Integer; socktype: Integer; protocol: Integer; options: Integer): Integer; cdecl;
@@ -12616,10 +12629,10 @@ function BIO_closesocket(sock: Integer): Integer; cdecl;
 function BIO_new_socket(sock: Integer; close_flag: Integer): PBIO; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_new_socket';
 
-function BIO_new_connect(host_port: PUTF8Char): PBIO; cdecl;
+function BIO_new_connect(host_port: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PBIO; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_new_connect';
 
-function BIO_new_accept(host_port: PUTF8Char): PBIO; cdecl;
+function BIO_new_accept(host_port: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PBIO; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_new_accept';
 
 function BIO_new_fd(fd: Integer; close_flag: Integer): PBIO; cdecl;
@@ -12631,74 +12644,74 @@ function BIO_new_bio_pair(bio1: PPBIO; writebuf1: NativeUInt; bio2: PPBIO; write
 procedure BIO_copy_next_retry(b: PBIO); cdecl;
   external LIB_CRYPTO name _PU + 'BIO_copy_next_retry';
 
-function BIO_printf(bio: PBIO; format: PUTF8Char): Integer varargs; cdecl;
+function BIO_printf(bio: PBIO; format: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer varargs; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_printf';
 
-function BIO_vprintf(bio: PBIO; format: PUTF8Char; args: Pointer): Integer; cdecl;
+function BIO_vprintf(bio: PBIO; format: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; args: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_vprintf';
 
-function BIO_snprintf(buf: PUTF8Char; n: NativeUInt; format: PUTF8Char): Integer varargs; cdecl;
+function BIO_snprintf(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; n: NativeUInt; format: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer varargs; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_snprintf';
 
-function BIO_vsnprintf(buf: PUTF8Char; n: NativeUInt; format: PUTF8Char; args: Pointer): Integer; cdecl;
+function BIO_vsnprintf(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; n: NativeUInt; format: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; args: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_vsnprintf';
 
-function BIO_meth_new(&type: Integer; name: PUTF8Char): PBIO_METHOD; cdecl;
+function BIO_meth_new({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PBIO_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_meth_new';
 
 procedure BIO_meth_free(biom: PBIO_METHOD); cdecl;
   external LIB_CRYPTO name _PU + 'BIO_meth_free';
 
-//function BIO_meth_get_write(p1: PBIOp2: PUTF8Charp3: Integerbiom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, const char *, int)" }; cdecl;
+//function BIO_meth_get_write(p1: PBIOp2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}p3: Integerbiom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, const char *, int)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'BIO_meth_get_write';
 
-//function BIO_meth_get_write_ex(p1: PBIOp2: PUTF8Charp3: NativeUIntp4: PNativeUIntbiom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, const char *, size_t, size_t *)" }; cdecl;
+//function BIO_meth_get_write_ex(p1: PBIOp2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}p3: NativeUIntp4: PNativeUIntbiom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, const char *, size_t, size_t *)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'BIO_meth_get_write_ex';
 
 type
-  BIO_meth_set_write_write = function(p1: PBIO; p2: PUTF8Char; p3: Integer): Integer; cdecl;
+  BIO_meth_set_write_write = function(p1: PBIO; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p3: Integer): Integer; cdecl;
 
 function BIO_meth_set_write(biom: PBIO_METHOD; write: BIO_meth_set_write_write): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_meth_set_write';
 
 type
-  BIO_meth_set_write_ex_bwrite = function(p1: PBIO; p2: PUTF8Char; p3: NativeUInt; p4: PNativeUInt): Integer; cdecl;
+  BIO_meth_set_write_ex_bwrite = function(p1: PBIO; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p3: NativeUInt; p4: PNativeUInt): Integer; cdecl;
 
 function BIO_meth_set_write_ex(biom: PBIO_METHOD; bwrite: BIO_meth_set_write_ex_bwrite): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_meth_set_write_ex';
 
-//function BIO_meth_get_read(p1: PBIOp2: PUTF8Charp3: Integerbiom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, char *, int)" }; cdecl;
+//function BIO_meth_get_read(p1: PBIOp2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}p3: Integerbiom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, char *, int)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'BIO_meth_get_read';
 
-//function BIO_meth_get_read_ex(p1: PBIOp2: PUTF8Charp3: NativeUIntp4: PNativeUIntbiom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, char *, size_t, size_t *)" }; cdecl;
+//function BIO_meth_get_read_ex(p1: PBIOp2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}p3: NativeUIntp4: PNativeUIntbiom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, char *, size_t, size_t *)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'BIO_meth_get_read_ex';
 
 type
-  BIO_meth_set_read_read = function(p1: PBIO; p2: PUTF8Char; p3: Integer): Integer; cdecl;
+  BIO_meth_set_read_read = function(p1: PBIO; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p3: Integer): Integer; cdecl;
 
 function BIO_meth_set_read(biom: PBIO_METHOD; read: BIO_meth_set_read_read): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_meth_set_read';
 
 type
-  BIO_meth_set_read_ex_bread = function(p1: PBIO; p2: PUTF8Char; p3: NativeUInt; p4: PNativeUInt): Integer; cdecl;
+  BIO_meth_set_read_ex_bread = function(p1: PBIO; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p3: NativeUInt; p4: PNativeUInt): Integer; cdecl;
 
 function BIO_meth_set_read_ex(biom: PBIO_METHOD; bread: BIO_meth_set_read_ex_bread): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_meth_set_read_ex';
 
-//function BIO_meth_get_puts(p1: PBIOp2: PUTF8Charbiom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, const char *)" }; cdecl;
+//function BIO_meth_get_puts(p1: PBIOp2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}biom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, const char *)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'BIO_meth_get_puts';
 
 type
-  BIO_meth_set_puts_puts = function(p1: PBIO; p2: PUTF8Char): Integer; cdecl;
+  BIO_meth_set_puts_puts = function(p1: PBIO; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
 
 function BIO_meth_set_puts(biom: PBIO_METHOD; puts: BIO_meth_set_puts_puts): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_meth_set_puts';
 
-//function BIO_meth_get_gets(p1: PBIOp2: PUTF8Charp3: Integerbiom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, char *, int)" }; cdecl;
+//function BIO_meth_get_gets(p1: PBIOp2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}p3: Integerbiom: PBIO_METHOD): Integer { TODO : Cannot convert original type "int (*)(BIO *, char *, int)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'BIO_meth_get_gets';
 
 type
-  BIO_meth_set_gets_gets = function(p1: PBIO; p2: PUTF8Char; p3: Integer): Integer; cdecl;
+  BIO_meth_set_gets_gets = function(p1: PBIO; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p3: Integer): Integer; cdecl;
 
 function BIO_meth_set_gets(biom: PBIO_METHOD; gets: BIO_meth_set_gets_gets): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_meth_set_gets';
@@ -12799,7 +12812,7 @@ procedure BN_zero_ex(a: PBIGNUM); cdecl;
 function BN_value_one(): PBIGNUM; cdecl;
   external LIB_CRYPTO name _PU + 'BN_value_one';
 
-function BN_options(): PUTF8Char; cdecl;
+function BN_options(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'BN_options';
 
 function BN_CTX_new(): PBN_CTX; cdecl;
@@ -12865,22 +12878,22 @@ procedure BN_swap(a: PBIGNUM; b: PBIGNUM); cdecl;
 function BN_bin2bn(s: Pointer; len: Integer; ret: PBIGNUM): PBIGNUM; cdecl;
   external LIB_CRYPTO name _PU + 'BN_bin2bn';
 
-function BN_bn2bin(a: PBIGNUM; &to: Pointer): Integer; cdecl;
+function BN_bn2bin(a: PBIGNUM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BN_bn2bin';
 
-function BN_bn2binpad(a: PBIGNUM; &to: Pointer; tolen: Integer): Integer; cdecl;
+function BN_bn2binpad(a: PBIGNUM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: Pointer; tolen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BN_bn2binpad';
 
 function BN_lebin2bn(s: Pointer; len: Integer; ret: PBIGNUM): PBIGNUM; cdecl;
   external LIB_CRYPTO name _PU + 'BN_lebin2bn';
 
-function BN_bn2lebinpad(a: PBIGNUM; &to: Pointer; tolen: Integer): Integer; cdecl;
+function BN_bn2lebinpad(a: PBIGNUM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: Pointer; tolen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BN_bn2lebinpad';
 
 function BN_mpi2bn(s: Pointer; len: Integer; ret: PBIGNUM): PBIGNUM; cdecl;
   external LIB_CRYPTO name _PU + 'BN_mpi2bn';
 
-function BN_bn2mpi(a: PBIGNUM; &to: Pointer): Integer; cdecl;
+function BN_bn2mpi(a: PBIGNUM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BN_bn2mpi';
 
 function BN_sub(r: PBIGNUM; a: PBIGNUM; b: PBIGNUM): Integer; cdecl;
@@ -13041,19 +13054,19 @@ function BN_set_bit(a: PBIGNUM; n: Integer): Integer; cdecl;
 function BN_clear_bit(a: PBIGNUM; n: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BN_clear_bit';
 
-function BN_bn2hex(a: PBIGNUM): PUTF8Char; cdecl;
+function BN_bn2hex(a: PBIGNUM): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'BN_bn2hex';
 
-function BN_bn2dec(a: PBIGNUM): PUTF8Char; cdecl;
+function BN_bn2dec(a: PBIGNUM): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'BN_bn2dec';
 
-function BN_hex2bn(a: PPBIGNUM; str: PUTF8Char): Integer; cdecl;
+function BN_hex2bn(a: PPBIGNUM; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BN_hex2bn';
 
-function BN_dec2bn(a: PPBIGNUM; str: PUTF8Char): Integer; cdecl;
+function BN_dec2bn(a: PPBIGNUM; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BN_dec2bn';
 
-function BN_asc2bn(a: PPBIGNUM; str: PUTF8Char): Integer; cdecl;
+function BN_asc2bn(a: PPBIGNUM; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BN_asc2bn';
 
 function BN_gcd(r: PBIGNUM; a: PBIGNUM; b: PBIGNUM; ctx: PBN_CTX): Integer; cdecl;
@@ -13122,16 +13135,16 @@ function BN_from_montgomery(r: PBIGNUM; a: PBIGNUM; mont: PBN_MONT_CTX; ctx: PBN
 procedure BN_MONT_CTX_free(mont: PBN_MONT_CTX); cdecl;
   external LIB_CRYPTO name _PU + 'BN_MONT_CTX_free';
 
-function BN_MONT_CTX_set(mont: PBN_MONT_CTX; &mod: PBIGNUM; ctx: PBN_CTX): Integer; cdecl;
+function BN_MONT_CTX_set(mont: PBN_MONT_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&mod{$ELSE}mod1{$IFEND}{$ELSE}&mod{$ENDIF}: PBIGNUM; ctx: PBN_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BN_MONT_CTX_set';
 
-function BN_MONT_CTX_copy(&to: PBN_MONT_CTX; from: PBN_MONT_CTX): PBN_MONT_CTX; cdecl;
+function BN_MONT_CTX_copy({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PBN_MONT_CTX; from: PBN_MONT_CTX): PBN_MONT_CTX; cdecl;
   external LIB_CRYPTO name _PU + 'BN_MONT_CTX_copy';
 
-function BN_MONT_CTX_set_locked(pmont: PPBN_MONT_CTX; lock: PCRYPTO_RWLOCK; &mod: PBIGNUM; ctx: PBN_CTX): PBN_MONT_CTX; cdecl;
+function BN_MONT_CTX_set_locked(pmont: PPBN_MONT_CTX; lock: PCRYPTO_RWLOCK; {$IFNDEF FPC}{$IF CompilerVersion > 21}&mod{$ELSE}mod1{$IFEND}{$ELSE}&mod{$ENDIF}: PBIGNUM; ctx: PBN_CTX): PBN_MONT_CTX; cdecl;
   external LIB_CRYPTO name _PU + 'BN_MONT_CTX_set_locked';
 
-function BN_BLINDING_new(A: PBIGNUM; Ai: PBIGNUM; &mod: PBIGNUM): PBN_BLINDING; cdecl;
+function BN_BLINDING_new(A: PBIGNUM; Ai: PBIGNUM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&mod{$ELSE}mod1{$IFEND}{$ELSE}&mod{$ENDIF}: PBIGNUM): PBN_BLINDING; cdecl;
   external LIB_CRYPTO name _PU + 'BN_BLINDING_new';
 
 procedure BN_BLINDING_free(b: PBN_BLINDING); cdecl;
@@ -13290,7 +13303,7 @@ function BN_get0_nist_prime_521(): PBIGNUM; cdecl;
 //function BN_nist_mod_func(r: PBIGNUMa: PBIGNUMfield: PBIGNUMctx: PBN_CTXp: PBIGNUM): Integer { TODO : Cannot convert original type "int (*)(BIGNUM *, const BIGNUM *, const BIGNUM *, BN_CTX *)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'BN_nist_mod_func';
 
-function BN_generate_dsa_nonce(&out: PBIGNUM; range: PBIGNUM; priv: PBIGNUM; &message: PByte; message_len: NativeUInt; ctx: PBN_CTX): Integer; cdecl;
+function BN_generate_dsa_nonce({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIGNUM; range: PBIGNUM; priv: PBIGNUM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&message{$ELSE}message1{$IFEND}{$ELSE}&message{$ENDIF}: PByte; message_len: NativeUInt; ctx: PBN_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BN_generate_dsa_nonce';
 
 function BN_get_rfc2409_prime_768(bn: PBIGNUM): PBIGNUM; cdecl;
@@ -13320,19 +13333,19 @@ function BN_get_rfc3526_prime_8192(bn: PBIGNUM): PBIGNUM; cdecl;
 function BN_bntest_rand(rnd: PBIGNUM; bits: Integer; top: Integer; bottom: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'BN_bntest_rand';
 
-function d2i_ASN1_SEQUENCE_ANY(a: PPASN1_SEQUENCE_ANY; &in: PPByte; len: Integer): PASN1_SEQUENCE_ANY; cdecl;
+function d2i_ASN1_SEQUENCE_ANY(a: PPASN1_SEQUENCE_ANY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_SEQUENCE_ANY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_SEQUENCE_ANY';
 
-function i2d_ASN1_SEQUENCE_ANY(a: PASN1_SEQUENCE_ANY; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_SEQUENCE_ANY(a: PASN1_SEQUENCE_ANY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_SEQUENCE_ANY';
 
 function ASN1_SEQUENCE_ANY_it(): PASN1_ITEM; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_SEQUENCE_ANY_it';
 
-function d2i_ASN1_SET_ANY(a: PPASN1_SEQUENCE_ANY; &in: PPByte; len: Integer): PASN1_SEQUENCE_ANY; cdecl;
+function d2i_ASN1_SET_ANY(a: PPASN1_SEQUENCE_ANY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_SEQUENCE_ANY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_SET_ANY';
 
-function i2d_ASN1_SET_ANY(a: PASN1_SEQUENCE_ANY; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_SET_ANY(a: PASN1_SEQUENCE_ANY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_SET_ANY';
 
 function ASN1_SET_ANY_it(): PASN1_ITEM; cdecl;
@@ -13344,10 +13357,10 @@ function ASN1_TYPE_new(): PASN1_TYPE; cdecl;
 procedure ASN1_TYPE_free(a: PASN1_TYPE); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_TYPE_free';
 
-function d2i_ASN1_TYPE(a: PPASN1_TYPE; &in: PPByte; len: Integer): PASN1_TYPE; cdecl;
+function d2i_ASN1_TYPE(a: PPASN1_TYPE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_TYPE; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_TYPE';
 
-function i2d_ASN1_TYPE(a: PASN1_TYPE; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_TYPE(a: PASN1_TYPE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_TYPE';
 
 function ASN1_ANY_it(): PASN1_ITEM; cdecl;
@@ -13356,10 +13369,10 @@ function ASN1_ANY_it(): PASN1_ITEM; cdecl;
 function ASN1_TYPE_get(a: PASN1_TYPE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_TYPE_get';
 
-procedure ASN1_TYPE_set(a: PASN1_TYPE; &type: Integer; value: Pointer); cdecl;
+procedure ASN1_TYPE_set(a: PASN1_TYPE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; value: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_TYPE_set';
 
-function ASN1_TYPE_set1(a: PASN1_TYPE; &type: Integer; value: Pointer): Integer; cdecl;
+function ASN1_TYPE_set1(a: PASN1_TYPE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; value: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_TYPE_set1';
 
 function ASN1_TYPE_cmp(a: PASN1_TYPE; b: PASN1_TYPE): Integer; cdecl;
@@ -13401,7 +13414,7 @@ function ASN1_STRING_copy(dst: PASN1_STRING; str: PASN1_STRING): Integer; cdecl;
 function ASN1_STRING_dup(a: PASN1_STRING): PASN1_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_STRING_dup';
 
-function ASN1_STRING_type_new(&type: Integer): PASN1_STRING; cdecl;
+function ASN1_STRING_type_new({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): PASN1_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_STRING_type_new';
 
 function ASN1_STRING_cmp(a: PASN1_STRING; b: PASN1_STRING): Integer; cdecl;
@@ -13434,10 +13447,10 @@ function ASN1_BIT_STRING_new(): PASN1_BIT_STRING; cdecl;
 procedure ASN1_BIT_STRING_free(a: PASN1_BIT_STRING); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_BIT_STRING_free';
 
-function d2i_ASN1_BIT_STRING(a: PPASN1_BIT_STRING; &in: PPByte; len: Integer): PASN1_BIT_STRING; cdecl;
+function d2i_ASN1_BIT_STRING(a: PPASN1_BIT_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_BIT_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_BIT_STRING';
 
-function i2d_ASN1_BIT_STRING(a: PASN1_BIT_STRING; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_BIT_STRING(a: PASN1_BIT_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_BIT_STRING';
 
 function ASN1_BIT_STRING_it(): PASN1_ITEM; cdecl;
@@ -13455,13 +13468,13 @@ function ASN1_BIT_STRING_get_bit(a: PASN1_BIT_STRING; n: Integer): Integer; cdec
 function ASN1_BIT_STRING_check(a: PASN1_BIT_STRING; flags: PByte; flags_len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_BIT_STRING_check';
 
-function ASN1_BIT_STRING_name_print(&out: PBIO; bs: PASN1_BIT_STRING; tbl: PBIT_STRING_BITNAME; indent: Integer): Integer; cdecl;
+function ASN1_BIT_STRING_name_print({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; bs: PASN1_BIT_STRING; tbl: PBIT_STRING_BITNAME; indent: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_BIT_STRING_name_print';
 
-function ASN1_BIT_STRING_num_asc(name: PUTF8Char; tbl: PBIT_STRING_BITNAME): Integer; cdecl;
+function ASN1_BIT_STRING_num_asc(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; tbl: PBIT_STRING_BITNAME): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_BIT_STRING_num_asc';
 
-function ASN1_BIT_STRING_set_asc(bs: PASN1_BIT_STRING; name: PUTF8Char; value: Integer; tbl: PBIT_STRING_BITNAME): Integer; cdecl;
+function ASN1_BIT_STRING_set_asc(bs: PASN1_BIT_STRING; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; value: Integer; tbl: PBIT_STRING_BITNAME): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_BIT_STRING_set_asc';
 
 function ASN1_INTEGER_new(): PASN1_INTEGER; cdecl;
@@ -13470,10 +13483,10 @@ function ASN1_INTEGER_new(): PASN1_INTEGER; cdecl;
 procedure ASN1_INTEGER_free(a: PASN1_INTEGER); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_INTEGER_free';
 
-function d2i_ASN1_INTEGER(a: PPASN1_INTEGER; &in: PPByte; len: Integer): PASN1_INTEGER; cdecl;
+function d2i_ASN1_INTEGER(a: PPASN1_INTEGER; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_INTEGER; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_INTEGER';
 
-function i2d_ASN1_INTEGER(a: PASN1_INTEGER; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_INTEGER(a: PASN1_INTEGER; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_INTEGER';
 
 function ASN1_INTEGER_it(): PASN1_ITEM; cdecl;
@@ -13494,10 +13507,10 @@ function ASN1_ENUMERATED_new(): PASN1_ENUMERATED; cdecl;
 procedure ASN1_ENUMERATED_free(a: PASN1_ENUMERATED); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_ENUMERATED_free';
 
-function d2i_ASN1_ENUMERATED(a: PPASN1_ENUMERATED; &in: PPByte; len: Integer): PASN1_ENUMERATED; cdecl;
+function d2i_ASN1_ENUMERATED(a: PPASN1_ENUMERATED; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_ENUMERATED; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_ENUMERATED';
 
-function i2d_ASN1_ENUMERATED(a: PASN1_ENUMERATED; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_ENUMERATED(a: PASN1_ENUMERATED; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_ENUMERATED';
 
 function ASN1_ENUMERATED_it(): PASN1_ITEM; cdecl;
@@ -13512,7 +13525,7 @@ function ASN1_UTCTIME_set(s: PASN1_UTCTIME; t: Longint): PASN1_UTCTIME; cdecl;
 function ASN1_UTCTIME_adj(s: PASN1_UTCTIME; t: Longint; offset_day: Integer; offset_sec: Integer): PASN1_UTCTIME; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_UTCTIME_adj';
 
-function ASN1_UTCTIME_set_string(s: PASN1_UTCTIME; str: PUTF8Char): Integer; cdecl;
+function ASN1_UTCTIME_set_string(s: PASN1_UTCTIME; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_UTCTIME_set_string';
 
 function ASN1_UTCTIME_cmp_time_t(s: PASN1_UTCTIME; t: Longint): Integer; cdecl;
@@ -13527,10 +13540,10 @@ function ASN1_GENERALIZEDTIME_set(s: PASN1_GENERALIZEDTIME; t: Longint): PASN1_G
 function ASN1_GENERALIZEDTIME_adj(s: PASN1_GENERALIZEDTIME; t: Longint; offset_day: Integer; offset_sec: Integer): PASN1_GENERALIZEDTIME; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_GENERALIZEDTIME_adj';
 
-function ASN1_GENERALIZEDTIME_set_string(s: PASN1_GENERALIZEDTIME; str: PUTF8Char): Integer; cdecl;
+function ASN1_GENERALIZEDTIME_set_string(s: PASN1_GENERALIZEDTIME; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_GENERALIZEDTIME_set_string';
 
-function ASN1_TIME_diff(pday: PInteger; psec: PInteger; from: PASN1_TIME; &to: PASN1_TIME): Integer; cdecl;
+function ASN1_TIME_diff(pday: PInteger; psec: PInteger; from: PASN1_TIME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PASN1_TIME): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_TIME_diff';
 
 function ASN1_OCTET_STRING_new(): PASN1_OCTET_STRING; cdecl;
@@ -13539,10 +13552,10 @@ function ASN1_OCTET_STRING_new(): PASN1_OCTET_STRING; cdecl;
 procedure ASN1_OCTET_STRING_free(a: PASN1_OCTET_STRING); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_OCTET_STRING_free';
 
-function d2i_ASN1_OCTET_STRING(a: PPASN1_OCTET_STRING; &in: PPByte; len: Integer): PASN1_OCTET_STRING; cdecl;
+function d2i_ASN1_OCTET_STRING(a: PPASN1_OCTET_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_OCTET_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_OCTET_STRING';
 
-function i2d_ASN1_OCTET_STRING(a: PASN1_OCTET_STRING; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_OCTET_STRING(a: PASN1_OCTET_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_OCTET_STRING';
 
 function ASN1_OCTET_STRING_it(): PASN1_ITEM; cdecl;
@@ -13563,10 +13576,10 @@ function ASN1_VISIBLESTRING_new(): PASN1_VISIBLESTRING; cdecl;
 procedure ASN1_VISIBLESTRING_free(a: PASN1_VISIBLESTRING); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_VISIBLESTRING_free';
 
-function d2i_ASN1_VISIBLESTRING(a: PPASN1_VISIBLESTRING; &in: PPByte; len: Integer): PASN1_VISIBLESTRING; cdecl;
+function d2i_ASN1_VISIBLESTRING(a: PPASN1_VISIBLESTRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_VISIBLESTRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_VISIBLESTRING';
 
-function i2d_ASN1_VISIBLESTRING(a: PASN1_VISIBLESTRING; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_VISIBLESTRING(a: PASN1_VISIBLESTRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_VISIBLESTRING';
 
 function ASN1_VISIBLESTRING_it(): PASN1_ITEM; cdecl;
@@ -13578,10 +13591,10 @@ function ASN1_UNIVERSALSTRING_new(): PASN1_UNIVERSALSTRING; cdecl;
 procedure ASN1_UNIVERSALSTRING_free(a: PASN1_UNIVERSALSTRING); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_UNIVERSALSTRING_free';
 
-function d2i_ASN1_UNIVERSALSTRING(a: PPASN1_UNIVERSALSTRING; &in: PPByte; len: Integer): PASN1_UNIVERSALSTRING; cdecl;
+function d2i_ASN1_UNIVERSALSTRING(a: PPASN1_UNIVERSALSTRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_UNIVERSALSTRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_UNIVERSALSTRING';
 
-function i2d_ASN1_UNIVERSALSTRING(a: PASN1_UNIVERSALSTRING; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_UNIVERSALSTRING(a: PASN1_UNIVERSALSTRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_UNIVERSALSTRING';
 
 function ASN1_UNIVERSALSTRING_it(): PASN1_ITEM; cdecl;
@@ -13593,10 +13606,10 @@ function ASN1_UTF8STRING_new(): PASN1_UTF8STRING; cdecl;
 procedure ASN1_UTF8STRING_free(a: PASN1_UTF8STRING); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_UTF8STRING_free';
 
-function d2i_ASN1_UTF8STRING(a: PPASN1_UTF8STRING; &in: PPByte; len: Integer): PASN1_UTF8STRING; cdecl;
+function d2i_ASN1_UTF8STRING(a: PPASN1_UTF8STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_UTF8STRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_UTF8STRING';
 
-function i2d_ASN1_UTF8STRING(a: PASN1_UTF8STRING; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_UTF8STRING(a: PASN1_UTF8STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_UTF8STRING';
 
 function ASN1_UTF8STRING_it(): PASN1_ITEM; cdecl;
@@ -13608,10 +13621,10 @@ function ASN1_NULL_new(): PASN1_NULL; cdecl;
 procedure ASN1_NULL_free(a: PASN1_NULL); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_NULL_free';
 
-function d2i_ASN1_NULL(a: PPASN1_NULL; &in: PPByte; len: Integer): PASN1_NULL; cdecl;
+function d2i_ASN1_NULL(a: PPASN1_NULL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_NULL; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_NULL';
 
-function i2d_ASN1_NULL(a: PASN1_NULL; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_NULL(a: PASN1_NULL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_NULL';
 
 function ASN1_NULL_it(): PASN1_ITEM; cdecl;
@@ -13623,10 +13636,10 @@ function ASN1_BMPSTRING_new(): PASN1_BMPSTRING; cdecl;
 procedure ASN1_BMPSTRING_free(a: PASN1_BMPSTRING); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_BMPSTRING_free';
 
-function d2i_ASN1_BMPSTRING(a: PPASN1_BMPSTRING; &in: PPByte; len: Integer): PASN1_BMPSTRING; cdecl;
+function d2i_ASN1_BMPSTRING(a: PPASN1_BMPSTRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_BMPSTRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_BMPSTRING';
 
-function i2d_ASN1_BMPSTRING(a: PASN1_BMPSTRING; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_BMPSTRING(a: PASN1_BMPSTRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_BMPSTRING';
 
 function ASN1_BMPSTRING_it(): PASN1_ITEM; cdecl;
@@ -13644,10 +13657,10 @@ function ASN1_PRINTABLE_new(): PASN1_STRING; cdecl;
 procedure ASN1_PRINTABLE_free(a: PASN1_STRING); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_PRINTABLE_free';
 
-function d2i_ASN1_PRINTABLE(a: PPASN1_STRING; &in: PPByte; len: Integer): PASN1_STRING; cdecl;
+function d2i_ASN1_PRINTABLE(a: PPASN1_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_PRINTABLE';
 
-function i2d_ASN1_PRINTABLE(a: PASN1_STRING; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_PRINTABLE(a: PASN1_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_PRINTABLE';
 
 function ASN1_PRINTABLE_it(): PASN1_ITEM; cdecl;
@@ -13659,10 +13672,10 @@ function DIRECTORYSTRING_new(): PASN1_STRING; cdecl;
 procedure DIRECTORYSTRING_free(a: PASN1_STRING); cdecl;
   external LIB_CRYPTO name _PU + 'DIRECTORYSTRING_free';
 
-function d2i_DIRECTORYSTRING(a: PPASN1_STRING; &in: PPByte; len: Integer): PASN1_STRING; cdecl;
+function d2i_DIRECTORYSTRING(a: PPASN1_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_DIRECTORYSTRING';
 
-function i2d_DIRECTORYSTRING(a: PASN1_STRING; &out: PPByte): Integer; cdecl;
+function i2d_DIRECTORYSTRING(a: PASN1_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_DIRECTORYSTRING';
 
 function DIRECTORYSTRING_it(): PASN1_ITEM; cdecl;
@@ -13674,10 +13687,10 @@ function DISPLAYTEXT_new(): PASN1_STRING; cdecl;
 procedure DISPLAYTEXT_free(a: PASN1_STRING); cdecl;
   external LIB_CRYPTO name _PU + 'DISPLAYTEXT_free';
 
-function d2i_DISPLAYTEXT(a: PPASN1_STRING; &in: PPByte; len: Integer): PASN1_STRING; cdecl;
+function d2i_DISPLAYTEXT(a: PPASN1_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_DISPLAYTEXT';
 
-function i2d_DISPLAYTEXT(a: PASN1_STRING; &out: PPByte): Integer; cdecl;
+function i2d_DISPLAYTEXT(a: PASN1_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_DISPLAYTEXT';
 
 function DISPLAYTEXT_it(): PASN1_ITEM; cdecl;
@@ -13689,10 +13702,10 @@ function ASN1_PRINTABLESTRING_new(): PASN1_PRINTABLESTRING; cdecl;
 procedure ASN1_PRINTABLESTRING_free(a: PASN1_PRINTABLESTRING); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_PRINTABLESTRING_free';
 
-function d2i_ASN1_PRINTABLESTRING(a: PPASN1_PRINTABLESTRING; &in: PPByte; len: Integer): PASN1_PRINTABLESTRING; cdecl;
+function d2i_ASN1_PRINTABLESTRING(a: PPASN1_PRINTABLESTRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_PRINTABLESTRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_PRINTABLESTRING';
 
-function i2d_ASN1_PRINTABLESTRING(a: PASN1_PRINTABLESTRING; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_PRINTABLESTRING(a: PASN1_PRINTABLESTRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_PRINTABLESTRING';
 
 function ASN1_PRINTABLESTRING_it(): PASN1_ITEM; cdecl;
@@ -13704,10 +13717,10 @@ function ASN1_T61STRING_new(): PASN1_T61STRING; cdecl;
 procedure ASN1_T61STRING_free(a: PASN1_T61STRING); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_T61STRING_free';
 
-function d2i_ASN1_T61STRING(a: PPASN1_T61STRING; &in: PPByte; len: Integer): PASN1_T61STRING; cdecl;
+function d2i_ASN1_T61STRING(a: PPASN1_T61STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_T61STRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_T61STRING';
 
-function i2d_ASN1_T61STRING(a: PASN1_T61STRING; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_T61STRING(a: PASN1_T61STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_T61STRING';
 
 function ASN1_T61STRING_it(): PASN1_ITEM; cdecl;
@@ -13719,10 +13732,10 @@ function ASN1_IA5STRING_new(): PASN1_IA5STRING; cdecl;
 procedure ASN1_IA5STRING_free(a: PASN1_IA5STRING); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_IA5STRING_free';
 
-function d2i_ASN1_IA5STRING(a: PPASN1_IA5STRING; &in: PPByte; len: Integer): PASN1_IA5STRING; cdecl;
+function d2i_ASN1_IA5STRING(a: PPASN1_IA5STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_IA5STRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_IA5STRING';
 
-function i2d_ASN1_IA5STRING(a: PASN1_IA5STRING; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_IA5STRING(a: PASN1_IA5STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_IA5STRING';
 
 function ASN1_IA5STRING_it(): PASN1_ITEM; cdecl;
@@ -13734,10 +13747,10 @@ function ASN1_GENERALSTRING_new(): PASN1_GENERALSTRING; cdecl;
 procedure ASN1_GENERALSTRING_free(a: PASN1_GENERALSTRING); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_GENERALSTRING_free';
 
-function d2i_ASN1_GENERALSTRING(a: PPASN1_GENERALSTRING; &in: PPByte; len: Integer): PASN1_GENERALSTRING; cdecl;
+function d2i_ASN1_GENERALSTRING(a: PPASN1_GENERALSTRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_GENERALSTRING; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_GENERALSTRING';
 
-function i2d_ASN1_GENERALSTRING(a: PASN1_GENERALSTRING; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_GENERALSTRING(a: PASN1_GENERALSTRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_GENERALSTRING';
 
 function ASN1_GENERALSTRING_it(): PASN1_ITEM; cdecl;
@@ -13749,10 +13762,10 @@ function ASN1_UTCTIME_new(): PASN1_UTCTIME; cdecl;
 procedure ASN1_UTCTIME_free(a: PASN1_UTCTIME); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_UTCTIME_free';
 
-function d2i_ASN1_UTCTIME(a: PPASN1_UTCTIME; &in: PPByte; len: Integer): PASN1_UTCTIME; cdecl;
+function d2i_ASN1_UTCTIME(a: PPASN1_UTCTIME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_UTCTIME; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_UTCTIME';
 
-function i2d_ASN1_UTCTIME(a: PASN1_UTCTIME; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_UTCTIME(a: PASN1_UTCTIME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_UTCTIME';
 
 function ASN1_UTCTIME_it(): PASN1_ITEM; cdecl;
@@ -13764,10 +13777,10 @@ function ASN1_GENERALIZEDTIME_new(): PASN1_GENERALIZEDTIME; cdecl;
 procedure ASN1_GENERALIZEDTIME_free(a: PASN1_GENERALIZEDTIME); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_GENERALIZEDTIME_free';
 
-function d2i_ASN1_GENERALIZEDTIME(a: PPASN1_GENERALIZEDTIME; &in: PPByte; len: Integer): PASN1_GENERALIZEDTIME; cdecl;
+function d2i_ASN1_GENERALIZEDTIME(a: PPASN1_GENERALIZEDTIME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_GENERALIZEDTIME; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_GENERALIZEDTIME';
 
-function i2d_ASN1_GENERALIZEDTIME(a: PASN1_GENERALIZEDTIME; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_GENERALIZEDTIME(a: PASN1_GENERALIZEDTIME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_GENERALIZEDTIME';
 
 function ASN1_GENERALIZEDTIME_it(): PASN1_ITEM; cdecl;
@@ -13779,10 +13792,10 @@ function ASN1_TIME_new(): PASN1_TIME; cdecl;
 procedure ASN1_TIME_free(a: PASN1_TIME); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_TIME_free';
 
-function d2i_ASN1_TIME(a: PPASN1_TIME; &in: PPByte; len: Integer): PASN1_TIME; cdecl;
+function d2i_ASN1_TIME(a: PPASN1_TIME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASN1_TIME; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASN1_TIME';
 
-function i2d_ASN1_TIME(a: PASN1_TIME; &out: PPByte): Integer; cdecl;
+function i2d_ASN1_TIME(a: PASN1_TIME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_TIME';
 
 function ASN1_TIME_it(): PASN1_ITEM; cdecl;
@@ -13800,13 +13813,13 @@ function ASN1_TIME_adj(s: PASN1_TIME; t: Longint; offset_day: Integer; offset_se
 function ASN1_TIME_check(t: PASN1_TIME): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_TIME_check';
 
-function ASN1_TIME_to_generalizedtime(t: PASN1_TIME; &out: PPASN1_GENERALIZEDTIME): PASN1_GENERALIZEDTIME; cdecl;
+function ASN1_TIME_to_generalizedtime(t: PASN1_TIME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPASN1_GENERALIZEDTIME): PASN1_GENERALIZEDTIME; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_TIME_to_generalizedtime';
 
-function ASN1_TIME_set_string(s: PASN1_TIME; str: PUTF8Char): Integer; cdecl;
+function ASN1_TIME_set_string(s: PASN1_TIME; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_TIME_set_string';
 
-function ASN1_TIME_set_string_X509(s: PASN1_TIME; str: PUTF8Char): Integer; cdecl;
+function ASN1_TIME_set_string_X509(s: PASN1_TIME; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_TIME_set_string_X509';
 
 function ASN1_TIME_to_tm(s: PASN1_TIME; tm: Ptm): Integer; cdecl;
@@ -13824,31 +13837,31 @@ function ASN1_TIME_compare(a: PASN1_TIME; b: PASN1_TIME): Integer; cdecl;
 function i2a_ASN1_INTEGER(bp: PBIO; a: PASN1_INTEGER): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2a_ASN1_INTEGER';
 
-function a2i_ASN1_INTEGER(bp: PBIO; bs: PASN1_INTEGER; buf: PUTF8Char; size: Integer): Integer; cdecl;
+function a2i_ASN1_INTEGER(bp: PBIO; bs: PASN1_INTEGER; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; size: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'a2i_ASN1_INTEGER';
 
 function i2a_ASN1_ENUMERATED(bp: PBIO; a: PASN1_ENUMERATED): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2a_ASN1_ENUMERATED';
 
-function a2i_ASN1_ENUMERATED(bp: PBIO; bs: PASN1_ENUMERATED; buf: PUTF8Char; size: Integer): Integer; cdecl;
+function a2i_ASN1_ENUMERATED(bp: PBIO; bs: PASN1_ENUMERATED; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; size: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'a2i_ASN1_ENUMERATED';
 
 function i2a_ASN1_OBJECT(bp: PBIO; a: PASN1_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2a_ASN1_OBJECT';
 
-function a2i_ASN1_STRING(bp: PBIO; bs: PASN1_STRING; buf: PUTF8Char; size: Integer): Integer; cdecl;
+function a2i_ASN1_STRING(bp: PBIO; bs: PASN1_STRING; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; size: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'a2i_ASN1_STRING';
 
-function i2a_ASN1_STRING(bp: PBIO; a: PASN1_STRING; &type: Integer): Integer; cdecl;
+function i2a_ASN1_STRING(bp: PBIO; a: PASN1_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2a_ASN1_STRING';
 
-function i2t_ASN1_OBJECT(buf: PUTF8Char; buf_len: Integer; a: PASN1_OBJECT): Integer; cdecl;
+function i2t_ASN1_OBJECT(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; buf_len: Integer; a: PASN1_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2t_ASN1_OBJECT';
 
-function a2d_ASN1_OBJECT(&out: PByte; olen: Integer; buf: PUTF8Char; num: Integer): Integer; cdecl;
+function a2d_ASN1_OBJECT({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; olen: Integer; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; num: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'a2d_ASN1_OBJECT';
 
-function ASN1_OBJECT_create(nid: Integer; data: PByte; len: Integer; sn: PUTF8Char; ln: PUTF8Char): PASN1_OBJECT; cdecl;
+function ASN1_OBJECT_create(nid: Integer; data: PByte; len: Integer; sn: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ln: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PASN1_OBJECT; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_OBJECT_create';
 
 function ASN1_INTEGER_get_int64(pr: PInt64; a: PASN1_INTEGER): Integer; cdecl;
@@ -13926,37 +13939,37 @@ function ASN1_item_dup(it: PASN1_ITEM; x: Pointer): Pointer; cdecl;
 type
   ASN1_d2i_fp_xnew = function(): Pointer; cdecl;
 
-function ASN1_d2i_fp(xnew: ASN1_d2i_fp_xnew; d2i: Pd2i_of_void; &in: PPointer; x: PPointer): Pointer; cdecl;
+function ASN1_d2i_fp(xnew: ASN1_d2i_fp_xnew; d2i: Pd2i_of_void; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPointer; x: PPointer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_d2i_fp';
 
-function ASN1_item_d2i_fp(it: PASN1_ITEM; &in: PPointer; x: Pointer): Pointer; cdecl;
+function ASN1_item_d2i_fp(it: PASN1_ITEM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPointer; x: Pointer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_d2i_fp';
 
-function ASN1_i2d_fp(i2d: Pi2d_of_void; &out: PPointer; x: Pointer): Integer; cdecl;
+function ASN1_i2d_fp(i2d: Pi2d_of_void; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPointer; x: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_i2d_fp';
 
-function ASN1_item_i2d_fp(it: PASN1_ITEM; &out: PPointer; x: Pointer): Integer; cdecl;
+function ASN1_item_i2d_fp(it: PASN1_ITEM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPointer; x: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_i2d_fp';
 
 function ASN1_STRING_print_ex_fp(fp: PPointer; str: PASN1_STRING; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_STRING_print_ex_fp';
 
-function ASN1_STRING_to_UTF8(&out: PPByte; &in: PASN1_STRING): Integer; cdecl;
+function ASN1_STRING_to_UTF8({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PASN1_STRING): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_STRING_to_UTF8';
 
 type
   ASN1_d2i_bio_xnew = function(): Pointer; cdecl;
 
-function ASN1_d2i_bio(xnew: ASN1_d2i_bio_xnew; d2i: Pd2i_of_void; &in: PBIO; x: PPointer): Pointer; cdecl;
+function ASN1_d2i_bio(xnew: ASN1_d2i_bio_xnew; d2i: Pd2i_of_void; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; x: PPointer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_d2i_bio';
 
-function ASN1_item_d2i_bio(it: PASN1_ITEM; &in: PBIO; x: Pointer): Pointer; cdecl;
+function ASN1_item_d2i_bio(it: PASN1_ITEM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; x: Pointer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_d2i_bio';
 
-function ASN1_i2d_bio(i2d: Pi2d_of_void; &out: PBIO; x: PByte): Integer; cdecl;
+function ASN1_i2d_bio(i2d: Pi2d_of_void; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; x: PByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_i2d_bio';
 
-function ASN1_item_i2d_bio(it: PASN1_ITEM; &out: PBIO; x: Pointer): Integer; cdecl;
+function ASN1_item_i2d_bio(it: PASN1_ITEM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; x: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_i2d_bio';
 
 function ASN1_UTCTIME_print(fp: PBIO; a: PASN1_UTCTIME): Integer; cdecl;
@@ -13971,13 +13984,13 @@ function ASN1_TIME_print(fp: PBIO; a: PASN1_TIME): Integer; cdecl;
 function ASN1_STRING_print(bp: PBIO; v: PASN1_STRING): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_STRING_print';
 
-function ASN1_STRING_print_ex(&out: PBIO; str: PASN1_STRING; flags: Cardinal): Integer; cdecl;
+function ASN1_STRING_print_ex({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; str: PASN1_STRING; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_STRING_print_ex';
 
 function ASN1_buf_print(bp: PBIO; buf: PByte; buflen: NativeUInt; off: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_buf_print';
 
-function ASN1_bn_print(bp: PBIO; number: PUTF8Char; num: PBIGNUM; buf: PByte; off: Integer): Integer; cdecl;
+function ASN1_bn_print(bp: PBIO; number: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; num: PBIGNUM; buf: PByte; off: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_bn_print';
 
 function ASN1_parse(bp: PBIO; pp: PByte; len: Integer; indent: Integer): Integer; cdecl;
@@ -13986,7 +13999,7 @@ function ASN1_parse(bp: PBIO; pp: PByte; len: Integer; indent: Integer): Integer
 function ASN1_parse_dump(bp: PBIO; pp: PByte; len: Integer; indent: Integer; dump: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_parse_dump';
 
-function ASN1_tag2str(tag: Integer): PUTF8Char; cdecl;
+function ASN1_tag2str(tag: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_tag2str';
 
 function ASN1_UNIVERSALSTRING_to_string(s: PASN1_UNIVERSALSTRING): Integer; cdecl;
@@ -14013,19 +14026,19 @@ function ASN1_item_pack(obj: Pointer; it: PASN1_ITEM; oct: PPASN1_OCTET_STRING):
 procedure ASN1_STRING_set_default_mask(mask: Cardinal); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_STRING_set_default_mask';
 
-function ASN1_STRING_set_default_mask_asc(p: PUTF8Char): Integer; cdecl;
+function ASN1_STRING_set_default_mask_asc(p: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_STRING_set_default_mask_asc';
 
 function ASN1_STRING_get_default_mask(): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_STRING_get_default_mask';
 
-function ASN1_mbstring_copy(&out: PPASN1_STRING; &in: PByte; len: Integer; inform: Integer; mask: Cardinal): Integer; cdecl;
+function ASN1_mbstring_copy({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPASN1_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; len: Integer; inform: Integer; mask: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_mbstring_copy';
 
-function ASN1_mbstring_ncopy(&out: PPASN1_STRING; &in: PByte; len: Integer; inform: Integer; mask: Cardinal; minsize: Integer; maxsize: Integer): Integer; cdecl;
+function ASN1_mbstring_ncopy({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPASN1_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; len: Integer; inform: Integer; mask: Cardinal; minsize: Integer; maxsize: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_mbstring_ncopy';
 
-function ASN1_STRING_set_by_NID(&out: PPASN1_STRING; &in: PByte; inlen: Integer; inform: Integer; nid: Integer): PASN1_STRING; cdecl;
+function ASN1_STRING_set_by_NID({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPASN1_STRING; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: Integer; inform: Integer; nid: Integer): PASN1_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_STRING_set_by_NID';
 
 function ASN1_STRING_TABLE_get(nid: Integer): PASN1_STRING_TABLE; cdecl;
@@ -14043,13 +14056,13 @@ function ASN1_item_new(it: PASN1_ITEM): PASN1_VALUE; cdecl;
 procedure ASN1_item_free(val: PASN1_VALUE; it: PASN1_ITEM); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_free';
 
-function ASN1_item_d2i(val: PPASN1_VALUE; &in: PPByte; len: Integer; it: PASN1_ITEM): PASN1_VALUE; cdecl;
+function ASN1_item_d2i(val: PPASN1_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer; it: PASN1_ITEM): PASN1_VALUE; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_d2i';
 
-function ASN1_item_i2d(val: PASN1_VALUE; &out: PPByte; it: PASN1_ITEM): Integer; cdecl;
+function ASN1_item_i2d(val: PASN1_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; it: PASN1_ITEM): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_i2d';
 
-function ASN1_item_ndef_i2d(val: PASN1_VALUE; &out: PPByte; it: PASN1_ITEM): Integer; cdecl;
+function ASN1_item_ndef_i2d(val: PASN1_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; it: PASN1_ITEM): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_ndef_i2d';
 
 procedure ASN1_add_oid_module(); cdecl;
@@ -14058,16 +14071,16 @@ procedure ASN1_add_oid_module(); cdecl;
 procedure ASN1_add_stable_module(); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_add_stable_module';
 
-function ASN1_generate_nconf(str: PUTF8Char; nconf: PCONF): PASN1_TYPE; cdecl;
+function ASN1_generate_nconf(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; nconf: PCONF): PASN1_TYPE; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_generate_nconf';
 
-function ASN1_generate_v3(str: PUTF8Char; cnf: PX509V3_CTX): PASN1_TYPE; cdecl;
+function ASN1_generate_v3(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cnf: PX509V3_CTX): PASN1_TYPE; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_generate_v3';
 
-function ASN1_str2mask(str: PUTF8Char; pmask: PCardinal): Integer; cdecl;
+function ASN1_str2mask(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pmask: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_str2mask';
 
-function ASN1_item_print(&out: PBIO; ifld: PASN1_VALUE; indent: Integer; it: PASN1_ITEM; pctx: PASN1_PCTX): Integer; cdecl;
+function ASN1_item_print({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; ifld: PASN1_VALUE; indent: Integer; it: PASN1_ITEM; pctx: PASN1_PCTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_print';
 
 function ASN1_PCTX_new(): PASN1_PCTX; cdecl;
@@ -14133,13 +14146,13 @@ function ASN1_SCTX_get_app_data(p: PASN1_SCTX): Pointer; cdecl;
 function BIO_f_asn1(): PBIO_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_f_asn1';
 
-function BIO_new_NDEF(&out: PBIO; val: PASN1_VALUE; it: PASN1_ITEM): PBIO; cdecl;
+function BIO_new_NDEF({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; val: PASN1_VALUE; it: PASN1_ITEM): PBIO; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_new_NDEF';
 
-function i2d_ASN1_bio_stream(&out: PBIO; val: PASN1_VALUE; &in: PBIO; flags: Integer; it: PASN1_ITEM): Integer; cdecl;
+function i2d_ASN1_bio_stream({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; val: PASN1_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; flags: Integer; it: PASN1_ITEM): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASN1_bio_stream';
 
-function PEM_write_bio_ASN1_stream(&out: PBIO; val: PASN1_VALUE; &in: PBIO; flags: Integer; hdr: PUTF8Char; it: PASN1_ITEM): Integer; cdecl;
+function PEM_write_bio_ASN1_stream({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; val: PASN1_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; flags: Integer; hdr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; it: PASN1_ITEM): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_write_bio_ASN1_stream';
 
 function SMIME_write_ASN1(bio: PBIO; val: PASN1_VALUE; data: PBIO; flags: Integer; ctype_nid: Integer; econt_nid: Integer; mdalgs: Pstack_st_X509_ALGOR; it: PASN1_ITEM): Integer; cdecl;
@@ -14148,13 +14161,13 @@ function SMIME_write_ASN1(bio: PBIO; val: PASN1_VALUE; data: PBIO; flags: Intege
 function SMIME_read_ASN1(bio: PBIO; bcont: PPBIO; it: PASN1_ITEM): PASN1_VALUE; cdecl;
   external LIB_CRYPTO name _PU + 'SMIME_read_ASN1';
 
-function SMIME_crlf_copy(&in: PBIO; &out: PBIO; flags: Integer): Integer; cdecl;
+function SMIME_crlf_copy({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; flags: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'SMIME_crlf_copy';
 
-function SMIME_text(&in: PBIO; &out: PBIO): Integer; cdecl;
+function SMIME_text({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'SMIME_text';
 
-function ASN1_ITEM_lookup(name: PUTF8Char): PASN1_ITEM; cdecl;
+function ASN1_ITEM_lookup(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PASN1_ITEM; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_ITEM_lookup';
 
 function ASN1_ITEM_get(i: NativeUInt): PASN1_ITEM; cdecl;
@@ -14214,10 +14227,10 @@ function ASN1_item_ex_new(pval: PPASN1_VALUE; it: PASN1_ITEM): Integer; cdecl;
 procedure ASN1_item_ex_free(pval: PPASN1_VALUE; it: PASN1_ITEM); cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_ex_free';
 
-function ASN1_item_ex_d2i(pval: PPASN1_VALUE; &in: PPByte; len: Integer; it: PASN1_ITEM; tag: Integer; aclass: Integer; opt: UTF8Char; ctx: PASN1_TLC): Integer; cdecl;
+function ASN1_item_ex_d2i(pval: PPASN1_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer; it: PASN1_ITEM; tag: Integer; aclass: Integer; opt: {$IFNDEF FPC}{$IF CompilerVersion > 21}UTF8Char{$ELSE}WideChar{$IFEND}{$ELSE}UTF8Char{$ENDIF}; ctx: PASN1_TLC): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_ex_d2i';
 
-function ASN1_item_ex_i2d(pval: PPASN1_VALUE; &out: PPByte; it: PASN1_ITEM; tag: Integer; aclass: Integer): Integer; cdecl;
+function ASN1_item_ex_i2d(pval: PPASN1_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; it: PASN1_ITEM; tag: Integer; aclass: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_ex_i2d';
 
 function ERR_load_ASYNC_strings(): Integer; cdecl;
@@ -14262,19 +14275,19 @@ procedure BF_encrypt(data: PCardinal; key: PBF_KEY); cdecl;
 procedure BF_decrypt(data: PCardinal; key: PBF_KEY); cdecl;
   external LIB_CRYPTO name _PU + 'BF_decrypt';
 
-procedure BF_ecb_encrypt(&in: PByte; &out: PByte; key: PBF_KEY; enc: Integer); cdecl;
+procedure BF_ecb_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; key: PBF_KEY; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'BF_ecb_encrypt';
 
-procedure BF_cbc_encrypt(&in: PByte; &out: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; enc: Integer); cdecl;
+procedure BF_cbc_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'BF_cbc_encrypt';
 
-procedure BF_cfb64_encrypt(&in: PByte; &out: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
+procedure BF_cfb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'BF_cfb64_encrypt';
 
-procedure BF_ofb64_encrypt(&in: PByte; &out: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; num: PInteger); cdecl;
+procedure BF_ofb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; schedule: PBF_KEY; ivec: PByte; num: PInteger); cdecl;
   external LIB_CRYPTO name _PU + 'BF_ofb64_encrypt';
 
-function BF_options(): PUTF8Char; cdecl;
+function BF_options(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'BF_options';
 
 function ERR_load_BUF_strings(): Integer; cdecl;
@@ -14295,43 +14308,43 @@ function BUF_MEM_grow(str: PBUF_MEM; len: NativeUInt): NativeUInt; cdecl;
 function BUF_MEM_grow_clean(str: PBUF_MEM; len: NativeUInt): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'BUF_MEM_grow_clean';
 
-procedure BUF_reverse(&out: PByte; &in: PByte; siz: NativeUInt); cdecl;
+procedure BUF_reverse({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; siz: NativeUInt); cdecl;
   external LIB_CRYPTO name _PU + 'BUF_reverse';
 
 function Camellia_set_key(userKey: PByte; bits: Integer; key: PCAMELLIA_KEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'Camellia_set_key';
 
-procedure Camellia_encrypt(&in: PByte; &out: PByte; key: PCAMELLIA_KEY); cdecl;
+procedure Camellia_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; key: PCAMELLIA_KEY); cdecl;
   external LIB_CRYPTO name _PU + 'Camellia_encrypt';
 
-procedure Camellia_decrypt(&in: PByte; &out: PByte; key: PCAMELLIA_KEY); cdecl;
+procedure Camellia_decrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; key: PCAMELLIA_KEY); cdecl;
   external LIB_CRYPTO name _PU + 'Camellia_decrypt';
 
-procedure Camellia_ecb_encrypt(&in: PByte; &out: PByte; key: PCAMELLIA_KEY; enc: Integer); cdecl;
+procedure Camellia_ecb_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; key: PCAMELLIA_KEY; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'Camellia_ecb_encrypt';
 
-procedure Camellia_cbc_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; enc: Integer); cdecl;
+procedure Camellia_cbc_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'Camellia_cbc_encrypt';
 
-procedure Camellia_cfb128_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
+procedure Camellia_cfb128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'Camellia_cfb128_encrypt';
 
-procedure Camellia_cfb1_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
+procedure Camellia_cfb1_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'Camellia_cfb1_encrypt';
 
-procedure Camellia_cfb8_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
+procedure Camellia_cfb8_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'Camellia_cfb8_encrypt';
 
-procedure Camellia_ofb128_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger); cdecl;
+procedure Camellia_ofb128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; num: PInteger); cdecl;
   external LIB_CRYPTO name _PU + 'Camellia_ofb128_encrypt';
 
-procedure Camellia_ctr128_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; ecount_buf: PByte; num: PCardinal); cdecl;
+procedure Camellia_ctr128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: PCAMELLIA_KEY; ivec: PByte; ecount_buf: PByte; num: PCardinal); cdecl;
   external LIB_CRYPTO name _PU + 'Camellia_ctr128_encrypt';
 
 procedure CAST_set_key(key: PCAST_KEY; len: Integer; data: PByte); cdecl;
   external LIB_CRYPTO name _PU + 'CAST_set_key';
 
-procedure CAST_ecb_encrypt(&in: PByte; &out: PByte; key: PCAST_KEY; enc: Integer); cdecl;
+procedure CAST_ecb_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; key: PCAST_KEY; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'CAST_ecb_encrypt';
 
 procedure CAST_encrypt(data: PCardinal; key: PCAST_KEY); cdecl;
@@ -14340,13 +14353,13 @@ procedure CAST_encrypt(data: PCardinal; key: PCAST_KEY); cdecl;
 procedure CAST_decrypt(data: PCardinal; key: PCAST_KEY); cdecl;
   external LIB_CRYPTO name _PU + 'CAST_decrypt';
 
-procedure CAST_cbc_encrypt(&in: PByte; &out: PByte; length: Integer; ks: PCAST_KEY; iv: PByte; enc: Integer); cdecl;
+procedure CAST_cbc_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; ks: PCAST_KEY; iv: PByte; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'CAST_cbc_encrypt';
 
-procedure CAST_cfb64_encrypt(&in: PByte; &out: PByte; length: Integer; schedule: PCAST_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
+procedure CAST_cfb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; schedule: PCAST_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'CAST_cfb64_encrypt';
 
-procedure CAST_ofb64_encrypt(&in: PByte; &out: PByte; length: Integer; schedule: PCAST_KEY; ivec: PByte; num: PInteger); cdecl;
+procedure CAST_ofb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; schedule: PCAST_KEY; ivec: PByte; num: PInteger); cdecl;
   external LIB_CRYPTO name _PU + 'CAST_ofb64_encrypt';
 
 function ERR_load_EVP_strings(): Integer; cdecl;
@@ -14359,39 +14372,39 @@ function OBJ_NAME_init(): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_NAME_init';
 
 type
-  OBJ_NAME_new_index_hash_func = function(p1: PUTF8Char): Cardinal; cdecl;
+  OBJ_NAME_new_index_hash_func = function(p1: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Cardinal; cdecl;
 
 type
-  OBJ_NAME_new_index_cmp_func = function(p1: PUTF8Char; p2: PUTF8Char): Integer; cdecl;
+  OBJ_NAME_new_index_cmp_func = function(p1: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
 
 type
-  OBJ_NAME_new_index_free_func = procedure(p1: PUTF8Char; p2: Integer; p3: PUTF8Char); cdecl;
+  OBJ_NAME_new_index_free_func = procedure(p1: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p2: Integer; p3: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}); cdecl;
 
 function OBJ_NAME_new_index(hash_func: OBJ_NAME_new_index_hash_func; cmp_func: OBJ_NAME_new_index_cmp_func; free_func: OBJ_NAME_new_index_free_func): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_NAME_new_index';
 
-function OBJ_NAME_get(name: PUTF8Char; &type: Integer): PUTF8Char; cdecl;
+function OBJ_NAME_get(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_NAME_get';
 
-function OBJ_NAME_add(name: PUTF8Char; &type: Integer; data: PUTF8Char): Integer; cdecl;
+function OBJ_NAME_add(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; data: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_NAME_add';
 
-function OBJ_NAME_remove(name: PUTF8Char; &type: Integer): Integer; cdecl;
+function OBJ_NAME_remove(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_NAME_remove';
 
-procedure OBJ_NAME_cleanup(&type: Integer); cdecl;
+procedure OBJ_NAME_cleanup({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_NAME_cleanup';
 
 type
   OBJ_NAME_do_all_fn = procedure(p1: POBJ_NAME; arg: Pointer); cdecl;
 
-procedure OBJ_NAME_do_all(&type: Integer; fn: OBJ_NAME_do_all_fn; arg: Pointer); cdecl;
+procedure OBJ_NAME_do_all({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; fn: OBJ_NAME_do_all_fn; arg: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_NAME_do_all';
 
 type
   OBJ_NAME_do_all_sorted_fn = procedure(p1: POBJ_NAME; arg: Pointer); cdecl;
 
-procedure OBJ_NAME_do_all_sorted(&type: Integer; fn: OBJ_NAME_do_all_sorted_fn; arg: Pointer); cdecl;
+procedure OBJ_NAME_do_all_sorted({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; fn: OBJ_NAME_do_all_sorted_fn; arg: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_NAME_do_all_sorted';
 
 function OBJ_dup(o: PASN1_OBJECT): PASN1_OBJECT; cdecl;
@@ -14400,28 +14413,28 @@ function OBJ_dup(o: PASN1_OBJECT): PASN1_OBJECT; cdecl;
 function OBJ_nid2obj(n: Integer): PASN1_OBJECT; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_nid2obj';
 
-function OBJ_nid2ln(n: Integer): PUTF8Char; cdecl;
+function OBJ_nid2ln(n: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_nid2ln';
 
-function OBJ_nid2sn(n: Integer): PUTF8Char; cdecl;
+function OBJ_nid2sn(n: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_nid2sn';
 
 function OBJ_obj2nid(o: PASN1_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_obj2nid';
 
-function OBJ_txt2obj(s: PUTF8Char; no_name: Integer): PASN1_OBJECT; cdecl;
+function OBJ_txt2obj(s: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; no_name: Integer): PASN1_OBJECT; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_txt2obj';
 
-function OBJ_obj2txt(buf: PUTF8Char; buf_len: Integer; a: PASN1_OBJECT; no_name: Integer): Integer; cdecl;
+function OBJ_obj2txt(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; buf_len: Integer; a: PASN1_OBJECT; no_name: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_obj2txt';
 
-function OBJ_txt2nid(s: PUTF8Char): Integer; cdecl;
+function OBJ_txt2nid(s: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_txt2nid';
 
-function OBJ_ln2nid(s: PUTF8Char): Integer; cdecl;
+function OBJ_ln2nid(s: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_ln2nid';
 
-function OBJ_sn2nid(s: PUTF8Char): Integer; cdecl;
+function OBJ_sn2nid(s: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_sn2nid';
 
 function OBJ_cmp(a: PASN1_OBJECT; b: PASN1_OBJECT): Integer; cdecl;
@@ -14445,10 +14458,10 @@ function OBJ_new_nid(num: Integer): Integer; cdecl;
 function OBJ_add_object(obj: PASN1_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_add_object';
 
-function OBJ_create(oid: PUTF8Char; sn: PUTF8Char; ln: PUTF8Char): Integer; cdecl;
+function OBJ_create(oid: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; sn: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ln: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_create';
 
-function OBJ_create_objects(&in: PBIO): Integer; cdecl;
+function OBJ_create_objects({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OBJ_create_objects';
 
 function OBJ_length(obj: PASN1_OBJECT): NativeUInt; cdecl;
@@ -14505,11 +14518,11 @@ function EVP_MD_meth_set_update(md: PEVP_MD; update: EVP_MD_meth_set_update_upda
 type
   EVP_MD_meth_set_final_final = function(ctx: PEVP_MD_CTX; md: PByte): Integer; cdecl;
 
-function EVP_MD_meth_set_final(md: PEVP_MD; &final: EVP_MD_meth_set_final_final): Integer; cdecl;
+function EVP_MD_meth_set_final(md: PEVP_MD; {$IFNDEF FPC}{$IF CompilerVersion > 21}&final{$ELSE}final1{$IFEND}{$ELSE}&final{$ENDIF}: EVP_MD_meth_set_final_final): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_MD_meth_set_final';
 
 type
-  EVP_MD_meth_set_copy_copy = function(&to: PEVP_MD_CTX; from: PEVP_MD_CTX): Integer; cdecl;
+  EVP_MD_meth_set_copy_copy = function({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PEVP_MD_CTX; from: PEVP_MD_CTX): Integer; cdecl;
 
 function EVP_MD_meth_set_copy(md: PEVP_MD; copy: EVP_MD_meth_set_copy_copy): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_MD_meth_set_copy';
@@ -14547,7 +14560,7 @@ function EVP_MD_meth_get_flags(md: PEVP_MD): Cardinal; cdecl;
 //function EVP_MD_meth_get_final(ctx: PEVP_MD_CTXmd: PBytemd: PEVP_MD): Integer { TODO : Cannot convert original type "int (*)(EVP_MD_CTX *, unsigned char *)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'EVP_MD_meth_get_final';
 
-//function EVP_MD_meth_get_copy(&to: PEVP_MD_CTXfrom: PEVP_MD_CTXmd: PEVP_MD): Integer { TODO : Cannot convert original type "int (*)(EVP_MD_CTX *, const EVP_MD_CTX *)" }; cdecl;
+//function EVP_MD_meth_get_copy({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PEVP_MD_CTXfrom: PEVP_MD_CTXmd: PEVP_MD): Integer { TODO : Cannot convert original type "int (*)(EVP_MD_CTX *, const EVP_MD_CTX *)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'EVP_MD_meth_get_copy';
 
 //function EVP_MD_meth_get_cleanup(ctx: PEVP_MD_CTXmd: PEVP_MD): Integer { TODO : Cannot convert original type "int (*)(EVP_MD_CTX *)" }; cdecl;
@@ -14581,7 +14594,7 @@ function EVP_CIPHER_meth_set_init(cipher: PEVP_CIPHER; init: EVP_CIPHER_meth_set
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_meth_set_init';
 
 type
-  EVP_CIPHER_meth_set_do_cipher_do_cipher = function(ctx: PEVP_CIPHER_CTX; &out: PByte; &in: PByte; inl: NativeUInt): Integer; cdecl;
+  EVP_CIPHER_meth_set_do_cipher_do_cipher = function(ctx: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inl: NativeUInt): Integer; cdecl;
 
 function EVP_CIPHER_meth_set_do_cipher(cipher: PEVP_CIPHER; do_cipher: EVP_CIPHER_meth_set_do_cipher_do_cipher): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_meth_set_do_cipher';
@@ -14605,7 +14618,7 @@ function EVP_CIPHER_meth_set_get_asn1_params(cipher: PEVP_CIPHER; get_asn1_param
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_meth_set_get_asn1_params';
 
 type
-  EVP_CIPHER_meth_set_ctrl_ctrl = function(p1: PEVP_CIPHER_CTX; &type: Integer; arg: Integer; ptr: Pointer): Integer; cdecl;
+  EVP_CIPHER_meth_set_ctrl_ctrl = function(p1: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; arg: Integer; ptr: Pointer): Integer; cdecl;
 
 function EVP_CIPHER_meth_set_ctrl(cipher: PEVP_CIPHER; ctrl: EVP_CIPHER_meth_set_ctrl_ctrl): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_meth_set_ctrl';
@@ -14613,7 +14626,7 @@ function EVP_CIPHER_meth_set_ctrl(cipher: PEVP_CIPHER; ctrl: EVP_CIPHER_meth_set
 //function EVP_CIPHER_meth_get_init(ctx: PEVP_CIPHER_CTXkey: PByteiv: PByteenc: Integercipher: PEVP_CIPHER): Integer { TODO : Cannot convert original type "int (*)(EVP_CIPHER_CTX *, const unsigned char *, const unsigned char *, int)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'EVP_CIPHER_meth_get_init';
 
-//function EVP_CIPHER_meth_get_do_cipher(ctx: PEVP_CIPHER_CTX&out: PByte&in: PByteinl: NativeUIntcipher: PEVP_CIPHER): Integer { TODO : Cannot convert original type "int (*)(EVP_CIPHER_CTX *, unsigned char *, const unsigned char *, size_t)" }; cdecl;
+//function EVP_CIPHER_meth_get_do_cipher(ctx: PEVP_CIPHER_CTX{$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte{$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByteinl: NativeUIntcipher: PEVP_CIPHER): Integer { TODO : Cannot convert original type "int (*)(EVP_CIPHER_CTX *, unsigned char *, const unsigned char *, size_t)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'EVP_CIPHER_meth_get_do_cipher';
 
 //function EVP_CIPHER_meth_get_cleanup(p1: PEVP_CIPHER_CTXcipher: PEVP_CIPHER): Integer { TODO : Cannot convert original type "int (*)(EVP_CIPHER_CTX *)" }; cdecl;
@@ -14625,7 +14638,7 @@ function EVP_CIPHER_meth_set_ctrl(cipher: PEVP_CIPHER; ctrl: EVP_CIPHER_meth_set
 //function EVP_CIPHER_meth_get_get_asn1_params(p1: PEVP_CIPHER_CTXp2: PASN1_TYPEcipher: PEVP_CIPHER): Integer { TODO : Cannot convert original type "int (*)(EVP_CIPHER_CTX *, ASN1_TYPE *)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'EVP_CIPHER_meth_get_get_asn1_params';
 
-//function EVP_CIPHER_meth_get_ctrl(p1: PEVP_CIPHER_CTX&type: Integerarg: Integerptr: Pointercipher: PEVP_CIPHER): Integer { TODO : Cannot convert original type "int (*)(EVP_CIPHER_CTX *, int, int, void *)" }; cdecl;
+//function EVP_CIPHER_meth_get_ctrl(p1: PEVP_CIPHER_CTX{$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integerarg: Integerptr: Pointercipher: PEVP_CIPHER): Integer { TODO : Cannot convert original type "int (*)(EVP_CIPHER_CTX *, int, int, void *)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'EVP_CIPHER_meth_get_ctrl';
 
 function EVP_MD_type(md: PEVP_MD): Integer; cdecl;
@@ -14718,7 +14731,7 @@ function EVP_CIPHER_CTX_num(ctx: PEVP_CIPHER_CTX): Integer; cdecl;
 procedure EVP_CIPHER_CTX_set_num(ctx: PEVP_CIPHER_CTX; num: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_CTX_set_num';
 
-function EVP_CIPHER_CTX_copy(&out: PEVP_CIPHER_CTX; &in: PEVP_CIPHER_CTX): Integer; cdecl;
+function EVP_CIPHER_CTX_copy({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PEVP_CIPHER_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_CTX_copy';
 
 function EVP_CIPHER_CTX_get_app_data(ctx: PEVP_CIPHER_CTX): Pointer; cdecl;
@@ -14733,7 +14746,7 @@ function EVP_CIPHER_CTX_get_cipher_data(ctx: PEVP_CIPHER_CTX): Pointer; cdecl;
 function EVP_CIPHER_CTX_set_cipher_data(ctx: PEVP_CIPHER_CTX; cipher_data: Pointer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_CTX_set_cipher_data';
 
-function EVP_Cipher(c: PEVP_CIPHER_CTX; &out: PByte; &in: PByte; inl: Cardinal): Integer; cdecl;
+function EVP_Cipher(c: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inl: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_Cipher';
 
 function EVP_MD_CTX_ctrl(ctx: PEVP_MD_CTX; cmd: Integer; p1: Integer; p2: Pointer): Integer; cdecl;
@@ -14752,7 +14765,7 @@ procedure EVP_MD_CTX_free(ctx: PEVP_MD_CTX); cdecl;
 procedure EVP_MD_CTX_destroy(ctx: PEVP_MD_CTX); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_MD_CTX_free';
 
-function EVP_MD_CTX_copy_ex(&out: PEVP_MD_CTX; &in: PEVP_MD_CTX): Integer; cdecl;
+function EVP_MD_CTX_copy_ex({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PEVP_MD_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PEVP_MD_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_MD_CTX_copy_ex';
 
 procedure EVP_MD_CTX_set_flags(ctx: PEVP_MD_CTX; flags: Integer); cdecl;
@@ -14764,7 +14777,7 @@ procedure EVP_MD_CTX_clear_flags(ctx: PEVP_MD_CTX; flags: Integer); cdecl;
 function EVP_MD_CTX_test_flags(ctx: PEVP_MD_CTX; flags: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_MD_CTX_test_flags';
 
-function EVP_DigestInit_ex(ctx: PEVP_MD_CTX; &type: PEVP_MD; impl: PENGINE): Integer; cdecl;
+function EVP_DigestInit_ex(ctx: PEVP_MD_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; impl: PENGINE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DigestInit_ex';
 
 function EVP_DigestUpdate(ctx: PEVP_MD_CTX; d: Pointer; cnt: NativeUInt): Integer; cdecl;
@@ -14773,13 +14786,13 @@ function EVP_DigestUpdate(ctx: PEVP_MD_CTX; d: Pointer; cnt: NativeUInt): Intege
 function EVP_DigestFinal_ex(ctx: PEVP_MD_CTX; md: PByte; s: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DigestFinal_ex';
 
-function EVP_Digest(data: Pointer; count: NativeUInt; md: PByte; size: PCardinal; &type: PEVP_MD; impl: PENGINE): Integer; cdecl;
+function EVP_Digest(data: Pointer; count: NativeUInt; md: PByte; size: PCardinal; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; impl: PENGINE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_Digest';
 
-function EVP_MD_CTX_copy(&out: PEVP_MD_CTX; &in: PEVP_MD_CTX): Integer; cdecl;
+function EVP_MD_CTX_copy({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PEVP_MD_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PEVP_MD_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_MD_CTX_copy';
 
-function EVP_DigestInit(ctx: PEVP_MD_CTX; &type: PEVP_MD): Integer; cdecl;
+function EVP_DigestInit(ctx: PEVP_MD_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DigestInit';
 
 function EVP_DigestFinal(ctx: PEVP_MD_CTX; md: PByte; s: PCardinal): Integer; cdecl;
@@ -14788,19 +14801,19 @@ function EVP_DigestFinal(ctx: PEVP_MD_CTX; md: PByte; s: PCardinal): Integer; cd
 function EVP_DigestFinalXOF(ctx: PEVP_MD_CTX; md: PByte; len: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DigestFinalXOF';
 
-function EVP_read_pw_string(buf: PUTF8Char; length: Integer; prompt: PUTF8Char; verify: Integer): Integer; cdecl;
+function EVP_read_pw_string(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; length: Integer; prompt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; verify: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_read_pw_string';
 
-function EVP_read_pw_string_min(buf: PUTF8Char; minlen: Integer; maxlen: Integer; prompt: PUTF8Char; verify: Integer): Integer; cdecl;
+function EVP_read_pw_string_min(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; minlen: Integer; maxlen: Integer; prompt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; verify: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_read_pw_string_min';
 
-procedure EVP_set_pw_prompt(prompt: PUTF8Char); cdecl;
+procedure EVP_set_pw_prompt(prompt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_set_pw_prompt';
 
-function EVP_get_pw_prompt(): PUTF8Char; cdecl;
+function EVP_get_pw_prompt(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_get_pw_prompt';
 
-function EVP_BytesToKey(&type: PEVP_CIPHER; md: PEVP_MD; salt: PByte; data: PByte; datal: Integer; count: Integer; key: PByte; iv: PByte): Integer; cdecl;
+function EVP_BytesToKey({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_CIPHER; md: PEVP_MD; salt: PByte; data: PByte; datal: Integer; count: Integer; key: PByte; iv: PByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_BytesToKey';
 
 procedure EVP_CIPHER_CTX_set_flags(ctx: PEVP_CIPHER_CTX; flags: Integer); cdecl;
@@ -14818,13 +14831,13 @@ function EVP_EncryptInit(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; key: PByte; 
 function EVP_EncryptInit_ex(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; impl: PENGINE; key: PByte; iv: PByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_EncryptInit_ex';
 
-function EVP_EncryptUpdate(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger; &in: PByte; inl: Integer): Integer; cdecl;
+function EVP_EncryptUpdate(ctx: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outl: PInteger; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_EncryptUpdate';
 
-function EVP_EncryptFinal_ex(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger): Integer; cdecl;
+function EVP_EncryptFinal_ex(ctx: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outl: PInteger): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_EncryptFinal_ex';
 
-function EVP_EncryptFinal(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger): Integer; cdecl;
+function EVP_EncryptFinal(ctx: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outl: PInteger): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_EncryptFinal';
 
 function EVP_DecryptInit(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; key: PByte; iv: PByte): Integer; cdecl;
@@ -14833,7 +14846,7 @@ function EVP_DecryptInit(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; key: PByte; 
 function EVP_DecryptInit_ex(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; impl: PENGINE; key: PByte; iv: PByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DecryptInit_ex';
 
-function EVP_DecryptUpdate(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger; &in: PByte; inl: Integer): Integer; cdecl;
+function EVP_DecryptUpdate(ctx: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outl: PInteger; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DecryptUpdate';
 
 function EVP_DecryptFinal(ctx: PEVP_CIPHER_CTX; outm: PByte; outl: PInteger): Integer; cdecl;
@@ -14848,7 +14861,7 @@ function EVP_CipherInit(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; key: PByte; i
 function EVP_CipherInit_ex(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; impl: PENGINE; key: PByte; iv: PByte; enc: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CipherInit_ex';
 
-function EVP_CipherUpdate(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger; &in: PByte; inl: Integer): Integer; cdecl;
+function EVP_CipherUpdate(ctx: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outl: PInteger; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CipherUpdate';
 
 function EVP_CipherFinal(ctx: PEVP_CIPHER_CTX; outm: PByte; outl: PInteger): Integer; cdecl;
@@ -14869,28 +14882,28 @@ function EVP_VerifyFinal(ctx: PEVP_MD_CTX; sigbuf: PByte; siglen: Cardinal; pkey
 function EVP_DigestVerify(ctx: PEVP_MD_CTX; sigret: PByte; siglen: NativeUInt; tbs: PByte; tbslen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DigestVerify';
 
-function EVP_DigestSignInit(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; &type: PEVP_MD; e: PENGINE; pkey: PEVP_PKEY): Integer; cdecl;
+function EVP_DigestSignInit(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; e: PENGINE; pkey: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DigestSignInit';
 
 function EVP_DigestSignFinal(ctx: PEVP_MD_CTX; sigret: PByte; var siglen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DigestSignFinal';
 
-function EVP_DigestVerifyInit(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; &type: PEVP_MD; e: PENGINE; pkey: PEVP_PKEY): Integer; cdecl;
+function EVP_DigestVerifyInit(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; e: PENGINE; pkey: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DigestVerifyInit';
 
 function EVP_DigestVerifyFinal(ctx: PEVP_MD_CTX; sig: PByte; siglen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DigestVerifyFinal';
 
-function EVP_OpenInit(ctx: PEVP_CIPHER_CTX; &type: PEVP_CIPHER; ek: PByte; ekl: Integer; iv: PByte; priv: PEVP_PKEY): Integer; cdecl;
+function EVP_OpenInit(ctx: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_CIPHER; ek: PByte; ekl: Integer; iv: PByte; priv: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_OpenInit';
 
-function EVP_OpenFinal(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger): Integer; cdecl;
+function EVP_OpenFinal(ctx: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outl: PInteger): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_OpenFinal';
 
-function EVP_SealInit(ctx: PEVP_CIPHER_CTX; &type: PEVP_CIPHER; ek: PPByte; ekl: PInteger; iv: PByte; pubk: PPEVP_PKEY; npubk: Integer): Integer; cdecl;
+function EVP_SealInit(ctx: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_CIPHER; ek: PPByte; ekl: PInteger; iv: PByte; pubk: PPEVP_PKEY; npubk: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_SealInit';
 
-function EVP_SealFinal(ctx: PEVP_CIPHER_CTX; &out: PByte; outl: PInteger): Integer; cdecl;
+function EVP_SealFinal(ctx: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outl: PInteger): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_SealFinal';
 
 function EVP_ENCODE_CTX_new(): PEVP_ENCODE_CTX; cdecl;
@@ -14908,10 +14921,10 @@ function EVP_ENCODE_CTX_num(ctx: PEVP_ENCODE_CTX): Integer; cdecl;
 procedure EVP_EncodeInit(ctx: PEVP_ENCODE_CTX); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_EncodeInit';
 
-function EVP_EncodeUpdate(ctx: PEVP_ENCODE_CTX; &out: PByte; outl: PInteger; &in: PByte; inl: Integer): Integer; cdecl;
+function EVP_EncodeUpdate(ctx: PEVP_ENCODE_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outl: PInteger; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_EncodeUpdate';
 
-procedure EVP_EncodeFinal(ctx: PEVP_ENCODE_CTX; &out: PByte; outl: PInteger); cdecl;
+procedure EVP_EncodeFinal(ctx: PEVP_ENCODE_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outl: PInteger); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_EncodeFinal';
 
 function EVP_EncodeBlock(t: PByte; f: PByte; n: Integer): Integer; cdecl;
@@ -14920,10 +14933,10 @@ function EVP_EncodeBlock(t: PByte; f: PByte; n: Integer): Integer; cdecl;
 procedure EVP_DecodeInit(ctx: PEVP_ENCODE_CTX); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DecodeInit';
 
-function EVP_DecodeUpdate(ctx: PEVP_ENCODE_CTX; &out: PByte; outl: PInteger; &in: PByte; inl: Integer): Integer; cdecl;
+function EVP_DecodeUpdate(ctx: PEVP_ENCODE_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outl: PInteger; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DecodeUpdate';
 
-function EVP_DecodeFinal(ctx: PEVP_ENCODE_CTX; &out: PByte; outl: PInteger): Integer; cdecl;
+function EVP_DecodeFinal(ctx: PEVP_ENCODE_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outl: PInteger): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_DecodeFinal';
 
 function EVP_DecodeBlock(t: PByte; f: PByte; n: Integer): Integer; cdecl;
@@ -14944,7 +14957,7 @@ function EVP_CIPHER_CTX_set_key_length(x: PEVP_CIPHER_CTX; keylen: Integer): Int
 function EVP_CIPHER_CTX_set_padding(c: PEVP_CIPHER_CTX; pad: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_CTX_set_padding';
 
-function EVP_CIPHER_CTX_ctrl(ctx: PEVP_CIPHER_CTX; &type: Integer; arg: Integer; ptr: Pointer): Integer; cdecl;
+function EVP_CIPHER_CTX_ctrl(ctx: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; arg: Integer; ptr: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_CTX_ctrl';
 
 function EVP_CIPHER_CTX_rand_key(ctx: PEVP_CIPHER_CTX; key: PByte): Integer; cdecl;
@@ -15505,32 +15518,32 @@ function EVP_add_cipher(cipher: PEVP_CIPHER): Integer; cdecl;
 function EVP_add_digest(digest: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_add_digest';
 
-function EVP_get_cipherbyname(name: PUTF8Char): PEVP_CIPHER; cdecl;
+function EVP_get_cipherbyname(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PEVP_CIPHER; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_get_cipherbyname';
 
-function EVP_get_digestbyname(name: PUTF8Char): PEVP_MD; cdecl;
+function EVP_get_digestbyname(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PEVP_MD; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_get_digestbyname';
 
 type
-  EVP_CIPHER_do_all_fn = procedure(ciph: PEVP_CIPHER; from: PUTF8Char; &to: PUTF8Char; x: Pointer); cdecl;
+  EVP_CIPHER_do_all_fn = procedure(ciph: PEVP_CIPHER; from: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; x: Pointer); cdecl;
 
 procedure EVP_CIPHER_do_all(fn: EVP_CIPHER_do_all_fn; arg: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_do_all';
 
 type
-  EVP_CIPHER_do_all_sorted_fn = procedure(ciph: PEVP_CIPHER; from: PUTF8Char; &to: PUTF8Char; x: Pointer); cdecl;
+  EVP_CIPHER_do_all_sorted_fn = procedure(ciph: PEVP_CIPHER; from: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; x: Pointer); cdecl;
 
 procedure EVP_CIPHER_do_all_sorted(fn: EVP_CIPHER_do_all_sorted_fn; arg: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_do_all_sorted';
 
 type
-  EVP_MD_do_all_fn = procedure(ciph: PEVP_MD; from: PUTF8Char; &to: PUTF8Char; x: Pointer); cdecl;
+  EVP_MD_do_all_fn = procedure(ciph: PEVP_MD; from: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; x: Pointer); cdecl;
 
 procedure EVP_MD_do_all(fn: EVP_MD_do_all_fn; arg: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_MD_do_all';
 
 type
-  EVP_MD_do_all_sorted_fn = procedure(ciph: PEVP_MD; from: PUTF8Char; &to: PUTF8Char; x: Pointer); cdecl;
+  EVP_MD_do_all_sorted_fn = procedure(ciph: PEVP_MD; from: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; x: Pointer); cdecl;
 
 procedure EVP_MD_do_all_sorted(fn: EVP_MD_do_all_sorted_fn; arg: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_MD_do_all_sorted';
@@ -15541,7 +15554,7 @@ function EVP_PKEY_decrypt_old(dec_key: PByte; enc_key: PByte; enc_key_len: Integ
 function EVP_PKEY_encrypt_old(enc_key: PByte; key: PByte; key_len: Integer; pub_key: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_encrypt_old';
 
-function EVP_PKEY_type(&type: Integer): Integer; cdecl;
+function EVP_PKEY_type({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_type';
 
 function EVP_PKEY_id(pkey: PEVP_PKEY): Integer; cdecl;
@@ -15559,13 +15572,13 @@ function EVP_PKEY_security_bits(pkey: PEVP_PKEY): Integer; cdecl;
 function EVP_PKEY_size(pkey: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_size';
 
-function EVP_PKEY_set_type(pkey: PEVP_PKEY; &type: Integer): Integer; cdecl;
+function EVP_PKEY_set_type(pkey: PEVP_PKEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_set_type';
 
-function EVP_PKEY_set_type_str(pkey: PEVP_PKEY; str: PUTF8Char; len: Integer): Integer; cdecl;
+function EVP_PKEY_set_type_str(pkey: PEVP_PKEY; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_set_type_str';
 
-function EVP_PKEY_set_alias_type(pkey: PEVP_PKEY; &type: Integer): Integer; cdecl;
+function EVP_PKEY_set_alias_type(pkey: PEVP_PKEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_set_alias_type';
 
 function EVP_PKEY_set1_engine(pkey: PEVP_PKEY; e: PENGINE): Integer; cdecl;
@@ -15574,7 +15587,7 @@ function EVP_PKEY_set1_engine(pkey: PEVP_PKEY; e: PENGINE): Integer; cdecl;
 function EVP_PKEY_get0_engine(pkey: PEVP_PKEY): PENGINE; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_get0_engine';
 
-function EVP_PKEY_assign(pkey: PEVP_PKEY; &type: Integer; key: Pointer): Integer; cdecl;
+function EVP_PKEY_assign(pkey: PEVP_PKEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; key: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_assign';
 
 function EVP_PKEY_get0(pkey: PEVP_PKEY): Pointer; cdecl;
@@ -15634,13 +15647,13 @@ function EVP_PKEY_up_ref(pkey: PEVP_PKEY): Integer; cdecl;
 procedure EVP_PKEY_free(pkey: PEVP_PKEY); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_free';
 
-function d2i_PublicKey(&type: Integer; a: PPEVP_PKEY; pp: PPByte; length: Integer): PEVP_PKEY; cdecl;
+function d2i_PublicKey({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; a: PPEVP_PKEY; pp: PPByte; length: Integer): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PublicKey';
 
 function i2d_PublicKey(a: PEVP_PKEY; pp: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PublicKey';
 
-function d2i_PrivateKey(&type: Integer; a: PPEVP_PKEY; pp: PPByte; length: Integer): PEVP_PKEY; cdecl;
+function d2i_PrivateKey({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; a: PPEVP_PKEY; pp: PPByte; length: Integer): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PrivateKey';
 
 function d2i_AutoPrivateKey(a: PPEVP_PKEY; pp: PPByte; length: Integer): PEVP_PKEY; cdecl;
@@ -15649,7 +15662,7 @@ function d2i_AutoPrivateKey(a: PPEVP_PKEY; pp: PPByte; length: Integer): PEVP_PK
 function i2d_PrivateKey(a: PEVP_PKEY; pp: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PrivateKey';
 
-function EVP_PKEY_copy_parameters(&to: PEVP_PKEY; from: PEVP_PKEY): Integer; cdecl;
+function EVP_PKEY_copy_parameters({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PEVP_PKEY; from: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_copy_parameters';
 
 function EVP_PKEY_missing_parameters(pkey: PEVP_PKEY): Integer; cdecl;
@@ -15664,13 +15677,13 @@ function EVP_PKEY_cmp_parameters(a: PEVP_PKEY; b: PEVP_PKEY): Integer; cdecl;
 function EVP_PKEY_cmp(a: PEVP_PKEY; b: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_cmp';
 
-function EVP_PKEY_print_public(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+function EVP_PKEY_print_public({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_print_public';
 
-function EVP_PKEY_print_private(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+function EVP_PKEY_print_private({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_print_private';
 
-function EVP_PKEY_print_params(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+function EVP_PKEY_print_params({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_print_params';
 
 function EVP_PKEY_get_default_digest_nid(pkey: PEVP_PKEY; pnid: PInteger): Integer; cdecl;
@@ -15685,40 +15698,40 @@ function EVP_PKEY_get1_tls_encodedpoint(pkey: PEVP_PKEY; ppt: PPByte): NativeUIn
 function EVP_CIPHER_type(ctx: PEVP_CIPHER): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_type';
 
-function EVP_CIPHER_param_to_asn1(c: PEVP_CIPHER_CTX; &type: PASN1_TYPE): Integer; cdecl;
+function EVP_CIPHER_param_to_asn1(c: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PASN1_TYPE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_param_to_asn1';
 
-function EVP_CIPHER_asn1_to_param(c: PEVP_CIPHER_CTX; &type: PASN1_TYPE): Integer; cdecl;
+function EVP_CIPHER_asn1_to_param(c: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PASN1_TYPE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_asn1_to_param';
 
-function EVP_CIPHER_set_asn1_iv(c: PEVP_CIPHER_CTX; &type: PASN1_TYPE): Integer; cdecl;
+function EVP_CIPHER_set_asn1_iv(c: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PASN1_TYPE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_set_asn1_iv';
 
-function EVP_CIPHER_get_asn1_iv(c: PEVP_CIPHER_CTX; &type: PASN1_TYPE): Integer; cdecl;
+function EVP_CIPHER_get_asn1_iv(c: PEVP_CIPHER_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PASN1_TYPE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_CIPHER_get_asn1_iv';
 
-function PKCS5_PBE_keyivgen(ctx: PEVP_CIPHER_CTX; pass: PUTF8Char; passlen: Integer; param: PASN1_TYPE; cipher: PEVP_CIPHER; md: PEVP_MD; en_de: Integer): Integer; cdecl;
+function PKCS5_PBE_keyivgen(ctx: PEVP_CIPHER_CTX; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; param: PASN1_TYPE; cipher: PEVP_CIPHER; md: PEVP_MD; en_de: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS5_PBE_keyivgen';
 
-function PKCS5_PBKDF2_HMAC_SHA1(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; keylen: Integer; &out: PByte): Integer; cdecl;
+function PKCS5_PBKDF2_HMAC_SHA1(pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; keylen: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS5_PBKDF2_HMAC_SHA1';
 
-function PKCS5_PBKDF2_HMAC(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; digest: PEVP_MD; keylen: Integer; &out: PByte): Integer; cdecl;
+function PKCS5_PBKDF2_HMAC(pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; digest: PEVP_MD; keylen: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS5_PBKDF2_HMAC';
 
-function PKCS5_v2_PBE_keyivgen(ctx: PEVP_CIPHER_CTX; pass: PUTF8Char; passlen: Integer; param: PASN1_TYPE; cipher: PEVP_CIPHER; md: PEVP_MD; en_de: Integer): Integer; cdecl;
+function PKCS5_v2_PBE_keyivgen(ctx: PEVP_CIPHER_CTX; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; param: PASN1_TYPE; cipher: PEVP_CIPHER; md: PEVP_MD; en_de: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS5_v2_PBE_keyivgen';
 
-function EVP_PBE_scrypt(pass: PUTF8Char; passlen: NativeUInt; salt: PByte; saltlen: NativeUInt; N: UInt64; r: UInt64; p: UInt64; maxmem: UInt64; key: PByte; keylen: NativeUInt): Integer; cdecl;
+function EVP_PBE_scrypt(pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: NativeUInt; salt: PByte; saltlen: NativeUInt; N: UInt64; r: UInt64; p: UInt64; maxmem: UInt64; key: PByte; keylen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PBE_scrypt';
 
-function PKCS5_v2_scrypt_keyivgen(ctx: PEVP_CIPHER_CTX; pass: PUTF8Char; passlen: Integer; param: PASN1_TYPE; c: PEVP_CIPHER; md: PEVP_MD; en_de: Integer): Integer; cdecl;
+function PKCS5_v2_scrypt_keyivgen(ctx: PEVP_CIPHER_CTX; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; param: PASN1_TYPE; c: PEVP_CIPHER; md: PEVP_MD; en_de: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS5_v2_scrypt_keyivgen';
 
 procedure PKCS5_PBE_add(); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS5_PBE_add';
 
-function EVP_PBE_CipherInit(pbe_obj: PASN1_OBJECT; pass: PUTF8Char; passlen: Integer; param: PASN1_TYPE; ctx: PEVP_CIPHER_CTX; en_de: Integer): Integer; cdecl;
+function EVP_PBE_CipherInit(pbe_obj: PASN1_OBJECT; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; param: PASN1_TYPE; ctx: PEVP_CIPHER_CTX; en_de: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PBE_CipherInit';
 
 function EVP_PBE_alg_add_type(pbe_type: Integer; pbe_nid: Integer; cipher_nid: Integer; md_nid: Integer; keygen: PEVP_PBE_KEYGEN): Integer; cdecl;
@@ -15730,7 +15743,7 @@ function EVP_PBE_alg_add(nid: Integer; cipher: PEVP_CIPHER; md: PEVP_MD; keygen:
 type
   PPEVP_PBE_KEYGEN = Pointer;
 
-function EVP_PBE_find(&type: Integer; pbe_nid: Integer; pcnid: PInteger; pmnid: PInteger; pkeygen: PPEVP_PBE_KEYGEN): Integer; cdecl;
+function EVP_PBE_find({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; pbe_nid: Integer; pcnid: PInteger; pmnid: PInteger; pkeygen: PPEVP_PBE_KEYGEN): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PBE_find';
 
 procedure EVP_PBE_cleanup(); cdecl;
@@ -15745,25 +15758,25 @@ function EVP_PKEY_asn1_get_count(): Integer; cdecl;
 function EVP_PKEY_asn1_get0(idx: Integer): PEVP_PKEY_ASN1_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_asn1_get0';
 
-function EVP_PKEY_asn1_find(pe: PPENGINE; &type: Integer): PEVP_PKEY_ASN1_METHOD; cdecl;
+function EVP_PKEY_asn1_find(pe: PPENGINE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): PEVP_PKEY_ASN1_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_asn1_find';
 
-function EVP_PKEY_asn1_find_str(pe: PPENGINE; str: PUTF8Char; len: Integer): PEVP_PKEY_ASN1_METHOD; cdecl;
+function EVP_PKEY_asn1_find_str(pe: PPENGINE; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer): PEVP_PKEY_ASN1_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_asn1_find_str';
 
 function EVP_PKEY_asn1_add0(ameth: PEVP_PKEY_ASN1_METHOD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_asn1_add0';
 
-function EVP_PKEY_asn1_add_alias(&to: Integer; from: Integer): Integer; cdecl;
+function EVP_PKEY_asn1_add_alias({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: Integer; from: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_asn1_add_alias';
 
-function EVP_PKEY_asn1_get0_info(ppkey_id: PInteger; pkey_base_id: PInteger; ppkey_flags: PInteger; pinfo: PPUTF8Char; ppem_str: PPUTF8Char; ameth: PEVP_PKEY_ASN1_METHOD): Integer; cdecl;
+function EVP_PKEY_asn1_get0_info(ppkey_id: PInteger; pkey_base_id: PInteger; ppkey_flags: PInteger; pinfo: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; ppem_str: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; ameth: PEVP_PKEY_ASN1_METHOD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_asn1_get0_info';
 
 function EVP_PKEY_get0_asn1(pkey: PEVP_PKEY): PEVP_PKEY_ASN1_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_get0_asn1';
 
-function EVP_PKEY_asn1_new(id: Integer; flags: Integer; pem_str: PUTF8Char; info: PUTF8Char): PEVP_PKEY_ASN1_METHOD; cdecl;
+function EVP_PKEY_asn1_new(id: Integer; flags: Integer; pem_str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; info: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PEVP_PKEY_ASN1_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_asn1_new';
 
 procedure EVP_PKEY_asn1_copy(dst: PEVP_PKEY_ASN1_METHOD; src: PEVP_PKEY_ASN1_METHOD); cdecl;
@@ -15782,7 +15795,7 @@ type
   EVP_PKEY_asn1_set_public_pub_cmp = function(a: PEVP_PKEY; b: PEVP_PKEY): Integer; cdecl;
 
 type
-  EVP_PKEY_asn1_set_public_pub_print = function(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+  EVP_PKEY_asn1_set_public_pub_print = function({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
 
 type
   EVP_PKEY_asn1_set_public_pkey_size = function(pk: PEVP_PKEY): Integer; cdecl;
@@ -15800,7 +15813,7 @@ type
   EVP_PKEY_asn1_set_private_priv_encode = function(p8: PPKCS8_PRIV_KEY_INFO; pk: PEVP_PKEY): Integer; cdecl;
 
 type
-  EVP_PKEY_asn1_set_private_priv_print = function(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+  EVP_PKEY_asn1_set_private_priv_print = function({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
 
 procedure EVP_PKEY_asn1_set_private(ameth: PEVP_PKEY_ASN1_METHOD; priv_decode: EVP_PKEY_asn1_set_private_priv_decode; priv_encode: EVP_PKEY_asn1_set_private_priv_encode; priv_print: EVP_PKEY_asn1_set_private_priv_print); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_asn1_set_private';
@@ -15815,13 +15828,13 @@ type
   EVP_PKEY_asn1_set_param_param_missing = function(pk: PEVP_PKEY): Integer; cdecl;
 
 type
-  EVP_PKEY_asn1_set_param_param_copy = function(&to: PEVP_PKEY; from: PEVP_PKEY): Integer; cdecl;
+  EVP_PKEY_asn1_set_param_param_copy = function({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PEVP_PKEY; from: PEVP_PKEY): Integer; cdecl;
 
 type
   EVP_PKEY_asn1_set_param_param_cmp = function(a: PEVP_PKEY; b: PEVP_PKEY): Integer; cdecl;
 
 type
-  EVP_PKEY_asn1_set_param_param_print = function(&out: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+  EVP_PKEY_asn1_set_param_param_print = function({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; pkey: PEVP_PKEY; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
 
 procedure EVP_PKEY_asn1_set_param(ameth: PEVP_PKEY_ASN1_METHOD; param_decode: EVP_PKEY_asn1_set_param_param_decode; param_encode: EVP_PKEY_asn1_set_param_param_encode; param_missing: EVP_PKEY_asn1_set_param_param_missing; param_copy: EVP_PKEY_asn1_set_param_param_copy; param_cmp: EVP_PKEY_asn1_set_param_param_cmp; param_print: EVP_PKEY_asn1_set_param_param_print); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_asn1_set_param';
@@ -15901,7 +15914,7 @@ type
 procedure EVP_PKEY_asn1_set_security_bits(ameth: PEVP_PKEY_ASN1_METHOD; pkey_security_bits: EVP_PKEY_asn1_set_security_bits_pkey_security_bits); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_asn1_set_security_bits';
 
-function EVP_PKEY_meth_find(&type: Integer): PEVP_PKEY_METHOD; cdecl;
+function EVP_PKEY_meth_find({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): PEVP_PKEY_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_meth_find';
 
 function EVP_PKEY_meth_new(id: Integer; flags: Integer): PEVP_PKEY_METHOD; cdecl;
@@ -15943,19 +15956,19 @@ procedure EVP_PKEY_CTX_free(ctx: PEVP_PKEY_CTX); cdecl;
 function EVP_PKEY_CTX_ctrl(ctx: PEVP_PKEY_CTX; keytype: Integer; optype: Integer; cmd: Integer; p1: Integer; p2: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_ctrl';
 
-function EVP_PKEY_CTX_ctrl_str(ctx: PEVP_PKEY_CTX; &type: PUTF8Char; value: PUTF8Char): Integer; cdecl;
+function EVP_PKEY_CTX_ctrl_str(ctx: PEVP_PKEY_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_ctrl_str';
 
 function EVP_PKEY_CTX_ctrl_uint64(ctx: PEVP_PKEY_CTX; keytype: Integer; optype: Integer; cmd: Integer; value: UInt64): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_ctrl_uint64';
 
-function EVP_PKEY_CTX_str2ctrl(ctx: PEVP_PKEY_CTX; cmd: Integer; str: PUTF8Char): Integer; cdecl;
+function EVP_PKEY_CTX_str2ctrl(ctx: PEVP_PKEY_CTX; cmd: Integer; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_str2ctrl';
 
-function EVP_PKEY_CTX_hex2ctrl(ctx: PEVP_PKEY_CTX; cmd: Integer; hex: PUTF8Char): Integer; cdecl;
+function EVP_PKEY_CTX_hex2ctrl(ctx: PEVP_PKEY_CTX; cmd: Integer; hex: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_hex2ctrl';
 
-function EVP_PKEY_CTX_md(ctx: PEVP_PKEY_CTX; optype: Integer; cmd: Integer; md: PUTF8Char): Integer; cdecl;
+function EVP_PKEY_CTX_md(ctx: PEVP_PKEY_CTX; optype: Integer; cmd: Integer; md: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_md';
 
 function EVP_PKEY_CTX_get_operation(ctx: PEVP_PKEY_CTX): Integer; cdecl;
@@ -15964,13 +15977,13 @@ function EVP_PKEY_CTX_get_operation(ctx: PEVP_PKEY_CTX): Integer; cdecl;
 procedure EVP_PKEY_CTX_set0_keygen_info(ctx: PEVP_PKEY_CTX; dat: PInteger; datlen: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_set0_keygen_info';
 
-function EVP_PKEY_new_mac_key(&type: Integer; e: PENGINE; key: PByte; keylen: Integer): PEVP_PKEY; cdecl;
+function EVP_PKEY_new_mac_key({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; e: PENGINE; key: PByte; keylen: Integer): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_new_mac_key';
 
-function EVP_PKEY_new_raw_private_key(&type: Integer; e: PENGINE; priv: PByte; len: NativeUInt): PEVP_PKEY; cdecl;
+function EVP_PKEY_new_raw_private_key({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; e: PENGINE; priv: PByte; len: NativeUInt): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_new_raw_private_key';
 
-function EVP_PKEY_new_raw_public_key(&type: Integer; e: PENGINE; pub: PByte; len: NativeUInt): PEVP_PKEY; cdecl;
+function EVP_PKEY_new_raw_public_key({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; e: PENGINE; pub: PByte; len: NativeUInt): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_new_raw_public_key';
 
 function EVP_PKEY_get_raw_private_key(pkey: PEVP_PKEY; priv: PByte; len: PNativeUInt): Integer; cdecl;
@@ -16021,13 +16034,13 @@ function EVP_PKEY_verify_recover(ctx: PEVP_PKEY_CTX; rout: PByte; routlen: PNati
 function EVP_PKEY_encrypt_init(ctx: PEVP_PKEY_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_encrypt_init';
 
-function EVP_PKEY_encrypt(ctx: PEVP_PKEY_CTX; &out: PByte; outlen: PNativeUInt; &in: PByte; inlen: NativeUInt): Integer; cdecl;
+function EVP_PKEY_encrypt(ctx: PEVP_PKEY_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: PNativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_encrypt';
 
 function EVP_PKEY_decrypt_init(ctx: PEVP_PKEY_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_decrypt_init';
 
-function EVP_PKEY_decrypt(ctx: PEVP_PKEY_CTX; &out: PByte; outlen: PNativeUInt; &in: PByte; inlen: NativeUInt): Integer; cdecl;
+function EVP_PKEY_decrypt(ctx: PEVP_PKEY_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: PNativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_decrypt';
 
 function EVP_PKEY_derive_init(ctx: PEVP_PKEY_CTX): Integer; cdecl;
@@ -16154,7 +16167,7 @@ type
   EVP_PKEY_meth_set_encrypt_encrypt_init = function(ctx: PEVP_PKEY_CTX): Integer; cdecl;
 
 type
-  EVP_PKEY_meth_set_encrypt_encryptfn = function(ctx: PEVP_PKEY_CTX; &out: PByte; outlen: PNativeUInt; &in: PByte; inlen: NativeUInt): Integer; cdecl;
+  EVP_PKEY_meth_set_encrypt_encryptfn = function(ctx: PEVP_PKEY_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: PNativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: NativeUInt): Integer; cdecl;
 
 procedure EVP_PKEY_meth_set_encrypt(pmeth: PEVP_PKEY_METHOD; encrypt_init: EVP_PKEY_meth_set_encrypt_encrypt_init; encryptfn: EVP_PKEY_meth_set_encrypt_encryptfn); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_meth_set_encrypt';
@@ -16163,7 +16176,7 @@ type
   EVP_PKEY_meth_set_decrypt_decrypt_init = function(ctx: PEVP_PKEY_CTX): Integer; cdecl;
 
 type
-  EVP_PKEY_meth_set_decrypt_decrypt = function(ctx: PEVP_PKEY_CTX; &out: PByte; outlen: PNativeUInt; &in: PByte; inlen: NativeUInt): Integer; cdecl;
+  EVP_PKEY_meth_set_decrypt_decrypt = function(ctx: PEVP_PKEY_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: PNativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: NativeUInt): Integer; cdecl;
 
 procedure EVP_PKEY_meth_set_decrypt(pmeth: PEVP_PKEY_METHOD; decrypt_init: EVP_PKEY_meth_set_decrypt_decrypt_init; decrypt: EVP_PKEY_meth_set_decrypt_decrypt); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_meth_set_decrypt';
@@ -16178,10 +16191,10 @@ procedure EVP_PKEY_meth_set_derive(pmeth: PEVP_PKEY_METHOD; derive_init: EVP_PKE
   external LIB_CRYPTO name _PU + 'EVP_PKEY_meth_set_derive';
 
 type
-  EVP_PKEY_meth_set_ctrl_ctrl = function(ctx: PEVP_PKEY_CTX; &type: Integer; p1: Integer; p2: Pointer): Integer; cdecl;
+  EVP_PKEY_meth_set_ctrl_ctrl = function(ctx: PEVP_PKEY_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; p1: Integer; p2: Pointer): Integer; cdecl;
 
 type
-  EVP_PKEY_meth_set_ctrl_ctrl_str = function(ctx: PEVP_PKEY_CTX; &type: PUTF8Char; value: PUTF8Char): Integer; cdecl;
+  EVP_PKEY_meth_set_ctrl_ctrl_str = function(ctx: PEVP_PKEY_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
 
 procedure EVP_PKEY_meth_set_ctrl(pmeth: PEVP_PKEY_METHOD; ctrl: EVP_PKEY_meth_set_ctrl_ctrl; ctrl_str: EVP_PKEY_meth_set_ctrl_ctrl_str); cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_meth_set_ctrl';
@@ -16297,7 +16310,7 @@ procedure CMAC_CTX_free(ctx: PCMAC_CTX); cdecl;
 function CMAC_CTX_get0_cipher_ctx(ctx: PCMAC_CTX): PEVP_CIPHER_CTX; cdecl;
   external LIB_CRYPTO name _PU + 'CMAC_CTX_get0_cipher_ctx';
 
-function CMAC_CTX_copy(&out: PCMAC_CTX; &in: PCMAC_CTX): Integer; cdecl;
+function CMAC_CTX_copy({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PCMAC_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PCMAC_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMAC_CTX_copy';
 
 function CMAC_Init(ctx: PCMAC_CTX; key: Pointer; keylen: NativeUInt; cipher: PEVP_CIPHER; impl: PENGINE): Integer; cdecl;
@@ -16306,7 +16319,7 @@ function CMAC_Init(ctx: PCMAC_CTX; key: Pointer; keylen: NativeUInt; cipher: PEV
 function CMAC_Update(ctx: PCMAC_CTX; data: Pointer; dlen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMAC_Update';
 
-function CMAC_Final(ctx: PCMAC_CTX; &out: PByte; poutlen: PNativeUInt): Integer; cdecl;
+function CMAC_Final(ctx: PCMAC_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; poutlen: PNativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMAC_Final';
 
 function CMAC_resume(ctx: PCMAC_CTX): Integer; cdecl;
@@ -16625,10 +16638,10 @@ function EC_GROUP_get_ecpkparameters(group: PEC_GROUP; params: PECPKPARAMETERS):
 function EC_get_builtin_curves(r: PEC_builtin_curve; nitems: NativeUInt): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'EC_get_builtin_curves';
 
-function EC_curve_nid2nist(nid: Integer): PUTF8Char; cdecl;
+function EC_curve_nid2nist(nid: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'EC_curve_nid2nist';
 
-function EC_curve_nist2nid(name: PUTF8Char): Integer; cdecl;
+function EC_curve_nist2nid(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EC_curve_nist2nid';
 
 (** Creates a new EC_POINT object for the specified EC_GROUP
@@ -16798,10 +16811,10 @@ function EC_POINT_point2bn(p1: PEC_GROUP; p2: PEC_POINT; form: point_conversion_
 function EC_POINT_bn2point(p1: PEC_GROUP; p2: PBIGNUM; p3: PEC_POINT; p4: PBN_CTX): PEC_POINT; cdecl;
   external LIB_CRYPTO name _PU + 'EC_POINT_bn2point';
 
-function EC_POINT_point2hex(p1: PEC_GROUP; p2: PEC_POINT; form: point_conversion_form_t; p4: PBN_CTX): PUTF8Char; cdecl;
+function EC_POINT_point2hex(p1: PEC_GROUP; p2: PEC_POINT; form: point_conversion_form_t; p4: PBN_CTX): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'EC_POINT_point2hex';
 
-function EC_POINT_hex2point(p1: PEC_GROUP; p2: PUTF8Char; p3: PEC_POINT; p4: PBN_CTX): PEC_POINT; cdecl;
+function EC_POINT_hex2point(p1: PEC_GROUP; p2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p3: PEC_POINT; p4: PBN_CTX): PEC_POINT; cdecl;
   external LIB_CRYPTO name _PU + 'EC_POINT_hex2point';
 
 (** Computes the sum of two EC_POINT
@@ -16935,10 +16948,10 @@ function EC_GROUP_get_trinomial_basis(p1: PEC_GROUP; k: PCardinal): Integer; cde
 function EC_GROUP_get_pentanomial_basis(p1: PEC_GROUP; k1: PCardinal; k2: PCardinal; k3: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EC_GROUP_get_pentanomial_basis';
 
-function d2i_ECPKParameters(p1: PPEC_GROUP; &in: PPByte; len: Integer): PEC_GROUP; cdecl;
+function d2i_ECPKParameters(p1: PPEC_GROUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PEC_GROUP; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ECPKParameters';
 
-function i2d_ECPKParameters(p1: PEC_GROUP; &out: PPByte): Integer; cdecl;
+function i2d_ECPKParameters(p1: PEC_GROUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ECPKParameters';
 
 function ECPKParameters_print(bp: PBIO; x: PEC_GROUP; off: Integer): Integer; cdecl;
@@ -17167,7 +17180,7 @@ function EC_KEY_priv2buf(eckey: PEC_KEY; pbuf: PPByte): NativeUInt; cdecl;
  *  \param  len  length of the DER encoded private key
  *  \return the decoded private key or NULL if an error occurred.
  *)
-function d2i_ECPrivateKey(key: PPEC_KEY; &in: PPByte; len: Integer): PEC_KEY; cdecl;
+function d2i_ECPrivateKey(key: PPEC_KEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PEC_KEY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ECPrivateKey';
 
 (** Encodes a private key object and stores the result in a buffer.
@@ -17176,7 +17189,7 @@ function d2i_ECPrivateKey(key: PPEC_KEY; &in: PPByte; len: Integer): PEC_KEY; cd
  *               of bytes needed).
  *  \return 1 on success and 0 if an error occurred.
  *)
-function i2d_ECPrivateKey(key: PEC_KEY; &out: PPByte): Integer; cdecl;
+function i2d_ECPrivateKey(key: PEC_KEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ECPrivateKey';
 
 (** Decodes ec parameter from a memory buffer.
@@ -17186,7 +17199,7 @@ function i2d_ECPrivateKey(key: PEC_KEY; &out: PPByte): Integer; cdecl;
  *  \return a EC_KEY object with the decoded parameters or NULL if an error
  *          occurred.
  *)
-function d2i_ECParameters(key: PPEC_KEY; &in: PPByte; len: Integer): PEC_KEY; cdecl;
+function d2i_ECParameters(key: PPEC_KEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PEC_KEY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ECParameters';
 
 (** Encodes ec parameter and stores the result in a buffer.
@@ -17195,7 +17208,7 @@ function d2i_ECParameters(key: PPEC_KEY; &in: PPByte; len: Integer): PEC_KEY; cd
  *               of bytes needed).
  *  \return 1 on success and 0 if an error occurred.
  *)
-function i2d_ECParameters(key: PEC_KEY; &out: PPByte): Integer; cdecl;
+function i2d_ECParameters(key: PEC_KEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ECParameters';
 
 (** Decodes a ec public key from a octet string.
@@ -17205,7 +17218,7 @@ function i2d_ECParameters(key: PEC_KEY; &out: PPByte): Integer; cdecl;
  *  \return EC_KEY object with decoded public key or NULL if an error
  *          occurred.
  *)
-function o2i_ECPublicKey(key: PPEC_KEY; &in: PPByte; len: Integer): PEC_KEY; cdecl;
+function o2i_ECPublicKey(key: PPEC_KEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PEC_KEY; cdecl;
   external LIB_CRYPTO name _PU + 'o2i_ECPublicKey';
 
 (** Encodes a ec public key in an octet string.
@@ -17214,7 +17227,7 @@ function o2i_ECPublicKey(key: PPEC_KEY; &in: PPByte; len: Integer): PEC_KEY; cde
  *               of bytes needed).
  *  \return 1 on success and 0 if an error occurred
  *)
-function i2o_ECPublicKey(key: PEC_KEY; &out: PPByte): Integer; cdecl;
+function i2o_ECPublicKey(key: PEC_KEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2o_ECPublicKey';
 
 (** Prints out the ec parameters on human readable form.
@@ -17269,13 +17282,13 @@ function EC_KEY_set_method(key: PEC_KEY; meth: PEC_KEY_METHOD): Integer; cdecl;
 function EC_KEY_new_method(engine: PENGINE): PEC_KEY; cdecl;
   external LIB_CRYPTO name _PU + 'EC_KEY_new_method';
 
-function ECDH_KDF_X9_62(&out: PByte; outlen: NativeUInt; Z: PByte; Zlen: NativeUInt; sinfo: PByte; sinfolen: NativeUInt; md: PEVP_MD): Integer; cdecl;
+function ECDH_KDF_X9_62({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: NativeUInt; Z: PByte; Zlen: NativeUInt; sinfo: PByte; sinfolen: NativeUInt; md: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ECDH_KDF_X9_62';
 
 type
-  ECDH_compute_key_KDF = function(&in: Pointer; inlen: NativeUInt; &out: Pointer; outlen: PNativeUInt): Pointer; cdecl;
+  ECDH_compute_key_KDF = function({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: Pointer; inlen: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: Pointer; outlen: PNativeUInt): Pointer; cdecl;
 
-function ECDH_compute_key(&out: Pointer; outlen: NativeUInt; pub_key: PEC_POINT; ecdh: PEC_KEY; KDF: ECDH_compute_key_KDF): Integer; cdecl;
+function ECDH_compute_key({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: Pointer; outlen: NativeUInt; pub_key: PEC_POINT; ecdh: PEC_KEY; KDF: ECDH_compute_key_KDF): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ECDH_compute_key';
 
 function ECDSA_SIG_new(): PECDSA_SIG; cdecl;
@@ -17314,13 +17327,13 @@ function ECDSA_do_verify(dgst: PByte; dgst_len: Integer; sig: PECDSA_SIG; eckey:
 function ECDSA_sign_setup(eckey: PEC_KEY; ctx: PBN_CTX; kinv: PPBIGNUM; rp: PPBIGNUM): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ECDSA_sign_setup';
 
-function ECDSA_sign(&type: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: PCardinal; eckey: PEC_KEY): Integer; cdecl;
+function ECDSA_sign({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: PCardinal; eckey: PEC_KEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ECDSA_sign';
 
-function ECDSA_sign_ex(&type: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: PCardinal; kinv: PBIGNUM; rp: PBIGNUM; eckey: PEC_KEY): Integer; cdecl;
+function ECDSA_sign_ex({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: PCardinal; kinv: PBIGNUM; rp: PBIGNUM; eckey: PEC_KEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ECDSA_sign_ex';
 
-function ECDSA_verify(&type: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: Integer; eckey: PEC_KEY): Integer; cdecl;
+function ECDSA_verify({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; dgst: PByte; dgstlen: Integer; sig: PByte; siglen: Integer; eckey: PEC_KEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ECDSA_verify';
 
 function ECDSA_size(eckey: PEC_KEY): Integer; cdecl;
@@ -17366,7 +17379,7 @@ procedure EC_KEY_METHOD_set_compute_key(meth: PEC_KEY_METHOD; ckey: EC_KEY_METHO
   external LIB_CRYPTO name _PU + 'EC_KEY_METHOD_set_compute_key';
 
 type
-  EC_KEY_METHOD_set_sign_sign = function(&type: Integer; dgst: PByte; dlen: Integer; sig: PByte; siglen: PCardinal; kinv: PBIGNUM; r: PBIGNUM; eckey: PEC_KEY): Integer; cdecl;
+  EC_KEY_METHOD_set_sign_sign = function({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; dgst: PByte; dlen: Integer; sig: PByte; siglen: PCardinal; kinv: PBIGNUM; r: PBIGNUM; eckey: PEC_KEY): Integer; cdecl;
 
 type
   EC_KEY_METHOD_set_sign_sign_setup = function(eckey: PEC_KEY; ctx_in: PBN_CTX; kinvp: PPBIGNUM; rp: PPBIGNUM): Integer; cdecl;
@@ -17378,7 +17391,7 @@ procedure EC_KEY_METHOD_set_sign(meth: PEC_KEY_METHOD; sign: EC_KEY_METHOD_set_s
   external LIB_CRYPTO name _PU + 'EC_KEY_METHOD_set_sign';
 
 type
-  EC_KEY_METHOD_set_verify_verify = function(&type: Integer; dgst: PByte; dgst_len: Integer; sigbuf: PByte; sig_len: Integer; eckey: PEC_KEY): Integer; cdecl;
+  EC_KEY_METHOD_set_verify_verify = function({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; dgst: PByte; dgst_len: Integer; sigbuf: PByte; sig_len: Integer; eckey: PEC_KEY): Integer; cdecl;
 
 type
   EC_KEY_METHOD_set_verify_verify_sig = function(dgst: PByte; dgst_len: Integer; sig: PECDSA_SIG; eckey: PEC_KEY): Integer; cdecl;
@@ -17515,16 +17528,16 @@ function RSA_check_key(p1: PRSA): Integer; cdecl;
 function RSA_check_key_ex(p1: PRSA; cb: PBN_GENCB): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_check_key_ex';
 
-function RSA_public_encrypt(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+function RSA_public_encrypt(flen: Integer; from: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_public_encrypt';
 
-function RSA_private_encrypt(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+function RSA_private_encrypt(flen: Integer; from: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_private_encrypt';
 
-function RSA_public_decrypt(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+function RSA_public_decrypt(flen: Integer; from: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_public_decrypt';
 
-function RSA_private_decrypt(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+function RSA_private_decrypt(flen: Integer; from: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_private_decrypt';
 
 procedure RSA_free(r: PRSA); cdecl;
@@ -17557,19 +17570,19 @@ function RSA_PKCS1_OpenSSL(): PRSA_METHOD; cdecl;
 function RSA_pkey_ctx_ctrl(ctx: PEVP_PKEY_CTX; optype: Integer; cmd: Integer; p1: Integer; p2: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_pkey_ctx_ctrl';
 
-function d2i_RSAPublicKey(a: PPRSA; &in: PPByte; len: Integer): PRSA; cdecl;
+function d2i_RSAPublicKey(a: PPRSA; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PRSA; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_RSAPublicKey';
 
-function i2d_RSAPublicKey(a: PRSA; &out: PPByte): Integer; cdecl;
+function i2d_RSAPublicKey(a: PRSA; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_RSAPublicKey';
 
 function RSAPublicKey_it(): PASN1_ITEM; cdecl;
   external LIB_CRYPTO name _PU + 'RSAPublicKey_it';
 
-function d2i_RSAPrivateKey(a: PPRSA; &in: PPByte; len: Integer): PRSA; cdecl;
+function d2i_RSAPrivateKey(a: PPRSA; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PRSA; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_RSAPrivateKey';
 
-function i2d_RSAPrivateKey(a: PRSA; &out: PPByte): Integer; cdecl;
+function i2d_RSAPrivateKey(a: PRSA; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_RSAPrivateKey';
 
 function RSAPrivateKey_it(): PASN1_ITEM; cdecl;
@@ -17581,10 +17594,10 @@ function RSA_PSS_PARAMS_new(): PRSA_PSS_PARAMS; cdecl;
 procedure RSA_PSS_PARAMS_free(a: PRSA_PSS_PARAMS); cdecl;
   external LIB_CRYPTO name _PU + 'RSA_PSS_PARAMS_free';
 
-function d2i_RSA_PSS_PARAMS(a: PPRSA_PSS_PARAMS; &in: PPByte; len: Integer): PRSA_PSS_PARAMS; cdecl;
+function d2i_RSA_PSS_PARAMS(a: PPRSA_PSS_PARAMS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PRSA_PSS_PARAMS; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_RSA_PSS_PARAMS';
 
-function i2d_RSA_PSS_PARAMS(a: PRSA_PSS_PARAMS; &out: PPByte): Integer; cdecl;
+function i2d_RSA_PSS_PARAMS(a: PRSA_PSS_PARAMS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_RSA_PSS_PARAMS';
 
 function RSA_PSS_PARAMS_it(): PASN1_ITEM; cdecl;
@@ -17596,10 +17609,10 @@ function RSA_OAEP_PARAMS_new(): PRSA_OAEP_PARAMS; cdecl;
 procedure RSA_OAEP_PARAMS_free(a: PRSA_OAEP_PARAMS); cdecl;
   external LIB_CRYPTO name _PU + 'RSA_OAEP_PARAMS_free';
 
-function d2i_RSA_OAEP_PARAMS(a: PPRSA_OAEP_PARAMS; &in: PPByte; len: Integer): PRSA_OAEP_PARAMS; cdecl;
+function d2i_RSA_OAEP_PARAMS(a: PPRSA_OAEP_PARAMS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PRSA_OAEP_PARAMS; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_RSA_OAEP_PARAMS';
 
-function i2d_RSA_OAEP_PARAMS(a: PRSA_OAEP_PARAMS; &out: PPByte): Integer; cdecl;
+function i2d_RSA_OAEP_PARAMS(a: PRSA_OAEP_PARAMS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_RSA_OAEP_PARAMS';
 
 function RSA_OAEP_PARAMS_it(): PASN1_ITEM; cdecl;
@@ -17611,16 +17624,16 @@ function RSA_print_fp(fp: PPointer; r: PRSA; offset: Integer): Integer; cdecl;
 function RSA_print(bp: PBIO; r: PRSA; offset: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_print';
 
-function RSA_sign(&type: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl;
+function RSA_sign({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_sign';
 
-function RSA_verify(&type: Integer; m: PByte; m_length: Cardinal; sigbuf: PByte; siglen: Cardinal; rsa: PRSA): Integer; cdecl;
+function RSA_verify({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; m: PByte; m_length: Cardinal; sigbuf: PByte; siglen: Cardinal; rsa: PRSA): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_verify';
 
-function RSA_sign_ASN1_OCTET_STRING(&type: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl;
+function RSA_sign_ASN1_OCTET_STRING({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_sign_ASN1_OCTET_STRING';
 
-function RSA_verify_ASN1_OCTET_STRING(&type: Integer; m: PByte; m_length: Cardinal; sigbuf: PByte; siglen: Cardinal; rsa: PRSA): Integer; cdecl;
+function RSA_verify_ASN1_OCTET_STRING({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; m: PByte; m_length: Cardinal; sigbuf: PByte; siglen: Cardinal; rsa: PRSA): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_verify_ASN1_OCTET_STRING';
 
 function RSA_blinding_on(rsa: PRSA; ctx: PBN_CTX): Integer; cdecl;
@@ -17632,49 +17645,49 @@ procedure RSA_blinding_off(rsa: PRSA); cdecl;
 function RSA_setup_blinding(rsa: PRSA; ctx: PBN_CTX): PBN_BLINDING; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_setup_blinding';
 
-function RSA_padding_add_PKCS1_type_1(&to: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl;
+function RSA_padding_add_PKCS1_type_1({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_add_PKCS1_type_1';
 
-function RSA_padding_check_PKCS1_type_1(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl;
+function RSA_padding_check_PKCS1_type_1({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_check_PKCS1_type_1';
 
-function RSA_padding_add_PKCS1_type_2(&to: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl;
+function RSA_padding_add_PKCS1_type_2({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_add_PKCS1_type_2';
 
-function RSA_padding_check_PKCS1_type_2(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl;
+function RSA_padding_check_PKCS1_type_2({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_check_PKCS1_type_2';
 
 function PKCS1_MGF1(mask: PByte; len: Integer; seed: PByte; seedlen: Integer; dgst: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS1_MGF1';
 
-function RSA_padding_add_PKCS1_OAEP(&to: PByte; tlen: Integer; f: PByte; fl: Integer; p: PByte; pl: Integer): Integer; cdecl;
+function RSA_padding_add_PKCS1_OAEP({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer; p: PByte; pl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_add_PKCS1_OAEP';
 
-function RSA_padding_check_PKCS1_OAEP(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer; p: PByte; pl: Integer): Integer; cdecl;
+function RSA_padding_check_PKCS1_OAEP({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer; p: PByte; pl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_check_PKCS1_OAEP';
 
-function RSA_padding_add_PKCS1_OAEP_mgf1(&to: PByte; tlen: Integer; from: PByte; flen: Integer; param: PByte; plen: Integer; md: PEVP_MD; mgf1md: PEVP_MD): Integer; cdecl;
+function RSA_padding_add_PKCS1_OAEP_mgf1({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; from: PByte; flen: Integer; param: PByte; plen: Integer; md: PEVP_MD; mgf1md: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_add_PKCS1_OAEP_mgf1';
 
-function RSA_padding_check_PKCS1_OAEP_mgf1(&to: PByte; tlen: Integer; from: PByte; flen: Integer; num: Integer; param: PByte; plen: Integer; md: PEVP_MD; mgf1md: PEVP_MD): Integer; cdecl;
+function RSA_padding_check_PKCS1_OAEP_mgf1({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; from: PByte; flen: Integer; num: Integer; param: PByte; plen: Integer; md: PEVP_MD; mgf1md: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_check_PKCS1_OAEP_mgf1';
 
-function RSA_padding_add_SSLv23(&to: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl;
+function RSA_padding_add_SSLv23({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_add_SSLv23';
 
-function RSA_padding_check_SSLv23(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl;
+function RSA_padding_check_SSLv23({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_check_SSLv23';
 
-function RSA_padding_add_none(&to: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl;
+function RSA_padding_add_none({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_add_none';
 
-function RSA_padding_check_none(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl;
+function RSA_padding_check_none({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_check_none';
 
-function RSA_padding_add_X931(&to: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl;
+function RSA_padding_add_X931({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_add_X931';
 
-function RSA_padding_check_X931(&to: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl;
+function RSA_padding_check_X931({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; tlen: Integer; f: PByte; fl: Integer; rsa_len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_padding_check_X931';
 
 function RSA_X931_hash_id(nid: Integer): Integer; cdecl;
@@ -17704,7 +17717,7 @@ function RSAPublicKey_dup(rsa: PRSA): PRSA; cdecl;
 function RSAPrivateKey_dup(rsa: PRSA): PRSA; cdecl;
   external LIB_CRYPTO name _PU + 'RSAPrivateKey_dup';
 
-function RSA_meth_new(name: PUTF8Char; flags: Integer): PRSA_METHOD; cdecl;
+function RSA_meth_new(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Integer): PRSA_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_meth_new';
 
 procedure RSA_meth_free(meth: PRSA_METHOD); cdecl;
@@ -17713,10 +17726,10 @@ procedure RSA_meth_free(meth: PRSA_METHOD); cdecl;
 function RSA_meth_dup(meth: PRSA_METHOD): PRSA_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_meth_dup';
 
-function RSA_meth_get0_name(meth: PRSA_METHOD): PUTF8Char; cdecl;
+function RSA_meth_get0_name(meth: PRSA_METHOD): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_meth_get0_name';
 
-function RSA_meth_set1_name(meth: PRSA_METHOD; name: PUTF8Char): Integer; cdecl;
+function RSA_meth_set1_name(meth: PRSA_METHOD; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_meth_set1_name';
 
 function RSA_meth_get_flags(meth: PRSA_METHOD): Integer; cdecl;
@@ -17731,38 +17744,38 @@ function RSA_meth_get0_app_data(meth: PRSA_METHOD): Pointer; cdecl;
 function RSA_meth_set0_app_data(meth: PRSA_METHOD; app_data: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_meth_set0_app_data';
 
-//function RSA_meth_get_pub_enc(flen: Integerfrom: PByte&to: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer { TODO : Cannot convert original type "int (*)(int, const unsigned char *, unsigned char *, RSA *, int)" }; cdecl;
+//function RSA_meth_get_pub_enc(flen: Integerfrom: PByte{$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer { TODO : Cannot convert original type "int (*)(int, const unsigned char *, unsigned char *, RSA *, int)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'RSA_meth_get_pub_enc';
 
 type
-  RSA_meth_set_pub_enc_pub_enc = function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+  RSA_meth_set_pub_enc_pub_enc = function(flen: Integer; from: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
 
 function RSA_meth_set_pub_enc(rsa: PRSA_METHOD; pub_enc: RSA_meth_set_pub_enc_pub_enc): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_meth_set_pub_enc';
 
-//function RSA_meth_get_pub_dec(flen: Integerfrom: PByte&to: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer { TODO : Cannot convert original type "int (*)(int, const unsigned char *, unsigned char *, RSA *, int)" }; cdecl;
+//function RSA_meth_get_pub_dec(flen: Integerfrom: PByte{$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer { TODO : Cannot convert original type "int (*)(int, const unsigned char *, unsigned char *, RSA *, int)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'RSA_meth_get_pub_dec';
 
 type
-  RSA_meth_set_pub_dec_pub_dec = function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+  RSA_meth_set_pub_dec_pub_dec = function(flen: Integer; from: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
 
 function RSA_meth_set_pub_dec(rsa: PRSA_METHOD; pub_dec: RSA_meth_set_pub_dec_pub_dec): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_meth_set_pub_dec';
 
-//function RSA_meth_get_priv_enc(flen: Integerfrom: PByte&to: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer { TODO : Cannot convert original type "int (*)(int, const unsigned char *, unsigned char *, RSA *, int)" }; cdecl;
+//function RSA_meth_get_priv_enc(flen: Integerfrom: PByte{$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer { TODO : Cannot convert original type "int (*)(int, const unsigned char *, unsigned char *, RSA *, int)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'RSA_meth_get_priv_enc';
 
 type
-  RSA_meth_set_priv_enc_priv_enc = function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+  RSA_meth_set_priv_enc_priv_enc = function(flen: Integer; from: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
 
 function RSA_meth_set_priv_enc(rsa: PRSA_METHOD; priv_enc: RSA_meth_set_priv_enc_priv_enc): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_meth_set_priv_enc';
 
-//function RSA_meth_get_priv_dec(flen: Integerfrom: PByte&to: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer { TODO : Cannot convert original type "int (*)(int, const unsigned char *, unsigned char *, RSA *, int)" }; cdecl;
+//function RSA_meth_get_priv_dec(flen: Integerfrom: PByte{$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PBytersa: PRSApadding: Integermeth: PRSA_METHOD): Integer { TODO : Cannot convert original type "int (*)(int, const unsigned char *, unsigned char *, RSA *, int)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'RSA_meth_get_priv_dec';
 
 type
-  RSA_meth_set_priv_dec_priv_dec = function(flen: Integer; from: PByte; &to: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
+  RSA_meth_set_priv_dec_priv_dec = function(flen: Integer; from: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PByte; rsa: PRSA; padding: Integer): Integer; cdecl;
 
 function RSA_meth_set_priv_dec(rsa: PRSA_METHOD; priv_dec: RSA_meth_set_priv_dec_priv_dec): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_meth_set_priv_dec';
@@ -17803,11 +17816,11 @@ type
 function RSA_meth_set_finish(rsa: PRSA_METHOD; finish: RSA_meth_set_finish_finish): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_meth_set_finish';
 
-//function RSA_meth_get_sign(&type: Integerm: PBytem_length: Cardinalsigret: PBytesiglen: PCardinalrsa: PRSAmeth: PRSA_METHOD): Integer { TODO : Cannot convert original type "int (*)(int, const unsigned char *, unsigned int, unsigned char *, unsigned int *, const RSA *)" }; cdecl;
+//function RSA_meth_get_sign({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integerm: PBytem_length: Cardinalsigret: PBytesiglen: PCardinalrsa: PRSAmeth: PRSA_METHOD): Integer { TODO : Cannot convert original type "int (*)(int, const unsigned char *, unsigned int, unsigned char *, unsigned int *, const RSA *)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'RSA_meth_get_sign';
 
 type
-  RSA_meth_set_sign_sign = function(&type: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl;
+  RSA_meth_set_sign_sign = function({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; m: PByte; m_length: Cardinal; sigret: PByte; siglen: PCardinal; rsa: PRSA): Integer; cdecl;
 
 function RSA_meth_set_sign(rsa: PRSA_METHOD; sign: RSA_meth_set_sign_sign): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RSA_meth_set_sign';
@@ -17956,7 +17969,7 @@ function DH_new_by_nid(nid: Integer): PDH; cdecl;
 function DH_get_nid(dh: PDH): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'DH_get_nid';
 
-function DH_KDF_X9_42(&out: PByte; outlen: NativeUInt; Z: PByte; Zlen: NativeUInt; key_oid: PASN1_OBJECT; ukm: PByte; ukmlen: NativeUInt; md: PEVP_MD): Integer; cdecl;
+function DH_KDF_X9_42({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: NativeUInt; Z: PByte; Zlen: NativeUInt; key_oid: PASN1_OBJECT; ukm: PByte; ukmlen: NativeUInt; md: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'DH_KDF_X9_42';
 
 procedure DH_get0_pqg(dh: PDH; p: PPBIGNUM; q: PPBIGNUM; g: PPBIGNUM); cdecl;
@@ -18004,7 +18017,7 @@ function DH_get_length(dh: PDH): Integer; cdecl;
 function DH_set_length(dh: PDH; length: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'DH_set_length';
 
-function DH_meth_new(name: PUTF8Char; flags: Integer): PDH_METHOD; cdecl;
+function DH_meth_new(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Integer): PDH_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'DH_meth_new';
 
 procedure DH_meth_free(dhm: PDH_METHOD); cdecl;
@@ -18013,10 +18026,10 @@ procedure DH_meth_free(dhm: PDH_METHOD); cdecl;
 function DH_meth_dup(dhm: PDH_METHOD): PDH_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'DH_meth_dup';
 
-function DH_meth_get0_name(dhm: PDH_METHOD): PUTF8Char; cdecl;
+function DH_meth_get0_name(dhm: PDH_METHOD): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'DH_meth_get0_name';
 
-function DH_meth_set1_name(dhm: PDH_METHOD; name: PUTF8Char): Integer; cdecl;
+function DH_meth_set1_name(dhm: PDH_METHOD; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'DH_meth_set1_name';
 
 function DH_meth_get_flags(dhm: PDH_METHOD): Integer; cdecl;
@@ -18154,10 +18167,10 @@ function DSA_security_bits(d: PDSA): Integer; cdecl;
 function DSA_sign_setup(dsa: PDSA; ctx_in: PBN_CTX; kinvp: PPBIGNUM; rp: PPBIGNUM): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'DSA_sign_setup';
 
-function DSA_sign(&type: Integer; dgst: PByte; dlen: Integer; sig: PByte; siglen: PCardinal; dsa: PDSA): Integer; cdecl;
+function DSA_sign({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; dgst: PByte; dlen: Integer; sig: PByte; siglen: PCardinal; dsa: PDSA): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'DSA_sign';
 
-function DSA_verify(&type: Integer; dgst: PByte; dgst_len: Integer; sigbuf: PByte; siglen: Integer; dsa: PDSA): Integer; cdecl;
+function DSA_verify({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; dgst: PByte; dgst_len: Integer; sigbuf: PByte; siglen: Integer; dsa: PDSA): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'DSA_verify';
 
 function DSA_set_ex_data(d: PDSA; idx: Integer; arg: Pointer): Integer; cdecl;
@@ -18250,7 +18263,7 @@ procedure DSA_set_flags(d: PDSA; flags: Integer); cdecl;
 function DSA_get0_engine(d: PDSA): PENGINE; cdecl;
   external LIB_CRYPTO name _PU + 'DSA_get0_engine';
 
-function DSA_meth_new(name: PUTF8Char; flags: Integer): PDSA_METHOD; cdecl;
+function DSA_meth_new(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Integer): PDSA_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'DSA_meth_new';
 
 procedure DSA_meth_free(dsam: PDSA_METHOD); cdecl;
@@ -18259,10 +18272,10 @@ procedure DSA_meth_free(dsam: PDSA_METHOD); cdecl;
 function DSA_meth_dup(dsam: PDSA_METHOD): PDSA_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'DSA_meth_dup';
 
-function DSA_meth_get0_name(dsam: PDSA_METHOD): PUTF8Char; cdecl;
+function DSA_meth_get0_name(dsam: PDSA_METHOD): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'DSA_meth_get0_name';
 
-function DSA_meth_set1_name(dsam: PDSA_METHOD; name: PUTF8Char): Integer; cdecl;
+function DSA_meth_set1_name(dsam: PDSA_METHOD; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'DSA_meth_set1_name';
 
 function DSA_meth_get_flags(dsam: PDSA_METHOD): Integer; cdecl;
@@ -18454,7 +18467,7 @@ procedure OPENSSL_LH_doall(lh: POPENSSL_LHASH; func: OPENSSL_LH_DOALL_FUNC); cde
 procedure OPENSSL_LH_doall_arg(lh: POPENSSL_LHASH; func: OPENSSL_LH_DOALL_FUNCARG; arg: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_LH_doall_arg';
 
-function OPENSSL_LH_strhash(c: PUTF8Char): Cardinal; cdecl;
+function OPENSSL_LH_strhash(c: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_LH_strhash';
 
 function OPENSSL_LH_num_items(lh: POPENSSL_LHASH): Cardinal; cdecl;
@@ -18475,13 +18488,13 @@ procedure OPENSSL_LH_node_stats(lh: POPENSSL_LHASH; fp: PPointer); cdecl;
 procedure OPENSSL_LH_node_usage_stats(lh: POPENSSL_LHASH; fp: PPointer); cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_LH_node_usage_stats';
 
-procedure OPENSSL_LH_stats_bio(lh: POPENSSL_LHASH; &out: PBIO); cdecl;
+procedure OPENSSL_LH_stats_bio(lh: POPENSSL_LHASH; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO); cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_LH_stats_bio';
 
-procedure OPENSSL_LH_node_stats_bio(lh: POPENSSL_LHASH; &out: PBIO); cdecl;
+procedure OPENSSL_LH_node_stats_bio(lh: POPENSSL_LHASH; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO); cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_LH_node_stats_bio';
 
-procedure OPENSSL_LH_node_usage_stats_bio(lh: POPENSSL_LHASH; &out: PBIO); cdecl;
+procedure OPENSSL_LH_node_usage_stats_bio(lh: POPENSSL_LHASH; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO); cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_LH_node_usage_stats_bio';
 
 function X509_STORE_set_depth(store: PX509_STORE; depth: Integer): Integer; cdecl;
@@ -18490,10 +18503,10 @@ function X509_STORE_set_depth(store: PX509_STORE; depth: Integer): Integer; cdec
 procedure X509_STORE_CTX_set_depth(ctx: PX509_STORE_CTX; depth: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'X509_STORE_CTX_set_depth';
 
-function X509_OBJECT_idx_by_subject(h: Pstack_st_X509_OBJECT; &type: X509_LOOKUP_TYPE; name: PX509_NAME): Integer; cdecl;
+function X509_OBJECT_idx_by_subject(h: Pstack_st_X509_OBJECT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; name: PX509_NAME): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_OBJECT_idx_by_subject';
 
-function X509_OBJECT_retrieve_by_subject(h: Pstack_st_X509_OBJECT; &type: X509_LOOKUP_TYPE; name: PX509_NAME): PX509_OBJECT; cdecl;
+function X509_OBJECT_retrieve_by_subject(h: Pstack_st_X509_OBJECT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; name: PX509_NAME): PX509_OBJECT; cdecl;
   external LIB_CRYPTO name _PU + 'X509_OBJECT_retrieve_by_subject';
 
 function X509_OBJECT_retrieve_match(h: Pstack_st_X509_OBJECT; x: PX509_OBJECT): PX509_OBJECT; cdecl;
@@ -18733,7 +18746,7 @@ function X509_LOOKUP_hash_dir(): PX509_LOOKUP_METHOD; cdecl;
 function X509_LOOKUP_file(): PX509_LOOKUP_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'X509_LOOKUP_file';
 
-function X509_LOOKUP_meth_new(name: PUTF8Char): PX509_LOOKUP_METHOD; cdecl;
+function X509_LOOKUP_meth_new(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PX509_LOOKUP_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'X509_LOOKUP_meth_new';
 
 procedure X509_LOOKUP_meth_free(method: PX509_LOOKUP_METHOD); cdecl;
@@ -18811,24 +18824,24 @@ function X509_STORE_add_cert(ctx: PX509_STORE; x: PX509): Integer; cdecl;
 function X509_STORE_add_crl(ctx: PX509_STORE; x: PX509_CRL): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_STORE_add_crl';
 
-function X509_STORE_CTX_get_by_subject(vs: PX509_STORE_CTX; &type: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl;
+function X509_STORE_CTX_get_by_subject(vs: PX509_STORE_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_STORE_CTX_get_by_subject';
-function X509_STORE_get_by_subject(vs: PX509_STORE_CTX; &type: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl;
+function X509_STORE_get_by_subject(vs: PX509_STORE_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_STORE_CTX_get_by_subject';
 
-function X509_STORE_CTX_get_obj_by_subject(vs: PX509_STORE_CTX; &type: X509_LOOKUP_TYPE; name: PX509_NAME): PX509_OBJECT; cdecl;
+function X509_STORE_CTX_get_obj_by_subject(vs: PX509_STORE_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; name: PX509_NAME): PX509_OBJECT; cdecl;
   external LIB_CRYPTO name _PU + 'X509_STORE_CTX_get_obj_by_subject';
 
-function X509_LOOKUP_ctrl(ctx: PX509_LOOKUP; cmd: Integer; argc: PUTF8Char; argl: Integer; ret: PPUTF8Char): Integer; cdecl;
+function X509_LOOKUP_ctrl(ctx: PX509_LOOKUP; cmd: Integer; argc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; argl: Integer; ret: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_LOOKUP_ctrl';
 
-function X509_load_cert_file(ctx: PX509_LOOKUP; &file: PUTF8Char; &type: Integer): Integer; cdecl;
+function X509_load_cert_file(ctx: PX509_LOOKUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_load_cert_file';
 
-function X509_load_crl_file(ctx: PX509_LOOKUP; &file: PUTF8Char; &type: Integer): Integer; cdecl;
+function X509_load_crl_file(ctx: PX509_LOOKUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_load_crl_file';
 
-function X509_load_cert_crl_file(ctx: PX509_LOOKUP; &file: PUTF8Char; &type: Integer): Integer; cdecl;
+function X509_load_cert_crl_file(ctx: PX509_LOOKUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_load_cert_crl_file';
 
 function X509_LOOKUP_new(method: PX509_LOOKUP_METHOD): PX509_LOOKUP; cdecl;
@@ -18840,16 +18853,16 @@ procedure X509_LOOKUP_free(ctx: PX509_LOOKUP); cdecl;
 function X509_LOOKUP_init(ctx: PX509_LOOKUP): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_LOOKUP_init';
 
-function X509_LOOKUP_by_subject(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl;
+function X509_LOOKUP_by_subject(ctx: PX509_LOOKUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; name: PX509_NAME; ret: PX509_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_LOOKUP_by_subject';
 
-function X509_LOOKUP_by_issuer_serial(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; name: PX509_NAME; serial: PASN1_INTEGER; ret: PX509_OBJECT): Integer; cdecl;
+function X509_LOOKUP_by_issuer_serial(ctx: PX509_LOOKUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; name: PX509_NAME; serial: PASN1_INTEGER; ret: PX509_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_LOOKUP_by_issuer_serial';
 
-function X509_LOOKUP_by_fingerprint(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; bytes: PByte; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
+function X509_LOOKUP_by_fingerprint(ctx: PX509_LOOKUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; bytes: PByte; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_LOOKUP_by_fingerprint';
 
-function X509_LOOKUP_by_alias(ctx: PX509_LOOKUP; &type: X509_LOOKUP_TYPE; str: PUTF8Char; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
+function X509_LOOKUP_by_alias(ctx: PX509_LOOKUP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: X509_LOOKUP_TYPE; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer; ret: PX509_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_LOOKUP_by_alias';
 
 function X509_LOOKUP_set_method_data(ctx: PX509_LOOKUP; data: Pointer): Integer; cdecl;
@@ -18864,7 +18877,7 @@ function X509_LOOKUP_get_store(ctx: PX509_LOOKUP): PX509_STORE; cdecl;
 function X509_LOOKUP_shutdown(ctx: PX509_LOOKUP): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_LOOKUP_shutdown';
 
-function X509_STORE_load_locations(ctx: PX509_STORE; &file: PUTF8Char; dir: PUTF8Char): Integer; cdecl;
+function X509_STORE_load_locations(ctx: PX509_STORE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; dir: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_STORE_load_locations';
 
 function X509_STORE_set_default_paths(ctx: PX509_STORE): Integer; cdecl;
@@ -18950,7 +18963,7 @@ function X509_STORE_CTX_get0_param(ctx: PX509_STORE_CTX): PX509_VERIFY_PARAM; cd
 procedure X509_STORE_CTX_set0_param(ctx: PX509_STORE_CTX; param: PX509_VERIFY_PARAM); cdecl;
   external LIB_CRYPTO name _PU + 'X509_STORE_CTX_set0_param';
 
-function X509_STORE_CTX_set_default(ctx: PX509_STORE_CTX; name: PUTF8Char): Integer; cdecl;
+function X509_STORE_CTX_set_default(ctx: PX509_STORE_CTX; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_STORE_CTX_set_default';
 
 procedure X509_STORE_CTX_set0_dane(ctx: PX509_STORE_CTX; dane: PSSL_DANE); cdecl;
@@ -18962,13 +18975,13 @@ function X509_VERIFY_PARAM_new(): PX509_VERIFY_PARAM; cdecl;
 procedure X509_VERIFY_PARAM_free(param: PX509_VERIFY_PARAM); cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_free';
 
-function X509_VERIFY_PARAM_inherit(&to: PX509_VERIFY_PARAM; from: PX509_VERIFY_PARAM): Integer; cdecl;
+function X509_VERIFY_PARAM_inherit({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PX509_VERIFY_PARAM; from: PX509_VERIFY_PARAM): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_inherit';
 
-function X509_VERIFY_PARAM_set1(&to: PX509_VERIFY_PARAM; from: PX509_VERIFY_PARAM): Integer; cdecl;
+function X509_VERIFY_PARAM_set1({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PX509_VERIFY_PARAM; from: PX509_VERIFY_PARAM): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_set1';
 
-function X509_VERIFY_PARAM_set1_name(param: PX509_VERIFY_PARAM; name: PUTF8Char): Integer; cdecl;
+function X509_VERIFY_PARAM_set1_name(param: PX509_VERIFY_PARAM; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_set1_name';
 
 function X509_VERIFY_PARAM_set_flags(param: PX509_VERIFY_PARAM; flags: Cardinal): Integer; cdecl;
@@ -19004,16 +19017,16 @@ function X509_VERIFY_PARAM_add0_policy(param: PX509_VERIFY_PARAM; policy: PASN1_
 function X509_VERIFY_PARAM_set1_policies(param: PX509_VERIFY_PARAM; policies: Pstack_st_ASN1_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_set1_policies';
 
-function X509_VERIFY_PARAM_set_inh_flags(param: PX509_VERIFY_PARAM; flags: UInt32): Integer; cdecl;
+function X509_VERIFY_PARAM_set_inh_flags(param: PX509_VERIFY_PARAM; flags: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_set_inh_flags';
 
-function X509_VERIFY_PARAM_get_inh_flags(param: PX509_VERIFY_PARAM): UInt32; cdecl;
+function X509_VERIFY_PARAM_get_inh_flags(param: PX509_VERIFY_PARAM): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_get_inh_flags';
 
-function X509_VERIFY_PARAM_set1_host(param: PX509_VERIFY_PARAM; name: PUTF8Char; namelen: NativeUInt): Integer; cdecl;
+function X509_VERIFY_PARAM_set1_host(param: PX509_VERIFY_PARAM; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; namelen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_set1_host';
 
-function X509_VERIFY_PARAM_add1_host(param: PX509_VERIFY_PARAM; name: PUTF8Char; namelen: NativeUInt): Integer; cdecl;
+function X509_VERIFY_PARAM_add1_host(param: PX509_VERIFY_PARAM; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; namelen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_add1_host';
 
 procedure X509_VERIFY_PARAM_set_hostflags(param: PX509_VERIFY_PARAM; flags: Cardinal); cdecl;
@@ -19022,19 +19035,19 @@ procedure X509_VERIFY_PARAM_set_hostflags(param: PX509_VERIFY_PARAM; flags: Card
 function X509_VERIFY_PARAM_get_hostflags(param: PX509_VERIFY_PARAM): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_get_hostflags';
 
-function X509_VERIFY_PARAM_get0_peername(p1: PX509_VERIFY_PARAM): PUTF8Char; cdecl;
+function X509_VERIFY_PARAM_get0_peername(p1: PX509_VERIFY_PARAM): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_get0_peername';
 
 procedure X509_VERIFY_PARAM_move_peername(p1: PX509_VERIFY_PARAM; p2: PX509_VERIFY_PARAM); cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_move_peername';
 
-function X509_VERIFY_PARAM_set1_email(param: PX509_VERIFY_PARAM; email: PUTF8Char; emaillen: NativeUInt): Integer; cdecl;
+function X509_VERIFY_PARAM_set1_email(param: PX509_VERIFY_PARAM; email: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; emaillen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_set1_email';
 
 function X509_VERIFY_PARAM_set1_ip(param: PX509_VERIFY_PARAM; ip: PByte; iplen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_set1_ip';
 
-function X509_VERIFY_PARAM_set1_ip_asc(param: PX509_VERIFY_PARAM; ipasc: PUTF8Char): Integer; cdecl;
+function X509_VERIFY_PARAM_set1_ip_asc(param: PX509_VERIFY_PARAM; ipasc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_set1_ip_asc';
 
 function X509_VERIFY_PARAM_get_depth(param: PX509_VERIFY_PARAM): Integer; cdecl;
@@ -19043,7 +19056,7 @@ function X509_VERIFY_PARAM_get_depth(param: PX509_VERIFY_PARAM): Integer; cdecl;
 function X509_VERIFY_PARAM_get_auth_level(param: PX509_VERIFY_PARAM): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_get_auth_level';
 
-function X509_VERIFY_PARAM_get0_name(param: PX509_VERIFY_PARAM): PUTF8Char; cdecl;
+function X509_VERIFY_PARAM_get0_name(param: PX509_VERIFY_PARAM): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_get0_name';
 
 function X509_VERIFY_PARAM_add0_table(param: PX509_VERIFY_PARAM): Integer; cdecl;
@@ -19055,7 +19068,7 @@ function X509_VERIFY_PARAM_get_count(): Integer; cdecl;
 function X509_VERIFY_PARAM_get0(id: Integer): PX509_VERIFY_PARAM; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_get0';
 
-function X509_VERIFY_PARAM_lookup(name: PUTF8Char): PX509_VERIFY_PARAM; cdecl;
+function X509_VERIFY_PARAM_lookup(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PX509_VERIFY_PARAM; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_lookup';
 
 procedure X509_VERIFY_PARAM_table_cleanup(); cdecl;
@@ -19103,16 +19116,16 @@ function PKCS7_ISSUER_AND_SERIAL_new(): PPKCS7_ISSUER_AND_SERIAL; cdecl;
 procedure PKCS7_ISSUER_AND_SERIAL_free(a: PPKCS7_ISSUER_AND_SERIAL); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_ISSUER_AND_SERIAL_free';
 
-function d2i_PKCS7_ISSUER_AND_SERIAL(a: PPPKCS7_ISSUER_AND_SERIAL; &in: PPByte; len: Integer): PPKCS7_ISSUER_AND_SERIAL; cdecl;
+function d2i_PKCS7_ISSUER_AND_SERIAL(a: PPPKCS7_ISSUER_AND_SERIAL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS7_ISSUER_AND_SERIAL; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS7_ISSUER_AND_SERIAL';
 
-function i2d_PKCS7_ISSUER_AND_SERIAL(a: PPKCS7_ISSUER_AND_SERIAL; &out: PPByte): Integer; cdecl;
+function i2d_PKCS7_ISSUER_AND_SERIAL(a: PPKCS7_ISSUER_AND_SERIAL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_ISSUER_AND_SERIAL';
 
 function PKCS7_ISSUER_AND_SERIAL_it(): PASN1_ITEM; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_ISSUER_AND_SERIAL_it';
 
-function PKCS7_ISSUER_AND_SERIAL_digest(data: PPKCS7_ISSUER_AND_SERIAL; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
+function PKCS7_ISSUER_AND_SERIAL_digest(data: PPKCS7_ISSUER_AND_SERIAL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_ISSUER_AND_SERIAL_digest';
 
 function d2i_PKCS7_fp(fp: PPointer; p7: PPPKCS7): PPKCS7; cdecl;
@@ -19130,10 +19143,10 @@ function d2i_PKCS7_bio(bp: PBIO; p7: PPPKCS7): PPKCS7; cdecl;
 function i2d_PKCS7_bio(bp: PBIO; p7: PPKCS7): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_bio';
 
-function i2d_PKCS7_bio_stream(&out: PBIO; p7: PPKCS7; &in: PBIO; flags: Integer): Integer; cdecl;
+function i2d_PKCS7_bio_stream({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; p7: PPKCS7; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; flags: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_bio_stream';
 
-function PEM_write_bio_PKCS7_stream(&out: PBIO; p7: PPKCS7; &in: PBIO; flags: Integer): Integer; cdecl;
+function PEM_write_bio_PKCS7_stream({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; p7: PPKCS7; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; flags: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_write_bio_PKCS7_stream';
 
 function PKCS7_SIGNER_INFO_new(): PPKCS7_SIGNER_INFO; cdecl;
@@ -19142,10 +19155,10 @@ function PKCS7_SIGNER_INFO_new(): PPKCS7_SIGNER_INFO; cdecl;
 procedure PKCS7_SIGNER_INFO_free(a: PPKCS7_SIGNER_INFO); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_SIGNER_INFO_free';
 
-function d2i_PKCS7_SIGNER_INFO(a: PPPKCS7_SIGNER_INFO; &in: PPByte; len: Integer): PPKCS7_SIGNER_INFO; cdecl;
+function d2i_PKCS7_SIGNER_INFO(a: PPPKCS7_SIGNER_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS7_SIGNER_INFO; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS7_SIGNER_INFO';
 
-function i2d_PKCS7_SIGNER_INFO(a: PPKCS7_SIGNER_INFO; &out: PPByte): Integer; cdecl;
+function i2d_PKCS7_SIGNER_INFO(a: PPKCS7_SIGNER_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_SIGNER_INFO';
 
 function PKCS7_SIGNER_INFO_it(): PASN1_ITEM; cdecl;
@@ -19157,10 +19170,10 @@ function PKCS7_RECIP_INFO_new(): PPKCS7_RECIP_INFO; cdecl;
 procedure PKCS7_RECIP_INFO_free(a: PPKCS7_RECIP_INFO); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_RECIP_INFO_free';
 
-function d2i_PKCS7_RECIP_INFO(a: PPPKCS7_RECIP_INFO; &in: PPByte; len: Integer): PPKCS7_RECIP_INFO; cdecl;
+function d2i_PKCS7_RECIP_INFO(a: PPPKCS7_RECIP_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS7_RECIP_INFO; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS7_RECIP_INFO';
 
-function i2d_PKCS7_RECIP_INFO(a: PPKCS7_RECIP_INFO; &out: PPByte): Integer; cdecl;
+function i2d_PKCS7_RECIP_INFO(a: PPKCS7_RECIP_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_RECIP_INFO';
 
 function PKCS7_RECIP_INFO_it(): PASN1_ITEM; cdecl;
@@ -19172,10 +19185,10 @@ function PKCS7_SIGNED_new(): PPKCS7_SIGNED; cdecl;
 procedure PKCS7_SIGNED_free(a: PPKCS7_SIGNED); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_SIGNED_free';
 
-function d2i_PKCS7_SIGNED(a: PPPKCS7_SIGNED; &in: PPByte; len: Integer): PPKCS7_SIGNED; cdecl;
+function d2i_PKCS7_SIGNED(a: PPPKCS7_SIGNED; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS7_SIGNED; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS7_SIGNED';
 
-function i2d_PKCS7_SIGNED(a: PPKCS7_SIGNED; &out: PPByte): Integer; cdecl;
+function i2d_PKCS7_SIGNED(a: PPKCS7_SIGNED; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_SIGNED';
 
 function PKCS7_SIGNED_it(): PASN1_ITEM; cdecl;
@@ -19187,10 +19200,10 @@ function PKCS7_ENC_CONTENT_new(): PPKCS7_ENC_CONTENT; cdecl;
 procedure PKCS7_ENC_CONTENT_free(a: PPKCS7_ENC_CONTENT); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_ENC_CONTENT_free';
 
-function d2i_PKCS7_ENC_CONTENT(a: PPPKCS7_ENC_CONTENT; &in: PPByte; len: Integer): PPKCS7_ENC_CONTENT; cdecl;
+function d2i_PKCS7_ENC_CONTENT(a: PPPKCS7_ENC_CONTENT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS7_ENC_CONTENT; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS7_ENC_CONTENT';
 
-function i2d_PKCS7_ENC_CONTENT(a: PPKCS7_ENC_CONTENT; &out: PPByte): Integer; cdecl;
+function i2d_PKCS7_ENC_CONTENT(a: PPKCS7_ENC_CONTENT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_ENC_CONTENT';
 
 function PKCS7_ENC_CONTENT_it(): PASN1_ITEM; cdecl;
@@ -19202,10 +19215,10 @@ function PKCS7_ENVELOPE_new(): PPKCS7_ENVELOPE; cdecl;
 procedure PKCS7_ENVELOPE_free(a: PPKCS7_ENVELOPE); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_ENVELOPE_free';
 
-function d2i_PKCS7_ENVELOPE(a: PPPKCS7_ENVELOPE; &in: PPByte; len: Integer): PPKCS7_ENVELOPE; cdecl;
+function d2i_PKCS7_ENVELOPE(a: PPPKCS7_ENVELOPE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS7_ENVELOPE; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS7_ENVELOPE';
 
-function i2d_PKCS7_ENVELOPE(a: PPKCS7_ENVELOPE; &out: PPByte): Integer; cdecl;
+function i2d_PKCS7_ENVELOPE(a: PPKCS7_ENVELOPE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_ENVELOPE';
 
 function PKCS7_ENVELOPE_it(): PASN1_ITEM; cdecl;
@@ -19217,10 +19230,10 @@ function PKCS7_SIGN_ENVELOPE_new(): PPKCS7_SIGN_ENVELOPE; cdecl;
 procedure PKCS7_SIGN_ENVELOPE_free(a: PPKCS7_SIGN_ENVELOPE); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_SIGN_ENVELOPE_free';
 
-function d2i_PKCS7_SIGN_ENVELOPE(a: PPPKCS7_SIGN_ENVELOPE; &in: PPByte; len: Integer): PPKCS7_SIGN_ENVELOPE; cdecl;
+function d2i_PKCS7_SIGN_ENVELOPE(a: PPPKCS7_SIGN_ENVELOPE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS7_SIGN_ENVELOPE; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS7_SIGN_ENVELOPE';
 
-function i2d_PKCS7_SIGN_ENVELOPE(a: PPKCS7_SIGN_ENVELOPE; &out: PPByte): Integer; cdecl;
+function i2d_PKCS7_SIGN_ENVELOPE(a: PPKCS7_SIGN_ENVELOPE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_SIGN_ENVELOPE';
 
 function PKCS7_SIGN_ENVELOPE_it(): PASN1_ITEM; cdecl;
@@ -19232,10 +19245,10 @@ function PKCS7_DIGEST_new(): PPKCS7_DIGEST; cdecl;
 procedure PKCS7_DIGEST_free(a: PPKCS7_DIGEST); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_DIGEST_free';
 
-function d2i_PKCS7_DIGEST(a: PPPKCS7_DIGEST; &in: PPByte; len: Integer): PPKCS7_DIGEST; cdecl;
+function d2i_PKCS7_DIGEST(a: PPPKCS7_DIGEST; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS7_DIGEST; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS7_DIGEST';
 
-function i2d_PKCS7_DIGEST(a: PPKCS7_DIGEST; &out: PPByte): Integer; cdecl;
+function i2d_PKCS7_DIGEST(a: PPKCS7_DIGEST; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_DIGEST';
 
 function PKCS7_DIGEST_it(): PASN1_ITEM; cdecl;
@@ -19247,10 +19260,10 @@ function PKCS7_ENCRYPT_new(): PPKCS7_ENCRYPT; cdecl;
 procedure PKCS7_ENCRYPT_free(a: PPKCS7_ENCRYPT); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_ENCRYPT_free';
 
-function d2i_PKCS7_ENCRYPT(a: PPPKCS7_ENCRYPT; &in: PPByte; len: Integer): PPKCS7_ENCRYPT; cdecl;
+function d2i_PKCS7_ENCRYPT(a: PPPKCS7_ENCRYPT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS7_ENCRYPT; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS7_ENCRYPT';
 
-function i2d_PKCS7_ENCRYPT(a: PPKCS7_ENCRYPT; &out: PPByte): Integer; cdecl;
+function i2d_PKCS7_ENCRYPT(a: PPKCS7_ENCRYPT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_ENCRYPT';
 
 function PKCS7_ENCRYPT_it(): PASN1_ITEM; cdecl;
@@ -19262,10 +19275,10 @@ function PKCS7_new(): PPKCS7; cdecl;
 procedure PKCS7_free(a: PPKCS7); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_free';
 
-function d2i_PKCS7(a: PPPKCS7; &in: PPByte; len: Integer): PPKCS7; cdecl;
+function d2i_PKCS7(a: PPPKCS7; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS7; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS7';
 
-function i2d_PKCS7(a: PPKCS7; &out: PPByte): Integer; cdecl;
+function i2d_PKCS7(a: PPKCS7; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7';
 
 function PKCS7_it(): PASN1_ITEM; cdecl;
@@ -19277,19 +19290,19 @@ function PKCS7_ATTR_SIGN_it(): PASN1_ITEM; cdecl;
 function PKCS7_ATTR_VERIFY_it(): PASN1_ITEM; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_ATTR_VERIFY_it';
 
-function i2d_PKCS7_NDEF(a: PPKCS7; &out: PPByte): Integer; cdecl;
+function i2d_PKCS7_NDEF(a: PPKCS7; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS7_NDEF';
 
-function PKCS7_print_ctx(&out: PBIO; x: PPKCS7; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+function PKCS7_print_ctx({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; x: PPKCS7; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_print_ctx';
 
-function PKCS7_ctrl(p7: PPKCS7; cmd: Integer; larg: Integer; parg: PUTF8Char): Integer; cdecl;
+function PKCS7_ctrl(p7: PPKCS7; cmd: Integer; larg: Integer; parg: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_ctrl';
 
-function PKCS7_set_type(p7: PPKCS7; &type: Integer): Integer; cdecl;
+function PKCS7_set_type(p7: PPKCS7; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_set_type';
 
-function PKCS7_set0_type_other(p7: PPKCS7; &type: Integer; other: PASN1_TYPE): Integer; cdecl;
+function PKCS7_set0_type_other(p7: PPKCS7; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; other: PASN1_TYPE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_set0_type_other';
 
 function PKCS7_set_content(p7: PPKCS7; p7_data: PPKCS7): Integer; cdecl;
@@ -19367,7 +19380,7 @@ function PKCS7_get_issuer_and_serial(p7: PPKCS7; idx: Integer): PPKCS7_ISSUER_AN
 function PKCS7_digest_from_attributes(sk: Pstack_st_X509_ATTRIBUTE): PASN1_OCTET_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_digest_from_attributes';
 
-function PKCS7_add_signed_attribute(p7si: PPKCS7_SIGNER_INFO; nid: Integer; &type: Integer; data: Pointer): Integer; cdecl;
+function PKCS7_add_signed_attribute(p7si: PPKCS7_SIGNER_INFO; nid: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; data: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_add_signed_attribute';
 
 function PKCS7_add_attribute(p7si: PPKCS7_SIGNER_INFO; nid: Integer; atrtype: Integer; value: Pointer): Integer; cdecl;
@@ -19394,13 +19407,13 @@ function PKCS7_sign_add_signer(p7: PPKCS7; signcert: PX509; pkey: PEVP_PKEY; md:
 function PKCS7_final(p7: PPKCS7; data: PBIO; flags: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_final';
 
-function PKCS7_verify(p7: PPKCS7; certs: Pstack_st_X509; store: PX509_STORE; indata: PBIO; &out: PBIO; flags: Integer): Integer; cdecl;
+function PKCS7_verify(p7: PPKCS7; certs: Pstack_st_X509; store: PX509_STORE; indata: PBIO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; flags: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_verify';
 
 function PKCS7_get0_signers(p7: PPKCS7; certs: Pstack_st_X509; flags: Integer): Pstack_st_X509; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_get0_signers';
 
-function PKCS7_encrypt(certs: Pstack_st_X509; &in: PBIO; cipher: PEVP_CIPHER; flags: Integer): PPKCS7; cdecl;
+function PKCS7_encrypt(certs: Pstack_st_X509; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; cipher: PEVP_CIPHER; flags: Integer): PPKCS7; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS7_encrypt';
 
 function PKCS7_decrypt(p7: PPKCS7; pkey: PEVP_PKEY; cert: PX509; data: PBIO; flags: Integer): Integer; cdecl;
@@ -19430,7 +19443,7 @@ function SMIME_write_PKCS7(bio: PBIO; p7: PPKCS7; data: PBIO; flags: Integer): I
 function SMIME_read_PKCS7(bio: PBIO; bcont: PPBIO): PPKCS7; cdecl;
   external LIB_CRYPTO name _PU + 'SMIME_read_PKCS7';
 
-function BIO_new_PKCS7(&out: PBIO; p7: PPKCS7): PBIO; cdecl;
+function BIO_new_PKCS7({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; p7: PPKCS7): PBIO; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_new_PKCS7';
 
 procedure X509_CRL_set_default_method(meth: PX509_CRL_METHOD); cdecl;
@@ -19460,7 +19473,7 @@ procedure X509_CRL_set_meth_data(crl: PX509_CRL; dat: Pointer); cdecl;
 function X509_CRL_get_meth_data(crl: PX509_CRL): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_CRL_get_meth_data';
 
-function X509_verify_cert_error_string(n: Integer): PUTF8Char; cdecl;
+function X509_verify_cert_error_string(n: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_verify_cert_error_string';
 
 function X509_verify(a: PX509; r: PEVP_PKEY): Integer; cdecl;
@@ -19475,10 +19488,10 @@ function X509_CRL_verify(a: PX509_CRL; r: PEVP_PKEY): Integer; cdecl;
 function NETSCAPE_SPKI_verify(a: PNETSCAPE_SPKI; r: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'NETSCAPE_SPKI_verify';
 
-function NETSCAPE_SPKI_b64_decode(str: PUTF8Char; len: Integer): PNETSCAPE_SPKI; cdecl;
+function NETSCAPE_SPKI_b64_decode(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer): PNETSCAPE_SPKI; cdecl;
   external LIB_CRYPTO name _PU + 'NETSCAPE_SPKI_b64_decode';
 
-function NETSCAPE_SPKI_b64_encode(x: PNETSCAPE_SPKI): PUTF8Char; cdecl;
+function NETSCAPE_SPKI_b64_encode(x: PNETSCAPE_SPKI): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'NETSCAPE_SPKI_b64_encode';
 
 function NETSCAPE_SPKI_get_pubkey(x: PNETSCAPE_SPKI): PEVP_PKEY; cdecl;
@@ -19487,7 +19500,7 @@ function NETSCAPE_SPKI_get_pubkey(x: PNETSCAPE_SPKI): PEVP_PKEY; cdecl;
 function NETSCAPE_SPKI_set_pubkey(x: PNETSCAPE_SPKI; pkey: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'NETSCAPE_SPKI_set_pubkey';
 
-function NETSCAPE_SPKI_print(&out: PBIO; spki: PNETSCAPE_SPKI): Integer; cdecl;
+function NETSCAPE_SPKI_print({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; spki: PNETSCAPE_SPKI): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'NETSCAPE_SPKI_print';
 
 function X509_signature_dump(bp: PBIO; sig: PASN1_STRING; indent: Integer): Integer; cdecl;
@@ -19523,19 +19536,19 @@ function X509_CRL_http_nbio(rctx: POCSP_REQ_CTX; pcrl: PPX509_CRL): Integer; cde
 function NETSCAPE_SPKI_sign(x: PNETSCAPE_SPKI; pkey: PEVP_PKEY; md: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'NETSCAPE_SPKI_sign';
 
-function X509_pubkey_digest(data: PX509; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
+function X509_pubkey_digest(data: PX509; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_pubkey_digest';
 
-function X509_digest(data: PX509; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
+function X509_digest(data: PX509; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_digest';
 
-function X509_CRL_digest(data: PX509_CRL; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
+function X509_CRL_digest(data: PX509_CRL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_CRL_digest';
 
-function X509_REQ_digest(data: PX509_REQ; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
+function X509_REQ_digest(data: PX509_REQ; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_REQ_digest';
 
-function X509_NAME_digest(data: PX509_NAME; &type: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
+function X509_NAME_digest(data: PX509_NAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; md: PByte; len: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_digest';
 
 function d2i_X509_fp(fp: PPointer; x509: PPX509): PX509; cdecl;
@@ -19766,22 +19779,22 @@ function X509_time_adj_ex(s: PASN1_TIME; offset_day: Integer; offset_sec: Intege
 function X509_gmtime_adj(s: PASN1_TIME; adj: Integer): PASN1_TIME; cdecl;
   external LIB_CRYPTO name _PU + 'X509_gmtime_adj';
 
-function X509_get_default_cert_area(): PUTF8Char; cdecl;
+function X509_get_default_cert_area(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_get_default_cert_area';
 
-function X509_get_default_cert_dir(): PUTF8Char; cdecl;
+function X509_get_default_cert_dir(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_get_default_cert_dir';
 
-function X509_get_default_cert_file(): PUTF8Char; cdecl;
+function X509_get_default_cert_file(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_get_default_cert_file';
 
-function X509_get_default_cert_dir_env(): PUTF8Char; cdecl;
+function X509_get_default_cert_dir_env(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_get_default_cert_dir_env';
 
-function X509_get_default_cert_file_env(): PUTF8Char; cdecl;
+function X509_get_default_cert_file_env(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_get_default_cert_file_env';
 
-function X509_get_default_private_dir(): PUTF8Char; cdecl;
+function X509_get_default_private_dir(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_get_default_private_dir';
 
 function X509_to_X509_REQ(x: PX509; pkey: PEVP_PKEY; md: PEVP_MD): PX509_REQ; cdecl;
@@ -19796,19 +19809,19 @@ function X509_ALGOR_new(): PX509_ALGOR; cdecl;
 procedure X509_ALGOR_free(a: PX509_ALGOR); cdecl;
   external LIB_CRYPTO name _PU + 'X509_ALGOR_free';
 
-function d2i_X509_ALGOR(a: PPX509_ALGOR; &in: PPByte; len: Integer): PX509_ALGOR; cdecl;
+function d2i_X509_ALGOR(a: PPX509_ALGOR; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_ALGOR; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_ALGOR';
 
-function i2d_X509_ALGOR(a: PX509_ALGOR; &out: PPByte): Integer; cdecl;
+function i2d_X509_ALGOR(a: PX509_ALGOR; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_ALGOR';
 
 function X509_ALGOR_it(): PASN1_ITEM; cdecl;
   external LIB_CRYPTO name _PU + 'X509_ALGOR_it';
 
-function d2i_X509_ALGORS(a: PPX509_ALGORS; &in: PPByte; len: Integer): PX509_ALGORS; cdecl;
+function d2i_X509_ALGORS(a: PPX509_ALGORS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_ALGORS; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_ALGORS';
 
-function i2d_X509_ALGORS(a: PX509_ALGORS; &out: PPByte): Integer; cdecl;
+function i2d_X509_ALGORS(a: PX509_ALGORS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_ALGORS';
 
 function X509_ALGORS_it(): PASN1_ITEM; cdecl;
@@ -19820,10 +19833,10 @@ function X509_VAL_new(): PX509_VAL; cdecl;
 procedure X509_VAL_free(a: PX509_VAL); cdecl;
   external LIB_CRYPTO name _PU + 'X509_VAL_free';
 
-function d2i_X509_VAL(a: PPX509_VAL; &in: PPByte; len: Integer): PX509_VAL; cdecl;
+function d2i_X509_VAL(a: PPX509_VAL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_VAL; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_VAL';
 
-function i2d_X509_VAL(a: PX509_VAL; &out: PPByte): Integer; cdecl;
+function i2d_X509_VAL(a: PX509_VAL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_VAL';
 
 function X509_VAL_it(): PASN1_ITEM; cdecl;
@@ -19835,10 +19848,10 @@ function X509_PUBKEY_new(): PX509_PUBKEY; cdecl;
 procedure X509_PUBKEY_free(a: PX509_PUBKEY); cdecl;
   external LIB_CRYPTO name _PU + 'X509_PUBKEY_free';
 
-function d2i_X509_PUBKEY(a: PPX509_PUBKEY; &in: PPByte; len: Integer): PX509_PUBKEY; cdecl;
+function d2i_X509_PUBKEY(a: PPX509_PUBKEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_PUBKEY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_PUBKEY';
 
-function i2d_X509_PUBKEY(a: PX509_PUBKEY; &out: PPByte): Integer; cdecl;
+function i2d_X509_PUBKEY(a: PX509_PUBKEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_PUBKEY';
 
 function X509_PUBKEY_it(): PASN1_ITEM; cdecl;
@@ -19889,10 +19902,10 @@ function X509_SIG_new(): PX509_SIG; cdecl;
 procedure X509_SIG_free(a: PX509_SIG); cdecl;
   external LIB_CRYPTO name _PU + 'X509_SIG_free';
 
-function d2i_X509_SIG(a: PPX509_SIG; &in: PPByte; len: Integer): PX509_SIG; cdecl;
+function d2i_X509_SIG(a: PPX509_SIG; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_SIG; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_SIG';
 
-function i2d_X509_SIG(a: PX509_SIG; &out: PPByte): Integer; cdecl;
+function i2d_X509_SIG(a: PX509_SIG; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_SIG';
 
 function X509_SIG_it(): PASN1_ITEM; cdecl;
@@ -19910,10 +19923,10 @@ function X509_REQ_INFO_new(): PX509_REQ_INFO; cdecl;
 procedure X509_REQ_INFO_free(a: PX509_REQ_INFO); cdecl;
   external LIB_CRYPTO name _PU + 'X509_REQ_INFO_free';
 
-function d2i_X509_REQ_INFO(a: PPX509_REQ_INFO; &in: PPByte; len: Integer): PX509_REQ_INFO; cdecl;
+function d2i_X509_REQ_INFO(a: PPX509_REQ_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_REQ_INFO; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_REQ_INFO';
 
-function i2d_X509_REQ_INFO(a: PX509_REQ_INFO; &out: PPByte): Integer; cdecl;
+function i2d_X509_REQ_INFO(a: PX509_REQ_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_REQ_INFO';
 
 function X509_REQ_INFO_it(): PASN1_ITEM; cdecl;
@@ -19925,10 +19938,10 @@ function X509_REQ_new(): PX509_REQ; cdecl;
 procedure X509_REQ_free(a: PX509_REQ); cdecl;
   external LIB_CRYPTO name _PU + 'X509_REQ_free';
 
-function d2i_X509_REQ(a: PPX509_REQ; &in: PPByte; len: Integer): PX509_REQ; cdecl;
+function d2i_X509_REQ(a: PPX509_REQ; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_REQ; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_REQ';
 
-function i2d_X509_REQ(a: PX509_REQ; &out: PPByte): Integer; cdecl;
+function i2d_X509_REQ(a: PX509_REQ; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_REQ';
 
 function X509_REQ_it(): PASN1_ITEM; cdecl;
@@ -19940,10 +19953,10 @@ function X509_ATTRIBUTE_new(): PX509_ATTRIBUTE; cdecl;
 procedure X509_ATTRIBUTE_free(a: PX509_ATTRIBUTE); cdecl;
   external LIB_CRYPTO name _PU + 'X509_ATTRIBUTE_free';
 
-function d2i_X509_ATTRIBUTE(a: PPX509_ATTRIBUTE; &in: PPByte; len: Integer): PX509_ATTRIBUTE; cdecl;
+function d2i_X509_ATTRIBUTE(a: PPX509_ATTRIBUTE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_ATTRIBUTE; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_ATTRIBUTE';
 
-function i2d_X509_ATTRIBUTE(a: PX509_ATTRIBUTE; &out: PPByte): Integer; cdecl;
+function i2d_X509_ATTRIBUTE(a: PX509_ATTRIBUTE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_ATTRIBUTE';
 
 function X509_ATTRIBUTE_it(): PASN1_ITEM; cdecl;
@@ -19958,19 +19971,19 @@ function X509_EXTENSION_new(): PX509_EXTENSION; cdecl;
 procedure X509_EXTENSION_free(a: PX509_EXTENSION); cdecl;
   external LIB_CRYPTO name _PU + 'X509_EXTENSION_free';
 
-function d2i_X509_EXTENSION(a: PPX509_EXTENSION; &in: PPByte; len: Integer): PX509_EXTENSION; cdecl;
+function d2i_X509_EXTENSION(a: PPX509_EXTENSION; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_EXTENSION; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_EXTENSION';
 
-function i2d_X509_EXTENSION(a: PX509_EXTENSION; &out: PPByte): Integer; cdecl;
+function i2d_X509_EXTENSION(a: PX509_EXTENSION; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_EXTENSION';
 
 function X509_EXTENSION_it(): PASN1_ITEM; cdecl;
   external LIB_CRYPTO name _PU + 'X509_EXTENSION_it';
 
-function d2i_X509_EXTENSIONS(a: PPX509_EXTENSIONS; &in: PPByte; len: Integer): PX509_EXTENSIONS; cdecl;
+function d2i_X509_EXTENSIONS(a: PPX509_EXTENSIONS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_EXTENSIONS; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_EXTENSIONS';
 
-function i2d_X509_EXTENSIONS(a: PX509_EXTENSIONS; &out: PPByte): Integer; cdecl;
+function i2d_X509_EXTENSIONS(a: PX509_EXTENSIONS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_EXTENSIONS';
 
 function X509_EXTENSIONS_it(): PASN1_ITEM; cdecl;
@@ -19982,10 +19995,10 @@ function X509_NAME_ENTRY_new(): PX509_NAME_ENTRY; cdecl;
 procedure X509_NAME_ENTRY_free(a: PX509_NAME_ENTRY); cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_ENTRY_free';
 
-function d2i_X509_NAME_ENTRY(a: PPX509_NAME_ENTRY; &in: PPByte; len: Integer): PX509_NAME_ENTRY; cdecl;
+function d2i_X509_NAME_ENTRY(a: PPX509_NAME_ENTRY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_NAME_ENTRY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_NAME_ENTRY';
 
-function i2d_X509_NAME_ENTRY(a: PX509_NAME_ENTRY; &out: PPByte): Integer; cdecl;
+function i2d_X509_NAME_ENTRY(a: PX509_NAME_ENTRY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_NAME_ENTRY';
 
 function X509_NAME_ENTRY_it(): PASN1_ITEM; cdecl;
@@ -19997,10 +20010,10 @@ function X509_NAME_new(): PX509_NAME; cdecl;
 procedure X509_NAME_free(a: PX509_NAME); cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_free';
 
-function d2i_X509_NAME(a: PPX509_NAME; &in: PPByte; len: Integer): PX509_NAME; cdecl;
+function d2i_X509_NAME(a: PPX509_NAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_NAME; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_NAME';
 
-function i2d_X509_NAME(a: PX509_NAME; &out: PPByte): Integer; cdecl;
+function i2d_X509_NAME(a: PX509_NAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_NAME';
 
 function X509_NAME_it(): PASN1_ITEM; cdecl;
@@ -20015,10 +20028,10 @@ function X509_CINF_new(): PX509_CINF; cdecl;
 procedure X509_CINF_free(a: PX509_CINF); cdecl;
   external LIB_CRYPTO name _PU + 'X509_CINF_free';
 
-function d2i_X509_CINF(a: PPX509_CINF; &in: PPByte; len: Integer): PX509_CINF; cdecl;
+function d2i_X509_CINF(a: PPX509_CINF; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_CINF; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_CINF';
 
-function i2d_X509_CINF(a: PX509_CINF; &out: PPByte): Integer; cdecl;
+function i2d_X509_CINF(a: PX509_CINF; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_CINF';
 
 function X509_CINF_it(): PASN1_ITEM; cdecl;
@@ -20030,10 +20043,10 @@ function X509_new(): PX509; cdecl;
 procedure X509_free(a: PX509); cdecl;
   external LIB_CRYPTO name _PU + 'X509_free';
 
-function d2i_X509(a: PPX509; &in: PPByte; len: Integer): PX509; cdecl;
+function d2i_X509(a: PPX509; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509';
 
-function i2d_X509(a: PX509; &out: PPByte): Integer; cdecl;
+function i2d_X509(a: PX509; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509';
 
 function X509_it(): PASN1_ITEM; cdecl;
@@ -20045,10 +20058,10 @@ function X509_CERT_AUX_new(): PX509_CERT_AUX; cdecl;
 procedure X509_CERT_AUX_free(a: PX509_CERT_AUX); cdecl;
   external LIB_CRYPTO name _PU + 'X509_CERT_AUX_free';
 
-function d2i_X509_CERT_AUX(a: PPX509_CERT_AUX; &in: PPByte; len: Integer): PX509_CERT_AUX; cdecl;
+function d2i_X509_CERT_AUX(a: PPX509_CERT_AUX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_CERT_AUX; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_CERT_AUX';
 
-function i2d_X509_CERT_AUX(a: PX509_CERT_AUX; &out: PPByte): Integer; cdecl;
+function i2d_X509_CERT_AUX(a: PX509_CERT_AUX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_CERT_AUX';
 
 function X509_CERT_AUX_it(): PASN1_ITEM; cdecl;
@@ -20072,7 +20085,7 @@ function i2d_re_X509_tbs(x: PX509; pp: PPByte): Integer; cdecl;
 function X509_SIG_INFO_get(siginf: PX509_SIG_INFO; mdnid: PInteger; pknid: PInteger; secbits: PInteger; flags: PUInt32): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_SIG_INFO_get';
 
-procedure X509_SIG_INFO_set(siginf: PX509_SIG_INFO; mdnid: Integer; pknid: Integer; secbits: Integer; flags: UInt32); cdecl;
+procedure X509_SIG_INFO_set(siginf: PX509_SIG_INFO; mdnid: Integer; pknid: Integer; secbits: Integer; flags: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}); cdecl;
   external LIB_CRYPTO name _PU + 'X509_SIG_INFO_set';
 
 function X509_get_signature_info(x: PX509; mdnid: PInteger; pknid: PInteger; secbits: PInteger; flags: PUInt32): Integer; cdecl;
@@ -20132,10 +20145,10 @@ function X509_REVOKED_new(): PX509_REVOKED; cdecl;
 procedure X509_REVOKED_free(a: PX509_REVOKED); cdecl;
   external LIB_CRYPTO name _PU + 'X509_REVOKED_free';
 
-function d2i_X509_REVOKED(a: PPX509_REVOKED; &in: PPByte; len: Integer): PX509_REVOKED; cdecl;
+function d2i_X509_REVOKED(a: PPX509_REVOKED; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_REVOKED; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_REVOKED';
 
-function i2d_X509_REVOKED(a: PX509_REVOKED; &out: PPByte): Integer; cdecl;
+function i2d_X509_REVOKED(a: PX509_REVOKED; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_REVOKED';
 
 function X509_REVOKED_it(): PASN1_ITEM; cdecl;
@@ -20147,10 +20160,10 @@ function X509_CRL_INFO_new(): PX509_CRL_INFO; cdecl;
 procedure X509_CRL_INFO_free(a: PX509_CRL_INFO); cdecl;
   external LIB_CRYPTO name _PU + 'X509_CRL_INFO_free';
 
-function d2i_X509_CRL_INFO(a: PPX509_CRL_INFO; &in: PPByte; len: Integer): PX509_CRL_INFO; cdecl;
+function d2i_X509_CRL_INFO(a: PPX509_CRL_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_CRL_INFO; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_CRL_INFO';
 
-function i2d_X509_CRL_INFO(a: PX509_CRL_INFO; &out: PPByte): Integer; cdecl;
+function i2d_X509_CRL_INFO(a: PX509_CRL_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_CRL_INFO';
 
 function X509_CRL_INFO_it(): PASN1_ITEM; cdecl;
@@ -20162,10 +20175,10 @@ function X509_CRL_new(): PX509_CRL; cdecl;
 procedure X509_CRL_free(a: PX509_CRL); cdecl;
   external LIB_CRYPTO name _PU + 'X509_CRL_free';
 
-function d2i_X509_CRL(a: PPX509_CRL; &in: PPByte; len: Integer): PX509_CRL; cdecl;
+function d2i_X509_CRL(a: PPX509_CRL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PX509_CRL; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_X509_CRL';
 
-function i2d_X509_CRL(a: PX509_CRL; &out: PPByte): Integer; cdecl;
+function i2d_X509_CRL(a: PX509_CRL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_X509_CRL';
 
 function X509_CRL_it(): PASN1_ITEM; cdecl;
@@ -20192,10 +20205,10 @@ function NETSCAPE_SPKI_new(): PNETSCAPE_SPKI; cdecl;
 procedure NETSCAPE_SPKI_free(a: PNETSCAPE_SPKI); cdecl;
   external LIB_CRYPTO name _PU + 'NETSCAPE_SPKI_free';
 
-function d2i_NETSCAPE_SPKI(a: PPNETSCAPE_SPKI; &in: PPByte; len: Integer): PNETSCAPE_SPKI; cdecl;
+function d2i_NETSCAPE_SPKI(a: PPNETSCAPE_SPKI; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PNETSCAPE_SPKI; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_NETSCAPE_SPKI';
 
-function i2d_NETSCAPE_SPKI(a: PNETSCAPE_SPKI; &out: PPByte): Integer; cdecl;
+function i2d_NETSCAPE_SPKI(a: PNETSCAPE_SPKI; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_NETSCAPE_SPKI';
 
 function NETSCAPE_SPKI_it(): PASN1_ITEM; cdecl;
@@ -20207,10 +20220,10 @@ function NETSCAPE_SPKAC_new(): PNETSCAPE_SPKAC; cdecl;
 procedure NETSCAPE_SPKAC_free(a: PNETSCAPE_SPKAC); cdecl;
   external LIB_CRYPTO name _PU + 'NETSCAPE_SPKAC_free';
 
-function d2i_NETSCAPE_SPKAC(a: PPNETSCAPE_SPKAC; &in: PPByte; len: Integer): PNETSCAPE_SPKAC; cdecl;
+function d2i_NETSCAPE_SPKAC(a: PPNETSCAPE_SPKAC; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PNETSCAPE_SPKAC; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_NETSCAPE_SPKAC';
 
-function i2d_NETSCAPE_SPKAC(a: PNETSCAPE_SPKAC; &out: PPByte): Integer; cdecl;
+function i2d_NETSCAPE_SPKAC(a: PNETSCAPE_SPKAC; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_NETSCAPE_SPKAC';
 
 function NETSCAPE_SPKAC_it(): PASN1_ITEM; cdecl;
@@ -20222,10 +20235,10 @@ function NETSCAPE_CERT_SEQUENCE_new(): PNETSCAPE_CERT_SEQUENCE; cdecl;
 procedure NETSCAPE_CERT_SEQUENCE_free(a: PNETSCAPE_CERT_SEQUENCE); cdecl;
   external LIB_CRYPTO name _PU + 'NETSCAPE_CERT_SEQUENCE_free';
 
-function d2i_NETSCAPE_CERT_SEQUENCE(a: PPNETSCAPE_CERT_SEQUENCE; &in: PPByte; len: Integer): PNETSCAPE_CERT_SEQUENCE; cdecl;
+function d2i_NETSCAPE_CERT_SEQUENCE(a: PPNETSCAPE_CERT_SEQUENCE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PNETSCAPE_CERT_SEQUENCE; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_NETSCAPE_CERT_SEQUENCE';
 
-function i2d_NETSCAPE_CERT_SEQUENCE(a: PNETSCAPE_CERT_SEQUENCE; &out: PPByte): Integer; cdecl;
+function i2d_NETSCAPE_CERT_SEQUENCE(a: PNETSCAPE_CERT_SEQUENCE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_NETSCAPE_CERT_SEQUENCE';
 
 function NETSCAPE_CERT_SEQUENCE_it(): PASN1_ITEM; cdecl;
@@ -20237,25 +20250,25 @@ function X509_INFO_new(): PX509_INFO; cdecl;
 procedure X509_INFO_free(a: PX509_INFO); cdecl;
   external LIB_CRYPTO name _PU + 'X509_INFO_free';
 
-function X509_NAME_oneline(a: PX509_NAME; buf: PUTF8Char; size: Integer): PUTF8Char; cdecl;
+function X509_NAME_oneline(a: PX509_NAME; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; size: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_oneline';
 
-function ASN1_verify(i2d: Pi2d_of_void; algor1: PX509_ALGOR; signature: PASN1_BIT_STRING; data: PUTF8Char; pkey: PEVP_PKEY): Integer; cdecl;
+function ASN1_verify(i2d: Pi2d_of_void; algor1: PX509_ALGOR; signature: PASN1_BIT_STRING; data: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pkey: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_verify';
 
-function ASN1_digest(i2d: Pi2d_of_void; &type: PEVP_MD; data: PUTF8Char; md: PByte; len: PCardinal): Integer; cdecl;
+function ASN1_digest(i2d: Pi2d_of_void; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; data: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; md: PByte; len: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_digest';
 
-function ASN1_sign(i2d: Pi2d_of_void; algor1: PX509_ALGOR; algor2: PX509_ALGOR; signature: PASN1_BIT_STRING; data: PUTF8Char; pkey: PEVP_PKEY; &type: PEVP_MD): Integer; cdecl;
+function ASN1_sign(i2d: Pi2d_of_void; algor1: PX509_ALGOR; algor2: PX509_ALGOR; signature: PASN1_BIT_STRING; data: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pkey: PEVP_PKEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_sign';
 
-function ASN1_item_digest(it: PASN1_ITEM; &type: PEVP_MD; data: Pointer; md: PByte; len: PCardinal): Integer; cdecl;
+function ASN1_item_digest(it: PASN1_ITEM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD; data: Pointer; md: PByte; len: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_digest';
 
 function ASN1_item_verify(it: PASN1_ITEM; algor1: PX509_ALGOR; signature: PASN1_BIT_STRING; data: Pointer; pkey: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_verify';
 
-function ASN1_item_sign(it: PASN1_ITEM; algor1: PX509_ALGOR; algor2: PX509_ALGOR; signature: PASN1_BIT_STRING; data: Pointer; pkey: PEVP_PKEY; &type: PEVP_MD): Integer; cdecl;
+function ASN1_item_sign(it: PASN1_ITEM; algor1: PX509_ALGOR; algor2: PX509_ALGOR; signature: PASN1_BIT_STRING; data: Pointer; pkey: PEVP_PKEY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ASN1_item_sign';
 
 function ASN1_item_sign_ctx(it: PASN1_ITEM; algor1: PX509_ALGOR; algor2: PX509_ALGOR; signature: PASN1_BIT_STRING; asn: Pointer; ctx: PEVP_MD_CTX): Integer; cdecl;
@@ -20416,13 +20429,13 @@ function X509_REQ_delete_attr(req: PX509_REQ; loc: Integer): PX509_ATTRIBUTE; cd
 function X509_REQ_add1_attr(req: PX509_REQ; attr: PX509_ATTRIBUTE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_REQ_add1_attr';
 
-function X509_REQ_add1_attr_by_OBJ(req: PX509_REQ; obj: PASN1_OBJECT; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl;
+function X509_REQ_add1_attr_by_OBJ(req: PX509_REQ; obj: PASN1_OBJECT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PByte; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_REQ_add1_attr_by_OBJ';
 
-function X509_REQ_add1_attr_by_NID(req: PX509_REQ; nid: Integer; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl;
+function X509_REQ_add1_attr_by_NID(req: PX509_REQ; nid: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PByte; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_REQ_add1_attr_by_NID';
 
-function X509_REQ_add1_attr_by_txt(req: PX509_REQ; attrname: PUTF8Char; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl;
+function X509_REQ_add1_attr_by_txt(req: PX509_REQ; attrname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PByte; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_REQ_add1_attr_by_txt';
 
 function X509_CRL_set_version(x: PX509_CRL; version: Integer): Integer; cdecl;
@@ -20555,7 +20568,7 @@ function X509_CRL_cmp(a: PX509_CRL; b: PX509_CRL): Integer; cdecl;
 function X509_CRL_match(a: PX509_CRL; b: PX509_CRL): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_CRL_match';
 
-function X509_aux_print(&out: PBIO; x: PX509; indent: Integer): Integer; cdecl;
+function X509_aux_print({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; x: PX509; indent: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_aux_print';
 
 function X509_print_ex_fp(bp: PPointer; x: PX509; nmflag: Cardinal; cflag: Cardinal): Integer; cdecl;
@@ -20576,7 +20589,7 @@ function X509_NAME_print_ex_fp(fp: PPointer; nm: PX509_NAME; indent: Integer; fl
 function X509_NAME_print(bp: PBIO; name: PX509_NAME; obase: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_print';
 
-function X509_NAME_print_ex(&out: PBIO; nm: PX509_NAME; indent: Integer; flags: Cardinal): Integer; cdecl;
+function X509_NAME_print_ex({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; nm: PX509_NAME; indent: Integer; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_print_ex';
 
 function X509_print_ex(bp: PBIO; x: PX509; nmflag: Cardinal; cflag: Cardinal): Integer; cdecl;
@@ -20588,7 +20601,7 @@ function X509_print(bp: PBIO; x: PX509): Integer; cdecl;
 function X509_ocspid_print(bp: PBIO; x: PX509): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_ocspid_print';
 
-function X509_CRL_print_ex(&out: PBIO; x: PX509_CRL; nmflag: Cardinal): Integer; cdecl;
+function X509_CRL_print_ex({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; x: PX509_CRL; nmflag: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_CRL_print_ex';
 
 function X509_CRL_print(bp: PBIO; x: PX509_CRL): Integer; cdecl;
@@ -20603,10 +20616,10 @@ function X509_REQ_print(bp: PBIO; req: PX509_REQ): Integer; cdecl;
 function X509_NAME_entry_count(name: PX509_NAME): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_entry_count';
 
-function X509_NAME_get_text_by_NID(name: PX509_NAME; nid: Integer; buf: PUTF8Char; len: Integer): Integer; cdecl;
+function X509_NAME_get_text_by_NID(name: PX509_NAME; nid: Integer; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_get_text_by_NID';
 
-function X509_NAME_get_text_by_OBJ(name: PX509_NAME; obj: PASN1_OBJECT; buf: PUTF8Char; len: Integer): Integer; cdecl;
+function X509_NAME_get_text_by_OBJ(name: PX509_NAME; obj: PASN1_OBJECT; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_get_text_by_OBJ';
 
 function X509_NAME_get_index_by_NID(name: PX509_NAME; nid: Integer; lastpos: Integer): Integer; cdecl;
@@ -20621,31 +20634,31 @@ function X509_NAME_get_entry(name: PX509_NAME; loc: Integer): PX509_NAME_ENTRY; 
 function X509_NAME_delete_entry(name: PX509_NAME; loc: Integer): PX509_NAME_ENTRY; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_delete_entry';
 
-function X509_NAME_add_entry(name: PX509_NAME; ne: PX509_NAME_ENTRY; loc: Integer; &set: Integer): Integer; cdecl;
+function X509_NAME_add_entry(name: PX509_NAME; ne: PX509_NAME_ENTRY; loc: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&set{$ELSE}set1{$IFEND}{$ELSE}&set{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_add_entry';
 
-function X509_NAME_add_entry_by_OBJ(name: PX509_NAME; obj: PASN1_OBJECT; &type: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; &set: Integer): Integer; cdecl;
+function X509_NAME_add_entry_by_OBJ(name: PX509_NAME; obj: PASN1_OBJECT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&set{$ELSE}set1{$IFEND}{$ELSE}&set{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_add_entry_by_OBJ';
 
-function X509_NAME_add_entry_by_NID(name: PX509_NAME; nid: Integer; &type: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; &set: Integer): Integer; cdecl;
+function X509_NAME_add_entry_by_NID(name: PX509_NAME; nid: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&set{$ELSE}set1{$IFEND}{$ELSE}&set{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_add_entry_by_NID';
 
-function X509_NAME_ENTRY_create_by_txt(ne: PPX509_NAME_ENTRY; field: PUTF8Char; &type: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl;
+function X509_NAME_ENTRY_create_by_txt(ne: PPX509_NAME_ENTRY; field: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_ENTRY_create_by_txt';
 
-function X509_NAME_ENTRY_create_by_NID(ne: PPX509_NAME_ENTRY; nid: Integer; &type: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl;
+function X509_NAME_ENTRY_create_by_NID(ne: PPX509_NAME_ENTRY; nid: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_ENTRY_create_by_NID';
 
-function X509_NAME_add_entry_by_txt(name: PX509_NAME; field: PUTF8Char; &type: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; &set: Integer): Integer; cdecl;
+function X509_NAME_add_entry_by_txt(name: PX509_NAME; field: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PAnsiChar; len: Integer; loc: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&set{$ELSE}set1{$IFEND}{$ELSE}&set{$ENDIF}: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_add_entry_by_txt';
 
-function X509_NAME_ENTRY_create_by_OBJ(ne: PPX509_NAME_ENTRY; obj: PASN1_OBJECT; &type: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl;
+function X509_NAME_ENTRY_create_by_OBJ(ne: PPX509_NAME_ENTRY; obj: PASN1_OBJECT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PAnsiChar; len: Integer): PX509_NAME_ENTRY; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_ENTRY_create_by_OBJ';
 
 function X509_NAME_ENTRY_set_object(ne: PX509_NAME_ENTRY; obj: PASN1_OBJECT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_ENTRY_set_object';
 
-function X509_NAME_ENTRY_set_data(ne: PX509_NAME_ENTRY; &type: Integer; bytes: PAnsiChar; len: Integer): Integer; cdecl;
+function X509_NAME_ENTRY_set_data(ne: PX509_NAME_ENTRY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PAnsiChar; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_NAME_ENTRY_set_data';
 
 function X509_NAME_ENTRY_get_object(ne: PX509_NAME_ENTRY): PASN1_OBJECT; cdecl;
@@ -20804,16 +20817,16 @@ function X509at_delete_attr(x: Pstack_st_X509_ATTRIBUTE; loc: Integer): PX509_AT
 function X509at_add1_attr(x: PPstack_st_X509_ATTRIBUTE; attr: PX509_ATTRIBUTE): Pstack_st_X509_ATTRIBUTE; cdecl;
   external LIB_CRYPTO name _PU + 'X509at_add1_attr';
 
-function X509at_add1_attr_by_OBJ(x: PPstack_st_X509_ATTRIBUTE; obj: PASN1_OBJECT; &type: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl;
+function X509at_add1_attr_by_OBJ(x: PPstack_st_X509_ATTRIBUTE; obj: PASN1_OBJECT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl;
   external LIB_CRYPTO name _PU + 'X509at_add1_attr_by_OBJ';
 
-function X509at_add1_attr_by_NID(x: PPstack_st_X509_ATTRIBUTE; nid: Integer; &type: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl;
+function X509at_add1_attr_by_NID(x: PPstack_st_X509_ATTRIBUTE; nid: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl;
   external LIB_CRYPTO name _PU + 'X509at_add1_attr_by_NID';
 
-function X509at_add1_attr_by_txt(x: PPstack_st_X509_ATTRIBUTE; attrname: PUTF8Char; &type: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl;
+function X509at_add1_attr_by_txt(x: PPstack_st_X509_ATTRIBUTE; attrname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PByte; len: Integer): Pstack_st_X509_ATTRIBUTE; cdecl;
   external LIB_CRYPTO name _PU + 'X509at_add1_attr_by_txt';
 
-function X509at_get0_data_by_OBJ(x: Pstack_st_X509_ATTRIBUTE; obj: PASN1_OBJECT; lastpos: Integer; &type: Integer): Pointer; cdecl;
+function X509at_get0_data_by_OBJ(x: Pstack_st_X509_ATTRIBUTE; obj: PASN1_OBJECT; lastpos: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'X509at_get0_data_by_OBJ';
 
 function X509_ATTRIBUTE_create_by_NID(attr: PPX509_ATTRIBUTE; nid: Integer; atrtype: Integer; data: Pointer; len: Integer): PX509_ATTRIBUTE; cdecl;
@@ -20822,7 +20835,7 @@ function X509_ATTRIBUTE_create_by_NID(attr: PPX509_ATTRIBUTE; nid: Integer; atrt
 function X509_ATTRIBUTE_create_by_OBJ(attr: PPX509_ATTRIBUTE; obj: PASN1_OBJECT; atrtype: Integer; data: Pointer; len: Integer): PX509_ATTRIBUTE; cdecl;
   external LIB_CRYPTO name _PU + 'X509_ATTRIBUTE_create_by_OBJ';
 
-function X509_ATTRIBUTE_create_by_txt(attr: PPX509_ATTRIBUTE; atrname: PUTF8Char; &type: Integer; bytes: PByte; len: Integer): PX509_ATTRIBUTE; cdecl;
+function X509_ATTRIBUTE_create_by_txt(attr: PPX509_ATTRIBUTE; atrname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PByte; len: Integer): PX509_ATTRIBUTE; cdecl;
   external LIB_CRYPTO name _PU + 'X509_ATTRIBUTE_create_by_txt';
 
 function X509_ATTRIBUTE_set1_object(attr: PX509_ATTRIBUTE; obj: PASN1_OBJECT): Integer; cdecl;
@@ -20861,13 +20874,13 @@ function EVP_PKEY_delete_attr(key: PEVP_PKEY; loc: Integer): PX509_ATTRIBUTE; cd
 function EVP_PKEY_add1_attr(key: PEVP_PKEY; attr: PX509_ATTRIBUTE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_add1_attr';
 
-function EVP_PKEY_add1_attr_by_OBJ(key: PEVP_PKEY; obj: PASN1_OBJECT; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl;
+function EVP_PKEY_add1_attr_by_OBJ(key: PEVP_PKEY; obj: PASN1_OBJECT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PByte; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_add1_attr_by_OBJ';
 
-function EVP_PKEY_add1_attr_by_NID(key: PEVP_PKEY; nid: Integer; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl;
+function EVP_PKEY_add1_attr_by_NID(key: PEVP_PKEY; nid: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PByte; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_add1_attr_by_NID';
 
-function EVP_PKEY_add1_attr_by_txt(key: PEVP_PKEY; attrname: PUTF8Char; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl;
+function EVP_PKEY_add1_attr_by_txt(key: PEVP_PKEY; attrname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PByte; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'EVP_PKEY_add1_attr_by_txt';
 
 function X509_verify_cert(ctx: PX509_STORE_CTX): Integer; cdecl;
@@ -20885,10 +20898,10 @@ function PBEPARAM_new(): PPBEPARAM; cdecl;
 procedure PBEPARAM_free(a: PPBEPARAM); cdecl;
   external LIB_CRYPTO name _PU + 'PBEPARAM_free';
 
-function d2i_PBEPARAM(a: PPPBEPARAM; &in: PPByte; len: Integer): PPBEPARAM; cdecl;
+function d2i_PBEPARAM(a: PPPBEPARAM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPBEPARAM; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PBEPARAM';
 
-function i2d_PBEPARAM(a: PPBEPARAM; &out: PPByte): Integer; cdecl;
+function i2d_PBEPARAM(a: PPBEPARAM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PBEPARAM';
 
 function PBEPARAM_it(): PASN1_ITEM; cdecl;
@@ -20900,10 +20913,10 @@ function PBE2PARAM_new(): PPBE2PARAM; cdecl;
 procedure PBE2PARAM_free(a: PPBE2PARAM); cdecl;
   external LIB_CRYPTO name _PU + 'PBE2PARAM_free';
 
-function d2i_PBE2PARAM(a: PPPBE2PARAM; &in: PPByte; len: Integer): PPBE2PARAM; cdecl;
+function d2i_PBE2PARAM(a: PPPBE2PARAM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPBE2PARAM; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PBE2PARAM';
 
-function i2d_PBE2PARAM(a: PPBE2PARAM; &out: PPByte): Integer; cdecl;
+function i2d_PBE2PARAM(a: PPBE2PARAM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PBE2PARAM';
 
 function PBE2PARAM_it(): PASN1_ITEM; cdecl;
@@ -20915,10 +20928,10 @@ function PBKDF2PARAM_new(): PPBKDF2PARAM; cdecl;
 procedure PBKDF2PARAM_free(a: PPBKDF2PARAM); cdecl;
   external LIB_CRYPTO name _PU + 'PBKDF2PARAM_free';
 
-function d2i_PBKDF2PARAM(a: PPPBKDF2PARAM; &in: PPByte; len: Integer): PPBKDF2PARAM; cdecl;
+function d2i_PBKDF2PARAM(a: PPPBKDF2PARAM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPBKDF2PARAM; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PBKDF2PARAM';
 
-function i2d_PBKDF2PARAM(a: PPBKDF2PARAM; &out: PPByte): Integer; cdecl;
+function i2d_PBKDF2PARAM(a: PPBKDF2PARAM; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PBKDF2PARAM';
 
 function PBKDF2PARAM_it(): PASN1_ITEM; cdecl;
@@ -20930,10 +20943,10 @@ function SCRYPT_PARAMS_new(): PSCRYPT_PARAMS; cdecl;
 procedure SCRYPT_PARAMS_free(a: PSCRYPT_PARAMS); cdecl;
   external LIB_CRYPTO name _PU + 'SCRYPT_PARAMS_free';
 
-function d2i_SCRYPT_PARAMS(a: PPSCRYPT_PARAMS; &in: PPByte; len: Integer): PSCRYPT_PARAMS; cdecl;
+function d2i_SCRYPT_PARAMS(a: PPSCRYPT_PARAMS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PSCRYPT_PARAMS; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_SCRYPT_PARAMS';
 
-function i2d_SCRYPT_PARAMS(a: PSCRYPT_PARAMS; &out: PPByte): Integer; cdecl;
+function i2d_SCRYPT_PARAMS(a: PSCRYPT_PARAMS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_SCRYPT_PARAMS';
 
 function SCRYPT_PARAMS_it(): PASN1_ITEM; cdecl;
@@ -20963,10 +20976,10 @@ function PKCS8_PRIV_KEY_INFO_new(): PPKCS8_PRIV_KEY_INFO; cdecl;
 procedure PKCS8_PRIV_KEY_INFO_free(a: PPKCS8_PRIV_KEY_INFO); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS8_PRIV_KEY_INFO_free';
 
-function d2i_PKCS8_PRIV_KEY_INFO(a: PPPKCS8_PRIV_KEY_INFO; &in: PPByte; len: Integer): PPKCS8_PRIV_KEY_INFO; cdecl;
+function d2i_PKCS8_PRIV_KEY_INFO(a: PPPKCS8_PRIV_KEY_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS8_PRIV_KEY_INFO; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS8_PRIV_KEY_INFO';
 
-function i2d_PKCS8_PRIV_KEY_INFO(a: PPKCS8_PRIV_KEY_INFO; &out: PPByte): Integer; cdecl;
+function i2d_PKCS8_PRIV_KEY_INFO(a: PPKCS8_PRIV_KEY_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS8_PRIV_KEY_INFO';
 
 function PKCS8_PRIV_KEY_INFO_it(): PASN1_ITEM; cdecl;
@@ -20987,7 +21000,7 @@ function PKCS8_pkey_get0(ppkalg: PPASN1_OBJECT; pk: PPByte; ppklen: PInteger; pa
 function PKCS8_pkey_get0_attrs(p8: PPKCS8_PRIV_KEY_INFO): Pstack_st_X509_ATTRIBUTE; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS8_pkey_get0_attrs';
 
-function PKCS8_pkey_add1_attr_by_NID(p8: PPKCS8_PRIV_KEY_INFO; nid: Integer; &type: Integer; bytes: PByte; len: Integer): Integer; cdecl;
+function PKCS8_pkey_add1_attr_by_NID(p8: PPKCS8_PRIV_KEY_INFO; nid: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: PByte; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS8_pkey_add1_attr_by_NID';
 
 function X509_PUBKEY_set0_param(pub: PX509_PUBKEY; aobj: PASN1_OBJECT; ptype: Integer; pval: Pointer; penc: PByte; penclen: Integer): Integer; cdecl;
@@ -21011,7 +21024,7 @@ function X509_TRUST_get_by_id(id: Integer): Integer; cdecl;
 type
   X509_TRUST_add_ck = function(p1: PX509_TRUST; p2: PX509; p3: Integer): Integer; cdecl;
 
-function X509_TRUST_add(id: Integer; flags: Integer; ck: X509_TRUST_add_ck; name: PUTF8Char; arg1: Integer; arg2: Pointer): Integer; cdecl;
+function X509_TRUST_add(id: Integer; flags: Integer; ck: X509_TRUST_add_ck; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; arg1: Integer; arg2: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_TRUST_add';
 
 procedure X509_TRUST_cleanup(); cdecl;
@@ -21020,7 +21033,7 @@ procedure X509_TRUST_cleanup(); cdecl;
 function X509_TRUST_get_flags(xp: PX509_TRUST): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_TRUST_get_flags';
 
-function X509_TRUST_get0_name(xp: PX509_TRUST): PUTF8Char; cdecl;
+function X509_TRUST_get0_name(xp: PX509_TRUST): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_TRUST_get0_name';
 
 function X509_TRUST_get_trust(xp: PX509_TRUST): Integer; cdecl;
@@ -21035,7 +21048,7 @@ function CONF_set_default_method(meth: PCONF_METHOD): Integer; cdecl;
 procedure CONF_set_nconf(conf: PCONF; hash: Plhash_st_CONF_VALUE); cdecl;
   external LIB_CRYPTO name _PU + 'CONF_set_nconf';
 
-function CONF_load(conf: Plhash_st_CONF_VALUE; &file: PUTF8Char; eline: PInteger): Plhash_st_CONF_VALUE; cdecl;
+function CONF_load(conf: Plhash_st_CONF_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; eline: PInteger): Plhash_st_CONF_VALUE; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_load';
 
 function CONF_load_fp(conf: Plhash_st_CONF_VALUE; fp: PPointer; eline: PInteger): Plhash_st_CONF_VALUE; cdecl;
@@ -21044,25 +21057,25 @@ function CONF_load_fp(conf: Plhash_st_CONF_VALUE; fp: PPointer; eline: PInteger)
 function CONF_load_bio(conf: Plhash_st_CONF_VALUE; bp: PBIO; eline: PInteger): Plhash_st_CONF_VALUE; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_load_bio';
 
-function CONF_get_section(conf: Plhash_st_CONF_VALUE; section: PUTF8Char): Pstack_st_CONF_VALUE; cdecl;
+function CONF_get_section(conf: Plhash_st_CONF_VALUE; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Pstack_st_CONF_VALUE; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_get_section';
 
-function CONF_get_string(conf: Plhash_st_CONF_VALUE; group: PUTF8Char; name: PUTF8Char): PUTF8Char; cdecl;
+function CONF_get_string(conf: Plhash_st_CONF_VALUE; group: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_get_string';
 
-function CONF_get_number(conf: Plhash_st_CONF_VALUE; group: PUTF8Char; name: PUTF8Char): Integer; cdecl;
+function CONF_get_number(conf: Plhash_st_CONF_VALUE; group: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_get_number';
 
 procedure CONF_free(conf: Plhash_st_CONF_VALUE); cdecl;
   external LIB_CRYPTO name _PU + 'CONF_free';
 
-function CONF_dump_fp(conf: Plhash_st_CONF_VALUE; &out: PPointer): Integer; cdecl;
+function CONF_dump_fp(conf: Plhash_st_CONF_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_dump_fp';
 
-function CONF_dump_bio(conf: Plhash_st_CONF_VALUE; &out: PBIO): Integer; cdecl;
+function CONF_dump_bio(conf: Plhash_st_CONF_VALUE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_dump_bio';
 
-procedure OPENSSL_config(config_name: PUTF8Char); cdecl;
+procedure OPENSSL_config(config_name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}); cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_config';
 
 function NCONF_new(meth: PCONF_METHOD): PCONF; cdecl;
@@ -21080,7 +21093,7 @@ procedure NCONF_free(conf: PCONF); cdecl;
 procedure NCONF_free_data(conf: PCONF); cdecl;
   external LIB_CRYPTO name _PU + 'NCONF_free_data';
 
-function NCONF_load(conf: PCONF; &file: PUTF8Char; eline: PInteger): Integer; cdecl;
+function NCONF_load(conf: PCONF; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; eline: PInteger): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'NCONF_load';
 
 function NCONF_load_fp(conf: PCONF; fp: PPointer; eline: PInteger): Integer; cdecl;
@@ -21089,25 +21102,25 @@ function NCONF_load_fp(conf: PCONF; fp: PPointer; eline: PInteger): Integer; cde
 function NCONF_load_bio(conf: PCONF; bp: PBIO; eline: PInteger): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'NCONF_load_bio';
 
-function NCONF_get_section(conf: PCONF; section: PUTF8Char): Pstack_st_CONF_VALUE; cdecl;
+function NCONF_get_section(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Pstack_st_CONF_VALUE; cdecl;
   external LIB_CRYPTO name _PU + 'NCONF_get_section';
 
-function NCONF_get_string(conf: PCONF; group: PUTF8Char; name: PUTF8Char): PUTF8Char; cdecl;
+function NCONF_get_string(conf: PCONF; group: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'NCONF_get_string';
 
-function NCONF_get_number_e(conf: PCONF; group: PUTF8Char; name: PUTF8Char; result: PInteger): Integer; cdecl;
+function NCONF_get_number_e(conf: PCONF; group: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; result: PInteger): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'NCONF_get_number_e';
 
-function NCONF_dump_fp(conf: PCONF; &out: PPointer): Integer; cdecl;
+function NCONF_dump_fp(conf: PCONF; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'NCONF_dump_fp';
 
-function NCONF_dump_bio(conf: PCONF; &out: PBIO): Integer; cdecl;
+function NCONF_dump_bio(conf: PCONF; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'NCONF_dump_bio';
 
-function CONF_modules_load(cnf: PCONF; appname: PUTF8Char; flags: Cardinal): Integer; cdecl;
+function CONF_modules_load(cnf: PCONF; appname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_modules_load';
 
-function CONF_modules_load_file(filename: PUTF8Char; appname: PUTF8Char; flags: Cardinal): Integer; cdecl;
+function CONF_modules_load_file(filename: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; appname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_modules_load_file';
 
 procedure CONF_modules_unload(all: Integer); cdecl;
@@ -21116,13 +21129,13 @@ procedure CONF_modules_unload(all: Integer); cdecl;
 procedure CONF_modules_finish(); cdecl;
   external LIB_CRYPTO name _PU + 'CONF_modules_finish';
 
-function CONF_module_add(name: PUTF8Char; ifunc: Pconf_init_func; ffunc: Pconf_finish_func): Integer; cdecl;
+function CONF_module_add(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ifunc: Pconf_init_func; ffunc: Pconf_finish_func): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_module_add';
 
-function CONF_imodule_get_name(md: PCONF_IMODULE): PUTF8Char; cdecl;
+function CONF_imodule_get_name(md: PCONF_IMODULE): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_imodule_get_name';
 
-function CONF_imodule_get_value(md: PCONF_IMODULE): PUTF8Char; cdecl;
+function CONF_imodule_get_value(md: PCONF_IMODULE): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_imodule_get_value';
 
 function CONF_imodule_get_usr_data(md: PCONF_IMODULE): Pointer; cdecl;
@@ -21146,13 +21159,13 @@ function CONF_module_get_usr_data(pmod: PCONF_MODULE): Pointer; cdecl;
 procedure CONF_module_set_usr_data(pmod: PCONF_MODULE; usr_data: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'CONF_module_set_usr_data';
 
-function CONF_get1_default_config_file(): PUTF8Char; cdecl;
+function CONF_get1_default_config_file(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_get1_default_config_file';
 
 type
-  CONF_parse_list_list_cb = function(elem: PUTF8Char; len: Integer; usr: Pointer): Integer; cdecl;
+  CONF_parse_list_list_cb = function(elem: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer; usr: Pointer): Integer; cdecl;
 
-function CONF_parse_list(list: PUTF8Char; sep: Integer; nospc: Integer; list_cb: CONF_parse_list_list_cb; arg: Pointer): Integer; cdecl;
+function CONF_parse_list(list: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; sep: Integer; nospc: Integer; list_cb: CONF_parse_list_list_cb; arg: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CONF_parse_list';
 
 procedure OPENSSL_load_builtin_modules(); cdecl;
@@ -21167,10 +21180,10 @@ function PROXY_POLICY_new(): PPROXY_POLICY; cdecl;
 procedure PROXY_POLICY_free(a: PPROXY_POLICY); cdecl;
   external LIB_CRYPTO name _PU + 'PROXY_POLICY_free';
 
-function d2i_PROXY_POLICY(a: PPPROXY_POLICY; &in: PPByte; len: Integer): PPROXY_POLICY; cdecl;
+function d2i_PROXY_POLICY(a: PPPROXY_POLICY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPROXY_POLICY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PROXY_POLICY';
 
-function i2d_PROXY_POLICY(a: PPROXY_POLICY; &out: PPByte): Integer; cdecl;
+function i2d_PROXY_POLICY(a: PPROXY_POLICY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PROXY_POLICY';
 
 function PROXY_POLICY_it(): PASN1_ITEM; cdecl;
@@ -21182,10 +21195,10 @@ function PROXY_CERT_INFO_EXTENSION_new(): PPROXY_CERT_INFO_EXTENSION; cdecl;
 procedure PROXY_CERT_INFO_EXTENSION_free(a: PPROXY_CERT_INFO_EXTENSION); cdecl;
   external LIB_CRYPTO name _PU + 'PROXY_CERT_INFO_EXTENSION_free';
 
-function d2i_PROXY_CERT_INFO_EXTENSION(a: PPPROXY_CERT_INFO_EXTENSION; &in: PPByte; len: Integer): PPROXY_CERT_INFO_EXTENSION; cdecl;
+function d2i_PROXY_CERT_INFO_EXTENSION(a: PPPROXY_CERT_INFO_EXTENSION; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPROXY_CERT_INFO_EXTENSION; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PROXY_CERT_INFO_EXTENSION';
 
-function i2d_PROXY_CERT_INFO_EXTENSION(a: PPROXY_CERT_INFO_EXTENSION; &out: PPByte): Integer; cdecl;
+function i2d_PROXY_CERT_INFO_EXTENSION(a: PPROXY_CERT_INFO_EXTENSION; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PROXY_CERT_INFO_EXTENSION';
 
 function PROXY_CERT_INFO_EXTENSION_it(): PASN1_ITEM; cdecl;
@@ -21197,10 +21210,10 @@ function BASIC_CONSTRAINTS_new(): PBASIC_CONSTRAINTS; cdecl;
 procedure BASIC_CONSTRAINTS_free(a: PBASIC_CONSTRAINTS); cdecl;
   external LIB_CRYPTO name _PU + 'BASIC_CONSTRAINTS_free';
 
-function d2i_BASIC_CONSTRAINTS(a: PPBASIC_CONSTRAINTS; &in: PPByte; len: Integer): PBASIC_CONSTRAINTS; cdecl;
+function d2i_BASIC_CONSTRAINTS(a: PPBASIC_CONSTRAINTS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PBASIC_CONSTRAINTS; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_BASIC_CONSTRAINTS';
 
-function i2d_BASIC_CONSTRAINTS(a: PBASIC_CONSTRAINTS; &out: PPByte): Integer; cdecl;
+function i2d_BASIC_CONSTRAINTS(a: PBASIC_CONSTRAINTS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_BASIC_CONSTRAINTS';
 
 function BASIC_CONSTRAINTS_it(): PASN1_ITEM; cdecl;
@@ -21212,10 +21225,10 @@ function SXNET_new(): PSXNET; cdecl;
 procedure SXNET_free(a: PSXNET); cdecl;
   external LIB_CRYPTO name _PU + 'SXNET_free';
 
-function d2i_SXNET(a: PPSXNET; &in: PPByte; len: Integer): PSXNET; cdecl;
+function d2i_SXNET(a: PPSXNET; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PSXNET; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_SXNET';
 
-function i2d_SXNET(a: PSXNET; &out: PPByte): Integer; cdecl;
+function i2d_SXNET(a: PSXNET; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_SXNET';
 
 function SXNET_it(): PASN1_ITEM; cdecl;
@@ -21227,25 +21240,25 @@ function SXNETID_new(): PSXNETID; cdecl;
 procedure SXNETID_free(a: PSXNETID); cdecl;
   external LIB_CRYPTO name _PU + 'SXNETID_free';
 
-function d2i_SXNETID(a: PPSXNETID; &in: PPByte; len: Integer): PSXNETID; cdecl;
+function d2i_SXNETID(a: PPSXNETID; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PSXNETID; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_SXNETID';
 
-function i2d_SXNETID(a: PSXNETID; &out: PPByte): Integer; cdecl;
+function i2d_SXNETID(a: PSXNETID; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_SXNETID';
 
 function SXNETID_it(): PASN1_ITEM; cdecl;
   external LIB_CRYPTO name _PU + 'SXNETID_it';
 
-function SXNET_add_id_asc(psx: PPSXNET; zone: PUTF8Char; user: PUTF8Char; userlen: Integer): Integer; cdecl;
+function SXNET_add_id_asc(psx: PPSXNET; zone: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; user: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; userlen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'SXNET_add_id_asc';
 
-function SXNET_add_id_ulong(psx: PPSXNET; lzone: Cardinal; user: PUTF8Char; userlen: Integer): Integer; cdecl;
+function SXNET_add_id_ulong(psx: PPSXNET; lzone: Cardinal; user: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; userlen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'SXNET_add_id_ulong';
 
-function SXNET_add_id_INTEGER(psx: PPSXNET; izone: PASN1_INTEGER; user: PUTF8Char; userlen: Integer): Integer; cdecl;
+function SXNET_add_id_INTEGER(psx: PPSXNET; izone: PASN1_INTEGER; user: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; userlen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'SXNET_add_id_INTEGER';
 
-function SXNET_get_id_asc(sx: PSXNET; zone: PUTF8Char): PASN1_OCTET_STRING; cdecl;
+function SXNET_get_id_asc(sx: PSXNET; zone: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PASN1_OCTET_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'SXNET_get_id_asc';
 
 function SXNET_get_id_ulong(sx: PSXNET; lzone: Cardinal): PASN1_OCTET_STRING; cdecl;
@@ -21260,10 +21273,10 @@ function AUTHORITY_KEYID_new(): PAUTHORITY_KEYID; cdecl;
 procedure AUTHORITY_KEYID_free(a: PAUTHORITY_KEYID); cdecl;
   external LIB_CRYPTO name _PU + 'AUTHORITY_KEYID_free';
 
-function d2i_AUTHORITY_KEYID(a: PPAUTHORITY_KEYID; &in: PPByte; len: Integer): PAUTHORITY_KEYID; cdecl;
+function d2i_AUTHORITY_KEYID(a: PPAUTHORITY_KEYID; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PAUTHORITY_KEYID; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_AUTHORITY_KEYID';
 
-function i2d_AUTHORITY_KEYID(a: PAUTHORITY_KEYID; &out: PPByte): Integer; cdecl;
+function i2d_AUTHORITY_KEYID(a: PAUTHORITY_KEYID; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_AUTHORITY_KEYID';
 
 function AUTHORITY_KEYID_it(): PASN1_ITEM; cdecl;
@@ -21275,10 +21288,10 @@ function PKEY_USAGE_PERIOD_new(): PPKEY_USAGE_PERIOD; cdecl;
 procedure PKEY_USAGE_PERIOD_free(a: PPKEY_USAGE_PERIOD); cdecl;
   external LIB_CRYPTO name _PU + 'PKEY_USAGE_PERIOD_free';
 
-function d2i_PKEY_USAGE_PERIOD(a: PPPKEY_USAGE_PERIOD; &in: PPByte; len: Integer): PPKEY_USAGE_PERIOD; cdecl;
+function d2i_PKEY_USAGE_PERIOD(a: PPPKEY_USAGE_PERIOD; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKEY_USAGE_PERIOD; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKEY_USAGE_PERIOD';
 
-function i2d_PKEY_USAGE_PERIOD(a: PPKEY_USAGE_PERIOD; &out: PPByte): Integer; cdecl;
+function i2d_PKEY_USAGE_PERIOD(a: PPKEY_USAGE_PERIOD; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKEY_USAGE_PERIOD';
 
 function PKEY_USAGE_PERIOD_it(): PASN1_ITEM; cdecl;
@@ -21290,10 +21303,10 @@ function GENERAL_NAME_new(): PGENERAL_NAME; cdecl;
 procedure GENERAL_NAME_free(a: PGENERAL_NAME); cdecl;
   external LIB_CRYPTO name _PU + 'GENERAL_NAME_free';
 
-function d2i_GENERAL_NAME(a: PPGENERAL_NAME; &in: PPByte; len: Integer): PGENERAL_NAME; cdecl;
+function d2i_GENERAL_NAME(a: PPGENERAL_NAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PGENERAL_NAME; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_GENERAL_NAME';
 
-function i2d_GENERAL_NAME(a: PGENERAL_NAME; &out: PPByte): Integer; cdecl;
+function i2d_GENERAL_NAME(a: PGENERAL_NAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_GENERAL_NAME';
 
 function GENERAL_NAME_it(): PASN1_ITEM; cdecl;
@@ -21311,16 +21324,16 @@ function v2i_ASN1_BIT_STRING(method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; nval:
 function i2v_ASN1_BIT_STRING(method: PX509V3_EXT_METHOD; bits: PASN1_BIT_STRING; extlist: Pstack_st_CONF_VALUE): Pstack_st_CONF_VALUE; cdecl;
   external LIB_CRYPTO name _PU + 'i2v_ASN1_BIT_STRING';
 
-function i2s_ASN1_IA5STRING(method: PX509V3_EXT_METHOD; ia5: PASN1_IA5STRING): PUTF8Char; cdecl;
+function i2s_ASN1_IA5STRING(method: PX509V3_EXT_METHOD; ia5: PASN1_IA5STRING): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'i2s_ASN1_IA5STRING';
 
-function s2i_ASN1_IA5STRING(method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; str: PUTF8Char): PASN1_IA5STRING; cdecl;
+function s2i_ASN1_IA5STRING(method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PASN1_IA5STRING; cdecl;
   external LIB_CRYPTO name _PU + 's2i_ASN1_IA5STRING';
 
 function i2v_GENERAL_NAME(method: PX509V3_EXT_METHOD; gen: PGENERAL_NAME; ret: Pstack_st_CONF_VALUE): Pstack_st_CONF_VALUE; cdecl;
   external LIB_CRYPTO name _PU + 'i2v_GENERAL_NAME';
 
-function GENERAL_NAME_print(&out: PBIO; gen: PGENERAL_NAME): Integer; cdecl;
+function GENERAL_NAME_print({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; gen: PGENERAL_NAME): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'GENERAL_NAME_print';
 
 function GENERAL_NAMES_new(): PGENERAL_NAMES; cdecl;
@@ -21329,10 +21342,10 @@ function GENERAL_NAMES_new(): PGENERAL_NAMES; cdecl;
 procedure GENERAL_NAMES_free(a: PGENERAL_NAMES); cdecl;
   external LIB_CRYPTO name _PU + 'GENERAL_NAMES_free';
 
-function d2i_GENERAL_NAMES(a: PPGENERAL_NAMES; &in: PPByte; len: Integer): PGENERAL_NAMES; cdecl;
+function d2i_GENERAL_NAMES(a: PPGENERAL_NAMES; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PGENERAL_NAMES; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_GENERAL_NAMES';
 
-function i2d_GENERAL_NAMES(a: PGENERAL_NAMES; &out: PPByte): Integer; cdecl;
+function i2d_GENERAL_NAMES(a: PGENERAL_NAMES; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_GENERAL_NAMES';
 
 function GENERAL_NAMES_it(): PASN1_ITEM; cdecl;
@@ -21350,10 +21363,10 @@ function OTHERNAME_new(): POTHERNAME; cdecl;
 procedure OTHERNAME_free(a: POTHERNAME); cdecl;
   external LIB_CRYPTO name _PU + 'OTHERNAME_free';
 
-function d2i_OTHERNAME(a: PPOTHERNAME; &in: PPByte; len: Integer): POTHERNAME; cdecl;
+function d2i_OTHERNAME(a: PPOTHERNAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POTHERNAME; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OTHERNAME';
 
-function i2d_OTHERNAME(a: POTHERNAME; &out: PPByte): Integer; cdecl;
+function i2d_OTHERNAME(a: POTHERNAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OTHERNAME';
 
 function OTHERNAME_it(): PASN1_ITEM; cdecl;
@@ -21365,10 +21378,10 @@ function EDIPARTYNAME_new(): PEDIPARTYNAME; cdecl;
 procedure EDIPARTYNAME_free(a: PEDIPARTYNAME); cdecl;
   external LIB_CRYPTO name _PU + 'EDIPARTYNAME_free';
 
-function d2i_EDIPARTYNAME(a: PPEDIPARTYNAME; &in: PPByte; len: Integer): PEDIPARTYNAME; cdecl;
+function d2i_EDIPARTYNAME(a: PPEDIPARTYNAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PEDIPARTYNAME; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_EDIPARTYNAME';
 
-function i2d_EDIPARTYNAME(a: PEDIPARTYNAME; &out: PPByte): Integer; cdecl;
+function i2d_EDIPARTYNAME(a: PEDIPARTYNAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_EDIPARTYNAME';
 
 function EDIPARTYNAME_it(): PASN1_ITEM; cdecl;
@@ -21377,7 +21390,7 @@ function EDIPARTYNAME_it(): PASN1_ITEM; cdecl;
 function OTHERNAME_cmp(a: POTHERNAME; b: POTHERNAME): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OTHERNAME_cmp';
 
-procedure GENERAL_NAME_set0_value(a: PGENERAL_NAME; &type: Integer; value: Pointer); cdecl;
+procedure GENERAL_NAME_set0_value(a: PGENERAL_NAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; value: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'GENERAL_NAME_set0_value';
 
 function GENERAL_NAME_get0_value(a: PGENERAL_NAME; ptype: PInteger): Pointer; cdecl;
@@ -21389,10 +21402,10 @@ function GENERAL_NAME_set0_othername(gen: PGENERAL_NAME; oid: PASN1_OBJECT; valu
 function GENERAL_NAME_get0_otherName(gen: PGENERAL_NAME; poid: PPASN1_OBJECT; pvalue: PPASN1_TYPE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'GENERAL_NAME_get0_otherName';
 
-function i2s_ASN1_OCTET_STRING(method: PX509V3_EXT_METHOD; ia5: PASN1_OCTET_STRING): PUTF8Char; cdecl;
+function i2s_ASN1_OCTET_STRING(method: PX509V3_EXT_METHOD; ia5: PASN1_OCTET_STRING): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'i2s_ASN1_OCTET_STRING';
 
-function s2i_ASN1_OCTET_STRING(method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; str: PUTF8Char): PASN1_OCTET_STRING; cdecl;
+function s2i_ASN1_OCTET_STRING(method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PASN1_OCTET_STRING; cdecl;
   external LIB_CRYPTO name _PU + 's2i_ASN1_OCTET_STRING';
 
 function EXTENDED_KEY_USAGE_new(): PEXTENDED_KEY_USAGE; cdecl;
@@ -21401,10 +21414,10 @@ function EXTENDED_KEY_USAGE_new(): PEXTENDED_KEY_USAGE; cdecl;
 procedure EXTENDED_KEY_USAGE_free(a: PEXTENDED_KEY_USAGE); cdecl;
   external LIB_CRYPTO name _PU + 'EXTENDED_KEY_USAGE_free';
 
-function d2i_EXTENDED_KEY_USAGE(a: PPEXTENDED_KEY_USAGE; &in: PPByte; len: Integer): PEXTENDED_KEY_USAGE; cdecl;
+function d2i_EXTENDED_KEY_USAGE(a: PPEXTENDED_KEY_USAGE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PEXTENDED_KEY_USAGE; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_EXTENDED_KEY_USAGE';
 
-function i2d_EXTENDED_KEY_USAGE(a: PEXTENDED_KEY_USAGE; &out: PPByte): Integer; cdecl;
+function i2d_EXTENDED_KEY_USAGE(a: PEXTENDED_KEY_USAGE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_EXTENDED_KEY_USAGE';
 
 function EXTENDED_KEY_USAGE_it(): PASN1_ITEM; cdecl;
@@ -21425,10 +21438,10 @@ function CERTIFICATEPOLICIES_new(): PCERTIFICATEPOLICIES; cdecl;
 procedure CERTIFICATEPOLICIES_free(a: PCERTIFICATEPOLICIES); cdecl;
   external LIB_CRYPTO name _PU + 'CERTIFICATEPOLICIES_free';
 
-function d2i_CERTIFICATEPOLICIES(a: PPCERTIFICATEPOLICIES; &in: PPByte; len: Integer): PCERTIFICATEPOLICIES; cdecl;
+function d2i_CERTIFICATEPOLICIES(a: PPCERTIFICATEPOLICIES; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PCERTIFICATEPOLICIES; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_CERTIFICATEPOLICIES';
 
-function i2d_CERTIFICATEPOLICIES(a: PCERTIFICATEPOLICIES; &out: PPByte): Integer; cdecl;
+function i2d_CERTIFICATEPOLICIES(a: PCERTIFICATEPOLICIES; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_CERTIFICATEPOLICIES';
 
 function CERTIFICATEPOLICIES_it(): PASN1_ITEM; cdecl;
@@ -21440,10 +21453,10 @@ function POLICYINFO_new(): PPOLICYINFO; cdecl;
 procedure POLICYINFO_free(a: PPOLICYINFO); cdecl;
   external LIB_CRYPTO name _PU + 'POLICYINFO_free';
 
-function d2i_POLICYINFO(a: PPPOLICYINFO; &in: PPByte; len: Integer): PPOLICYINFO; cdecl;
+function d2i_POLICYINFO(a: PPPOLICYINFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPOLICYINFO; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_POLICYINFO';
 
-function i2d_POLICYINFO(a: PPOLICYINFO; &out: PPByte): Integer; cdecl;
+function i2d_POLICYINFO(a: PPOLICYINFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_POLICYINFO';
 
 function POLICYINFO_it(): PASN1_ITEM; cdecl;
@@ -21455,10 +21468,10 @@ function POLICYQUALINFO_new(): PPOLICYQUALINFO; cdecl;
 procedure POLICYQUALINFO_free(a: PPOLICYQUALINFO); cdecl;
   external LIB_CRYPTO name _PU + 'POLICYQUALINFO_free';
 
-function d2i_POLICYQUALINFO(a: PPPOLICYQUALINFO; &in: PPByte; len: Integer): PPOLICYQUALINFO; cdecl;
+function d2i_POLICYQUALINFO(a: PPPOLICYQUALINFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPOLICYQUALINFO; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_POLICYQUALINFO';
 
-function i2d_POLICYQUALINFO(a: PPOLICYQUALINFO; &out: PPByte): Integer; cdecl;
+function i2d_POLICYQUALINFO(a: PPOLICYQUALINFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_POLICYQUALINFO';
 
 function POLICYQUALINFO_it(): PASN1_ITEM; cdecl;
@@ -21470,10 +21483,10 @@ function USERNOTICE_new(): PUSERNOTICE; cdecl;
 procedure USERNOTICE_free(a: PUSERNOTICE); cdecl;
   external LIB_CRYPTO name _PU + 'USERNOTICE_free';
 
-function d2i_USERNOTICE(a: PPUSERNOTICE; &in: PPByte; len: Integer): PUSERNOTICE; cdecl;
+function d2i_USERNOTICE(a: PPUSERNOTICE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PUSERNOTICE; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_USERNOTICE';
 
-function i2d_USERNOTICE(a: PUSERNOTICE; &out: PPByte): Integer; cdecl;
+function i2d_USERNOTICE(a: PUSERNOTICE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_USERNOTICE';
 
 function USERNOTICE_it(): PASN1_ITEM; cdecl;
@@ -21485,10 +21498,10 @@ function NOTICEREF_new(): PNOTICEREF; cdecl;
 procedure NOTICEREF_free(a: PNOTICEREF); cdecl;
   external LIB_CRYPTO name _PU + 'NOTICEREF_free';
 
-function d2i_NOTICEREF(a: PPNOTICEREF; &in: PPByte; len: Integer): PNOTICEREF; cdecl;
+function d2i_NOTICEREF(a: PPNOTICEREF; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PNOTICEREF; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_NOTICEREF';
 
-function i2d_NOTICEREF(a: PNOTICEREF; &out: PPByte): Integer; cdecl;
+function i2d_NOTICEREF(a: PNOTICEREF; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_NOTICEREF';
 
 function NOTICEREF_it(): PASN1_ITEM; cdecl;
@@ -21500,10 +21513,10 @@ function CRL_DIST_POINTS_new(): PCRL_DIST_POINTS; cdecl;
 procedure CRL_DIST_POINTS_free(a: PCRL_DIST_POINTS); cdecl;
   external LIB_CRYPTO name _PU + 'CRL_DIST_POINTS_free';
 
-function d2i_CRL_DIST_POINTS(a: PPCRL_DIST_POINTS; &in: PPByte; len: Integer): PCRL_DIST_POINTS; cdecl;
+function d2i_CRL_DIST_POINTS(a: PPCRL_DIST_POINTS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PCRL_DIST_POINTS; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_CRL_DIST_POINTS';
 
-function i2d_CRL_DIST_POINTS(a: PCRL_DIST_POINTS; &out: PPByte): Integer; cdecl;
+function i2d_CRL_DIST_POINTS(a: PCRL_DIST_POINTS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_CRL_DIST_POINTS';
 
 function CRL_DIST_POINTS_it(): PASN1_ITEM; cdecl;
@@ -21515,10 +21528,10 @@ function DIST_POINT_new(): PDIST_POINT; cdecl;
 procedure DIST_POINT_free(a: PDIST_POINT); cdecl;
   external LIB_CRYPTO name _PU + 'DIST_POINT_free';
 
-function d2i_DIST_POINT(a: PPDIST_POINT; &in: PPByte; len: Integer): PDIST_POINT; cdecl;
+function d2i_DIST_POINT(a: PPDIST_POINT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PDIST_POINT; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_DIST_POINT';
 
-function i2d_DIST_POINT(a: PDIST_POINT; &out: PPByte): Integer; cdecl;
+function i2d_DIST_POINT(a: PDIST_POINT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_DIST_POINT';
 
 function DIST_POINT_it(): PASN1_ITEM; cdecl;
@@ -21530,10 +21543,10 @@ function DIST_POINT_NAME_new(): PDIST_POINT_NAME; cdecl;
 procedure DIST_POINT_NAME_free(a: PDIST_POINT_NAME); cdecl;
   external LIB_CRYPTO name _PU + 'DIST_POINT_NAME_free';
 
-function d2i_DIST_POINT_NAME(a: PPDIST_POINT_NAME; &in: PPByte; len: Integer): PDIST_POINT_NAME; cdecl;
+function d2i_DIST_POINT_NAME(a: PPDIST_POINT_NAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PDIST_POINT_NAME; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_DIST_POINT_NAME';
 
-function i2d_DIST_POINT_NAME(a: PDIST_POINT_NAME; &out: PPByte): Integer; cdecl;
+function i2d_DIST_POINT_NAME(a: PDIST_POINT_NAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_DIST_POINT_NAME';
 
 function DIST_POINT_NAME_it(): PASN1_ITEM; cdecl;
@@ -21545,10 +21558,10 @@ function ISSUING_DIST_POINT_new(): PISSUING_DIST_POINT; cdecl;
 procedure ISSUING_DIST_POINT_free(a: PISSUING_DIST_POINT); cdecl;
   external LIB_CRYPTO name _PU + 'ISSUING_DIST_POINT_free';
 
-function d2i_ISSUING_DIST_POINT(a: PPISSUING_DIST_POINT; &in: PPByte; len: Integer): PISSUING_DIST_POINT; cdecl;
+function d2i_ISSUING_DIST_POINT(a: PPISSUING_DIST_POINT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PISSUING_DIST_POINT; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ISSUING_DIST_POINT';
 
-function i2d_ISSUING_DIST_POINT(a: PISSUING_DIST_POINT; &out: PPByte): Integer; cdecl;
+function i2d_ISSUING_DIST_POINT(a: PISSUING_DIST_POINT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ISSUING_DIST_POINT';
 
 function ISSUING_DIST_POINT_it(): PASN1_ITEM; cdecl;
@@ -21569,10 +21582,10 @@ function ACCESS_DESCRIPTION_new(): PACCESS_DESCRIPTION; cdecl;
 procedure ACCESS_DESCRIPTION_free(a: PACCESS_DESCRIPTION); cdecl;
   external LIB_CRYPTO name _PU + 'ACCESS_DESCRIPTION_free';
 
-function d2i_ACCESS_DESCRIPTION(a: PPACCESS_DESCRIPTION; &in: PPByte; len: Integer): PACCESS_DESCRIPTION; cdecl;
+function d2i_ACCESS_DESCRIPTION(a: PPACCESS_DESCRIPTION; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PACCESS_DESCRIPTION; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ACCESS_DESCRIPTION';
 
-function i2d_ACCESS_DESCRIPTION(a: PACCESS_DESCRIPTION; &out: PPByte): Integer; cdecl;
+function i2d_ACCESS_DESCRIPTION(a: PACCESS_DESCRIPTION; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ACCESS_DESCRIPTION';
 
 function ACCESS_DESCRIPTION_it(): PASN1_ITEM; cdecl;
@@ -21584,10 +21597,10 @@ function AUTHORITY_INFO_ACCESS_new(): PAUTHORITY_INFO_ACCESS; cdecl;
 procedure AUTHORITY_INFO_ACCESS_free(a: PAUTHORITY_INFO_ACCESS); cdecl;
   external LIB_CRYPTO name _PU + 'AUTHORITY_INFO_ACCESS_free';
 
-function d2i_AUTHORITY_INFO_ACCESS(a: PPAUTHORITY_INFO_ACCESS; &in: PPByte; len: Integer): PAUTHORITY_INFO_ACCESS; cdecl;
+function d2i_AUTHORITY_INFO_ACCESS(a: PPAUTHORITY_INFO_ACCESS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PAUTHORITY_INFO_ACCESS; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_AUTHORITY_INFO_ACCESS';
 
-function i2d_AUTHORITY_INFO_ACCESS(a: PAUTHORITY_INFO_ACCESS; &out: PPByte): Integer; cdecl;
+function i2d_AUTHORITY_INFO_ACCESS(a: PAUTHORITY_INFO_ACCESS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_AUTHORITY_INFO_ACCESS';
 
 function AUTHORITY_INFO_ACCESS_it(): PASN1_ITEM; cdecl;
@@ -21632,52 +21645,52 @@ procedure POLICY_CONSTRAINTS_free(a: PPOLICY_CONSTRAINTS); cdecl;
 function POLICY_CONSTRAINTS_it(): PASN1_ITEM; cdecl;
   external LIB_CRYPTO name _PU + 'POLICY_CONSTRAINTS_it';
 
-function a2i_GENERAL_NAME(&out: PGENERAL_NAME; method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; gen_type: Integer; value: PUTF8Char; is_nc: Integer): PGENERAL_NAME; cdecl;
+function a2i_GENERAL_NAME({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PGENERAL_NAME; method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; gen_type: Integer; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; is_nc: Integer): PGENERAL_NAME; cdecl;
   external LIB_CRYPTO name _PU + 'a2i_GENERAL_NAME';
 
 function v2i_GENERAL_NAME(method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; cnf: PCONF_VALUE): PGENERAL_NAME; cdecl;
   external LIB_CRYPTO name _PU + 'v2i_GENERAL_NAME';
 
-function v2i_GENERAL_NAME_ex(&out: PGENERAL_NAME; method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; cnf: PCONF_VALUE; is_nc: Integer): PGENERAL_NAME; cdecl;
+function v2i_GENERAL_NAME_ex({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PGENERAL_NAME; method: PX509V3_EXT_METHOD; ctx: PX509V3_CTX; cnf: PCONF_VALUE; is_nc: Integer): PGENERAL_NAME; cdecl;
   external LIB_CRYPTO name _PU + 'v2i_GENERAL_NAME_ex';
 
 procedure X509V3_conf_free(val: PCONF_VALUE); cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_conf_free';
 
-function X509V3_EXT_nconf_nid(conf: PCONF; ctx: PX509V3_CTX; ext_nid: Integer; value: PUTF8Char): PX509_EXTENSION; cdecl;
+function X509V3_EXT_nconf_nid(conf: PCONF; ctx: PX509V3_CTX; ext_nid: Integer; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PX509_EXTENSION; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_nconf_nid';
 
-function X509V3_EXT_nconf(conf: PCONF; ctx: PX509V3_CTX; name: PUTF8Char; value: PUTF8Char): PX509_EXTENSION; cdecl;
+function X509V3_EXT_nconf(conf: PCONF; ctx: PX509V3_CTX; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PX509_EXTENSION; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_nconf';
 
-function X509V3_EXT_add_nconf_sk(conf: PCONF; ctx: PX509V3_CTX; section: PUTF8Char; sk: PPstack_st_X509_EXTENSION): Integer; cdecl;
+function X509V3_EXT_add_nconf_sk(conf: PCONF; ctx: PX509V3_CTX; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; sk: PPstack_st_X509_EXTENSION): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_add_nconf_sk';
 
-function X509V3_EXT_add_nconf(conf: PCONF; ctx: PX509V3_CTX; section: PUTF8Char; cert: PX509): Integer; cdecl;
+function X509V3_EXT_add_nconf(conf: PCONF; ctx: PX509V3_CTX; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cert: PX509): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_add_nconf';
 
-function X509V3_EXT_REQ_add_nconf(conf: PCONF; ctx: PX509V3_CTX; section: PUTF8Char; req: PX509_REQ): Integer; cdecl;
+function X509V3_EXT_REQ_add_nconf(conf: PCONF; ctx: PX509V3_CTX; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; req: PX509_REQ): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_REQ_add_nconf';
 
-function X509V3_EXT_CRL_add_nconf(conf: PCONF; ctx: PX509V3_CTX; section: PUTF8Char; crl: PX509_CRL): Integer; cdecl;
+function X509V3_EXT_CRL_add_nconf(conf: PCONF; ctx: PX509V3_CTX; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; crl: PX509_CRL): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_CRL_add_nconf';
 
-function X509V3_EXT_conf_nid(conf: Plhash_st_CONF_VALUE; ctx: PX509V3_CTX; ext_nid: Integer; value: PUTF8Char): PX509_EXTENSION; cdecl;
+function X509V3_EXT_conf_nid(conf: Plhash_st_CONF_VALUE; ctx: PX509V3_CTX; ext_nid: Integer; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PX509_EXTENSION; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_conf_nid';
 
-function X509V3_EXT_conf(conf: Plhash_st_CONF_VALUE; ctx: PX509V3_CTX; name: PUTF8Char; value: PUTF8Char): PX509_EXTENSION; cdecl;
+function X509V3_EXT_conf(conf: Plhash_st_CONF_VALUE; ctx: PX509V3_CTX; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PX509_EXTENSION; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_conf';
 
-function X509V3_EXT_add_conf(conf: Plhash_st_CONF_VALUE; ctx: PX509V3_CTX; section: PUTF8Char; cert: PX509): Integer; cdecl;
+function X509V3_EXT_add_conf(conf: Plhash_st_CONF_VALUE; ctx: PX509V3_CTX; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cert: PX509): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_add_conf';
 
-function X509V3_EXT_REQ_add_conf(conf: Plhash_st_CONF_VALUE; ctx: PX509V3_CTX; section: PUTF8Char; req: PX509_REQ): Integer; cdecl;
+function X509V3_EXT_REQ_add_conf(conf: Plhash_st_CONF_VALUE; ctx: PX509V3_CTX; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; req: PX509_REQ): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_REQ_add_conf';
 
-function X509V3_EXT_CRL_add_conf(conf: Plhash_st_CONF_VALUE; ctx: PX509V3_CTX; section: PUTF8Char; crl: PX509_CRL): Integer; cdecl;
+function X509V3_EXT_CRL_add_conf(conf: Plhash_st_CONF_VALUE; ctx: PX509V3_CTX; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; crl: PX509_CRL): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_CRL_add_conf';
 
-function X509V3_add_value_bool_nf(name: PUTF8Char; asn1_bool: Integer; extlist: PPstack_st_CONF_VALUE): Integer; cdecl;
+function X509V3_add_value_bool_nf(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; asn1_bool: Integer; extlist: PPstack_st_CONF_VALUE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_add_value_bool_nf';
 
 function X509V3_get_value_bool(value: PCONF_VALUE; asn1_bool: PInteger): Integer; cdecl;
@@ -21692,13 +21705,13 @@ procedure X509V3_set_nconf(ctx: PX509V3_CTX; conf: PCONF); cdecl;
 procedure X509V3_set_conf_lhash(ctx: PX509V3_CTX; lhash: Plhash_st_CONF_VALUE); cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_set_conf_lhash';
 
-function X509V3_get_string(ctx: PX509V3_CTX; name: PUTF8Char; section: PUTF8Char): PUTF8Char; cdecl;
+function X509V3_get_string(ctx: PX509V3_CTX; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_get_string';
 
-function X509V3_get_section(ctx: PX509V3_CTX; section: PUTF8Char): Pstack_st_CONF_VALUE; cdecl;
+function X509V3_get_section(ctx: PX509V3_CTX; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Pstack_st_CONF_VALUE; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_get_section';
 
-procedure X509V3_string_free(ctx: PX509V3_CTX; str: PUTF8Char); cdecl;
+procedure X509V3_string_free(ctx: PX509V3_CTX; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}); cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_string_free';
 
 procedure X509V3_section_free(ctx: PX509V3_CTX; section: Pstack_st_CONF_VALUE); cdecl;
@@ -21707,28 +21720,28 @@ procedure X509V3_section_free(ctx: PX509V3_CTX; section: Pstack_st_CONF_VALUE); 
 procedure X509V3_set_ctx(ctx: PX509V3_CTX; issuer: PX509; subject: PX509; req: PX509_REQ; crl: PX509_CRL; flags: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_set_ctx';
 
-function X509V3_add_value(name: PUTF8Char; value: PUTF8Char; extlist: PPstack_st_CONF_VALUE): Integer; cdecl;
+function X509V3_add_value(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; extlist: PPstack_st_CONF_VALUE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_add_value';
 
-function X509V3_add_value_uchar(name: PUTF8Char; value: PByte; extlist: PPstack_st_CONF_VALUE): Integer; cdecl;
+function X509V3_add_value_uchar(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; value: PByte; extlist: PPstack_st_CONF_VALUE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_add_value_uchar';
 
-function X509V3_add_value_bool(name: PUTF8Char; asn1_bool: Integer; extlist: PPstack_st_CONF_VALUE): Integer; cdecl;
+function X509V3_add_value_bool(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; asn1_bool: Integer; extlist: PPstack_st_CONF_VALUE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_add_value_bool';
 
-function X509V3_add_value_int(name: PUTF8Char; aint: PASN1_INTEGER; extlist: PPstack_st_CONF_VALUE): Integer; cdecl;
+function X509V3_add_value_int(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; aint: PASN1_INTEGER; extlist: PPstack_st_CONF_VALUE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_add_value_int';
 
-function i2s_ASN1_INTEGER(meth: PX509V3_EXT_METHOD; aint: PASN1_INTEGER): PUTF8Char; cdecl;
+function i2s_ASN1_INTEGER(meth: PX509V3_EXT_METHOD; aint: PASN1_INTEGER): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'i2s_ASN1_INTEGER';
 
-function s2i_ASN1_INTEGER(meth: PX509V3_EXT_METHOD; value: PUTF8Char): PASN1_INTEGER; cdecl;
+function s2i_ASN1_INTEGER(meth: PX509V3_EXT_METHOD; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PASN1_INTEGER; cdecl;
   external LIB_CRYPTO name _PU + 's2i_ASN1_INTEGER';
 
-function i2s_ASN1_ENUMERATED(meth: PX509V3_EXT_METHOD; aint: PASN1_ENUMERATED): PUTF8Char; cdecl;
+function i2s_ASN1_ENUMERATED(meth: PX509V3_EXT_METHOD; aint: PASN1_ENUMERATED): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'i2s_ASN1_ENUMERATED';
 
-function i2s_ASN1_ENUMERATED_TABLE(meth: PX509V3_EXT_METHOD; aint: PASN1_ENUMERATED): PUTF8Char; cdecl;
+function i2s_ASN1_ENUMERATED_TABLE(meth: PX509V3_EXT_METHOD; aint: PASN1_ENUMERATED): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'i2s_ASN1_ENUMERATED_TABLE';
 
 function X509V3_EXT_add(ext: PX509V3_EXT_METHOD): Integer; cdecl;
@@ -21752,7 +21765,7 @@ function X509V3_EXT_get_nid(nid: Integer): PX509V3_EXT_METHOD; cdecl;
 function X509V3_add_standard_extensions(): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_add_standard_extensions';
 
-function X509V3_parse_list(line: PUTF8Char): Pstack_st_CONF_VALUE; cdecl;
+function X509V3_parse_list(line: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Pstack_st_CONF_VALUE; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_parse_list';
 
 function X509V3_EXT_d2i(ext: PX509_EXTENSION): Pointer; cdecl;
@@ -21767,16 +21780,16 @@ function X509V3_EXT_i2d(ext_nid: Integer; crit: Integer; ext_struc: Pointer): PX
 function X509V3_add1_i2d(x: PPstack_st_X509_EXTENSION; nid: Integer; value: Pointer; crit: Integer; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_add1_i2d';
 
-procedure X509V3_EXT_val_prn(&out: PBIO; val: Pstack_st_CONF_VALUE; indent: Integer; ml: Integer); cdecl;
+procedure X509V3_EXT_val_prn({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; val: Pstack_st_CONF_VALUE; indent: Integer; ml: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_val_prn';
 
-function X509V3_EXT_print(&out: PBIO; ext: PX509_EXTENSION; flag: Cardinal; indent: Integer): Integer; cdecl;
+function X509V3_EXT_print({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; ext: PX509_EXTENSION; flag: Cardinal; indent: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_print';
 
-function X509V3_EXT_print_fp(&out: PPointer; ext: PX509_EXTENSION; flag: Integer; indent: Integer): Integer; cdecl;
+function X509V3_EXT_print_fp({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPointer; ext: PX509_EXTENSION; flag: Integer; indent: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_EXT_print_fp';
 
-function X509V3_extensions_print(&out: PBIO; title: PUTF8Char; exts: Pstack_st_X509_EXTENSION; flag: Cardinal; indent: Integer): Integer; cdecl;
+function X509V3_extensions_print({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; title: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; exts: Pstack_st_X509_EXTENSION; flag: Cardinal; indent: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_extensions_print';
 
 function X509_check_ca(x: PX509): Integer; cdecl;
@@ -21806,13 +21819,13 @@ procedure X509_set_proxy_pathlen(x: PX509; l: Integer); cdecl;
 function X509_get_proxy_pathlen(x: PX509): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_get_proxy_pathlen';
 
-function X509_get_extension_flags(x: PX509): UInt32; cdecl;
+function X509_get_extension_flags(x: PX509): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_get_extension_flags';
 
-function X509_get_key_usage(x: PX509): UInt32; cdecl;
+function X509_get_key_usage(x: PX509): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_get_key_usage';
 
-function X509_get_extended_key_usage(x: PX509): UInt32; cdecl;
+function X509_get_extended_key_usage(x: PX509): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_get_extended_key_usage';
 
 function X509_get0_subject_key_id(x: PX509): PASN1_OCTET_STRING; cdecl;
@@ -21833,7 +21846,7 @@ function X509_PURPOSE_get_count(): Integer; cdecl;
 function X509_PURPOSE_get0(idx: Integer): PX509_PURPOSE; cdecl;
   external LIB_CRYPTO name _PU + 'X509_PURPOSE_get0';
 
-function X509_PURPOSE_get_by_sname(sname: PUTF8Char): Integer; cdecl;
+function X509_PURPOSE_get_by_sname(sname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_PURPOSE_get_by_sname';
 
 function X509_PURPOSE_get_by_id(id: Integer): Integer; cdecl;
@@ -21842,13 +21855,13 @@ function X509_PURPOSE_get_by_id(id: Integer): Integer; cdecl;
 type
   X509_PURPOSE_add_ck = function(p1: PX509_PURPOSE; p2: PX509; p3: Integer): Integer; cdecl;
 
-function X509_PURPOSE_add(id: Integer; trust: Integer; flags: Integer; ck: X509_PURPOSE_add_ck; name: PUTF8Char; sname: PUTF8Char; arg: Pointer): Integer; cdecl;
+function X509_PURPOSE_add(id: Integer; trust: Integer; flags: Integer; ck: X509_PURPOSE_add_ck; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; sname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; arg: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_PURPOSE_add';
 
-function X509_PURPOSE_get0_name(xp: PX509_PURPOSE): PUTF8Char; cdecl;
+function X509_PURPOSE_get0_name(xp: PX509_PURPOSE): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_PURPOSE_get0_name';
 
-function X509_PURPOSE_get0_sname(xp: PX509_PURPOSE): PUTF8Char; cdecl;
+function X509_PURPOSE_get0_sname(xp: PX509_PURPOSE): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_PURPOSE_get0_sname';
 
 function X509_PURPOSE_get_trust(xp: PX509_PURPOSE): Integer; cdecl;
@@ -21872,28 +21885,28 @@ procedure X509_email_free(sk: Pstack_st_OPENSSL_STRING); cdecl;
 function X509_get1_ocsp(x: PX509): Pstack_st_OPENSSL_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'X509_get1_ocsp';
 
-function X509_check_host(x: PX509; chk: PUTF8Char; chklen: NativeUInt; flags: Cardinal; peername: PPUTF8Char): Integer; cdecl;
+function X509_check_host(x: PX509; chk: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; chklen: NativeUInt; flags: Cardinal; peername: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_check_host';
 
-function X509_check_email(x: PX509; chk: PUTF8Char; chklen: NativeUInt; flags: Cardinal): Integer; cdecl;
+function X509_check_email(x: PX509; chk: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; chklen: NativeUInt; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_check_email';
 
 function X509_check_ip(x: PX509; chk: PByte; chklen: NativeUInt; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_check_ip';
 
-function X509_check_ip_asc(x: PX509; ipasc: PUTF8Char; flags: Cardinal): Integer; cdecl;
+function X509_check_ip_asc(x: PX509; ipasc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_check_ip_asc';
 
-function a2i_IPADDRESS(ipasc: PUTF8Char): PASN1_OCTET_STRING; cdecl;
+function a2i_IPADDRESS(ipasc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PASN1_OCTET_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'a2i_IPADDRESS';
 
-function a2i_IPADDRESS_NC(ipasc: PUTF8Char): PASN1_OCTET_STRING; cdecl;
+function a2i_IPADDRESS_NC(ipasc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PASN1_OCTET_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'a2i_IPADDRESS_NC';
 
 function X509V3_NAME_from_section(nm: PX509_NAME; dn_sk: Pstack_st_CONF_VALUE; chtype: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509V3_NAME_from_section';
 
-procedure X509_POLICY_NODE_print(&out: PBIO; node: PX509_POLICY_NODE; indent: Integer); cdecl;
+procedure X509_POLICY_NODE_print({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; node: PX509_POLICY_NODE; indent: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'X509_POLICY_NODE_print';
 
 function ASRange_new(): PASRange; cdecl;
@@ -21902,10 +21915,10 @@ function ASRange_new(): PASRange; cdecl;
 procedure ASRange_free(a: PASRange); cdecl;
   external LIB_CRYPTO name _PU + 'ASRange_free';
 
-function d2i_ASRange(a: PPASRange; &in: PPByte; len: Integer): PASRange; cdecl;
+function d2i_ASRange(a: PPASRange; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASRange; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASRange';
 
-function i2d_ASRange(a: PASRange; &out: PPByte): Integer; cdecl;
+function i2d_ASRange(a: PASRange; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASRange';
 
 function ASRange_it(): PASN1_ITEM; cdecl;
@@ -21917,10 +21930,10 @@ function ASIdOrRange_new(): PASIdOrRange; cdecl;
 procedure ASIdOrRange_free(a: PASIdOrRange); cdecl;
   external LIB_CRYPTO name _PU + 'ASIdOrRange_free';
 
-function d2i_ASIdOrRange(a: PPASIdOrRange; &in: PPByte; len: Integer): PASIdOrRange; cdecl;
+function d2i_ASIdOrRange(a: PPASIdOrRange; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASIdOrRange; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASIdOrRange';
 
-function i2d_ASIdOrRange(a: PASIdOrRange; &out: PPByte): Integer; cdecl;
+function i2d_ASIdOrRange(a: PASIdOrRange; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASIdOrRange';
 
 function ASIdOrRange_it(): PASN1_ITEM; cdecl;
@@ -21932,10 +21945,10 @@ function ASIdentifierChoice_new(): PASIdentifierChoice; cdecl;
 procedure ASIdentifierChoice_free(a: PASIdentifierChoice); cdecl;
   external LIB_CRYPTO name _PU + 'ASIdentifierChoice_free';
 
-function d2i_ASIdentifierChoice(a: PPASIdentifierChoice; &in: PPByte; len: Integer): PASIdentifierChoice; cdecl;
+function d2i_ASIdentifierChoice(a: PPASIdentifierChoice; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASIdentifierChoice; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASIdentifierChoice';
 
-function i2d_ASIdentifierChoice(a: PASIdentifierChoice; &out: PPByte): Integer; cdecl;
+function i2d_ASIdentifierChoice(a: PASIdentifierChoice; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASIdentifierChoice';
 
 function ASIdentifierChoice_it(): PASN1_ITEM; cdecl;
@@ -21947,10 +21960,10 @@ function ASIdentifiers_new(): PASIdentifiers; cdecl;
 procedure ASIdentifiers_free(a: PASIdentifiers); cdecl;
   external LIB_CRYPTO name _PU + 'ASIdentifiers_free';
 
-function d2i_ASIdentifiers(a: PPASIdentifiers; &in: PPByte; len: Integer): PASIdentifiers; cdecl;
+function d2i_ASIdentifiers(a: PPASIdentifiers; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PASIdentifiers; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ASIdentifiers';
 
-function i2d_ASIdentifiers(a: PASIdentifiers; &out: PPByte): Integer; cdecl;
+function i2d_ASIdentifiers(a: PASIdentifiers; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ASIdentifiers';
 
 function ASIdentifiers_it(): PASN1_ITEM; cdecl;
@@ -21962,10 +21975,10 @@ function IPAddressRange_new(): PIPAddressRange; cdecl;
 procedure IPAddressRange_free(a: PIPAddressRange); cdecl;
   external LIB_CRYPTO name _PU + 'IPAddressRange_free';
 
-function d2i_IPAddressRange(a: PPIPAddressRange; &in: PPByte; len: Integer): PIPAddressRange; cdecl;
+function d2i_IPAddressRange(a: PPIPAddressRange; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PIPAddressRange; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_IPAddressRange';
 
-function i2d_IPAddressRange(a: PIPAddressRange; &out: PPByte): Integer; cdecl;
+function i2d_IPAddressRange(a: PIPAddressRange; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_IPAddressRange';
 
 function IPAddressRange_it(): PASN1_ITEM; cdecl;
@@ -21977,10 +21990,10 @@ function IPAddressOrRange_new(): PIPAddressOrRange; cdecl;
 procedure IPAddressOrRange_free(a: PIPAddressOrRange); cdecl;
   external LIB_CRYPTO name _PU + 'IPAddressOrRange_free';
 
-function d2i_IPAddressOrRange(a: PPIPAddressOrRange; &in: PPByte; len: Integer): PIPAddressOrRange; cdecl;
+function d2i_IPAddressOrRange(a: PPIPAddressOrRange; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PIPAddressOrRange; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_IPAddressOrRange';
 
-function i2d_IPAddressOrRange(a: PIPAddressOrRange; &out: PPByte): Integer; cdecl;
+function i2d_IPAddressOrRange(a: PIPAddressOrRange; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_IPAddressOrRange';
 
 function IPAddressOrRange_it(): PASN1_ITEM; cdecl;
@@ -21992,10 +22005,10 @@ function IPAddressChoice_new(): PIPAddressChoice; cdecl;
 procedure IPAddressChoice_free(a: PIPAddressChoice); cdecl;
   external LIB_CRYPTO name _PU + 'IPAddressChoice_free';
 
-function d2i_IPAddressChoice(a: PPIPAddressChoice; &in: PPByte; len: Integer): PIPAddressChoice; cdecl;
+function d2i_IPAddressChoice(a: PPIPAddressChoice; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PIPAddressChoice; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_IPAddressChoice';
 
-function i2d_IPAddressChoice(a: PIPAddressChoice; &out: PPByte): Integer; cdecl;
+function i2d_IPAddressChoice(a: PIPAddressChoice; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_IPAddressChoice';
 
 function IPAddressChoice_it(): PASN1_ITEM; cdecl;
@@ -22007,10 +22020,10 @@ function IPAddressFamily_new(): PIPAddressFamily; cdecl;
 procedure IPAddressFamily_free(a: PIPAddressFamily); cdecl;
   external LIB_CRYPTO name _PU + 'IPAddressFamily_free';
 
-function d2i_IPAddressFamily(a: PPIPAddressFamily; &in: PPByte; len: Integer): PIPAddressFamily; cdecl;
+function d2i_IPAddressFamily(a: PPIPAddressFamily; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PIPAddressFamily; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_IPAddressFamily';
 
-function i2d_IPAddressFamily(a: PIPAddressFamily; &out: PPByte): Integer; cdecl;
+function i2d_IPAddressFamily(a: PIPAddressFamily; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_IPAddressFamily';
 
 function IPAddressFamily_it(): PASN1_ITEM; cdecl;
@@ -22079,10 +22092,10 @@ function NAMING_AUTHORITY_new(): PNAMING_AUTHORITY; cdecl;
 procedure NAMING_AUTHORITY_free(a: PNAMING_AUTHORITY); cdecl;
   external LIB_CRYPTO name _PU + 'NAMING_AUTHORITY_free';
 
-function d2i_NAMING_AUTHORITY(a: PPNAMING_AUTHORITY; &in: PPByte; len: Integer): PNAMING_AUTHORITY; cdecl;
+function d2i_NAMING_AUTHORITY(a: PPNAMING_AUTHORITY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PNAMING_AUTHORITY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_NAMING_AUTHORITY';
 
-function i2d_NAMING_AUTHORITY(a: PNAMING_AUTHORITY; &out: PPByte): Integer; cdecl;
+function i2d_NAMING_AUTHORITY(a: PNAMING_AUTHORITY; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_NAMING_AUTHORITY';
 
 function NAMING_AUTHORITY_it(): PASN1_ITEM; cdecl;
@@ -22094,10 +22107,10 @@ function PROFESSION_INFO_new(): PPROFESSION_INFO; cdecl;
 procedure PROFESSION_INFO_free(a: PPROFESSION_INFO); cdecl;
   external LIB_CRYPTO name _PU + 'PROFESSION_INFO_free';
 
-function d2i_PROFESSION_INFO(a: PPPROFESSION_INFO; &in: PPByte; len: Integer): PPROFESSION_INFO; cdecl;
+function d2i_PROFESSION_INFO(a: PPPROFESSION_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPROFESSION_INFO; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PROFESSION_INFO';
 
-function i2d_PROFESSION_INFO(a: PPROFESSION_INFO; &out: PPByte): Integer; cdecl;
+function i2d_PROFESSION_INFO(a: PPROFESSION_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PROFESSION_INFO';
 
 function PROFESSION_INFO_it(): PASN1_ITEM; cdecl;
@@ -22109,10 +22122,10 @@ function ADMISSIONS_new(): PADMISSIONS; cdecl;
 procedure ADMISSIONS_free(a: PADMISSIONS); cdecl;
   external LIB_CRYPTO name _PU + 'ADMISSIONS_free';
 
-function d2i_ADMISSIONS(a: PPADMISSIONS; &in: PPByte; len: Integer): PADMISSIONS; cdecl;
+function d2i_ADMISSIONS(a: PPADMISSIONS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PADMISSIONS; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ADMISSIONS';
 
-function i2d_ADMISSIONS(a: PADMISSIONS; &out: PPByte): Integer; cdecl;
+function i2d_ADMISSIONS(a: PADMISSIONS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ADMISSIONS';
 
 function ADMISSIONS_it(): PASN1_ITEM; cdecl;
@@ -22124,10 +22137,10 @@ function ADMISSION_SYNTAX_new(): PADMISSION_SYNTAX; cdecl;
 procedure ADMISSION_SYNTAX_free(a: PADMISSION_SYNTAX); cdecl;
   external LIB_CRYPTO name _PU + 'ADMISSION_SYNTAX_free';
 
-function d2i_ADMISSION_SYNTAX(a: PPADMISSION_SYNTAX; &in: PPByte; len: Integer): PADMISSION_SYNTAX; cdecl;
+function d2i_ADMISSION_SYNTAX(a: PPADMISSION_SYNTAX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PADMISSION_SYNTAX; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_ADMISSION_SYNTAX';
 
-function i2d_ADMISSION_SYNTAX(a: PADMISSION_SYNTAX; &out: PPByte): Integer; cdecl;
+function i2d_ADMISSION_SYNTAX(a: PADMISSION_SYNTAX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_ADMISSION_SYNTAX';
 
 function ADMISSION_SYNTAX_it(): PASN1_ITEM; cdecl;
@@ -22151,16 +22164,16 @@ procedure NAMING_AUTHORITY_set0_authorityURL(n: PNAMING_AUTHORITY; namingAuthori
 procedure NAMING_AUTHORITY_set0_authorityText(n: PNAMING_AUTHORITY; namingAuthorityText: PASN1_STRING); cdecl;
   external LIB_CRYPTO name _PU + 'NAMING_AUTHORITY_set0_authorityText';
 
-function ADMISSION_SYNTAX_get0_admissionAuthority(&as: PADMISSION_SYNTAX): PGENERAL_NAME; cdecl;
+function ADMISSION_SYNTAX_get0_admissionAuthority({$IFNDEF FPC}{$IF CompilerVersion > 21}&as{$ELSE}as1{$IFEND}{$ELSE}&as{$ENDIF}: PADMISSION_SYNTAX): PGENERAL_NAME; cdecl;
   external LIB_CRYPTO name _PU + 'ADMISSION_SYNTAX_get0_admissionAuthority';
 
-procedure ADMISSION_SYNTAX_set0_admissionAuthority(&as: PADMISSION_SYNTAX; aa: PGENERAL_NAME); cdecl;
+procedure ADMISSION_SYNTAX_set0_admissionAuthority({$IFNDEF FPC}{$IF CompilerVersion > 21}&as{$ELSE}as1{$IFEND}{$ELSE}&as{$ENDIF}: PADMISSION_SYNTAX; aa: PGENERAL_NAME); cdecl;
   external LIB_CRYPTO name _PU + 'ADMISSION_SYNTAX_set0_admissionAuthority';
 
-function ADMISSION_SYNTAX_get0_contentsOfAdmissions(&as: PADMISSION_SYNTAX): Pstack_st_ADMISSIONS; cdecl;
+function ADMISSION_SYNTAX_get0_contentsOfAdmissions({$IFNDEF FPC}{$IF CompilerVersion > 21}&as{$ELSE}as1{$IFEND}{$ELSE}&as{$ENDIF}: PADMISSION_SYNTAX): Pstack_st_ADMISSIONS; cdecl;
   external LIB_CRYPTO name _PU + 'ADMISSION_SYNTAX_get0_contentsOfAdmissions';
 
-procedure ADMISSION_SYNTAX_set0_contentsOfAdmissions(&as: PADMISSION_SYNTAX; a: Pstack_st_ADMISSIONS); cdecl;
+procedure ADMISSION_SYNTAX_set0_contentsOfAdmissions({$IFNDEF FPC}{$IF CompilerVersion > 21}&as{$ELSE}as1{$IFEND}{$ELSE}&as{$ENDIF}: PADMISSION_SYNTAX; a: Pstack_st_ADMISSIONS); cdecl;
   external LIB_CRYPTO name _PU + 'ADMISSION_SYNTAX_set0_contentsOfAdmissions';
 
 function ADMISSIONS_get0_admissionAuthority(a: PADMISSIONS): PGENERAL_NAME; cdecl;
@@ -22196,7 +22209,7 @@ procedure PROFESSION_INFO_set0_namingAuthority(pi: PPROFESSION_INFO; na: PNAMING
 function PROFESSION_INFO_get0_professionItems(pi: PPROFESSION_INFO): Pstack_st_ASN1_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'PROFESSION_INFO_get0_professionItems';
 
-procedure PROFESSION_INFO_set0_professionItems(pi: PPROFESSION_INFO; &as: Pstack_st_ASN1_STRING); cdecl;
+procedure PROFESSION_INFO_set0_professionItems(pi: PPROFESSION_INFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&as{$ELSE}as1{$IFEND}{$ELSE}&as{$ENDIF}: Pstack_st_ASN1_STRING); cdecl;
   external LIB_CRYPTO name _PU + 'PROFESSION_INFO_set0_professionItems';
 
 function PROFESSION_INFO_get0_professionOIDs(pi: PPROFESSION_INFO): Pstack_st_ASN1_OBJECT; cdecl;
@@ -22220,10 +22233,10 @@ function CMS_ContentInfo_new(): PCMS_ContentInfo; cdecl;
 procedure CMS_ContentInfo_free(a: PCMS_ContentInfo); cdecl;
   external LIB_CRYPTO name _PU + 'CMS_ContentInfo_free';
 
-function d2i_CMS_ContentInfo(a: PPCMS_ContentInfo; &in: PPByte; len: Integer): PCMS_ContentInfo; cdecl;
+function d2i_CMS_ContentInfo(a: PPCMS_ContentInfo; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PCMS_ContentInfo; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_CMS_ContentInfo';
 
-function i2d_CMS_ContentInfo(a: PCMS_ContentInfo; &out: PPByte): Integer; cdecl;
+function i2d_CMS_ContentInfo(a: PCMS_ContentInfo; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_CMS_ContentInfo';
 
 function CMS_ContentInfo_it(): PASN1_ITEM; cdecl;
@@ -22235,16 +22248,16 @@ function CMS_ReceiptRequest_new(): PCMS_ReceiptRequest; cdecl;
 procedure CMS_ReceiptRequest_free(a: PCMS_ReceiptRequest); cdecl;
   external LIB_CRYPTO name _PU + 'CMS_ReceiptRequest_free';
 
-function d2i_CMS_ReceiptRequest(a: PPCMS_ReceiptRequest; &in: PPByte; len: Integer): PCMS_ReceiptRequest; cdecl;
+function d2i_CMS_ReceiptRequest(a: PPCMS_ReceiptRequest; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PCMS_ReceiptRequest; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_CMS_ReceiptRequest';
 
-function i2d_CMS_ReceiptRequest(a: PCMS_ReceiptRequest; &out: PPByte): Integer; cdecl;
+function i2d_CMS_ReceiptRequest(a: PCMS_ReceiptRequest; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_CMS_ReceiptRequest';
 
 function CMS_ReceiptRequest_it(): PASN1_ITEM; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_ReceiptRequest_it';
 
-function CMS_ContentInfo_print_ctx(&out: PBIO; x: PCMS_ContentInfo; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
+function CMS_ContentInfo_print_ctx({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; x: PCMS_ContentInfo; indent: Integer; pctx: PASN1_PCTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_ContentInfo_print_ctx';
 
 function CMS_get0_type(cms: PCMS_ContentInfo): PASN1_OBJECT; cdecl;
@@ -22274,13 +22287,13 @@ function d2i_CMS_bio(bp: PBIO; cms: PPCMS_ContentInfo): PCMS_ContentInfo; cdecl;
 function i2d_CMS_bio(bp: PBIO; cms: PCMS_ContentInfo): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_CMS_bio';
 
-function BIO_new_CMS(&out: PBIO; cms: PCMS_ContentInfo): PBIO; cdecl;
+function BIO_new_CMS({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; cms: PCMS_ContentInfo): PBIO; cdecl;
   external LIB_CRYPTO name _PU + 'BIO_new_CMS';
 
-function i2d_CMS_bio_stream(&out: PBIO; cms: PCMS_ContentInfo; &in: PBIO; flags: Integer): Integer; cdecl;
+function i2d_CMS_bio_stream({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; cms: PCMS_ContentInfo; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; flags: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_CMS_bio_stream';
 
-function PEM_write_bio_CMS_stream(&out: PBIO; cms: PCMS_ContentInfo; &in: PBIO; flags: Integer): Integer; cdecl;
+function PEM_write_bio_CMS_stream({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; cms: PCMS_ContentInfo; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; flags: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_write_bio_CMS_stream';
 
 function SMIME_read_CMS(bio: PBIO; bcont: PPBIO): PCMS_ContentInfo; cdecl;
@@ -22298,28 +22311,28 @@ function CMS_sign(signcert: PX509; pkey: PEVP_PKEY; certs: Pstack_st_X509; data:
 function CMS_sign_receipt(si: PCMS_SignerInfo; signcert: PX509; pkey: PEVP_PKEY; certs: Pstack_st_X509; flags: Cardinal): PCMS_ContentInfo; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_sign_receipt';
 
-function CMS_data(cms: PCMS_ContentInfo; &out: PBIO; flags: Cardinal): Integer; cdecl;
+function CMS_data(cms: PCMS_ContentInfo; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_data';
 
-function CMS_data_create(&in: PBIO; flags: Cardinal): PCMS_ContentInfo; cdecl;
+function CMS_data_create({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; flags: Cardinal): PCMS_ContentInfo; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_data_create';
 
-function CMS_digest_verify(cms: PCMS_ContentInfo; dcont: PBIO; &out: PBIO; flags: Cardinal): Integer; cdecl;
+function CMS_digest_verify(cms: PCMS_ContentInfo; dcont: PBIO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_digest_verify';
 
-function CMS_digest_create(&in: PBIO; md: PEVP_MD; flags: Cardinal): PCMS_ContentInfo; cdecl;
+function CMS_digest_create({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; md: PEVP_MD; flags: Cardinal): PCMS_ContentInfo; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_digest_create';
 
-function CMS_EncryptedData_decrypt(cms: PCMS_ContentInfo; key: PByte; keylen: NativeUInt; dcont: PBIO; &out: PBIO; flags: Cardinal): Integer; cdecl;
+function CMS_EncryptedData_decrypt(cms: PCMS_ContentInfo; key: PByte; keylen: NativeUInt; dcont: PBIO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_EncryptedData_decrypt';
 
-function CMS_EncryptedData_encrypt(&in: PBIO; cipher: PEVP_CIPHER; key: PByte; keylen: NativeUInt; flags: Cardinal): PCMS_ContentInfo; cdecl;
+function CMS_EncryptedData_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; cipher: PEVP_CIPHER; key: PByte; keylen: NativeUInt; flags: Cardinal): PCMS_ContentInfo; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_EncryptedData_encrypt';
 
 function CMS_EncryptedData_set1_key(cms: PCMS_ContentInfo; ciph: PEVP_CIPHER; key: PByte; keylen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_EncryptedData_set1_key';
 
-function CMS_verify(cms: PCMS_ContentInfo; certs: Pstack_st_X509; store: PX509_STORE; dcont: PBIO; &out: PBIO; flags: Cardinal): Integer; cdecl;
+function CMS_verify(cms: PCMS_ContentInfo; certs: Pstack_st_X509; store: PX509_STORE; dcont: PBIO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_verify';
 
 function CMS_verify_receipt(rcms: PCMS_ContentInfo; ocms: PCMS_ContentInfo; certs: Pstack_st_X509; store: PX509_STORE; flags: Cardinal): Integer; cdecl;
@@ -22328,10 +22341,10 @@ function CMS_verify_receipt(rcms: PCMS_ContentInfo; ocms: PCMS_ContentInfo; cert
 function CMS_get0_signers(cms: PCMS_ContentInfo): Pstack_st_X509; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_get0_signers';
 
-function CMS_encrypt(certs: Pstack_st_X509; &in: PBIO; cipher: PEVP_CIPHER; flags: Cardinal): PCMS_ContentInfo; cdecl;
+function CMS_encrypt(certs: Pstack_st_X509; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; cipher: PEVP_CIPHER; flags: Cardinal): PCMS_ContentInfo; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_encrypt';
 
-function CMS_decrypt(cms: PCMS_ContentInfo; pkey: PEVP_PKEY; cert: PX509; dcont: PBIO; &out: PBIO; flags: Cardinal): Integer; cdecl;
+function CMS_decrypt(cms: PCMS_ContentInfo; pkey: PEVP_PKEY; cert: PX509; dcont: PBIO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_decrypt';
 
 function CMS_decrypt_set1_pkey(cms: PCMS_ContentInfo; pk: PEVP_PKEY; cert: PX509): Integer; cdecl;
@@ -22394,10 +22407,10 @@ function CMS_RecipientInfo_decrypt(cms: PCMS_ContentInfo; ri: PCMS_RecipientInfo
 function CMS_RecipientInfo_encrypt(cms: PCMS_ContentInfo; ri: PCMS_RecipientInfo): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_RecipientInfo_encrypt';
 
-function CMS_uncompress(cms: PCMS_ContentInfo; dcont: PBIO; &out: PBIO; flags: Cardinal): Integer; cdecl;
+function CMS_uncompress(cms: PCMS_ContentInfo; dcont: PBIO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_uncompress';
 
-function CMS_compress(&in: PBIO; comp_nid: Integer; flags: Cardinal): PCMS_ContentInfo; cdecl;
+function CMS_compress({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; comp_nid: Integer; flags: Cardinal): PCMS_ContentInfo; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_compress';
 
 function CMS_set1_eContentType(cms: PCMS_ContentInfo; oid: PASN1_OBJECT): Integer; cdecl;
@@ -22499,16 +22512,16 @@ function CMS_signed_delete_attr(si: PCMS_SignerInfo; loc: Integer): PX509_ATTRIB
 function CMS_signed_add1_attr(si: PCMS_SignerInfo; attr: PX509_ATTRIBUTE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_signed_add1_attr';
 
-function CMS_signed_add1_attr_by_OBJ(si: PCMS_SignerInfo; obj: PASN1_OBJECT; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
+function CMS_signed_add1_attr_by_OBJ(si: PCMS_SignerInfo; obj: PASN1_OBJECT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_signed_add1_attr_by_OBJ';
 
-function CMS_signed_add1_attr_by_NID(si: PCMS_SignerInfo; nid: Integer; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
+function CMS_signed_add1_attr_by_NID(si: PCMS_SignerInfo; nid: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_signed_add1_attr_by_NID';
 
-function CMS_signed_add1_attr_by_txt(si: PCMS_SignerInfo; attrname: PUTF8Char; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
+function CMS_signed_add1_attr_by_txt(si: PCMS_SignerInfo; attrname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_signed_add1_attr_by_txt';
 
-function CMS_signed_get0_data_by_OBJ(si: PCMS_SignerInfo; oid: PASN1_OBJECT; lastpos: Integer; &type: Integer): Pointer; cdecl;
+function CMS_signed_get0_data_by_OBJ(si: PCMS_SignerInfo; oid: PASN1_OBJECT; lastpos: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_signed_get0_data_by_OBJ';
 
 function CMS_unsigned_get_attr_count(si: PCMS_SignerInfo): Integer; cdecl;
@@ -22529,16 +22542,16 @@ function CMS_unsigned_delete_attr(si: PCMS_SignerInfo; loc: Integer): PX509_ATTR
 function CMS_unsigned_add1_attr(si: PCMS_SignerInfo; attr: PX509_ATTRIBUTE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_unsigned_add1_attr';
 
-function CMS_unsigned_add1_attr_by_OBJ(si: PCMS_SignerInfo; obj: PASN1_OBJECT; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
+function CMS_unsigned_add1_attr_by_OBJ(si: PCMS_SignerInfo; obj: PASN1_OBJECT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_unsigned_add1_attr_by_OBJ';
 
-function CMS_unsigned_add1_attr_by_NID(si: PCMS_SignerInfo; nid: Integer; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
+function CMS_unsigned_add1_attr_by_NID(si: PCMS_SignerInfo; nid: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_unsigned_add1_attr_by_NID';
 
-function CMS_unsigned_add1_attr_by_txt(si: PCMS_SignerInfo; attrname: PUTF8Char; &type: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
+function CMS_unsigned_add1_attr_by_txt(si: PCMS_SignerInfo; attrname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; bytes: Pointer; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_unsigned_add1_attr_by_txt';
 
-function CMS_unsigned_get0_data_by_OBJ(si: PCMS_SignerInfo; oid: PASN1_OBJECT; lastpos: Integer; &type: Integer): Pointer; cdecl;
+function CMS_unsigned_get0_data_by_OBJ(si: PCMS_SignerInfo; oid: PASN1_OBJECT; lastpos: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'CMS_unsigned_get0_data_by_OBJ';
 
 function CMS_get1_ReceiptRequest(si: PCMS_SignerInfo; prr: PPCMS_ReceiptRequest): Integer; cdecl;
@@ -22598,37 +22611,37 @@ function COMP_CTX_get_type(comp: PCOMP_CTX): Integer; cdecl;
 function COMP_get_type(meth: PCOMP_METHOD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'COMP_get_type';
 
-function COMP_get_name(meth: PCOMP_METHOD): PUTF8Char; cdecl;
+function COMP_get_name(meth: PCOMP_METHOD): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'COMP_get_name';
 
 procedure COMP_CTX_free(ctx: PCOMP_CTX); cdecl;
   external LIB_CRYPTO name _PU + 'COMP_CTX_free';
 
-function COMP_compress_block(ctx: PCOMP_CTX; &out: PByte; olen: Integer; &in: PByte; ilen: Integer): Integer; cdecl;
+function COMP_compress_block(ctx: PCOMP_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; olen: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; ilen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'COMP_compress_block';
 
-function COMP_expand_block(ctx: PCOMP_CTX; &out: PByte; olen: Integer; &in: PByte; ilen: Integer): Integer; cdecl;
+function COMP_expand_block(ctx: PCOMP_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; olen: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; ilen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'COMP_expand_block';
 
 function COMP_zlib(): PCOMP_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'COMP_zlib';
 
-function _CONF_new_section(conf: PCONF; section: PUTF8Char): PCONF_VALUE; cdecl;
+function _CONF_new_section(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PCONF_VALUE; cdecl;
   external LIB_CRYPTO name _PU + '_CONF_new_section';
 
-function _CONF_get_section(conf: PCONF; section: PUTF8Char): PCONF_VALUE; cdecl;
+function _CONF_get_section(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PCONF_VALUE; cdecl;
   external LIB_CRYPTO name _PU + '_CONF_get_section';
 
-function _CONF_get_section_values(conf: PCONF; section: PUTF8Char): Pstack_st_CONF_VALUE; cdecl;
+function _CONF_get_section_values(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Pstack_st_CONF_VALUE; cdecl;
   external LIB_CRYPTO name _PU + '_CONF_get_section_values';
 
 function _CONF_add_string(conf: PCONF; section: PCONF_VALUE; value: PCONF_VALUE): Integer; cdecl;
   external LIB_CRYPTO name _PU + '_CONF_add_string';
 
-function _CONF_get_string(conf: PCONF; section: PUTF8Char; name: PUTF8Char): PUTF8Char; cdecl;
+function _CONF_get_string(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + '_CONF_get_string';
 
-function _CONF_get_number(conf: PCONF; section: PUTF8Char; name: PUTF8Char): Integer; cdecl;
+function _CONF_get_number(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + '_CONF_get_number';
 
 function _CONF_new_data(conf: PCONF): Integer; cdecl;
@@ -22679,7 +22692,7 @@ procedure CT_POLICY_EVAL_CTX_set_time(ctx: PCT_POLICY_EVAL_CTX; time_in_ms: UInt
 function SCT_new(): PSCT; cdecl;
   external LIB_CRYPTO name _PU + 'SCT_new';
 
-function SCT_new_from_base64(version: Byte; logid_base64: PUTF8Char; entry_type: ct_log_entry_type_t; timestamp: UInt64; extensions_base64: PUTF8Char; signature_base64: PUTF8Char): PSCT; cdecl;
+function SCT_new_from_base64(version: Byte; logid_base64: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; entry_type: ct_log_entry_type_t; timestamp: UInt64; extensions_base64: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; signature_base64: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PSCT; cdecl;
   external LIB_CRYPTO name _PU + 'SCT_new_from_base64';
 
 procedure SCT_free(sct: PSCT); cdecl;
@@ -22745,13 +22758,13 @@ function SCT_get_source(sct: PSCT): sct_source_t; cdecl;
 function SCT_set_source(sct: PSCT; source: sct_source_t): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'SCT_set_source';
 
-function SCT_validation_status_string(sct: PSCT): PUTF8Char; cdecl;
+function SCT_validation_status_string(sct: PSCT): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'SCT_validation_status_string';
 
-procedure SCT_print(sct: PSCT; &out: PBIO; indent: Integer; logs: PCTLOG_STORE); cdecl;
+procedure SCT_print(sct: PSCT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; indent: Integer; logs: PCTLOG_STORE); cdecl;
   external LIB_CRYPTO name _PU + 'SCT_print';
 
-procedure SCT_LIST_print(sct_list: Pstack_st_SCT; &out: PBIO; indent: Integer; separator: PUTF8Char; logs: PCTLOG_STORE); cdecl;
+procedure SCT_LIST_print(sct_list: Pstack_st_SCT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; indent: Integer; separator: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; logs: PCTLOG_STORE); cdecl;
   external LIB_CRYPTO name _PU + 'SCT_LIST_print';
 
 function SCT_get_validation_status(sct: PSCT): sct_validation_status_t; cdecl;
@@ -22778,25 +22791,25 @@ function i2d_SCT_LIST(a: Pstack_st_SCT; pp: PPByte): Integer; cdecl;
 function d2i_SCT_LIST(a: PPstack_st_SCT; pp: PPByte; len: Integer): Pstack_st_SCT; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_SCT_LIST';
 
-function i2o_SCT(sct: PSCT; &out: PPByte): Integer; cdecl;
+function i2o_SCT(sct: PSCT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2o_SCT';
 
-function o2i_SCT(psct: PPSCT; &in: PPByte; len: NativeUInt): PSCT; cdecl;
+function o2i_SCT(psct: PPSCT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: NativeUInt): PSCT; cdecl;
   external LIB_CRYPTO name _PU + 'o2i_SCT';
 
 (********************
  * CT log functions *
  ********************)
-function CTLOG_new(public_key: PEVP_PKEY; name: PUTF8Char): PCTLOG; cdecl;
+function CTLOG_new(public_key: PEVP_PKEY; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PCTLOG; cdecl;
   external LIB_CRYPTO name _PU + 'CTLOG_new';
 
-function CTLOG_new_from_base64(ct_log: PPCTLOG; pkey_base64: PUTF8Char; name: PUTF8Char): Integer; cdecl;
+function CTLOG_new_from_base64(ct_log: PPCTLOG; pkey_base64: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CTLOG_new_from_base64';
 
 procedure CTLOG_free(log: PCTLOG); cdecl;
   external LIB_CRYPTO name _PU + 'CTLOG_free';
 
-function CTLOG_get0_name(log: PCTLOG): PUTF8Char; cdecl;
+function CTLOG_get0_name(log: PCTLOG): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'CTLOG_get0_name';
 
 procedure CTLOG_get0_log_id(log: PCTLOG; log_id: PPUInt8; log_id_len: PNativeUInt); cdecl;
@@ -22817,7 +22830,7 @@ procedure CTLOG_STORE_free(store: PCTLOG_STORE); cdecl;
 function CTLOG_STORE_get0_log_by_id(store: PCTLOG_STORE; log_id: PUInt8; log_id_len: NativeUInt): PCTLOG; cdecl;
   external LIB_CRYPTO name _PU + 'CTLOG_STORE_get0_log_by_id';
 
-function CTLOG_STORE_load_file(store: PCTLOG_STORE; &file: PUTF8Char): Integer; cdecl;
+function CTLOG_STORE_load_file(store: PCTLOG_STORE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CTLOG_STORE_load_file';
 
 function CTLOG_STORE_load_default_file(store: PCTLOG_STORE): Integer; cdecl;
@@ -22826,7 +22839,7 @@ function CTLOG_STORE_load_default_file(store: PCTLOG_STORE): Integer; cdecl;
 function _shadow_DES_check_key(): PInteger; cdecl;
   external LIB_CRYPTO name _PU + '_shadow_DES_check_key';
 
-function DES_options(): PUTF8Char; cdecl;
+function DES_options(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'DES_options';
 
 procedure DES_ecb3_encrypt(input: Pconst_DES_cblock; output: PDES_cblock; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; enc: Integer); cdecl;
@@ -22844,7 +22857,7 @@ procedure DES_ncbc_encrypt(input: PByte; output: PByte; length: Integer; schedul
 procedure DES_xcbc_encrypt(input: PByte; output: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; inw: Pconst_DES_cblock; outw: Pconst_DES_cblock; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'DES_xcbc_encrypt';
 
-procedure DES_cfb_encrypt(&in: PByte; &out: PByte; numbits: Integer; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl;
+procedure DES_cfb_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; numbits: Integer; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'DES_cfb_encrypt';
 
 procedure DES_ecb_encrypt(input: Pconst_DES_cblock; output: PDES_cblock; ks: PDES_key_schedule; enc: Integer); cdecl;
@@ -22865,22 +22878,22 @@ procedure DES_decrypt3(data: PDES_LONG; ks1: PDES_key_schedule; ks2: PDES_key_sc
 procedure DES_ede3_cbc_encrypt(input: PByte; output: PByte; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'DES_ede3_cbc_encrypt';
 
-procedure DES_ede3_cfb64_encrypt(&in: PByte; &out: PByte; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; num: PInteger; enc: Integer); cdecl;
+procedure DES_ede3_cfb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'DES_ede3_cfb64_encrypt';
 
-procedure DES_ede3_cfb_encrypt(&in: PByte; &out: PByte; numbits: Integer; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl;
+procedure DES_ede3_cfb_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; numbits: Integer; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'DES_ede3_cfb_encrypt';
 
-procedure DES_ede3_ofb64_encrypt(&in: PByte; &out: PByte; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; num: PInteger); cdecl;
+procedure DES_ede3_ofb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; ks1: PDES_key_schedule; ks2: PDES_key_schedule; ks3: PDES_key_schedule; ivec: PDES_cblock; num: PInteger); cdecl;
   external LIB_CRYPTO name _PU + 'DES_ede3_ofb64_encrypt';
 
-function DES_fcrypt(buf: PUTF8Char; salt: PUTF8Char; ret: PUTF8Char): PUTF8Char; cdecl;
+function DES_fcrypt(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; salt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ret: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'DES_fcrypt';
 
-function DES_crypt(buf: PUTF8Char; salt: PUTF8Char): PUTF8Char; cdecl;
+function DES_crypt(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; salt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'DES_crypt';
 
-procedure DES_ofb_encrypt(&in: PByte; &out: PByte; numbits: Integer; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock); cdecl;
+procedure DES_ofb_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; numbits: Integer; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock); cdecl;
   external LIB_CRYPTO name _PU + 'DES_ofb_encrypt';
 
 procedure DES_pcbc_encrypt(input: PByte; output: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; enc: Integer); cdecl;
@@ -22915,16 +22928,16 @@ function DES_set_key_checked(key: Pconst_DES_cblock; schedule: PDES_key_schedule
 procedure DES_set_key_unchecked(key: Pconst_DES_cblock; schedule: PDES_key_schedule); cdecl;
   external LIB_CRYPTO name _PU + 'DES_set_key_unchecked';
 
-procedure DES_string_to_key(str: PUTF8Char; key: PDES_cblock); cdecl;
+procedure DES_string_to_key(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; key: PDES_cblock); cdecl;
   external LIB_CRYPTO name _PU + 'DES_string_to_key';
 
-procedure DES_string_to_2keys(str: PUTF8Char; key1: PDES_cblock; key2: PDES_cblock); cdecl;
+procedure DES_string_to_2keys(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; key1: PDES_cblock; key2: PDES_cblock); cdecl;
   external LIB_CRYPTO name _PU + 'DES_string_to_2keys';
 
-procedure DES_cfb64_encrypt(&in: PByte; &out: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; num: PInteger; enc: Integer); cdecl;
+procedure DES_cfb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'DES_cfb64_encrypt';
 
-procedure DES_ofb64_encrypt(&in: PByte; &out: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; num: PInteger); cdecl;
+procedure DES_ofb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; schedule: PDES_key_schedule; ivec: PDES_cblock; num: PInteger); cdecl;
   external LIB_CRYPTO name _PU + 'DES_ofb64_encrypt';
 
 function _openssl_ebcdic2ascii(dest: Pointer; srce: Pointer; count: NativeUInt): Pointer; cdecl;
@@ -22966,13 +22979,13 @@ procedure RAND_keep_random_devices_open(keep: Integer); cdecl;
 procedure RAND_add(buf: Pointer; num: Integer; randomness: Double); cdecl;
   external LIB_CRYPTO name _PU + 'RAND_add';
 
-function RAND_load_file(&file: PUTF8Char; max_bytes: Integer): Integer; cdecl;
+function RAND_load_file({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; max_bytes: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RAND_load_file';
 
-function RAND_write_file(&file: PUTF8Char): Integer; cdecl;
+function RAND_write_file({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RAND_write_file';
 
-function RAND_file_name(&file: PUTF8Char; num: NativeUInt): PUTF8Char; cdecl;
+function RAND_file_name({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; num: NativeUInt): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'RAND_file_name';
 
 function RAND_status(): Integer; cdecl;
@@ -22984,31 +22997,31 @@ function RAND_poll(): Integer; cdecl;
 function ERR_load_PEM_strings(): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_load_PEM_strings';
 
-function PEM_get_EVP_CIPHER_INFO(header: PUTF8Char; cipher: PEVP_CIPHER_INFO): Integer; cdecl;
+function PEM_get_EVP_CIPHER_INFO(header: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cipher: PEVP_CIPHER_INFO): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_get_EVP_CIPHER_INFO';
 
 function PEM_do_header(cipher: PEVP_CIPHER_INFO; data: PByte; len: PInteger; callback: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_do_header';
 
-function PEM_read_bio(bp: PBIO; name: PPUTF8Char; header: PPUTF8Char; data: PPByte; len: PInteger): Integer; cdecl;
+function PEM_read_bio(bp: PBIO; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; header: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; data: PPByte; len: PInteger): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_read_bio';
 
-function PEM_read_bio_ex(bp: PBIO; name: PPUTF8Char; header: PPUTF8Char; data: PPByte; len: PInteger; flags: Cardinal): Integer; cdecl;
+function PEM_read_bio_ex(bp: PBIO; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; header: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; data: PPByte; len: PInteger; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_read_bio_ex';
 
-function PEM_bytes_read_bio_secmem(pdata: PPByte; plen: PInteger; pnm: PPUTF8Char; name: PUTF8Char; bp: PBIO; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function PEM_bytes_read_bio_secmem(pdata: PPByte; plen: PInteger; pnm: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; bp: PBIO; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_bytes_read_bio_secmem';
 
-function PEM_write_bio(bp: PBIO; name: PUTF8Char; hdr: PUTF8Char; data: PByte; len: Integer): Integer; cdecl;
+function PEM_write_bio(bp: PBIO; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; hdr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; data: PByte; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_write_bio';
 
-function PEM_bytes_read_bio(pdata: PPByte; plen: PInteger; pnm: PPUTF8Char; name: PUTF8Char; bp: PBIO; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function PEM_bytes_read_bio(pdata: PPByte; plen: PInteger; pnm: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; bp: PBIO; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_bytes_read_bio';
 
-function PEM_ASN1_read_bio(d2i: Pd2i_of_void; name: PUTF8Char; bp: PBIO; x: PPointer; cb: Ppem_password_cb; u: Pointer): Pointer; cdecl;
+function PEM_ASN1_read_bio(d2i: Pd2i_of_void; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; bp: PBIO; x: PPointer; cb: Ppem_password_cb; u: Pointer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_ASN1_read_bio';
 
-function PEM_ASN1_write_bio(i2d: Pi2d_of_void; name: PUTF8Char; bp: PBIO; x: Pointer; enc: PEVP_CIPHER; kstr: PByte; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function PEM_ASN1_write_bio(i2d: Pi2d_of_void; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; bp: PBIO; x: Pointer; enc: PEVP_CIPHER; kstr: PByte; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_ASN1_write_bio';
 
 function PEM_X509_INFO_read_bio(bp: PBIO; sk: Pstack_st_X509_INFO; cb: Ppem_password_cb; u: Pointer): Pstack_st_X509_INFO; cdecl;
@@ -23017,22 +23030,22 @@ function PEM_X509_INFO_read_bio(bp: PBIO; sk: Pstack_st_X509_INFO; cb: Ppem_pass
 function PEM_X509_INFO_write_bio(bp: PBIO; xi: PX509_INFO; enc: PEVP_CIPHER; kstr: PByte; klen: Integer; cd: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_X509_INFO_write_bio';
 
-function PEM_read(fp: PPointer; name: PPUTF8Char; header: PPUTF8Char; data: PPByte; len: PInteger): Integer; cdecl;
+function PEM_read(fp: PPointer; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; header: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; data: PPByte; len: PInteger): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_read';
 
-function PEM_write(fp: PPointer; name: PUTF8Char; hdr: PUTF8Char; data: PByte; len: Integer): Integer; cdecl;
+function PEM_write(fp: PPointer; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; hdr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; data: PByte; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_write';
 
-function PEM_ASN1_read(d2i: Pd2i_of_void; name: PUTF8Char; fp: PPointer; x: PPointer; cb: Ppem_password_cb; u: Pointer): Pointer; cdecl;
+function PEM_ASN1_read(d2i: Pd2i_of_void; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; fp: PPointer; x: PPointer; cb: Ppem_password_cb; u: Pointer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_ASN1_read';
 
-function PEM_ASN1_write(i2d: Pi2d_of_void; name: PUTF8Char; fp: PPointer; x: Pointer; enc: PEVP_CIPHER; kstr: PByte; klen: Integer; callback: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function PEM_ASN1_write(i2d: Pi2d_of_void; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; fp: PPointer; x: Pointer; enc: PEVP_CIPHER; kstr: PByte; klen: Integer; callback: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_ASN1_write';
 
 function PEM_X509_INFO_read(fp: PPointer; sk: Pstack_st_X509_INFO; cb: Ppem_password_cb; u: Pointer): Pstack_st_X509_INFO; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_X509_INFO_read';
 
-function PEM_SignInit(ctx: PEVP_MD_CTX; &type: PEVP_MD): Integer; cdecl;
+function PEM_SignInit(ctx: PEVP_MD_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_SignInit';
 
 function PEM_SignUpdate(ctx: PEVP_MD_CTX; d: PByte; cnt: Cardinal): Integer; cdecl;
@@ -23041,13 +23054,13 @@ function PEM_SignUpdate(ctx: PEVP_MD_CTX; d: PByte; cnt: Cardinal): Integer; cde
 function PEM_SignFinal(ctx: PEVP_MD_CTX; sigret: PByte; siglen: PCardinal; pkey: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_SignFinal';
 
-function PEM_def_callback(buf: PUTF8Char; num: Integer; rwflag: Integer; userdata: Pointer): Integer; cdecl;
+function PEM_def_callback(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; num: Integer; rwflag: Integer; userdata: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_def_callback';
 
-procedure PEM_proc_type(buf: PUTF8Char; &type: Integer); cdecl;
+procedure PEM_proc_type(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'PEM_proc_type';
 
-procedure PEM_dek_info(buf: PUTF8Char; &type: PUTF8Char; len: Integer; str: PUTF8Char); cdecl;
+procedure PEM_dek_info(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}); cdecl;
   external LIB_CRYPTO name _PU + 'PEM_dek_info';
 
 function PEM_read_bio_X509(bp: PBIO; x: PPX509; cb: Ppem_password_cb; u: Pointer): PX509; cdecl;
@@ -23305,34 +23318,34 @@ function PEM_write_PUBKEY(fp: PPointer; x: PEVP_PKEY): Integer; cdecl;
 function PEM_write_bio_PrivateKey_traditional(bp: PBIO; x: PEVP_PKEY; enc: PEVP_CIPHER; kstr: PByte; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_write_bio_PrivateKey_traditional';
 
-function PEM_write_bio_PKCS8PrivateKey_nid(bp: PBIO; x: PEVP_PKEY; nid: Integer; kstr: PUTF8Char; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function PEM_write_bio_PKCS8PrivateKey_nid(bp: PBIO; x: PEVP_PKEY; nid: Integer; kstr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_write_bio_PKCS8PrivateKey_nid';
 
-function PEM_write_bio_PKCS8PrivateKey(p1: PBIO; p2: PEVP_PKEY; p3: PEVP_CIPHER; p4: PUTF8Char; p5: Integer; p6: Ppem_password_cb; p7: Pointer): Integer; cdecl;
+function PEM_write_bio_PKCS8PrivateKey(p1: PBIO; p2: PEVP_PKEY; p3: PEVP_CIPHER; p4: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; p5: Integer; p6: Ppem_password_cb; p7: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_write_bio_PKCS8PrivateKey';
 
-function i2d_PKCS8PrivateKey_bio(bp: PBIO; x: PEVP_PKEY; enc: PEVP_CIPHER; kstr: PUTF8Char; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function i2d_PKCS8PrivateKey_bio(bp: PBIO; x: PEVP_PKEY; enc: PEVP_CIPHER; kstr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS8PrivateKey_bio';
 
-function i2d_PKCS8PrivateKey_nid_bio(bp: PBIO; x: PEVP_PKEY; nid: Integer; kstr: PUTF8Char; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function i2d_PKCS8PrivateKey_nid_bio(bp: PBIO; x: PEVP_PKEY; nid: Integer; kstr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS8PrivateKey_nid_bio';
 
 function d2i_PKCS8PrivateKey_bio(bp: PBIO; x: PPEVP_PKEY; cb: Ppem_password_cb; u: Pointer): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS8PrivateKey_bio';
 
-function i2d_PKCS8PrivateKey_fp(fp: PPointer; x: PEVP_PKEY; enc: PEVP_CIPHER; kstr: PUTF8Char; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function i2d_PKCS8PrivateKey_fp(fp: PPointer; x: PEVP_PKEY; enc: PEVP_CIPHER; kstr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS8PrivateKey_fp';
 
-function i2d_PKCS8PrivateKey_nid_fp(fp: PPointer; x: PEVP_PKEY; nid: Integer; kstr: PUTF8Char; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function i2d_PKCS8PrivateKey_nid_fp(fp: PPointer; x: PEVP_PKEY; nid: Integer; kstr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS8PrivateKey_nid_fp';
 
-function PEM_write_PKCS8PrivateKey_nid(fp: PPointer; x: PEVP_PKEY; nid: Integer; kstr: PUTF8Char; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function PEM_write_PKCS8PrivateKey_nid(fp: PPointer; x: PEVP_PKEY; nid: Integer; kstr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; klen: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_write_PKCS8PrivateKey_nid';
 
 function d2i_PKCS8PrivateKey_fp(fp: PPointer; x: PPEVP_PKEY; cb: Ppem_password_cb; u: Pointer): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS8PrivateKey_fp';
 
-function PEM_write_PKCS8PrivateKey(fp: PPointer; x: PEVP_PKEY; enc: PEVP_CIPHER; kstr: PUTF8Char; klen: Integer; cd: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function PEM_write_PKCS8PrivateKey(fp: PPointer; x: PEVP_PKEY; enc: PEVP_CIPHER; kstr: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; klen: Integer; cd: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_write_PKCS8PrivateKey';
 
 function PEM_read_bio_Parameters(bp: PBIO; x: PPEVP_PKEY): PEVP_PKEY; cdecl;
@@ -23341,28 +23354,28 @@ function PEM_read_bio_Parameters(bp: PBIO; x: PPEVP_PKEY): PEVP_PKEY; cdecl;
 function PEM_write_bio_Parameters(bp: PBIO; x: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PEM_write_bio_Parameters';
 
-function b2i_PrivateKey(&in: PPByte; length: Integer): PEVP_PKEY; cdecl;
+function b2i_PrivateKey({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; length: Integer): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'b2i_PrivateKey';
 
-function b2i_PublicKey(&in: PPByte; length: Integer): PEVP_PKEY; cdecl;
+function b2i_PublicKey({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; length: Integer): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'b2i_PublicKey';
 
-function b2i_PrivateKey_bio(&in: PBIO): PEVP_PKEY; cdecl;
+function b2i_PrivateKey_bio({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'b2i_PrivateKey_bio';
 
-function b2i_PublicKey_bio(&in: PBIO): PEVP_PKEY; cdecl;
+function b2i_PublicKey_bio({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'b2i_PublicKey_bio';
 
-function i2b_PrivateKey_bio(&out: PBIO; pk: PEVP_PKEY): Integer; cdecl;
+function i2b_PrivateKey_bio({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; pk: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2b_PrivateKey_bio';
 
-function i2b_PublicKey_bio(&out: PBIO; pk: PEVP_PKEY): Integer; cdecl;
+function i2b_PublicKey_bio({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; pk: PEVP_PKEY): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2b_PublicKey_bio';
 
-function b2i_PVK_bio(&in: PBIO; cb: Ppem_password_cb; u: Pointer): PEVP_PKEY; cdecl;
+function b2i_PVK_bio({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; cb: Ppem_password_cb; u: Pointer): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'b2i_PVK_bio';
 
-function i2b_PVK_bio(&out: PBIO; pk: PEVP_PKEY; enclevel: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
+function i2b_PVK_bio({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; pk: PEVP_PKEY; enclevel: Integer; cb: Ppem_password_cb; u: Pointer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2b_PVK_bio';
 
 function ERR_load_UI_strings(): Integer; cdecl;
@@ -23377,37 +23390,37 @@ function UI_new_method(method: PUI_METHOD): PUI; cdecl;
 procedure UI_free(ui: PUI); cdecl;
   external LIB_CRYPTO name _PU + 'UI_free';
 
-function UI_add_input_string(ui: PUI; prompt: PUTF8Char; flags: Integer; result_buf: PUTF8Char; minsize: Integer; maxsize: Integer): Integer; cdecl;
+function UI_add_input_string(ui: PUI; prompt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Integer; result_buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; minsize: Integer; maxsize: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_add_input_string';
 
-function UI_dup_input_string(ui: PUI; prompt: PUTF8Char; flags: Integer; result_buf: PUTF8Char; minsize: Integer; maxsize: Integer): Integer; cdecl;
+function UI_dup_input_string(ui: PUI; prompt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Integer; result_buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; minsize: Integer; maxsize: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_dup_input_string';
 
-function UI_add_verify_string(ui: PUI; prompt: PUTF8Char; flags: Integer; result_buf: PUTF8Char; minsize: Integer; maxsize: Integer; test_buf: PUTF8Char): Integer; cdecl;
+function UI_add_verify_string(ui: PUI; prompt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Integer; result_buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; minsize: Integer; maxsize: Integer; test_buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_add_verify_string';
 
-function UI_dup_verify_string(ui: PUI; prompt: PUTF8Char; flags: Integer; result_buf: PUTF8Char; minsize: Integer; maxsize: Integer; test_buf: PUTF8Char): Integer; cdecl;
+function UI_dup_verify_string(ui: PUI; prompt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Integer; result_buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; minsize: Integer; maxsize: Integer; test_buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_dup_verify_string';
 
-function UI_add_input_boolean(ui: PUI; prompt: PUTF8Char; action_desc: PUTF8Char; ok_chars: PUTF8Char; cancel_chars: PUTF8Char; flags: Integer; result_buf: PUTF8Char): Integer; cdecl;
+function UI_add_input_boolean(ui: PUI; prompt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; action_desc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ok_chars: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cancel_chars: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Integer; result_buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_add_input_boolean';
 
-function UI_dup_input_boolean(ui: PUI; prompt: PUTF8Char; action_desc: PUTF8Char; ok_chars: PUTF8Char; cancel_chars: PUTF8Char; flags: Integer; result_buf: PUTF8Char): Integer; cdecl;
+function UI_dup_input_boolean(ui: PUI; prompt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; action_desc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ok_chars: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cancel_chars: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Integer; result_buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_dup_input_boolean';
 
-function UI_add_info_string(ui: PUI; text: PUTF8Char): Integer; cdecl;
+function UI_add_info_string(ui: PUI; text: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_add_info_string';
 
-function UI_dup_info_string(ui: PUI; text: PUTF8Char): Integer; cdecl;
+function UI_dup_info_string(ui: PUI; text: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_dup_info_string';
 
-function UI_add_error_string(ui: PUI; text: PUTF8Char): Integer; cdecl;
+function UI_add_error_string(ui: PUI; text: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_add_error_string';
 
-function UI_dup_error_string(ui: PUI; text: PUTF8Char): Integer; cdecl;
+function UI_dup_error_string(ui: PUI; text: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_dup_error_string';
 
-function UI_construct_prompt(ui_method: PUI; object_desc: PUTF8Char; object_name: PUTF8Char): PUTF8Char; cdecl;
+function UI_construct_prompt(ui_method: PUI; object_desc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; object_name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'UI_construct_prompt';
 
 function UI_add_user_data(ui: PUI; user_data: Pointer): Pointer; cdecl;
@@ -23419,7 +23432,7 @@ function UI_dup_user_data(ui: PUI; user_data: Pointer): Integer; cdecl;
 function UI_get0_user_data(ui: PUI): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_get0_user_data';
 
-function UI_get0_result(ui: PUI; i: Integer): PUTF8Char; cdecl;
+function UI_get0_result(ui: PUI; i: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'UI_get0_result';
 
 function UI_get_result_length(ui: PUI; i: Integer): Integer; cdecl;
@@ -23458,7 +23471,7 @@ function UI_OpenSSL(): PUI_METHOD; cdecl;
 function UI_null(): PUI_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'UI_null';
 
-function UI_create_method(name: PUTF8Char): PUI_METHOD; cdecl;
+function UI_create_method(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PUI_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'UI_create_method';
 
 procedure UI_destroy_method(ui_method: PUI_METHOD); cdecl;
@@ -23500,11 +23513,11 @@ type
 type
   UI_method_set_data_duplicator_destructor = procedure(ui: PUI; ui_data: Pointer); cdecl;
 
-function UI_method_set_data_duplicator(method: PUI_METHOD; duplicator: UI_method_set_data_duplicator_duplicator; &destructor: UI_method_set_data_duplicator_destructor): Integer; cdecl;
+function UI_method_set_data_duplicator(method: PUI_METHOD; duplicator: UI_method_set_data_duplicator_duplicator; {$IFNDEF FPC}{$IF CompilerVersion > 21}&destructor{$ELSE}destructor1{$IFEND}{$ELSE}&destructor{$ENDIF}: UI_method_set_data_duplicator_destructor): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_method_set_data_duplicator';
 
 type
-  UI_method_set_prompt_constructor_prompt_constructor = function(ui: PUI; object_desc: PUTF8Char; object_name: PUTF8Char): PUTF8Char; cdecl;
+  UI_method_set_prompt_constructor_prompt_constructor = function(ui: PUI; object_desc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; object_name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
 
 function UI_method_set_prompt_constructor(method: PUI_METHOD; prompt_constructor: UI_method_set_prompt_constructor_prompt_constructor): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_method_set_prompt_constructor';
@@ -23527,7 +23540,7 @@ function UI_method_set_ex_data(method: PUI_METHOD; idx: Integer; data: Pointer):
 //function UI_method_get_closer(p1: PUImethod: PUI_METHOD): Integer { TODO : Cannot convert original type "int (*)(UI *)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'UI_method_get_closer';
 
-//function UI_method_get_prompt_constructor(p1: PUIp2: PUTF8Charp3: PUTF8Charmethod: PUI_METHOD): Integer { TODO : Cannot convert original type "char *(*)(UI *, const char *, const char *)" }; cdecl;
+//function UI_method_get_prompt_constructor(p1: PUIp2: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}p3: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}method: PUI_METHOD): Integer { TODO : Cannot convert original type "char *(*)(UI *, const char *, const char *)" }; cdecl;
 //  external LIB_CRYPTO name _PU + 'UI_method_get_prompt_constructor';
 
 //function UI_method_get_data_duplicator(p1: PUIp2: Pointermethod: PUI_METHOD): Integer { TODO : Cannot convert original type "void *(*)(UI *, void *)" }; cdecl;
@@ -23545,19 +23558,19 @@ function UI_get_string_type(uis: PUI_STRING): UI_string_types; cdecl;
 function UI_get_input_flags(uis: PUI_STRING): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_get_input_flags';
 
-function UI_get0_output_string(uis: PUI_STRING): PUTF8Char; cdecl;
+function UI_get0_output_string(uis: PUI_STRING): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'UI_get0_output_string';
 
-function UI_get0_action_string(uis: PUI_STRING): PUTF8Char; cdecl;
+function UI_get0_action_string(uis: PUI_STRING): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'UI_get0_action_string';
 
-function UI_get0_result_string(uis: PUI_STRING): PUTF8Char; cdecl;
+function UI_get0_result_string(uis: PUI_STRING): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'UI_get0_result_string';
 
 function UI_get_result_string_length(uis: PUI_STRING): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_get_result_string_length';
 
-function UI_get0_test_string(uis: PUI_STRING): PUTF8Char; cdecl;
+function UI_get0_test_string(uis: PUI_STRING): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'UI_get0_test_string';
 
 function UI_get_result_minsize(uis: PUI_STRING): Integer; cdecl;
@@ -23566,74 +23579,74 @@ function UI_get_result_minsize(uis: PUI_STRING): Integer; cdecl;
 function UI_get_result_maxsize(uis: PUI_STRING): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_get_result_maxsize';
 
-function UI_set_result(ui: PUI; uis: PUI_STRING; result: PUTF8Char): Integer; cdecl;
+function UI_set_result(ui: PUI; uis: PUI_STRING; result: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_set_result';
 
-function UI_set_result_ex(ui: PUI; uis: PUI_STRING; result: PUTF8Char; len: Integer): Integer; cdecl;
+function UI_set_result_ex(ui: PUI; uis: PUI_STRING; result: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_set_result_ex';
 
-function UI_UTIL_read_pw_string(buf: PUTF8Char; length: Integer; prompt: PUTF8Char; verify: Integer): Integer; cdecl;
+function UI_UTIL_read_pw_string(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; length: Integer; prompt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; verify: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_UTIL_read_pw_string';
 
-function UI_UTIL_read_pw(buf: PUTF8Char; buff: PUTF8Char; size: Integer; prompt: PUTF8Char; verify: Integer): Integer; cdecl;
+function UI_UTIL_read_pw(buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; buff: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; size: Integer; prompt: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; verify: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'UI_UTIL_read_pw';
 
 function UI_UTIL_wrap_read_pem_callback(cb: Ppem_password_cb; rwflag: Integer): PUI_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'UI_UTIL_wrap_read_pem_callback';
 
-procedure ERR_put_error(lib: Integer; func: Integer; reason: Integer; &file: PUTF8Char; line: Integer); cdecl;
+procedure ERR_put_error(lib: Integer; func: Integer; reason: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; line: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'ERR_put_error';
 
-procedure ERR_set_error_data(data: PUTF8Char; flags: Integer); cdecl;
+procedure ERR_set_error_data(data: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; flags: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'ERR_set_error_data';
 
 function ERR_get_error(): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_get_error';
 
-function ERR_get_error_line(&file: PPUTF8Char; line: PInteger): Cardinal; cdecl;
+function ERR_get_error_line({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; line: PInteger): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_get_error_line';
 
-function ERR_get_error_line_data(&file: PPUTF8Char; line: PInteger; data: PPUTF8Char; flags: PInteger): Cardinal; cdecl;
+function ERR_get_error_line_data({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; line: PInteger; data: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; flags: PInteger): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_get_error_line_data';
 
 function ERR_peek_error(): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_peek_error';
 
-function ERR_peek_error_line(&file: PPUTF8Char; line: PInteger): Cardinal; cdecl;
+function ERR_peek_error_line({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; line: PInteger): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_peek_error_line';
 
-function ERR_peek_error_line_data(&file: PPUTF8Char; line: PInteger; data: PPUTF8Char; flags: PInteger): Cardinal; cdecl;
+function ERR_peek_error_line_data({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; line: PInteger; data: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; flags: PInteger): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_peek_error_line_data';
 
 function ERR_peek_last_error(): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_peek_last_error';
 
-function ERR_peek_last_error_line(&file: PPUTF8Char; line: PInteger): Cardinal; cdecl;
+function ERR_peek_last_error_line({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; line: PInteger): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_peek_last_error_line';
 
-function ERR_peek_last_error_line_data(&file: PPUTF8Char; line: PInteger; data: PPUTF8Char; flags: PInteger): Cardinal; cdecl;
+function ERR_peek_last_error_line_data({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; line: PInteger; data: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; flags: PInteger): Cardinal; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_peek_last_error_line_data';
 
 procedure ERR_clear_error(); cdecl;
   external LIB_CRYPTO name _PU + 'ERR_clear_error';
 
-function ERR_error_string(e: Cardinal; buf: PUTF8Char): PUTF8Char; cdecl;
+function ERR_error_string(e: Cardinal; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_error_string';
 
-procedure ERR_error_string_n(e: Cardinal; buf: PUTF8Char; len: NativeUInt); cdecl;
+procedure ERR_error_string_n(e: Cardinal; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: NativeUInt); cdecl;
   external LIB_CRYPTO name _PU + 'ERR_error_string_n';
 
-function ERR_lib_error_string(e: Cardinal): PUTF8Char; cdecl;
+function ERR_lib_error_string(e: Cardinal): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_lib_error_string';
 
-function ERR_func_error_string(e: Cardinal): PUTF8Char; cdecl;
+function ERR_func_error_string(e: Cardinal): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_func_error_string';
 
-function ERR_reason_error_string(e: Cardinal): PUTF8Char; cdecl;
+function ERR_reason_error_string(e: Cardinal): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_reason_error_string';
 
 type
-  ERR_print_errors_cb_cb = function(str: PUTF8Char; len: NativeUInt; u: Pointer): Integer; cdecl;
+  ERR_print_errors_cb_cb = function(str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: NativeUInt; u: Pointer): Integer; cdecl;
 
 procedure ERR_print_errors_cb(cb: ERR_print_errors_cb_cb; u: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'ERR_print_errors_cb';
@@ -23704,7 +23717,7 @@ function ENGINE_add(e: PENGINE): Integer; cdecl;
 function ENGINE_remove(e: PENGINE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_remove';
 
-function ENGINE_by_id(id: PUTF8Char): PENGINE; cdecl;
+function ENGINE_by_id(id: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PENGINE; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_by_id';
 
 procedure ENGINE_load_builtin_engines(); cdecl;
@@ -23815,10 +23828,10 @@ function ENGINE_cmd_is_executable(e: PENGINE; cmd: Integer): Integer; cdecl;
 type
   ENGINE_ctrl_cmd_f = procedure(); cdecl;
 
-function ENGINE_ctrl_cmd(e: PENGINE; cmd_name: PUTF8Char; i: Integer; p: Pointer; f: ENGINE_ctrl_cmd_f; cmd_optional: Integer): Integer; cdecl;
+function ENGINE_ctrl_cmd(e: PENGINE; cmd_name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; i: Integer; p: Pointer; f: ENGINE_ctrl_cmd_f; cmd_optional: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_ctrl_cmd';
 
-function ENGINE_ctrl_cmd_string(e: PENGINE; cmd_name: PUTF8Char; arg: PUTF8Char; cmd_optional: Integer): Integer; cdecl;
+function ENGINE_ctrl_cmd_string(e: PENGINE; cmd_name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; arg: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cmd_optional: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_ctrl_cmd_string';
 
 function ENGINE_new(): PENGINE; cdecl;
@@ -23830,10 +23843,10 @@ function ENGINE_free(e: PENGINE): Integer; cdecl;
 function ENGINE_up_ref(e: PENGINE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_up_ref';
 
-function ENGINE_set_id(e: PENGINE; id: PUTF8Char): Integer; cdecl;
+function ENGINE_set_id(e: PENGINE; id: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_set_id';
 
-function ENGINE_set_name(e: PENGINE; name: PUTF8Char): Integer; cdecl;
+function ENGINE_set_name(e: PENGINE; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_set_name';
 
 function ENGINE_set_RSA(e: PENGINE; rsa_meth: PRSA_METHOD): Integer; cdecl;
@@ -23896,10 +23909,10 @@ function ENGINE_set_ex_data(e: PENGINE; idx: Integer; arg: Pointer): Integer; cd
 function ENGINE_get_ex_data(e: PENGINE; idx: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_get_ex_data';
 
-function ENGINE_get_id(e: PENGINE): PUTF8Char; cdecl;
+function ENGINE_get_id(e: PENGINE): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_get_id';
 
-function ENGINE_get_name(e: PENGINE): PUTF8Char; cdecl;
+function ENGINE_get_name(e: PENGINE): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_get_name';
 
 function ENGINE_get_RSA(e: PENGINE): PRSA_METHOD; cdecl;
@@ -23962,10 +23975,10 @@ function ENGINE_get_pkey_meth(e: PENGINE; nid: Integer): PEVP_PKEY_METHOD; cdecl
 function ENGINE_get_pkey_asn1_meth(e: PENGINE; nid: Integer): PEVP_PKEY_ASN1_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_get_pkey_asn1_meth';
 
-function ENGINE_get_pkey_asn1_meth_str(e: PENGINE; str: PUTF8Char; len: Integer): PEVP_PKEY_ASN1_METHOD; cdecl;
+function ENGINE_get_pkey_asn1_meth_str(e: PENGINE; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer): PEVP_PKEY_ASN1_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_get_pkey_asn1_meth_str';
 
-function ENGINE_pkey_asn1_find_str(pe: PPENGINE; str: PUTF8Char; len: Integer): PEVP_PKEY_ASN1_METHOD; cdecl;
+function ENGINE_pkey_asn1_find_str(pe: PPENGINE; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; len: Integer): PEVP_PKEY_ASN1_METHOD; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_pkey_asn1_find_str';
 
 function ENGINE_get_cmd_defns(e: PENGINE): PENGINE_CMD_DEFN; cdecl;
@@ -23980,10 +23993,10 @@ function ENGINE_init(e: PENGINE): Integer; cdecl;
 function ENGINE_finish(e: PENGINE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_finish';
 
-function ENGINE_load_private_key(e: PENGINE; key_id: PUTF8Char; ui_method: PUI_METHOD; callback_data: Pointer): PEVP_PKEY; cdecl;
+function ENGINE_load_private_key(e: PENGINE; key_id: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ui_method: PUI_METHOD; callback_data: Pointer): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_load_private_key';
 
-function ENGINE_load_public_key(e: PENGINE; key_id: PUTF8Char; ui_method: PUI_METHOD; callback_data: Pointer): PEVP_PKEY; cdecl;
+function ENGINE_load_public_key(e: PENGINE; key_id: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ui_method: PUI_METHOD; callback_data: Pointer): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_load_public_key';
 
 function ENGINE_load_ssl_client_cert(e: PENGINE; s: PSSL; ca_dn: Pstack_st_X509_NAME; pcert: PPX509; ppkey: PPEVP_PKEY; pother: PPstack_st_X509; ui_method: PUI_METHOD; callback_data: Pointer): Integer; cdecl;
@@ -24019,7 +24032,7 @@ function ENGINE_get_pkey_asn1_meth_engine(nid: Integer): PENGINE; cdecl;
 function ENGINE_set_default_RSA(e: PENGINE): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_set_default_RSA';
 
-function ENGINE_set_default_string(e: PENGINE; def_list: PUTF8Char): Integer; cdecl;
+function ENGINE_set_default_string(e: PENGINE; def_list: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ENGINE_set_default_string';
 
 function ENGINE_set_default_DSA(e: PENGINE): Integer; cdecl;
@@ -24091,10 +24104,10 @@ procedure HMAC_CTX_set_flags(ctx: PHMAC_CTX; flags: Cardinal); cdecl;
 function HMAC_CTX_get_md(ctx: PHMAC_CTX): PEVP_MD; cdecl;
   external LIB_CRYPTO name _PU + 'HMAC_CTX_get_md';
 
-function IDEA_options(): PUTF8Char; cdecl;
+function IDEA_options(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'IDEA_options';
 
-procedure IDEA_ecb_encrypt(&in: PByte; &out: PByte; ks: PIDEA_KEY_SCHEDULE); cdecl;
+procedure IDEA_ecb_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; ks: PIDEA_KEY_SCHEDULE); cdecl;
   external LIB_CRYPTO name _PU + 'IDEA_ecb_encrypt';
 
 procedure IDEA_set_encrypt_key(key: PByte; ks: PIDEA_KEY_SCHEDULE); cdecl;
@@ -24103,16 +24116,16 @@ procedure IDEA_set_encrypt_key(key: PByte; ks: PIDEA_KEY_SCHEDULE); cdecl;
 procedure IDEA_set_decrypt_key(ek: PIDEA_KEY_SCHEDULE; dk: PIDEA_KEY_SCHEDULE); cdecl;
   external LIB_CRYPTO name _PU + 'IDEA_set_decrypt_key';
 
-procedure IDEA_cbc_encrypt(&in: PByte; &out: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; enc: Integer); cdecl;
+procedure IDEA_cbc_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'IDEA_cbc_encrypt';
 
-procedure IDEA_cfb64_encrypt(&in: PByte; &out: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; num: PInteger; enc: Integer); cdecl;
+procedure IDEA_cfb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'IDEA_cfb64_encrypt';
 
-procedure IDEA_ofb64_encrypt(&in: PByte; &out: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; num: PInteger); cdecl;
+procedure IDEA_ofb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; ks: PIDEA_KEY_SCHEDULE; iv: PByte; num: PInteger); cdecl;
   external LIB_CRYPTO name _PU + 'IDEA_ofb64_encrypt';
 
-procedure IDEA_encrypt(&in: PCardinal; ks: PIDEA_KEY_SCHEDULE); cdecl;
+procedure IDEA_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PCardinal; ks: PIDEA_KEY_SCHEDULE); cdecl;
   external LIB_CRYPTO name _PU + 'IDEA_encrypt';
 
 function ERR_load_KDF_strings(): Integer; cdecl;
@@ -24160,52 +24173,52 @@ function MDC2_Final(md: PByte; c: PMDC2_CTX): Integer; cdecl;
 function MDC2(d: PByte; n: NativeUInt; md: PByte): PByte; cdecl;
   external LIB_CRYPTO name _PU + 'MDC2';
 
-procedure CRYPTO_cbc128_encrypt(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f); cdecl;
+procedure CRYPTO_cbc128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_cbc128_encrypt';
 
-procedure CRYPTO_cbc128_decrypt(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f); cdecl;
+procedure CRYPTO_cbc128_decrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_cbc128_decrypt';
 
-procedure CRYPTO_ctr128_encrypt(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; ecount_buf: PByte; num: PCardinal; block: block128_f); cdecl;
+procedure CRYPTO_ctr128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; ecount_buf: PByte; num: PCardinal; block: block128_f); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ctr128_encrypt';
 
-procedure CRYPTO_ctr128_encrypt_ctr32(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; ecount_buf: PByte; num: PCardinal; ctr: ctr128_f); cdecl;
+procedure CRYPTO_ctr128_encrypt_ctr32({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; ecount_buf: PByte; num: PCardinal; ctr: ctr128_f); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ctr128_encrypt_ctr32';
 
-procedure CRYPTO_ofb128_encrypt(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; block: block128_f); cdecl;
+procedure CRYPTO_ofb128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; block: block128_f); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ofb128_encrypt';
 
-procedure CRYPTO_cfb128_encrypt(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl;
+procedure CRYPTO_cfb128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_cfb128_encrypt';
 
-procedure CRYPTO_cfb128_8_encrypt(&in: PByte; &out: PByte; length: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl;
+procedure CRYPTO_cfb128_8_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_cfb128_8_encrypt';
 
-procedure CRYPTO_cfb128_1_encrypt(&in: PByte; &out: PByte; bits: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl;
+procedure CRYPTO_cfb128_1_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; bits: NativeUInt; key: Pointer; ivec: PByte; num: PInteger; enc: Integer; block: block128_f); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_cfb128_1_encrypt';
 
-function CRYPTO_cts128_encrypt_block(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl;
+function CRYPTO_cts128_encrypt_block({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_cts128_encrypt_block';
 
-function CRYPTO_cts128_encrypt(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl;
+function CRYPTO_cts128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_cts128_encrypt';
 
-function CRYPTO_cts128_decrypt_block(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl;
+function CRYPTO_cts128_decrypt_block({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_cts128_decrypt_block';
 
-function CRYPTO_cts128_decrypt(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl;
+function CRYPTO_cts128_decrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_cts128_decrypt';
 
-function CRYPTO_nistcts128_encrypt_block(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl;
+function CRYPTO_nistcts128_encrypt_block({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_nistcts128_encrypt_block';
 
-function CRYPTO_nistcts128_encrypt(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl;
+function CRYPTO_nistcts128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_nistcts128_encrypt';
 
-function CRYPTO_nistcts128_decrypt_block(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl;
+function CRYPTO_nistcts128_decrypt_block({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; block: block128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_nistcts128_decrypt_block';
 
-function CRYPTO_nistcts128_decrypt(&in: PByte; &out: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl;
+function CRYPTO_nistcts128_decrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; key: Pointer; ivec: PByte; cbc: cbc128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_nistcts128_decrypt';
 
 function CRYPTO_gcm128_new(key: Pointer; block: block128_f): PGCM128_CONTEXT; cdecl;
@@ -24220,16 +24233,16 @@ procedure CRYPTO_gcm128_setiv(ctx: PGCM128_CONTEXT; iv: PByte; len: NativeUInt);
 function CRYPTO_gcm128_aad(ctx: PGCM128_CONTEXT; aad: PByte; len: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_gcm128_aad';
 
-function CRYPTO_gcm128_encrypt(ctx: PGCM128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt): Integer; cdecl;
+function CRYPTO_gcm128_encrypt(ctx: PGCM128_CONTEXT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_gcm128_encrypt';
 
-function CRYPTO_gcm128_decrypt(ctx: PGCM128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt): Integer; cdecl;
+function CRYPTO_gcm128_decrypt(ctx: PGCM128_CONTEXT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_gcm128_decrypt';
 
-function CRYPTO_gcm128_encrypt_ctr32(ctx: PGCM128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt; stream: ctr128_f): Integer; cdecl;
+function CRYPTO_gcm128_encrypt_ctr32(ctx: PGCM128_CONTEXT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; stream: ctr128_f): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_gcm128_encrypt_ctr32';
 
-function CRYPTO_gcm128_decrypt_ctr32(ctx: PGCM128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt; stream: ctr128_f): Integer; cdecl;
+function CRYPTO_gcm128_decrypt_ctr32(ctx: PGCM128_CONTEXT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; stream: ctr128_f): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_gcm128_decrypt_ctr32';
 
 function CRYPTO_gcm128_finish(ctx: PGCM128_CONTEXT; tag: PByte; len: NativeUInt): Integer; cdecl;
@@ -24250,34 +24263,34 @@ function CRYPTO_ccm128_setiv(ctx: PCCM128_CONTEXT; nonce: PByte; nlen: NativeUIn
 procedure CRYPTO_ccm128_aad(ctx: PCCM128_CONTEXT; aad: PByte; alen: NativeUInt); cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ccm128_aad';
 
-function CRYPTO_ccm128_encrypt(ctx: PCCM128_CONTEXT; inp: PByte; &out: PByte; len: NativeUInt): Integer; cdecl;
+function CRYPTO_ccm128_encrypt(ctx: PCCM128_CONTEXT; inp: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ccm128_encrypt';
 
-function CRYPTO_ccm128_decrypt(ctx: PCCM128_CONTEXT; inp: PByte; &out: PByte; len: NativeUInt): Integer; cdecl;
+function CRYPTO_ccm128_decrypt(ctx: PCCM128_CONTEXT; inp: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ccm128_decrypt';
 
-function CRYPTO_ccm128_encrypt_ccm64(ctx: PCCM128_CONTEXT; inp: PByte; &out: PByte; len: NativeUInt; stream: ccm128_f): Integer; cdecl;
+function CRYPTO_ccm128_encrypt_ccm64(ctx: PCCM128_CONTEXT; inp: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; stream: ccm128_f): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ccm128_encrypt_ccm64';
 
-function CRYPTO_ccm128_decrypt_ccm64(ctx: PCCM128_CONTEXT; inp: PByte; &out: PByte; len: NativeUInt; stream: ccm128_f): Integer; cdecl;
+function CRYPTO_ccm128_decrypt_ccm64(ctx: PCCM128_CONTEXT; inp: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; stream: ccm128_f): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ccm128_decrypt_ccm64';
 
 function CRYPTO_ccm128_tag(ctx: PCCM128_CONTEXT; tag: PByte; len: NativeUInt): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ccm128_tag';
 
-function CRYPTO_xts128_encrypt(ctx: PXTS128_CONTEXT; iv: PByte; inp: PByte; &out: PByte; len: NativeUInt; enc: Integer): Integer; cdecl;
+function CRYPTO_xts128_encrypt(ctx: PXTS128_CONTEXT; iv: PByte; inp: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; enc: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_xts128_encrypt';
 
-function CRYPTO_128_wrap(key: Pointer; iv: PByte; &out: PByte; &in: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl;
+function CRYPTO_128_wrap(key: Pointer; iv: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_128_wrap';
 
-function CRYPTO_128_unwrap(key: Pointer; iv: PByte; &out: PByte; &in: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl;
+function CRYPTO_128_unwrap(key: Pointer; iv: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_128_unwrap';
 
-function CRYPTO_128_wrap_pad(key: Pointer; icv: PByte; &out: PByte; &in: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl;
+function CRYPTO_128_wrap_pad(key: Pointer; icv: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_128_wrap_pad';
 
-function CRYPTO_128_unwrap_pad(key: Pointer; icv: PByte; &out: PByte; &in: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl;
+function CRYPTO_128_unwrap_pad(key: Pointer; icv: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: NativeUInt; block: block128_f): NativeUInt; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_128_unwrap_pad';
 
 function CRYPTO_ocb128_new(keyenc: Pointer; keydec: Pointer; encrypt: block128_f; decrypt: block128_f; stream: ocb128_f): POCB128_CONTEXT; cdecl;
@@ -24295,10 +24308,10 @@ function CRYPTO_ocb128_setiv(ctx: POCB128_CONTEXT; iv: PByte; len: NativeUInt; t
 function CRYPTO_ocb128_aad(ctx: POCB128_CONTEXT; aad: PByte; len: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ocb128_aad';
 
-function CRYPTO_ocb128_encrypt(ctx: POCB128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt): Integer; cdecl;
+function CRYPTO_ocb128_encrypt(ctx: POCB128_CONTEXT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ocb128_encrypt';
 
-function CRYPTO_ocb128_decrypt(ctx: POCB128_CONTEXT; &in: PByte; &out: PByte; len: NativeUInt): Integer; cdecl;
+function CRYPTO_ocb128_decrypt(ctx: POCB128_CONTEXT; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'CRYPTO_ocb128_decrypt';
 
 function CRYPTO_ocb128_finish(ctx: POCB128_CONTEXT; tag: PByte; len: NativeUInt): Integer; cdecl;
@@ -24316,10 +24329,10 @@ function ERR_load_OCSP_strings(): Integer; cdecl;
 function OCSP_CERTID_dup(id: POCSP_CERTID): POCSP_CERTID; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_CERTID_dup';
 
-function OCSP_sendreq_bio(b: PBIO; path: PUTF8Char; req: POCSP_REQUEST): POCSP_RESPONSE; cdecl;
+function OCSP_sendreq_bio(b: PBIO; path: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; req: POCSP_REQUEST): POCSP_RESPONSE; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_sendreq_bio';
 
-function OCSP_sendreq_new(io: PBIO; path: PUTF8Char; req: POCSP_REQUEST; maxline: Integer): POCSP_REQ_CTX; cdecl;
+function OCSP_sendreq_new(io: PBIO; path: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; req: POCSP_REQUEST; maxline: Integer): POCSP_REQ_CTX; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_sendreq_new';
 
 function OCSP_REQ_CTX_nbio(rctx: POCSP_REQ_CTX): Integer; cdecl;
@@ -24346,13 +24359,13 @@ function OCSP_REQ_CTX_nbio_d2i(rctx: POCSP_REQ_CTX; pval: PPASN1_VALUE; it: PASN
 function OCSP_REQ_CTX_get0_mem_bio(rctx: POCSP_REQ_CTX): PBIO; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_REQ_CTX_get0_mem_bio';
 
-function OCSP_REQ_CTX_http(rctx: POCSP_REQ_CTX; op: PUTF8Char; path: PUTF8Char): Integer; cdecl;
+function OCSP_REQ_CTX_http(rctx: POCSP_REQ_CTX; op: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; path: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_REQ_CTX_http';
 
 function OCSP_REQ_CTX_set1_req(rctx: POCSP_REQ_CTX; req: POCSP_REQUEST): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_REQ_CTX_set1_req';
 
-function OCSP_REQ_CTX_add1_header(rctx: POCSP_REQ_CTX; name: PUTF8Char; value: PUTF8Char): Integer; cdecl;
+function OCSP_REQ_CTX_add1_header(rctx: POCSP_REQ_CTX; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_REQ_CTX_add1_header';
 
 function OCSP_cert_to_id(dgst: PEVP_MD; subject: PX509; issuer: PX509): POCSP_CERTID; cdecl;
@@ -24436,7 +24449,7 @@ function OCSP_check_validity(thisupd: PASN1_GENERALIZEDTIME; nextupd: PASN1_GENE
 function OCSP_request_verify(req: POCSP_REQUEST; certs: Pstack_st_X509; store: PX509_STORE; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_request_verify';
 
-function OCSP_parse_url(url: PUTF8Char; phost: PPUTF8Char; pport: PPUTF8Char; ppath: PPUTF8Char; pssl: PInteger): Integer; cdecl;
+function OCSP_parse_url(url: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; phost: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; pport: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; ppath: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; pssl: PInteger): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_parse_url';
 
 function OCSP_id_issuer_cmp(a: POCSP_CERTID; b: POCSP_CERTID): Integer; cdecl;
@@ -24484,16 +24497,16 @@ function OCSP_RESPID_set_by_key(respid: POCSP_RESPID; cert: PX509): Integer; cde
 function OCSP_RESPID_match(respid: POCSP_RESPID; cert: PX509): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_RESPID_match';
 
-function OCSP_crlID_new(url: PUTF8Char; n: PInteger; tim: PUTF8Char): PX509_EXTENSION; cdecl;
+function OCSP_crlID_new(url: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; n: PInteger; tim: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PX509_EXTENSION; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_crlID_new';
 
-function OCSP_accept_responses_new(oids: PPUTF8Char): PX509_EXTENSION; cdecl;
+function OCSP_accept_responses_new(oids: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}): PX509_EXTENSION; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_accept_responses_new';
 
-function OCSP_archive_cutoff_new(tim: PUTF8Char): PX509_EXTENSION; cdecl;
+function OCSP_archive_cutoff_new(tim: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PX509_EXTENSION; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_archive_cutoff_new';
 
-function OCSP_url_svcloc_new(issuer: PX509_NAME; urls: PPUTF8Char): PX509_EXTENSION; cdecl;
+function OCSP_url_svcloc_new(issuer: PX509_NAME; urls: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}): PX509_EXTENSION; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_url_svcloc_new';
 
 function OCSP_REQUEST_get_ext_count(x: POCSP_REQUEST): Integer; cdecl;
@@ -24613,10 +24626,10 @@ function OCSP_SINGLERESP_new(): POCSP_SINGLERESP; cdecl;
 procedure OCSP_SINGLERESP_free(a: POCSP_SINGLERESP); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_SINGLERESP_free';
 
-function d2i_OCSP_SINGLERESP(a: PPOCSP_SINGLERESP; &in: PPByte; len: Integer): POCSP_SINGLERESP; cdecl;
+function d2i_OCSP_SINGLERESP(a: PPOCSP_SINGLERESP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_SINGLERESP; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_SINGLERESP';
 
-function i2d_OCSP_SINGLERESP(a: POCSP_SINGLERESP; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_SINGLERESP(a: POCSP_SINGLERESP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_SINGLERESP';
 
 function OCSP_SINGLERESP_it(): PASN1_ITEM; cdecl;
@@ -24628,10 +24641,10 @@ function OCSP_CERTSTATUS_new(): POCSP_CERTSTATUS; cdecl;
 procedure OCSP_CERTSTATUS_free(a: POCSP_CERTSTATUS); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_CERTSTATUS_free';
 
-function d2i_OCSP_CERTSTATUS(a: PPOCSP_CERTSTATUS; &in: PPByte; len: Integer): POCSP_CERTSTATUS; cdecl;
+function d2i_OCSP_CERTSTATUS(a: PPOCSP_CERTSTATUS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_CERTSTATUS; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_CERTSTATUS';
 
-function i2d_OCSP_CERTSTATUS(a: POCSP_CERTSTATUS; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_CERTSTATUS(a: POCSP_CERTSTATUS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_CERTSTATUS';
 
 function OCSP_CERTSTATUS_it(): PASN1_ITEM; cdecl;
@@ -24643,10 +24656,10 @@ function OCSP_REVOKEDINFO_new(): POCSP_REVOKEDINFO; cdecl;
 procedure OCSP_REVOKEDINFO_free(a: POCSP_REVOKEDINFO); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_REVOKEDINFO_free';
 
-function d2i_OCSP_REVOKEDINFO(a: PPOCSP_REVOKEDINFO; &in: PPByte; len: Integer): POCSP_REVOKEDINFO; cdecl;
+function d2i_OCSP_REVOKEDINFO(a: PPOCSP_REVOKEDINFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_REVOKEDINFO; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_REVOKEDINFO';
 
-function i2d_OCSP_REVOKEDINFO(a: POCSP_REVOKEDINFO; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_REVOKEDINFO(a: POCSP_REVOKEDINFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_REVOKEDINFO';
 
 function OCSP_REVOKEDINFO_it(): PASN1_ITEM; cdecl;
@@ -24658,10 +24671,10 @@ function OCSP_BASICRESP_new(): POCSP_BASICRESP; cdecl;
 procedure OCSP_BASICRESP_free(a: POCSP_BASICRESP); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_BASICRESP_free';
 
-function d2i_OCSP_BASICRESP(a: PPOCSP_BASICRESP; &in: PPByte; len: Integer): POCSP_BASICRESP; cdecl;
+function d2i_OCSP_BASICRESP(a: PPOCSP_BASICRESP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_BASICRESP; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_BASICRESP';
 
-function i2d_OCSP_BASICRESP(a: POCSP_BASICRESP; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_BASICRESP(a: POCSP_BASICRESP; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_BASICRESP';
 
 function OCSP_BASICRESP_it(): PASN1_ITEM; cdecl;
@@ -24673,10 +24686,10 @@ function OCSP_RESPDATA_new(): POCSP_RESPDATA; cdecl;
 procedure OCSP_RESPDATA_free(a: POCSP_RESPDATA); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_RESPDATA_free';
 
-function d2i_OCSP_RESPDATA(a: PPOCSP_RESPDATA; &in: PPByte; len: Integer): POCSP_RESPDATA; cdecl;
+function d2i_OCSP_RESPDATA(a: PPOCSP_RESPDATA; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_RESPDATA; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_RESPDATA';
 
-function i2d_OCSP_RESPDATA(a: POCSP_RESPDATA; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_RESPDATA(a: POCSP_RESPDATA; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_RESPDATA';
 
 function OCSP_RESPDATA_it(): PASN1_ITEM; cdecl;
@@ -24688,10 +24701,10 @@ function OCSP_RESPID_new(): POCSP_RESPID; cdecl;
 procedure OCSP_RESPID_free(a: POCSP_RESPID); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_RESPID_free';
 
-function d2i_OCSP_RESPID(a: PPOCSP_RESPID; &in: PPByte; len: Integer): POCSP_RESPID; cdecl;
+function d2i_OCSP_RESPID(a: PPOCSP_RESPID; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_RESPID; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_RESPID';
 
-function i2d_OCSP_RESPID(a: POCSP_RESPID; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_RESPID(a: POCSP_RESPID; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_RESPID';
 
 function OCSP_RESPID_it(): PASN1_ITEM; cdecl;
@@ -24703,10 +24716,10 @@ function OCSP_RESPONSE_new(): POCSP_RESPONSE; cdecl;
 procedure OCSP_RESPONSE_free(a: POCSP_RESPONSE); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_RESPONSE_free';
 
-function d2i_OCSP_RESPONSE(a: PPOCSP_RESPONSE; &in: PPByte; len: Integer): POCSP_RESPONSE; cdecl;
+function d2i_OCSP_RESPONSE(a: PPOCSP_RESPONSE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_RESPONSE; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_RESPONSE';
 
-function i2d_OCSP_RESPONSE(a: POCSP_RESPONSE; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_RESPONSE(a: POCSP_RESPONSE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_RESPONSE';
 
 function OCSP_RESPONSE_it(): PASN1_ITEM; cdecl;
@@ -24718,10 +24731,10 @@ function OCSP_RESPBYTES_new(): POCSP_RESPBYTES; cdecl;
 procedure OCSP_RESPBYTES_free(a: POCSP_RESPBYTES); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_RESPBYTES_free';
 
-function d2i_OCSP_RESPBYTES(a: PPOCSP_RESPBYTES; &in: PPByte; len: Integer): POCSP_RESPBYTES; cdecl;
+function d2i_OCSP_RESPBYTES(a: PPOCSP_RESPBYTES; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_RESPBYTES; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_RESPBYTES';
 
-function i2d_OCSP_RESPBYTES(a: POCSP_RESPBYTES; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_RESPBYTES(a: POCSP_RESPBYTES; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_RESPBYTES';
 
 function OCSP_RESPBYTES_it(): PASN1_ITEM; cdecl;
@@ -24733,10 +24746,10 @@ function OCSP_ONEREQ_new(): POCSP_ONEREQ; cdecl;
 procedure OCSP_ONEREQ_free(a: POCSP_ONEREQ); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_ONEREQ_free';
 
-function d2i_OCSP_ONEREQ(a: PPOCSP_ONEREQ; &in: PPByte; len: Integer): POCSP_ONEREQ; cdecl;
+function d2i_OCSP_ONEREQ(a: PPOCSP_ONEREQ; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_ONEREQ; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_ONEREQ';
 
-function i2d_OCSP_ONEREQ(a: POCSP_ONEREQ; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_ONEREQ(a: POCSP_ONEREQ; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_ONEREQ';
 
 function OCSP_ONEREQ_it(): PASN1_ITEM; cdecl;
@@ -24748,10 +24761,10 @@ function OCSP_CERTID_new(): POCSP_CERTID; cdecl;
 procedure OCSP_CERTID_free(a: POCSP_CERTID); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_CERTID_free';
 
-function d2i_OCSP_CERTID(a: PPOCSP_CERTID; &in: PPByte; len: Integer): POCSP_CERTID; cdecl;
+function d2i_OCSP_CERTID(a: PPOCSP_CERTID; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_CERTID; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_CERTID';
 
-function i2d_OCSP_CERTID(a: POCSP_CERTID; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_CERTID(a: POCSP_CERTID; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_CERTID';
 
 function OCSP_CERTID_it(): PASN1_ITEM; cdecl;
@@ -24763,10 +24776,10 @@ function OCSP_REQUEST_new(): POCSP_REQUEST; cdecl;
 procedure OCSP_REQUEST_free(a: POCSP_REQUEST); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_REQUEST_free';
 
-function d2i_OCSP_REQUEST(a: PPOCSP_REQUEST; &in: PPByte; len: Integer): POCSP_REQUEST; cdecl;
+function d2i_OCSP_REQUEST(a: PPOCSP_REQUEST; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_REQUEST; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_REQUEST';
 
-function i2d_OCSP_REQUEST(a: POCSP_REQUEST; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_REQUEST(a: POCSP_REQUEST; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_REQUEST';
 
 function OCSP_REQUEST_it(): PASN1_ITEM; cdecl;
@@ -24778,10 +24791,10 @@ function OCSP_SIGNATURE_new(): POCSP_SIGNATURE; cdecl;
 procedure OCSP_SIGNATURE_free(a: POCSP_SIGNATURE); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_SIGNATURE_free';
 
-function d2i_OCSP_SIGNATURE(a: PPOCSP_SIGNATURE; &in: PPByte; len: Integer): POCSP_SIGNATURE; cdecl;
+function d2i_OCSP_SIGNATURE(a: PPOCSP_SIGNATURE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_SIGNATURE; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_SIGNATURE';
 
-function i2d_OCSP_SIGNATURE(a: POCSP_SIGNATURE; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_SIGNATURE(a: POCSP_SIGNATURE; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_SIGNATURE';
 
 function OCSP_SIGNATURE_it(): PASN1_ITEM; cdecl;
@@ -24793,10 +24806,10 @@ function OCSP_REQINFO_new(): POCSP_REQINFO; cdecl;
 procedure OCSP_REQINFO_free(a: POCSP_REQINFO); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_REQINFO_free';
 
-function d2i_OCSP_REQINFO(a: PPOCSP_REQINFO; &in: PPByte; len: Integer): POCSP_REQINFO; cdecl;
+function d2i_OCSP_REQINFO(a: PPOCSP_REQINFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_REQINFO; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_REQINFO';
 
-function i2d_OCSP_REQINFO(a: POCSP_REQINFO; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_REQINFO(a: POCSP_REQINFO; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_REQINFO';
 
 function OCSP_REQINFO_it(): PASN1_ITEM; cdecl;
@@ -24808,10 +24821,10 @@ function OCSP_REQINFO_it(): PASN1_ITEM; cdecl;
 procedure OCSP_CRLID_free(a: POCSP_CRLID); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_CRLID_free';
 
-function d2i_OCSP_CRLID(a: PPOCSP_CRLID; &in: PPByte; len: Integer): POCSP_CRLID; cdecl;
+function d2i_OCSP_CRLID(a: PPOCSP_CRLID; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_CRLID; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_CRLID';
 
-function i2d_OCSP_CRLID(a: POCSP_CRLID; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_CRLID(a: POCSP_CRLID; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_CRLID';
 
 function OCSP_CRLID_it(): PASN1_ITEM; cdecl;
@@ -24823,22 +24836,22 @@ function OCSP_SERVICELOC_new(): POCSP_SERVICELOC; cdecl;
 procedure OCSP_SERVICELOC_free(a: POCSP_SERVICELOC); cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_SERVICELOC_free';
 
-function d2i_OCSP_SERVICELOC(a: PPOCSP_SERVICELOC; &in: PPByte; len: Integer): POCSP_SERVICELOC; cdecl;
+function d2i_OCSP_SERVICELOC(a: PPOCSP_SERVICELOC; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): POCSP_SERVICELOC; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_OCSP_SERVICELOC';
 
-function i2d_OCSP_SERVICELOC(a: POCSP_SERVICELOC; &out: PPByte): Integer; cdecl;
+function i2d_OCSP_SERVICELOC(a: POCSP_SERVICELOC; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_OCSP_SERVICELOC';
 
 function OCSP_SERVICELOC_it(): PASN1_ITEM; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_SERVICELOC_it';
 
-function OCSP_response_status_str(s: Integer): PUTF8Char; cdecl;
+function OCSP_response_status_str(s: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_response_status_str';
 
-function OCSP_cert_status_str(s: Integer): PUTF8Char; cdecl;
+function OCSP_cert_status_str(s: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_cert_status_str';
 
-function OCSP_crl_reason_str(s: Integer): PUTF8Char; cdecl;
+function OCSP_crl_reason_str(s: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OCSP_crl_reason_str';
 
 function OCSP_REQUEST_print(bp: PBIO; a: POCSP_REQUEST; flags: Cardinal): Integer; cdecl;
@@ -24920,24 +24933,24 @@ function PKCS12_SAFEBAG_create0_p8inf(p8: PPKCS8_PRIV_KEY_INFO): PPKCS12_SAFEBAG
 function PKCS12_SAFEBAG_create0_pkcs8(p8: PX509_SIG): PPKCS12_SAFEBAG; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_SAFEBAG_create0_pkcs8';
 
-function PKCS12_SAFEBAG_create_pkcs8_encrypt(pbe_nid: Integer; pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; p8inf: PPKCS8_PRIV_KEY_INFO): PPKCS12_SAFEBAG; cdecl;
+function PKCS12_SAFEBAG_create_pkcs8_encrypt(pbe_nid: Integer; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; p8inf: PPKCS8_PRIV_KEY_INFO): PPKCS12_SAFEBAG; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_SAFEBAG_create_pkcs8_encrypt';
-function PKCS12_MAKE_SHKEYBAG(pbe_nid: Integer; pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; p8inf: PPKCS8_PRIV_KEY_INFO): PPKCS12_SAFEBAG; cdecl;
+function PKCS12_MAKE_SHKEYBAG(pbe_nid: Integer; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; p8inf: PPKCS8_PRIV_KEY_INFO): PPKCS12_SAFEBAG; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_SAFEBAG_create_pkcs8_encrypt';
 
 function PKCS12_item_pack_safebag(obj: Pointer; it: PASN1_ITEM; nid1: Integer; nid2: Integer): PPKCS12_SAFEBAG; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_item_pack_safebag';
 
-function PKCS8_decrypt(p8: PX509_SIG; pass: PUTF8Char; passlen: Integer): PPKCS8_PRIV_KEY_INFO; cdecl;
+function PKCS8_decrypt(p8: PX509_SIG; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer): PPKCS8_PRIV_KEY_INFO; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS8_decrypt';
 
-function PKCS12_decrypt_skey(bag: PPKCS12_SAFEBAG; pass: PUTF8Char; passlen: Integer): PPKCS8_PRIV_KEY_INFO; cdecl;
+function PKCS12_decrypt_skey(bag: PPKCS12_SAFEBAG; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer): PPKCS8_PRIV_KEY_INFO; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_decrypt_skey';
 
-function PKCS8_encrypt(pbe_nid: Integer; cipher: PEVP_CIPHER; pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; p8: PPKCS8_PRIV_KEY_INFO): PX509_SIG; cdecl;
+function PKCS8_encrypt(pbe_nid: Integer; cipher: PEVP_CIPHER; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; p8: PPKCS8_PRIV_KEY_INFO): PX509_SIG; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS8_encrypt';
 
-function PKCS8_set0_pbe(pass: PUTF8Char; passlen: Integer; p8inf: PPKCS8_PRIV_KEY_INFO; pbe: PX509_ALGOR): PX509_SIG; cdecl;
+function PKCS8_set0_pbe(pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; p8inf: PPKCS8_PRIV_KEY_INFO; pbe: PX509_ALGOR): PX509_SIG; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS8_set0_pbe';
 
 function PKCS12_pack_p7data(sk: Pstack_st_PKCS12_SAFEBAG): PPKCS7; cdecl;
@@ -24946,10 +24959,10 @@ function PKCS12_pack_p7data(sk: Pstack_st_PKCS12_SAFEBAG): PPKCS7; cdecl;
 function PKCS12_unpack_p7data(p7: PPKCS7): Pstack_st_PKCS12_SAFEBAG; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_unpack_p7data';
 
-function PKCS12_pack_p7encdata(pbe_nid: Integer; pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; bags: Pstack_st_PKCS12_SAFEBAG): PPKCS7; cdecl;
+function PKCS12_pack_p7encdata(pbe_nid: Integer; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; bags: Pstack_st_PKCS12_SAFEBAG): PPKCS7; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_pack_p7encdata';
 
-function PKCS12_unpack_p7encdata(p7: PPKCS7; pass: PUTF8Char; passlen: Integer): Pstack_st_PKCS12_SAFEBAG; cdecl;
+function PKCS12_unpack_p7encdata(p7: PPKCS7; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer): Pstack_st_PKCS12_SAFEBAG; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_unpack_p7encdata';
 
 function PKCS12_pack_authsafes(p12: PPKCS12; safes: Pstack_st_PKCS7): Integer; cdecl;
@@ -24961,15 +24974,15 @@ function PKCS12_unpack_authsafes(p12: PPKCS12): Pstack_st_PKCS7; cdecl;
 function PKCS12_add_localkeyid(bag: PPKCS12_SAFEBAG; name: PByte; namelen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_add_localkeyid';
 
-function PKCS12_add_friendlyname_asc(bag: PPKCS12_SAFEBAG; name: PUTF8Char; namelen: Integer): Integer; cdecl;
+function PKCS12_add_friendlyname_asc(bag: PPKCS12_SAFEBAG; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; namelen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_add_friendlyname_asc';
 
-function PKCS12_add_friendlyname_utf8(bag: PPKCS12_SAFEBAG; name: PUTF8Char; namelen: Integer): Integer; cdecl;
+function PKCS12_add_friendlyname_utf8(bag: PPKCS12_SAFEBAG; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; namelen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_add_friendlyname_utf8';
-function PKCS12_add_friendlyname(bag: PPKCS12_SAFEBAG; name: PUTF8Char; namelen: Integer): Integer; cdecl;
+function PKCS12_add_friendlyname(bag: PPKCS12_SAFEBAG; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; namelen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_add_friendlyname_utf8';
 
-function PKCS12_add_CSPName_asc(bag: PPKCS12_SAFEBAG; name: PUTF8Char; namelen: Integer): Integer; cdecl;
+function PKCS12_add_CSPName_asc(bag: PPKCS12_SAFEBAG; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; namelen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_add_CSPName_asc';
 
 function PKCS12_add_friendlyname_uni(bag: PPKCS12_SAFEBAG; name: PByte; namelen: Integer): Integer; cdecl;
@@ -24981,60 +24994,60 @@ function PKCS8_add_keyusage(p8: PPKCS8_PRIV_KEY_INFO; usage: Integer): Integer; 
 function PKCS12_get_attr_gen(attrs: Pstack_st_X509_ATTRIBUTE; attr_nid: Integer): PASN1_TYPE; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_get_attr_gen';
 
-function PKCS12_get_friendlyname(bag: PPKCS12_SAFEBAG): PUTF8Char; cdecl;
+function PKCS12_get_friendlyname(bag: PPKCS12_SAFEBAG): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_get_friendlyname';
 
 function PKCS12_SAFEBAG_get0_attrs(bag: PPKCS12_SAFEBAG): Pstack_st_X509_ATTRIBUTE; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_SAFEBAG_get0_attrs';
 
-function PKCS12_pbe_crypt(algor: PX509_ALGOR; pass: PUTF8Char; passlen: Integer; &in: PByte; inlen: Integer; data: PPByte; datalen: PInteger; en_de: Integer): PByte; cdecl;
+function PKCS12_pbe_crypt(algor: PX509_ALGOR; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: Integer; data: PPByte; datalen: PInteger; en_de: Integer): PByte; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_pbe_crypt';
 
-function PKCS12_item_decrypt_d2i(algor: PX509_ALGOR; it: PASN1_ITEM; pass: PUTF8Char; passlen: Integer; oct: PASN1_OCTET_STRING; zbuf: Integer): Pointer; cdecl;
+function PKCS12_item_decrypt_d2i(algor: PX509_ALGOR; it: PASN1_ITEM; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; oct: PASN1_OCTET_STRING; zbuf: Integer): Pointer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_item_decrypt_d2i';
 
-function PKCS12_item_i2d_encrypt(algor: PX509_ALGOR; it: PASN1_ITEM; pass: PUTF8Char; passlen: Integer; obj: Pointer; zbuf: Integer): PASN1_OCTET_STRING; cdecl;
+function PKCS12_item_i2d_encrypt(algor: PX509_ALGOR; it: PASN1_ITEM; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; obj: Pointer; zbuf: Integer): PASN1_OCTET_STRING; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_item_i2d_encrypt';
 
 function PKCS12_init(mode: Integer): PPKCS12; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_init';
 
-function PKCS12_key_gen_asc(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; &out: PByte; md_type: PEVP_MD): Integer; cdecl;
+function PKCS12_key_gen_asc(pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; md_type: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_key_gen_asc';
 
-function PKCS12_key_gen_uni(pass: PByte; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; &out: PByte; md_type: PEVP_MD): Integer; cdecl;
+function PKCS12_key_gen_uni(pass: PByte; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; md_type: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_key_gen_uni';
 
-function PKCS12_key_gen_utf8(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; &out: PByte; md_type: PEVP_MD): Integer; cdecl;
+function PKCS12_key_gen_utf8(pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; md_type: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_key_gen_utf8';
-function PKCS12_key_gen(pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; &out: PByte; md_type: PEVP_MD): Integer; cdecl;
+function PKCS12_key_gen(pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; salt: PByte; saltlen: Integer; id: Integer; iter: Integer; n: Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; md_type: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_key_gen_utf8';
 
-function PKCS12_PBE_keyivgen(ctx: PEVP_CIPHER_CTX; pass: PUTF8Char; passlen: Integer; param: PASN1_TYPE; cipher: PEVP_CIPHER; md_type: PEVP_MD; en_de: Integer): Integer; cdecl;
+function PKCS12_PBE_keyivgen(ctx: PEVP_CIPHER_CTX; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; param: PASN1_TYPE; cipher: PEVP_CIPHER; md_type: PEVP_MD; en_de: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_PBE_keyivgen';
 
-function PKCS12_gen_mac(p12: PPKCS12; pass: PUTF8Char; passlen: Integer; mac: PByte; maclen: PCardinal): Integer; cdecl;
+function PKCS12_gen_mac(p12: PPKCS12; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; mac: PByte; maclen: PCardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_gen_mac';
 
-function PKCS12_verify_mac(p12: PPKCS12; pass: PUTF8Char; passlen: Integer): Integer; cdecl;
+function PKCS12_verify_mac(p12: PPKCS12; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_verify_mac';
 
-function PKCS12_set_mac(p12: PPKCS12; pass: PUTF8Char; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; md_type: PEVP_MD): Integer; cdecl;
+function PKCS12_set_mac(p12: PPKCS12; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; passlen: Integer; salt: PByte; saltlen: Integer; iter: Integer; md_type: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_set_mac';
 
 function PKCS12_setup_mac(p12: PPKCS12; iter: Integer; salt: PByte; saltlen: Integer; md_type: PEVP_MD): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_setup_mac';
 
-function OPENSSL_asc2uni(asc: PUTF8Char; asclen: Integer; uni: PPByte; unilen: PInteger): PByte; cdecl;
+function OPENSSL_asc2uni(asc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; asclen: Integer; uni: PPByte; unilen: PInteger): PByte; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_asc2uni';
 
-function OPENSSL_uni2asc(uni: PByte; unilen: Integer): PUTF8Char; cdecl;
+function OPENSSL_uni2asc(uni: PByte; unilen: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_uni2asc';
 
-function OPENSSL_utf82uni(asc: PUTF8Char; asclen: Integer; uni: PPByte; unilen: PInteger): PByte; cdecl;
+function OPENSSL_utf82uni(asc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; asclen: Integer; uni: PPByte; unilen: PInteger): PByte; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_utf82uni';
 
-function OPENSSL_uni2utf8(uni: PByte; unilen: Integer): PUTF8Char; cdecl;
+function OPENSSL_uni2utf8(uni: PByte; unilen: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OPENSSL_uni2utf8';
 
 function PKCS12_new(): PPKCS12; cdecl;
@@ -25043,10 +25056,10 @@ function PKCS12_new(): PPKCS12; cdecl;
 procedure PKCS12_free(a: PPKCS12); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_free';
 
-function d2i_PKCS12(a: PPPKCS12; &in: PPByte; len: Integer): PPKCS12; cdecl;
+function d2i_PKCS12(a: PPPKCS12; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS12; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS12';
 
-function i2d_PKCS12(a: PPKCS12; &out: PPByte): Integer; cdecl;
+function i2d_PKCS12(a: PPKCS12; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS12';
 
 function PKCS12_it(): PASN1_ITEM; cdecl;
@@ -25058,10 +25071,10 @@ function PKCS12_MAC_DATA_new(): PPKCS12_MAC_DATA; cdecl;
 procedure PKCS12_MAC_DATA_free(a: PPKCS12_MAC_DATA); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_MAC_DATA_free';
 
-function d2i_PKCS12_MAC_DATA(a: PPPKCS12_MAC_DATA; &in: PPByte; len: Integer): PPKCS12_MAC_DATA; cdecl;
+function d2i_PKCS12_MAC_DATA(a: PPPKCS12_MAC_DATA; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS12_MAC_DATA; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS12_MAC_DATA';
 
-function i2d_PKCS12_MAC_DATA(a: PPKCS12_MAC_DATA; &out: PPByte): Integer; cdecl;
+function i2d_PKCS12_MAC_DATA(a: PPKCS12_MAC_DATA; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS12_MAC_DATA';
 
 function PKCS12_MAC_DATA_it(): PASN1_ITEM; cdecl;
@@ -25073,10 +25086,10 @@ function PKCS12_SAFEBAG_new(): PPKCS12_SAFEBAG; cdecl;
 procedure PKCS12_SAFEBAG_free(a: PPKCS12_SAFEBAG); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_SAFEBAG_free';
 
-function d2i_PKCS12_SAFEBAG(a: PPPKCS12_SAFEBAG; &in: PPByte; len: Integer): PPKCS12_SAFEBAG; cdecl;
+function d2i_PKCS12_SAFEBAG(a: PPPKCS12_SAFEBAG; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS12_SAFEBAG; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS12_SAFEBAG';
 
-function i2d_PKCS12_SAFEBAG(a: PPKCS12_SAFEBAG; &out: PPByte): Integer; cdecl;
+function i2d_PKCS12_SAFEBAG(a: PPKCS12_SAFEBAG; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS12_SAFEBAG';
 
 function PKCS12_SAFEBAG_it(): PASN1_ITEM; cdecl;
@@ -25088,10 +25101,10 @@ function PKCS12_BAGS_new(): PPKCS12_BAGS; cdecl;
 procedure PKCS12_BAGS_free(a: PPKCS12_BAGS); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_BAGS_free';
 
-function d2i_PKCS12_BAGS(a: PPPKCS12_BAGS; &in: PPByte; len: Integer): PPKCS12_BAGS; cdecl;
+function d2i_PKCS12_BAGS(a: PPPKCS12_BAGS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PPByte; len: Integer): PPKCS12_BAGS; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS12_BAGS';
 
-function i2d_PKCS12_BAGS(a: PPKCS12_BAGS; &out: PPByte): Integer; cdecl;
+function i2d_PKCS12_BAGS(a: PPKCS12_BAGS; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'i2d_PKCS12_BAGS';
 
 function PKCS12_BAGS_it(): PASN1_ITEM; cdecl;
@@ -25106,19 +25119,19 @@ function PKCS12_AUTHSAFES_it(): PASN1_ITEM; cdecl;
 procedure PKCS12_PBE_add(); cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_PBE_add';
 
-function PKCS12_parse(p12: PPKCS12; pass: PUTF8Char; pkey: PPEVP_PKEY; cert: PPX509; ca: PPstack_st_X509): Integer; cdecl;
+function PKCS12_parse(p12: PPKCS12; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pkey: PPEVP_PKEY; cert: PPX509; ca: PPstack_st_X509): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_parse';
 
-function PKCS12_create(pass: PUTF8Char; name: PUTF8Char; pkey: PEVP_PKEY; cert: PX509; ca: Pstack_st_X509; nid_key: Integer; nid_cert: Integer; iter: Integer; mac_iter: Integer; keytype: Integer): PPKCS12; cdecl;
+function PKCS12_create(pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pkey: PEVP_PKEY; cert: PX509; ca: Pstack_st_X509; nid_key: Integer; nid_cert: Integer; iter: Integer; mac_iter: Integer; keytype: Integer): PPKCS12; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_create';
 
 function PKCS12_add_cert(pbags: PPstack_st_PKCS12_SAFEBAG; cert: PX509): PPKCS12_SAFEBAG; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_add_cert';
 
-function PKCS12_add_key(pbags: PPstack_st_PKCS12_SAFEBAG; key: PEVP_PKEY; key_usage: Integer; iter: Integer; key_nid: Integer; pass: PUTF8Char): PPKCS12_SAFEBAG; cdecl;
+function PKCS12_add_key(pbags: PPstack_st_PKCS12_SAFEBAG; key: PEVP_PKEY; key_usage: Integer; iter: Integer; key_nid: Integer; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PPKCS12_SAFEBAG; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_add_key';
 
-function PKCS12_add_safe(psafes: PPstack_st_PKCS7; bags: Pstack_st_PKCS12_SAFEBAG; safe_nid: Integer; iter: Integer; pass: PUTF8Char): Integer; cdecl;
+function PKCS12_add_safe(psafes: PPstack_st_PKCS7; bags: Pstack_st_PKCS12_SAFEBAG; safe_nid: Integer; iter: Integer; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_add_safe';
 
 function PKCS12_add_safes(safes: Pstack_st_PKCS7; p7_nid: Integer): PPKCS12; cdecl;
@@ -25136,19 +25149,19 @@ function d2i_PKCS12_bio(bp: PBIO; p12: PPPKCS12): PPKCS12; cdecl;
 function d2i_PKCS12_fp(fp: PPointer; p12: PPPKCS12): PPKCS12; cdecl;
   external LIB_CRYPTO name _PU + 'd2i_PKCS12_fp';
 
-function PKCS12_newpass(p12: PPKCS12; oldpass: PUTF8Char; newpass: PUTF8Char): Integer; cdecl;
+function PKCS12_newpass(p12: PPKCS12; oldpass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; newpass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'PKCS12_newpass';
 
-function RAND_DRBG_new(&type: Integer; flags: Cardinal; parent: PRAND_DRBG): PRAND_DRBG; cdecl;
+function RAND_DRBG_new({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; flags: Cardinal; parent: PRAND_DRBG): PRAND_DRBG; cdecl;
   external LIB_CRYPTO name _PU + 'RAND_DRBG_new';
 
-function RAND_DRBG_secure_new(&type: Integer; flags: Cardinal; parent: PRAND_DRBG): PRAND_DRBG; cdecl;
+function RAND_DRBG_secure_new({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; flags: Cardinal; parent: PRAND_DRBG): PRAND_DRBG; cdecl;
   external LIB_CRYPTO name _PU + 'RAND_DRBG_secure_new';
 
-function RAND_DRBG_set(drbg: PRAND_DRBG; &type: Integer; flags: Cardinal): Integer; cdecl;
+function RAND_DRBG_set(drbg: PRAND_DRBG; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RAND_DRBG_set';
 
-function RAND_DRBG_set_defaults(&type: Integer; flags: Cardinal): Integer; cdecl;
+function RAND_DRBG_set_defaults({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; flags: Cardinal): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RAND_DRBG_set_defaults';
 
 function RAND_DRBG_instantiate(drbg: PRAND_DRBG; pers: PByte; perslen: NativeUInt): Integer; cdecl;
@@ -25163,10 +25176,10 @@ procedure RAND_DRBG_free(drbg: PRAND_DRBG); cdecl;
 function RAND_DRBG_reseed(drbg: PRAND_DRBG; adin: PByte; adinlen: NativeUInt; prediction_resistance: Integer): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RAND_DRBG_reseed';
 
-function RAND_DRBG_generate(drbg: PRAND_DRBG; &out: PByte; outlen: NativeUInt; prediction_resistance: Integer; adin: PByte; adinlen: NativeUInt): Integer; cdecl;
+function RAND_DRBG_generate(drbg: PRAND_DRBG; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: NativeUInt; prediction_resistance: Integer; adin: PByte; adinlen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RAND_DRBG_generate';
 
-function RAND_DRBG_bytes(drbg: PRAND_DRBG; &out: PByte; outlen: NativeUInt): Integer; cdecl;
+function RAND_DRBG_bytes(drbg: PRAND_DRBG; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'RAND_DRBG_bytes';
 
 function RAND_DRBG_set_reseed_interval(drbg: PRAND_DRBG; interval: Cardinal): Integer; cdecl;
@@ -25199,7 +25212,7 @@ function RAND_DRBG_set_callbacks(drbg: PRAND_DRBG; get_entropy: RAND_DRBG_get_en
 procedure RC2_set_key(key: PRC2_KEY; len: Integer; data: PByte; bits: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'RC2_set_key';
 
-procedure RC2_ecb_encrypt(&in: PByte; &out: PByte; key: PRC2_KEY; enc: Integer); cdecl;
+procedure RC2_ecb_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; key: PRC2_KEY; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'RC2_ecb_encrypt';
 
 procedure RC2_encrypt(data: PCardinal; key: PRC2_KEY); cdecl;
@@ -25208,16 +25221,16 @@ procedure RC2_encrypt(data: PCardinal; key: PRC2_KEY); cdecl;
 procedure RC2_decrypt(data: PCardinal; key: PRC2_KEY); cdecl;
   external LIB_CRYPTO name _PU + 'RC2_decrypt';
 
-procedure RC2_cbc_encrypt(&in: PByte; &out: PByte; length: Integer; ks: PRC2_KEY; iv: PByte; enc: Integer); cdecl;
+procedure RC2_cbc_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; ks: PRC2_KEY; iv: PByte; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'RC2_cbc_encrypt';
 
-procedure RC2_cfb64_encrypt(&in: PByte; &out: PByte; length: Integer; schedule: PRC2_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
+procedure RC2_cfb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; schedule: PRC2_KEY; ivec: PByte; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'RC2_cfb64_encrypt';
 
-procedure RC2_ofb64_encrypt(&in: PByte; &out: PByte; length: Integer; schedule: PRC2_KEY; ivec: PByte; num: PInteger); cdecl;
+procedure RC2_ofb64_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; length: Integer; schedule: PRC2_KEY; ivec: PByte; num: PInteger); cdecl;
   external LIB_CRYPTO name _PU + 'RC2_ofb64_encrypt';
 
-function RC4_options(): PUTF8Char; cdecl;
+function RC4_options(): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'RC4_options';
 
 procedure RC4_set_key(key: PRC4_KEY; len: Integer; data: PByte); cdecl;
@@ -25250,46 +25263,46 @@ procedure SEED_encrypt(s: PByte; d: PByte; ks: PSEED_KEY_SCHEDULE); cdecl;
 procedure SEED_decrypt(s: PByte; d: PByte; ks: PSEED_KEY_SCHEDULE); cdecl;
   external LIB_CRYPTO name _PU + 'SEED_decrypt';
 
-procedure SEED_ecb_encrypt(&in: PByte; &out: PByte; ks: PSEED_KEY_SCHEDULE; enc: Integer); cdecl;
+procedure SEED_ecb_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; ks: PSEED_KEY_SCHEDULE; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'SEED_ecb_encrypt';
 
-procedure SEED_cbc_encrypt(&in: PByte; &out: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; enc: Integer); cdecl;
+procedure SEED_cbc_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'SEED_cbc_encrypt';
 
-procedure SEED_cfb128_encrypt(&in: PByte; &out: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; num: PInteger; enc: Integer); cdecl;
+procedure SEED_cfb128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; num: PInteger; enc: Integer); cdecl;
   external LIB_CRYPTO name _PU + 'SEED_cfb128_encrypt';
 
-procedure SEED_ofb128_encrypt(&in: PByte; &out: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; num: PInteger); cdecl;
+procedure SEED_ofb128_encrypt({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; len: NativeUInt; ks: PSEED_KEY_SCHEDULE; ivec: PByte; num: PInteger); cdecl;
   external LIB_CRYPTO name _PU + 'SEED_ofb128_encrypt';
 
 procedure SRP_user_pwd_free(user_pwd: PSRP_user_pwd); cdecl;
   external LIB_CRYPTO name _PU + 'SRP_user_pwd_free';
 
-function SRP_VBASE_new(seed_key: PUTF8Char): PSRP_VBASE; cdecl;
+function SRP_VBASE_new(seed_key: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PSRP_VBASE; cdecl;
   external LIB_CRYPTO name _PU + 'SRP_VBASE_new';
 
 procedure SRP_VBASE_free(vb: PSRP_VBASE); cdecl;
   external LIB_CRYPTO name _PU + 'SRP_VBASE_free';
 
-function SRP_VBASE_init(vb: PSRP_VBASE; verifier_file: PUTF8Char): Integer; cdecl;
+function SRP_VBASE_init(vb: PSRP_VBASE; verifier_file: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'SRP_VBASE_init';
 
-function SRP_VBASE_get_by_user(vb: PSRP_VBASE; username: PUTF8Char): PSRP_user_pwd; cdecl;
+function SRP_VBASE_get_by_user(vb: PSRP_VBASE; username: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PSRP_user_pwd; cdecl;
   external LIB_CRYPTO name _PU + 'SRP_VBASE_get_by_user';
 
-function SRP_VBASE_get1_by_user(vb: PSRP_VBASE; username: PUTF8Char): PSRP_user_pwd; cdecl;
+function SRP_VBASE_get1_by_user(vb: PSRP_VBASE; username: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PSRP_user_pwd; cdecl;
   external LIB_CRYPTO name _PU + 'SRP_VBASE_get1_by_user';
 
-function SRP_create_verifier(user: PUTF8Char; pass: PUTF8Char; salt: PPUTF8Char; verifier: PPUTF8Char; N: PUTF8Char; g: PUTF8Char): PUTF8Char; cdecl;
+function SRP_create_verifier(user: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; salt: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; verifier: {$IFNDEF FPC}{$IF CompilerVersion > 21}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ELSE}PWideChar{$IFEND}{$ELSE}{$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}{$ENDIF}; N: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; g: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'SRP_create_verifier';
 
-function SRP_create_verifier_BN(user: PUTF8Char; pass: PUTF8Char; salt: PPBIGNUM; verifier: PPBIGNUM; N: PBIGNUM; g: PBIGNUM): Integer; cdecl;
+function SRP_create_verifier_BN(user: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; salt: PPBIGNUM; verifier: PPBIGNUM; N: PBIGNUM; g: PBIGNUM): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'SRP_create_verifier_BN';
 
-function SRP_check_known_gN_param(g: PBIGNUM; N: PBIGNUM): PUTF8Char; cdecl;
+function SRP_check_known_gN_param(g: PBIGNUM; N: PBIGNUM): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'SRP_check_known_gN_param';
 
-function SRP_get_default_gN(id: PUTF8Char): PSRP_gN; cdecl;
+function SRP_get_default_gN(id: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PSRP_gN; cdecl;
   external LIB_CRYPTO name _PU + 'SRP_get_default_gN';
 
 function SRP_Calc_server_key(A: PBIGNUM; v: PBIGNUM; u: PBIGNUM; b: PBIGNUM; N: PBIGNUM): PBIGNUM; cdecl;
@@ -25304,7 +25317,7 @@ function SRP_Verify_A_mod_N(A: PBIGNUM; N: PBIGNUM): Integer; cdecl;
 function SRP_Calc_u(A: PBIGNUM; B: PBIGNUM; N: PBIGNUM): PBIGNUM; cdecl;
   external LIB_CRYPTO name _PU + 'SRP_Calc_u';
 
-function SRP_Calc_x(s: PBIGNUM; user: PUTF8Char; pass: PUTF8Char): PBIGNUM; cdecl;
+function SRP_Calc_x(s: PBIGNUM; user: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PBIGNUM; cdecl;
   external LIB_CRYPTO name _PU + 'SRP_Calc_x';
 
 function SRP_Calc_A(a: PBIGNUM; N: PBIGNUM; g: PBIGNUM): PBIGNUM; cdecl;
@@ -25325,7 +25338,7 @@ procedure DTLS_set_timer_cb(s: PSSL; cb: DTLS_timer_cb); cdecl;
 function ERR_load_OSSL_STORE_strings(): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'ERR_load_OSSL_STORE_strings';
 
-function OSSL_STORE_open(uri: PUTF8Char; ui_method: PUI_METHOD; ui_data: Pointer; post_process: OSSL_STORE_post_process_info_fn; post_process_data: Pointer): POSSL_STORE_CTX; cdecl;
+function OSSL_STORE_open(uri: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ui_method: PUI_METHOD; ui_data: Pointer; post_process: OSSL_STORE_post_process_info_fn; post_process_data: Pointer): POSSL_STORE_CTX; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_open';
 
 function OSSL_STORE_ctrl(ctx: POSSL_STORE_CTX; cmd: Integer): Integer varargs; cdecl;
@@ -25346,10 +25359,10 @@ function OSSL_STORE_error(ctx: POSSL_STORE_CTX): Integer; cdecl;
 function OSSL_STORE_close(ctx: POSSL_STORE_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_close';
 
-function OSSL_STORE_INFO_new_NAME(name: PUTF8Char): POSSL_STORE_INFO; cdecl;
+function OSSL_STORE_INFO_new_NAME(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): POSSL_STORE_INFO; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_INFO_new_NAME';
 
-function OSSL_STORE_INFO_set0_NAME_description(info: POSSL_STORE_INFO; desc: PUTF8Char): Integer; cdecl;
+function OSSL_STORE_INFO_set0_NAME_description(info: POSSL_STORE_INFO; desc: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_INFO_set0_NAME_description';
 
 function OSSL_STORE_INFO_new_PARAMS(params: PEVP_PKEY): POSSL_STORE_INFO; cdecl;
@@ -25367,16 +25380,16 @@ function OSSL_STORE_INFO_new_CRL(crl: PX509_CRL): POSSL_STORE_INFO; cdecl;
 function OSSL_STORE_INFO_get_type(info: POSSL_STORE_INFO): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_INFO_get_type';
 
-function OSSL_STORE_INFO_get0_NAME(info: POSSL_STORE_INFO): PUTF8Char; cdecl;
+function OSSL_STORE_INFO_get0_NAME(info: POSSL_STORE_INFO): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_INFO_get0_NAME';
 
-function OSSL_STORE_INFO_get1_NAME(info: POSSL_STORE_INFO): PUTF8Char; cdecl;
+function OSSL_STORE_INFO_get1_NAME(info: POSSL_STORE_INFO): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_INFO_get1_NAME';
 
-function OSSL_STORE_INFO_get0_NAME_description(info: POSSL_STORE_INFO): PUTF8Char; cdecl;
+function OSSL_STORE_INFO_get0_NAME_description(info: POSSL_STORE_INFO): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_INFO_get0_NAME_description';
 
-function OSSL_STORE_INFO_get1_NAME_description(info: POSSL_STORE_INFO): PUTF8Char; cdecl;
+function OSSL_STORE_INFO_get1_NAME_description(info: POSSL_STORE_INFO): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_INFO_get1_NAME_description';
 
 function OSSL_STORE_INFO_get0_PARAMS(info: POSSL_STORE_INFO): PEVP_PKEY; cdecl;
@@ -25403,7 +25416,7 @@ function OSSL_STORE_INFO_get0_CRL(info: POSSL_STORE_INFO): PX509_CRL; cdecl;
 function OSSL_STORE_INFO_get1_CRL(info: POSSL_STORE_INFO): PX509_CRL; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_INFO_get1_CRL';
 
-function OSSL_STORE_INFO_type_string(&type: Integer): PUTF8Char; cdecl;
+function OSSL_STORE_INFO_type_string({$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_INFO_type_string';
 
 procedure OSSL_STORE_INFO_free(info: POSSL_STORE_INFO); cdecl;
@@ -25421,7 +25434,7 @@ function OSSL_STORE_SEARCH_by_issuer_serial(name: PX509_NAME; serial: PASN1_INTE
 function OSSL_STORE_SEARCH_by_key_fingerprint(digest: PEVP_MD; bytes: PByte; len: NativeUInt): POSSL_STORE_SEARCH; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_SEARCH_by_key_fingerprint';
 
-function OSSL_STORE_SEARCH_by_alias(alias: PUTF8Char): POSSL_STORE_SEARCH; cdecl;
+function OSSL_STORE_SEARCH_by_alias(alias: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): POSSL_STORE_SEARCH; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_SEARCH_by_alias';
 
 procedure OSSL_STORE_SEARCH_free(search: POSSL_STORE_SEARCH); cdecl;
@@ -25439,7 +25452,7 @@ function OSSL_STORE_SEARCH_get0_serial(criterion: POSSL_STORE_SEARCH): PASN1_INT
 function OSSL_STORE_SEARCH_get0_bytes(criterion: POSSL_STORE_SEARCH; length: PNativeUInt): PByte; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_SEARCH_get0_bytes';
 
-function OSSL_STORE_SEARCH_get0_string(criterion: POSSL_STORE_SEARCH): PUTF8Char; cdecl;
+function OSSL_STORE_SEARCH_get0_string(criterion: POSSL_STORE_SEARCH): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_SEARCH_get0_string';
 
 function OSSL_STORE_SEARCH_get0_digest(criterion: POSSL_STORE_SEARCH): PEVP_MD; cdecl;
@@ -25451,13 +25464,13 @@ function OSSL_STORE_expect(ctx: POSSL_STORE_CTX; expected_type: Integer): Intege
 function OSSL_STORE_find(ctx: POSSL_STORE_CTX; search: POSSL_STORE_SEARCH): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_find';
 
-function OSSL_STORE_LOADER_new(e: PENGINE; scheme: PUTF8Char): POSSL_STORE_LOADER; cdecl;
+function OSSL_STORE_LOADER_new(e: PENGINE; scheme: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): POSSL_STORE_LOADER; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_LOADER_new';
 
 function OSSL_STORE_LOADER_get0_engine(loader: POSSL_STORE_LOADER): PENGINE; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_LOADER_get0_engine';
 
-function OSSL_STORE_LOADER_get0_scheme(loader: POSSL_STORE_LOADER): PUTF8Char; cdecl;
+function OSSL_STORE_LOADER_get0_scheme(loader: POSSL_STORE_LOADER): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_LOADER_get0_scheme';
 
 function OSSL_STORE_LOADER_set_open(loader: POSSL_STORE_LOADER; open_function: OSSL_STORE_open_fn): Integer; cdecl;
@@ -25490,7 +25503,7 @@ procedure OSSL_STORE_LOADER_free(loader: POSSL_STORE_LOADER); cdecl;
 function OSSL_STORE_register_loader(loader: POSSL_STORE_LOADER): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_register_loader';
 
-function OSSL_STORE_unregister_loader(scheme: PUTF8Char): POSSL_STORE_LOADER; cdecl;
+function OSSL_STORE_unregister_loader(scheme: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): POSSL_STORE_LOADER; cdecl;
   external LIB_CRYPTO name _PU + 'OSSL_STORE_unregister_loader';
 
 type
@@ -25970,10 +25983,10 @@ procedure TS_RESP_CTX_set_time_cb(ctx: PTS_RESP_CTX; cb: TS_time_cb; data: Point
 procedure TS_RESP_CTX_set_extension_cb(ctx: PTS_RESP_CTX; cb: TS_extension_cb; data: Pointer); cdecl;
   external LIB_CRYPTO name _PU + 'TS_RESP_CTX_set_extension_cb';
 
-function TS_RESP_CTX_set_status_info(ctx: PTS_RESP_CTX; status: Integer; text: PUTF8Char): Integer; cdecl;
+function TS_RESP_CTX_set_status_info(ctx: PTS_RESP_CTX; status: Integer; text: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_RESP_CTX_set_status_info';
 
-function TS_RESP_CTX_set_status_info_cond(ctx: PTS_RESP_CTX; status: Integer; text: PUTF8Char): Integer; cdecl;
+function TS_RESP_CTX_set_status_info_cond(ctx: PTS_RESP_CTX; status: Integer; text: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_RESP_CTX_set_status_info_cond';
 
 function TS_RESP_CTX_add_failure_info(ctx: PTS_RESP_CTX; failure: Integer): Integer; cdecl;
@@ -26054,70 +26067,70 @@ function TS_X509_ALGOR_print_bio(bio: PBIO; alg: PX509_ALGOR): Integer; cdecl;
 function TS_MSG_IMPRINT_print_bio(bio: PBIO; msg: PTS_MSG_IMPRINT): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_MSG_IMPRINT_print_bio';
 
-function TS_CONF_load_cert(&file: PUTF8Char): PX509; cdecl;
+function TS_CONF_load_cert({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PX509; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_load_cert';
 
-function TS_CONF_load_certs(&file: PUTF8Char): Pstack_st_X509; cdecl;
+function TS_CONF_load_certs({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Pstack_st_X509; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_load_certs';
 
-function TS_CONF_load_key(&file: PUTF8Char; pass: PUTF8Char): PEVP_PKEY; cdecl;
+function TS_CONF_load_key({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): PEVP_PKEY; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_load_key';
 
-function TS_CONF_get_tsa_section(conf: PCONF; section: PUTF8Char): PUTF8Char; cdecl;
+function TS_CONF_get_tsa_section(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_get_tsa_section';
 
-function TS_CONF_set_serial(conf: PCONF; section: PUTF8Char; cb: TS_serial_cb; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_serial(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cb: TS_serial_cb; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_serial';
 
-function TS_CONF_set_crypto_device(conf: PCONF; section: PUTF8Char; device: PUTF8Char): Integer; cdecl;
+function TS_CONF_set_crypto_device(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; device: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_crypto_device';
 
-function TS_CONF_set_default_engine(name: PUTF8Char): Integer; cdecl;
+function TS_CONF_set_default_engine(name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_default_engine';
 
-function TS_CONF_set_signer_cert(conf: PCONF; section: PUTF8Char; cert: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_signer_cert(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cert: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_signer_cert';
 
-function TS_CONF_set_certs(conf: PCONF; section: PUTF8Char; certs: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_certs(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; certs: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_certs';
 
-function TS_CONF_set_signer_key(conf: PCONF; section: PUTF8Char; key: PUTF8Char; pass: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_signer_key(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; key: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_signer_key';
 
-function TS_CONF_set_signer_digest(conf: PCONF; section: PUTF8Char; md: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_signer_digest(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; md: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_signer_digest';
 
-function TS_CONF_set_def_policy(conf: PCONF; section: PUTF8Char; policy: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_def_policy(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; policy: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_def_policy';
 
-function TS_CONF_set_policies(conf: PCONF; section: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_policies(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_policies';
 
-function TS_CONF_set_digests(conf: PCONF; section: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_digests(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_digests';
 
-function TS_CONF_set_accuracy(conf: PCONF; section: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_accuracy(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_accuracy';
 
-function TS_CONF_set_clock_precision_digits(conf: PCONF; section: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_clock_precision_digits(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_clock_precision_digits';
 
-function TS_CONF_set_ordering(conf: PCONF; section: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_ordering(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_ordering';
 
-function TS_CONF_set_tsa_name(conf: PCONF; section: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_tsa_name(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_tsa_name';
 
-function TS_CONF_set_ess_cert_id_chain(conf: PCONF; section: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_ess_cert_id_chain(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_ess_cert_id_chain';
 
-function TS_CONF_set_ess_cert_id_digest(conf: PCONF; section: PUTF8Char; ctx: PTS_RESP_CTX): Integer; cdecl;
+function TS_CONF_set_ess_cert_id_digest(conf: PCONF; section: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; ctx: PTS_RESP_CTX): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TS_CONF_set_ess_cert_id_digest';
 
-function TXT_DB_read(&in: PBIO; num: Integer): PTXT_DB; cdecl;
+function TXT_DB_read({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PBIO; num: Integer): PTXT_DB; cdecl;
   external LIB_CRYPTO name _PU + 'TXT_DB_read';
 
-function TXT_DB_write(&out: PBIO; db: PTXT_DB): Integer; cdecl;
+function TXT_DB_write({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PBIO; db: PTXT_DB): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'TXT_DB_write';
 
 type
@@ -26164,7 +26177,7 @@ function BIO_new_ssl_connect(ctx: PSSL_CTX): PBIO; cdecl;
 function BIO_new_buffer_ssl_connect(ctx: PSSL_CTX): PBIO; cdecl;
   external LIB_SSL name _PU + 'BIO_new_buffer_ssl_connect';
 
-function BIO_ssl_copy_session_id(&to: PBIO; from: PBIO): Integer; cdecl;
+function BIO_ssl_copy_session_id({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PBIO; from: PBIO): Integer; cdecl;
   external LIB_SSL name _PU + 'BIO_ssl_copy_session_id';
 
 procedure BIO_ssl_shutdown(ssl_bio: PBIO); cdecl;
@@ -26203,7 +26216,7 @@ function DTLS_get_data_mtu(s: PSSL): NativeUInt; cdecl;
 function ERR_load_SSL_strings(): Integer; cdecl;
   external LIB_SSL name _PU + 'ERR_load_SSL_strings';
 
-function OPENSSL_cipher_name(rfc_name: PUTF8Char): PUTF8Char; cdecl;
+function OPENSSL_cipher_name(rfc_name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'OPENSSL_cipher_name';
 
 function OPENSSL_init_ssl(opts: UInt64; settings: POPENSSL_INIT_SETTINGS): Integer; cdecl;
@@ -26224,7 +26237,7 @@ function PEM_write_SSL_SESSION(fp: PPointer; x: PSSL_SESSION): Integer; cdecl;
 function SRP_Calc_A_param(s: PSSL): Integer; cdecl;
   external LIB_SSL name _PU + 'SRP_Calc_A_param';
 
-function i2d_SSL_SESSION(&in: PSSL_SESSION; pp: PPByte): Integer; cdecl;
+function i2d_SSL_SESSION({$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PSSL_SESSION; pp: PPByte): Integer; cdecl;
   external LIB_SSL name _PU + 'i2d_SSL_SESSION';
 
 function d2i_SSL_SESSION(a: PPSSL_SESSION; pp: PPByte; length: Integer): PSSL_SESSION; cdecl;
@@ -26281,7 +26294,7 @@ function SSL_CTX_use_certificate(ctx: PSSL_CTX; x: PX509): Integer; cdecl;
 function SSL_CTX_use_certificate_ASN1(ctx: PSSL_CTX; len: Integer; d: PByte): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_use_certificate_ASN1';
 
-function SSL_CTX_use_cert_and_key(ctx: PSSL_CTX; x509: PX509; privatekey: PEVP_PKEY; chain: Pstack_st_X509; &override: Integer): Integer; cdecl;
+function SSL_CTX_use_cert_and_key(ctx: PSSL_CTX; x509: PX509; privatekey: PEVP_PKEY; chain: Pstack_st_X509; {$IFNDEF FPC}{$IF CompilerVersion > 21}&override{$ELSE}override1{$IFEND}{$ELSE}&override{$ENDIF}: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_use_cert_and_key';
 
 procedure SSL_CTX_set_default_passwd_cb(ctx: PSSL_CTX; cb: Ppem_password_cb); cdecl;
@@ -26341,13 +26354,13 @@ function SSL_CTX_set_trust(ctx: PSSL_CTX; trust: Integer): Integer; cdecl;
 function SSL_set_trust(ssl: PSSL; trust: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_trust';
 
-function SSL_set1_host(s: PSSL; hostname: PUTF8Char): Integer; cdecl;
+function SSL_set1_host(s: PSSL; hostname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set1_host';
 
-function SSL_add1_host(s: PSSL; hostname: PUTF8Char): Integer; cdecl;
+function SSL_add1_host(s: PSSL; hostname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_add1_host';
 
-function SSL_get0_peername(s: PSSL): PUTF8Char; cdecl;
+function SSL_get0_peername(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_get0_peername';
 
 procedure SSL_set_hostflags(s: PSSL; flags: Cardinal); cdecl;
@@ -26356,19 +26369,19 @@ procedure SSL_set_hostflags(s: PSSL; flags: Cardinal); cdecl;
 function SSL_CTX_dane_enable(ctx: PSSL_CTX): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_dane_enable';
 
-function SSL_CTX_dane_mtype_set(ctx: PSSL_CTX; md: PEVP_MD; mtype: UInt8; ord: UInt8): Integer; cdecl;
+function SSL_CTX_dane_mtype_set(ctx: PSSL_CTX; md: PEVP_MD; mtype: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt8{$ELSE}LongInt{$IFEND}{$ELSE}UInt8{$ENDIF}; ord: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt8{$ELSE}LongInt{$IFEND}{$ELSE}UInt8{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_dane_mtype_set';
 
-function SSL_dane_enable(s: PSSL; basedomain: PUTF8Char): Integer; cdecl;
+function SSL_dane_enable(s: PSSL; basedomain: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_dane_enable';
 
-function SSL_dane_tlsa_add(s: PSSL; usage: UInt8; selector: UInt8; mtype: UInt8; data: PByte; dlen: NativeUInt): Integer; cdecl;
+function SSL_dane_tlsa_add(s: PSSL; usage: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt8{$ELSE}LongInt{$IFEND}{$ELSE}UInt8{$ENDIF}; selector: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt8{$ELSE}LongInt{$IFEND}{$ELSE}UInt8{$ENDIF}; mtype: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt8{$ELSE}LongInt{$IFEND}{$ELSE}UInt8{$ENDIF}; data: PByte; dlen: NativeUInt): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_dane_tlsa_add';
 
 function SSL_get0_dane_authority(s: PSSL; mcert: PPX509; mspki: PPEVP_PKEY): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_get0_dane_authority';
 
-function SSL_get0_dane_tlsa(s: PSSL; usage: PUInt8; selector: PUInt8; mtype: PUInt8; data: PPByte; dlen: PNativeUInt): Integer; cdecl;
+function SSL_get0_dane_tlsa(s: PSSL; usage: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUInt8{$ELSE}PLongInt{$IFEND}{$ELSE}PUInt8{$ENDIF}; selector: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUInt8{$ELSE}PLongInt{$IFEND}{$ELSE}PUInt8{$ENDIF}; mtype: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUInt8{$ELSE}PLongInt{$IFEND}{$ELSE}PUInt8{$ENDIF}; data: PPByte; dlen: PNativeUInt): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_get0_dane_tlsa';
 
 function SSL_get0_dane(ssl: PSSL): PSSL_DANE; cdecl;
@@ -26398,17 +26411,17 @@ function SSL_CTX_get0_param(ctx: PSSL_CTX): PX509_VERIFY_PARAM; cdecl;
 function SSL_get0_param(ssl: PSSL): PX509_VERIFY_PARAM; cdecl;
   external LIB_SSL name _PU + 'SSL_get0_param';
 
-function SSL_CTX_set_srp_username(ctx: PSSL_CTX; name: PUTF8Char): Integer; cdecl;
+function SSL_CTX_set_srp_username(ctx: PSSL_CTX; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_srp_username';
 
-function SSL_CTX_set_srp_password(ctx: PSSL_CTX; password: PUTF8Char): Integer; cdecl;
+function SSL_CTX_set_srp_password(ctx: PSSL_CTX; password: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_srp_password';
 
 function SSL_CTX_set_srp_strength(ctx: PSSL_CTX; strength: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_srp_strength';
 
 type
-  SSL_CTX_set_srp_client_pwd_callback_cb = function(p1: PSSL; p2: Pointer): PUTF8Char; cdecl;
+  SSL_CTX_set_srp_client_pwd_callback_cb = function(p1: PSSL; p2: Pointer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
 
 function SSL_CTX_set_srp_client_pwd_callback(ctx: PSSL_CTX; cb: SSL_CTX_set_srp_client_pwd_callback_cb): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_srp_client_pwd_callback';
@@ -26428,10 +26441,10 @@ function SSL_CTX_set_srp_username_callback(ctx: PSSL_CTX; cb: SSL_CTX_set_srp_us
 function SSL_CTX_set_srp_cb_arg(ctx: PSSL_CTX; arg: Pointer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_srp_cb_arg';
 
-function SSL_set_srp_server_param(s: PSSL; N: PBIGNUM; g: PBIGNUM; sa: PBIGNUM; v: PBIGNUM; info: PUTF8Char): Integer; cdecl;
+function SSL_set_srp_server_param(s: PSSL; N: PBIGNUM; g: PBIGNUM; sa: PBIGNUM; v: PBIGNUM; info: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_srp_server_param';
 
-function SSL_set_srp_server_param_pw(s: PSSL; user: PUTF8Char; pass: PUTF8Char; grp: PUTF8Char): Integer; cdecl;
+function SSL_set_srp_server_param_pw(s: PSSL; user: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; pass: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; grp: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_srp_server_param_pw';
 
 function SSL_get_srp_g(s: PSSL): PBIGNUM; cdecl;
@@ -26440,10 +26453,10 @@ function SSL_get_srp_g(s: PSSL): PBIGNUM; cdecl;
 function SSL_get_srp_N(s: PSSL): PBIGNUM; cdecl;
   external LIB_SSL name _PU + 'SSL_get_srp_N';
 
-function SSL_get_srp_username(s: PSSL): PUTF8Char; cdecl;
+function SSL_get_srp_username(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_get_srp_username';
 
-function SSL_get_srp_userinfo(s: PSSL): PUTF8Char; cdecl;
+function SSL_get_srp_userinfo(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_get_srp_userinfo';
 
 procedure SSL_CTX_set_client_hello_cb(c: PSSL_CTX; cb: SSL_client_hello_cb_fn; arg: Pointer); cdecl;
@@ -26455,22 +26468,22 @@ function SSL_client_hello_isv2(s: PSSL): Integer; cdecl;
 function SSL_client_hello_get0_legacy_version(s: PSSL): Cardinal; cdecl;
   external LIB_SSL name _PU + 'SSL_client_hello_get0_legacy_version';
 
-function SSL_client_hello_get0_random(s: PSSL; &out: PPByte): NativeUInt; cdecl;
+function SSL_client_hello_get0_random(s: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): NativeUInt; cdecl;
   external LIB_SSL name _PU + 'SSL_client_hello_get0_random';
 
-function SSL_client_hello_get0_session_id(s: PSSL; &out: PPByte): NativeUInt; cdecl;
+function SSL_client_hello_get0_session_id(s: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): NativeUInt; cdecl;
   external LIB_SSL name _PU + 'SSL_client_hello_get0_session_id';
 
-function SSL_client_hello_get0_ciphers(s: PSSL; &out: PPByte): NativeUInt; cdecl;
+function SSL_client_hello_get0_ciphers(s: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): NativeUInt; cdecl;
   external LIB_SSL name _PU + 'SSL_client_hello_get0_ciphers';
 
-function SSL_client_hello_get0_compression_methods(s: PSSL; &out: PPByte): NativeUInt; cdecl;
+function SSL_client_hello_get0_compression_methods(s: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte): NativeUInt; cdecl;
   external LIB_SSL name _PU + 'SSL_client_hello_get0_compression_methods';
 
-function SSL_client_hello_get1_extensions_present(s: PSSL; &out: PPInteger; outlen: PNativeUInt): Integer; cdecl;
+function SSL_client_hello_get1_extensions_present(s: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPInteger; outlen: PNativeUInt): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_client_hello_get1_extensions_present';
 
-function SSL_client_hello_get0_ext(s: PSSL; &type: Cardinal; &out: PPByte; outlen: PNativeUInt): Integer; cdecl;
+function SSL_client_hello_get0_ext(s: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Cardinal; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; outlen: PNativeUInt): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_client_hello_get0_ext';
 
 procedure SSL_certs_clear(s: PSSL); cdecl;
@@ -26536,7 +26549,7 @@ function SSL_get_early_data_status(s: PSSL): Integer; cdecl;
 function SSL_get_error(s: PSSL; ret_code: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_get_error';
 
-function SSL_get_version(s: PSSL): PUTF8Char; cdecl;
+function SSL_get_version(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_get_version';
 
 function SSL_CTX_set_ssl_version(ctx: PSSL_CTX; meth: PSSL_METHOD): Integer; cdecl;
@@ -26593,16 +26606,16 @@ function SSL_get_ssl_method(s: PSSL): PSSL_METHOD; cdecl;
 function SSL_set_ssl_method(s: PSSL; method: PSSL_METHOD): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_ssl_method';
 
-function SSL_alert_type_string_long(value: Integer): PUTF8Char; cdecl;
+function SSL_alert_type_string_long(value: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_alert_type_string_long';
 
-function SSL_alert_type_string(value: Integer): PUTF8Char; cdecl;
+function SSL_alert_type_string(value: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_alert_type_string';
 
-function SSL_alert_desc_string_long(value: Integer): PUTF8Char; cdecl;
+function SSL_alert_desc_string_long(value: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_alert_desc_string_long';
 
-function SSL_alert_desc_string(value: Integer): PUTF8Char; cdecl;
+function SSL_alert_desc_string(value: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_alert_desc_string';
 
 procedure SSL_set0_CA_list(s: PSSL; name_list: Pstack_st_X509_NAME); cdecl;
@@ -26653,7 +26666,7 @@ procedure SSL_set_accept_state(s: PSSL); cdecl;
 function SSL_get_default_timeout(s: PSSL): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_get_default_timeout';
 
-function SSL_CIPHER_description(p1: PSSL_CIPHER; buf: PUTF8Char; size: Integer): PUTF8Char; cdecl;
+function SSL_CIPHER_description(p1: PSSL_CIPHER; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; size: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_CIPHER_description';
 
 function SSL_dup_CA_list(sk: Pstack_st_X509_NAME): Pstack_st_X509_NAME; cdecl;
@@ -26707,7 +26720,7 @@ function SSL_CTX_set_default_verify_dir(ctx: PSSL_CTX): Integer; cdecl;
 function SSL_CTX_set_default_verify_file(ctx: PSSL_CTX): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_default_verify_file';
 
-function SSL_CTX_load_verify_locations(ctx: PSSL_CTX; CAfile: PUTF8Char; CApath: PUTF8Char): Integer; cdecl;
+function SSL_CTX_load_verify_locations(ctx: PSSL_CTX; CAfile: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; CApath: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_load_verify_locations';
 
 function SSL_get_session(ssl: PSSL): PSSL_SESSION; cdecl;
@@ -26725,12 +26738,12 @@ function SSL_set_SSL_CTX(ssl: PSSL; ctx: PSSL_CTX): PSSL_CTX; cdecl;
   external LIB_SSL name _PU + 'SSL_set_SSL_CTX';
 
 type
-  SSL_set_info_callback_cb = procedure(ssl: PSSL; &type: Integer; val: Integer); cdecl;
+  SSL_set_info_callback_cb = procedure(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; val: Integer); cdecl;
 
 procedure SSL_set_info_callback(ssl: PSSL; cb: SSL_set_info_callback_cb); cdecl;
   external LIB_SSL name _PU + 'SSL_set_info_callback';
 
-//function SSL_get_info_callback(ssl: PSSL&type: Integerval: Integerssl: PSSL): Integer { TODO : Cannot convert original type "void (*)(const SSL *, int, int)" }; cdecl;
+//function SSL_get_info_callback(ssl: PSSL{$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integerval: Integerssl: PSSL): Integer { TODO : Cannot convert original type "void (*)(const SSL *, int, int)" }; cdecl;
 //  external LIB_SSL name _PU + 'SSL_get_info_callback';
 
 function SSL_get_state(ssl: PSSL): OSSL_HANDSHAKE_STATE; cdecl;
@@ -26745,19 +26758,19 @@ function SSL_get_verify_result(ssl: PSSL): Integer; cdecl;
 function SSL_get0_verified_chain(s: PSSL): Pstack_st_X509; cdecl;
   external LIB_SSL name _PU + 'SSL_get0_verified_chain';
 
-function SSL_get_client_random(ssl: PSSL; &out: PByte; outlen: NativeUInt): NativeUInt; cdecl;
+function SSL_get_client_random(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: NativeUInt): NativeUInt; cdecl;
   external LIB_SSL name _PU + 'SSL_get_client_random';
 
-function SSL_get_server_random(ssl: PSSL; &out: PByte; outlen: NativeUInt): NativeUInt; cdecl;
+function SSL_get_server_random(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: NativeUInt): NativeUInt; cdecl;
   external LIB_SSL name _PU + 'SSL_get_server_random';
 
-function SSL_SESSION_get_master_key(sess: PSSL_SESSION; &out: PByte; outlen: NativeUInt): NativeUInt; cdecl;
+function SSL_SESSION_get_master_key(sess: PSSL_SESSION; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; outlen: NativeUInt): NativeUInt; cdecl;
   external LIB_SSL name _PU + 'SSL_SESSION_get_master_key';
 
-function SSL_SESSION_set1_master_key(sess: PSSL_SESSION; &in: PByte; len: NativeUInt): Integer; cdecl;
+function SSL_SESSION_set1_master_key(sess: PSSL_SESSION; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; len: NativeUInt): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_SESSION_set1_master_key';
 
-function SSL_SESSION_get_max_fragment_length(sess: PSSL_SESSION): UInt8; cdecl;
+function SSL_SESSION_get_max_fragment_length(sess: PSSL_SESSION): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt8{$ELSE}LongInt{$IFEND}{$ELSE}UInt8{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_SESSION_get_max_fragment_length';
 
 function SSL_set_ex_data(ssl: PSSL; idx: Integer; data: Pointer): Integer; cdecl;
@@ -26805,10 +26818,10 @@ function SSL_get_current_compression(s: PSSL): PCOMP_METHOD; cdecl;
 function SSL_get_current_expansion(s: PSSL): PCOMP_METHOD; cdecl;
   external LIB_SSL name _PU + 'SSL_get_current_expansion';
 
-function SSL_COMP_get_name(comp: PCOMP_METHOD): PUTF8Char; cdecl;
+function SSL_COMP_get_name(comp: PCOMP_METHOD): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_COMP_get_name';
 
-function SSL_COMP_get0_name(comp: PSSL_COMP): PUTF8Char; cdecl;
+function SSL_COMP_get0_name(comp: PSSL_COMP): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_COMP_get0_name';
 
 function SSL_COMP_get_id(comp: PSSL_COMP): Integer; cdecl;
@@ -26857,7 +26870,7 @@ procedure SSL_set_not_resumable_session_callback(ssl: PSSL; cb: SSL_set_not_resu
   external LIB_SSL name _PU + 'SSL_set_not_resumable_session_callback';
 
 type
-  SSL_CTX_set_record_padding_callback_cb = function(ssl: PSSL; &type: Integer; len: NativeUInt; arg: Pointer): UInt64; cdecl;
+  SSL_CTX_set_record_padding_callback_cb = function(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; len: NativeUInt; arg: Pointer): UInt64; cdecl;
 
 procedure SSL_CTX_set_record_padding_callback(ctx: PSSL_CTX; cb: SSL_CTX_set_record_padding_callback_cb); cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_record_padding_callback';
@@ -26872,7 +26885,7 @@ function SSL_CTX_set_block_padding(ctx: PSSL_CTX; block_size: NativeUInt): Integ
   external LIB_SSL name _PU + 'SSL_CTX_set_block_padding';
 
 type
-  SSL_set_record_padding_callback_cb = function(ssl: PSSL; &type: Integer; len: NativeUInt; arg: Pointer): UInt64; cdecl;
+  SSL_set_record_padding_callback_cb = function(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; len: NativeUInt; arg: Pointer): UInt64; cdecl;
 
 procedure SSL_set_record_padding_callback(ssl: PSSL; cb: SSL_set_record_padding_callback_cb); cdecl;
   external LIB_SSL name _PU + 'SSL_set_record_padding_callback';
@@ -26919,7 +26932,7 @@ function SSL_CONF_CTX_set_flags(cctx: PSSL_CONF_CTX; flags: Cardinal): Cardinal;
 function SSL_CONF_CTX_clear_flags(cctx: PSSL_CONF_CTX; flags: Cardinal): Cardinal; cdecl;
   external LIB_SSL name _PU + 'SSL_CONF_CTX_clear_flags';
 
-function SSL_CONF_CTX_set1_prefix(cctx: PSSL_CONF_CTX; pre: PUTF8Char): Integer; cdecl;
+function SSL_CONF_CTX_set1_prefix(cctx: PSSL_CONF_CTX; pre: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CONF_CTX_set1_prefix';
 
 procedure SSL_CONF_CTX_set_ssl(cctx: PSSL_CONF_CTX; ssl: PSSL); cdecl;
@@ -26928,22 +26941,22 @@ procedure SSL_CONF_CTX_set_ssl(cctx: PSSL_CONF_CTX; ssl: PSSL); cdecl;
 procedure SSL_CONF_CTX_set_ssl_ctx(cctx: PSSL_CONF_CTX; ctx: PSSL_CTX); cdecl;
   external LIB_SSL name _PU + 'SSL_CONF_CTX_set_ssl_ctx';
 
-function SSL_CONF_cmd(cctx: PSSL_CONF_CTX; cmd: PUTF8Char; value: PUTF8Char): Integer; cdecl;
+function SSL_CONF_cmd(cctx: PSSL_CONF_CTX; cmd: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; value: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CONF_cmd';
 
-function SSL_CONF_cmd_argv(cctx: PSSL_CONF_CTX; pargc: PInteger; pargv: PPPUTF8Char): Integer; cdecl;
+function SSL_CONF_cmd_argv(cctx: PSSL_CONF_CTX; pargc: PInteger; pargv: {$IFNDEF FPC}{$IF CompilerVersion > 21}PPUTF8Char{$ELSE}PPWideChar{$IFEND}{$ELSE}PPUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CONF_cmd_argv';
 
-function SSL_CONF_cmd_value_type(cctx: PSSL_CONF_CTX; cmd: PUTF8Char): Integer; cdecl;
+function SSL_CONF_cmd_value_type(cctx: PSSL_CONF_CTX; cmd: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CONF_cmd_value_type';
 
 procedure SSL_add_ssl_module(); cdecl;
   external LIB_SSL name _PU + 'SSL_add_ssl_module';
 
-function SSL_config(s: PSSL; name: PUTF8Char): Integer; cdecl;
+function SSL_config(s: PSSL; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_config';
 
-function SSL_CTX_config(ctx: PSSL_CTX; name: PUTF8Char): Integer; cdecl;
+function SSL_CTX_config(ctx: PSSL_CTX; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_config';
 
 function SSL_set_ct_validation_callback(s: PSSL; callback: ssl_ct_validation_cb; arg: Pointer): Integer; cdecl;
@@ -26970,7 +26983,7 @@ function SSL_get0_peer_scts(s: PSSL): Pstack_st_SCT; cdecl;
 function SSL_CTX_set_default_ctlog_list_file(ctx: PSSL_CTX): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_default_ctlog_list_file';
 
-function SSL_CTX_set_ctlog_list_file(ctx: PSSL_CTX; path: PUTF8Char): Integer; cdecl;
+function SSL_CTX_set_ctlog_list_file(ctx: PSSL_CTX; path: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_ctlog_list_file';
 
 procedure SSL_CTX_set0_ctlog_store(ctx: PSSL_CTX; logs: PCTLOG_STORE); cdecl;
@@ -27042,10 +27055,10 @@ procedure SSL_CTX_set_allow_early_data_cb(ctx: PSSL_CTX; cb: SSL_allow_early_dat
 procedure SSL_set_allow_early_data_cb(s: PSSL; cb: SSL_allow_early_data_cb_fn; arg: Pointer); cdecl;
   external LIB_SSL name _PU + 'SSL_set_allow_early_data_cb';
 
-function SSL_CTX_set_tlsext_use_srtp(ctx: PSSL_CTX; profiles: PUTF8Char): Integer; cdecl;
+function SSL_CTX_set_tlsext_use_srtp(ctx: PSSL_CTX; profiles: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_tlsext_use_srtp';
 
-function SSL_set_tlsext_use_srtp(ssl: PSSL; profiles: PUTF8Char): Integer; cdecl;
+function SSL_set_tlsext_use_srtp(ssl: PSSL; profiles: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_tlsext_use_srtp';
 
 function SSL_get_srtp_profiles(ssl: PSSL): Pstack_st_SRTP_PROTECTION_PROFILE; cdecl;
@@ -27112,12 +27125,12 @@ procedure SSL_CTX_sess_set_get_cb(ctx: PSSL_CTX; get_session_cb: SSL_CTX_sess_se
 //  external LIB_SSL name _PU + 'SSL_CTX_sess_get_get_cb';
 
 type
-  SSL_CTX_set_info_callback_cb = procedure(ssl: PSSL; &type: Integer; val: Integer); cdecl;
+  SSL_CTX_set_info_callback_cb = procedure(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer; val: Integer); cdecl;
 
 procedure SSL_CTX_set_info_callback(ctx: PSSL_CTX; cb: SSL_CTX_set_info_callback_cb); cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_info_callback';
 
-//function SSL_CTX_get_info_callback(ssl: PSSL&type: Integerval: Integerctx: PSSL_CTX): Integer { TODO : Cannot convert original type "void (*)(const SSL *, int, int)" }; cdecl;
+//function SSL_CTX_get_info_callback(ssl: PSSL{$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integerval: Integerctx: PSSL_CTX): Integer { TODO : Cannot convert original type "void (*)(const SSL *, int, int)" }; cdecl;
 //  external LIB_SSL name _PU + 'SSL_CTX_get_info_callback';
 
 type
@@ -27171,7 +27184,7 @@ procedure SSL_get0_next_proto_negotiated(s: PSSL; data: PPByte; len: PCardinal);
 procedure SSL_get0_npn_negotiated(s: PSSL; data: PPByte; len: PCardinal); cdecl;
   external LIB_SSL name _PU + 'SSL_get0_next_proto_negotiated';
 
-function SSL_select_next_proto(&out: PPByte; outlen: PByte; &in: PByte; inlen: Cardinal; client: PByte; client_len: Cardinal): Integer; cdecl;
+function SSL_select_next_proto({$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PPByte; outlen: PByte; {$IFNDEF FPC}{$IF CompilerVersion > 21}&in{$ELSE}in1{$IFEND}{$ELSE}&in{$ENDIF}: PByte; inlen: Cardinal; client: PByte; client_len: Cardinal): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_select_next_proto';
 
 function SSL_CTX_set_alpn_protos(ctx: PSSL_CTX; protos: PByte; protos_len: Cardinal): Integer; cdecl;
@@ -27198,16 +27211,16 @@ procedure SSL_CTX_set_psk_server_callback(ctx: PSSL_CTX; cb: SSL_psk_server_cb_f
 procedure SSL_set_psk_server_callback(ssl: PSSL; cb: SSL_psk_server_cb_func); cdecl;
   external LIB_SSL name _PU + 'SSL_set_psk_server_callback';
 
-function SSL_CTX_use_psk_identity_hint(ctx: PSSL_CTX; identity_hint: PUTF8Char): Integer; cdecl;
+function SSL_CTX_use_psk_identity_hint(ctx: PSSL_CTX; identity_hint: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_use_psk_identity_hint';
 
-function SSL_use_psk_identity_hint(s: PSSL; identity_hint: PUTF8Char): Integer; cdecl;
+function SSL_use_psk_identity_hint(s: PSSL; identity_hint: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_use_psk_identity_hint';
 
-function SSL_get_psk_identity_hint(s: PSSL): PUTF8Char; cdecl;
+function SSL_get_psk_identity_hint(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_get_psk_identity_hint';
 
-function SSL_get_psk_identity(s: PSSL): PUTF8Char; cdecl;
+function SSL_get_psk_identity(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_get_psk_identity';
 
 procedure SSL_set_psk_find_session_callback(s: PSSL; cb: SSL_psk_find_session_cb_func); cdecl;
@@ -27243,46 +27256,46 @@ procedure SSL_CTX_set_keylog_callback(ctx: PSSL_CTX; cb: SSL_CTX_keylog_cb_func)
 function SSL_CTX_get_keylog_callback(ctx: PSSL_CTX): SSL_CTX_keylog_cb_func; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_get_keylog_callback';
 
-function SSL_CTX_set_max_early_data(ctx: PSSL_CTX; max_early_data: UInt32): Integer; cdecl;
+function SSL_CTX_set_max_early_data(ctx: PSSL_CTX; max_early_data: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_max_early_data';
 
-function SSL_CTX_get_max_early_data(ctx: PSSL_CTX): UInt32; cdecl;
+function SSL_CTX_get_max_early_data(ctx: PSSL_CTX): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_get_max_early_data';
 
-function SSL_set_max_early_data(s: PSSL; max_early_data: UInt32): Integer; cdecl;
+function SSL_set_max_early_data(s: PSSL; max_early_data: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_max_early_data';
 
-function SSL_get_max_early_data(s: PSSL): UInt32; cdecl;
+function SSL_get_max_early_data(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_get_max_early_data';
 
-function SSL_CTX_set_recv_max_early_data(ctx: PSSL_CTX; recv_max_early_data: UInt32): Integer; cdecl;
+function SSL_CTX_set_recv_max_early_data(ctx: PSSL_CTX; recv_max_early_data: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_recv_max_early_data';
 
-function SSL_CTX_get_recv_max_early_data(ctx: PSSL_CTX): UInt32; cdecl;
+function SSL_CTX_get_recv_max_early_data(ctx: PSSL_CTX): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_get_recv_max_early_data';
 
-function SSL_set_recv_max_early_data(s: PSSL; recv_max_early_data: UInt32): Integer; cdecl;
+function SSL_set_recv_max_early_data(s: PSSL; recv_max_early_data: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_recv_max_early_data';
 
-function SSL_get_recv_max_early_data(s: PSSL): UInt32; cdecl;
+function SSL_get_recv_max_early_data(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_get_recv_max_early_data';
 
-function SSL_CTX_set_tlsext_max_fragment_length(ctx: PSSL_CTX; mode: UInt8): Integer; cdecl;
+function SSL_CTX_set_tlsext_max_fragment_length(ctx: PSSL_CTX; mode: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt8{$ELSE}LongInt{$IFEND}{$ELSE}UInt8{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_tlsext_max_fragment_length';
 
-function SSL_set_tlsext_max_fragment_length(ssl: PSSL; mode: UInt8): Integer; cdecl;
+function SSL_set_tlsext_max_fragment_length(ssl: PSSL; mode: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt8{$ELSE}LongInt{$IFEND}{$ELSE}UInt8{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_tlsext_max_fragment_length';
 
-function SSL_get_servername(s: PSSL; &type: Integer): PUTF8Char; cdecl;
+function SSL_get_servername(s: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_get_servername';
 
 function SSL_get_servername_type(s: PSSL): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_get_servername_type';
 
-function SSL_export_keying_material(s: PSSL; &out: PByte; olen: NativeUInt; &label: PUTF8Char; llen: NativeUInt; context: PByte; contextlen: NativeUInt; use_context: Integer): Integer; cdecl;
+function SSL_export_keying_material(s: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; olen: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&label{$ELSE}label1{$IFEND}{$ELSE}&label{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; llen: NativeUInt; context: PByte; contextlen: NativeUInt; use_context: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_export_keying_material';
 
-function SSL_export_keying_material_early(s: PSSL; &out: PByte; olen: NativeUInt; &label: PUTF8Char; llen: NativeUInt; context: PByte; contextlen: NativeUInt): Integer; cdecl;
+function SSL_export_keying_material_early(s: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&out{$ELSE}out1{$IFEND}{$ELSE}&out{$ENDIF}: PByte; olen: NativeUInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}&label{$ELSE}label1{$IFEND}{$ELSE}&label{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; llen: NativeUInt; context: PByte; contextlen: NativeUInt): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_export_keying_material_early';
 
 function SSL_get_peer_signature_type_nid(s: PSSL; pnid: PInteger): Integer; cdecl;
@@ -27318,7 +27331,7 @@ function SSL_get_finished(s: PSSL; buf: Pointer; count: NativeUInt): NativeUInt;
 function SSL_get_peer_finished(s: PSSL; buf: Pointer; count: NativeUInt): NativeUInt; cdecl;
   external LIB_SSL name _PU + 'SSL_get_peer_finished';
 
-function SSL_CTX_set_cipher_list(p1: PSSL_CTX; str: PUTF8Char): Integer; cdecl;
+function SSL_CTX_set_cipher_list(p1: PSSL_CTX; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_cipher_list';
 
 function SSL_CTX_new(meth: PSSL_METHOD): PSSL_CTX; cdecl;
@@ -27363,19 +27376,19 @@ function SSL_get_pending_cipher(s: PSSL): PSSL_CIPHER; cdecl;
 function SSL_CIPHER_get_bits(c: PSSL_CIPHER; alg_bits: PInteger): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CIPHER_get_bits';
 
-function SSL_CIPHER_get_version(c: PSSL_CIPHER): PUTF8Char; cdecl;
+function SSL_CIPHER_get_version(c: PSSL_CIPHER): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_CIPHER_get_version';
 
-function SSL_CIPHER_get_name(c: PSSL_CIPHER): PUTF8Char; cdecl;
+function SSL_CIPHER_get_name(c: PSSL_CIPHER): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_CIPHER_get_name';
 
-function SSL_CIPHER_standard_name(c: PSSL_CIPHER): PUTF8Char; cdecl;
+function SSL_CIPHER_standard_name(c: PSSL_CIPHER): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_CIPHER_standard_name';
 
-function SSL_CIPHER_get_id(c: PSSL_CIPHER): UInt32; cdecl;
+function SSL_CIPHER_get_id(c: PSSL_CIPHER): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_CIPHER_get_id';
 
-function SSL_CIPHER_get_protocol_id(c: PSSL_CIPHER): UInt16; cdecl;
+function SSL_CIPHER_get_protocol_id(c: PSSL_CIPHER): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt16{$ELSE}LongInt{$IFEND}{$ELSE}UInt16{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_CIPHER_get_protocol_id';
 
 function SSL_CIPHER_get_kx_nid(c: PSSL_CIPHER): Integer; cdecl;
@@ -27399,10 +27412,10 @@ function SSL_get_rfd(s: PSSL): Integer; cdecl;
 function SSL_get_wfd(s: PSSL): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_get_wfd';
 
-function SSL_get_cipher_list(s: PSSL; n: Integer): PUTF8Char; cdecl;
+function SSL_get_cipher_list(s: PSSL; n: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_get_cipher_list';
 
-function SSL_get_shared_ciphers(s: PSSL; buf: PUTF8Char; size: Integer): PUTF8Char; cdecl;
+function SSL_get_shared_ciphers(s: PSSL; buf: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; size: Integer): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_get_shared_ciphers';
 
 function SSL_get_read_ahead(s: PSSL): Integer; cdecl;
@@ -27438,13 +27451,13 @@ function SSL_get_rbio(s: PSSL): PBIO; cdecl;
 function SSL_get_wbio(s: PSSL): PBIO; cdecl;
   external LIB_SSL name _PU + 'SSL_get_wbio';
 
-function SSL_set_cipher_list(s: PSSL; str: PUTF8Char): Integer; cdecl;
+function SSL_set_cipher_list(s: PSSL; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_cipher_list';
 
-function SSL_CTX_set_ciphersuites(ctx: PSSL_CTX; str: PUTF8Char): Integer; cdecl;
+function SSL_CTX_set_ciphersuites(ctx: PSSL_CTX; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_ciphersuites';
 
-function SSL_set_ciphersuites(s: PSSL; str: PUTF8Char): Integer; cdecl;
+function SSL_set_ciphersuites(s: PSSL; str: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_ciphersuites';
 
 procedure SSL_set_read_ahead(s: PSSL; yes: Integer); cdecl;
@@ -27489,7 +27502,7 @@ function SSL_use_certificate(ssl: PSSL; x: PX509): Integer; cdecl;
 function SSL_use_certificate_ASN1(ssl: PSSL; d: PByte; len: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_use_certificate_ASN1';
 
-function SSL_use_cert_and_key(ssl: PSSL; x509: PX509; privatekey: PEVP_PKEY; chain: Pstack_st_X509; &override: Integer): Integer; cdecl;
+function SSL_use_cert_and_key(ssl: PSSL; x509: PX509; privatekey: PEVP_PKEY; chain: Pstack_st_X509; {$IFNDEF FPC}{$IF CompilerVersion > 21}&override{$ELSE}override1{$IFEND}{$ELSE}&override{$ENDIF}: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_use_cert_and_key';
 
 function SSL_CTX_use_serverinfo(ctx: PSSL_CTX; serverinfo: PByte; serverinfo_length: NativeUInt): Integer; cdecl;
@@ -27498,52 +27511,52 @@ function SSL_CTX_use_serverinfo(ctx: PSSL_CTX; serverinfo: PByte; serverinfo_len
 function SSL_CTX_use_serverinfo_ex(ctx: PSSL_CTX; version: Cardinal; serverinfo: PByte; serverinfo_length: NativeUInt): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_use_serverinfo_ex';
 
-function SSL_CTX_use_serverinfo_file(ctx: PSSL_CTX; &file: PUTF8Char): Integer; cdecl;
+function SSL_CTX_use_serverinfo_file(ctx: PSSL_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_use_serverinfo_file';
 
-function SSL_use_RSAPrivateKey_file(ssl: PSSL; &file: PUTF8Char; &type: Integer): Integer; cdecl;
+function SSL_use_RSAPrivateKey_file(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_use_RSAPrivateKey_file';
 
-function SSL_use_PrivateKey_file(ssl: PSSL; &file: PUTF8Char; &type: Integer): Integer; cdecl;
+function SSL_use_PrivateKey_file(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_use_PrivateKey_file';
 
-function SSL_use_certificate_file(ssl: PSSL; &file: PUTF8Char; &type: Integer): Integer; cdecl;
+function SSL_use_certificate_file(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_use_certificate_file';
 
-function SSL_CTX_use_RSAPrivateKey_file(ctx: PSSL_CTX; &file: PUTF8Char; &type: Integer): Integer; cdecl;
+function SSL_CTX_use_RSAPrivateKey_file(ctx: PSSL_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_use_RSAPrivateKey_file';
 
-function SSL_CTX_use_PrivateKey_file(ctx: PSSL_CTX; &file: PUTF8Char; &type: Integer): Integer; cdecl;
+function SSL_CTX_use_PrivateKey_file(ctx: PSSL_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_use_PrivateKey_file';
 
-function SSL_CTX_use_certificate_file(ctx: PSSL_CTX; &file: PUTF8Char; &type: Integer): Integer; cdecl;
+function SSL_CTX_use_certificate_file(ctx: PSSL_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; {$IFNDEF FPC}{$IF CompilerVersion > 21}&type{$ELSE}type1{$IFEND}{$ELSE}&type{$ENDIF}: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_use_certificate_file';
 
-function SSL_CTX_use_certificate_chain_file(ctx: PSSL_CTX; &file: PUTF8Char): Integer; cdecl;
+function SSL_CTX_use_certificate_chain_file(ctx: PSSL_CTX; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_use_certificate_chain_file';
 
-function SSL_use_certificate_chain_file(ssl: PSSL; &file: PUTF8Char): Integer; cdecl;
+function SSL_use_certificate_chain_file(ssl: PSSL; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_use_certificate_chain_file';
 
-function SSL_load_client_CA_file(&file: PUTF8Char): Pstack_st_X509_NAME; cdecl;
+function SSL_load_client_CA_file({$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Pstack_st_X509_NAME; cdecl;
   external LIB_SSL name _PU + 'SSL_load_client_CA_file';
 
-function SSL_add_file_cert_subjects_to_stack(stackCAs: Pstack_st_X509_NAME; &file: PUTF8Char): Integer; cdecl;
+function SSL_add_file_cert_subjects_to_stack(stackCAs: Pstack_st_X509_NAME; {$IFNDEF FPC}{$IF CompilerVersion > 21}&file{$ELSE}file1{$IFEND}{$ELSE}&file{$ENDIF}: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_add_file_cert_subjects_to_stack';
 
-function SSL_add_dir_cert_subjects_to_stack(stackCAs: Pstack_st_X509_NAME; dir: PUTF8Char): Integer; cdecl;
+function SSL_add_dir_cert_subjects_to_stack(stackCAs: Pstack_st_X509_NAME; dir: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_add_dir_cert_subjects_to_stack';
 
-function SSL_state_string(s: PSSL): PUTF8Char; cdecl;
+function SSL_state_string(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_state_string';
 
-function SSL_rstate_string(s: PSSL): PUTF8Char; cdecl;
+function SSL_rstate_string(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_rstate_string';
 
-function SSL_state_string_long(s: PSSL): PUTF8Char; cdecl;
+function SSL_state_string_long(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_state_string_long';
 
-function SSL_rstate_string_long(s: PSSL): PUTF8Char; cdecl;
+function SSL_rstate_string_long(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_rstate_string_long';
 
 function SSL_SESSION_get_time(s: PSSL_SESSION): Integer; cdecl;
@@ -27564,10 +27577,10 @@ function SSL_SESSION_get_protocol_version(s: PSSL_SESSION): Integer; cdecl;
 function SSL_SESSION_set_protocol_version(s: PSSL_SESSION; version: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_SESSION_set_protocol_version';
 
-function SSL_SESSION_get0_hostname(s: PSSL_SESSION): PUTF8Char; cdecl;
+function SSL_SESSION_get0_hostname(s: PSSL_SESSION): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_SESSION_get0_hostname';
 
-function SSL_SESSION_set1_hostname(s: PSSL_SESSION; hostname: PUTF8Char): Integer; cdecl;
+function SSL_SESSION_set1_hostname(s: PSSL_SESSION; hostname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_SESSION_set1_hostname';
 
 procedure SSL_SESSION_get0_alpn_selected(s: PSSL_SESSION; alpn: PPByte; len: PNativeUInt); cdecl;
@@ -27591,13 +27604,13 @@ function SSL_SESSION_get_ticket_lifetime_hint(s: PSSL_SESSION): Cardinal; cdecl;
 procedure SSL_SESSION_get0_ticket(s: PSSL_SESSION; tick: PPByte; len: PNativeUInt); cdecl;
   external LIB_SSL name _PU + 'SSL_SESSION_get0_ticket';
 
-function SSL_SESSION_get_max_early_data(s: PSSL_SESSION): UInt32; cdecl;
+function SSL_SESSION_get_max_early_data(s: PSSL_SESSION): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}; cdecl;
   external LIB_SSL name _PU + 'SSL_SESSION_get_max_early_data';
 
-function SSL_SESSION_set_max_early_data(s: PSSL_SESSION; max_early_data: UInt32): Integer; cdecl;
+function SSL_SESSION_set_max_early_data(s: PSSL_SESSION; max_early_data: {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_SESSION_set_max_early_data';
 
-function SSL_copy_session_id(&to: PSSL; from: PSSL): Integer; cdecl;
+function SSL_copy_session_id({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PSSL; from: PSSL): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_copy_session_id';
 
 function SSL_SESSION_get0_peer(s: PSSL_SESSION): PX509; cdecl;
@@ -27642,7 +27655,7 @@ function SSL_SESSION_up_ref(ses: PSSL_SESSION): Integer; cdecl;
 procedure SSL_SESSION_free(ses: PSSL_SESSION); cdecl;
   external LIB_SSL name _PU + 'SSL_SESSION_free';
 
-function SSL_set_session(&to: PSSL; session: PSSL_SESSION): Integer; cdecl;
+function SSL_set_session({$IFNDEF FPC}{$IF CompilerVersion > 21}&to{$ELSE}to1{$IFEND}{$ELSE}&to{$ENDIF}: PSSL; session: PSSL_SESSION): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_session';
 
 function SSL_CTX_add_session(ctx: PSSL_CTX; session: PSSL_SESSION): Integer; cdecl;
@@ -27729,12 +27742,12 @@ type
   TTimeVal = timeval;
 
 { LibCrypto Helpers }
-function BIO_get_flags(b: PBIO): Integer; inline;
-function BIO_should_retry(b: PBIO): Boolean; inline;
-function BIO_should_read(b: PBIO): Boolean; inline;
-function BIO_should_write(b: PBIO): Boolean; inline;
-function BIO_should_io_special(b: PBIO): Boolean; inline;
-function BIO_retry_type(b: PBIO): Integer; inline;
+function BIO_get_flags(b: PBIO): Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
+function BIO_should_retry(b: PBIO): Boolean; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
+function BIO_should_read(b: PBIO): Boolean; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
+function BIO_should_write(b: PBIO): Boolean; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
+function BIO_should_io_special(b: PBIO): Boolean; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
+function BIO_retry_type(b: PBIO): Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
 function BIO_get_ssl(b: PBIO; s: PSSL): Integer;
 function BIO_pending(b: PBIO): Integer;
 
@@ -27742,14 +27755,14 @@ function SSL_error(const AErrorCode: Integer): String;
 function SSL_is_fatal_error(const AErrorCode: Integer): Boolean;
 
 { LibSsl Helpers }
-function SSL_CTX_set_session_cache_mode(ctx: PSSL_CTX; mode: Integer): Integer; inline;
-function SSL_CTX_add_extra_chain_cert(ctx: PSSL_CTX; cert: PX509): Longword; inline;
-function SSL_CTX_set_tmp_dh(ctx: PSSL_CTX; dh: Pointer): Integer; inline;
-function SSL_CTX_set_tmp_ecdh(ctx: PSSL_CTX; ecdh: Pointer): Integer; inline;
+function SSL_CTX_set_session_cache_mode(ctx: PSSL_CTX; mode: Integer): Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
+function SSL_CTX_add_extra_chain_cert(ctx: PSSL_CTX; cert: PX509): Longword; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
+function SSL_CTX_set_tmp_dh(ctx: PSSL_CTX; dh: Pointer): Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
+function SSL_CTX_set_tmp_ecdh(ctx: PSSL_CTX; ecdh: Pointer): Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
 function SSL_CTX_set_ecdh_auto(ctx: PSSL_CTX; onoff: Integer): Integer;
-function SSL_CTX_set_min_proto_version(ctx: PSSL_CTX; version: Integer): Integer; inline;
-function SSL_CTX_set_max_proto_version(ctx: PSSL_CTX; version: Integer): Integer; inline;
-function SSL_set_tlsext_host_name(const s: PSSL; const name: String): LongInt; inline;
+function SSL_CTX_set_min_proto_version(ctx: PSSL_CTX; version: Integer): Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
+function SSL_CTX_set_max_proto_version(ctx: PSSL_CTX; version: Integer): Integer; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
+function SSL_set_tlsext_host_name(const s: PSSL; const name: String): LongInt; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
 function SSL_set_mode(s: PSSL; version: Integer): Integer;
 function SSL_get_mode(s: PSSL): Integer;
 
@@ -27803,22 +27816,31 @@ end;
 function SSL_error(const AErrorCode: Integer): String;
 var
 {$IFNDEF FPC}
- P: TPtrWrapper;
+ {$IF CompilerVersion > 21}
+  P: TPtrWrapper;
+ {$ELSE}
+  P: Pointer;
+ {$IFEND}
 {$ELSE}
  P: Pointer;
 {$ENDIF}
 begin
-  P := {$IFNDEF FPC}TMarshal.{$ENDIF}AllocMem(1024);
+  P := {$IFNDEF FPC}{$IF CompilerVersion > 21}TMarshal.{$IFEND}{$ENDIF}AllocMem(1024);
   try
-    ERR_error_string_n(AErrorCode, P{$IFNDEF FPC}.ToPointer{$ENDIF}, 1024);
+    ERR_error_string_n(AErrorCode, P{$IFNDEF FPC}{$IF CompilerVersion > 21}.ToPointer{$IFEND}{$ENDIF}, 1024);
     {$IFNDEF FPC}
-    Result := TMarshal.ReadStringAsAnsi(P);
+     {$IF CompilerVersion > 21}
+      Result := TMarshal.ReadStringAsAnsi(P);
+     {$ELSE}
+      SetLength(Result, Length(PChar(P)^));
+      SetString(Result, PChar(P), Length(Result));
+     {$IFEND}
     {$ELSE}
      SetLength(Result, Length(PChar(P)^));
      SetString(Result, PChar(P), Length(Result));
     {$ENDIF}
   finally
-    {$IFNDEF FPC}TMarshal.{$ENDIF}FreeMem(P);
+    {$IFNDEF FPC}{$IF CompilerVersion > 21}TMarshal.{$IFEND}{$ENDIF}FreeMem(P);
   end;
 end;
 

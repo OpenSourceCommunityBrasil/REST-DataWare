@@ -38,7 +38,7 @@ Uses
   DateUtils;
 
 Type
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
   DWInteger       = Longint;
   DWInt64         = Int64;
   DWFloat         = Real;
@@ -53,7 +53,7 @@ Type
  {$ENDIF}
  PDWInt64         = ^DWInt64;
 
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   DWString     = AnsiString;
   DWWideString = WideString;
   {$ELSE}
@@ -371,13 +371,13 @@ End;
  Class Procedure ParseRESTURL           (Const Cmd       : String;
                                          Encoding        : TEncodeSelect;
                                          Var mark        : String
-                                         {$IFDEF RESTDWLAZARUS}
+                                         {$IFDEF FPC}
                                          ;DatabaseCharSet: TDatabaseCharSet
                                          {$ENDIF};
                                          Var Result      : TRESTDWParams);Overload;
  Class Procedure ParseRESTURL           (UriParams       : String;
                                          Encoding        : TEncodeSelect;
-                                         {$IFDEF RESTDWLAZARUS}
+                                         {$IFDEF FPC}
                                          DatabaseCharSet : TDatabaseCharSet;
                                          {$ENDIF}
                                          Var Result      : TRESTDWParams);Overload;
@@ -387,7 +387,7 @@ End;
                                          Query           : String;
                                          Var mark        : String;
                                          Encoding        : TEncodeSelect;
-                                         {$IFDEF RESTDWLAZARUS}
+                                         {$IFDEF FPC}
                                          DatabaseCharSet : TDatabaseCharSet;
                                          {$ENDIF}
                                          Var Result      : TRESTDWParams;
@@ -396,38 +396,38 @@ End;
  Class Procedure ParseWebFormsParams    (Var DWParams    : TRESTDWParams;
                                          WebParams       : TStrings;
                                          Encoding        : TEncodeSelect
-                                         {$IFDEF RESTDWLAZARUS}
+                                         {$IFDEF FPC}
                                          ;DatabaseCharSet: TDatabaseCharSet
                                          {$ENDIF};
                                          MethodType      : TRequestType = rtPost);Overload;
  Class Function ParseDWParamsURL        (Const Cmd       : String;
                                          Encoding        : TEncodeSelect;
                                          Var ResultPR    : TRESTDWParams
-                                         {$IFDEF RESTDWLAZARUS}
+                                         {$IFDEF FPC}
                                          ;DatabaseCharSet: TDatabaseCharSet
                                          {$ENDIF})       : Boolean;
  Class Function ParseBodyRawToDWParam   (Const BodyRaw   : String;
                                          Encoding        : TEncodeSelect;
                                          Var ResultPR    : TRESTDWParams
-                                         {$IFDEF RESTDWLAZARUS}
+                                         {$IFDEF FPC}
                                          ;DatabaseCharSet: TDatabaseCharSet
                                          {$ENDIF})       : Boolean;Overload;
  Class Function ParseBodyRawToDWParam   (Const BodyRaw   : TStream;
                                          Encoding        : TEncodeSelect;
                                          Var ResultPR    : TRESTDWParams
-                                         {$IFDEF RESTDWLAZARUS}
+                                         {$IFDEF FPC}
                                          ;DatabaseCharSet: TDatabaseCharSet
                                          {$ENDIF})       : Boolean;Overload;
  Class Function ParseBodyBinToDWParam   (Const BodyBin   : String;
                                          Encoding        : TEncodeSelect;
                                          Var ResultPR    : TRESTDWParams
-                                         {$IFDEF RESTDWLAZARUS}
+                                         {$IFDEF FPC}
                                          ;DatabaseCharSet: TDatabaseCharSet
                                          {$ENDIF})       : Boolean;
  Class Function ParseFormParamsToDWParam(Const FormParams: String;
                                          Encoding        : TEncodeSelect;
                                          Var ResultPR    : TRESTDWParams
-                                         {$IFDEF RESTDWLAZARUS}
+                                         {$IFDEF FPC}
                                          ;DatabaseCharSet: TDatabaseCharSet
                                          {$ENDIF})       : Boolean;
  End;
@@ -518,7 +518,7 @@ Begin
  {$IFNDEF FPC}
   sAnsi := PChar(s);
  {$ELSE}
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
    sAnsi := PChar(s);
   {$ELSE}
    sAnsi := PChar(@s);
@@ -733,14 +733,14 @@ Begin
                   vBuildData := Format(cValueToken, [viss,
                                                      ISO8601FromDateTime(vFinalRequest),
                                                      ISO8601FromDateTime(vInitRequest),
-                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
-                                                                   {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})])
+                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
+                                                                   {$IFDEF FPC}, csUndefined{$ENDIF})])
                  Else
                   vBuildData := Format(cValueTokenNoLife, [viss,
                                                            ISO8601FromDateTime(vInitRequest),
-                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
-                                                                         {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
-                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
+                                                                         {$IFDEF FPC}, csUndefined{$ENDIF})]);
+                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF FPC}, csUndefined{$ENDIF});
                  Result     := Format(cTokenStringRDWTS, [Result + '.' + vCripto.Encrypt(Result)]);
                 End;
   rdwJWT      : Begin
@@ -750,14 +750,14 @@ Begin
                   vBuildData := Format(cValueToken, [viss,
                                                      IntToStr(DateTimeToUnix(vFinalRequest{$IFNDEF FPC}{$IFDEF DELPHI2010UP}, False{$ENDIF}{$ELSE}, False{$ENDIF})),
                                                      IntToStr(DateTimeToUnix(vInitRequest{$IFNDEF FPC}{$IFDEF DELPHI2010UP}, False{$ENDIF}{$ELSE}, False{$ENDIF})),
-                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
-                                                                   {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})])
+                                                     EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
+                                                                   {$IFDEF FPC}, csUndefined{$ENDIF})])
                  Else
                   vBuildData := Format(cValueTokenNoLife, [viss,
                                                            IntToStr(DateTimeToUnix(vInitRequest {$IFNDEF FPC}{$IFDEF DELPHI2010UP}, False{$ENDIF}{$ELSE}, False{$ENDIF})),
-                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}), vMD5])
-                                                                         {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
-                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+                                                           EncodeStrings(Format(cValueKeyToken, [EncodeStrings(vSecrets{$IFDEF FPC}, csUndefined{$ENDIF}), vMD5])
+                                                                         {$IFDEF FPC}, csUndefined{$ENDIF})]);
+                 Result     := Result + '.' + EncodeStrings(vBuildData{$IFDEF FPC}, csUndefined{$ENDIF});
                  Result     := Format(cTokenStringRDWTS, [Result + '.' + vCripto.Encrypt(Result)]);
                 End;
  End;
@@ -765,7 +765,7 @@ End;
 
 Function TTokenValue.ToJSON  : String;
 Begin
-  Result := EncodeStrings(GetHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+  Result := EncodeStrings(GetHeader{$IFDEF FPC}, csUndefined{$ENDIF});
 End;
 
 Procedure TTokenValue.SetSecrets  (Value : String);
@@ -850,7 +850,7 @@ Begin
   //Read Header
   If Trim(vHeader) <> '' Then
    Begin
-    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
     If bJsonValue.PairCount > 0 Then
      Begin
       If Not bJsonValue.PairByName['typ'].isnull Then
@@ -861,7 +861,7 @@ Begin
   //Read Body
   If Trim(vBody) <> '' Then
    Begin
-    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vBody{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vBody{$IFDEF FPC}, csUndefined{$ENDIF}));
     If bJsonValue.PairCount > 0 Then
      Begin
       If (Not (bJsonValue.PairByName['iat'].isnull)) And
@@ -885,7 +885,7 @@ Begin
                          , False{$IFEND});
        End;
       If Not bJsonValue.PairByName['secrets'].isnull Then
-       vSecrets := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+       vSecrets := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      End;
     FreeAndNil(bJsonValue);
    End;
@@ -966,7 +966,7 @@ Var
         End;
        Result            := Trim(bJsonValue.PairByName['secrets'].Name) <> '';
        If Result Then
-        vSecrets         := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        vSecrets         := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
        If Trim(bJsonValue.PairByName['exp'].Name) <> '' Then
         Begin
          Result          := False;
@@ -1001,7 +1001,7 @@ Begin
  Result          := (Trim(vHeader) <> '') And (Trim(vBody) <> '') And (Trim(vStringComparer) <> '');
  If Result Then
   Begin
-   Result                   := ReadHeader(DecodeStrings(vHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+   Result                   := ReadHeader(DecodeStrings(vHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
    If Result Then
     Begin
      Result                 := False;
@@ -1014,10 +1014,10 @@ Begin
       If Result Then
        Begin
         Result              := False;
-        vHeader             := DecodeStrings(vHeader                 {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-        vBody               := DecodeStrings(vBody                   {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-        Secrets             := DecodeStrings(GetSecretsValue(vBody)  {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-        Secrets             := DecodeStrings(GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        vHeader             := DecodeStrings(vHeader                 {$IFDEF FPC}, csUndefined{$ENDIF});
+        vBody               := DecodeStrings(vBody                   {$IFDEF FPC}, csUndefined{$ENDIF});
+        Secrets             := DecodeStrings(GetSecretsValue(vBody)  {$IFDEF FPC}, csUndefined{$ENDIF});
+        Secrets             := DecodeStrings(GetSecretsValue(Secrets){$IFDEF FPC}, csUndefined{$ENDIF});
         Result              := ReadBody(vBody);
        End;
      Finally
@@ -1062,7 +1062,7 @@ Begin
   //Read Header
   If Trim(vHeader) <> '' Then
    Begin
-    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
     If bJsonValue.PairCount > 0 Then
      Begin
       If Not bJsonValue.PairByName['typ'].isnull Then
@@ -1073,7 +1073,7 @@ Begin
   //Read Body
   If Trim(vBody) <> '' Then
    Begin
-    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vBody{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+    bJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(vBody{$IFDEF FPC}, csUndefined{$ENDIF}));
     If bJsonValue.PairCount > 0 Then
      Begin
       If Not bJsonValue.PairByName['iat'].isnull Then
@@ -1095,7 +1095,7 @@ Begin
                           , False{$IFEND});
        End;
       If Not bJsonValue.PairByName['secrets'].isnull Then
-       vSecrets := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+       vSecrets := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      End;
     FreeAndNil(bJsonValue);
    End;
@@ -1176,7 +1176,7 @@ Var
         End;
        Result            := Trim(bJsonValue.PairByName['secrets'].Name) <> '';
        If Result Then
-        vSecrets         := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        vSecrets         := DecodeStrings(bJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
        If Trim(bJsonValue.PairByName['exp'].Name) <> '' Then
         Begin
          Result          := False;
@@ -1208,7 +1208,7 @@ Begin
  Result          := (Trim(vHeader) <> '') And (Trim(vBody) <> '') And (Trim(vStringComparer) <> '');
  If Result Then
   Begin
-   Result                   := ReadHeader(DecodeStrings(vHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+   Result                   := ReadHeader(DecodeStrings(vHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
    If Result Then
     Begin
      Result                 := False;
@@ -1221,10 +1221,10 @@ Begin
       If Result Then
        Begin
         Result              := False;
-        vHeader             := DecodeStrings(vHeader                 {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-        vBody               := DecodeStrings(vBody                   {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-        Secrets             := DecodeStrings(GetSecretsValue(vBody)  {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-        Secrets             := DecodeStrings(GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        vHeader             := DecodeStrings(vHeader                 {$IFDEF FPC}, csUndefined{$ENDIF});
+        vBody               := DecodeStrings(vBody                   {$IFDEF FPC}, csUndefined{$ENDIF});
+        Secrets             := DecodeStrings(GetSecretsValue(vBody)  {$IFDEF FPC}, csUndefined{$ENDIF});
+        Secrets             := DecodeStrings(GetSecretsValue(Secrets){$IFDEF FPC}, csUndefined{$ENDIF});
         Result              := ReadBody(vBody);
        End;
      Finally
@@ -1568,7 +1568,7 @@ End;
 
 Procedure TRESTDWClientAuthOptionParams.DestroyParam;
 Begin
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  If Not(csDesigning in TComponent(GetOwner).ComponentState) Then
   Begin
    If Assigned(RDWAuthOptionParam) Then
@@ -1587,7 +1587,7 @@ End;
 
 Procedure TRESTDWServerAuthOptionParams.DestroyParam;
 Begin
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  If Not(csDesigning in TComponent(GetOwner).ComponentState) Then
   Begin
    If Assigned(RDWAuthOptionParam) Then
@@ -1669,7 +1669,7 @@ End;
 Class Procedure TRESTDWDataUtils.ParseRESTURL(Const Cmd    : String;
                                         Encoding           : TEncodeSelect;
                                         Var mark           : String
-                                        {$IFDEF RESTDWLAZARUS};
+                                        {$IFDEF FPC};
                                         DatabaseCharSet    : TDatabaseCharSet
                                         {$ENDIF};
                                         Var Result         : TRESTDWParams);
@@ -1701,7 +1701,7 @@ Begin
   Begin
    Result := TRESTDWParams.Create;
    Result.Encoding := Encoding;
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
    Result.DatabaseCharSet := DatabaseCharSet;
    {$ENDIF}
   End;
@@ -1776,7 +1776,7 @@ End;
 
 Class Procedure TRESTDWDataUtils.ParseRESTURL(UriParams    : String;
                                         Encoding           : TEncodeSelect;
-                                        {$IFDEF RESTDWLAZARUS}
+                                        {$IFDEF FPC}
                                         DatabaseCharSet    : TDatabaseCharSet;
                                         {$ENDIF}
                                         Var Result         : TRESTDWParams);
@@ -1794,7 +1794,7 @@ Begin
   Begin
    Result := TRESTDWParams.Create;
    Result.Encoding := Encoding;
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
    Result.DatabaseCharSet := DatabaseCharSet;
    {$ENDIF}
   End;
@@ -1866,7 +1866,7 @@ Class Procedure TRESTDWDataUtils.ParseWebFormsParams(Params             : TStrin
                                                Query              : String;
                                                Var mark           : String;
                                                Encoding           : TEncodeSelect;
-                                               {$IFDEF RESTDWLAZARUS}
+                                               {$IFDEF FPC}
                                                 DatabaseCharSet   : TDatabaseCharSet;
                                                {$ENDIF}
                                                Var Result         : TRESTDWParams;
@@ -1892,7 +1892,7 @@ Begin
   Begin
    Result := TRESTDWParams.Create;
    Result.Encoding := Encoding;
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
    Result.DatabaseCharSet := DatabaseCharSet;
    {$ENDIF}
   End;
@@ -1934,7 +1934,7 @@ Begin
         Begin
          vCreateParam := True;
          JSONParam := TRESTDWJSONParam.Create(Result.Encoding);
-         {$IFDEF RESTDWLAZARUS}
+         {$IFDEF FPC}
          JSONParam.DatabaseCharSet := DatabaseCharSet;
          {$ENDIF}
          JSONParam.ObjectDirection := odIN;
@@ -1953,7 +1953,7 @@ Begin
             Begin
              vCreateParam := True;
              JSONParam := TRESTDWJSONParam.Create(Result.Encoding);
-             {$IFDEF RESTDWLAZARUS}
+             {$IFDEF FPC}
              JSONParam.DatabaseCharSet := DatabaseCharSet;
              {$ENDIF}
              JSONParam.ObjectDirection := odIN;
@@ -1970,7 +1970,7 @@ Begin
             Begin
              vCreateParam := True;
              JSONParam := TRESTDWJSONParam.Create(Result.Encoding);
-             {$IFDEF RESTDWLAZARUS}
+             {$IFDEF FPC}
              JSONParam.DatabaseCharSet := DatabaseCharSet;
              {$ENDIF}
              JSONParam.ObjectDirection := odIN;
@@ -2066,10 +2066,10 @@ Begin
               Begin
                JSONParam.Encoded  := False;
                If MethodType = rtPost Then
-                JSONParam.AsString := DecodeStrings(DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
-                                                                                    {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
+                JSONParam.AsString := DecodeStrings(DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF})
+                                                                                    {$IFDEF FPC}, csUndefined{$ENDIF})
                Else
-                JSONParam.AsString := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+                JSONParam.AsString := DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF});
               End;
               If JSONParam.IsNull Then
                JSONParam.AsString  := vValue;
@@ -2093,15 +2093,15 @@ Begin
                Begin
                 JSONParam.Encoded := False;
                 If MethodType = rtPost Then
-                 JSONParam.AsString       := DecodeStrings(DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
-                                                                                           {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})
+                 JSONParam.AsString       := DecodeStrings(DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF})
+                                                                                           {$IFDEF FPC}, csUndefined{$ENDIF})
                 Else
-                 JSONParam.AsString       := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+                 JSONParam.AsString       := DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF});
                End;
               If JSONParam.IsNull Then
                JSONParam.AsString  := vValue;
              End;
-            {$IFDEF RESTDWLAZARUS}
+            {$IFDEF FPC}
             JSONParam.DatabaseCharSet := DatabaseCharSet;
             {$ENDIF}
             If vNewParam Then
@@ -2118,7 +2118,7 @@ End;
 Class Procedure TRESTDWDataUtils.ParseWebFormsParams (Var DWParams: TRESTDWParams;
                                                 WebParams         : TStrings;
                                                 Encoding          : TEncodeSelect
-                                                {$IFDEF RESTDWLAZARUS}
+                                                {$IFDEF FPC}
                                                  ;DatabaseCharSet : TDatabaseCharSet
                                                 {$ENDIF};
                                                 MethodType        : TRequestType = rtPost);
@@ -2170,7 +2170,7 @@ End;
 Class Function TRESTDWDataUtils.ParseDWParamsURL(Const Cmd        : String;
                                                  Encoding         : TEncodeSelect;
                                                  Var ResultPR     : TRESTDWParams
-                                                 {$IFDEF RESTDWLAZARUS}
+                                                 {$IFDEF FPC}
                                                  ;DatabaseCharSet : TDatabaseCharSet
                                                  {$ENDIF})        : Boolean;
 Var
@@ -2194,7 +2194,7 @@ Begin
       Begin
        ResultPR := TRESTDWParams.Create;
        ResultPR.Encoding := Encoding;
-       {$IFDEF RESTDWLAZARUS}
+       {$IFDEF FPC}
        ResultPR.DatabaseCharSet := DatabaseCharSet;
        {$ENDIF}
       End;
@@ -2296,7 +2296,7 @@ End;
 Class Function TRESTDWDataUtils.ParseBodyRawToDWParam(Const BodyRaw    : String;
                                                       Encoding         : TEncodeSelect;
                                                       Var ResultPR     : TRESTDWParams
-                                                      {$IFDEF RESTDWLAZARUS}
+                                                      {$IFDEF FPC}
                                                       ;DatabaseCharSet : TDatabaseCharSet
                                                       {$ENDIF})        : Boolean;
 Var
@@ -2308,7 +2308,7 @@ Begin
     Begin
      ResultPR := TRESTDWParams.Create;
      ResultPR.Encoding := Encoding;
-     {$IFDEF RESTDWLAZARUS}
+     {$IFDEF FPC}
      ResultPR.DatabaseCharSet := DatabaseCharSet;
      {$ENDIF}
     End;
@@ -2326,7 +2326,7 @@ End;
 Class Function TRESTDWDataUtils.ParseBodyRawToDWParam(Const BodyRaw    : TStream;
                                                       Encoding         : TEncodeSelect;
                                                       Var ResultPR     : TRESTDWParams
-                                                      {$IFDEF RESTDWLAZARUS}
+                                                      {$IFDEF FPC}
                                                       ;DatabaseCharSet : TDatabaseCharSet
                                                       {$ENDIF})        : Boolean;
 Var
@@ -2339,7 +2339,7 @@ Begin
     Begin
      ResultPR := TRESTDWParams.Create;
      ResultPR.Encoding := Encoding;
-     {$IFDEF RESTDWLAZARUS}
+     {$IFDEF FPC}
      ResultPR.DatabaseCharSet := DatabaseCharSet;
      {$ENDIF}
     End;
@@ -2357,7 +2357,7 @@ End;
 Class Function TRESTDWDataUtils.ParseBodyBinToDWParam(Const BodyBin    : String;
                                                       Encoding         : TEncodeSelect;
                                                       Var ResultPR     : TRESTDWParams
-                                                      {$IFDEF RESTDWLAZARUS}
+                                                      {$IFDEF FPC}
                                                       ;DatabaseCharSet : TDatabaseCharSet
                                                       {$ENDIF})        : Boolean;
 Var
@@ -2370,7 +2370,7 @@ Begin
     Begin
      ResultPR := TRESTDWParams.Create;
      ResultPR.Encoding := Encoding;
-     {$IFDEF RESTDWLAZARUS}
+     {$IFDEF FPC}
      ResultPR.DatabaseCharSet := DatabaseCharSet;
      {$ENDIF}
     End;
@@ -2408,7 +2408,7 @@ End;
 Class Function TRESTDWDataUtils.ParseFormParamsToDWParam(Const FormParams : String;
                                                          Encoding         : TEncodeSelect;
                                                          Var ResultPR     : TRESTDWParams
-                                                         {$IFDEF RESTDWLAZARUS}
+                                                         {$IFDEF FPC}
                                                          ;DatabaseCharSet : TDatabaseCharSet
                                                          {$ENDIF})        : Boolean;
 Var
@@ -2450,7 +2450,7 @@ begin
        Begin
         ResultPR := TRESTDWParams.Create;
         ResultPR.Encoding := Encoding;
-        {$IFDEF RESTDWLAZARUS}
+        {$IFDEF FPC}
         ResultPR.DatabaseCharSet := DatabaseCharSet;
         {$ENDIF}
        End;

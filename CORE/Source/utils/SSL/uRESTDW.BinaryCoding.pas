@@ -8,10 +8,14 @@ interface
 
 uses
  {$IFNDEF FPC}
-  System.SysUtils;
+  {$IF CompilerVersion > 21}
+   System.SysUtils
+  {$ELSE}
+   SysUtils
+  {$IFEND}
  {$ELSE}
-  SysUtils;
- {$ENDIF}
+  SysUtils
+ {$ENDIF}, uRESTDWProtoTypes;
 
 
 { Encodes binary data to a Base64 buffer.
@@ -22,7 +26,7 @@ uses
 
   Returns:
     A byte array containing the Base64 encoded data }
-function goBase64Encode(const AData: Pointer; const ASize: Integer): TBytes; overload;
+function goBase64Encode(const AData: Pointer; const ASize: Integer): TRESTDWBytes; overload;
 
 { Encodes binary data to a Base64 buffer.
 
@@ -31,7 +35,7 @@ function goBase64Encode(const AData: Pointer; const ASize: Integer): TBytes; ove
 
   Returns:
     A byte array containing the Base64 encoded data }
-function goBase64Encode(const AData: TBytes): TBytes; overload; inline;
+function goBase64Encode(const AData: TRESTDWBytes): TRESTDWBytes; overload; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
 
 { Decodes Base64-encoded binary data.
 
@@ -41,7 +45,7 @@ function goBase64Encode(const AData: TBytes): TBytes; overload; inline;
 
   Returns:
     A byte array containing the decoded binary data data }
-function goBase64Decode(const AData: Pointer; const ASize: Integer): TBytes; overload;
+function goBase64Decode(const AData: Pointer; const ASize: Integer): TRESTDWBytes; overload;
 
 { Decodes Base64-encoded binary data.
 
@@ -50,11 +54,18 @@ function goBase64Decode(const AData: Pointer; const ASize: Integer): TBytes; ove
 
   Returns:
     A byte array containing the decoded binary data data }
-function goBase64Decode(const AData: TBytes): TBytes; overload; inline;
+function goBase64Decode(const AData: TRESTDWBytes): TRESTDWBytes; overload; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
 
 implementation
 
-{$POINTERMATH ON}
+{$IFNDEF FPC}
+ {$IF CompilerVersion > 21}
+  {$POINTERMATH ON}
+ {$IFEND}
+{$ELSE}
+ {$POINTERMATH ON}
+{$ENDIF}
+
 
 const
   BASE64_ENCODE: array[0..64] of Byte = (
@@ -88,7 +99,7 @@ const
     $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
     $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF);
 
-function goBase64Encode(const AData: Pointer; const ASize: Integer): TBytes;
+function goBase64Encode(const AData: Pointer; const ASize: Integer): TRESTDWBytes;
 var
   Src: PByte;
   I, SrcIndex, DstIndex: Integer;
@@ -96,8 +107,7 @@ var
   B64: array [0..3] of Byte;
 begin
   if (AData = nil) or (ASize = 0) then
-    Exit(nil);
-
+    Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(nil){$IFEND}{$ELSE}(nil){$ENDIF};
   SetLength(Result, ((ASize + 2) div 3) * 4);
   Src := AData;
   SrcIndex := 0;
@@ -105,7 +115,7 @@ begin
 
   while (SrcIndex < ASize) do
   begin
-    B := Src[SrcIndex];
+    B := {$IFNDEF FPC}{$IF CompilerVersion > 21}Src[SrcIndex]{$ELSE}PRESTDWBytes(@Src)^[SrcIndex]{$IFEND}{$ELSE}Src[SrcIndex]{$ENDIF};
     Inc(SrcIndex);
 
     B64[0] := B shr 2;
@@ -113,7 +123,7 @@ begin
 
     if (SrcIndex < ASize) then
     begin
-      B := Src[SrcIndex];
+      B := {$IFNDEF FPC}{$IF CompilerVersion > 21}Src[SrcIndex]{$ELSE}PRESTDWBytes(@Src)^[SrcIndex]{$IFEND}{$ELSE}Src[SrcIndex]{$ENDIF};
       Inc(SrcIndex);
 
       B64[1] := B64[1] + (B shr 4);
@@ -121,7 +131,7 @@ begin
 
       if (SrcIndex < ASize) then
       begin
-        B := Src[SrcIndex];
+        B := {$IFNDEF FPC}{$IF CompilerVersion > 21}Src[SrcIndex]{$ELSE}PRESTDWBytes(@Src)^[SrcIndex]{$IFEND}{$ELSE}Src[SrcIndex]{$ENDIF};
         Inc(SrcIndex);
 
         B64[2] := B64[2] + (B shr 6);
@@ -147,7 +157,7 @@ begin
   SetLength(Result, DstIndex);
 end;
 
-function goBase64Encode(const AData: TBytes): TBytes;
+function goBase64Encode(const AData: TRESTDWBytes): TRESTDWBytes;
 begin
   if Assigned(AData) then
     Result := goBase64Encode(@AData[0], Length(AData))
@@ -155,7 +165,7 @@ begin
     Result := nil;
 end;
 
-function goBase64Decode(const AData: Pointer; const ASize: Integer): TBytes; overload;
+function goBase64Decode(const AData: Pointer; const ASize: Integer): TRESTDWBytes; overload;
 var
   Src: PByte;
   SrcIndex, DstIndex, Count: Integer;
@@ -163,7 +173,7 @@ var
   C: Cardinal;
 begin
   if (AData = nil) or (ASize = 0) then
-    Exit(nil);
+    Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(nil){$IFEND}{$ELSE}(nil){$ENDIF};
 
   SetLength(Result, (ASize div 4) * 3 + 4);
   Src := AData;
@@ -174,7 +184,7 @@ begin
 
   while (SrcIndex < ASize) do
   begin
-    B := BASE64_DECODE[Src[SrcIndex]];
+    B := BASE64_DECODE[{$IFNDEF FPC}{$IF CompilerVersion > 21}Src[SrcIndex]{$ELSE}PRESTDWBytes(@Src)^[SrcIndex]{$IFEND}{$ELSE}Src[SrcIndex]{$ENDIF}];
     if (B = $FE) then
       Break
     else if (B <> $FF) then
@@ -209,7 +219,7 @@ begin
   SetLength(Result, DstIndex);
 end;
 
-function goBase64Decode(const AData: TBytes): TBytes; overload; inline;
+function goBase64Decode(const AData: TRESTDWBytes): TRESTDWBytes; overload; {$IFNDEF FPC}{$IF CompilerVersion > 21}inline;{$IFEND}{$ELSE}inline;{$ENDIF}
 begin
   if Assigned(AData) then
     Result := goBase64Decode(@AData[0], Length(AData))

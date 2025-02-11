@@ -14,7 +14,6 @@ uses
  {$ELSE}
   SysUtils,
  {$ENDIF}
- uRESTDW.System,
  uRESTDWProtoTypes;
 
 const
@@ -384,7 +383,7 @@ var
   Data : String;
 begin
   Data := Base64UrlEncode(TBytes(FHeader)) + '.' + Base64UrlEncode(TBytes(FPayload));
-  if not TRESTDWOpenSSLHelper.Sign_RSASHA256(StringToBytes(Utf8Encode(EncodeStrings(Data{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))), APrivateKey, FSignature) then
+  if not TRESTDWOpenSSLHelper.Sign_RSASHA256(StringToBytes(EncodeStrings(Data{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})), APrivateKey, FSignature) then
     Exit(False);
 
   AJsonWebToken := Data + '.' + Base64UrlEncode(TBytes(FSignature));

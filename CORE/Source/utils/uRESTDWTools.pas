@@ -22,16 +22,22 @@ unit uRESTDWTools;
 
 interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 Uses
  {$IFDEF RESTDWLAZARUS}
- LConvEncoding, lazutf8,
+  LConvEncoding, lazutf8,
  {$ELSE}
- {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
- {$IF DEFINED(RESTDWFMX) OR DEFINED(LINUX)}IOUtils,System.WideStrUtils,{$IFEND}
- {$IFDEF DELPHIXE6UP}NetEncoding,{$ENDIF}
- EncdDecd,
+  {$IFNDEF RESTDWFPC}
+   {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
+   {$IF DEFINED(RESTDWFMX) OR DEFINED(LINUX)}IOUtils,System.WideStrUtils,{$IFEND}
+   {$IFDEF DELPHIXE6UP}NetEncoding,{$ENDIF}
+   EncdDecd,
+  {$ENDIF}
  {$ENDIF}
- Classes, SysUtils, DB,
+ SysUtils, Classes, DB,
  uRESTDWProtoTypes, uRESTDWConsts, DWDCPrijndael,
  DWDCPsha256;
 
@@ -80,11 +86,11 @@ Type
  Function  EncryptSHA256          (Key, Text            : TRESTDWString;
                                    Encrypt              : Boolean)         : String;
  Function  EncodeStrings          (Value                : String
-                                  {$IFDEF RESTDWLAZARUS}
+                                  {$IFDEF FPC}
                                   ;DatabaseCharSet      : TDatabaseCharSet
                                   {$ENDIF}) : String;
  Function  DecodeStrings          (Value                : String
-                                  {$IFDEF RESTDWLAZARUS}
+                                  {$IFDEF FPC}
                                   ;DatabaseCharSet      : TDatabaseCharSet
                                   {$ENDIF}) : String;
  Function  EncodeStream           (Value                : TStream)         : String;
@@ -377,7 +383,7 @@ Type
  Function  GetPairJSONInt         (Status               : Integer;
                                    MessageText          : String;
                                    Encoding             : TEncodeSelect = esUtf8) : String;
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  Function  GetStringUnicode(Value : String) : String;
  Function  GetStringEncode (Value : String; DatabaseCharSet : TDatabaseCharSet) : String;
  Function  GetStringDecode (Value : String; DatabaseCharSet : TDatabaseCharSet) : String;
@@ -470,7 +476,7 @@ Uses
 
 Procedure DynArrayToBinVariant(var V: Variant; const DynArray; Len: Integer);
 var
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   LVarBounds : Array of SizeInt;
   {$ELSE}
     {$IF Defined(DELPHIXE7UP)}
@@ -500,7 +506,7 @@ begin
   VarArrayLock(V);
   Try
    aVarData := PVarData(@V);
-   {$IFNDEF RESTDWLAZARUS}
+   {$IFNDEF FPC}
     Move(Pointer(DynArray)^, aVarData^.VArray.Data^, Len);
    {$ELSE}
     Move(Pointer(DynArray)^, aVarData^.VArray, Len);
@@ -629,7 +635,7 @@ Begin
   ftInteger         : Result := dwftInteger;
   ftWord            : Result := dwftWord;
   ftBoolean         : Result := dwftBoolean;
-  ftFloat           : Result := dwftFloat;
+  ftFloat           : Result := dwftSingle;
   ftCurrency        : Result := dwftCurrency;
   ftBCD             : Result := dwftBCD;
   ftDate            : Result := dwftDate;
@@ -724,7 +730,7 @@ Begin
   Inherited;
 End;
 
-{$IFDEF RESTDWLAZARUS}
+{$IFDEF FPC}
 Function  GetStringUnicode(Value : String) : String;
 Var
  Unicode,
@@ -732,18 +738,21 @@ Var
  P       : PChar;
 Begin
  P := PChar(Value);
+ {$IFDEF RESTDWLAZARUS}
  Result := '';
  Repeat
   Unicode := UTF8CharacterToUnicode(P, Charlen);
   Result  := Result + UTF8Copy(p, 1, 1);
   Inc(P, Charlen);
  Until (Charlen = 0) or (Unicode = 0);
+ {$ENDIF}
  Result := P;
 End;
 
 Function  GetStringEncode(Value : String;DatabaseCharSet : TDatabaseCharSet) : String;
 Begin
  Result := Value;
+ {$IFDEF RESTDWLAZARUS}
  Case DatabaseCharSet Of
    csWin1250    : Result := CP1250ToUTF8(Value);
    csWin1251    : Result := CP1251ToUTF8(Value);
@@ -758,11 +767,16 @@ Begin
    csISO_8859_1 : Result := ISO_8859_1ToUTF8(Value);
    csISO_8859_2 : Result := ISO_8859_2ToUTF8(Value);
  End;
+ {$ENDIF}
+ {$IFDEF RESTDWFPC}
+  Result := UTF8Encode(Value);
+ {$ENDIF}
 End;
 
 Function  GetStringDecode(Value : String;DatabaseCharSet : TDatabaseCharSet) : String;
 Begin
  Result := Value;
+ {$IFDEF RESTDWLAZARUS}
  Case DatabaseCharSet Of
    csWin1250    : Result := UTF8ToCP1250(Value);
    csWin1251    : Result := UTF8ToCP1251(Value);
@@ -777,6 +791,10 @@ Begin
    csISO_8859_1 : Result := UTF8ToISO_8859_1(Value);
    csISO_8859_2 : Result := UTF8ToISO_8859_2(Value);
  End;
+ {$ENDIF}
+ {$IFDEF RESTDWFPC}
+  Result := UTF8Decode(Value);
+ {$ENDIF}
 End;
 {$ENDIF}
 
@@ -909,7 +927,7 @@ Var
  lExt: {$IFDEF DELPHI2010UP}TFileName{$ELSE}PAnsiChar{$ENDIF};
 {$ENDIF}
 Begin
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
   Result := SysUtils.GetTempFileName(APath, 'restdw'); {Do not Localize}
  {$ELSE}
   {$IFDEF DELPHI2010UP}
@@ -938,7 +956,7 @@ End;
 Function CopyFileTo(Const Source,
                     Destination : TFileName): Boolean;
 Begin
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  Result := CopyFileTo(PChar(Source), PChar(Destination));
  {$ELSE}
   {$IF DEFINED(RESTDWFMX) OR DEFINED(LINUX)}
@@ -958,7 +976,7 @@ Function GetUniqueFileName(Const APath,
                            APrefix,
                            AExt         : String) : String;
 Var
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  LPrefix: string;
  {$ELSE}
  LNamePart : Integer;
@@ -966,7 +984,7 @@ Var
  LFName    : String;
  {$ENDIF}
 Begin
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
   LPrefix := APrefix;
   If LPrefix = '' Then
    LPrefix := 'restdw'; {Do not localize}
@@ -1972,7 +1990,7 @@ Begin
    If (LName <> '')   And
       ((LValue <> '') Or LQuoted) Then
     Begin
-     {$IFDEF RESTDWLAZARUS}
+     {$IFDEF FPC}
       vObject := TObject(PtrUint(LQuoted));
      {$ELSE}
       vObject := TObject(LQuoted);
@@ -2498,7 +2516,7 @@ Begin
    Begin
     For I := 0 To LItems.Count -1 Do
      Begin
-     {$IFDEF RESTDWLAZARUS}
+     {$IFDEF FPC}
       vValidate := Boolean(PtrUint(LItems.Objects[I]));
      {$ELSE}
       vValidate := Boolean(LItems.Objects[I]);
@@ -3034,7 +3052,7 @@ Var
  End;
 Begin
  c      := #0;
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  b      := #0;
  i      := 0;
  {$ENDIF}
@@ -3438,7 +3456,7 @@ Begin
 End;
 
 Function EncodeStream (Value : TStream) : String;
- {$IFNDEF RESTDWLAZARUS}
+ {$IFNDEF FPC}
    Function EncodeBase64(AValue : TStream) : String;
    Var
     StreamDecoded : TMemoryStream;
@@ -3531,7 +3549,11 @@ Begin
     End;
    {$ELSE}
     {$IFNDEF FPC} //Alterado para IOS Brito
-     Result:= TNetEncoding.Base64.Decode(SA); // Alterado por Alison Wolf
+     {$IF CompilerVersion >= 21}
+      Result:= TNetEncoding.Base64.Decode(SA); // Alterado por Alison Wolf
+     {$ELSE}
+      Result:= BytesToString(Base64Decode(SA));
+     {$IFEND}
     {$ELSE}
      Result:= BytesToString(Base64Decode(SA));
     {$ENDIF}
@@ -3541,11 +3563,11 @@ End;
 
 {$IF Defined(RESTDWMOBILE)} //Alterado para IOS Brito
 Function DecodeBase64(Const Value : String) : String;
-{$ELSEIF (NOT Defined(RESTDWLAZARUS) AND Defined(RESTDWLINUX))} //Alteardo para Lazarus LINUX Brito
+{$ELSEIF (NOT Defined(FPC) AND Defined(RESTDWLINUX))} //Alteardo para Lazarus LINUX Brito
 Function  DecodeBase64 (Const Value : String)             : String;
 {$ELSE}
 Function DecodeBase64(Const Value : String
-                      {$IFDEF RESTDWLAZARUS}
+                      {$IFDEF FPC}
                       ;DatabaseCharSet : TDatabaseCharSet
                       {$ENDIF}) : String;
   {$IFEND}
@@ -3554,7 +3576,7 @@ Var
 Begin
  vValue := Decode64(Value);
  {$IFDEF RESTDWLAZARUS}
- Case DatabaseCharSet Of
+  Case DatabaseCharSet Of
    csWin1250    : vValue := CP1250ToUTF8(vValue);
    csWin1251    : vValue := CP1251ToUTF8(vValue);
    csWin1252    : vValue := CP1252ToUTF8(vValue);
@@ -3567,7 +3589,10 @@ Begin
    csUTF8       : vValue := UTF8ToUTF8BOM(vValue);
    csISO_8859_1 : vValue := ISO_8859_1ToUTF8(vValue);
    csISO_8859_2 : vValue := ISO_8859_2ToUTF8(vValue);
- End;
+  End;
+ {$ENDIF}
+ {$IFDEF RESTDWFPC}
+  Result := UTF8Encode(Value);
  {$ENDIF}
  Result := vValue;
 End;
@@ -3578,7 +3603,7 @@ Function EncodeBase64(Const Value : String) : String;
 Function EncodeBase64(Const Value : String) : String;
 {$ELSE}
 Function EncodeBase64(Const Value : String
-                      {$IFDEF RESTDWLAZARUS}
+                      {$IFDEF FPC}
                       ;DatabaseCharSet : TDatabaseCharSet
                       {$ENDIF}) : String;
 {$IFEND}
@@ -3605,7 +3630,10 @@ Begin
     csISO_8859_2 : vValue := ISO_8859_2ToUTF8(vValue);
   End;
   {$ENDIF}
-  {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXE6UP)}
+  {$IFDEF RESTDWFPC}
+   Result := UTF8Encode(Value);
+  {$ENDIF}
+  {$IF Defined(FPC) OR not Defined(DELPHIXE6UP)}
    Result := Base64Encode(Value);
   {$ELSE}
    Ne      := TBase64Encoding.Create(-1, '');
@@ -3618,18 +3646,18 @@ Begin
 End;
 
 Function EncodeStrings(Value : String
-                      {$IFDEF RESTDWLAZARUS}
+                      {$IFDEF FPC}
                       ;DatabaseCharSet : TDatabaseCharSet
                       {$ENDIF}) : String;
 Begin
  Result := '';
  If Value = '' Then
   Exit;
- Result := EncodeBase64(Value{$IFDEF RESTDWLAZARUS}, DatabaseCharSet{$ENDIF});
+ Result := EncodeBase64(Value{$IFDEF FPC}, DatabaseCharSet{$ENDIF});
 End;
 
 Function DecodeStrings(Value : String
-                       {$IFDEF RESTDWLAZARUS}
+                       {$IFDEF FPC}
                        ;DatabaseCharSet : TDatabaseCharSet
                        {$ENDIF}) : String;
 Var
@@ -3640,7 +3668,7 @@ Begin
   Exit;
  vTempValue := StringReplace(Value, sLineBreak, '', [rfReplaceAll]);
  Try
-   {$IF Defined(RESTDWLAZARUS)}
+   {$IF Defined(FPC)}
    Result := DecodeBase64(vTempValue, DatabaseCharSet);
    {$ELSEIF Defined(RESTDWMOBILE)} //Alterado para IOS Brito
    Result := Decode64(vTempValue);
@@ -4782,7 +4810,7 @@ Begin
   ftGuid            : Result := 'ftGuid';
   ftTimeStamp       : Result := 'ftTimeStamp';
   ftFMTBcd          : Result := 'ftFMTBcd';
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   ftWideMemo         : Result := 'ftWideMemo';
   ftFixedWideChar    : Result := 'ftFixedWideChar';
   {$ENDIF}

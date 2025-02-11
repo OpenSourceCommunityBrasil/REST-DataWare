@@ -530,17 +530,17 @@ Begin
                   '"username":"%s","password":"%s","dbPort":%d,'+
                   '"otherDetails":"%s","charset":"%s","databasetype":"%s","protocol":"%s",'+
                   '"driverID":"%s","datasource":"%s"}',
-                  [EncodeStrings(vDatabaseName{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
-                   EncodeStrings(vHostName{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
-                   EncodeStrings(vUsername{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
-                   EncodeStrings(vPassword{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
+                  [EncodeStrings(vDatabaseName{$IFDEF FPC}, csUndefined{$ENDIF}),
+                   EncodeStrings(vHostName    {$IFDEF FPC}, csUndefined{$ENDIF}),
+                   EncodeStrings(vUsername    {$IFDEF FPC}, csUndefined{$ENDIF}),
+                   EncodeStrings(vPassword    {$IFDEF FPC}, csUndefined{$ENDIF}),
                    vdbPort,
-                   EncodeStrings(votherDetails{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
-                   EncodeStrings(vCharset{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
-                   EncodeStrings(GetDatabaseType(vDWDatabaseType){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
-                   EncodeStrings(vProtocol{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
-                   EncodeStrings(vDriverID{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}),
-                   EncodeStrings(vDataSource{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
+                   EncodeStrings(votherDetails{$IFDEF FPC}, csUndefined{$ENDIF}),
+                   EncodeStrings(vCharset     {$IFDEF FPC}, csUndefined{$ENDIF}),
+                   EncodeStrings(GetDatabaseType(vDWDatabaseType){$IFDEF FPC}, csUndefined{$ENDIF}),
+                   EncodeStrings(vProtocol  {$IFDEF FPC}, csUndefined{$ENDIF}),
+                   EncodeStrings(vDriverID  {$IFDEF FPC}, csUndefined{$ENDIF}),
+                   EncodeStrings(vDataSource{$IFDEF FPC}, csUndefined{$ENDIF})]);
 End;
 
 Procedure TConnectionDefs.LoadFromJSON(Value : String);
@@ -551,20 +551,20 @@ Begin
  Try
   If bJsonValue.PairCount > 0 Then
    Begin
-    vDatabaseName   := DecodeStrings(bJsonValue.Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-    vHostName       := DecodeStrings(bJsonValue.Pairs[1].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-    vUsername       := DecodeStrings(bJsonValue.Pairs[2].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-    vPassword       := DecodeStrings(bJsonValue.Pairs[3].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+    vDatabaseName   := DecodeStrings(bJsonValue.Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+    vHostName       := DecodeStrings(bJsonValue.Pairs[1].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+    vUsername       := DecodeStrings(bJsonValue.Pairs[2].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+    vPassword       := DecodeStrings(bJsonValue.Pairs[3].Value{$IFDEF FPC}, csUndefined{$ENDIF});
     If bJsonValue.Pairs[4].Value <> '' Then
      vdbPort        := StrToInt(bJsonValue.Pairs[4].Value)
     Else
      vdbPort        := -1;
-    votherDetails   := DecodeStrings(bJsonValue.Pairs[5].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-    vCharset        := DecodeStrings(bJsonValue.Pairs[6].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-    vDWDatabaseType := GetDatabaseType(DecodeStrings(bJsonValue.Pairs[7].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
-    vProtocol       := DecodeStrings(bJsonValue.Pairs[8].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-    vDriverID       := DecodeStrings(bJsonValue.Pairs[9].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-    vDataSource     := DecodeStrings(bJsonValue.Pairs[10].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+    votherDetails   := DecodeStrings(bJsonValue.Pairs[5].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+    vCharset        := DecodeStrings(bJsonValue.Pairs[6].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+    vDWDatabaseType := GetDatabaseType(DecodeStrings(bJsonValue.Pairs[7].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+    vProtocol       := DecodeStrings(bJsonValue.Pairs[8].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+    vDriverID       := DecodeStrings(bJsonValue.Pairs[9].Value{$IFDEF FPC}, csUndefined{$ENDIF});
+    vDataSource     := DecodeStrings(bJsonValue.Pairs[10].Value{$IFDEF FPC}, csUndefined{$ENDIF});
    End;
  Finally
   FreeAndNil(bJsonValue);
@@ -605,7 +605,8 @@ End;
 
 Procedure TRESTDWClientSQLBase.BaseClose;
 Begin
- TRESTDWClientSQLBase(Self).Close;
+ If Active Then
+  TRESTDWClientSQLBase(Self).Close;
 End;
 
 Procedure TRESTDWClientSQLBase.BaseOpen;
@@ -631,7 +632,7 @@ End;
 
 Procedure TRESTDWClientSQLBase.SetComponentTAG;
 Begin
- vComponentTag := EncodeStrings(RandomString(10){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+ vComponentTag := EncodeStrings(RandomString(10){$IFDEF FPC}, csUndefined{$ENDIF});
 End;
 
 Procedure TRESTDWClientSQLBase.ForceInternalCalc;
@@ -735,20 +736,16 @@ Begin
   Begin
    If Assigned(TList(Self).Items[Index]) Then
     Begin
-      {$IFDEF RESTDWLAZARUS}
-        FreeAndNil(TList(Self).Items[Index]^);
-        Dispose(PRESTDWDataRoute(TList(Self).Items[Index]));
+     {$IFDEF FPC}
+      FreeAndNil(TList(Self).Items[Index]^);
+      Dispose(PRESTDWDataRoute(TList(Self).Items[Index]));
+     {$ELSE}
+      {$IFDEF DELPHI10_4UP}
+       FreeAndNil(TRESTDWDataRoute(TList(Self).Items[Index]^));
       {$ELSE}
-        {$IFDEF DELPHI10_4UP}
-          FreeAndNil(TRESTDWDataRoute(TList(Self).Items[Index]^));
-        {$ELSE}
-          FreeAndNil(TList(Self).Items[Index]^);
-        {$ENDIF}
-        {$IFDEF FPC}
-         Dispose(PRESTDWDataRoute(TList(Self).Items[Index]));
-        {$ELSE}
-         Dispose(TList(Self).Items[Index]);
-        {$ENDIF}
+       FreeAndNil(TList(Self).Items[Index]^);
+      {$ENDIF}
+      Dispose(TList(Self).Items[Index]);
      {$ENDIF}
     End;
    TList(Self).Delete(Index);
@@ -814,7 +811,7 @@ Begin
 End;
 
 Initialization
-{$IFDEF RESTDWLAZARUS}
+{$IFDEF FPC}
  RESTDWDecimalSeparator  := DecimalSeparator;
  RESTDWThousandSeparator := ThousandSeparator;
  RESTDWCurrencyDecimals  := CurrencyDecimals;
@@ -846,37 +843,20 @@ Initialization
   RESTDWShortDayNames     := TArrayWeek(FormatSettings.ShortDayNames);
   RESTDWLongDayNames      := TArrayWeek(FormatSettings.LongDayNames);
  {$ELSE}
-  {$IFDEF FPC}
-   RESTDWDecimalSeparator  := DecimalSeparator;
-   RESTDWThousandSeparator := ThousandSeparator;
-   RESTDWCurrencyDecimals  := CurrencyDecimals;
-   RESTDWShortDateFormat   := ShortDateFormat;
-   RESTDWDateSeparator     := DateSeparator;
-   RESTDWTimeSeparator     := TimeSeparator;
-   RESTDWShortTimeFormat   := ShortTimeFormat;
-   RESTDWTimeAMString      := TimeAMString;
-   RESTDWTimePMString      := TimePMString;
-   RESTDWLongMonthNames    := TArrayMonth(Pointer(@LongMonthNames)^);
-   RESTDWShortMonthNames   := TArrayMonth(Pointer(@ShortMonthNames)^);
-   RESTDWShortDayNames     := TArrayWeek(Pointer(@ShortDayNames)^);
-   RESTDWLongDayNames      := TArrayWeek(Pointer(@LongDayNames)^);
-   RESTDWCurrencyString    := CurrencyString;
-  {$ELSE}
-   RESTDWDecimalSeparator  := DecimalSeparator;
-   RESTDWThousandSeparator := ThousandSeparator;
-   RESTDWCurrencyDecimals  := CurrencyDecimals;
-   RESTDWShortDateFormat   := ShortDateFormat;
-   RESTDWDateSeparator     := DateSeparator;
-   RESTDWTimeSeparator     := TimeSeparator;
-   RESTDWShortTimeFormat   := ShortTimeFormat;
-   RESTDWTimeAMString      := TimeAMString;
-   RESTDWTimePMString      := TimePMString;
-   RESTDWLongMonthNames    := TArrayMonth(LongMonthNames);
-   RESTDWShortMonthNames   := TArrayMonth(ShortMonthNames);
-   RESTDWShortDayNames     := TArrayWeek(ShortDayNames);
-   RESTDWLongDayNames      := TArrayWeek(LongDayNames);
-   RESTDWCurrencyString    := CurrencyString;
-  {$ENDIF}
+  RESTDWDecimalSeparator  := DecimalSeparator;
+  RESTDWThousandSeparator := ThousandSeparator;
+  RESTDWCurrencyDecimals  := CurrencyDecimals;
+  RESTDWShortDateFormat   := ShortDateFormat;
+  RESTDWDateSeparator     := DateSeparator;
+  RESTDWTimeSeparator     := TimeSeparator;
+  RESTDWShortTimeFormat   := ShortTimeFormat;
+  RESTDWTimeAMString      := TimeAMString;
+  RESTDWTimePMString      := TimePMString;
+  RESTDWLongMonthNames    := TArrayMonth(LongMonthNames);
+  RESTDWShortMonthNames   := TArrayMonth(ShortMonthNames);
+  RESTDWShortDayNames     := TArrayWeek(ShortDayNames);
+  RESTDWLongDayNames      := TArrayWeek(LongDayNames);
+  RESTDWCurrencyString    := CurrencyString;
  {$ENDIF}
 {$ENDIF}
 

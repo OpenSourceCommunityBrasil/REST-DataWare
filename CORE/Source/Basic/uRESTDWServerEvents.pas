@@ -494,7 +494,7 @@ Begin
        vparams    := bJsonOBJb.Pairs[2].Value; //params
        vneedauth  := StringToBoolean(bJsonOBJb.Pairs[3].Value); //params
        vonlypredefparams := StringToBoolean(bJsonOBJb.Pairs[4].Value); //params
-       vContentType := DecodeStrings(bJsonOBJb.Pairs[5].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}); //Final
+       vContentType := DecodeStrings(bJsonOBJb.Pairs[5].Value{$IFDEF FPC}, csUndefined{$ENDIF}); //Final
        If EventByName[vEventName] = Nil Then
         vDWEvent  := TRESTDWEvent(Self.Add)
        Else
@@ -524,7 +524,7 @@ Begin
              vDWParamMethod.Encoded         := StringToBoolean(bJsonOBJc.Pairs[4].Value); // StringToBoolean(bJsonOBJc.get('encoded').toString);
             If bJsonArrayC.ElementCount > 5 Then
              If Trim(bJsonOBJc.Pairs[5].Value) <> '' Then //Trim(bJsonOBJc.get('default').toString) <> '' Then
-              vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.Pairs[5].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}); // bJsonOBJc.get('default').toString{$IFDEF FPC}, csUndefined{$ENDIF});
+              vDWParamMethod.DefaultValue   := DecodeStrings(bJsonOBJc.Pairs[5].Value{$IFDEF FPC}, csUndefined{$ENDIF}); // bJsonOBJc.get('default').toString{$IFDEF FPC}, csUndefined{$ENDIF});
             FreeAndNil(bJsonOBJc);
            End;
          Finally
@@ -617,7 +617,7 @@ Begin
   Begin
    vParamLine2  := Format('"needauth":"%s", "onlypredefparams":"%s", "ContentType":"%s"', [BooleanToString(Items[I].Routes.All.Active),
                                                                                            BooleanToString(Items[I].OnlyPreDefinedParams),
-                                                                                           EncodeStrings(Items[I].DefaultContentType{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
+                                                                                           EncodeStrings(Items[I].DefaultContentType{$IFDEF FPC}, csUndefined{$ENDIF})]);
    vTagEvent    := Format('{"eventname":"%s"', [TRESTDWEvent(Items[I]).EventName]);
    vTagEvent    := vTagEvent + Format(', "DataMode":"%s"', [GetDataModeName(Items[I].vDataMode)]);
    vTagEvent    := vTagEvent + ', "params":[%s], ' + vParamLine2 + '}';
@@ -630,7 +630,7 @@ Begin
                            GetValueType(Items[I].vDWParams[A].ObjectValue),
                            Items[I].vDWParams[A].ParamName,
                            BooleanToString(Items[I].vDWParams[A].Encoded),
-                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]);
+                           EncodeStrings(Items[I].vDWParams[A].DefaultValue{$IFDEF FPC}, csUndefined{$ENDIF})]);
      If vParamsLines = '' Then
       vParamsLines := vParamLine
      Else

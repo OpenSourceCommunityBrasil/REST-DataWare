@@ -50,7 +50,7 @@ Uses
    vEncodeStrings,
    vCompression            : Boolean;
    vEncoding               : TEncodeSelect;
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
    vDatabaseCharSet        : TDatabaseCharSet;
    {$ENDIF}
    vAccept,
@@ -376,7 +376,7 @@ Uses
    Property OnWorkBegin           : TOnWork                    Read vOnWorkBegin           Write SetOnWorkBegin;
    Property OnWorkEnd             : TOnWorkEnd                 Read vOnWorkEnd             Write SetOnWorkEnd;
    Property OnStatus              : TOnStatus                  Read vOnStatus              Write SetOnStatus;
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
    Property DatabaseCharSet       : TDatabaseCharSet           Read vDatabaseCharSet       Write vDatabaseCharSet;
    {$ENDIF}
    Property TypeRequest           : TTypeRequest               Read vTypeRequest           Write vTypeRequest Default trHttp;
@@ -430,8 +430,8 @@ Begin
       End;
     End;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
   End;
  vActualClientPoolerExec := RESTClientPoolerExec;
@@ -453,11 +453,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                              := TRESTDWParams.Create;
@@ -473,10 +473,10 @@ Begin
  JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Pooler';
  JSONParam.ObjectDirection             := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString                   := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString                    := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Method_Prefix';
@@ -498,10 +498,10 @@ Begin
      JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
      JSONParam.ParamName             := 'Params';
      JSONParam.ObjectDirection       := odInOut;
-     If RESTClientPoolerExec.CriptOptions.Use Then
-      JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
-     Else
-      JSONParam.AsString             := Params.ToJSON;
+//     If RESTClientPoolerExec.CriptOptions.Use Then
+//      JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
+//     Else
+     JSONParam.AsString             := Params.ToJSON;
      DWParams.Add(JSONParam);
     End;
   End;
@@ -539,7 +539,7 @@ Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
       Begin
        If Not DWParams.ItemsString['MessageError'].IsNull Then
-        MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
       End;
      If DWParams.ItemsString['Error'] <> Nil Then
       Begin
@@ -557,7 +557,7 @@ Begin
           Begin
            bJsonValue  := TRESTDWJSONInterfaceObject.Create(DWParams.ItemsString['Result'].AsString);
            If bJsonValue.PairCount > 3 Then
-            Result.SetValue(Decodestrings(TRESTDWJSONInterfaceObject(bJsonValue).Pairs[4].Value{$IFDEF RESTDWLAZARUS}, Result.DatabaseCharSet{$ENDIF}));
+            Result.SetValue(Decodestrings(TRESTDWJSONInterfaceObject(bJsonValue).Pairs[4].Value{$IFDEF FPC}, Result.DatabaseCharSet{$ENDIF}));
            FreeAndNil(bJsonValue);
           End
          Else
@@ -618,8 +618,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -649,11 +649,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                              := TRESTDWParams.Create;
@@ -682,10 +682,10 @@ Begin
  JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Pooler';
  JSONParam.ObjectDirection             := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString                   := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString                   := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                   := 'Method_Prefix';
@@ -705,10 +705,10 @@ Begin
    JSONParam                           := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                 := 'SQL';
    JSONParam.ObjectDirection           := odIn;
-   If RESTClientPoolerExec.CriptOptions.Use Then
-    JSONParam.AsString                 := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
-   Else
-    JSONParam.AsString                 := SQL;
+//   If RESTClientPoolerExec.CriptOptions.Use Then
+//    JSONParam.AsString                 := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
+//   Else
+   JSONParam.AsString                 := SQL;
    DWParams.Add(JSONParam);
    If Params <> Nil Then
     Begin
@@ -717,10 +717,10 @@ Begin
        JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
        JSONParam.ParamName             := 'Params';
        JSONParam.ObjectDirection       := odInOut;
-       If RESTClientPoolerExec.CriptOptions.Use Then
-        JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
-       Else
-        JSONParam.AsString             := Params.ToJSON;
+//       If RESTClientPoolerExec.CriptOptions.Use Then
+//        JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
+//       Else
+       JSONParam.AsString             := Params.ToJSON;
        DWParams.Add(JSONParam);
       End;
     End;
@@ -759,7 +759,7 @@ Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
       Begin
        If Not DWParams.ItemsString['MessageError'].IsNull Then
-        MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
       End;
      If DWParams.ItemsString['Error'] <> Nil Then
       Begin
@@ -777,7 +777,7 @@ Begin
           Begin
            bJsonValue  := TRESTDWJSONInterfaceObject.Create(DWParams.ItemsString['Result'].AsString);
            If bJsonValue.PairCount > 3 Then
-            Result.SetValue(Decodestrings(TRESTDWJSONInterfaceObject(bJsonValue).Pairs[4].Value{$IFDEF RESTDWLAZARUS}, Result.DatabaseCharSet{$ENDIF}));
+            Result.SetValue(Decodestrings(TRESTDWJSONInterfaceObject(bJsonValue).Pairs[4].Value{$IFDEF FPC}, Result.DatabaseCharSet{$ENDIF}));
            FreeAndNil(bJsonValue);
           End
          Else
@@ -837,8 +837,8 @@ Begin
  vConnection.EncodeStrings    := EncodeStrings;
  vConnection.Encoding         := Encoding;
  vConnection.AccessTag        := vAccessTag;
- vConnection.CriptOptions.Use := vCripto.Use;
- vConnection.CriptOptions.Key := vCripto.Key;
+// vConnection.CriptOptions.Use := vCripto.Use;
+// vConnection.CriptOptions.Key := vCripto.Key;
  vConnection.DataRoute        := DataRoute;
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
  {$IFNDEF RESTDWLAZARUS}
@@ -981,8 +981,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -1012,11 +1012,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -1025,18 +1025,18 @@ Begin
  JSONParam.ParamName             := 'MassiveSQLCache';
  JSONParam.ObjectDirection       := odIn;
  JSONParam.ObjectValue           := ovString;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.SetValue(RESTClientPoolerExec.CriptOptions.Encrypt(MassiveSQLCache), JSONParam.Encoded)
- Else
-  JSONParam.SetValue(MassiveSQLCache, JSONParam.Encoded);
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.SetValue(RESTClientPoolerExec.CriptOptions.Encrypt(MassiveSQLCache), JSONParam.Encoded)
+// Else
+ JSONParam.SetValue(MassiveSQLCache, JSONParam.Encoded);
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -1078,7 +1078,7 @@ Begin
      Result          := TRESTDWJSONValue.Create;
      Result.Encoding := vEncoding;
      If Not DWParams.ItemsString['MessageError'].IsNull Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['Result'] <> Nil Then
@@ -1134,8 +1134,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -1165,11 +1165,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -1183,10 +1183,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -1228,7 +1228,7 @@ Begin
      Result          := TRESTDWJSONValue.Create;
      Result.Encoding := vEncoding;
      If Not DWParams.ItemsString['MessageError'].IsNull Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['Result'] <> Nil Then
@@ -1272,12 +1272,12 @@ Begin
  vConnectTimeOut  := 3000;
  vBinaryRequest   := False;
  vPoolerNotFoundMessage := cPoolerNotFound;
- {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+ {$IF Defined(FPC) or Defined(DELPHIXEUP)}
  vEncoding        := esUtf8;
  {$ELSE}
  vEncoding        := esASCII;
  {$IFEND}
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  vDatabaseCharSet := csUndefined;
  {$ENDIF}
  vCripto          := TCripto.Create;
@@ -1321,8 +1321,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    vDataRoute           := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(Method_Prefix) <> '' Then
     Begin
@@ -1348,10 +1348,10 @@ Begin
  RESTClientPoolerExec.Encoding        := vEncoding;
  RESTClientPoolerExec.UserAgent       := vUserAgent;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- RESTClientPoolerExec.CriptOptions.Use:= vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key:= vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use:= vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key:= vCripto.Key;
  RESTClientPoolerExec.DataRoute        := vDataRoute;
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams  := TRESTDWParams.Create;
@@ -1433,7 +1433,7 @@ Begin
    RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
    RESTClientPoolerExec.SetAccessTag(vAccessTag);
    RESTClientPoolerExec.Encoding         := vEncoding;
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
     RESTClientPoolerExec.DatabaseCharSet := vDatabaseCharSet;
    {$ENDIF}
   End
@@ -1450,8 +1450,8 @@ Begin
    RESTClientPoolerExec.Encoding         := vEncoding;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -1474,18 +1474,18 @@ Begin
  RESTClientPoolerExec.OnWorkBegin        := vOnWorkBegin;
  RESTClientPoolerExec.OnWorkEnd          := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus           := vOnStatus;
- RESTClientPoolerExec.CriptOptions.Use   := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key   := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use   := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key   := vCripto.Key;
  RESTClientPoolerExec.DataRoute          := DataRoute;
  DWParams                                := TRESTDWParams.Create;
  DWParams.Encoding                       := RESTClientPoolerExec.Encoding;
  JSONParam                               := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                     := 'Pooler';
  JSONParam.ObjectDirection               := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString                     := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString                     := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString                     := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString                     := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                               := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName                     := 'Result';
@@ -1575,8 +1575,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -1606,11 +1606,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -1618,10 +1618,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -1631,18 +1631,18 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
- Else
-  JSONParam.AsString             := SQL;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
+// Else
+ JSONParam.AsString             := SQL;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
- Else
-  JSONParam.AsString             := Params.ToJSON;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
+// Else
+ JSONParam.AsString             := Params.ToJSON;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
@@ -1712,7 +1712,7 @@ Begin
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['RowsAffected'] <> Nil Then
       RowsAffected  := DWParams.ItemsString['RowsAffected'].AsInteger;
      If DWParams.ItemsString['Result'] <> Nil Then
@@ -1774,8 +1774,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -1806,11 +1806,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -1818,10 +1818,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -1831,10 +1831,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odInOut;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
- Else
-  JSONParam.AsString             := Params.ToJSON;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
+// Else
+ JSONParam.AsString             := Params.ToJSON;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
@@ -1902,7 +1902,7 @@ Begin
      Result.Encoded := False;
      Result.Encoding := RESTClientPoolerExec.Encoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['RowsAffected'] <> Nil Then
@@ -1979,8 +1979,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -2011,11 +2011,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -2023,10 +2023,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -2036,18 +2036,18 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
- Else
-  JSONParam.AsString             := SQL;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
+// Else
+ JSONParam.AsString             := SQL;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odInOut;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
- Else
-  JSONParam.AsString             := Params.ToJSON;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
+// Else
+ JSONParam.AsString             := Params.ToJSON;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
@@ -2115,7 +2115,7 @@ Begin
      Result.Encoded := False;
      Result.Encoding := RESTClientPoolerExec.Encoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['RowsAffected'] <> Nil Then
@@ -2196,8 +2196,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -2227,11 +2227,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -2239,10 +2239,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -2317,7 +2317,7 @@ Begin
      Result.Encoded  := False;
      Result.Encoding := RESTClientPoolerExec.Encoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['RowsAffected'] <> Nil Then
@@ -2338,7 +2338,7 @@ Begin
    Else
     Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value)
      Else
@@ -2400,8 +2400,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -2431,11 +2431,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -2443,10 +2443,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -2456,10 +2456,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
- Else
-  JSONParam.AsString             := SQL;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
+// Else
+ JSONParam.AsString             := SQL;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
@@ -2526,7 +2526,7 @@ Begin
      Result.Encoded  := False;
      Result.Encoding := RESTClientPoolerExec.Encoding;
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['RowsAffected'] <> Nil Then
@@ -2555,7 +2555,7 @@ Begin
    Else
     Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value)
      Else
@@ -2632,8 +2632,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -2662,11 +2662,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -2674,10 +2674,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -2718,7 +2718,7 @@ Begin
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['Result'] <> Nil Then
@@ -2733,7 +2733,7 @@ Begin
    Else
     Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Begin
        Error  := StringToBoolean(DWParams.ItemsString['Error'].Value);
@@ -2793,8 +2793,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -2824,11 +2824,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -2836,10 +2836,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -2882,7 +2882,7 @@ Begin
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['Result'] <> Nil Then
@@ -2897,7 +2897,7 @@ Begin
    Else
     Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Begin
        Error  := StringToBoolean(DWParams.ItemsString['Error'].Value);
@@ -2957,8 +2957,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -2988,11 +2988,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -3000,10 +3000,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -3046,7 +3046,7 @@ Begin
       (Uppercase(lResponse) <> Uppercase(cInvalidAuth)) Then
     Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['Result'] <> Nil Then
@@ -3061,7 +3061,7 @@ Begin
    Else
     Begin
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Error'] <> Nil Then
       Begin
        Error  := StringToBoolean(DWParams.ItemsString['Error'].Value);
@@ -3145,8 +3145,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -3174,13 +3174,13 @@ Begin
  RESTClientPoolerExec.OnWorkEnd       := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus        := vOnStatus;
  RESTClientPoolerExec.Encoding        := vEncoding;
- RESTClientPoolerExec.CriptOptions.Use:= vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key:= vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use:= vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key:= vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.UserAgent        := vUserAgent;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  TokenValidade;
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams  := TRESTDWParams.Create;
@@ -3258,10 +3258,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'DataRoute';
@@ -3271,10 +3271,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'RDWParams';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
- Else
-  JSONParam.AsString             := Params.ToJSON;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
+// Else
+ JSONParam.AsString             := Params.ToJSON;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
@@ -3307,7 +3307,7 @@ Begin
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If Error Then
       If DWParams.ItemsString['MessageError'] <> Nil Then
-       MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+       MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      Result := lResponse;
      If vBinaryRequest Then
       Begin
@@ -3360,8 +3360,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -3390,11 +3390,11 @@ Begin
  RESTClientPoolerExec.OnWorkEnd        := vOnWorkEnd;
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -3402,10 +3402,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -3415,18 +3415,18 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
- Else
-  JSONParam.AsString             := SQL;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
+// Else
+ JSONParam.AsString             := SQL;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Params';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
- Else
-  JSONParam.AsString             := Params.ToJSON;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Params.ToJSON)
+// Else
+ JSONParam.AsString             := Params.ToJSON;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
@@ -3464,7 +3464,7 @@ Begin
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Result'] <> Nil Then
       Result := StrToInt(DWParams.ItemsString['Result'].AsString);
     End
@@ -3514,8 +3514,8 @@ Begin
    RESTClientPoolerExec := RESTClientPooler;
    DataRoute            := RESTClientPoolerExec.DataRoute;
    AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//   vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//   vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
    vtyperequest         := RESTClientPoolerExec.TypeRequest;
    If Trim(DataRoute) = '' Then
     Begin
@@ -3545,11 +3545,11 @@ Begin
  RESTClientPoolerExec.OnStatus         := vOnStatus;
  RESTClientPoolerExec.Encoding         := vEncoding;
  RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
- RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
- RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+// RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+// RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  DWParams                        := TRESTDWParams.Create;
@@ -3557,10 +3557,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Pooler';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
- Else
-  JSONParam.AsString             := Pooler;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+// Else
+ JSONParam.AsString             := Pooler;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Method_Prefix';
@@ -3570,10 +3570,10 @@ Begin
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'SQL';
  JSONParam.ObjectDirection       := odIn;
- If RESTClientPoolerExec.CriptOptions.Use Then
-  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
- Else
-  JSONParam.AsString             := SQL;
+// If RESTClientPoolerExec.CriptOptions.Use Then
+//  JSONParam.AsString             := RESTClientPoolerExec.CriptOptions.Encrypt(SQL)
+// Else
+ JSONParam.AsString             := SQL;
  DWParams.Add(JSONParam);
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'Error';
@@ -3610,7 +3610,7 @@ Begin
      If DWParams.ItemsString['Error'] <> Nil Then
       Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
      If DWParams.ItemsString['MessageError'] <> Nil Then
-      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+      MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
      If DWParams.ItemsString['Result'] <> Nil Then
       Result := StrToInt(DWParams.ItemsString['Result'].AsString);
     End
@@ -3668,8 +3668,8 @@ Begin
      RESTClientPoolerExec := RESTClientPooler;
      DataRoute            := RESTClientPoolerExec.DataRoute;
      AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-     vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-     vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//     vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//     vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
      vtyperequest         := RESTClientPoolerExec.TypeRequest;
      If Trim(DataRoute) = '' Then
       Begin
@@ -3700,11 +3700,11 @@ Begin
    RESTClientPoolerExec.OnStatus         := vOnStatus;
    RESTClientPoolerExec.Encoding         := vEncoding;
    RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
-   RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
-   RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+//   RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+//   RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
    RESTClientPoolerExec.DataRoute        := DataRoute;
    RESTClientPoolerExec.SetAccessTag(vAccessTag);
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
    RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
    {$ENDIF}
    DWParams                              := TRESTDWParams.Create;
@@ -3712,18 +3712,18 @@ Begin
    JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'LinesDataset';
    JSONParam.ObjectDirection             := odIn;
-   If RESTClientPoolerExec.CriptOptions.Use Then
-    JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(LinesDataset)
-   Else
-     JSONParam.AsString                  := LinesDataset;
+//   If RESTClientPoolerExec.CriptOptions.Use Then
+//    JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(LinesDataset)
+//   Else
+   JSONParam.AsString                  := LinesDataset;
    DWParams.Add(JSONParam);
    JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Pooler';
    JSONParam.ObjectDirection             := odIn;
-   If RESTClientPoolerExec.CriptOptions.Use Then
-    JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
-   Else
-    JSONParam.AsString                   := Pooler;
+//   If RESTClientPoolerExec.CriptOptions.Use Then
+//    JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+//   Else
+   JSONParam.AsString                   := Pooler;
    DWParams.Add(JSONParam);
    JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Method_Prefix';
@@ -3763,7 +3763,7 @@ Begin
         (Uppercase(Result) <> Uppercase(cInvalidAuth)) Then
       Begin
        If DWParams.ItemsString['MessageError'] <> Nil Then
-        MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
        If DWParams.ItemsString['Error'] <> Nil Then
         Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
        If DWParams.ItemsString['Result'] <> Nil Then
@@ -3824,8 +3824,8 @@ Begin
      RESTClientPoolerExec := RESTClientPooler;
      DataRoute            := RESTClientPoolerExec.DataRoute;
      AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-     vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-     vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//     vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//     vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
      vtyperequest         := RESTClientPoolerExec.TypeRequest;
      If Trim(DataRoute) = '' Then
       Begin
@@ -3856,11 +3856,11 @@ Begin
    RESTClientPoolerExec.OnStatus         := vOnStatus;
    RESTClientPoolerExec.Encoding         := vEncoding;
    RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
-   RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
-   RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+//   RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+//   RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
    RESTClientPoolerExec.DataRoute        := DataRoute;
    RESTClientPoolerExec.SetAccessTag(vAccessTag);
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
    RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
    {$ENDIF}
    DWParams                              := TRESTDWParams.Create;
@@ -3874,10 +3874,10 @@ Begin
    JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Pooler';
    JSONParam.ObjectDirection             := odIn;
-   If RESTClientPoolerExec.CriptOptions.Use Then
-    JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
-   Else
-    JSONParam.AsString                   := Pooler;
+//   If RESTClientPoolerExec.CriptOptions.Use Then
+//    JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+//   Else
+   JSONParam.AsString                   := Pooler;
    DWParams.Add(JSONParam);
    JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Method_Prefix';
@@ -3936,7 +3936,7 @@ Begin
         (Uppercase(vResult) <> Uppercase(cInvalidAuth)) Then
       Begin
        If DWParams.ItemsString['MessageError'] <> Nil Then
-        MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
        If DWParams.ItemsString['Error'] <> Nil Then
         Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
        If DWParams.ItemsString['Result'] <> Nil Then
@@ -3995,8 +3995,8 @@ Begin
      RESTClientPoolerExec := RESTClientPooler;
      DataRoute            := RESTClientPoolerExec.DataRoute;
      AuthenticationOptions.Assign(RESTClientPoolerExec.AuthenticationOptions);
-     vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
-     vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
+//     vCripto.Use          := RESTClientPoolerExec.CriptOptions.Use;
+//     vCripto.Key          := RESTClientPoolerExec.CriptOptions.Key;
      vtyperequest         := RESTClientPoolerExec.TypeRequest;
      If Trim(DataRoute) = '' Then
       Begin
@@ -4027,11 +4027,11 @@ Begin
    RESTClientPoolerExec.OnStatus         := vOnStatus;
    RESTClientPoolerExec.Encoding         := vEncoding;
    RESTClientPoolerExec.EncodedStrings   := EncodeStrings;
-   RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
-   RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
+//   RESTClientPoolerExec.CriptOptions.Use := vCripto.Use;
+//   RESTClientPoolerExec.CriptOptions.Key := vCripto.Key;
    RESTClientPoolerExec.DataRoute        := DataRoute;
    RESTClientPoolerExec.SetAccessTag(vAccessTag);
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
    RESTClientPoolerExec.DatabaseCharSet  := vDatabaseCharSet;
    {$ENDIF}
    DWParams                              := TRESTDWParams.Create;
@@ -4039,18 +4039,18 @@ Begin
    JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'LinesDataset';
    JSONParam.ObjectDirection             := odIn;
-   If RESTClientPoolerExec.CriptOptions.Use Then
-    JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(LinesDataset)
-   Else
-     JSONParam.AsString                  := LinesDataset;
+//   If RESTClientPoolerExec.CriptOptions.Use Then
+//    JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(LinesDataset)
+//   Else
+   JSONParam.AsString                  := LinesDataset;
    DWParams.Add(JSONParam);
    JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Pooler';
    JSONParam.ObjectDirection             := odIn;
-   If RESTClientPoolerExec.CriptOptions.Use Then
-    JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
-   Else
-    JSONParam.AsString                   := Pooler;
+//   If RESTClientPoolerExec.CriptOptions.Use Then
+//    JSONParam.AsString                   := RESTClientPoolerExec.CriptOptions.Encrypt(Pooler)
+//   Else
+   JSONParam.AsString                   := Pooler;
    DWParams.Add(JSONParam);
    JSONParam                             := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
    JSONParam.ParamName                   := 'Method_Prefix';
@@ -4100,7 +4100,7 @@ Begin
         (Uppercase(Result) <> Uppercase(cInvalidAuth)) Then
       Begin
        If DWParams.ItemsString['MessageError'] <> Nil Then
-        MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        MessageError  := DecodeStrings(DWParams.ItemsString['MessageError'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
        If DWParams.ItemsString['Error'] <> Nil Then
         Error         := StringToBoolean(DWParams.ItemsString['Error'].Value);
        If DWParams.ItemsString['Result'] <> Nil Then

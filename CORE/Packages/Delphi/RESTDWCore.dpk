@@ -29,12 +29,6 @@ package RESTDWCore;
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 
-requires
-  {$IF Defined(VER150)}
-  bdertl,
-  {$IFEND}
-  soaprtl;
-
 contains
   uRESTDWBasic in '..\..\Source\Basic\uRESTDWBasic.pas',
   uRESTDWBasicDB in '..\..\Source\Basic\uRESTDWBasicDB.pas',

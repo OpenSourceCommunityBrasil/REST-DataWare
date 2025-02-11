@@ -7,9 +7,13 @@ interface
 
 uses
  {$IFNDEF FPC}
-  uRESTDW.System,
-  System.SysUtils,
-  System.NetEncoding,
+  {$IF CompilerVersion > 21}
+   uRESTDW.System,
+   System.SysUtils,
+   System.NetEncoding,
+  {$ELSE}
+   SysUtils,
+  {$IFEND}
   OpenSSL.Api_11,
   uRESTDWProtoTypes;
  {$ELSE}
@@ -18,7 +22,6 @@ uses
   System.NetEncoding,
   OpenSSL.Api_11,
   uRESTDWProtoTypes,
-  uRESTDWTools,
   uRESTDWConsts;
  {$ENDIF}
 
@@ -30,17 +33,17 @@ type
   TRESTDWOpenSSLHelper = class
   protected
     class function CertToPEM(const ACertificates: array of PX509; const APrivateKey: PEVP_PKEY;
-      out ACertificatePEM, APrivateKeyPEM: TRESTDWBytes): Boolean; static;
+      out ACertificatePEM, APrivateKeyPEM: TRESTDWBytes): Boolean; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
     class function CreateCertRequest(const ACountry, AState, ALocality, AOrganization, AOrgUnit, ACommonName: String;
-      out ARSA: PRSA; out ACertRequest: PX509_REQ; out APrivateKey: PEVP_PKEY): Boolean; static;
+      out ARSA: PRSA; out ACertRequest: PX509_REQ; out APrivateKey: PEVP_PKEY): Boolean; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
-    class function SetRandomSerial(const ACertificate: PX509): Boolean; static;
+    class function SetRandomSerial(const ACertificate: PX509): Boolean; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
     class function CreateKeyPair_CA(const ACertificateCA: PX509; const APrivateKeyCA: PEVP_PKEY;
       const ACountry, AState, ALocality, AOrganization, AOrgUnit, ACommonName: String;
       const AServerName: String; const AExpiresDays: Integer;
-      out ARSA: PRSA; out ACertificate: PX509; out APrivateKey: PEVP_PKEY): Boolean; static;
+      out ARSA: PRSA; out ACertificate: PX509; out APrivateKey: PEVP_PKEY): Boolean; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
   public
     { Generates a crypto-safe random buffer of bytes
 
@@ -49,7 +52,7 @@ type
 
       Returns:
         Bytes of random data }
-    class function RandomBytes(const ASize: Integer): TRESTDWBytes; static;
+    class function RandomBytes(const ASize: Integer): TRESTDWBytes; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
     { Generates a crypto-safe random string
 
@@ -59,7 +62,7 @@ type
 
       Returns:
         String of random data }
-    class function RandomString(const ACharset: String; const ASize: Integer): String; overload; static;
+    class function RandomString(const ACharset: String; const ASize: Integer): String; overload; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
     { Generates a crypto-safe random string
 
@@ -68,7 +71,7 @@ type
 
       Returns:
         String of random data }
-    class function RandomString(const ASize: Integer): String; overload; static;
+    class function RandomString(const ASize: Integer): String; overload; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
     { Generates a crypto-safe random string of characters only
 
@@ -77,7 +80,7 @@ type
 
       Returns:
         String of random data }
-    class function RandomChars(const ASize: Integer): String; static;
+    class function RandomChars(const ASize: Integer): String; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
     { Generates a crypto-safe lowercase random string
 
@@ -86,7 +89,7 @@ type
 
       Returns:
         String of random data }
-    class function RandomLowerString(const ASize: Integer): String; static;
+    class function RandomLowerString(const ASize: Integer): String; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
     { Generates a crypto-safe random string of lowercase characters only
 
@@ -95,7 +98,7 @@ type
 
       Returns:
         String of random data }
-    class function RandomLowerChars(const ASize: Integer): String; static;
+    class function RandomLowerChars(const ASize: Integer): String; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
     { Generates a crypto-safe random string of numbers
 
@@ -104,7 +107,7 @@ type
 
       Returns:
         String of random data }
-    class function RandomDigits(const ASize: Integer): String; static;
+    class function RandomDigits(const ASize: Integer): String; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
   public
     { Signs data using a private key to produce a signature
 
@@ -116,7 +119,7 @@ type
       Returns:
         True if the signature was created, False otherwise }
     class function Sign_RSASHA256(const AData: TRESTDWBytes; const APrivateKey: TRESTDWBytes;
-      out ASignature: TRESTDWBytes): Boolean; static;
+      out ASignature: TRESTDWBytes): Boolean; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
     { Verifies data using a public key and a signature
 
@@ -137,7 +140,7 @@ type
 
       Returns:
         String containing the hash of the data and key }
-    class function HMAC_SHA256(const AKey, AData: RawByteString): String; static;
+    class function HMAC_SHA256(const AKey, AData: {$IFNDEF FPC}{$IF CompilerVersion > 21}RawByteString{$ELSE}AnsiString{$IFEND}{$ELSE}RawByteString{$ENDIF}): String; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
     { Creates an HMAC SHA1 hash of the provided data
 
@@ -147,7 +150,7 @@ type
 
       Returns:
         String containing the hash of the data and key }
-    class function HMAC_SHA1(const AKey, AData: RawByteString): TRESTDWBytes; static;
+    class function HMAC_SHA1(const AKey, AData: {$IFNDEF FPC}{$IF CompilerVersion > 21}RawByteString{$ELSE}AnsiString{$IFEND}{$ELSE}RawByteString{$ENDIF}): TRESTDWBytes; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
   public
     { Creates a X.509 self-signed certificate
 
@@ -177,7 +180,7 @@ type
                                              const AServerName  : String;
                                              const AExpiresDays : Integer;
                                              out ACertificate,
-                                             APrivateKey        : TRESTDWBytes): Boolean; static;
+                                             APrivateKey        : TRESTDWBytes): Boolean; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
 
     { Creates a X.509 certificate signed by the provided CA
 
@@ -210,17 +213,22 @@ type
                                                const AServerName     : String;
                                                const AExpiresDays    : Integer;
                                                out ACertificate,
-                                               APrivateKey: TRESTDWBytes) : Boolean; static;
+                                               APrivateKey: TRESTDWBytes) : Boolean; {$IFNDEF FPC}{$IF CompilerVersion > 21}static;{$IFEND}{$ELSE}static;{$ENDIF}
   end;
 
 implementation
 
 uses
  {$IFNDEF FPC}
-  System.Classes
+  {$IF CompilerVersion > 21}
+   System.Classes
+  {$ELSE}
+   Classes
+  {$IFEND}
  {$ELSE}
   Classes
  {$ENDIF},
+  uRESTDWTools,
   uRESTDW.BinaryCoding;
 
 { TRESTDWOpenSSLHelper }
@@ -240,7 +248,15 @@ begin
   SetLength(Result, ASize);
   Bytes := RandomBytes(ASize);
   for I := 0 to ASize - 1 do
+   {$IFNDEF FPC}
+    {$IF CompilerVersion > 21}
+     Result[I + Low(String)] := ACharset[Bytes[I] MOD Length(ACharset) + Low(String)];
+    {$ELSE}
+     Result[I + 1] := ACharset[Bytes[I] MOD Length(ACharset) + 1];
+    {$IFEND}
+   {$ELSE}
     Result[I + Low(String)] := ACharset[Bytes[I] MOD Length(ACharset) + Low(String)];
+   {$ENDIF}
 end;
 
 class function TRESTDWOpenSSLHelper.RandomString(const ASize: Integer): String;
@@ -321,14 +337,14 @@ end;
 
 class function TRESTDWOpenSSLHelper.Verify_RSASHA256(const AHeader, APayload, ASignature: TRESTDWBytes; const APublicKey: TRESTDWBytes): Boolean;
 const
-  PKCS1_SIGNATURE_PUBKEY: RawByteString = '-----BEGIN RSA PUBLIC KEY-----';
+  PKCS1_SIGNATURE_PUBKEY: {$IFNDEF FPC}{$IF CompilerVersion > 21}RawByteString{$ELSE}AnsiString{$IFEND}{$ELSE}RawByteString{$ENDIF} = '-----BEGIN RSA PUBLIC KEY-----';
 var
   BIOPublicKey: PBIO;
   RSA: PRSA;
   PublicKey: PEVP_PKEY;
   Ctx: PEVP_MD_CTX;
   SHA256: PEVP_MD;
-  Dot: RawByteString;
+  Dot: {$IFNDEF FPC}{$IF CompilerVersion > 21}RawByteString{$ELSE}AnsiString{$IFEND}{$ELSE}RawByteString{$ENDIF};
 begin
   Dot := '.';
 
@@ -373,7 +389,7 @@ begin
   end;
 end;
 
-class function TRESTDWOpenSSLHelper.HMAC_SHA256(const AKey, AData: RawByteString): String;
+class function TRESTDWOpenSSLHelper.HMAC_SHA256(const AKey, AData: {$IFNDEF FPC}{$IF CompilerVersion > 21}RawByteString{$ELSE}AnsiString{$IFEND}{$ELSE}RawByteString{$ENDIF}): String;
 const
   EVP_MAX_MD_SIZE = 64;
 var
@@ -388,8 +404,13 @@ begin
    begin
     SetLength(Text, Size * 2);
     {$IFNDEF FPC}
-     BinToHex(TBytes(Buffer), 0, TBytes(Text), 0, Size);
-     Result := TEncoding.UTF8.GetString(Text).ToLower;
+     {$IF CompilerVersion > 21}
+      BinToHex(TBytes(Buffer), 0, TBytes(Text), 0, Size);
+      Result := TEncoding.UTF8.GetString(Text).ToLower;
+     {$ELSE}
+      SetLength(Result, Size);
+      BinToHex(PChar(Buffer), PChar(Result), Size);
+     {$IFEND}
     {$ELSE}
      SetLength(Result, Size);
      BinToHex(PChar(Buffer), PChar(Result), Size);
@@ -404,7 +425,7 @@ Begin
 End;
 {$ENDIF}
 
-class function TRESTDWOpenSSLHelper.HMAC_SHA1(const AKey, AData: RawByteString): TRESTDWBytes;
+class function TRESTDWOpenSSLHelper.HMAC_SHA1(const AKey, AData: {$IFNDEF FPC}{$IF CompilerVersion > 21}RawByteString{$ELSE}AnsiString{$IFEND}{$ELSE}RawByteString{$ENDIF}): TRESTDWBytes;
 const
   EVP_MAX_MD_SIZE = 20;
 var
@@ -421,6 +442,7 @@ end;
 class function TRESTDWOpenSSLHelper.CertToPEM(const ACertificates: array of PX509; const APrivateKey: PEVP_PKEY;
   out ACertificatePEM, APrivateKeyPEM: TRESTDWBytes): Boolean;
 var
+  I              : Integer;
   Certificate    : PX509;
   BIOCert,
   BIOPrivateKey  : PBIO;
@@ -431,17 +453,19 @@ var
   Pending,
   Read           : Integer;
   {$IFNDEF FPC}
-  Base64         : TBase64Encoding;
+   {$IF CompilerVersion > 21}
+    Base64       : TBase64Encoding;
+   {$IFEND}
   {$ENDIF}
 begin
   { Write the certificate chain }
-  for Certificate in ACertificates do
+  for I := 0 To Length(ACertificates) -1 do
   begin
+   Certificate := ACertificates[I];
     BIOCert := BIO_new(BIO_s_mem);
     try
       if i2d_X509_bio(BIOCert, Certificate) <> 1 then
-        Exit(False);
-
+        Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
       Pending := bio_ctrl_pending(BIOCert);
       SetLength(DERCert, Pending);
       Read := BIO_read(BIOCert, {$IFNDEF FPC}DERCert{$ELSE}Pointer(DERCert){$ENDIF}, Pending);
@@ -449,19 +473,33 @@ begin
       begin
         SetLength(DERCert, Read);
         {$IFNDEF FPC}
-        Base64 := TBase64Encoding.Create{$IFNDEF FPC}(64, #10){$ENDIF};
+         {$IF CompilerVersion > 21}
+          Base64 := TBase64Encoding.Create{$IFNDEF FPC}(64, #10){$ENDIF};
+         {$IFEND}
         {$ENDIF}
         try
-          FTempBytes  := TRESTDWBytes(TEncoding.ANSI.GeTBytes('-----BEGIN CERTIFICATE-----' + #10 +
-                                                              {$IFNDEF FPC}
-                                                               Base64.EncodeBytesToString(DERCert)
-                                                              {$ELSE}
-                                                               EncodeStrings(BytesToString(DERCert), csUndefined)
-                                                              {$ENDIF} + #10 +
-                                                              '-----END CERTIFICATE-----' + #10));
          {$IFNDEF FPC}
-          ACertificatePEM := ACertificatePEM + FTempBytes;
+          {$IF CompilerVersion > 21}
+           FTempBytes  := TRESTDWBytes(TEncoding.ANSI.GeTBytes('-----BEGIN CERTIFICATE-----' + #10  +
+                                                                Base64.EncodeBytesToString(DERCert) + #10 +
+                                                               '-----END CERTIFICATE-----' + #10));
+
+           ACertificatePEM := ACertificatePEM + FTempBytes;
+          {$ELSE}
+           FTempBytes  := StringToBytes('-----BEGIN CERTIFICATE-----' + #10 +
+                                        EncodeStrings(BytesToString(DERCert))
+                                        + #10 +
+                                        '-----END CERTIFICATE-----' + #10);
+           FTempBytesB := ACertificatePEM;
+           SetLength(ACertificatePEM, Length(FTempBytesB) + Length(FTempBytes));
+           Move(FTempBytesB[0], ACertificatePEM[0],                   Length(FTempBytesB));
+           Move(FTempBytes[0],  ACertificatePEM[Length(FTempBytesB)], Length(FTempBytes));
+          {$IFEND}
          {$ELSE}
+          FTempBytes  := TRESTDWBytes(TEncoding.ANSI.GeTBytes('-----BEGIN CERTIFICATE-----' + #10 +
+                                                               EncodeStrings(BytesToString(DERCert), csUndefined)
+                                                              + #10 +
+                                                              '-----END CERTIFICATE-----' + #10));
           FTempBytesB := ACertificatePEM;
           SetLength(ACertificatePEM, Length(FTempBytesB) + Length(FTempBytes));
           Move(FTempBytesB[0], ACertificatePEM[0],                   Length(FTempBytesB));
@@ -469,7 +507,9 @@ begin
          {$ENDIF}
         finally
          {$IFNDEF FPC}
-          Base64.Free;
+          {$IF CompilerVersion > 21}
+           Base64.Free;
+          {$IFEND} 
          {$ENDIF}
         end;
       end;
@@ -483,40 +523,55 @@ begin
   BIOPrivateKey := BIO_new(BIO_s_mem);
   try
     if i2d_PrivateKey_bio(BIOPrivateKey, APrivateKey) <> 1 then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     Pending := bio_ctrl_pending(BIOPrivateKey);
     SetLength(DERPrivateKey, Pending);
     Read := BIO_read(BIOPrivateKey, {$IFNDEF FPC}DERPrivateKey{$ELSE}Pointer(DERPrivateKey){$ENDIF}, Pending);
-    if Read > 0 then
-    begin
+    If Read > 0 Then
+     Begin
       SetLength(DERPrivateKey, Read);
       {$IFNDEF FPC}
-      Base64 := TBase64Encoding.Create{$IFNDEF FPC}(64, #10){$ENDIF};
+       {$IF CompilerVersion > 21}
+        Base64 := TBase64Encoding.Create{$IFNDEF FPC}(64, #10){$ENDIF};
+       {$IFEND}
       {$ENDIF}
-      try
-        FTempBytes  := TRESTDWBytes(TEncoding.ANSI.GetBytes('-----BEGIN RSA PRIVATE KEY-----' + #10 +
-                                                            {$IFNDEF FPC}
-                                                             Base64.EncodeBytesToString(DERPrivateKey)
-                                                            {$ELSE}
-                                                             EncodeStrings(BytesToString(DERPrivateKey), csUndefined)
-                                                            {$ENDIF} + #10 +
-                                                            '-----END RSA PRIVATE KEY-----' + #10));
+      Try
        {$IFNDEF FPC}
-        APrivateKeyPEM := APrivateKeyPEM + FTempBytes;
+        {$IF CompilerVersion > 21}
+         FTempBytes  := TRESTDWBytes(TEncoding.ANSI.GetBytes('-----BEGIN RSA PRIVATE KEY-----' + #10 +
+                                                              Base64.EncodeBytesToString(DERPrivateKey)
+                                                             + #10 +
+                                                             '-----END RSA PRIVATE KEY-----' + #10));
+         APrivateKeyPEM := APrivateKeyPEM + FTempBytes;
+        {$ELSE}
+         FTempBytes  := StringToBytes('-----BEGIN RSA PRIVATE KEY-----' + #10 +
+                                      EncodeStrings(BytesToString(DERPrivateKey))
+                                      + #10 +
+                                      '-----END RSA PRIVATE KEY-----' + #10);
+         FTempBytesB := APrivateKeyPEM;
+         SetLength(APrivateKeyPEM, Length(FTempBytesB) + Length(FTempBytes));
+         Move(FTempBytesB[0], APrivateKeyPEM[0],                   Length(FTempBytesB));
+         Move(FTempBytes[0],  APrivateKeyPEM[Length(FTempBytesB)], Length(FTempBytes));
+        {$IFEND}
        {$ELSE}
+        FTempBytes  := TRESTDWBytes(TEncoding.ANSI.GetBytes('-----BEGIN RSA PRIVATE KEY-----' + #10 +
+                                                             EncodeStrings(BytesToString(DERPrivateKey), csUndefined)
+                                                            + #10 +
+                                                            '-----END RSA PRIVATE KEY-----' + #10));
         FTempBytesB := APrivateKeyPEM;
         SetLength(APrivateKeyPEM, Length(FTempBytesB) + Length(FTempBytes));
         Move(FTempBytesB[0], APrivateKeyPEM[0],                   Length(FTempBytesB));
         Move(FTempBytes[0],  APrivateKeyPEM[Length(FTempBytesB)], Length(FTempBytes));
        {$ENDIF}
-      finally
+      Finally
        {$IFNDEF FPC}
-        Base64.Free;
+        {$IF CompilerVersion > 21}
+         Base64.Free;
+        {$IFEND}
        {$ENDIF}
-      end;
-    end;
-
+      End;
+     End;
     Result := True;
   finally
     if BIOPrivateKey <> nil then
@@ -532,47 +587,63 @@ var
 begin
 	APrivateKey := EVP_PKEY_new;
   if APrivateKey = nil then
-    Exit(False);
+    Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
   ACertRequest := X509_REQ_new;
   if ACertRequest = NIL then
-    Exit(False);
+    Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
   Bignum := BN_new;
   if Bignum = nil then
-    Exit(False);
+    Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
   try
     if BN_set_word(Bignum, RSA_F4) <> 1 then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     ARSA := RSA_new;
     if ARSA = nil then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     if RSA_generate_key_ex(ARSA, RSA_KEY_BITS, Bignum, nil) <> 1 then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     { Assign the RSA key pair to the private key }
     if EVP_PKEY_assign(APrivateKey, EVP_PKEY_RSA, ARSA) <> 1 then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     { Assign the public key for the request from the private key }
     if X509_REQ_set_pubkey(ACertRequest, APrivateKey) <> 1 then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     { Apply the name for the request }
     Name := X509_REQ_get_subject_name(ACertRequest);
-    X509_NAME_add_entry_by_txt(name, 'C', MBSTRING_ASC, MarshaledAString(AnsiString(ACountry)), -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, 'ST', MBSTRING_ASC, MarshaledAString(AnsiString(AState)), -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, 'L', MBSTRING_ASC, MarshaledAString(AnsiString(ALocality)), -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, 'O', MBSTRING_ASC, MarshaledAString(AnsiString(AOrganization)), -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, 'OU', MBSTRING_ASC, MarshaledAString(AnsiString(AOrgUnit)), -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, 'CN', MBSTRING_ASC, MarshaledAString(AnsiString(ACommonName)), -1, -1, 0);
-
+    {$IFNDEF FPC}
+     {$IF CompilerVersion > 21}
+      X509_NAME_add_entry_by_txt(name, 'C',  MBSTRING_ASC, MarshaledAString(AnsiString(ACountry)),      -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'ST', MBSTRING_ASC, MarshaledAString(AnsiString(AState)),        -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'L',  MBSTRING_ASC, MarshaledAString(AnsiString(ALocality)),     -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'O',  MBSTRING_ASC, MarshaledAString(AnsiString(AOrganization)), -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'OU', MBSTRING_ASC, MarshaledAString(AnsiString(AOrgUnit)),      -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'CN', MBSTRING_ASC, MarshaledAString(AnsiString(ACommonName)),   -1, -1, 0);
+     {$ELSE}
+      X509_NAME_add_entry_by_txt(name, 'C',  MBSTRING_ASC, PAnsiChar(ACountry),      -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'ST', MBSTRING_ASC, PAnsiChar(AState),        -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'L',  MBSTRING_ASC, PAnsiChar(ALocality),     -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'O',  MBSTRING_ASC, PAnsiChar(AOrganization), -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'OU', MBSTRING_ASC, PAnsiChar(AOrgUnit),      -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'CN', MBSTRING_ASC, PAnsiChar(ACommonName),   -1, -1, 0);
+     {$IFEND}
+    {$ELSE}
+     X509_NAME_add_entry_by_txt(name, 'C',  MBSTRING_ASC, MarshaledAString(AnsiString(ACountry)),      -1, -1, 0);
+     X509_NAME_add_entry_by_txt(name, 'ST', MBSTRING_ASC, MarshaledAString(AnsiString(AState)),        -1, -1, 0);
+     X509_NAME_add_entry_by_txt(name, 'L',  MBSTRING_ASC, MarshaledAString(AnsiString(ALocality)),     -1, -1, 0);
+     X509_NAME_add_entry_by_txt(name, 'O',  MBSTRING_ASC, MarshaledAString(AnsiString(AOrganization)), -1, -1, 0);
+     X509_NAME_add_entry_by_txt(name, 'OU', MBSTRING_ASC, MarshaledAString(AnsiString(AOrgUnit)),      -1, -1, 0);
+     X509_NAME_add_entry_by_txt(name, 'CN', MBSTRING_ASC, MarshaledAString(AnsiString(ACommonName)),   -1, -1, 0);
+    {$ENDIF}
     { Self-sign with SHA1 the request using our new private key }
     if X509_REQ_sign(ACertRequest, APrivateKey, EVP_sha256) = 0 then
-      Exit(False);
-
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
     Result := True;
   finally
     if Bignum <> nil then
@@ -591,13 +662,13 @@ begin
   Buffer[0] := Buffer[0] AND $7F; // Positive value
   Bignum := BN_new;
   if Bignum = nil then
-    Exit(False);
+    Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
   try
     BN_bin2bn({$IFNDEF FPC}Buffer{$ELSE}Pointer(Buffer){$ENDIF}, Length(Buffer), Bignum);
     Serial := ASN1_INTEGER_new;
     if Serial = nil then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
     try
       { Set the serial number }
       BN_to_ASN1_INTEGER(Bignum, Serial);
@@ -622,27 +693,27 @@ var
 	CertReq: PX509_REQ;
 	CertReqPublicKey: PEVP_PKEY;
   Extension: PX509_EXTENSION;
-  ServerName: RawByteString;
+  ServerName: {$IFNDEF FPC}{$IF CompilerVersion > 21}RawByteString{$ELSE}AnsiString{$IFEND}{$ELSE}RawByteString{$ENDIF};
   Name: PX509_NAME;
 begin
 	{ Create the certificate request and private key }
 	if not CreateCertRequest(
     ACountry, AState, ALocality, AOrganization, AOrgUnit, ACommonName,
     ARSA, CertReq, APrivateKey) then
-    Exit(False);
+    Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
   try
     { Create a self-signed certificate }
     ACertificate := X509_new;
     if ACertificate = nil then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     { Set version to X509v3 }
     if X509_set_version(ACertificate, 2) <> 1 then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     { Set random serial }
     if not SetRandomSerial(ACertificate) then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     { Set issuer to CA's subject }
     X509_set_issuer_name(ACertificate, X509_get_subject_name(ACertificateCA));
@@ -650,16 +721,15 @@ begin
     { Set expiration of the certificate }
     X509_gmtime_adj(X509_get_notBefore(ACertificate), 0);
     X509_gmtime_adj(X509_get_notAfter(ACertificate), 60 * 60 * 24 * AExpiresDays);
-
     { Use the same subject as the public key for the certificate request }
     Name := X509_REQ_get_subject_name(CertReq);
     if Name = nil then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
     if X509_set_subject_name(ACertificate, Name) <> 1 then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
     CertReqPublicKey := X509_REQ_get_pubkey(CertReq);
     if CertReqPublicKey = nil then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
     try
       X509_set_pubkey(ACertificate, CertReqPublicKey);
     finally
@@ -671,9 +741,18 @@ begin
     if AServerName <> '' then
     begin
       ServerName := 'DNS:' + AnsiString(AServerName);
-      Extension := X509V3_EXT_conf_nid(nil, nil, NID_subject_alt_name, MarshaledAString(ServerName));
+      {$IFNDEF FPC}
+       {$IF CompilerVersion > 21}
+        Extension := X509V3_EXT_conf_nid(nil, nil, NID_subject_alt_name, MarshaledAString(ServerName));
+       {$ELSE}
+        Extension := X509V3_EXT_conf_nid(nil, nil, NID_subject_alt_name, PWideChar(ServerName));
+       {$IFEND}
+      {$ELSE}
+       Extension := X509V3_EXT_conf_nid(nil, nil, NID_subject_alt_name, MarshaledAString(ServerName));
+      {$ENDIF}
+
       if Extension = nil then
-        Exit(False);
+        Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
       try
         X509_add_ext(ACertificate, Extension, -1);
       finally
@@ -683,7 +762,7 @@ begin
 
     { Sign our certificate with our CA }
     if X509_sign(ACertificate, APrivateKeyCA, EVP_sha256) = 0 then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     Result := True;
   finally
@@ -703,20 +782,20 @@ var
   RSA: PRSA;
   Bignum: PBIGNUM;
   Extension: PX509_EXTENSION;
-  ServerName: RawByteString;
+  ServerName: {$IFNDEF FPC}{$IF CompilerVersion > 21}RawByteString{$ELSE}AnsiString{$IFEND}{$ELSE}RawByteString{$ENDIF};
 begin
   { Create a self-signed certificate }
   Certificate := X509_new;
   if Certificate = nil then
-    Exit(False);
+    Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
   try
     { Set version to X509v3 }
     if X509_set_version(Certificate, 2) <> 1 then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     { Set random serial }
     if not SetRandomSerial(Certificate) then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     { Set expiration of the certificate }
     X509_gmtime_adj(X509_get_notBefore(Certificate), 0);
@@ -724,24 +803,49 @@ begin
 
     { Apply the name for the request }
     Name := X509_get_subject_name(Certificate);
-    X509_NAME_add_entry_by_txt(name, 'C', MBSTRING_ASC, MarshaledAString(AnsiString(ACountry)), -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, 'ST', MBSTRING_ASC, MarshaledAString(AnsiString(AState)), -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, 'L', MBSTRING_ASC, MarshaledAString(AnsiString(ALocality)), -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, 'O', MBSTRING_ASC, MarshaledAString(AnsiString(AOrganization)), -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, 'OU', MBSTRING_ASC, MarshaledAString(AnsiString(AOrgUnit)), -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, 'CN', MBSTRING_ASC, MarshaledAString(AnsiString(ACommonName)), -1, -1, 0);
-
+    {$IFNDEF FPC}
+     {$IF CompilerVersion > 21}
+      X509_NAME_add_entry_by_txt(name, 'C',  MBSTRING_ASC, MarshaledAString(AnsiString(ACountry)),      -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'ST', MBSTRING_ASC, MarshaledAString(AnsiString(AState)),        -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'L',  MBSTRING_ASC, MarshaledAString(AnsiString(ALocality)),     -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'O',  MBSTRING_ASC, MarshaledAString(AnsiString(AOrganization)), -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'OU', MBSTRING_ASC, MarshaledAString(AnsiString(AOrgUnit)),      -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'CN', MBSTRING_ASC, MarshaledAString(AnsiString(ACommonName)),   -1, -1, 0);
+     {$ELSE}
+      X509_NAME_add_entry_by_txt(name, 'C',  MBSTRING_ASC, PAnsiChar(ACountry),      -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'ST', MBSTRING_ASC, PAnsiChar(AState),        -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'L',  MBSTRING_ASC, PAnsiChar(ALocality),     -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'O',  MBSTRING_ASC, PAnsiChar(AOrganization), -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'OU', MBSTRING_ASC, PAnsiChar(AOrgUnit),      -1, -1, 0);
+      X509_NAME_add_entry_by_txt(name, 'CN', MBSTRING_ASC, PAnsiChar(ACommonName),   -1, -1, 0);
+     {$IFEND}
+    {$ELSE}
+     X509_NAME_add_entry_by_txt(name, 'C',  MBSTRING_ASC, MarshaledAString(AnsiString(ACountry)),      -1, -1, 0);
+     X509_NAME_add_entry_by_txt(name, 'ST', MBSTRING_ASC, MarshaledAString(AnsiString(AState)),        -1, -1, 0);
+     X509_NAME_add_entry_by_txt(name, 'L',  MBSTRING_ASC, MarshaledAString(AnsiString(ALocality)),     -1, -1, 0);
+     X509_NAME_add_entry_by_txt(name, 'O',  MBSTRING_ASC, MarshaledAString(AnsiString(AOrganization)), -1, -1, 0);
+     X509_NAME_add_entry_by_txt(name, 'OU', MBSTRING_ASC, MarshaledAString(AnsiString(AOrgUnit)),      -1, -1, 0);
+     X509_NAME_add_entry_by_txt(name, 'CN', MBSTRING_ASC, MarshaledAString(AnsiString(ACommonName)),   -1, -1, 0);
+    {$ENDIF}
     { Set issuer to subject }
     if X509_set_issuer_name(Certificate, Name) <> 1 then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
     { Set the server name }
     if AServerName <> '' then
     begin
       ServerName := 'DNS:' + AnsiString(AServerName);
-      Extension := X509V3_EXT_conf_nid(nil, nil, NID_subject_alt_name, MarshaledAString(ServerName));
+      {$IFNDEF FPC}
+       {$IF CompilerVersion > 21}
+        Extension := X509V3_EXT_conf_nid(nil, nil, NID_subject_alt_name, MarshaledAString(ServerName));
+       {$ELSE}
+        Extension := X509V3_EXT_conf_nid(nil, nil, NID_subject_alt_name, PWideChar(ServerName));
+       {$IFEND}
+      {$ELSE}
+       Extension := X509V3_EXT_conf_nid(nil, nil, NID_subject_alt_name, MarshaledAString(ServerName));
+      {$ENDIF}
       if Extension = nil then
-        Exit(False);
+        Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
       try
         X509_add_ext(Certificate, Extension, -1);
       finally
@@ -751,35 +855,35 @@ begin
 
     Bignum := BN_new;
     if Bignum = nil then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
     try
       if BN_set_word(Bignum, RSA_F4) <> 1 then
-        Exit(False);
+        Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
       RSA := RSA_new;
       try
         if RSA_generate_key_ex(RSA, RSA_KEY_BITS, Bignum, nil) <> 1 then
-          Exit(False);
+          Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
         PrivateKey := EVP_PKEY_new;
         if PrivateKey = nil then
-          Exit(False);
+          Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
         try
           { Assign the RSA key pair to the private key }
           if EVP_PKEY_assign(PrivateKey, EVP_PKEY_RSA, RSA) <> 1 then
-            Exit(False);
+            Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
           { Assign the public key from the private key }
           if X509_set_pubkey(Certificate, PrivateKey) <> 1 then
-            Exit(False);
+            Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
           { Sign with SHA-1 }
           if X509_sign(Certificate, PrivateKey, EVP_sha1) = 0 then
-            Exit(False);
+            Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
           { Convert the DER certificate to PEM }
           if not CertToPEM([Certificate], PrivateKey, ACertificate, APrivateKey) then
-            Exit(False);
+            Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
           { Owned by another object at this point, so do not free them directly }
           Certificate := nil;
@@ -822,27 +926,36 @@ begin
   try
     CertificateCA := PEM_read_bio_X509(BIOCertCA, nil, nil, nil);
     if not Assigned(CertificateCA) then
-      Exit(False);
+      Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
     try
       if APassword <> '' then
       begin
-        Password := MarshaledAString(AnsiString(APassword));
+        {$IFNDEF FPC}
+         {$IF CompilerVersion > 21}
+          Password := MarshaledAString(AnsiString(APassword));
+         {$ELSE}
+          Password := AnsiString(APassword);
+         {$IFEND}
+        {$ELSE}
+         Password := MarshaledAString(AnsiString(APassword));
+        {$ENDIF}
+
         PrivateKeyCA := PEM_read_bio_PrivateKey(BIOPrivateKeyCA, nil, nil, @Password[1]);
       end
       else
         PrivateKeyCA := PEM_read_bio_PrivateKey(BIOPrivateKeyCA, nil, nil, nil);
       if not Assigned(PrivateKeyCA) then
-        Exit(False);
+        Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
       try
         if not CreateKeyPair_CA(CertificateCA, PrivateKeyCA,
           ACountry, AState, ALocality, AOrganization, AOrgUnit, ACommonName,
           AServerName, AExpiresDays,
           RSA, Certificate, PrivateKey) then
-          Exit(False);
+          Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
         try
           { Convert the DER certificate to PEM }
           if not CertToPEM([Certificate], PrivateKey, ACertificate, APrivateKey) then
-            Exit(False);
+            Exit{$IFNDEF FPC}{$IF CompilerVersion > 21}(False){$IFEND}{$ELSE}(False){$ENDIF};
 
           { Owned by another object at this point, so do not free them directly }
           Certificate := nil;

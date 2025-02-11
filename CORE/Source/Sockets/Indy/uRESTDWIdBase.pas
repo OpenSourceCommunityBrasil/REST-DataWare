@@ -38,7 +38,6 @@ Uses
   uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
   uRESTDWConsts, uRESTDWProtoTypes, uRESTDWDataUtils, uRESTDWTools, uRESTDWZlib,
   uRESTDWAuthenticators,
-
   IdContext, IdHeaderList, IdTCPConnection, IdHTTPServer, IdCustomHTTPServer,
   IdSSLOpenSSL, IdSSL, IdAuthentication, IdTCPClient, IdHTTPHeaderInfo,
   IdComponent, IdBaseComponent, IdHTTP, IdMultipartFormData, IdMessageCoder,
@@ -514,17 +513,14 @@ Begin
  If Assigned(HttpRequest) then
   Begin
    Try
-    If Assigned(HttpRequest) Then
-     Begin
-      If Assigned(HttpRequest.IOHandler) Then
-       HttpRequest.IOHandler.CloseGracefully;
-      HttpRequest.Disconnect(false);
-     End;
+    If Assigned(HttpRequest.IOHandler) Then
+     HttpRequest.IOHandler.CloseGracefully;
+    HttpRequest.Disconnect(false);
+    If Assigned(ssl) Then
+     FreeAndNil(ssl);
+    HttpRequest.Free;
    Except
    End;
-   If Assigned(ssl) Then
-    FreeAndNil(ssl);
-   FreeAndNil(HttpRequest);
   End;
  Inherited;
 End;
@@ -551,50 +547,34 @@ Procedure TRESTDWIdClientREST.SetInternalEvents;
 Begin
  If Assigned(OnWork) Then
   Begin
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
     HttpRequest.OnWork := @pOnWork;
    {$ELSE}
-    {$IFDEF FPC}
-     HttpRequest.OnWork := @pOnWork;
-    {$ELSE}
-     HttpRequest.OnWork := pOnWork;
-    {$ENDIF}
+    HttpRequest.OnWork := pOnWork;
    {$ENDIF}
   End;
  If Assigned(OnWorkBegin) Then
   Begin
-   {$IFDEF RESTDWLAZARUS}
-   HttpRequest.OnWorkBegin   := @pOnWorkBegin;
+   {$IFDEF FPC}
+    HttpRequest.OnWorkBegin := @pOnWorkBegin;
    {$ELSE}
-    {$IFDEF FPC}
-     HttpRequest.OnWorkBegin := @pOnWorkBegin;
-    {$ELSE}
-     HttpRequest.OnWorkBegin := pOnWorkBegin;
-    {$ENDIF}
+    HttpRequest.OnWorkBegin := pOnWorkBegin;
    {$ENDIF}
   End;
  If Assigned(OnWorkEnd) Then
   Begin
-   {$IFDEF RESTDWLAZARUS}
-   HttpRequest.OnWorkEnd := @pOnWorkEnd;
+   {$IFDEF FPC}
+    HttpRequest.OnWorkEnd := @pOnWorkEnd;
    {$ELSE}
-    {$IFDEF FPC}
-     HttpRequest.OnWorkEnd := @pOnWorkEnd;
-    {$ELSE}
-     HttpRequest.OnWorkEnd := pOnWorkEnd;
-    {$ENDIF}
+    HttpRequest.OnWorkEnd := pOnWorkEnd;
    {$ENDIF}
   End;
  If Assigned(OnStatus) Then
   Begin
-   {$IFDEF RESTDWLAZARUS}
-   HttpRequest.OnStatus   := @pOnStatus;
+   {$IFDEF FPC}
+    HttpRequest.OnStatus   := @pOnStatus;
    {$ELSE}
-    {$IFDEF FPC}
-     HttpRequest.OnStatus := @pOnStatus;
-    {$ELSE}
-     HttpRequest.OnStatus := pOnStatus;
-    {$ENDIF}
+    HttpRequest.OnStatus := pOnStatus;
    {$ENDIF}
   End;
 End;
@@ -2738,10 +2718,10 @@ Begin
      OnBeforeDelete(AUrl, CustomHeaders);
    CopyStringList(CustomHeaders, vTempHeaders);
    SendParams := TStringStream.Create(vTempHeaders.Text);
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
     HttpRequest.Delete(AUrl, atempResponse);
    {$ELSE}
-     TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, AUrl, SendParams, atempResponse, []);
+    TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, AUrl, SendParams, atempResponse, []);
    {$ENDIF}
    Result:= HttpRequest.ResponseCode;
    If Assigned(atempResponse) Then
@@ -2829,10 +2809,10 @@ Begin
      OnBeforeDelete(AUrl, CustomHeaders);
    CopyStringList(CustomHeaders, vTempHeaders);
    SendParams := TStringStream.Create(vTempHeaders.Text);
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
     HttpRequest.Delete(AUrl, atempResponse);
    {$ELSE}
-     TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, AUrl, SendParams, atempResponse, []);
+    TIdHTTPAccess(HttpRequest).DoRequest(Id_HTTPMethodDelete, AUrl, SendParams, atempResponse, []);
    {$ENDIF}
    Result:= HttpRequest.ResponseCode;
    If Assigned(atempResponse) Then
@@ -2947,14 +2927,10 @@ Procedure TRESTDWIdClientREST.SetCertOptions;
 Begin
  If Assigned(ssl) Then
   Begin
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
     ssl.OnGetPassword          := @Getpassword;
    {$ELSE}
-    {$IFDEF FPC}
-     ssl.OnGetPassword         := @Getpassword;
-    {$ELSE}
-     ssl.OnGetPassword         := Getpassword;
-    {$ENDIF}
+    ssl.OnGetPassword         := Getpassword;
    {$ENDIF}
    ssl.SSLOptions.CertFile     := vCertFile;
    ssl.SSLOptions.KeyFile      := vKeyFile;
@@ -3073,14 +3049,10 @@ Begin
    If ssl = Nil Then
     Begin
      ssl                := TIdSSLIOHandlerSocketOpenSSL.Create(HttpRequest);
-     {$IFDEF RESTDWLAZARUS}
+     {$IFDEF FPC}
       ssl.OnVerifyPeer  := @IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
      {$ELSE}
-      {$IFDEF FPC}
-       ssl.OnVerifyPeer := @IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
-      {$ELSE}
-       ssl.OnVerifyPeer := IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
-      {$ENDIF}
+      ssl.OnVerifyPeer := IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
      {$ENDIF}
     End;
     ssl.SSLOptions.SSLVersions := vSSLVersions;
@@ -3170,7 +3142,7 @@ Begin
                     End;
                    ActiveRequest := Stringreplace(lowercase(ActiveRequest), 'http://', '', [rfReplaceAll]);
                    ActiveRequest := Stringreplace(lowercase(ActiveRequest), 'https://', '', [rfReplaceAll]);
-                   TRESTDWDataUtils.ParseRESTURL(ActiveRequest, RequestCharset, vmark{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}, DWParams);
+                   TRESTDWDataUtils.ParseRESTURL(ActiveRequest, RequestCharset, vmark{$IFDEF FPC}, csUndefined{$ENDIF}, DWParams);
                    If Assigned(DWParams) Then
                     FreeAndNil(DWParams);
                      Case TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).TokenType Of
@@ -3178,11 +3150,11 @@ Begin
 //                                      If TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).AutoBuildHex Then
 //                                       HttpRequest.Request.CustomHeaders.Add(Format('Authorization: Basic %s', [EncodeStrings(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientID + ':' +
 //                                                                                                                              TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientSecret
-//                                                                                                                              {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]))
+//                                                                                                                              {$IFDEF FPC}, csUndefined{$ENDIF})]))
 //                                      Else
 //                                       HttpRequest.Request.CustomHeaders.Add(Format('Authorization: Basic %s', [EncodeStrings(TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientID + ':' +
 //                                                                                                                              TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).ClientSecret
-//                                                                                                                              {$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF})]));
+//                                                                                                                              {$IFDEF FPC}, csUndefined{$ENDIF})]));
                                      End;
                       rdwOATBearer : HttpRequest.Request.CustomHeaders.Add('Authorization: Bearer ' + TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).Token);
                       rdwOATToken  : HttpRequest.Request.CustomHeaders.Add('Authorization: Token ' + Format('token="%s"', [TRESTDWAuthOAuth(AuthenticationOptions.OptionParams).Token]));
@@ -3425,7 +3397,7 @@ Begin
  SetSocketKind('Standalone - Indy');
  HTTPServer                       := TIdHTTPServer.Create(Nil);
  lHandler                         := TIdServerIOHandlerSSLOpenSSL.Create(Nil);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  HTTPServer.OnQuerySSLPort        := @IdHTTPServerQuerySSLPort;
  HTTPServer.OnCommandGet          := @aCommandGet;
  HTTPServer.OnCommandOther        := @aCommandOther;
@@ -3434,21 +3406,12 @@ Begin
  HTTPServer.OnParseAuthentication := @OnParseAuthentication;
  DatabaseCharSet                  := csUndefined;
  {$ELSE}
-  {$IFDEF FPC}
-   HTTPServer.OnQuerySSLPort        := @IdHTTPServerQuerySSLPort;
-   HTTPServer.OnCommandGet          := @aCommandGet;
-   HTTPServer.OnCommandOther        := @aCommandOther;
-   HTTPServer.OnConnect             := @CustomOnConnect;
-   HTTPServer.OnCreatePostStream    := @CreatePostStream;
-   HTTPServer.OnParseAuthentication := @OnParseAuthentication;
-  {$ELSE}
-   HTTPServer.OnQuerySSLPort       := IdHTTPServerQuerySSLPort;
-   HTTPServer.OnCommandGet         := aCommandGet;
-   HTTPServer.OnCommandOther       := aCommandOther;
-   HTTPServer.OnConnect            := CustomOnConnect;
-   HTTPServer.OnCreatePostStream   := CreatePostStream;
-   HTTPServer.OnParseAuthentication := OnParseAuthentication;
-  {$ENDIF}
+  HTTPServer.OnQuerySSLPort       := IdHTTPServerQuerySSLPort;
+  HTTPServer.OnCommandGet         := aCommandGet;
+  HTTPServer.OnCommandOther       := aCommandOther;
+  HTTPServer.OnConnect            := CustomOnConnect;
+  HTTPServer.OnCreatePostStream   := CreatePostStream;
+  HTTPServer.OnParseAuthentication := OnParseAuthentication;
  {$ENDIF}
  HTTPServer.MaxConnections      := -1;
  FSocketKind := 'Indy';
@@ -3607,17 +3570,12 @@ Begin
      Begin
       lHandler.SSLOptions.Method                := aSSLMethod;
       lHandler.SSLOptions.SSLVersions           := PIdSSLVersions(@SSLVersions)^;
-      {$IFDEF RESTDWLAZARUS}
+      {$IFDEF FPC}
        lHandler.OnGetPassword                   := @GetSSLPassword;
        lHandler.OnVerifyPeer                    := @SSLVerifyPeer;
       {$ELSE}
-       {$IFDEF FPC}
-        lHandler.OnGetPassword                  := @GetSSLPassword;
-        lHandler.OnVerifyPeer                   := @SSLVerifyPeer;
-       {$ELSE}
-        lHandler.OnGetPassword                  := GetSSLPassword;
-        lHandler.OnVerifyPeer                   := SSLVerifyPeer;
-       {$ENDIF}
+       lHandler.OnGetPassword                  := GetSSLPassword;
+       lHandler.OnVerifyPeer                   := SSLVerifyPeer;
       {$ENDIF}
       lHandler.SSLOptions.CertFile              := ASSLCertFile;
       lHandler.SSLOptions.KeyFile               := ASSLPrivateKeyFile;
@@ -3896,14 +3854,13 @@ Var
              Begin
               If (JSONParam.Encoded) Then
                Begin
-                 {$IF Defined(RESTDWLAZARUS)}
+                {$IF Defined(FPC)}
                  vValue := DecodeStrings(bJsonOBJ.Pairs[4].Value, DatabaseCharSet);
-                 {$ELSE}
+                {$ELSE}
                  vValue := DecodeStrings(bJsonOBJ.Pairs[4].Value);
                  If Encoding = esUtf8 Then
-                   vValue := Utf8Decode(vValue);
-//                 vValue := AnsiString(vValue);
-                 {$IFEND}
+                  vValue := Utf8Decode(vValue);
+                {$IFEND}
                End
               Else If JSONParam.ObjectValue <> ovObject then
                vValue := bJsonOBJ.Pairs[4].Value
@@ -3951,20 +3908,20 @@ Var
    vTempValue := '';
   End;
  End;
- Function GetParamsValues(Var DWParams : TRESTDWParams{$IFDEF RESTDWLAZARUS};vDatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
+ Function GetParamsValues(Var DWParams : TRESTDWParams{$IFDEF FPC};vDatabaseCharSet : TDatabaseCharSet{$ENDIF}) : String;
  Var
   I         : Integer;
  Begin
   Result := '';
   JSONValue := Nil;
   If WelcomeMessage <> '' Then
-   Result := 'dwwelcomemessage=' + EncodeStrings(WelcomeMessage{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+   Result := 'dwwelcomemessage=' + EncodeStrings(WelcomeMessage{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
   If AccessTag <> '' Then
    Begin
     If Result <> '' Then
-     Result := Result + '&dwaccesstag=' + EncodeStrings(AccessTag{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+     Result := Result + '&dwaccesstag=' + EncodeStrings(AccessTag{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
     Else
-     Result := 'dwaccesstag=' + EncodeStrings(AccessTag{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+     Result := 'dwaccesstag=' + EncodeStrings(AccessTag{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
    End;
   If ServerEventName <> '' Then
    Begin
@@ -3995,9 +3952,9 @@ Var
        JSONValue.SetValue(ServerEventName, JSONValue.Encoded);
       Finally
        If Result <> '' Then
-        Result := Result + '&dwservereventname=' + EncodeStrings(JSONValue.ToJSON{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+        Result := Result + '&dwservereventname=' + EncodeStrings(JSONValue.ToJSON{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
        Else
-        Result := 'dwservereventname=' + EncodeStrings(JSONValue.ToJSON{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+        Result := 'dwservereventname=' + EncodeStrings(JSONValue.ToJSON{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
        FreeAndNil(JSONValue);
       End;
     End;
@@ -4034,13 +3991,13 @@ Var
        Begin
         If DWParams.Items[I].ObjectValue in [ovSmallint, ovInteger, ovWord, ovBoolean, ovByte,
                                              ovAutoInc, ovLargeint, ovLongWord, ovShortint, ovSingle] Then
-         Result := Result + Format('&%s=%s', [DWParams.Items[I].ParamName, EncodeStrings(DWParams.Items[I].Value{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})])
+         Result := Result + Format('&%s=%s', [DWParams.Items[I].ParamName, EncodeStrings(DWParams.Items[I].Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})])
         Else
          Begin
           If vCripto.Use Then
            Result := Result + Format('&%s=%s', [DWParams.Items[I].ParamName, vCripto.Encrypt(DWParams.Items[I].Value)])
           Else
-           Result := Result + Format('&%s=%s', [DWParams.Items[I].ParamName, EncodeStrings(DWParams.Items[I].Value{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})]);
+           Result := Result + Format('&%s=%s', [DWParams.Items[I].ParamName, EncodeStrings(DWParams.Items[I].Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})]);
          End;
        End
       Else
@@ -4053,7 +4010,7 @@ Var
           If vCripto.Use Then
            Result := Format('%s=%s', [DWParams.Items[I].ParamName, vCripto.Encrypt(DWParams.Items[I].Value)])
           Else
-           Result := Format('%s=%s', [DWParams.Items[I].ParamName, EncodeStrings(DWParams.Items[I].Value{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})]);
+           Result := Format('%s=%s', [DWParams.Items[I].ParamName, EncodeStrings(DWParams.Items[I].Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})]);
          End;
        End;
      End;
@@ -4186,9 +4143,9 @@ Var
       HttpRequest.ContentType := 'application/json';
       vURL := URL + '?';
       If WelcomeMessage <> '' Then
-       vURL := vURL + BuildValue('dwwelcomemessage', EncodeStrings(WelcomeMessage{$IFDEF RESTDWLAZARUS}, DatabaseCharSet{$ENDIF}));
+       vURL := vURL + BuildValue('dwwelcomemessage', EncodeStrings(WelcomeMessage{$IFDEF FPC}, DatabaseCharSet{$ENDIF}));
       If (AccessTag <> '') Then
-       vURL := vURL + BuildValue('dwaccesstag',      EncodeStrings(AccessTag{$IFDEF RESTDWLAZARUS}, DatabaseCharSet{$ENDIF}));
+       vURL := vURL + BuildValue('dwaccesstag',      EncodeStrings(AccessTag{$IFDEF FPC}, DatabaseCharSet{$ENDIF}));
       If AuthenticationOptions.AuthorizationOption    <> rdwAONone Then
        Begin
         Case AuthenticationOptions.AuthorizationOption Of
@@ -4210,7 +4167,7 @@ Var
       vURL := vURL + BuildValue('binaryrequest',     BooleanToString(BinaryRequest));
       If aBinaryCompatibleMode Then
        vURL := vURL + BuildValue('BinaryCompatibleMode', BooleanToString(aBinaryCompatibleMode));
-      vURL := Format('%s&%s', [vURL, GetParamsValues(Params{$IFDEF RESTDWLAZARUS}, DatabaseCharSet{$ENDIF})]);
+      vURL := Format('%s&%s', [vURL, GetParamsValues(Params{$IFDEF FPC}, DatabaseCharSet{$ENDIF})]);
       If Assigned(vCripto) Then
        vURL := vURL + BuildValue('dwusecript',       BooleanToString(vCripto.Use));
       {$IFDEF DELPHIXEUP}
@@ -4271,9 +4228,9 @@ Var
      Begin;
       SendParams := TIdMultiPartFormDataStream.Create;
       If WelcomeMessage <> '' Then
-       SendParams.AddFormField('dwwelcomemessage', EncodeStrings(WelcomeMessage{$IFDEF RESTDWLAZARUS}, DatabaseCharSet{$ENDIF}));
+       SendParams.AddFormField('dwwelcomemessage', EncodeStrings(WelcomeMessage{$IFDEF FPC}, DatabaseCharSet{$ENDIF}));
       If AccessTag <> '' Then
-       SendParams.AddFormField('dwaccesstag',      EncodeStrings(AccessTag{$IFDEF RESTDWLAZARUS}, DatabaseCharSet{$ENDIF}));
+       SendParams.AddFormField('dwaccesstag',      EncodeStrings(AccessTag{$IFDEF FPC}, DatabaseCharSet{$ENDIF}));
       If ServerEventName <> '' Then
        Begin
         If Assigned(Params) Then
@@ -5048,7 +5005,7 @@ Begin
  HTTPServer                       := TIdHTTPServer.Create(Nil);
  ClientHttpBase                   := TRESTDWClientHttpBase;
  lHandler                         := TIdServerIOHandlerSSLOpenSSL.Create(Nil);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  HTTPServer.OnQuerySSLPort        := @IdHTTPServerQuerySSLPort;
  HTTPServer.OnCommandGet          := @aCommandGet;
  HTTPServer.OnCommandOther        := @aCommandOther;
@@ -5057,21 +5014,12 @@ Begin
  HTTPServer.OnParseAuthentication := @OnParseAuthentication;
  DatabaseCharSet                  := csUndefined;
  {$ELSE}
-  {$IFDEF FPC}
-   HTTPServer.OnQuerySSLPort        := @IdHTTPServerQuerySSLPort;
-   HTTPServer.OnCommandGet          := @aCommandGet;
-   HTTPServer.OnCommandOther        := @aCommandOther;
-   HTTPServer.OnConnect             := @CustomOnConnect;
-   HTTPServer.OnCreatePostStream    := @CreatePostStream;
-   HTTPServer.OnParseAuthentication := @OnParseAuthentication;
-  {$ELSE}
-   HTTPServer.OnQuerySSLPort       := IdHTTPServerQuerySSLPort;
-   HTTPServer.OnCommandGet         := aCommandGet;
-   HTTPServer.OnCommandOther       := aCommandOther;
-   HTTPServer.OnConnect            := CustomOnConnect;
-   HTTPServer.OnCreatePostStream   := CreatePostStream;
-   HTTPServer.OnParseAuthentication := OnParseAuthentication;
-  {$ENDIF}
+  HTTPServer.OnQuerySSLPort       := IdHTTPServerQuerySSLPort;
+  HTTPServer.OnCommandGet         := aCommandGet;
+  HTTPServer.OnCommandOther       := aCommandOther;
+  HTTPServer.OnConnect            := CustomOnConnect;
+  HTTPServer.OnCreatePostStream   := CreatePostStream;
+  HTTPServer.OnParseAuthentication := OnParseAuthentication;
  {$ENDIF}
  HTTPServer.MaxConnections      := -1;
  FSocketKind := 'Indy';
@@ -5193,17 +5141,12 @@ Begin
      Begin
       lHandler.SSLOptions.Method                := aSSLMethod;
       lHandler.SSLOptions.SSLVersions           := PIdSSLVersions(@SSLVersions)^;
-      {$IFDEF RESTDWLAZARUS}
+      {$IFDEF FPC}
        lHandler.OnGetPassword                   := @GetSSLPassword;
        lHandler.OnVerifyPeer                    := @SSLVerifyPeer;
       {$ELSE}
-       {$IFDEF FPC}
-        lHandler.OnGetPassword                  := @GetSSLPassword;
-        lHandler.OnVerifyPeer                   := @SSLVerifyPeer;
-       {$ELSE}
-        lHandler.OnGetPassword                  := GetSSLPassword;
-        lHandler.OnVerifyPeer                   := SSLVerifyPeer;
-       {$ENDIF}
+       lHandler.OnGetPassword                  := GetSSLPassword;
+       lHandler.OnVerifyPeer                   := SSLVerifyPeer;
       {$ENDIF}
       lHandler.SSLOptions.CertFile              := ASSLCertFile;
       lHandler.SSLOptions.KeyFile               := ASSLPrivateKeyFile;

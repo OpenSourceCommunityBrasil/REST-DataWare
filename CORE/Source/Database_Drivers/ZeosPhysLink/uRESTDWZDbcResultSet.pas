@@ -2,10 +2,10 @@ unit uRESTDWZDbcResultSet;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
-{$IFNDEF RESTDWLAZARUS}
+{$IFNDEF FPC}
   {$I ZDbc.inc}
 {$ELSE}
-  {$MODE DELPHI}
+ {$MODE DELPHI}
 {$ENDIF}
 
 {
@@ -170,7 +170,7 @@ implementation
 
 uses
   ZMessages, ZTokenizer, ZVariant, ZEncoding, ZFastCode,
-  ZGenericSqlAnalyser, uRESTDWProtoTypes {$IFNDEF RESTDWLAZARUS}, SqlTimSt {$ENDIF};
+  ZGenericSqlAnalyser, uRESTDWProtoTypes {$IFNDEF FPC}, SqlTimSt {$ENDIF};
 
 { TZRESTDWCachedResultSet }
 
@@ -358,7 +358,7 @@ begin
     SetLength(FVariantTable[i],FFieldCount);
     for j := 0 to FFieldCount-1 do begin
       FStream.Read(vBoolean,SizeOf(vBoolean));
-      if vBoolean then begin
+      if Not vBoolean then begin
         FVariantTable[i,j] := variants.null;
         Continue;
       end;
@@ -369,7 +369,7 @@ begin
         vString := '';
         if vInt64 > 0 then begin
           SetLength(vString, vInt64);
-          {$IFDEF RESTDWLAZARUS}
+          {$IFDEF FPC}
            FStream.Read(Pointer(vString)^, vInt64);
            if FEncodeStrs then
              vString := DecodeStrings(vString, csUndefined);
@@ -390,7 +390,7 @@ begin
         vString := '';
         if vInt64 > 0 then begin
           SetLength(vString, vInt64);
-          {$IFDEF RESTDWLAZARUS}
+          {$IFDEF FPC}
            FStream.Read(Pointer(vString)^, vInt64);
            if FEncodeStrs then
              vString := DecodeStrings(vString, csUndefined);
@@ -534,7 +534,7 @@ begin
         vString := '';
         if vInt64 > 0 then begin
           SetLength(vString, vInt64);
-          {$IFDEF RESTDWLAZARUS}
+          {$IFDEF FPC}
            FStream.Read(Pointer(vString)^, vInt64);
            if FEncodeStrs then
              vString := DecodeStrings(vString, csUndefined);
@@ -776,7 +776,7 @@ end;
     vCurrency : Currency;
   begin
     vCurrency := GetCurrency(ColumnIndex);
-    {$IFNDEF RESTDWLAZARUS}
+    {$IFNDEF FPC}
       if not LastWasNull then
         Result := CurrencyToBcd(vCurrency);
     {$ELSE}

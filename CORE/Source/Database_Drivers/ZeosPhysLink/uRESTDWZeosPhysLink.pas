@@ -25,27 +25,26 @@ unit uRESTDWZeosPhysLink;
 
 interface
 
+{$IFNDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
+  {$MODE OBJFPC}{$H+}
+ {$ENDIF}
+{$ENDIF}
+
 uses
-  Classes, SysUtils, ZConnection, ZDbcIntfs, uRESTDWAbout, uRESTDWBasicDB,
-  uRESTDWZDbc;
+  Classes, SysUtils, ZConnection, uRESTDWAbout, uRESTDWBasicDB, uRESTDWZDbc;
 
 type
   TRESTDWZeosPhysLink = class(TRESTDWComponent)
   private
     FZConnection : TZConnection;
     FDatabase : TRESTDWDatabasebaseBase;
-    {$IFDEF ZEOS80UP}
-    FProvider : TZServerProvider;
-    {$ENDIF}
     FOldZeosBeforeConnect : TNotifyEvent;
     procedure setZConnection(const Value: TZConnection);
   protected
     procedure OnRESTDWZeosBeforeConnect(Sender : TObject);
   published
     property ZConnection : TZConnection read FZConnection write setZConnection;
-    {$IFDEF ZEOS80UP}
-    property Provider : TZServerProvider read FProvider write FProvider;
-    {$ENDIF}
     property Database : TRESTDWDatabasebaseBase read FDatabase write FDatabase;
   end;
 
@@ -66,7 +65,7 @@ begin
   FOldZeosBeforeConnect := nil;
   if (FZConnection <> nil) and (ZConnection.Protocol = 'restdw') then begin
     FOldZeosBeforeConnect := FZConnection.BeforeConnect;
-    FZConnection.BeforeConnect := {$IFDEF RESTDWLAZARUS}@{$ENDIF}OnRESTDWZeosBeforeConnect;
+   FZConnection.BeforeConnect := {$IFDEF FPC}@{$ENDIF}OnRESTDWZeosBeforeConnect;
   end;
 end;
 

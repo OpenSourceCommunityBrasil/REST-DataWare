@@ -4,6 +4,10 @@ unit uRESTDWPropertyPersist;
 
 interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 uses
   Classes;
 
@@ -74,7 +78,11 @@ Var
  {$IFDEF RESTDWLAZARUS}
    lPropType : PTypeInfo;
  {$ELSE}
+  {$IFDEF RESTDWFPC}
+   lPropType : PTypeInfo;
+  {$ELSE}
    lPropType : PPTypeInfo;
+  {$ENDIF}
  {$ENDIF}
  Writer      : TWriter;
 Begin

@@ -1,4 +1,4 @@
-﻿unit uRESTDWMemExprParser;
+unit uRESTDWMemExprParser;
 
 {$I ..\..\Includes\uRESTDW.inc}
 

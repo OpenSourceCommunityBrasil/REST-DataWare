@@ -50,6 +50,10 @@ unit uRESTDWJSON;
 
 interface
 
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
+{$ENDIF}
+
 uses
  {$IFDEF MSWINDOWS}
  Windows,

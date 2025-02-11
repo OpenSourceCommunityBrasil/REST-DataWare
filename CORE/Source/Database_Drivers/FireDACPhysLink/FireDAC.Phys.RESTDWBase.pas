@@ -765,7 +765,7 @@ begin
   FStream.Read(vBoolean, SizeOf(vBoolean));
 
   // is null
-  if vBoolean then
+  if Not vBoolean then
     Exit;
 
   // N - Bytes

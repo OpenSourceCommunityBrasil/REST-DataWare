@@ -86,7 +86,7 @@ end;
   vRestWebService       : String;
   vAuthOptionParams     : TRESTDWClientAuthOptionParams;
   vEncoding             : TEncodeSelect;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   vDatabaseCharSet      : TDatabaseCharSet;
   {$ENDIF}
   vTypeRequest          : TTypeRequest;
@@ -112,7 +112,7 @@ end;
   Property Encoding              : TEncodeSelect                 Read vEncoding             Write vEncoding;          //Encoding da string
   Property WelcomeMessage        : String                        Read vWelcomeMessage       Write vWelcomeMessage;
   Property ProxyOptions          : TProxyConnectionInfo          Read vTransparentProxy     Write vTransparentProxy;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   Property DatabaseCharSet       : TDatabaseCharSet              Read vDatabaseCharSet      Write vDatabaseCharSet;
   {$ENDIF}
   Property Name                  : String                        Read vListName             Write vListName;
@@ -201,7 +201,7 @@ End;
   vDatacompress,
   vUseSSL,
   vAuthentication      : Boolean;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   vDatabaseCharSet     : TDatabaseCharSet;
   {$ENDIF}
   vFailOverConnections : TFailOverConnections;
@@ -279,7 +279,7 @@ End;
   Property UserAgent               : String                        Read vUserAgent               Write vUserAgent;
   Property PoolerNotFoundMessage   : String                        Read vPoolerNotFoundMessage   Write vPoolerNotFoundMessage;
   Property SSLVersions             : TRESTDWSSLVersions            Read vSSLVersions             Write vSSLVersions;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
   Property ClientIpVersion         : TRESTDWClientIpVersions       Read vClientIpVersion         Write SetIpVersion default civIPv4;
@@ -310,7 +310,7 @@ End;
    vGarbageTime                   : Integer;
    vNotifyWelcomeMessage          : TNotifyWelcomeMessage;
    vRESTDwAuthError               : TRESTDWAuthError;
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
    vDatabaseCharSet               : TDatabaseCharSet;
    {$ENDIF}
    Procedure  ProcessMessages;
@@ -342,7 +342,7 @@ End;
    Property AuthenticationOptions : TRESTDWServerAuthOptionParams Read vServerAuthOptions     Write SetServerAuthOptions;
    Property ServerMethodClass     : TComponentClass            Read aServerMethod          Write SetServerMethod;
    Property Encoding              : TEncodeSelect              Read vEncoding              Write vEncoding;          //Encoding da string
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
    Property DatabaseCharSet       : TDatabaseCharSet           Read vDatabaseCharSet       Write vDatabaseCharSet;
    {$ENDIF}
    Property CriptOptions          : TCripto                    Read vCripto                Write vCripto;
@@ -377,15 +377,11 @@ End;
   procedure Notification(AComponent : TComponent;
                          Operation  : TOperation); Override;
  Private
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
    vCriticalSection    : TRTLCriticalSection;
    vDatabaseCharSet    : TDatabaseCharSet;
   {$ELSE}
-   {$IFDEF FPC}
-    vCriticalSection   : TRTLCriticalSection;
-   {$ELSE}
-    vCriticalSection   : TCriticalSection;
-   {$ENDIF}
+   vCriticalSection   : TCriticalSection;
   {$ENDIF}
   vClientHttpBase      : TComponentClass;
   vBeforeUseCriptKey   : TBeforeUseCriptKey;
@@ -528,7 +524,7 @@ End;
   Property OnBeforeUseCriptKey     : TBeforeUseCriptKey            Read vBeforeUseCriptKey       Write vBeforeUseCriptKey;
   Property CriptOptions            : TCripto                       Read vCripto                  Write vCripto;
   Property EncodeErrors            : Boolean                       Read vEncode_Errors           Write vEncode_Errors;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
   Property ServerIPVersionConfig  : TRESTDWServerIpVersionConfig   Read vServerIpVersionConfig   Write vServerIpVersionConfig;
@@ -943,8 +939,8 @@ Begin
   vConnection.Compression      := vCompression;
   vConnection.TypeRequest      := vTypeRequest;
   vConnection.AccessTag        := vAccessTag;
-  vConnection.CriptOptions.Use := CriptOptions.Use;
-  vConnection.CriptOptions.Key := CriptOptions.Key;
+//  vConnection.CriptOptions.Use := CriptOptions.Use;
+//  vConnection.CriptOptions.Key := CriptOptions.Key;
   vConnection.DataRoute        := DataRoute;
   vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
   Result := TStringList.Create;
@@ -1209,8 +1205,8 @@ Begin
  vConnection.EncodeStrings    := EncodedStrings;
  vConnection.Encoding         := Encoding;
  vConnection.AccessTag        := vAccessTag;
- vConnection.CriptOptions.Use := vCripto.Use;
- vConnection.CriptOptions.Key := vCripto.Key;
+// vConnection.CriptOptions.Use := vCripto.Use;
+// vConnection.CriptOptions.Key := vCripto.Key;
  vConnection.DataRoute        := DataRoute;
  vConnection.AuthenticationOptions.Assign(AuthenticationOptions);
  {$IFNDEF RESTDWLAZARUS}
@@ -1523,7 +1519,7 @@ Begin
  vHandleRedirects                      := False;
  vUserAgent                            := cUserAgent;
  vLastErrorMessage                     := '';
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
  vDatabaseCharSet                      := csUndefined;
  {$ENDIF}
  vContentType                          := cDefaultContentType;
@@ -1722,9 +1718,9 @@ Var
        If (vTempText <> '') And (vTempText[InitStrPos] = ' ') then
         Delete(vTempText,1,1);
        If pos('dwwelcomemessage', lowercase(aName)) > 0 Then
-        vWelcomeMessage := DecodeStrings(vTempText{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+        vWelcomeMessage := DecodeStrings(vTempText{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
        Else If pos('dwaccesstag', lowercase(aName)) > 0 Then
-        vAccessTag := DecodeStrings(vTempText{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+        vAccessTag := DecodeStrings(vTempText{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
        Else If pos('datacompression', lowercase(aName)) > 0 Then
         compresseddata := StringToBoolean(vTempText)
        Else If pos('dwencodestrings', lowercase(aName)) > 0 Then
@@ -1754,7 +1750,7 @@ Var
          Try
           JSONValue.Encoding  := vEncoding;
           JSONValue.Encoded  := True;
-          {$IFDEF RESTDWLAZARUS}
+          {$IFDEF FPC}
           JSONValue.DatabaseCharSet := vDatabaseCharSet;
           {$ENDIF}
           JSONValue.LoadFromJSON(vTempText);
@@ -1768,7 +1764,7 @@ Var
          If Not Assigned(DWParams) Then
           TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
                                           QueryParams,
-                                          vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
+                                          vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
          Try
           If Trim(lowercase(aName)) <> '' Then
            Begin
@@ -1778,7 +1774,7 @@ Var
               JSONParam := TRESTDWJSONParam.Create(DWParams.Encoding);
               JSONParam.ObjectDirection := odIN;
               JSONParam.ParamName       := lowercase(aName);
-              {$IFDEF RESTDWLAZARUS}
+              {$IFDEF FPC}
               JSONParam.DatabaseCharSet := vDatabaseCharSet;
               {$ENDIF}
               If (Pos(LowerCase('{"ObjectType":"toParam", "Direction":"'), LowerCase(vTempText)) > 0) Then
@@ -1802,7 +1798,7 @@ Var
  End;
  Procedure WriteError;
  Begin
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
    If vEncoding = esUtf8 Then
     mb := TStringStream.Create(Utf8Encode(vErrorMessage))
    Else
@@ -2113,21 +2109,21 @@ Begin
     ReadRawHeaders;
     vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
     If Cmd <> '' Then
-     TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
+     TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
     If ((Params.Count > 0) And (RequestType In [rtGet, rtDelete])) Then
      Begin
       vRequestHeader.Add(Url);
       vRequestHeader.Add(Params.Text);
       vRequestHeader.Add(QueryParams);
       TRESTDWDataUtils.ParseWebFormsParams(Params, Url, QueryParams,
-                                           vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF},
+                                           vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF},
                                            DWParams,    RequestType);
       If DWParams <> Nil Then
        Begin
         If (DWParams.ItemsString['dwwelcomemessage']     <> Nil)    Then
-         vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+         vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
         If (DWParams.ItemsString['dwaccesstag']          <> Nil)    Then
-         vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+         vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
         If (DWParams.ItemsString['datacompression']      <> Nil)    Then
          compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
         If (DWParams.ItemsString['dwencodestrings']      <> Nil)    Then
@@ -2139,7 +2135,7 @@ Begin
         If (DWParams.ItemsString['dwservereventname']    <> Nil)    Then
          Begin
           If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
-           vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+           vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
          End;
        End;
      End
@@ -2151,13 +2147,13 @@ Begin
         vOldMethod := vUrlToExec;
         If Not Assigned(DWParams) Then
          Begin
-          TRESTDWDataUtils.ParseRESTURL (Url, vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
+          TRESTDWDataUtils.ParseRESTURL (Url, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
           If DWParams <> Nil Then
            Begin
             If DWParams.ItemsString['dwwelcomemessage']      <> Nil  Then
-             vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+             vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
-             vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+             vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             If (DWParams.ItemsString['datacompression']      <> Nil) Then
              compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
             If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
@@ -2165,7 +2161,7 @@ Begin
             If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
              Begin
               If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
-               vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+               vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
              End;
             If (DWParams.ItemsString['dwusecript']           <> Nil) Then
              vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
@@ -2182,11 +2178,11 @@ Begin
        Begin
         If QueryParams <> '' Then
          Begin
-          TRESTDWDataUtils.ParseFormParamsToDWParam(QueryParams, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+          TRESTDWDataUtils.ParseFormParamsToDWParam(QueryParams, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
           If (DWParams.ItemsString['dwwelcomemessage']     <> Nil) Then
-           vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+           vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
           If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
-           vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+           vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
           If (DWParams.ItemsString['datacompression']      <> Nil) Then
            compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
           If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
@@ -3231,9 +3227,9 @@ Var
        If (vTempText <> '') And (vTempText[InitStrPos] = ' ') then
         Delete(vTempText,1,1);
        If pos('dwwelcomemessage', lowercase(aName)) > 0 Then
-        vWelcomeMessage := DecodeStrings(vTempText{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+        vWelcomeMessage := DecodeStrings(vTempText{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
        Else If pos('dwaccesstag', lowercase(aName)) > 0 Then
-        vAccessTag := DecodeStrings(vTempText{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+        vAccessTag := DecodeStrings(vTempText{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
        Else If pos('datacompression', lowercase(aName)) > 0 Then
         compresseddata := StringToBoolean(vTempText)
        Else If pos('dwencodestrings', lowercase(aName)) > 0 Then
@@ -3263,7 +3259,7 @@ Var
          Try
           JSONValue.Encoding  := vEncoding;
           JSONValue.Encoded  := True;
-          {$IFDEF RESTDWLAZARUS}
+          {$IFDEF FPC}
           JSONValue.DatabaseCharSet := vDatabaseCharSet;
           {$ENDIF}
           JSONValue.LoadFromJSON(vTempText);
@@ -3277,7 +3273,7 @@ Var
          If Not Assigned(DWParams) Then
           TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
                                           QueryParams,
-                                          vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
+                                          vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
          Try
           If Trim(lowercase(aName)) <> '' Then
            Begin
@@ -3287,7 +3283,7 @@ Var
               JSONParam := TRESTDWJSONParam.Create(DWParams.Encoding);
               JSONParam.ObjectDirection := odIN;
               JSONParam.ParamName       := lowercase(aName);
-              {$IFDEF RESTDWLAZARUS}
+              {$IFDEF FPC}
               JSONParam.DatabaseCharSet := vDatabaseCharSet;
               {$ENDIF}
               If (Pos(LowerCase('{"ObjectType":"toParam", "Direction":"'), LowerCase(vTempText)) > 0) Then
@@ -3311,7 +3307,7 @@ Var
  End;
  Procedure WriteError;
  Begin
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
    If vEncoding = esUtf8 Then
     mb := TStringStream.Create(Utf8Encode(vErrorMessage))
    Else
@@ -3622,21 +3618,21 @@ Begin
     ReadRawHeaders;
     vCompareContext := CompareBaseURL(Cmd); // := aDefaultUrl;
     If Cmd <> '' Then
-     TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
+     TRESTDWDataUtils.ParseRESTURL (ClearRequestType(Cmd), vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
     If ((Params.Count > 0) And (RequestType In [rtGet, rtDelete])) Then
      Begin
       vRequestHeader.Add(Url);
       vRequestHeader.Add(Params.Text);
       vRequestHeader.Add(QueryParams);
       TRESTDWDataUtils.ParseWebFormsParams(Params, Url, QueryParams,
-                                           vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF},
+                                           vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF},
                                            DWParams,    RequestType);
       If DWParams <> Nil Then
        Begin
         If (DWParams.ItemsString['dwwelcomemessage']     <> Nil)    Then
-         vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+         vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
         If (DWParams.ItemsString['dwaccesstag']          <> Nil)    Then
-         vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+         vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
         If (DWParams.ItemsString['datacompression']      <> Nil)    Then
          compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
         If (DWParams.ItemsString['dwencodestrings']      <> Nil)    Then
@@ -3648,7 +3644,7 @@ Begin
         If (DWParams.ItemsString['dwservereventname']    <> Nil)    Then
          Begin
           If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
-           vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+           vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
          End;
        End;
      End
@@ -3660,13 +3656,13 @@ Begin
         vOldMethod := vUrlToExec;
         If Not Assigned(DWParams) Then
          Begin
-          TRESTDWDataUtils.ParseRESTURL (Url, vEncoding, vmark{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams);
+          TRESTDWDataUtils.ParseRESTURL (Url, vEncoding, vmark{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams);
           If DWParams <> Nil Then
            Begin
             If DWParams.ItemsString['dwwelcomemessage']      <> Nil  Then
-             vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+             vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
-             vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+             vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             If (DWParams.ItemsString['datacompression']      <> Nil) Then
              compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
             If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
@@ -3674,7 +3670,7 @@ Begin
             If (DWParams.ItemsString['dwservereventname']    <> Nil) Then
              Begin
               If vdwservereventname <> GetEventName(Lowercase(DWParams.ItemsString['dwservereventname'].AsString)) Then
-               vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+               vdwservereventname := DecodeStrings(DWParams.ItemsString['dwservereventname'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
              End;
             If (DWParams.ItemsString['dwusecript']           <> Nil) Then
              vdwCriptKey           := StringToBoolean(DWParams.ItemsString['dwusecript'].AsString);
@@ -3691,11 +3687,11 @@ Begin
        Begin
         If QueryParams <> '' Then
          Begin
-          TRESTDWDataUtils.ParseFormParamsToDWParam(QueryParams, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+          TRESTDWDataUtils.ParseFormParamsToDWParam(QueryParams, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
           If (DWParams.ItemsString['dwwelcomemessage']     <> Nil) Then
-           vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+           vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
           If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
-           vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+           vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
           If (DWParams.ItemsString['datacompression']      <> Nil) Then
            compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
           If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
@@ -3760,9 +3756,9 @@ Begin
      If Assigned(vServerMethod) Then
       Begin
 //       If DWParams.ItemsString['dwwelcomemessage'] <> Nil Then
-//        vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//        vWelcomeMessage := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
 //       If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
-//        vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//        vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
        vTempServerMethods  := vServerMethod.Create(Nil);
        If Not vCORS Then
         FreeAndNil(CORSCustomHeaders);
@@ -4813,7 +4809,7 @@ Begin
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.GetTableNames(vStrings, vError, vMessageError);
             If Params.ItemsString['Result'] <> Nil Then
              Begin
-              Params.ItemsString['Result'].CriptOptions.Use := False;
+//              Params.ItemsString['Result'].CriptOptions.Use := False;
               Params.ItemsString['Result'].SetValue(vStrings.Text, Params.ItemsString['Result'].Encoded);
              End;
            Except
@@ -4826,8 +4822,8 @@ Begin
            FreeAndNil(vStrings);
            If vMessageError <> '' Then
             Begin
-             Params.ItemsString['MessageError'].CriptOptions.Use := False;
-             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//             Params.ItemsString['MessageError'].CriptOptions.Use := False;
+             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             End;
            Params.ItemsString['Error'].AsBoolean := vError;
           End;
@@ -4883,13 +4879,13 @@ Begin
            Try
             If Not TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ConnectionSet Then
              Raise Exception.Create(cInvalidDriverConnection);
-            Params.ItemsString['TableName'].CriptOptions.Use := False;
+//            Params.ItemsString['TableName'].CriptOptions.Use := False;
             vTableName := Params.ItemsString['TableName'].AsString;
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.PrepareConnection(ConnectionDefs);
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.GetFieldNames(vTableName, vStrings, vError, vMessageError);
             If Params.ItemsString['Result'] <> Nil Then
              Begin
-              Params.ItemsString['Result'].CriptOptions.Use := False;
+//              Params.ItemsString['Result'].CriptOptions.Use := False;
               Params.ItemsString['Result'].SetValue(vStrings.Text, Params.ItemsString['Result'].Encoded);
              End;
            Except
@@ -4902,8 +4898,8 @@ Begin
            FreeAndNil(vStrings);
            If vMessageError <> '' Then
             Begin
-             Params.ItemsString['MessageError'].CriptOptions.Use := False;
-             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//             Params.ItemsString['MessageError'].CriptOptions.Use := False;
+             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             End;
            Params.ItemsString['Error'].AsBoolean := vError;
           End;
@@ -4958,13 +4954,13 @@ Begin
            Try
             If Not TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ConnectionSet Then
              Raise Exception.Create(cInvalidDriverConnection);
-            Params.ItemsString['TableName'].CriptOptions.Use := False;
+//            Params.ItemsString['TableName'].CriptOptions.Use := False;
             vTableName := Params.ItemsString['TableName'].AsString;
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.PrepareConnection(ConnectionDefs);
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.GetKeyFieldNames(vTableName, vStrings, vError, vMessageError);
             If Params.ItemsString['Result'] <> Nil Then
              Begin
-              Params.ItemsString['Result'].CriptOptions.Use := False;
+//              Params.ItemsString['Result'].CriptOptions.Use := False;
               Params.ItemsString['Result'].SetValue(vStrings.Text, Params.ItemsString['Result'].Encoded);
              End;
            Except
@@ -4977,8 +4973,8 @@ Begin
            FreeAndNil(vStrings);
            If vMessageError <> '' Then
             Begin
-             Params.ItemsString['MessageError'].CriptOptions.Use := False;
-             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//             Params.ItemsString['MessageError'].CriptOptions.Use := False;
+             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             End;
            Params.ItemsString['Error'].AsBoolean := vError;
           End;
@@ -5593,8 +5589,8 @@ Begin
             End;
             If vMessageError <> '' Then
              Begin
-              Params.ItemsString['MessageError'].CriptOptions.Use := False;
-              Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//              Params.ItemsString['MessageError'].CriptOptions.Use := False;
+              Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
              End;
             Params.ItemsString['Error'].AsBoolean := vError;
             If Params.ItemsString['RowsAffected'] <> Nil Then
@@ -5689,8 +5685,8 @@ Begin
             End;
             If vMessageError <> '' Then
              Begin
-              Params.ItemsString['MessageError'].CriptOptions.Use := False;
-              Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//              Params.ItemsString['MessageError'].CriptOptions.Use := False;
+              Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
              End;
             Params.ItemsString['Error'].AsBoolean := vError;
             If Params.ItemsString['RowsAffected'] <> Nil Then
@@ -5802,8 +5798,8 @@ Begin
             End;
             If vMessageError <> '' Then
              Begin
-              Params.ItemsString['MessageError'].CriptOptions.Use := False;
-              Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//              Params.ItemsString['MessageError'].CriptOptions.Use := False;
+              Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
              End;
             Params.ItemsString['Error'].AsBoolean        := vError;
             If Params.ItemsString['RowsAffected'] <> Nil Then
@@ -5912,8 +5908,8 @@ Begin
             End;
             If vMessageError <> '' Then
              Begin
-              Params.ItemsString['MessageError'].CriptOptions.Use := False;
-              Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//              Params.ItemsString['MessageError'].CriptOptions.Use := False;
+              Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
              End;
             Params.ItemsString['Error'].AsBoolean        := vError;
             If Params.ItemsString['RowsAffected'] <> Nil Then
@@ -6006,8 +6002,8 @@ Begin
            End;
            If vMessageError <> '' Then
             Begin
-             Params.ItemsString['MessageError'].CriptOptions.Use := False;
-             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//             Params.ItemsString['MessageError'].CriptOptions.Use := False;
+             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             End;
            Params.ItemsString['Error'].AsBoolean := vError;
            If Params.ItemsString['Result'] <> Nil Then
@@ -6168,12 +6164,12 @@ Begin
        If Not Assigned(DWParams) Then
         TRESTDWDataUtils.ParseWebFormsParams (aParams, Url,
                                               aQueryParams,
-                                              vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
+                                              vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
        If Assigned(DWParams.ItemsString['dwReadBodyRaw']) And (DWParams.ItemsString['dwReadBodyRaw'].AsString='1') Then
-        TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+        TRESTDWDataUtils.ParseBodyRawToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
        Else If (Assigned(DWParams.ItemsString['dwReadBodyBin']) And
                (DWParams.ItemsString['dwReadBodyBin'].AsString='1')) Then
-        TRESTDWDataUtils.ParseBodyBinToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+        TRESTDWDataUtils.ParseBodyBinToDWParam(TStringStream(mb).DataString, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
        Else
         Begin
          If (pos('boundary', ContentType) > 0) Then
@@ -6214,7 +6210,7 @@ Begin
                   Else
                    TRESTDWDataUtils.ParseWebFormsParams (aParams, Url,
                                                          aQueryParams,
-                                                         vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
+                                                         vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
                  End;
                 JSONParam    := TRESTDWJSONParam.Create(DWParams.Encoding);
                 JSONParam.ObjectDirection := odIN;
@@ -6245,9 +6241,9 @@ Begin
                   If Assigned(JSONParam) Then
                    FreeAndNil(JSONParam);
                   If (DWParams.ItemsString['dwwelcomemessage']     <> Nil) Then
-                   vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                   vWelcomeMessage       := DecodeStrings(DWParams.ItemsString['dwwelcomemessage'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                   If (DWParams.ItemsString['dwaccesstag']          <> Nil) Then
-                   vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                   vAccessTag            := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                   If (DWParams.ItemsString['datacompression']      <> Nil) Then
                    compresseddata        := StringToBoolean(DWParams.ItemsString['datacompression'].AsString);
                   If (DWParams.ItemsString['dwencodestrings']      <> Nil) Then
@@ -6343,9 +6339,9 @@ Begin
                 If Decoder <> Nil Then
                  TRESTDWMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
                 If pos('dwwelcomemessage', lowercase(vObjectName)) > 0      Then
-                 vWelcomeMessage := DecodeStrings(StreamToString(ms){$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+                 vWelcomeMessage := DecodeStrings(StreamToString(ms){$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                 Else If pos('dwaccesstag', lowercase(vObjectName)) > 0      Then
-                 vAccessTag := DecodeStrings(StreamToString(ms){$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+                 vAccessTag := DecodeStrings(StreamToString(ms){$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                 Else If Pos('dwusecript', lowercase(vObjectName)) > 0       Then
                  vdwCriptKey  := StringToBoolean(StreamToString(ms))
                 Else If pos('datacompression', lowercase(vObjectName)) > 0  Then
@@ -6442,9 +6438,9 @@ Begin
                      Then
             Begin
              If vEncoding = esUtf8 Then
-              TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(StreamToString(mb)), vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+              TRESTDWDataUtils.ParseBodyRawToDWParam(utf8decode(StreamToString(mb)), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else
-              TRESTDWDataUtils.ParseBodyRawToDWParam(StreamToString(mb), vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+              TRESTDWDataUtils.ParseBodyRawToDWParam(StreamToString(mb), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             End
            Else
             Begin
@@ -6453,7 +6449,7 @@ Begin
                If (mb.size > 0) Then
                 Begin
                  If DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(mb, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(mb, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End;
               End
              Else
@@ -6461,10 +6457,10 @@ Begin
                If (pos('boundary', ContentType) > 0) Then
                 Begin
                  If DWParams.ItemsString['undefined'] = nil then
-                  TRESTDWDataUtils.ParseBodyRawToDWParam(mb, vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                  TRESTDWDataUtils.ParseBodyRawToDWParam(mb, vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                 End
                Else
-                TRESTDWDataUtils.ParseDWParamsURL(StreamToString(mb), vEncoding, DWParams{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                TRESTDWDataUtils.ParseDWParamsURL(StreamToString(mb), vEncoding, DWParams{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
               End;
             End;
           End;
@@ -6480,7 +6476,7 @@ Begin
     aurlContext := vUrlToExec;
     If Not (RequestType In [rtPut, rtPatch, rtDelete]) Then
      Begin
-      {$IFDEF RESTDWLAZARUS}
+      {$IFDEF FPC}
       If aQueryParams <> '' Then
        Begin
         If Trim(aQueryParams) <> '' Then
@@ -6533,11 +6529,11 @@ Begin
         End;
       {$ENDIF}
       If (DWParams.ItemsString['dwaccesstag'] <> Nil) Then
-       vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+       vAccessTag := DecodeStrings(DWParams.ItemsString['dwaccesstag'].AsString{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
      End
     Else
      Begin
-      {$IFDEF RESTDWLAZARUS}
+      {$IFDEF FPC}
        vRequestHeader.Add(aParams.Text);
        vRequestHeader.Add(Url);
        vRequestHeader.Add(aQueryParams);
@@ -6696,7 +6692,7 @@ Begin
             If Not TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ConnectionSet Then
              Raise Exception.Create(cInvalidDriverConnection);
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.PrepareConnection(ConnectionDefs);
-            Params.ItemsString['Massive'].CriptOptions.Use := False;
+//            Params.ItemsString['Massive'].CriptOptions.Use := False;
             If BinaryEvent Then
              Begin
               vBufferStream := TMemoryStream.Create;
@@ -6724,15 +6720,15 @@ Begin
             DWParamsD.Free;
            If vMessageError <> '' Then
             Begin
-             Params.ItemsString['MessageError'].CriptOptions.Use := False;
-             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//             Params.ItemsString['MessageError'].CriptOptions.Use := False;
+             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             End;
            Params.ItemsString['Error'].AsBoolean        := vError;
            If (Params.ItemsString['RowsAffected'] <> Nil) Then
             Params.ItemsString['RowsAffected'].AsInteger := vRowsAffected;
            If (Params.ItemsString['Result'] <> Nil) And Not(vError) Then
             Begin
-             Params.ItemsString['Result'].CriptOptions.Use := False;
+//             Params.ItemsString['Result'].CriptOptions.Use := False;
              If vTempJSON <> Nil Then
               Params.ItemsString['Result'].SetValue(vTempJSON.ToJSON, Params.ItemsString['Result'].Encoded)
              Else
@@ -6803,7 +6799,7 @@ Begin
             If Not TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ConnectionSet Then
              Raise Exception.Create(cInvalidDriverConnection);
             TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.PrepareConnection(ConnectionDefs);
-            Params.ItemsString['Massive'].CriptOptions.Use := False;
+//            Params.ItemsString['Massive'].CriptOptions.Use := False;
             vTempJSON := TRESTDWPoolerDB(ServerMethodsClass.Components[i]).RESTDriver.ApplyUpdatesTB(Params.ItemsString['Massive'].AsString,
                                                                                                      DWParamsD, vError, vMessageError, vRowsAffected);
            Except
@@ -6817,15 +6813,15 @@ Begin
             DWParamsD.Free;
            If vMessageError <> '' Then
             Begin
-             Params.ItemsString['MessageError'].CriptOptions.Use := False;
-             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//             Params.ItemsString['MessageError'].CriptOptions.Use := False;
+             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             End;
            Params.ItemsString['Error'].AsBoolean        := vError;
            If (Params.ItemsString['RowsAffected'] <> Nil) Then
             Params.ItemsString['RowsAffected'].AsInteger := vRowsAffected;
            If (Params.ItemsString['Result'] <> Nil) And Not(vError) Then
             Begin
-             Params.ItemsString['Result'].CriptOptions.Use := False;
+//             Params.ItemsString['Result'].CriptOptions.Use := False;
              If vTempJSON <> Nil Then
               Params.ItemsString['Result'].SetValue(vTempJSON.ToJSON, Params.ItemsString['Result'].Encoded)
              Else
@@ -6915,8 +6911,8 @@ Begin
             End;
             If vMessageError <> '' Then
              Begin
-              Params.ItemsString['MessageError'].CriptOptions.Use := False;
-              Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//              Params.ItemsString['MessageError'].CriptOptions.Use := False;
+              Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
              End;
             Params.ItemsString['Error'].AsBoolean        := vError;
             If Params.ItemsString['Result'] <> Nil Then
@@ -7005,8 +7001,8 @@ Begin
            End;
            If vMessageError <> '' Then
             Begin
-             Params.ItemsString['MessageError'].CriptOptions.Use := False;
-             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//             Params.ItemsString['MessageError'].CriptOptions.Use := False;
+             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             End;
            Params.ItemsString['Error'].AsBoolean        := vError;
            If (Params.ItemsString['Result'] <> Nil) And Not(vError) Then
@@ -7080,8 +7076,8 @@ Begin
            End;
            If vMessageError <> '' Then
             Begin
-             Params.ItemsString['MessageError'].CriptOptions.Use := False;
-             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//             Params.ItemsString['MessageError'].CriptOptions.Use := False;
+             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             End;
            Params.ItemsString['Error'].AsBoolean        := vError;
            If (Params.ItemsString['Result'] <> Nil) And Not(vError) Then
@@ -7154,8 +7150,8 @@ Begin
            End;
            If vMessageError <> '' Then
             Begin
-             Params.ItemsString['MessageError'].CriptOptions.Use := False;
-             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+//             Params.ItemsString['MessageError'].CriptOptions.Use := False;
+             Params.ItemsString['MessageError'].AsString := EncodeStrings(vMessageError{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
             End;
            Params.ItemsString['Error'].AsBoolean        := vError;
            If (Params.ItemsString['Result'] <> Nil) And Not(vError) Then
@@ -7283,7 +7279,7 @@ Begin
            If TRESTDWServerEvents(ServerMethodsClass.Components[i]).AccessTag <> AccessTag Then
             Begin
              If Params.ItemsString['dwencodestrings'] <> Nil Then
-              vResult := EncodeStrings(cInvalidAccessTag{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+              vResult := EncodeStrings(cInvalidAccessTag{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
              Else
               vResult := cInvalidAccessTag;
              ErrorCode := 401;
@@ -7331,7 +7327,7 @@ Begin
               On E : Exception Do
                Begin
                 If Params.ItemsString['dwencodestrings'] <> Nil Then
-                 vResult := EncodeStrings(e.Message{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+                 vResult := EncodeStrings(e.Message{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                 Else
                  vResult := e.Message;
                 Result  := True;
@@ -7594,7 +7590,7 @@ Begin
                 On E : Exception Do
                  Begin
                   If Params.ItemsString['dwencodestrings'] <> Nil Then
-                   vResult := EncodeStrings(e.Message{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+                   vResult := EncodeStrings(e.Message{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                   Else
                    vResult := e.Message;
                   Error   := True;
@@ -7723,9 +7719,8 @@ Begin
  vCORSCustomHeaders.Add('Access-Control-Allow-Headers=Content-Type, Origin, Accept, Authorization, X-CUSTOM-HEADER');
 // vCORSCustomHeaders.Add('Access-Control-Allow-Credentials=true');
  vCripto                                := TCripto.Create;
- {$IFDEF RESTDWLAZARUS}
- vDatabaseCharSet                       := csUndefined;
- {$ELSE}
+ {$IFDEF FPC}
+  vDatabaseCharSet                       := csUndefined;
  {$ENDIF}
  vActive                                := False;
  vEncode_Errors                         := False;

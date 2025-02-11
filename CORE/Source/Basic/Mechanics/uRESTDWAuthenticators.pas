@@ -1,4 +1,4 @@
-﻿unit uRESTDWAuthenticators;
+unit uRESTDWAuthenticators;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
@@ -33,7 +33,7 @@ interface
 uses
   Classes, SysUtils, DateUtils,
   uRESTDWConsts, uRESTDWAbout,  uRESTDWDataUtils,  uRESTDWJSONInterface,
-  uRESTDWTools,  uRESTDWParams, uRESTDWProtoTypes, uRESTDW.OpenSsl_11;
+  uRESTDWTools,  uRESTDWParams, uRESTDWProtoTypes;//, uRESTDW.OpenSsl_11;
 
 Type
  TRESTDWCertOptions = Record
@@ -275,7 +275,7 @@ function TRESTDWAuthBasic.AuthValidate(ADataModuleRESTDW : TObject;
 Var
  LAuthenticationString : String;
 begin
-  LAuthenticationString := DecodeStrings(StringReplace(ARawHeaders.Values['Authorization'], 'Basic ', '', [rfReplaceAll]){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+  LAuthenticationString := DecodeStrings(StringReplace(ARawHeaders.Values['Authorization'], 'Basic ', '', [rfReplaceAll]){$IFDEF FPC}, csUndefined{$ENDIF});
   if (LAuthenticationString <> '') and ((AAuthUsername = '') and (AAuthPassword = '')) then
     Self.PrepareBasicAuth(LAuthenticationString, AAuthUsername, AAuthPassword);
    {$IFNDEF RESTDWLAZARUS}
@@ -580,7 +580,7 @@ Begin
   // Read Header
   If Trim(LHeader) <> '' Then
    Begin
-    LJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+    LJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(LHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
     Try
      If LJsonValue.PairCount > 0 Then
       Begin
@@ -595,7 +595,7 @@ Begin
    // Read Body
    If Trim(LBody) <> '' Then
     Begin
-     LJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(LBody{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+     LJsonValue := TRESTDWJSONInterfaceObject.Create(DecodeStrings(LBody{$IFDEF FPC}, csUndefined{$ENDIF}));
      Try
       If LJsonValue.PairCount > 0 Then
        Begin
@@ -614,7 +614,7 @@ Begin
            FEndTime := UnixToDateTime(StrToInt64(LJsonValue.PairByName['exp'].Value), False);
          End;
         If Not LJsonValue.PairByName['secrets'].IsNull Then
-         FSecrets := DecodeStrings(LJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+         FSecrets := DecodeStrings(LJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
        End;
      Finally
       If Assigned(LJsonValue) Then
@@ -903,7 +903,7 @@ Var
         End;
        Result := Trim(LJsonValue.PairByName['secrets'].Name) <> '';
        If Result Then
-        FSecrets := DecodeStrings(LJsonValue.PairByName['secrets'].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        FSecrets := DecodeStrings(LJsonValue.PairByName['secrets'].Value{$IFDEF FPC}, csUndefined{$ENDIF});
        If Trim(LJsonValue.PairByName['exp'].Name) <> '' Then
         Begin
          Result := False;
@@ -937,7 +937,7 @@ Begin
            (Trim(LStringComparer) <> '');
  If Result Then
   Begin
-   Result := ReadHeader(DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+   Result := ReadHeader(DecodeStrings(LHeader{$IFDEF FPC}, csUndefined{$ENDIF}));
    If Result then
     Begin
      Result := False;
@@ -950,10 +950,10 @@ Begin
       If Result Then
        Begin
         Result := False;
-        LHeader := DecodeStrings(LHeader{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
-        LBody   := DecodeStrings(LBody{$IFDEF RESTDWLAZARUS},   csUndefined{$ENDIF});
-        Secrets := DecodeStrings(GetSecretsValue(LBody){$IFDEF RESTDWLAZARUS},   csUndefined{$ENDIF});
-        Secrets := DecodeStrings(GetSecretsValue(Secrets){$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+        LHeader := DecodeStrings(LHeader{$IFDEF FPC}, csUndefined{$ENDIF});
+        LBody   := DecodeStrings(LBody{$IFDEF FPC},   csUndefined{$ENDIF});
+        Secrets := DecodeStrings(GetSecretsValue(LBody){$IFDEF FPC},   csUndefined{$ENDIF});
+        Secrets := DecodeStrings(GetSecretsValue(Secrets){$IFDEF FPC}, csUndefined{$ENDIF});
         Result := ReadBody(LBody);
        End;
      Finally
@@ -969,15 +969,15 @@ Function TRESTDWAuthOAuth.CreateSelfSignedCert_X509(CertOptions      : TRESTDWCe
                                                     Var Certificate,
                                                     PrivateKey       : TRESTDWBytes) : Boolean;
 begin
- Result := TRESTDWOpenSSLHelper.CreateSelfSignedCert_X509(CertOptions.Country,
-                                                          CertOptions.State,
-                                                          CertOptions.Locality,
-                                                          CertOptions.Organization,
-                                                          CertOptions.OrgUnit,
-                                                          CertOptions.CommonName,
-                                                          CertOptions.ServerName,
-                                                          CertOptions.ExpiresDays,
-                                                          Certificate, PrivateKey);
+// Result := TRESTDWOpenSSLHelper.CreateSelfSignedCert_X509(CertOptions.Country,
+//                                                          CertOptions.State,
+//                                                          CertOptions.Locality,
+//                                                          CertOptions.Organization,
+//                                                          CertOptions.OrgUnit,
+//                                                          CertOptions.CommonName,
+//                                                          CertOptions.ServerName,
+//                                                          CertOptions.ExpiresDays,
+//                                                          Certificate, PrivateKey);
 End;
 
 Function TRESTDWAuthOAuth.AuthValidate(ADataModuleRESTDW : TObject;

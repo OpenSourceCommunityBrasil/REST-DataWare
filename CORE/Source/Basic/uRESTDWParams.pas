@@ -94,7 +94,7 @@ Type
   aValue           : TRESTDWBytes;
   vEncoding        : TEncodeSelect;
   vFieldsList      : TFieldsList;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   vEncodingLazarus : TEncoding;
   vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
@@ -164,7 +164,7 @@ Type
                             DataModeD        : TDataMode = dmDataware;
                             DateTimeFormat   : String = '';
                             DelimiterFormat  : String = '';
-                            {$IFDEF RESTDWLAZARUS}
+                            {$IFDEF FPC}
                             CharSet          : TDatabaseCharSet = csUndefined;
                             {$ENDIF}
                             DataType         : Boolean = False;
@@ -178,7 +178,7 @@ Type
                             DataModeD        : TDataMode = dmDataware;
                             DateTimeFormat   : String = '';
                             DelimiterFormat  : String = '';
-                            {$IFDEF RESTDWLAZARUS}
+                            {$IFDEF FPC}
                             CharSet          : TDatabaseCharSet = csUndefined;
                             {$ENDIF}
                             DataType         : Boolean = False;
@@ -198,12 +198,12 @@ Type
                             Var JsonCount    : Integer;
                             Datapacks        : Integer          = -1;
                             ActualRec        : Integer          = 0;
-                            ClearDataset     : Boolean          = False{$IFDEF RESTDWLAZARUS};
+                            ClearDataset     : Boolean          = False{$IFDEF FPC};
                             CharSet          : TDatabaseCharSet = csUndefined{$ENDIF});Overload;
   Procedure WriteToDataset (DatasetType      : TDatasetType;
                             JSONValue        : String;
                             Const DestDS     : TDataset;
-                            ClearDataset     : Boolean          = False{$IFDEF RESTDWLAZARUS};
+                            ClearDataset     : Boolean          = False{$IFDEF FPC};
                             CharSet          : TDatabaseCharSet = csUndefined{$ENDIF});Overload;
   Procedure LoadFromJSON   (bValue           : String);Overload;
   Procedure LoadFromJSON   (bValue           : String;
@@ -246,7 +246,7 @@ Type
   Property DataMode           : TDataMode          Read vDataMode           Write vDataMode;
   Property FloatDecimalFormat : String             Read vFloatDecimalFormat Write vFloatDecimalFormat;
   Property AsBytes            : TRESTDWBytes       Read GetBytes            Write WriteBytes;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   Property DatabaseCharSet    : TDatabaseCharSet   Read vDatabaseCharSet    Write vDatabaseCharSet;
   {$ENDIF}
   Property OnWriterProcess    : TOnWriterProcess   Read vOnWriterProcess    Write vOnWriterProcess;
@@ -320,7 +320,7 @@ Type
   vNullValue,
   vBinary,
   vEncoded         : Boolean;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   vEncodingLazarus : TEncoding;
   vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
@@ -368,7 +368,7 @@ Type
   Procedure SetAsObject   (Value       : String);
   Procedure SetEncoded    (Value       : Boolean);
   Procedure SetParamContentType(Const bValue : String);
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   Procedure SetDatabaseCharSet (Value  : TDatabaseCharSet);
   {$ENDIF}
   Function TestNilParam : Boolean;
@@ -406,7 +406,7 @@ Type
   Procedure LoadFromParam    (Param    : TParam);
   Procedure SaveFromParam    (Param    : TParam);
   Property  CriptOptions      : TCripto          Read vCripto             Write vCripto;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   Property  DatabaseCharSet   : TDatabaseCharSet Read vDatabaseCharSet    Write SetDatabaseCharSet;
   {$ENDIF}
   Property ObjectDirection    : TObjectDirection Read vObjectDirection    Write SetObjectDirection;
@@ -457,7 +457,7 @@ Type
   vCripto       : TCripto;
   vHeaders      : TRESTDWHeaders;
   vUrl_Redirect : String;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   vEncodingLazarus : TEncoding;
   vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
@@ -504,7 +504,7 @@ Type
   Property    CriptOptions          : TCripto                  Read vCripto       Write vCripto;
   Property    RequestHeaders        : TRESTDWHeaders           Read vHeaders      Write vHeaders;
   Property    Url_Redirect          : String                   Read vUrl_Redirect Write vUrl_Redirect;
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   Property DatabaseCharSet          : TDatabaseCharSet Read vDatabaseCharSet    Write vDatabaseCharSet;
   {$ENDIF}
 End;
@@ -637,9 +637,9 @@ Begin
                     If (Pos('.', vTempValue) > 0) Or
                        (Pos(':', vTempValue) > 0) Or
                        (Pos('/', vTempValue) > 0) Or
-                       (Pos('\', vTempValue) > 0) Or
+                       (Pos('\', vTempValue) > 0)
                        //(Pos('-', vTempValue) > 0)
-                       (vTempValue.CountChar('-')>1)
+//                     Or (vTempValue.CountChar('-')>1) //Testar XyberX
                        Then
                      Field.AsDateTime := StrToDateTime(vTempValue)
                     Else If StrToInt64(vTempValue) <> 0 Then
@@ -798,7 +798,8 @@ End;
 //Alterado por ABrito
 Function TRESTDWJSONValue.GetValue(CanConvert : Boolean = True) : Variant;
 Var
- vTempString : String;
+ vTempString  : String;
+ vRESTDWBytes : TRESTDWBytes;
 Begin
  Result := '';
  If IsNull Then
@@ -828,16 +829,21 @@ Begin
       Begin
        {$IFNDEF FPC}
         {$IFDEF DELPHI2010UP}
-         vTempString:= TEncoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))));
+         vRESTDWBytes := StringUtf8ToBytes(DecodeStrings(vTempString{$IFDEF FPC}, csUndefined{$ENDIF}));
+         If Length(vRESTDWBytes) > 0 Then
+          vTempString:= TEncoding.UTF8.Getstring(vRESTDWBytes)
+         Else
+          vTempString:= '';
+         SetLength(vRESTDWBytes, 0);
         {$ELSE}
-         vTempString:= DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+         vTempString:= DecodeStrings(vTempString{$IFDEF FPC}, csUndefined{$ENDIF});
         {$ENDIF}
        {$ELSE}
-        vTempString:= TEncoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))));
+        vTempString:= TEncoding.UTF8.Getstring(TBytes(stringTobytes(DecodeStrings(vTempString{$IFDEF FPC}, csUndefined{$ENDIF}))));
        {$ENDIF}
        If (vObjectValue In [ovWideString, ovWidememo, ovMemo]) then
         Begin
-         vTempString:=DecodeStrings(vTempString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+         vTempString := DecodeStrings(vTempString{$IFDEF FPC}, csUndefined{$ENDIF});
          {$IFDEF RESTDWLINUX}
            vTempString:= Tencoding.UTF8.Getstring(stringtobytes(vTempString));
          {$ELSE}
@@ -1029,11 +1035,16 @@ Begin
     Begin
      If bValue <> 'null' Then
       Begin
-      {$IFDEF RESTDWLAZARUS}
-       If vEncoding = esUtf8 Then
-        aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(bValue))
+      {$IFDEF FPC}
+       If vObjectValue in [ovBoolean] Then
+        aValue := StringToBytes(BoolToStr(bValue, 'true', 'false'))
        Else
-        aValue := StringToBytes(String(bValue));
+        Begin
+         If vEncoding = esUtf8 Then
+          aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(bValue))
+         Else
+          aValue := StringToBytes(String(bValue));
+        End;
       {$ELSE}
        {$IFDEF DELPHIXEUP} // Delphi 2010 pra cima
         aValue := StringToBytes(String(bValue));
@@ -1442,7 +1453,7 @@ Var
                Begin
                 If (vEncoded) Then
                  Begin
-                  {$IFDEF RESTDWLAZARUS}
+                  {$IFDEF FPC}
                    vTempValue := Format('%s"%s"', [vTempField, EncodeStrings(StringToJsonString(bValue.Fields[i].AsString), vDatabaseCharSet)]);
                   {$ELSE}
                    vTempValue := Format('%s"%s"', [vTempField, EncodeStrings(StringToJsonString(bValue.Fields[i].AsString))]);
@@ -1458,7 +1469,7 @@ Var
                End
               Else
                Begin
-                {$IFDEF RESTDWLAZARUS}
+                {$IFDEF FPC}
                  vTempValue := Format('%s"%s"', [vTempField, EncodeStrings(bValue.Fields[i].AsString, vDatabaseCharSet)]);
                 {$ELSE}
                  vTempValue := bValue.Fields[i].AsString;
@@ -2103,7 +2114,7 @@ Procedure TRESTDWJSONValue.LoadFromDataset(TableName        : String;
                                      DataModeD        : TDataMode = dmDataware;
                                      DateTimeFormat   : String = '';
                                      DelimiterFormat  : String = '';
-                                     {$IFDEF RESTDWLAZARUS}
+                                     {$IFDEF FPC}
                                      CharSet          : TDatabaseCharSet = csUndefined;
                                      {$ENDIF}
                                      DataType         : Boolean = False;
@@ -2124,7 +2135,7 @@ Begin
  If (DataModeD = dmDataware) And (trim(TableName) = '') Then
   TableName := 'rdwtable';
  vtagName         := Lowercase(TableName);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
   If CharSet <> csUndefined Then
    DatabaseCharSet := CharSet;
  {$ENDIF}
@@ -2167,7 +2178,7 @@ Procedure TRESTDWJSONValue.LoadFromDataset(TableName        : String;
                                      DataModeD        : TDataMode   = dmDataware;
                                      DateTimeFormat   : String = '';
                                      DelimiterFormat  : String = '';
-                                     {$IFDEF RESTDWLAZARUS}
+                                     {$IFDEF FPC}
                                      CharSet          : TDatabaseCharSet = csUndefined;
                                      {$ENDIF}
                                      DataType         : Boolean = False;
@@ -2189,7 +2200,7 @@ Begin
  If (DataModeD = dmDataware) And (trim(TableName) = '') Then
   TableName := 'rdwtable';
  vtagName         := Lowercase(TableName);
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
   If CharSet <> csUndefined Then
    DatabaseCharSet := CharSet;
  {$ENDIF}
@@ -2485,7 +2496,7 @@ Begin
                     DestDS.FieldByName(sFieldName).Value := ''
                   Else Begin
                     If vEncoded Then
-                      DestDS.FieldByName(sFieldName).Value := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+                      DestDS.FieldByName(sFieldName).Value := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                     Else
                       DestDS.FieldByName(sFieldName).Value := vTempValue;
                   End;
@@ -2712,7 +2723,7 @@ Begin
 //                  Else
                   If vUtf8SpecialChars Then
                    vTempValue := Unescape_chars(vTempValue);
-                  {$IFDEF RESTDWLAZARUS}
+                  {$IFDEF FPC}
                   vTempValue  := GetStringDecode(vTempValue, vDatabaseCharSet);
                   {$ENDIF}
                   DestDS.Fields[i].AsString := vTempValue;
@@ -2805,12 +2816,12 @@ Begin
                   Else
                    Begin
                     if vEncoded then
-                     DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+                     DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                     Else
                      Begin
                       If vUtf8SpecialChars Then
                        vTempValue := unescape_chars(vTempValue);
-                      {$IFDEF RESTDWLAZARUS}
+                      {$IFDEF FPC}
                       vTempValue := GetStringDecode(vTempValue, vDatabaseCharSet);
                       {$ENDIF}
                       DestDS.Fields[i].AsString := vTempValue;
@@ -3316,7 +3327,7 @@ Begin
 //                  Else
                   If vUtf8SpecialChars Then
                    vTempValue := Unescape_chars(vTempValue);
-                  {$IFDEF RESTDWLAZARUS}
+                  {$IFDEF FPC}
                   vTempValue  := GetStringDecode(vTempValue, vDatabaseCharSet);
                   {$ENDIF}
                   DestDS.Fields[i].AsString := vTempValue;
@@ -3412,12 +3423,12 @@ Begin
                   Else
                    Begin
                     if vEncoded then
-                     DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF})
+                     DestDS.Fields[i].AsString := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF})
                     Else
                      Begin
                       If vUtf8SpecialChars Then
                        vTempValue := unescape_chars(vTempValue);
-                       {$IFDEF RESTDWLAZARUS}
+                       {$IFDEF FPC}
                          vTempValue := GetStringDecode(vTempValue, vDatabaseCharSet);
                        {$ENDIF}
                       DestDS.Fields[i].AsString := vTempValue;
@@ -3465,7 +3476,7 @@ Procedure TRESTDWJSONValue.WriteToDataset(DatasetType   : TDatasetType;
                                     Datapacks     : Integer = -1;
                                     ActualRec     : Integer = 0;
                                     ClearDataset  : Boolean          = False
-                                    {$IFDEF RESTDWLAZARUS};
+                                    {$IFDEF FPC};
                                     CharSet       : TDatabaseCharSet = csUndefined
                                     {$ENDIF});
 Var
@@ -3883,7 +3894,7 @@ Begin
                                                   ftMemo, ftFmtMemo]))
                    And (Not (DestDS.Fields[i].DataType = ftGuid)) Then
                 Begin
-                 vTempValue := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+                 vTempValue := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
                  {$IFNDEF DELPHI2007UP}
                    If vEncoding = esUtf8 Then
                     vTempValue := UTF8Decode(vTempValue);
@@ -3894,7 +3905,7 @@ Begin
                 Begin
                  If vUtf8SpecialChars Then
                   vTempValue := unescape_chars(vTempValue);
-                 {$IFDEF RESTDWLAZARUS}
+                 {$IFDEF FPC}
                  DestDS.Fields[i].AsString := GetStringDecode(vTempValue, DatabaseCharSet);
                  {$ELSE}
                  DestDS.Fields[i].AsString := vTempValue;
@@ -3987,7 +3998,7 @@ Procedure TRESTDWJSONValue.WriteToDataset (DatasetType    : TDatasetType;
                                      JSONValue      : String;
                                      Const DestDS   : TDataset;
                                      ClearDataset   : Boolean          = False
-                                     {$IFDEF RESTDWLAZARUS};
+                                     {$IFDEF FPC};
                                      CharSet        : TDatabaseCharSet = csUndefined
                                      {$ENDIF});
 Var
@@ -4041,7 +4052,7 @@ Begin
         End;
        End
       Else
-       vTempValue := DecodeStrings(vTempValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF});
+       vTempValue := DecodeStrings(vTempValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF});
      End;
     If Not(vObjectValue In [ovBytes, ovVarBytes, ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob]) Then
      SetValue(vTempValue, vEncoded)
@@ -4285,7 +4296,7 @@ Begin
      Else
       Begin
        vBinary := False;
-       WriteValue(EncodeStrings(Value{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
+       WriteValue(EncodeStrings(Value{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}))
       End;
     End
    Else
@@ -4361,7 +4372,7 @@ Begin
  {$ELSE}
    vEncoding        := esASCII;
  {$IFEND}
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
   vDatabaseCharSet  := csUndefined;
  {$ENDIF}
  vFieldExist        := Nil;
@@ -4731,7 +4742,7 @@ begin
  vParamContentType := bValue;
 end;
 
-{$IFDEF RESTDWLAZARUS}
+{$IFDEF FPC}
 Procedure TRESTDWJSONParam.SetDatabaseCharSet (Value  : TDatabaseCharSet);
 Begin
  vJSONValue.DatabaseCharSet := Value;
@@ -4763,8 +4774,8 @@ End;
 Constructor TRESTDWJSONParam.Create(Encoding : TEncodeSelect);
 Begin
  vJSONValue          := TRESTDWJSONValue.Create;
- vCripto             := TCripto.Create;
- vCripto.Use         := False;
+// vCripto             := TCripto.Create;
+// vCripto.Use         := False;
  vDataMode           := dmDataware;
  vEncoding           := Encoding;
  vTypeObject         := toParam;
@@ -4780,7 +4791,7 @@ Begin
  vParamFileName      := '';
  vParamContentType   := '';
 // vDefaultValue    : Variant;
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
   vDatabaseCharSet  := csUndefined;
  {$ENDIF}
 End;
@@ -4790,7 +4801,7 @@ Begin
  Clear;
  If vJSONValue <> Nil Then
   FreeAndNil(vJSONValue);
- If vCripto <> Nil Then
+ If Assigned(vCripto) Then
   FreeAndNil(vCripto);
  Inherited;
 End;
@@ -4839,7 +4850,7 @@ Begin
     vObjectValue       := GetValueType        (bJsonValue.Pairs[3].Value);
     vParamName         := Lowercase           (bJsonValue.Pairs[4].name);
     If vObjectValue = ovGuid Then
-     vValue            := DecodeStrings(vValue{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF});
+     vValue            := DecodeStrings(vValue{$IFDEF FPC}, csUndefined{$ENDIF});
     WriteValue(vValue);
     vBinary            := vObjectValue in [ovBytes, ovVarBytes, ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob];
     vJSONValue.vBinary := vBinary;
@@ -4904,7 +4915,7 @@ End;
 Procedure TRESTDWJSONParam.SaveToFile(FileName: String);
 Var
  vStringStream : TStream;
- {$IFDEF RESTDWLAZARUS}
+ {$IFDEF FPC}
   vFileStream  : TFileStream;
  {$ELSE}
   {$IF CompilerVersion < 21}
@@ -4918,7 +4929,7 @@ Begin
  SaveToStream(vStringStream);
  vStringStream.Position := 0;
  Try
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
   vStringStream.Position := 0;
   vFileStream   := TFileStream.Create(FileName, fmCreate);
   Try
@@ -5138,9 +5149,9 @@ Begin
                         Result := ''
                        Else
                         Begin
-                         If vCripto.Use Then
-                          Result := vCripto.Decrypt(vJSONValue.Value)
-                         Else
+//                         If vCripto.Use Then
+//                          Result := vCripto.Decrypt(vJSONValue.Value)
+//                         Else
                           Result := vJSONValue.Value;
                         End;
                       End;
@@ -5489,7 +5500,7 @@ Begin
 //     If vEncoding = esUtf8 Then
 //      WriteValue(EncodeStrings(aValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
 //     Else
-     WriteValue(EncodeStrings(aValue{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}))
+     WriteValue(EncodeStrings(aValue{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}))
     End
    Else
     WriteValue(aValue);
@@ -5615,7 +5626,7 @@ Begin
    //vEncoded := Not (Param.DataType in [{$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
    //                                    ftMemo, ftFmtMemo]);
    if (Param.DataType in [{$IFDEF DELPHIXEUP}ftWideString{$ENDIF}]) then
-    SetValue(EncodeStrings(Param.AsString{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}))
+    SetValue(EncodeStrings(Param.AsString{$IFDEF FPC}, csUndefined{$ENDIF}))
    else
    SetValue(Param.AsString, vEncoded);
    vEncoded := True;
@@ -5823,7 +5834,8 @@ End;
 Destructor TRESTDWParams.Destroy;
 Begin
  Clear;
- FreeAndNil(vCripto);
+ If Assigned(vCripto) Then
+  FreeAndNil(vCripto);
  FreeAndNil(vHeaders);
  Inherited;
 End;
@@ -5831,16 +5843,16 @@ End;
 Constructor TRESTDWParams.Create;
 Begin
  Inherited;
- vCripto       := TCripto.Create;
+// vCripto       := TCripto.Create;
  vDataMode     := dmDataware;
  vHeaders      := TRESTDWHeaders.Create;
  vUrl_Redirect := '';
-  {$IF Defined(RESTDWLAZARUS) or Defined(DELPHIXEUP)}
+  {$IF Defined(FPC) or Defined(DELPHIXEUP)}
     vEncoding := esUtf8;
   {$ELSE}
     vEncoding := esASCII;
   {$IFEND}
-  {$IFDEF RESTDWLAZARUS}
+  {$IFDEF FPC}
     vDatabaseCharSet := csUndefined;
   {$ENDIF}
 End;
@@ -5985,7 +5997,7 @@ Begin
         Begin
          If (JSONParam.ObjectValue in [ovString, ovGuid, ovWideString]) And (JSONParam.Encoded) Then
           Begin
-           JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+           JSONParam.SetValue(DecodeStrings(bJsonOBJ.Pairs[4].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
           End
          Else
           JSONParam.SetValue(bJsonOBJ.Pairs[4].Value, JSONParam.Encoded);
@@ -5998,7 +6010,7 @@ Begin
      End
     Else
      Begin
-      vStringStream := TStringStream.Create(DecodeStrings(bJsonOBJ.Pairs[0].Value{$IFDEF RESTDWLAZARUS}, csUndefined{$ENDIF}));
+      vStringStream := TStringStream.Create(DecodeStrings(bJsonOBJ.Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
       Try
        vStringStream.Position := 0;
        TRESTDWPropertyPersist(vParam).LoadFromStream(vStringStream);
@@ -6083,9 +6095,9 @@ Begin
  vItem^                  := Item;
  vItem^.vEncoding        := vEncoding;
  vItem^.DataMode         := vDataMode;
- vItem^.CriptOptions.Use := vCripto.Use;
- vItem^.CriptOptions.Key := vCripto.Key;
- {$IFDEF RESTDWLAZARUS}
+// vItem^.CriptOptions.Use := False;
+// vItem^.CriptOptions.Key := '';
+ {$IFDEF FPC}
  vItem^.DatabaseCharSet  := vDatabaseCharSet;
  {$ENDIF}
  Result                  := Inherited Add(vItem);
@@ -6415,7 +6427,7 @@ Var
     Try
      If L <> 0 Then
       Stream.Read(S[InitStrPos], L);
-     {$IFDEF RESTDWLAZARUS}
+     {$IFDEF FPC}
       S := GetStringEncode(S, vDatabaseCharSet);
      {$ENDIF}
     Finally
@@ -6452,7 +6464,7 @@ Var
        ovWideString,
        ovString,
        ovObject : Begin
-                   vItem.CriptOptions.Use := False;
+//                   vItem.CriptOptions.Use := False;
                    Stream.Read(L, Sizeof(DWInt64));
                    If (L = 0) Or (L > high(Sizeof(DWInt64))) Then
                     Continue;
@@ -6464,15 +6476,15 @@ Var
                       SetLength(vStringBytes, L);
                       Stream.Read(vStringBytes[0], L);
                       S := BytesToString(vStringBytes);
-                      {$IFDEF RESTDWLAZARUS}
+                      {$IFDEF FPC}
                        S := GetStringEncode(S, vDatabaseCharSet);
                       {$ENDIF}
                      End;
                    Finally
                    End;
                    vItem.AsString := S;
-                   vItem.CriptOptions.Use := CriptOptions.Use;
-                   vItem.CriptOptions.Key := CriptOptions.Key;
+//                   vItem.CriptOptions.Use := CriptOptions.Use;
+//                   vItem.CriptOptions.Key := CriptOptions.Key;
                   End;
        ovSingle,
        ovSmallint,
@@ -6672,8 +6684,8 @@ Var
 Begin
  For I := 0 To Count -1 Do
   Begin
-   Items[I].CriptOptions.Use := Use;
-   Items[I].CriptOptions.Key := Key;
+//   Items[I].CriptOptions.Use := Use;
+//   Items[I].CriptOptions.Key := Key;
   End;
 End;
 

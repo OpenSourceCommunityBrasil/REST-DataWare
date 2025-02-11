@@ -2,10 +2,10 @@
 
 {$I ..\..\Includes\uRESTDW.inc}
 
-{$IFNDEF RESTDWLAZARUS}
-  {$I ZDbc.inc}
+{$IFNDEF FPC}
+ {$I ZDbc.inc}
 {$ELSE}
-  {$MODE DELPHI}
+ {$MODE DELPHI}
 {$ENDIF}
 
 {
