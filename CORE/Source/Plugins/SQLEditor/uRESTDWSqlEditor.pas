@@ -163,9 +163,9 @@ Var
 Implementation
 
 {$IFDEF FPC}
-{$R *.lfm}
+ {$R *.lfm}
 {$ELSE}
-{$R *.dfm}
+ {$R *.dfm}
 {$ENDIF}
 
 Function TRESTDWSQLEditor.GetValue : String;

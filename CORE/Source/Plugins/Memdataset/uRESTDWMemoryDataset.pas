@@ -1,4 +1,4 @@
-    Unit uRESTDWMemoryDataset;
+Unit uRESTDWMemoryDataset;
 
 {$I ..\..\Includes\uRESTDW.inc}
 
@@ -183,6 +183,7 @@ Type
     Procedure AfterLoad;
     Function  GetDataset                  : TDataset;
     Function  GetBlob           (RecNo, Index    : Integer) : PMemBlobData;
+    Procedure Loaded;
     {$IFDEF FPC}
     Function  GetDatabaseCharSet          : TDatabaseCharSet;
     {$ENDIF}
@@ -409,8 +410,8 @@ Type
   End;
   TRESTDWDatasetIndexDefs = Class(TIndexDefs)
   Private
-   Function GetBufDatasetIndex(AIndex : Integer) : TRESTDWDatasetIndex;
-   Function GetBufferIndex(AIndex : Integer)     : TRESTDWIndex;
+   Function  GetBufDatasetIndex(AIndex : Integer) : TRESTDWDatasetIndex;
+   Function  GetBufferIndex(AIndex : Integer)     : TRESTDWIndex;
   Public
    Constructor Create(aDataset : TDataset);  {$IFNDEF FPC}
                                               {$IF CompilerVersion > 21}
@@ -420,9 +421,9 @@ Type
                                               Override;
                                              {$ENDIF}
    // Does not raise an exception if not found.
-   Function FindIndex(const IndexName: string)  : TRESTDWDatasetIndex;
-   Property RESTDWIndexdefs [AIndex : Integer]  : TRESTDWDatasetIndex Read GetBufDatasetIndex;
-   Property RESTDWIndexes   [AIndex : Integer]  : TRESTDWIndex        Read GetBufferIndex;
+   Function FindIndex(const IndexName: string)   : TRESTDWDatasetIndex;
+   Property Indexdefs [AIndex : Integer]  : TRESTDWDatasetIndex Read GetBufDatasetIndex;
+   Property Indexes   [AIndex : Integer]  : TRESTDWIndex        Read GetBufferIndex;
   End;
   TRESTDWMemTable = Class(TDataset, IRESTDWMemTable)
   Private
@@ -447,6 +448,7 @@ Type
     FSrcAutoIncField  : TField;
     FRecords          : TRecordList;
     FDataSet          : TDataset;
+    FFetch,
     FAllPacketsFetched,
     FRefreshing,
     FClearing,
@@ -627,7 +629,7 @@ Type
     procedure ClearIndexes;
     Function  GetDataset       : TDataset;
     Procedure SetIndexName(AValue : String);
-    Property Records [Index   : Integer] : TRESTDWMTMemoryRecord Read GetMemoryRecord;
+    Property  Records [Index   : Integer] : TRESTDWMTMemoryRecord Read GetMemoryRecord;
   Public
     Constructor Create(AOwner : TComponent);Override;
     Destructor  Destroy;Override;
@@ -690,6 +692,7 @@ Type
     Procedure LoadFromStream(stream     : TStream);
     Procedure Assign        (Source     : TPersistent);Reintroduce;Overload;Override;
     Function  GetCurrentIndexBuf : TRESTDWIndex;
+    Procedure SetIndexDefs(Value : TIndexDefs);
     Function  GetIndexDefs       : TIndexDefs;
     Function  GetIndexName       : String;
     Function  GetIndexFieldNames : String;
@@ -701,7 +704,7 @@ Type
     Function  LoadField (FieldDef       : TFieldDef;
                          buffer         : Pointer;
                          out CreateBlob : boolean)     : Boolean;
-    Function  Fetch              : Boolean;
+    Function  Fetch              : Boolean;Virtual;
     Procedure LoadBlobIntoBuffer(FieldDef : TFieldDef;
                                  ABlobBuf : PRESTDWBlobField); Virtual; Abstract;
     Function  LoadBuffer (Buffer : TRecordBuffer)      : TGetResult;
@@ -761,7 +764,7 @@ Type
     Property  AfterApply        : TApplyEvent        Read FAfterApply        Write FAfterApply;
     Property  BeforeApplyRecord : TApplyRecordEvent  Read FBeforeApplyRecord Write FBeforeApplyRecord;
     Property  AfterApplyRecord  : TApplyRecordEvent  Read FAfterApplyRecord  Write FAfterApplyRecord;
-    Property  IndexDefs         : TIndexDefs         Read GetIndexDefs;
+    Property  IndexDefs         : TIndexDefs         Read GetIndexDefs       Write SetIndexDefs;
     Property  IndexName         : String             Read GetIndexName       Write SetIndexName;
     Property  IndexFieldNames   : String             Read GetIndexFieldNames Write SetIndexFieldNames;
     Property  MaxIndexesCount   : Integer            Read FMaxIndexesCount   Write SetMaxIndexesCount default 2;
@@ -1039,9 +1042,7 @@ Begin
    End;
   End;
  If vDWFieldType      In FieldGroupVariant Then
-  Result := SizeOf(Variant)
- Else If vDWFieldType In FieldGroupGUID    Then
-  Result := GuidSize + 1;
+  Result := SizeOf(Variant);
  If Result > 0 Then
   Result := Result + SizeOf(Boolean);
 End;
@@ -1184,16 +1185,17 @@ Begin
  FRowsOriginal      := 0;
  FRowsChanged       := 0;
  FRowsAffected      := 0;
- FPacketRecords     := -1;
+ FPacketRecords     := 10;
  FMaxIndexesCount   := 2;
  FSaveLoadState     := slsNone;
  FOneValueInArray   := True;
  FDataSetClosed     := False;
  FRefreshing        := False;
- FAllPacketsFetched := False;
  FTrimEmptyString   := True;
  FStorageDataType   := Nil;
  FIndexes           := TRESTDWDatasetIndexDefs.Create(Self);
+ FAllPacketsFetched := False;
+ FFetch             := False;
 End;
 
 destructor TRESTDWMemTable.Destroy;
@@ -1249,7 +1251,7 @@ Begin
                 If CaseInsensitive then
                  Result := AnsiCompareText(vData1, vData2)
                 Else
-                 Result := AnsiCompareStr(PDWString(@Data1)^, PDWString(@Data2)^);
+                 Result := AnsiCompareStr(PDWString(@vData1)^, PDWString(@vData2)^);
                End;
     ftSmallint:
       If Smallint(Data1^) > Smallint(Data2^) then
@@ -1948,10 +1950,9 @@ Begin
       {$IFEND}
     {$ENDIF}
      Case Field.datatype Of
-      ftGuid      : Result := Result and (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
-
-                                            {$ELSE}PChar(Data){$IFEND}
-                                            {$ELSE}PAnsiChar(Data){$ENDIF}) > 0);
+      ftGuid,//      : Result := Result and (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
+             //                               {$ELSE}PChar(Data){$IFEND}
+             //                                {$ELSE}PAnsiChar(Data){$ENDIF}) > 0);
       ftString,
       ftFixedChar
       {$IF DEFINED(FPC) OR DEFINED(DELPHI10_0UP)}
@@ -2149,7 +2150,10 @@ Begin
             Begin
              If Length(TRESTDWBytes(Buffer)) = 0 Then
               SetLength(TRESTDWBytes(Buffer), cLen);
-             Move(PRESTDWBytes(@Data)^[0], Pointer(Buffer)^, cLen);
+             If Field.datatype = ftGuid Then
+              Move(PRESTDWBytes(@Data)^[0], Pointer(Buffer)^, cLen -1)
+             Else
+              Move(PRESTDWBytes(@Data)^[0], Pointer(Buffer)^, cLen);
             End;
            {$ELSE}
             Result := ((Not(aNullData)) and Not(VarIsNull(Data^)));
@@ -2194,7 +2198,10 @@ Begin
              Begin
               If Length(TRESTDWBytes(Buffer)) = 0 Then
                SetLength(TRESTDWBytes(Buffer), cLen);
-              Move(aDataBytes[0], Pointer(Buffer)^, cLen);
+              If Field.datatype = ftGuid Then
+               Move(aDataBytes[0], Pointer(Buffer)^, cLen -1)
+              Else
+               Move(aDataBytes[0], Pointer(Buffer)^, cLen);
              End;
            {$IFEND}
           {$ELSE}
@@ -2248,7 +2255,10 @@ Begin
             Begin
              If Length(TRESTDWBytes(Buffer)) = 0 Then
               SetLength(TRESTDWBytes(Buffer), cLen);
-             Move(aDataBytes[0], Pointer(Buffer)^, cLen);
+             If Field.datatype = ftGuid Then
+              Move(aDataBytes[0], Pointer(Buffer)^, cLen -1)
+             Else
+              Move(aDataBytes[0], Pointer(Buffer)^, cLen);
             End;
           {$ENDIF}
          SetLength(aDataBytes, 0);
@@ -2988,7 +2998,7 @@ End;
 
 function TRESTDWMemTable.Fetch: boolean;
 Begin
- Result := False;
+ Result := FFetch;
 End;
 
 Function DBCompareText(subValue, aValue: pointer; size: integer; options: TLocateOptions): LargeInt;
@@ -3525,6 +3535,7 @@ Var
  CreateBlobField : Boolean;
  BufBlob         : PRESTDWBlobField;
 Begin
+ vFieldSize := 0;
  If Not Fetch Then
   Begin
    Result := grEOF;
@@ -4405,7 +4416,7 @@ End;
 
 Function TRESTDWDatasetIndexDefs.GetBufferIndex(AIndex : Integer) : TRESTDWIndex;
 Begin
- Result := RESTDWIndexdefs[AIndex].BufferIndex;
+ Result := Indexdefs[AIndex].BufferIndex;
 End;
 
 Constructor TRESTDWDatasetIndexDefs.Create(aDataset : TDataset);
@@ -4419,7 +4430,7 @@ Var
 Begin
  I := IndexOf(IndexName);
  If I <> -1 Then
-  Result := RESTDWIndexdefs[I]
+  Result := Indexdefs[I]
  Else
   Result := Nil;
 End;
@@ -4533,12 +4544,12 @@ End;
 
 Function TRESTDWMemTable.GetBufIndex   (Aindex : Integer) : TRESTDWIndex;
 Begin
- Result := FIndexes.RESTDWIndexes[AIndex]
+ Result := FIndexes.Indexes[AIndex]
 End;
 
 Function TRESTDWMemTable.GetBufIndexDef(Aindex : Integer) : TRESTDWDatasetIndex;
 Begin
- Result := FIndexes.RESTDWIndexdefs[AIndex];
+ Result := FIndexes.Indexdefs[AIndex];
 End;
 
 Procedure TRESTDWMemTable.BuildCustomIndex;
@@ -4576,6 +4587,8 @@ Begin
   F.DescFields:=DescFields;
   FCurrentIndexDef:=F;
   F.SetIndexProperties;
+  FAllPacketsFetched := False;
+  FFetch             := True;
   If Active Then
    Begin
     FetchAll;
@@ -4583,6 +4596,7 @@ Begin
     Resync([rmCenter]);
    End;
   FPacketRecords := -1;
+  FFetch         := False;
 end;
 
 Procedure TRESTDWMemTable.SetIndexFieldNames(const AValue: String);
@@ -4620,16 +4634,17 @@ begin
     DatabaseErrorFmt(SIndexNotFound,[AValue],Self);
   FIndexName:=AValue;
   if Assigned(F) then
-    begin
+   Begin
+    SortOnFields(F.Fields, ixCaseInsensitive in F.Options, ixDescending in F.Options);
     B:=F.BufferIndex as TDoubleLinkedBufIndex;
     if GetCurrentIndexBuf <> Nil then
       B.FCurrentRecBuf:=(GetCurrentIndexBuf as TDoubleLinkedBufIndex).FCurrentRecBuf;
     FCurrentIndexDef:=F;
     if Active then
       Resync([rmCenter]);
-    end
-  else
-    FCurrentIndexDef:=Nil;
+   End
+  Else
+   FCurrentIndexDef:=Nil;
 end;
 
 Function  TRESTDWMemTable.GetCurrentIndexBuf : TRESTDWIndex;
@@ -4638,6 +4653,30 @@ Begin
   Result := FCurrentIndexDef.BufferIndex
  Else
   Result := Nil;
+End;
+
+Procedure TRESTDWMemTable.SetIndexDefs(Value : TIndexDefs);
+Var
+ I : Integer;
+ vIndexDef : TIndexDef;
+Begin
+ FIndexes.Clear;
+ For I := 0 To Value.Count -1 Do
+  Begin
+   If FIndexes.IndexOf(Value[I].Name) = -1 Then
+    Begin
+     vIndexDef                 := FIndexes.AddIndexDef;
+     vIndexDef.Name            := Value[I].Name;
+     vIndexDef.Fields          := Value[I].Fields;
+     vIndexDef.DescFields      := Value[I].DescFields;
+     vIndexDef.Expression      := Value[I].Expression;
+     vIndexDef.Options         := Value[I].Options;
+     vIndexDef.Source          := Value[I].Source;
+     {$IFNDEF FPC}
+      vIndexDef.GroupingLevel  := Value[I].GroupingLevel;
+     {$ENDIF}
+    End;
+  End;
 End;
 
 Function TRESTDWMemTable.GetIndexDefs : TIndexDefs;
@@ -4895,6 +4934,7 @@ Begin
  BindFields(True);
  InitBufferPointers(True);
  InternalFirst;
+ FAllPacketsFetched := False;
 End;
 
 Procedure TRESTDWMemTable.DoAfterOpen;
@@ -5797,20 +5837,23 @@ var
   Pos: Integer;
   F: TField;
 Begin
-  If FIndexList = nil then
-    FIndexList := TList.Create
-  Else
-    FIndexList.Clear;
-  Pos := 1;
-  while Pos <= Length(FieldNames) do
+ If FIndexList = Nil Then
+  FIndexList := TList.Create;
+//  Else
+//    FIndexList.Clear;
+ Pos := 1;
+ While Pos <= Length(FieldNames) Do
   Begin
     F := FieldByName(ExtractFieldNameEx(FieldNames, Pos));
-    If { (F.FieldKind = fkData) and } (F.datatype in ftSupported - ftBlobTypes) then
-      FIndexList.Add(F)
-    Else
-      ErrorFmt('Type mismatch for field %s, expecting: %s actual %s',
-        [F.DisplayName, GetSetFieldNames(ftSupported - ftBlobTypes),
-        FieldTypeNames[F.datatype]]);
+    If FIndexList.IndexOf(F) = -1 Then
+     Begin
+      If (F.FieldKind = fkData) And (F.datatype in ftSupported - ftBlobTypes) then
+       FIndexList.Add(F)
+      Else
+       ErrorFmt('Type mismatch for field %s, expecting: %s actual %s',
+                [F.DisplayName, GetSetFieldNames(ftSupported - ftBlobTypes),
+                 FieldTypeNames[F.datatype]]);
+     End;
   End;
 End;
 
@@ -6838,6 +6881,11 @@ Begin
     Inc(i);
   End
 End;
+
+//Function TRESTDWMemTable.Loaded;
+//Begin
+// Inherited Loaded;
+//End;
 
 Function TRESTDWMemTableEx.LoadFromDataSet(Source: TDataSet;
   {$IFDEF FPC}aRecordCount: Integer; {$ELSE}RecordCount: Integer; {$ENDIF}Mode: TLoadMode): Integer;

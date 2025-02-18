@@ -578,7 +578,7 @@ begin
               vParam.Clear;
           end
           else If vParam.DataType in [ftDate, ftTime, ftDateTime, ftTimeStamp] then begin
-            if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then begin
+            if (Trim(DWParams[I].AsString) <> '') and (not DWParams[I].IsNull) then begin
               if vParam.DataType = ftDate then
                 vParam.Value := DWParams[I].AsDate
               else If vParam.DataType = ftTime then
@@ -617,7 +617,7 @@ begin
                   if vParam.RESTDWDataTypeParam in [dwftMemo, dwftFmtMemo] then
                    vParam.Value := DecodeStrings(DWParams[I].AsString)
                   else
-                   vParam.Value := utf8tostring(DWParams[I].AsString);
+                   vParam.Value := DWParams[I].AsString;
                  {$ELSE}
                   if vParam.RESTDWDataTypeParam in [dwftMemo, dwftFmtMemo] then
                    vParam.Value := DecodeStrings(DWParams[I].AsString)
@@ -628,7 +628,7 @@ begin
                  if vParam.RESTDWDataTypeParam in [dwftMemo] then
                   vParam.Value := DecodeStrings(DWParams[I].AsString, csUndefined)
                  else
-                  vParam.Value := utf8tostring(DWParams[I].AsString);
+                  vParam.Value := DWParams[I].AsString;
                 {$ENDIF}
               End
               Else

@@ -94,22 +94,22 @@ Type
   vOwnerCollection     : TCollection;
   Procedure SetContextScript(Value : TStrings);
  Public
-  Function    GetDisplayName                  : String;       {$IFNDEF FPC}Override;{$ENDIF}
-  Procedure   SetDisplayName    (Const Value  : String);      {$IFNDEF FPC}Override;{$ENDIF}
-  Function    GetNamePath      : String;                      {$IFNDEF FPC}Override;{$ENDIF}
-  Procedure   Assign            (Source       : TPersistent);       Override;
-  Constructor Create            (aCollection  : TCollection);       Override;
+  Function    GetDisplayName                  : String;       Override;
+  Procedure   SetDisplayName    (Const Value  : String);      Override;
+  Function    GetNamePath      : String;                      Override;
+  Procedure   Assign            (Source       : TPersistent); Override;
+  Constructor Create            (aCollection  : TCollection); Override;
   Destructor  Destroy;           Override;
   Function    BuildClass       : String;
  Published
-  Property    ContextTag                  : String               Read vContextTag          Write vContextTag;
-  Property    TypeItem                    : String               Read vType                Write vType;
-  Property    ClassItem                   : String               Read vClass               Write vClass;
-  Property    TagID                       : String               Read vTagID               Write vTagID;
-  Property    TagReplace                  : String               Read vTagReplace          Write vTagReplace;
-  Property    css                         : String               Read vCss                 Write vCss;
-  Property    ContextScript               : TStrings             Read vContextScript       Write SetContextScript;
-  Property    ObjectName                  : String               Read FName                Write FName;
+  Property    ContextTag                  : String                   Read vContextTag          Write vContextTag;
+  Property    TypeItem                    : String                   Read vType                Write vType;
+  Property    ClassItem                   : String                   Read vClass               Write vClass;
+  Property    TagID                       : String                   Read vTagID               Write vTagID;
+  Property    TagReplace                  : String                   Read vTagReplace          Write vTagReplace;
+  Property    css                         : String                   Read vCss                 Write vCss;
+  Property    ContextScript               : TStrings                 Read vContextScript       Write SetContextScript;
+  Property    ObjectName                  : String                   Read FName                Write FName;
   Property    OnRequestExecute            : TRESTDWMarkRequest       Read vDWMarkRequest       Write vDWMarkRequest;
   Property    OnBeforeRendererContextItem : TRESTDWGetContextItemTag Read vDWGetContextItemTag Write vDWGetContextItemTag;
 End;
@@ -180,6 +180,9 @@ End;
 Type
  TRESTDWContext = Class;
  PDWContext = ^TRESTDWContext;
+
+ { TRESTDWContext }
+
  TRESTDWContext = Class(TCollectionItem)
  Protected
  Private
@@ -208,6 +211,8 @@ Type
   Function  GetBeforeRenderer            : TRESTDWBeforeRenderer;
   Procedure SetBeforeRenderer (Value     : TRESTDWBeforeRenderer);
   Procedure SetBaseURL(Value : String);
+  Procedure SetContextName(Value : String);
+  Property    Name                       : String                     Read GetDisplayName         Write SetDisplayName;
  Public
   Function    GetDisplayName             : String;  Override;
   Procedure   SetDisplayName(Const Value : String); Override;
@@ -219,9 +224,8 @@ Type
  Published
   Property    Params                     : TRESTDWParamsMethods       Read vDWParams              Write vDWParams;
   Property    ContentType                : String                     Read vContentType           Write vContentType;
-  Property    Name                       : String                     Read GetDisplayName         Write SetDisplayName;
   Property    BaseURL                    : String                     Read vBaseURL               Write SetBaseURL;
-  Property    ContextName                : String                     Read vContextName           Write vContextName;
+  Property    ContextName                : String                     Read vContextName           Write SetContextName;
   Property    DefaultHtml                : TStrings                   Read vDefaultHtml           Write SetDefaultPage;
   Property    Description                : TStrings                   Read vDescription           Write SetDescription;
   Property    Routes                     : TRESTDWRoutes              Read vDWRoutes              Write vDWRoutes;
@@ -301,7 +305,7 @@ implementation
 
 { TRESTDWContext }
 
-Function TRESTDWContext.GetNamePath: String;
+function TRESTDWContext.GetNamePath: String;
 Begin
  Result := vOwnerCollection.GetNamePath + FName;
 End;
@@ -314,7 +318,7 @@ begin
  DWReplyRequestData      := TRESTDWReplyRequestData.Create(Nil);
  vOwnerCollection        := aCollection;
  FName                   := 'dwcontext' + IntToStr(aCollection.Count);
- vContextName            := '';
+ vContextName            := FName;
  vBaseURL                := '/';
  DWReplyRequestData.Name := FName;
  vDWRoutes               := TRESTDWRoutes.Create;
@@ -335,17 +339,17 @@ begin
   inherited;
 end;
 
-Function TRESTDWContext.GetBeforeRenderer: TRESTDWBeforeRenderer;
+function TRESTDWContext.GetBeforeRenderer: TRESTDWBeforeRenderer;
 Begin
  Result := vDWBeforeRenderer;
 End;
 
-Function TRESTDWContext.GetDisplayName: String;
+function TRESTDWContext.GetDisplayName: String;
 Begin
- Result := DWReplyRequestData.Name;
+ Result := FName;
 End;
 
-Procedure TRESTDWContext.CompareParams(Var Dest : TRESTDWParams);
+procedure TRESTDWContext.CompareParams(var Dest: TRESTDWParams);
 Var
  I : Integer;
 Begin
@@ -364,7 +368,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWContext.Assign(Source: TPersistent);
+procedure TRESTDWContext.Assign(Source: TPersistent);
 begin
  If Source is TRESTDWContext then
   Begin
@@ -376,17 +380,17 @@ begin
   Inherited;
 End;
 
-Function TRESTDWContext.GetReplyRequestStream: TRESTDWReplyRequestStream;
+function TRESTDWContext.GetReplyRequestStream: TRESTDWReplyRequestStream;
 Begin
  Result := DWReplyRequestData.OnReplyRequestStream;
 End;
 
-Function TRESTDWContext.GetReplyRequest: TRESTDWReplyRequest;
+function TRESTDWContext.GetReplyRequest: TRESTDWReplyRequest;
 Begin
  Result := DWReplyRequestData.OnReplyRequest;
 End;
 
-Procedure TRESTDWContext.SetBaseURL(Value : String);
+procedure TRESTDWContext.SetBaseURL(Value: String);
 Var
  vTempValue : String;
 Begin
@@ -403,12 +407,18 @@ Begin
   End;
 End;
 
-Procedure TRESTDWContext.SetBeforeRenderer(Value: TRESTDWBeforeRenderer);
+Procedure TRESTDWContext.SetContextName(Value: String);
+Begin
+ FName        := Trim(Value);
+ vContextName := FName;
+End;
+
+procedure TRESTDWContext.SetBeforeRenderer(Value: TRESTDWBeforeRenderer);
 Begin
  vDWBeforeRenderer := Value;
 End;
 
-Procedure TRESTDWContext.SetDescription(Strings   : TStrings);
+procedure TRESTDWContext.SetDescription(Strings: TStrings);
 begin
  vDescription.Assign(Strings);
 end;
@@ -418,7 +428,7 @@ begin
  vDefaultHtml.Assign(Strings);
 end;
 
-Procedure TRESTDWContext.SetDisplayName(Const Value: String);
+procedure TRESTDWContext.SetDisplayName(const Value: String);
 Begin
  If Trim(Value) = '' Then
   Raise Exception.Create(cInvalidContextName)
@@ -432,7 +442,8 @@ Begin
   End;
 End;
 
-Procedure TRESTDWContext.SetReplyRequestStream(Value : TRESTDWReplyRequestStream);
+procedure TRESTDWContext.SetReplyRequestStream(Value: TRESTDWReplyRequestStream
+  );
 begin
  DWReplyRequestData.OnReplyRequestStream := Value;
 end;

@@ -22,10 +22,8 @@ unit uRESTDWParams;
  Roniery                    - Devel.
 }
 
-{$IFNDEF RESTDWLAZARUS}
- {$IFDEF FPC}
-  {$MODE OBJFPC}{$H+}
- {$ENDIF}
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
 
@@ -261,20 +259,22 @@ Type
   vTypeObject      : TTypeObject;
   vObjectDirection : TObjectDirection;
   vObjectValue     : TObjectValue;
+  FName,
   vAlias,
   vDefaultValue,
   vParamName       : String;
   vEncoded         : Boolean;
+  Property Name            : String           Read GetDisplayName   Write SetDisplayName;
  Public
-  Function    GetDisplayName             : String;       {$IFNDEF FPC}Override;{$ENDIF}
-  Procedure   SetDisplayName(Const Value : String);      {$IFNDEF FPC}Override;{$ENDIF}
-  Constructor Create        (aCollection : TCollection); {$IFNDEF FPC}Override;{$ENDIF}
+  Function    GetDisplayName             : String;       Override;
+  Procedure   SetDisplayName(Const Value : String);      Override;
+  Constructor Create        (aCollection : TCollection); Override;
  Published
   Property TypeObject      : TTypeObject      Read vTypeObject      Write vTypeObject;
   Property ObjectDirection : TObjectDirection Read vObjectDirection Write vObjectDirection;
   Property ObjectValue     : TObjectValue     Read vObjectValue     Write vObjectValue;
   Property Alias           : String           Read vAlias           Write vAlias;
-  Property ParamName       : String           Read GetDisplayName   Write SetDisplayName;
+  Property ParamName       : String           Read FName            Write FName;
   Property Encoded         : Boolean          Read vEncoded         Write vEncoded;
   Property DefaultValue    : String           Read vDefaultValue    Write vDefaultValue;
 End;
@@ -681,7 +681,8 @@ Begin
  vTypeObject      := toParam;
  vObjectDirection := odINOUT;
  vObjectValue     := ovString;
- vParamName       :=  'dwparam' + IntToStr(aCollection.Count);
+ vParamName       := 'dwparam' + IntToStr(aCollection.Count);
+ FName            := vParamName;
  vEncoded         := True;
  vDefaultValue    := '';
  vAlias           := '';
@@ -689,7 +690,7 @@ End;
 
 function TRESTDWParamMethod.GetDisplayName: String;
 begin
- Result := vParamName;
+ Result := FName;
 end;
 
 procedure TRESTDWParamMethod.SetDisplayName(const Value: String);
@@ -699,6 +700,7 @@ begin
  Else
   Begin
    vParamName := Trim(Value);
+   FName      := vParamName;
    Inherited SetDisplayName(Value);
   End;
 end;
@@ -1687,7 +1689,7 @@ Begin
   Result := vNewFieldList
  Else
   Begin
-   {$IFDEF RESTDWLAZARUS}
+   {$IFDEF FPC}
     Result := @aNewFieldList;
    {$ELSE}
     {$IFNDEF FPC}

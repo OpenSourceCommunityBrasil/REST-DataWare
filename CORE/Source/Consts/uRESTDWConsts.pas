@@ -22,10 +22,8 @@ Unit uRESTDWConsts;
  Roniery                    - Devel.
 }
 
-{$IFNDEF RESTDWLAZARUS}
- {$IFDEF FPC}
-  {$MODE OBJFPC}{$H+}
- {$ENDIF}
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
 Interface
@@ -62,7 +60,7 @@ Const
 
  // controle de versão
  RESTDWVersionINFO               = 'v2.1.0-';
- RESTDWRelease                   = '3920';
+ RESTDWRelease                   = '3933';
  RESTDWCodeProject               = 'Galaga - Github';
  RESTDWVersao                    = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWDialogoTitulo             = 'REST DataWare Components ' + RESTDWVersao;
