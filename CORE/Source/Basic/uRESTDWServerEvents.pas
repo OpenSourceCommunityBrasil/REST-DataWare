@@ -92,6 +92,7 @@ Type
   Procedure SetBaseUrl    (Value : String);
   Procedure SetContentType(Value : String);
   Procedure SetDataMode   (Value : TDataMode);
+  Property  Name                         : String         Read GetDisplayName        Write SetDisplayName;
  Public
   Function    GetDisplayName             : String;       Override;
   Procedure   SetDisplayName(Const Value : String);      Override;
@@ -104,8 +105,7 @@ Type
   Property    Routes               : TRESTDWRoutes        Read vDWRoutes             Write vDWRoutes;
   Property    Params               : TRESTDWParamsMethods Read vDWParams             Write vDWParams;
   Property    DataMode             : TDataMode            Read vDataMode             Write SetDataMode;
-  Property    Name                 : String               Read GetDisplayName        Write SetDisplayName;
-  Property    EventName            : String               Read vEventName            Write vEventName;
+  Property    EventName            : String               Read FName                 Write FName;
   Property    BaseURL              : String               Read vBaseURL              Write SetBaseURL;
   Property    DefaultContentType   : String               Read vContentType          Write SetContentType;
   Property    CallbackEvent        : Boolean              Read vCallbackEvent        Write vCallbackEvent;
@@ -171,7 +171,7 @@ Type
                              Var DWParams : TRESTDWParams);
  Published
   Property    IgnoreInvalidParams : Boolean      Read vIgnoreInvalidParams Write vIgnoreInvalidParams;
-  Property    Events              : TRESTDWEventList Read vEventList           Write vEventList;
+  Property    Events              : TRESTDWEventList Read vEventList       Write vEventList;
   Property    AccessTag           : String       Read vAccessTag           Write vAccessTag;
   Property    DefaultEvent        : String       Read vDefaultEvent        Write vDefaultEvent;
   Property    OnCreate            : TObjectEvent Read vOnCreate            Write vOnCreate;
@@ -268,7 +268,7 @@ End;
 
 Function TRESTDWEvent.GetDisplayName: String;
 Begin
- Result := DWReplyEventData.Name;
+ Result := FName;
 End;
 
 Procedure TRESTDWEvent.Assign(Source: TPersistent);
@@ -802,8 +802,8 @@ Begin
   If Assigned(vRESTClientPooler.OnBeforeExecute) Then
    vRESTClientPooler.OnBeforeExecute(Self);
  DWParams                        := TRESTDWParams.Create;
- DWParams.CriptOptions.Use       := CriptOptions.Use;
- DWParams.CriptOptions.Key       := CriptOptions.Key;
+// DWParams.CriptOptions.Use       := CriptOptions.Use;
+// DWParams.CriptOptions.Key       := CriptOptions.Key;
  JSONParam                       := TRESTDWJSONParam.Create(RESTClientPoolerExec.Encoding);
  JSONParam.ParamName             := 'dwservereventname';
  JSONParam.ObjectDirection       := odIn;

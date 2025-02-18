@@ -3,6 +3,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
   Height = 756
   Top = 195
   Width = 1079
+  BorderIcons = [biMinimize]
   BorderWidth = 5
   Caption = 'RESTDWClientSQL Editor'
   ClientHeight = 756
@@ -16,7 +17,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.2.4.0'
+  LCLVersion = '3.8.0.0'
   object PnlSQL: TPanel
     Left = 5
     Height = 415
@@ -26,6 +27,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
     BevelOuter = bvNone
     ClientHeight = 415
     ClientWidth = 1069
+    ParentBackground = False
     TabOrder = 0
     object PnlButton: TPanel
       Left = 974
@@ -36,6 +38,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       BevelOuter = bvNone
       ClientHeight = 415
       ClientWidth = 95
+      ParentBackground = False
       TabOrder = 0
       object BtnExecute: TButton
         Left = 8
@@ -43,8 +46,8 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Top = 20
         Width = 80
         Caption = 'Execute'
-        OnClick = BtnExecuteClick
         TabOrder = 0
+        OnClick = BtnExecuteClick
       end
     end
     object pEditor: TPanel
@@ -56,6 +59,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       BevelOuter = bvNone
       ClientHeight = 415
       ClientWidth = 765
+      ParentBackground = False
       TabOrder = 1
       object PageControl: TPageControl
         Left = 0
@@ -77,10 +81,10 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
             Top = 0
             Width = 757
             Align = alClient
-            OnDragDrop = MemoDragDrop
-            OnDragOver = MemoDragOver
             ScrollBars = ssBoth
             TabOrder = 0
+            OnDragDrop = MemoDragDrop
+            OnDragOver = MemoDragOver
           end
         end
       end
@@ -93,6 +97,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         BevelOuter = bvLowered
         ClientHeight = 21
         ClientWidth = 765
+        ParentBackground = False
         TabOrder = 1
         object Label3: TLabel
           Left = 7
@@ -126,6 +131,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       BevelOuter = bvNone
       ClientHeight = 415
       ClientWidth = 209
+      ParentBackground = False
       TabOrder = 2
       object labSql: TLabel
         Left = 0
@@ -187,9 +193,9 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         BorderStyle = bsNone
         DragMode = dmAutomatic
         ItemHeight = 0
+        TabOrder = 0
         OnClick = lbTablesClick
         OnKeyUp = lbTablesKeyUp
-        TabOrder = 0
       end
       object lbFields: TListBox
         Left = 0
@@ -212,20 +218,21 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         BevelOuter = bvNone
         ClientHeight = 56
         ClientWidth = 209
+        ParentBackground = False
         TabOrder = 2
         object rbInsert: TRadioButton
           Left = 88
-          Height = 19
+          Height = 17
           Top = 8
-          Width = 49
+          Width = 47
           Caption = 'Insert'
           TabOrder = 0
         end
         object rbSelect: TRadioButton
           Left = 8
-          Height = 19
+          Height = 17
           Top = 8
-          Width = 49
+          Width = 47
           Caption = 'Select'
           Checked = True
           TabOrder = 1
@@ -233,17 +240,17 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         end
         object rbDelete: TRadioButton
           Left = 88
-          Height = 19
+          Height = 17
           Top = 32
-          Width = 51
+          Width = 49
           Caption = 'Delete'
           TabOrder = 2
         end
         object rbUpdate: TRadioButton
           Left = 8
-          Height = 19
+          Height = 17
           Top = 32
-          Width = 55
+          Width = 53
           Caption = 'Update'
           TabOrder = 3
         end
@@ -259,6 +266,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
     BevelOuter = bvNone
     ClientHeight = 41
     ClientWidth = 1069
+    ParentBackground = False
     TabOrder = 1
     object BtnOk: TButton
       Left = 905
@@ -268,8 +276,8 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Anchors = [akTop, akRight]
       Caption = 'Ok'
       Default = True
-      OnClick = BtnOkClick
       TabOrder = 0
+      OnClick = BtnOkClick
     end
     object BtnCancelar: TButton
       Left = 986
@@ -279,8 +287,8 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Anchors = [akTop, akRight]
       Cancel = True
       Caption = 'Cancel'
-      OnClick = BtnCancelarClick
       TabOrder = 1
+      OnClick = BtnCancelarClick
     end
   end
   object PageControlResult: TPageControl

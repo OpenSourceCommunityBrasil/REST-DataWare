@@ -23,10 +23,8 @@ unit uRESTDWBasicDB;
  Roniery                    - Devel.
 }
 
-{$IFNDEF RESTDWLAZARUS}
- {$IFDEF FPC}
-  {$MODE OBJFPC}{$H+}
- {$ENDIF}
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
 interface

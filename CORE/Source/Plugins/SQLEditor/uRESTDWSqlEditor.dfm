@@ -1,6 +1,7 @@
 object FrmDWSqlEditor: TFrmDWSqlEditor
   Left = 479
   Top = 236
+  BorderIcons = [biMaximize]
   BorderWidth = 5
   Caption = 'RESTDWClientSQL Editor'
   ClientHeight = 707
