@@ -60,8 +60,8 @@ Const
 
  // controle de versão
  RESTDWVersionINFO               = 'v2.1.0-';
- RESTDWRelease                   = '3933';
- RESTDWCodeProject               = 'Galaga - Github';
+ RESTDWRelease                   = '3857';
+ RESTDWCodeProject               = 'Galaga - SourceForge';
  RESTDWVersao                    = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWDialogoTitulo             = 'REST DataWare Components ' + RESTDWVersao;
  RESTDWSobreTitulo               = 'REST DataWare '+ RESTDWVersao;
@@ -206,6 +206,7 @@ Const
  TDecimalChar                    = 'D';
  TFormdataParamName              = 'content-disposition: form-data; name';
  TJsonDatasetHeader              = '{"Field":"%s", "Type":"%s", "Primary":"%s", "Required":"%s", "Size":%d, "Precision":%d, "ReadOnly":"%s", "Autogeneration":"%s"}';
+ TJsonNumValue                   = '"%d"';
  TJsonStringValue                = '"%s"';
  TJsonValueFormat                = '%s';
  TMassiveFormatJSON              = '{"%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":"%s", "%s":[%s], ' +

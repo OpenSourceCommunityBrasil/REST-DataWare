@@ -46,7 +46,6 @@ uses
   FFieldTypes,
   FFieldAttrs     : Array of Byte;
   FFieldExists    : Array of Boolean;
- Public
   Procedure SaveRecordToStream       (ADataset    : TDataset;
                                       Var AStream : TStream);
   Procedure LoadRecordFromStream     (ADataset    : TDataset;
@@ -168,12 +167,17 @@ Begin
    // field precision
    AStream.Read(vInt, SizeOf(vInt));
    FFieldPrecision[I] := vInt;
-   If (FFieldTypes[I]  In [dwftFloat, dwftCurrency, dwftExtended, dwftSingle]) Then
+   If (FFieldTypes[I]  In [dwftFloat, dwftCurrency, dwftExtended]) Then
     vFieldDef.Precision := FFieldPrecision[I]
    Else If (vFieldType In [dwftBCD, dwftFMTBcd]) Then
     Begin
+     {$IFDEF FPC}
+     vFieldDef.Size := 0;
+     vFieldDef.Precision := FFieldPrecision[I];
+     {$ELSE}
      vFieldDef.Size := 0;
      vFieldDef.Precision := 0;
+     {$ENDIF}
     End;
    // field required + provider flag
    AStream.Read(vByte, SizeOf(Byte));
@@ -255,9 +259,22 @@ Procedure TRESTDWStorageBin.LoadDWMemFromStream(IDataset : IRESTDWMemTable;
         dwftSingle    : VFDef.Precision := FFieldPrecision[Index];
         dwftBCD,
         dwftFMTBcd    : Begin
+                        {$IFNDEF FPC}
                          VFDef.Size := 0;
                          VFDef.Precision := 0;
+                        {$ELSE}
+                         VFDef.Precision := FFieldPrecision[Index];
+                        {$ENDIF}
                         End;
+{
+        dwftWideString : Begin
+                          If VFDef.Size > 7100 Then
+                           Begin
+                            VFDef.Size := 7100;
+                            FFieldSize[Index] := VFDef.Size;
+                           End;
+                         End;
+}
       End;
      End;
    End;
@@ -317,11 +334,24 @@ Begin
    // field precision
    AStream.Read(vFieldPrecision, SizeOf(vFieldPrecision));
    {$IFDEF FPC}
-    If vFieldType = dwftSingle Then
-     If vFieldPrecision < 8 Then
-      FFieldPrecision[I] := 8;
+    If vFieldType in [dwftSingle, dwftFloat, dwftFMTBcd, dwftBCD] Then
+     If vFieldType in [dwftFloat, dwftFMTBcd, dwftBCD] Then
+      Begin
+       If (vFieldPrecision    < 12) Or
+          (FFieldPrecision[I] =  0) Then
+        FFieldPrecision[I] := 12;
+      End
+     Else
+      Begin
+       If (vFieldPrecision    < 8) Or
+          (FFieldPrecision[I] = 0) Then
+        FFieldPrecision[I] := 8;
+      End;
    {$ELSE}
     FFieldPrecision[I] := vFieldPrecision;
+    If vFieldType in [dwftSingle] Then
+     If vFieldPrecision < 12 Then
+      FFieldPrecision[I] := 12;
    {$ENDIF}
    // required + provider flags
    AStream.Read(vFieldProviderFlags, SizeOf(Byte));
@@ -625,16 +655,16 @@ Begin
                                    End;
            // 4 - Bytes - Flutuantes
            dwftSingle             :Begin          // Gledston
-                                     vLength := SizeOf(vSingle);
-                                     stream.Read(vSingle, vLength);
+                                     vLength := SizeOf(vDouble);
+                                     stream.Read(vDouble, vLength);
                                      If aField <> Nil Then
                                       Begin
                                        //Move(vSingle,PData^,Sizeof(vSingle));
-                                       SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(vSingle));
+                                       SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(vDouble));
                                        //Move Null para Bytes
                                        Move(vBoolean, vVarBytes[0], Sizeof(Boolean));
                                        //Move Bytes do Dado para Bytes
-                                       Move(vSingle, vVarBytes[1], Sizeof(vSingle));
+                                       Move(vDouble, vVarBytes[1], Sizeof(vDouble));
                                        //Move Bytes para Buffer
                                        Move(vVarBytes[0], PData^, Length(vVarBytes));
                                       End;
@@ -694,18 +724,6 @@ Begin
                                      stream.Read(vDouble, SizeOf(vDouble));
                                      If aField <> Nil Then
                                       Begin
-//                                       Case vDataType Of
-//                                        ftDate : vDateTimeRec.Date := DateTimeToTimeStamp(vDouble).Date;
-//                                        ftTime : vDateTimeRec.Time := DateTimeToTimeStamp(vDouble).Time;
-//                                        Else vDateTimeRec.DateTime := TimeStampToMSecs(DateTimeToTimeStamp(vDouble));
-//                                       End;
-//                                       SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(vDateTimeRec));
-//                                       //Move Null para Bytes
-//                                       Move(vBoolean, vVarBytes[0], Sizeof(Boolean));
-//                                       //Move Bytes do Dado para Bytes
-//                                       Move(vDateTimeRec, vVarBytes[1], SizeOf(vDateTimeRec));
-//                                       //Move Bytes para Buffer
-//                                       Move(vVarBytes[0], PData^, Length(vVarBytes));
                                        SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(vDouble));
                                        //Move Null para Bytes
                                        Move(vBoolean, vVarBytes[0], Sizeof(Boolean));
@@ -780,7 +798,7 @@ Begin
                                      If aField <> Nil Then
                                       Begin
                                        {$IFDEF FPC}
-                                        SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(vInt));
+                                        SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(vCurrency));
                                         //Move Null para Bytes
                                         Move(vBoolean, vVarBytes[0], Sizeof(Boolean));
                                         //Move Bytes do Dado para Bytes
@@ -1155,6 +1173,7 @@ Begin
    Case vByte Of
     dwftFixedWideChar,
     dwftWideString : vByte := FieldTypeToDWFieldType(ftString);
+    dwftSingle     : vByte := FieldTypeToDWFieldType(ftFloat);
    End;
    AStream.Write(vByte, SizeOf(vByte));
    // field size
@@ -1255,7 +1274,12 @@ Begin
    AStream.Write(vString[InitStrPos], vByte);
    // datatype
    vByte := FieldTypeToDWFieldType(ADataset.Fields[i].DataType);
-   AStream.Write(vByte, SizeOf(vByte));
+   Case vByte Of
+    dwftFixedWideChar,
+    dwftWideString : vByte := FieldTypeToDWFieldType(ftString);
+    dwftSingle     : vByte := FieldTypeToDWFieldType(ftFloat);
+   End;
+ AStream.Write(vByte, SizeOf(vByte));
    // fieldsize
    vInt := ADataset.Fields[i].Size;
    AStream.Write(vInt, SizeOf(vInt));
@@ -1434,8 +1458,8 @@ Begin
                              End;
         // 4 - Bytes - Flutuantes
         dwftSingle         : Begin
-                              Move(PData^, vSingle, Sizeof(vSingle));
-                              Stream.Write(vSingle, Sizeof(vSingle));
+                              Move(PData^, vDouble, Sizeof(vDouble));
+                              Stream.Write(vDouble, Sizeof(vDouble));
                              End;
         // 8 - Bytes - Inteiros
         dwftLargeint,
@@ -1651,11 +1675,7 @@ Begin
                          End;
     // 4 - Bytes - Flutuantes
    dwftSingle          : Begin
-                          {$IFDEF DELPHIXEUP}
-                           vSingle := ADataset.Fields[i].AsSingle;
-                          {$ELSE}
-                           vSingle := ADataset.Fields[i].AsFloat;
-                          {$ENDIF}
+                          vSingle := ADataset.Fields[i].Value;
                           AStream.Write(vSingle, SizeOf(vSingle));
                          End;
    // 8 - Bytes - Inteiros

@@ -66,24 +66,26 @@ Type
 
 Type
  TRESTDWJSONValue = Class
+ Protected
+  aValue            : TRESTDWBytes;
  Private
-  vFieldExist      : TFieldExist;
+  vFieldExist       : TFieldExist;
   vCreateDataset,
-  vNewFieldList    : TProcedureEvent;
-  vNewDataField    : TNewDataField;
-  vSetInitDataset  : TSetInitDataset;
-  vDataType        : Boolean; // Tiago Istuque - Por Nemi Vieira - 29/01/2019
-  vFieldDefinition : TFieldDefinition;
-  vSetRecordCount  : TSetRecordCount;
-  vSetnotrepage    : TSetnotrepage;
-  vFieldListCount  : TFieldListCount;
+  vNewFieldList     : TProcedureEvent;
+  vNewDataField     : TNewDataField;
+  vSetInitDataset   : TSetInitDataset;
+  vDataType         : Boolean; // Tiago Istuque - Por Nemi Vieira - 29/01/2019
+  vFieldDefinition  : TFieldDefinition;
+  vSetRecordCount   : TSetRecordCount;
+  vSetnotrepage     : TSetnotrepage;
+  vFieldListCount   : TFieldListCount;
   vGetInDesignEvents : TGetInDesignEvents;
   vSetInactive,
   vSetInBlockEvents,
   vSetInDesignEvents : TSetInitDataset;
   vPrepareDetailsNew : TProcedureEvent;
   vPrepareDetails    : TPrepareDetails;
-  vDataMode        : TDataMode;
+  vDataMode          : TDataMode;
   vInBlockEvents,
   vInactive,
   vNullValue,
@@ -95,7 +97,6 @@ Type
   vTypeObject      : TTypeObject;
   vObjectDirection : TObjectDirection;
   vObjectValue     : TObjectValue;
-  aValue           : TRESTDWBytes;
   vEncoding        : TEncodeSelect;
   vFieldsList      : TFieldsList;
   {$IFDEF FPC}
@@ -892,8 +893,12 @@ End;
 
 Destructor TRESTDWJSONValue.Destroy;
 Begin
- SetLength(aValue, 0);
- Clear;
+ If Assigned(Self) Then
+  Begin
+   SetLength(aValue, 0);
+   Finalize(aValue);
+   Clear;
+  End;
  Inherited;
 End;
 
@@ -1141,12 +1146,22 @@ Begin
   End;
  If vObjectValue In [ovDate, ovTime, ovDateTime, ovTimeStamp, ovOraTimeStamp, ovTimeStampOffset] Then
   Begin
-   If (Result <> '')                And
-      (Result <> '0')               And
-      (Lowercase(Result) <> 'null') Then
-    Result := StrToDateTime(Result)
+   If VarIsNull(Result) Then
+    Result := 0
    Else
-    Result := 0;
+    Begin
+     If (Result <> '0')               And
+        (Lowercase(Result) <> 'null') Then
+      Begin
+       Try
+        Result := StrToDateTime(Result);
+       Except
+        Result := 0;
+       End;
+      End
+     Else
+      Result := 0;
+    End;
   End;
  If vObjectValue In [ovLargeInt, ovLongWord, ovShortInt, ovSmallInt, ovInteger, ovWord,
                      ovBoolean, ovAutoInc, ovOraInterval] Then
@@ -1504,9 +1519,9 @@ Var
                  vTempValue  := bValue.Fields[i].AsString;
                End;
                If vUtf8SpecialChars Then
-                vTempValue := escape_chars(bValue.Fields[i].AsString)
+                vTempValue := escape_chars(vTempValue)
                Else
-                vTempValue := StringToJsonString(bValue.Fields[i].AsString);
+                vTempValue := StringToJsonString(vTempValue);
                vTempValue  := Format('%s"%s"', [vTempField, vTempValue]);
               {$ELSE}
                If vUtf8SpecialChars Then
@@ -1675,8 +1690,8 @@ Procedure TRESTDWJSONValue.LoadFromDataset(TableName        : String;
 Var
  vTagGeral,
  vVirtualValue : String;
- {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)}
- vSizeChar : Integer;
+ {$IF not Defined(RESTDWLAZARUS) AND Defined(DELPHIXEUP)}
+  vSizeChar : Integer;
  {$IFEND}
 Begin
  // Recebe o parametro "DataType" para fazer a tipagem na função que gera a linha "GenerateLine"
@@ -1705,9 +1720,10 @@ Begin
    aValue          := TRESTDWBytes(vEncodingLazarus.GetBytes(vTagGeral))
   Else
    aValue          := StringToBytes(vTagGeral);
- {$ELSEIF Defined(DELPHIXEUP)}
- aValue          := StringToBytes(vTagGeral);
  {$ELSE}
+  {$IF not Defined(DELPHIXEUP)}
+   aValue           := StringToBytes(vTagGeral);
+  {$ELSE}
    vSizeChar := 1;
    If vEncoding = esUtf8 Then
     Begin
@@ -1720,6 +1736,7 @@ Begin
      SetLength(aValue, Length(vTagGeral) * vSizeChar);
      move(AnsiString(vTagGeral)[InitStrPos], pByteArray(aValue)^, Length(vTagGeral) * vSizeChar);
     End;
+  {$IFEND}
  {$IFEND}
  vDataMode        := DataModeD;
  vNullValue       := Length(aValue) = 0;
@@ -1760,46 +1777,39 @@ Begin
    DatabaseCharSet := CharSet;
  {$ENDIF}
  vTagGeral        := DatasetValues(bValue, DateTimeFormat, DataModeD, DelimiterFormat, HeaderLowercase);
-
  // 13/10/2022 - Guilherme Discher
  Case CaseType Of
-  ctUpperCase:
-   vTagGeral := UpperCase(vTagGeral);
-  ctLowerCase:
-   vTagGeral := LowerCase(vTagGeral);
-  ctCamelCase:
-   Begin
-    vText     := vTagGeral;
-    vTagGeral := '';
-    I := InitStrPos;
-    While I <= Length(vText)-1 Do
-    Begin
-     If (vText[I] = '_') Or (vText[I] = '"') Or (vText[I -1] = '"') then
-     Begin
-      If vText[I] = '_' Then
-       Inc(I);
-
-      vTagGeral := vTagGeral + UpperCase(vText[I]);
-     End
-     Else If Trim(vText[I]) = '' Then
-     Begin
-       Inc(I);
-       vTagGeral := vTagGeral + ' ' + UpperCase(vText[I]);
-     End
-     Else
-     Begin
-      If I = 0 Then
-       vTagGeral := vTagGeral + UpperCase(vText[I])
-      Else
-       vTagGeral := vTagGeral + LowerCase(vText[I]);
-     End;
-     Inc(I);
-    End;
-   End;
-  Else
-    vTagGeral := vTagGeral;
+  ctUpperCase : vTagGeral := UpperCase(vTagGeral);
+  ctLowerCase : vTagGeral := LowerCase(vTagGeral);
+  ctCamelCase : Begin
+                 vText     := vTagGeral;
+                 vTagGeral := '';
+                 I := InitStrPos;
+                 While I <= Length(vText)-1 Do
+                  Begin
+                   If (vText[I] = '_') Or (vText[I] = '"') Or (vText[I -1] = '"') then
+                    Begin
+                     If vText[I] = '_' Then
+                      Inc(I);
+                     vTagGeral := vTagGeral + UpperCase(vText[I]);
+                    End
+                   Else If Trim(vText[I]) = '' Then
+                    Begin
+                     Inc(I);
+                     vTagGeral := vTagGeral + ' ' + UpperCase(vText[I]);
+                    End
+                   Else
+                    Begin
+                     If I = 0 Then
+                      vTagGeral := vTagGeral + UpperCase(vText[I])
+                     Else
+                      vTagGeral := vTagGeral + LowerCase(vText[I]);
+                    End;
+                   Inc(I);
+                  End;
+                End;
+    Else vTagGeral := vTagGeral;
  End;
-
  {$IF Defined(FPC)}
   If vEncodingLazarus = Nil Then
    SetEncoding(vEncoding);
@@ -1807,7 +1817,8 @@ Begin
    aValue          := TRESTDWBytes(vEncodingLazarus.GetBytes(vTagGeral))
   Else
    aValue          := StringToBytes(vTagGeral);
- {$ELSEIF Defined(DELPHIXEUP)}
+ {$ELSE}
+  {$If Defined(DELPHIXEUP)}
    aValue          := StringToBytes(vTagGeral);
   {$ELSE}
    vSizeChar := 1;
@@ -1815,6 +1826,7 @@ Begin
     vSizeChar := 2;
    SetLength(aValue, Length(vTagGeral) * vSizeChar);
    move(AnsiString(vTagGeral)[InitStrPos], pByteArray(aValue)^, Length(vTagGeral) * vSizeChar);
+  {$IFEND}
  {$IFEND}
  vDataMode        := DataModeD;
  vNullValue       := Length(aValue) = 0;
@@ -1879,10 +1891,6 @@ Begin
     SizeOfString := Length(aValue);
     vTempValue   := '';
     SetString(vTempValue, PChar(@aValue[0]), SizeOfString);
-{ //Comentado deleção de nulos
-    While pos(#0, vTempValue) > 0 Do
-     Delete(vTempValue, pos(#0, vTempValue), 1);
-}
     vTempValue   := FormatValue(vTempValue);
     If vEncoding = esUtf8 Then
      vTempValue   := Utf8Decode(vTempValue);
@@ -1898,13 +1906,13 @@ Begin
  Result := GetValue(False);
  If VarIsNull(Result) Then
   Exit;
-  {$IF Defined(FPC)}
+ {$IF Defined(FPC)}
   Result := GetStringDecode(Result, vDatabaseCharSet);
-  {$ELSEIF not Defined(DELPHIXEUP)}
+ {$ELSE IF not Defined(DELPHIXEUP)}
+  Result := UTF8Decode(Result);
+  If vEncoding = esUtf8 Then
    Result := UTF8Decode(Result);
-   If vEncoding = esUtf8 Then
-    Result := UTF8Decode(Result);
-  {$IFEND}
+ {$IFEND}
 End;
 
 Procedure TRESTDWJSONValue.ClearFieldList;
@@ -1924,7 +1932,7 @@ Begin
  If Not Assigned(Self) Then
   Exit;
  vNullValue := True;
- Setvalue('');
+ Setvalue(Null);
  ClearFieldList;
 End;
 
@@ -1946,13 +1954,9 @@ Begin
   Exit;
  If vObjectValue In [ovString, ovMemo, ovWideMemo, ovWideString] Then
   Begin
-  {$IF Defined(FPC)}
+  {$IFDEF FPC}
    Result := GetStringDecode(Result, vDatabaseCharSet);
-  {$ELSEIF not Defined(DELPHIXEUP)}
-   Result := UTF8Decode({$IFDEF FPC}String(Result){$ELSE}Result{$ENDIF});
-   If vEncoding = esUtf8 Then
-    Result := UTF8Decode({$IFDEF FPC}String(Result){$ELSE}Result{$ENDIF});
-  {$IFEND}
+  {$ENDIF}
   End;
 End;
 
@@ -3852,7 +3856,7 @@ Begin
 End;
 
 Procedure TRESTDWJSONValue.LoadFromStream(Stream : TMemoryStream;
-                                    Encode : Boolean = True);
+                                          Encode : Boolean = True);
 Begin
 // ObjectValue := ovBlob;
 // vBinary := True;
@@ -3865,7 +3869,6 @@ Begin
      Stream.Read(aValue[0], Stream.Size);
      vNullValue := False;
     End;
-//   SetValue(EncodeStream(Stream), Encode);
   End;
 End;
 
@@ -4205,7 +4208,7 @@ Begin
 End;
 
 Procedure TRESTDWJSONValue.SetValue(Value  : Variant;
-                              Encode : Boolean);
+                                    Encode : Boolean);
 Begin
  If Not Assigned(Self) Then
   Exit;
@@ -4271,9 +4274,13 @@ Begin
 End;
 
 Procedure TRESTDWJSONValue.WriteValue(bValue : Variant);
-{$IFNDEF DELPHIXEUP}
+{$IFDEF DELPHIXEUP}
 Var
  vValueAnsi : AnsiString;
+{$ENDIF}
+{$IFDEF FPC}
+Var
+ vTempString : String;
 {$ENDIF}
 Begin
  If Not Assigned(Self) Then
@@ -4312,22 +4319,30 @@ Begin
     Begin
      {$IFDEF RESTDWLAZARUS}
       If vEncoding = esUtf8 Then
-       aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
+       aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [DateTimeToStr(bValue)])))
       Else
-       aValue := StringToBytes(Format(TJsonStringValue, [bValue]));
+       aValue := StringToBytes(Format(TJsonStringValue, [DateTimeToStr(bValue)]));
      {$ELSE}
-      aValue := StringToBytes(Format(TJsonStringValue, [bValue]));
+      aValue := StringToBytes(Format(TJsonStringValue, [DateTimeToStr(bValue)]));
      {$ENDIF}
     End
    Else If vObjectValue in [ovSmallInt, ovSingle, ovFloat, ovCurrency, ovBCD, ovFMTBcd, ovExtended] Then
     Begin
      {$IFDEF RESTDWLAZARUS}
+      Try
+       If Not VarisNull(bValue) Then
+        vTempString := bValue
+       Else
+        vTempString := 'null';
+      Except
+       vTempString := 'null';
+      End;
       If vEncoding = esUtf8 Then
-       aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [bValue])))
+       aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(Format(TJsonStringValue, [vTempString])))
       Else
-       aValue := StringToBytes(Format(TJsonStringValue, [bValue]));
+       aValue := StringToBytes(Format(TJsonStringValue, [vTempString]));
      {$ELSE}
-      aValue := StringToBytes(Format(TJsonStringValue, [bValue]));
+      aValue := StringToBytes(Format(TJsonStringValue, [IntToStr(bValue)]));
      {$ENDIF}
     End
    Else
@@ -4339,12 +4354,14 @@ Begin
           aValue := TRESTDWBytes(vEncodingLazarus.GetBytes(bValue))
         Else
           aValue := StringToBytes(String(bValue));
-      {$ELSEIF Defined(DELPHIXEUP)}
+      {$ELSE}
+       {$IF not Defined(DELPHIXEUP)}
         aValue := StringToBytes(String(bValue));
-      {$ELSE} // Delphi 2010 pra cima
+       {$ELSE} // Delphi 2010 pra cima
         vValueAnsi := bValue;
         SetLength(aValue, Length(vValueAnsi));
         move(vValueAnsi[InitStrPos], pByteArray(aValue)^, Length(aValue));
+       {$IFEND}
       {$IFEND}
       End;
     End;

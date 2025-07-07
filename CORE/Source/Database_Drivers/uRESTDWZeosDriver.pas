@@ -608,10 +608,5 @@ begin
   end;
 end;
 
-{$IFDEF RESTDWLAZARUS}
-initialization
-{$I ..\RESTDWLazarusDrivers.lrs}
-{$ENDIF}
-
 end.
 

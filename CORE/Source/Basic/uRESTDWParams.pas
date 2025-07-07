@@ -5738,14 +5738,16 @@ End;
 
 Function TRESTDWParams.GetRecName(Index : String) : TRESTDWJSONParam;
 Var
- I         : Integer;
+ I          : Integer;
+ vParamName : String;
 Begin
  Result    := Nil;
  If Assigned(Self) And (Lowercase(Index) <> '') Then
   Begin
    For i := 0 To Self.Count - 1 Do
     Begin
-     If (Uppercase(Index) = Uppercase(TRESTDWJSONParam(TList(Self).Items[i]^).vParamName)) Or
+     vParamName := Uppercase(TRESTDWJSONParam(TList(Self).Items[i]^).vParamName);
+     If (Uppercase(Index) = vParamName) Or
         (Lowercase(Index) = Lowercase(TRESTDWJSONParam(TList(Self).Items[i]^).vAlias))     Then
       Begin
        Result := TRESTDWJSONParam(TList(Self).Items[i]^);

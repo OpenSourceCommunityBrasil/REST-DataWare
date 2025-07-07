@@ -295,34 +295,37 @@ end;
 
 class procedure TRESTDWUniDACDriver.CreateConnection(const AConnectionDefs : TConnectionDefs;
                                                      var AConnection : TComponent);
-begin
-  inherited CreateConnection(AConnectionDefs, AConnection);
-  if Assigned(AConnectionDefs) then begin
-    case AConnectionDefs.DriverType Of
-      dbtUndefined  : TUniConnection(AConnection).ProviderName := '';
-      dbtAccess     : TUniConnection(AConnection).ProviderName := 'access';
-      dbtDbase      : TUniConnection(AConnection).ProviderName := 'dbf';
-      dbtParadox    : TUniConnection(AConnection).ProviderName := '';
-      dbtFirebird   : TUniConnection(AConnection).ProviderName := 'interbase';
-      dbtInterbase  : TUniConnection(AConnection).ProviderName := 'interbase';
-      dbtMySQL      : TUniConnection(AConnection).ProviderName := 'mysql';
-      dbtSQLLite    : TUniConnection(AConnection).ProviderName := 'sqlite';
-      dbtOracle     : TUniConnection(AConnection).ProviderName := 'oracle';
-      dbtMsSQL      : TUniConnection(AConnection).ProviderName := 'sql server';
-      dbtODBC       : TUniConnection(AConnection).ProviderName := 'odbc';
-      dbtPostgreSQL : TUniConnection(AConnection).ProviderName := 'postgresql';
-      dbtAdo        : TUniConnection(AConnection).ProviderName := '';
-    end;
-  end;
-
-  with TUniConnection(AConnection) do begin
-    Server   := AConnectionDefs.HostName;
-    Database := AConnectionDefs.DatabaseName;
-    Username := AConnectionDefs.Username;
-    Password := AConnectionDefs.Password;
-    Port     := AConnectionDefs.DBPort;
-  end;
-end;
+Begin
+ Inherited CreateConnection(AConnectionDefs, AConnection);
+ If TUniConnection(AConnection).Connected Then
+  Exit;
+ If Assigned(AConnectionDefs) Then
+  Begin
+   Case AConnectionDefs.DriverType Of
+    dbtUndefined  : TUniConnection(AConnection).ProviderName := '';
+    dbtAccess     : TUniConnection(AConnection).ProviderName := 'access';
+    dbtDbase      : TUniConnection(AConnection).ProviderName := 'dbf';
+    dbtParadox    : TUniConnection(AConnection).ProviderName := '';
+    dbtFirebird   : TUniConnection(AConnection).ProviderName := 'interbase';
+    dbtInterbase  : TUniConnection(AConnection).ProviderName := 'interbase';
+    dbtMySQL      : TUniConnection(AConnection).ProviderName := 'mysql';
+    dbtSQLLite    : TUniConnection(AConnection).ProviderName := 'sqlite';
+    dbtOracle     : TUniConnection(AConnection).ProviderName := 'oracle';
+    dbtMsSQL      : TUniConnection(AConnection).ProviderName := 'sql server';
+    dbtODBC       : TUniConnection(AConnection).ProviderName := 'odbc';
+    dbtPostgreSQL : TUniConnection(AConnection).ProviderName := 'postgresql';
+    dbtAdo        : TUniConnection(AConnection).ProviderName := '';
+   End;
+  End;
+ With TUniConnection(AConnection) Do
+  Begin
+   Server   := AConnectionDefs.HostName;
+   Database := AConnectionDefs.DatabaseName;
+   Username := AConnectionDefs.Username;
+   Password := AConnectionDefs.Password;
+   Port     := AConnectionDefs.DBPort;
+  End;
+End;
 
 { TRESTDWUniDACQuery }
 

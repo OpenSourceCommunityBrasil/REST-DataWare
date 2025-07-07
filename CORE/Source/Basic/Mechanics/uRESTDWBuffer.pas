@@ -173,7 +173,7 @@ Begin
  If AByteCount > 0 Then
   Begin
    ExtractToBytes(LBytes, AByteCount);
-   Result := BytesToString(LBytes);
+   Result := BytesToStringInternal(LBytes);
   End
  Else
   Result := '';
@@ -484,7 +484,7 @@ End;
 
 Function TRESTDWBuffer.GetAsString: string;
 Begin
- Result := BytesToString(FBytes);
+ Result := BytesToStringInternal(FBytes);
 End;
 
 End.

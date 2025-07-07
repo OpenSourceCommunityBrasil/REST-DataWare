@@ -44,11 +44,12 @@ End;
  TMassiveType = (mtMassiveCache, mtMassiveObject);
 
  TMassiveValue = Class(TObject)
+ Protected
+  vJSONValue  : TRESTDWJSONValue;
  Private
   vIsNull,
   vModified,
   vBinary     : Boolean;
-  vJSONValue  : TRESTDWJSONValue;
   {$IFDEF FPC}
    vDatabaseCharSet : TDatabaseCharSet;
   {$ENDIF}
@@ -316,7 +317,7 @@ End;
   Property  TempBuffer  : TMassiveLine     Read vMassiveLine;
   Function  PrimaryKeys : TStringList;
   Function  AtualRec    : TMassiveLine;
-  Procedure NewBuffer   (Dataset              : TRESTDWClientSQLBase;
+  Procedure NewBuffer   (Var Dataset          : TRESTDWClientSQLBase;
                          MassiveModeData      : TMassiveMode;
                          ExecTag              : Boolean = False); Overload;
   Procedure NewBuffer   (Var MassiveLineBuff  : TMassiveLine;
@@ -324,18 +325,18 @@ End;
                          ExecTag              : Boolean = False); Overload;
   Procedure NewBuffer   (MassiveModeData      : TMassiveMode;
                          ExecTag              : Boolean = False); Overload;
-  Procedure BuildDataset(Dataset              : TRESTDWClientSQLBase;
+  Procedure BuildDataset(Var Dataset          : TRESTDWClientSQLBase;
                          UpdateTableName      : String);                 //Constroi o Dataset Massivo
-  Procedure BuildLine   (Dataset              : TRESTDWClientSQLBase;
+  Procedure BuildLine   (Var Dataset          : TRESTDWClientSQLBase;
                          MassiveModeBuff      : TMassiveMode;
                          Var MassiveLineBuff  : TMassiveLine;
                          UpdateTag            : Boolean = False;
                          ExecTag              : Boolean = False);
-  Procedure BuildBuffer (Dataset              : TRESTDWClientSQLBase;    //Cria um Valor Massivo Baseado nos Dados de Um Dataset
+  Procedure BuildBuffer (Var Dataset          : TRESTDWClientSQLBase;    //Cria um Valor Massivo Baseado nos Dados de Um Dataset
                          MassiveMode          : TMassiveMode;
                          UpdateTag            : Boolean = False;
                          ExecTag              : Boolean = False);
-  Procedure SaveBuffer  (Dataset              : TRESTDWClientSQLBase;
+  Procedure SaveBuffer  (Var Dataset          : TRESTDWClientSQLBase;
                          ExecTag              : Boolean = False);   //Salva Um Buffer Massivo na Lista de Massivos
   Procedure ClearBuffer;                                                //Limpa o Buffer Massivo Atual
   Procedure ClearDataset;                                               //Limpa Todo o Dataset Massivo
@@ -911,6 +912,9 @@ Begin
    {$IFDEF FPC}
     vJSONValue.DatabaseCharSet := csUndefined;
    {$ENDIF}
+   If vJSONValue.ObjectValue in [ovString, ovWideString] Then
+    If Not VarIsNull(Value) Then
+     Value := Utf8Encode(Value);
    If vJSONValue.Binary Then
     Begin
      vJSONValue.ObjectValue := ovBlob;
@@ -947,31 +951,38 @@ Procedure TMassiveValues.Delete(Index: Integer);
 Begin
  If (Index < Self.Count) And (Index > -1) Then
   Begin
-   {$IFDEF FPC}
+//   {$IFDEF FPC}
    If Assigned(PMassiveValue(TList(Self).Items[Index])) Then
     Begin
      If Assigned(PMassiveValue(TList(Self).Items[Index])^) Then
       Begin
        Try
-        FreeAndNil(TList(Self).Items[Index]^);
-        Dispose(PMassiveValue(TList(Self).Items[Index]));
+        {$IFDEF FPC}
+         If Assigned(TMassiveValue(TList(Self).Items[Index]^)) Then
+          FreeAndNil(TList(Self).Items[Index]^);
+         Dispose(PMassiveValue(TList(Self).Items[Index]));
+        {$ELSE}
+         If Assigned(TMassiveValue(TList(Self).Items[Index]^)) Then
+          FreeAndNil(TMassiveValue(TList(Self).Items[Index]^));
+         Dispose(TList(Self).Items[Index]);
+        {$ENDIF}
        Except
        End;
       End;
     End;
-   {$ELSE}
-   If Assigned(TList(Self).Items[Index]) Then
-    Begin
-     If Assigned(TMassiveValue(TList(Self).Items[Index]^)) Then
-      Begin
-       Try
-        TMassiveValue(TList(Self).Items[Index]^).Free;
-        Dispose(TList(Self).Items[Index]);
-       Except
-       End;
-      End;
-    End;
-   {$ENDIF}
+//   {$ELSE}
+//   If Assigned(TList(Self).Items[Index]) Then
+//    Begin
+//     If Assigned(TMassiveValue(TList(Self).Items[Index]^)) Then
+//      Begin
+//       Try
+//        TMassiveValue(TList(Self).Items[Index]^).Free;
+//        Dispose(TList(Self).Items[Index]);
+//       Except
+//       End;
+//      End;
+//    End;
+//   {$ENDIF}
    TList(Self).Delete(Index);
   End;
 End;
@@ -1363,7 +1374,7 @@ Begin
   End;
 End;
 
-Procedure TMassiveDatasetBuffer.BuildLine(Dataset             : TRESTDWClientSQLBase;
+Procedure TMassiveDatasetBuffer.BuildLine(Var Dataset         : TRESTDWClientSQLBase;
                                           MassiveModeBuff     : TMassiveMode;
                                           Var MassiveLineBuff : TMassiveLine;
                                           UpdateTag           : Boolean = False;
@@ -1800,7 +1811,7 @@ Begin
   End;
 End;
 
-Procedure TMassiveDatasetBuffer.BuildBuffer(Dataset     : TRESTDWClientSQLBase;
+Procedure TMassiveDatasetBuffer.BuildBuffer(Var Dataset : TRESTDWClientSQLBase;
                                             MassiveMode : TMassiveMode;
                                             UpdateTag   : Boolean = False;
                                             ExecTag     : Boolean = False);
@@ -1856,7 +1867,7 @@ Begin
  End;
 End;
 
-Procedure TMassiveDatasetBuffer.BuildDataset(Dataset         : TRESTDWClientSQLBase;
+Procedure TMassiveDatasetBuffer.BuildDataset(Var Dataset     : TRESTDWClientSQLBase;
                                              UpdateTableName : String);
 Var
  I : Integer;
@@ -2018,7 +2029,7 @@ Begin
  NewLineBuffer(MassiveLineBuff, MassiveModeData, ExecTag); //Sempre se assume mmInsert como padrão
 End;
 
-Procedure TMassiveDatasetBuffer.NewBuffer(Dataset         : TRESTDWClientSQLBase;
+Procedure TMassiveDatasetBuffer.NewBuffer(Var Dataset     : TRESTDWClientSQLBase;
                                           MassiveModeData : TMassiveMode;
                                           ExecTag         : Boolean = False);
 Begin
@@ -2100,8 +2111,8 @@ Begin
   Result := vMassiveBuffer.Count;
 End;
 
-Procedure TMassiveDatasetBuffer.SaveBuffer(Dataset : TRESTDWClientSQLBase;
-                                           ExecTag : Boolean = False);
+Procedure TMassiveDatasetBuffer.SaveBuffer(Var Dataset : TRESTDWClientSQLBase;
+                                           ExecTag     : Boolean = False);
 Var
  I, A          : Integer;
  Field         : TField;

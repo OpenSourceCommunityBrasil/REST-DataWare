@@ -97,6 +97,7 @@ Type
  Function  DecodeStream           (Value                : String)          : TMemoryStream;
  Function  Base64Encode           (Const S              : String)          : String;
  Function  BytesToStringUtf8      (Const bin            : TRESTDWBytes)    : String;Overload;
+ Function  BytesToStringInternal  (Const bin            : TRESTDWBytes)    : String;
  Function  BytesToString          (Const bin            : TRESTDWBytes)    : String;Overload;
  Function  BytesToString          (Const bin            : TRESTDWBytes;
                                    aUnicode             : Boolean)         : String;Overload;
@@ -635,7 +636,7 @@ Begin
   ftInteger         : Result := dwftInteger;
   ftWord            : Result := dwftWord;
   ftBoolean         : Result := dwftBoolean;
-  ftFloat           : Result := dwftSingle;
+  ftFloat           : Result := dwftFloat;
   ftCurrency        : Result := dwftCurrency;
   ftBCD             : Result := dwftBCD;
   ftDate            : Result := dwftDate;
@@ -3237,6 +3238,7 @@ Begin
    *)
    {$ENDIF};
 End;
+
 Function StringToFieldType(Const S : String): Integer;
 Begin
  If not IdentToInt(S, Result, FieldTypeIdents) then
@@ -3246,6 +3248,7 @@ Begin
  If TFieldType(Result) = ftWideString Then
   Result := Integer(ftString);
 End;
+
 Function StreamToBytes(Stream : TStream) : TRESTDWBytes;
 Begin
  Try
@@ -3303,10 +3306,14 @@ Begin
  If AStr <> '' Then
   Begin
    {$IF Defined(DELPHIXEUP)}
-    Result := TRESTDWBytes(TEncoding.ANSI.GetBytes(Astr));
+    Result := TRESTDWBytes(TEncoding.Ansi.GetBytes(Astr));
    {$ELSE}
+    {$IFDEF FPC}
+     Result := TRESTDWBytes(TEncoding.Ansi.GetBytes(Astr));
+    {$ELSE}
      SetLength(Result, Length(AStr));
      Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr));
+    {$ENDIF}
    {$IFEND}
   End;
 End;
@@ -3319,8 +3326,8 @@ Begin
    {$IF Defined(DELPHIXEUP)}
     Result := TRESTDWBytes(TEncoding.Utf8.GetBytes(Astr));
    {$ELSE}
-     SetLength(Result, Length(AStr) * 2);
-     Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr) * 2);
+    SetLength(Result, Length(AStr) * 2);
+    Move(Pointer(@AStr[InitStrPos])^, Pointer(Result)^, Length(AStr) * 2);
    {$IFEND}
   End;
 End;
@@ -3420,7 +3427,7 @@ Begin
   End;
 End;
 
-Function BytesToString(Const bin : TRESTDWBytes)   : String;
+Function BytesToStringInternal(Const bin : TRESTDWBytes)   : String;
 Var
  I : Integer;
  vStringStream : TStringStream;
@@ -3431,13 +3438,28 @@ Begin
   {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
    SetString(Result, PAnsiChar(bin), I);
   {$ELSE}
-    //SetString(Result, PWideChar(bin), I);       //gledston
-    {$IFDEF RESTDWWINDOWS}
-    Result :=TEncoding.ANSI.GetString(TBytes(bin));
-    {$ELSE}
-     Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
-//     Result := TEncoding.Utf8.GetString(TBytes(bin));
-    {$ENDIF}
+   Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
+  {$IFEND}
+  End;
+End;
+
+Function BytesToString(Const bin : TRESTDWBytes)   : String;
+Var
+ I : Integer;
+ vStringStream : TStringStream;
+Begin
+ I := restdwLength(bin);
+ If I > 0 Then
+  Begin
+  {$IF Defined(RESTDWLAZARUS) OR not Defined(DELPHIXEUP)}
+   {$IF Defined(RESTDWLAZARUS)}
+    Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
+   {$ELSE}
+    SetString(Result, PAnsiChar(bin), I);
+    Result := AnsiToUtf8(Result);
+   {$IFEND}
+  {$ELSE}
+   Result := AnsiToUtf8(TEncoding.ANSI.GetString(TBytes(bin)));
   {$IFEND}
   End;
 End;

@@ -2730,8 +2730,9 @@ Begin
     aString := utf8Decode(atempResponse.DataString)
    Else
     aString := atempResponse.DataString;
-   StringToStream(tempResponse, aString);
-   tempResponse.Position := 0;
+   StringToStream(atempResponse, aString); //StringToStream(tempResponse, aString);
+   atempResponse.Position := 0; //tempResponse.Position := 0;
+   AResponse.CopyFrom(atempResponse, aTempResponse.Size); // adicionado
    FreeAndNil(atempResponse);
    If Not IgnoreEvents Then
    If Assigned(OnAfterRequest) then
