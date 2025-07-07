@@ -23,10 +23,8 @@ unit uRESTDWDriverBase;
  Fernando Banhos            - Refactor Drivers REST Dataware.
 }
 
-{$IFNDEF RESTDWLAZARUS}
- {$IFDEF FPC}
-  {$MODE OBJFPC}{$H+}
- {$ENDIF}
+{$IFDEF FPC}
+ {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
 Interface
@@ -188,11 +186,11 @@ Type
   Property TableName : String  Read getTableName Write setTableName;
  End;
 
-  TRESTDWDrvQuery = Class(TRESTDWDrvDataset)
+ TRESTDWDrvQuery = Class(TRESTDWDrvDataset)
  Private
   Function getSQL       : TStrings; Virtual;
  Public
-  Function  GetInsertID  : int64;    Virtual;
+  Function GetInsertID  : Int64;    Virtual;
  Published
   Property SQL          : TStrings  Read getSQL;
  End;
@@ -262,45 +260,45 @@ Type
   constructor Create(AOwner : TComponent); override;
   destructor Destroy; override;
 
-  Function compConnIsValid(comp : TComponent) : boolean; virtual;
-  Function  getConectionType : TRESTDWDatabaseType; Virtual;
+  Function  compConnIsValid (comp   : TComponent) : Boolean;Virtual;
+  Function  getConectionType        : TRESTDWDatabaseType;  Virtual;
   Procedure setConectionType(aValue : TRESTDWDatabaseType); Virtual;
-  Function  getDatabaseInfo  : TRESTDWDatabaseInfo; Virtual;
-  Function  getQuery : TRESTDWDrvQuery; Overload; Virtual;
-  Function  getQuery(AUnidir : boolean) : TRESTDWDrvQuery; Overload; Virtual;
-  Function  getTable         : TRESTDWDrvTable;   Virtual;
-  Function  getStoreProc     : TRESTDWDrvStoreProc;   Virtual;
-  Procedure Connect;                                Virtual;
-  Procedure Disconect;                              Virtual;
-  Function ConnectionSet    : Boolean;              Virtual;
-  Function GetGenID          (Query                 : TRESTDWDrvQuery;
-                              GenName               : String;
-                              valor                 : Integer = 1): Integer;Overload;Virtual;
-  Function GetGenID          (GenName               : String;
-                              valor                 : Integer = 1): Integer;Overload;Virtual;
-  Function ApplyUpdates      (MassiveStream         : TStream;
-                              SQL                   : String;
-                              Params                : TRESTDWParams;
-                              Var Error             : Boolean;
-                              Var MessageError      : String;
-                              Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
-  Function ApplyUpdates      (Massive,
-                              SQL                   : String;
-                              Params                : TRESTDWParams;
-                              Var Error             : Boolean;
-                              Var MessageError      : String;
-                              Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
-  Function ApplyUpdatesTB    (MassiveStream         : TStream;
-                              SQL                   : String;
-                              Params                : TRESTDWParams;
-                              Var Error             : Boolean;
-                              Var MessageError      : String;
-                              Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
-  Function ApplyUpdatesTB    (Massive               : String;
-                              Params                : TRESTDWParams;
-                              Var Error             : Boolean;
-                              Var MessageError      : String;
-                              Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
+  Function  getDatabaseInfo         : TRESTDWDatabaseInfo;  Virtual;
+  Function  getQuery                : TRESTDWDrvQuery; Overload; Virtual;
+  Function  getQuery       (AUnidir : Boolean) : TRESTDWDrvQuery; Overload; Virtual;
+  Function  getTable                : TRESTDWDrvTable;      Virtual;
+  Function  getStoreProc            : TRESTDWDrvStoreProc;  Virtual;
+  Procedure Connect;                                        Virtual;
+  Procedure Disconect;                                      Virtual;
+  Function  ConnectionSet           : Boolean;              Virtual;
+  Function  GetGenID          (Query                 : TRESTDWDrvQuery;
+                               GenName               : String;
+                               valor                 : Integer = 1): Integer;Overload;Virtual;
+  Function  GetGenID          (GenName               : String;
+                               valor                 : Integer = 1): Integer;Overload;Virtual;
+  Function  ApplyUpdates      (MassiveStream         : TStream;
+                               SQL                   : String;
+                               Params                : TRESTDWParams;
+                               Var Error             : Boolean;
+                               Var MessageError      : String;
+                               Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
+  Function  ApplyUpdates      (Massive,
+                               SQL                   : String;
+                               Params                : TRESTDWParams;
+                               Var Error             : Boolean;
+                               Var MessageError      : String;
+                               Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
+  Function  ApplyUpdatesTB    (MassiveStream         : TStream;
+                               SQL                   : String;
+                               Params                : TRESTDWParams;
+                               Var Error             : Boolean;
+                               Var MessageError      : String;
+                               Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
+  Function  ApplyUpdatesTB    (Massive               : String;
+                               Params                : TRESTDWParams;
+                               Var Error             : Boolean;
+                               Var MessageError      : String;
+                               Var RowsAffected      : Integer)   : TRESTDWJSONValue;Overload;Virtual;
   Function ApplyUpdates_MassiveCache  (MassiveStream         : TStream;
                                        Var Error             : Boolean;
                                        Var MessageError      : String) : TRESTDWJSONValue;Overload;Virtual;

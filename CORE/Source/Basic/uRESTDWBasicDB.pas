@@ -6664,9 +6664,9 @@ Begin
          Begin
           TMassiveDatasetBuffer(vMassiveDataset).MassiveType := MassiveType;
           TMassiveDatasetBuffer(vMassiveDataset).LastOpen    := vLastOpen;
-          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmDelete,
+          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(TRESTDWClientSQLBase(Self), mmDelete,
                                                              TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
-          TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+          TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(TRESTDWClientSQLBase(Self), TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
             vStream := TMemoryStream.Create;
@@ -6747,9 +6747,9 @@ Begin
           TMassiveDatasetBuffer(vMassiveDataset).MassiveType := MassiveType;
           TMassiveDatasetBuffer(vMassiveDataset).LastOpen    := vLastOpen;
           TMassiveDatasetBuffer(vMassiveDataset).MassiveMode := mmDelete;
-          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmDelete,
+          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(TRESTDWClientSQLBase(Self), mmDelete,
                                                              TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
-          TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+          TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(TRESTDWClientSQLBase(Self), TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
             vStream := TMemoryStream.Create;
@@ -6789,8 +6789,8 @@ Begin
     Begin
      TMassiveDatasetBuffer(vMassiveDataset).MassiveType := MassiveType;
      TMassiveDatasetBuffer(vMassiveDataset).LastOpen    := vLastOpen;
-     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer  (Self, mmUpdate, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
-     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmUpdate, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer  (TRESTDWClientSQLBase(Self), mmUpdate, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(TRESTDWClientSQLBase(Self), mmUpdate, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
     End;
    If Assigned(vBeforeEdit) Then
     vBeforeEdit(Dataset);
@@ -6806,10 +6806,10 @@ Begin
      TMassiveDatasetBuffer(vMassiveDataset).MassiveType := MassiveType;
      TMassiveDatasetBuffer(vMassiveDataset).LastOpen    := vLastOpen;
      TMassiveDatasetBuffer(vMassiveDataset).MassiveMode := mmUpdate;
-     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer  (Self,
+     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer  (TRESTDWClientSQLBase(Self),
                                                         TMassiveDatasetBuffer(vMassiveDataset).MassiveMode,
                                                         TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
-     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self,
+     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(TRESTDWClientSQLBase(Self),
                                                         TMassiveDatasetBuffer(vMassiveDataset).MassiveMode,
                                                         TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
     End;
@@ -6889,7 +6889,8 @@ Begin
          Begin
           TMassiveDatasetBuffer(vMassiveDataset).MassiveType := MassiveType;
           TMassiveDatasetBuffer(vMassiveDataset).LastOpen    := vLastOpen;
-          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, DatasetStateToMassiveType(vOldState),
+          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(TRESTDWClientSQLBase(Self),
+                                                             DatasetStateToMassiveType(vOldState),
                                                              vOldState = dsEdit,
                                                              TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vOldState = dsEdit Then
@@ -6899,13 +6900,13 @@ Begin
               If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer.UpdateFieldChangesCount = 0 Then
                TMassiveDatasetBuffer(vMassiveDataset).ClearLine
               Else
-               TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+               TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(TRESTDWClientSQLBase(Self), TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
              End
             Else
              TMassiveDatasetBuffer(vMassiveDataset).ClearLine;
            End
           Else
-           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(TRESTDWClientSQLBase(Self), TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
             vStream := TMemoryStream.Create;
@@ -6969,7 +6970,7 @@ Begin
          Begin
           TMassiveDatasetBuffer(vMassiveDataset).MassiveType := MassiveType;
           TMassiveDatasetBuffer(vMassiveDataset).LastOpen    := vLastOpen;
-          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, DatasetStateToMassiveType(vOldState),
+          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(TRESTDWClientSQLBase(Self), DatasetStateToMassiveType(vOldState),
                                                              vOldState = dsEdit, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vOldState = dsEdit Then
            Begin
@@ -6978,13 +6979,13 @@ Begin
               If TMassiveDatasetBuffer(vMassiveDataset).TempBuffer.UpdateFieldChangesCount = 0 Then
                TMassiveDatasetBuffer(vMassiveDataset).ClearLine
               Else
-               TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+               TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(TRESTDWClientSQLBase(Self), TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
              End
             Else
              TMassiveDatasetBuffer(vMassiveDataset).ClearLine;
            End
           Else
-           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(TRESTDWClientSQLBase(Self), TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
             vStream := TMemoryStream.Create;
@@ -7039,9 +7040,11 @@ Begin
            TMassiveDatasetBuffer(vMassiveDataset).LastOpen      := vLastOpen;
            TMassiveDatasetBuffer(vMassiveDataset).Dataexec.Text := vSQL.Text;
            TMassiveDatasetBuffer(vMassiveDataset).Params.LoadFromParams(Params);
-           TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self,  TMassiveDatasetBuffer(vMassiveDataset).MassiveMode,
+           TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(TRESTDWClientSQLBase(Self),
+                                                              TMassiveDatasetBuffer(vMassiveDataset).MassiveMode,
                                                               False, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
-           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer (Self,  TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+           TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer (TRESTDWClientSQLBase(Self),
+                                                              TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
            If vMassiveCache <> Nil Then
             Begin
              vMassiveCache.MassiveType                          := MassiveType;
@@ -7318,8 +7321,8 @@ Begin
     Begin
      TMassiveDatasetBuffer(vMassiveDataset).MassiveType := MassiveType;
      TMassiveDatasetBuffer(vMassiveDataset).LastOpen    := vLastOpen;
-     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer  (Self, mmInsert, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
-     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmInsert, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer  (TRESTDWClientSQLBase(Self), mmInsert, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(TRESTDWClientSQLBase(Self), mmInsert, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
     End;
    If Assigned(vAfterInsert) Then
     vAfterInsert(Dataset);
@@ -7388,8 +7391,8 @@ Begin
      TMassiveDatasetBuffer(vMassiveDataset).MassiveType   := MassiveType;
      TMassiveDatasetBuffer(vMassiveDataset).LastOpen      := vLastOpen;
      TMassiveDatasetBuffer(vMassiveDataset).MassiveMode   := mmInsert;
-     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer  (Self, mmInsert, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
-     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, mmInsert, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+     TMassiveDatasetBuffer(vMassiveDataset).NewBuffer  (TRESTDWClientSQLBase(Self), mmInsert, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+     TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(TRESTDWClientSQLBase(Self), mmInsert, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
     End;
    If Assigned(vAfterInsert) Then
     vAfterInsert(Dataset);
@@ -7879,7 +7882,7 @@ Begin
             If State = dsBrowse Then
              Begin
               If Trim(vTableName) <> '' Then
-               TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vTableName));
+               TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(TRESTDWClientSQLBase(Self), Trim(vTableName));
               PrepareDetails(True);
              End
             Else If State = dsInactive Then
@@ -7916,7 +7919,7 @@ Begin
            If State = dsBrowse Then
             Begin
              If Trim(vTableName) <> '' Then
-              TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vTableName));
+              TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(TRESTDWClientSQLBase(Self), Trim(vTableName));
             End
            Else If State = dsInactive Then
             PrepareDetails(False);
@@ -8008,7 +8011,7 @@ Begin
           If State = dsBrowse Then
            Begin
             If Trim(vUpdateTableName) <> '' Then
-             TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
+             TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(TRESTDWClientSQLBase(Self), Trim(vUpdateTableName));
             PrepareDetails(True);
            End
           Else If State = dsInactive Then
@@ -8045,7 +8048,7 @@ Begin
          If State = dsBrowse Then
           Begin
            If Trim(vUpdateTableName) <> '' Then
-            TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
+            TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(TRESTDWClientSQLBase(Self), Trim(vUpdateTableName));
           End
          Else If State = dsInactive Then
           PrepareDetails(False);
@@ -8785,10 +8788,10 @@ Begin
          Begin
           TMassiveDatasetBuffer(vMassiveDataset).MassiveType := MassiveType;
           TMassiveDatasetBuffer(vMassiveDataset).LastOpen    := vLastOpen;
-          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, DatasetStateToMassiveType(vOldState),
+          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(TRESTDWClientSQLBase(Self), DatasetStateToMassiveType(vOldState),
                                                              vOldState = dsEdit,
                                                              TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
-          TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+          TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(TRESTDWClientSQLBase(Self), TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
             vStream := TMemoryStream.Create;
@@ -8846,10 +8849,12 @@ Begin
           TMassiveDatasetBuffer(vMassiveDataset).SequenceField := SequenceField;
           TMassiveDatasetBuffer(vMassiveDataset).MassiveType   := MassiveType;
           TMassiveDatasetBuffer(vMassiveDataset).LastOpen      := vLastOpen;
-          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(Self, DatasetStateToMassiveType(vOldState),
+          TMassiveDatasetBuffer(vMassiveDataset).BuildBuffer(TRESTDWClientSQLBase(Self),
+                                                             DatasetStateToMassiveType(vOldState),
                                                              vOldState = dsEdit,
                                                              TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
-          TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(Self, TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
+          TMassiveDatasetBuffer(vMassiveDataset).SaveBuffer(TRESTDWClientSQLBase(Self),
+                                                            TMassiveDatasetBuffer(vMassiveDataset).MassiveMode = mmExec);
           If vMassiveCache <> Nil Then
            Begin
             vStream := TMemoryStream.Create;
@@ -10688,8 +10693,8 @@ Begin
 //            //A Linha a baixo e pedido do Tiago Istuque que não mostrava o recordcount com BN
             TRESTDWClientSQLBase(Self).SetInBlockEvents(True); // Novavix
             TRESTDWClientSQL(Self).SetRecordCount(vJsonCount, vJsonCount);
-            TRESTDWClientSQL(Self).First;
             TRESTDWClientSQLBase(Self).SetInBlockEvents(False); // Novavix
+            TRESTDWClientSQL(Self).First;
            End;
          Finally
           SetInBlockEvents(False);
@@ -10881,7 +10886,7 @@ Begin
  If Trim(vTableName) <> '' Then
   Begin
    vLastOpen := Random(9999);
-   TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vTableName));
+   TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(TRESTDWClientSQLBase(Self), Trim(vTableName));
   End;
 End;
 
@@ -10890,7 +10895,7 @@ Begin
  If Trim(vUpdateTableName) <> '' Then
   Begin
    vLastOpen := Random(9999);
-   TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(Self, Trim(vUpdateTableName));
+   TMassiveDatasetBuffer(vMassiveDataset).BuildDataset(TRESTDWClientSQLBase(Self), Trim(vUpdateTableName));
   End;
 End;
 
