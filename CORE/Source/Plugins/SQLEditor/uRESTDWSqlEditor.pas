@@ -58,7 +58,7 @@ Const
   protected
     procedure Execute; override;
     {$IFDEF FPC}
-      procedure TerminatedSet; override;
+      procedure TerminatedSet; {$IFNDEF NOGUI}override;{$ENDIF}
     {$ENDIF}
     procedure callFimBusca;
   public
@@ -608,7 +608,7 @@ end;
 {$IFDEF FPC}
   procedure TThrBancoDados.TerminatedSet;
   begin
-    inherited TerminatedSet;
+    {$IFNDEF NOGUI} inherited TerminatedSet;{$ENDIF}
     DoTerminate;
   end;
 {$ENDIF}

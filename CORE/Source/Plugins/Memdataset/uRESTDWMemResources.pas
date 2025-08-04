@@ -2617,9 +2617,9 @@ const
 {$ENDIF UNITVERSIONING}
 implementation
 {$IFDEF UNITVERSIONING}
-initialization
+ initialization
   RegisterUnitVersion(HInstance, UnitVersioning);
-finalization
+ finalization
   UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
 end.

@@ -1543,9 +1543,7 @@ Procedure TMassiveDatasetBuffer.BuildLine(Var Dataset         : TRESTDWClientSQL
                     If Field.IsNull Then
                      MassiveLineBuff.vMassiveValues.Items[I + 1].Value := Null
                     Else If Trim(Field.AsString) <> '' Then
-                     MassiveLineBuff.vMassiveValues.Items[I + 1].Value := BuildStringFloat(Field.AsString)
-                    Else
-                     MassiveLineBuff.vMassiveValues.Items[I + 1].Value := '';
+                     MassiveLineBuff.vMassiveValues.Items[I + 1].Value := BuildStringFloat(Field.AsString);
                    End
                   Else
                    Begin

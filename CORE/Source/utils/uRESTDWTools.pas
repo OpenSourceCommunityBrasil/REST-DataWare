@@ -3621,7 +3621,7 @@ End;
 
 {$IF Defined(RESTDWMOBILE)}  //Alterado para IOS Brito
 Function EncodeBase64(Const Value : String) : String;
-{$ELSEIF (NOT Defined(RESTDWLAZARUS) AND Defined(RESTDWLINUX))} //Alterado para Lazarus LINUX Brito
+{$ELSEIF (NOT Defined(RESTDWLAZARUS) AND NOT Defined(RESTDWLAMW) AND Defined(RESTDWLINUX))} //Alterado para Lazarus LINUX Brito
 Function EncodeBase64(Const Value : String) : String;
 {$ELSE}
 Function EncodeBase64(Const Value : String

@@ -624,18 +624,19 @@ begin
 
   FCertificate := nil;
   FPrivateKey := nil;
-
+ {$IFNDEF RESTDWLAMW}
   if (LoadCrypto) and (LoadSSL) then
     FOpenSSLVersion := OpenSSL_version_num();
+ {$ENDIF}
 end;
 
 destructor TRESTDWSelfSigned.Destroy;
 begin
   ClearCerts;
-  
+  {$IFNDEF RESTDWLAMW}
   UnloadCrypto;
-  UnloadSSL;  
-  
+  {$ENDIF}
+  UnloadSSL;
   inherited Destroy;
 end;
 
@@ -694,9 +695,10 @@ var
   Extension: PX509_EXTENSION;
   AServerName: RawByteString;
 begin
+  {$IFNDEF RESTDWLAMW}
   if (not LoadCrypto) or (not LoadSSL) then
     Exit;
-
+  {$ENDIF}
   ClearCerts;
 
   { Create a self-signed certificate }
@@ -817,9 +819,10 @@ var
   cipher1 : TSslCipher;
   cipher2 : PEVP_CIPHER;
 begin
+  {$IFNDEF RESTDWLAMW}
   if (not LoadCrypto) or (not LoadSSL) then
     Exit;
-
+  {$ENDIF}
   stream.Size := 0;
 
   { Write the private key }

@@ -32,7 +32,8 @@ interface
 
 Uses
  {$IFDEF RESTDWFMX}System.IOUtils,{$ENDIF}
- SysUtils, Classes, Db, Variants, SyncObjs,
+ SysUtils, Classes, Db, Variants,
+ {$IFNDEF RESTDWLAZARUS}SyncObjs,{$ENDIF}
  uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWJSONObject,
  uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWDataUtils,
  uRESTDWTools, uRESTDWConsts, uRESTDWMessageCoderMIME,

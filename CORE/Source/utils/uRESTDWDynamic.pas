@@ -36,7 +36,7 @@ Uses
   SysUtils, Classes, TypInfo, RTLConsts;
 
 Type
- {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)}
+ {$IF not Defined(RESTDWLAZARUS) AND not Defined(RESTDWLAMW) AND not Defined(DELPHIXEUP)}
  NativeInt             = Integer;
  NativeUInt            = Cardinal;
  PNativeInt            = ^NativeInt;

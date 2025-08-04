@@ -170,36 +170,4 @@ object fDWJSONViewer: TfDWJSONViewer
     left = 376
     top = 368
   end
-  object RESTDWClientSQL1: TRESTDWClientSQL
-    Active = False
-    Encoding = esUtf8
-    DatabaseCharSet = csUndefined
-    FieldDefs = <>
-    MasterCascadeDelete = True
-    BinaryRequest = False
-    Datapacks = -1
-    DataCache = False
-    Params = <>
-    CacheUpdateRecords = True
-    AutoCommitData = False
-    AutoRefreshAfterCommit = False
-    RaiseErrors = True
-    Filtered = False
-    DWResponseTranslator = DWResponseTranslator1
-    ActionCursor = crSQLWait
-    ReflectChanges = False
-    left = 344
-    top = 368
-  end
-  object DWResponseTranslator1: TDWResponseTranslator
-    ElementAutoReadRootIndex = True
-    ElementRootBaseIndex = -1
-    RequestOpen = rtGet
-    RequestInsert = rtPost
-    RequestEdit = rtPost
-    RequestDelete = rtDelete
-    FieldDefs = <>
-    left = 312
-    top = 368
-  end
 end

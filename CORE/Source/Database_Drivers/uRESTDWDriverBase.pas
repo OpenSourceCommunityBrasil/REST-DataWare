@@ -1,4 +1,4 @@
-unit uRESTDWDriverBase;
+﻿unit uRESTDWDriverBase;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -3716,7 +3716,7 @@ Begin
     bJsonArray  := bJsonValue.OpenArray(I);
     vTempQuery.Close;
     vTempQuery.SQL.Clear;
-    vTempQuery.SQL.Add(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
+    vTempQuery.SQL.Text := DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}); //Add(DecodeStrings(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[0].Value{$IFDEF FPC}, csUndefined{$ENDIF}));
     vBinaryEvent    := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[2].Value);
     vMetaData       := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[3].Value);
     vCompatibleMode := StringToBoolean(TRESTDWJSONInterfaceObject(bJsonArray).Pairs[4].Value);
@@ -3860,7 +3860,7 @@ Begin
     End;
     vTempQuery.Close;
     vTempQuery.SQL.Clear;
-    vTempQuery.SQL.Add(StringReplace(BytesToString(vSqlStream), sLineBreak, ' ', [rfReplaceAll]));
+    vTempQuery.SQL.Text := BytesToString(vSqlStream);//Add(StringReplace(BytesToString(vSqlStream), sLineBreak, ' ', [rfReplaceAll]));
     SetLength(vSqlStream, 0);
     DWParams := TRESTDWParams.Create;
     Try

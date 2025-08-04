@@ -27,8 +27,12 @@ interface
 uses
   {$IFDEF RESTDWLAZARUS}
     StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
-    LResources, LazFileUtils, FormEditingIntf, PropEdits, lazideintf,
-    ProjectIntf, ComponentEditors, fpWeb,
+    LResources, LazFileUtils,
+    {$IFNDEF RESTDWLAMW}
+    FormEditingIntf, PropEdits, lazideintf,
+    ProjectIntf, ComponentEditors,
+    {$ENDIF}
+  fpWeb,
   {$ELSE}
     {$IFNDEF DELPHIXE2UP}
       Graphics,
@@ -38,6 +42,7 @@ uses
   {$ENDIF}
   Classes, uRESTDWIdBase;
 
+{$IFNDEF RESTDWLAMW}
 Type
   TPoolersList = Class(TStringProperty)
   Public
@@ -45,11 +50,13 @@ Type
     Procedure GetValues(Proc: TGetStrProc); Override;
     Procedure Edit; Override;
   End;
+{$ENDIF}
 
 Procedure Register;
 
 Implementation
 
+{$IFNDEF RESTDWLAMW}
 Function TPoolersList.GetAttributes: TPropertyAttributes;
 Begin
   // editor, sorted list, multiple selection
@@ -84,13 +91,16 @@ Begin
     End;
   End;
 End;
+{$ENDIF}
 
 Procedure Register;
 Begin
  RegisterComponents    ('REST Dataware - Service', [TRESTDWIdServicePooler, TRESTDWIdProxyRequest, TRESTDWIdPoolerList]);
  RegisterComponents    ('REST Dataware - Client',  [TRESTDWIdClientREST,    TRESTDWIdClientPooler]);
  RegisterComponents    ('REST Dataware - DB',      [TRESTDWIdDatabase]);
+ {$IFNDEF RESTDWLAMW}
  RegisterPropertyEditor(TypeInfo(String),           TRESTDWIdDatabase,      'PoolerName',         TPoolersList);
+ {$ENDIF}
 End;
 
 {$IFDEF RESTDWLAZARUS}
