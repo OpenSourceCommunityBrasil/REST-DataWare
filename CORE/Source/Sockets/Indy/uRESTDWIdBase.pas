@@ -32,7 +32,7 @@ interface
 Uses
   {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
   {$IFNDEF RESTDWLAZARUS}SyncObjs,{$ENDIF}
-  {$IF not Defined(RESTDWLAZARUS) AND not Defined(DELPHIXEUP)}uRESTDWMassiveBuffer,{$IFEND}
+  {$IF not Defined(RESTDWLAZARUS) AND not Defined(RESTDWLAMW) AND not Defined(DELPHIXEUP)}uRESTDWMassiveBuffer,{$IFEND}
   SysUtils, Classes, Db, Variants,
   uRESTDWBasic, uRESTDWBasicDB, uRESTDWComponentEvents, uRESTDWBasicTypes,
   uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,

@@ -48,7 +48,7 @@
       </Item3>
     </Files>
     <CompatibilityMode Value="True"/>
-    <RequiredPkgs Count="5">
+    <RequiredPkgs Count="3">
       <Item1>
         <PackageName Value="restdatawarecomponents"/>
         <MinVersion Major="2" Valid="True"/>
@@ -58,14 +58,8 @@
         <MinVersion Major="10" Minor="6" Valid="True"/>
       </Item2>
       <Item3>
-        <PackageName Value="IDEIntf"/>
-      </Item3>
-      <Item4>
-        <PackageName Value="LCL"/>
-      </Item4>
-      <Item5>
         <PackageName Value="FCL"/>
-      </Item5>
+      </Item3>
     </RequiredPkgs>
     <UsageOptions>
       <LibraryPath Value="..\..\Source\static\$(TargetCPU)-$(TargetOS)"/>

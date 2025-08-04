@@ -1,23 +1,24 @@
 object FrmDWSqlEditor: TFrmDWSqlEditor
   Left = 472
-  Height = 756
+  Height = 1134
   Top = 195
-  Width = 1079
+  Width = 1618
   BorderIcons = [biMinimize]
   BorderWidth = 5
   Caption = 'RESTDWClientSQL Editor'
-  ClientHeight = 756
-  ClientWidth = 1079
+  ClientHeight = 1134
+  ClientWidth = 1618
   Color = clBtnFace
+  DesignTimePPI = 144
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -17
   Font.Name = 'Tahoma'
+  Position = poScreenCenter
+  LCLVersion = '4.0.0.4'
   OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
-  Position = poScreenCenter
-  LCLVersion = '3.8.0.0'
   object PnlSQL: TPanel
     Left = 5
     Height = 415
@@ -30,21 +31,21 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
     ParentBackground = False
     TabOrder = 0
     object PnlButton: TPanel
-      Left = 974
+      Left = 927
       Height = 415
       Top = 0
-      Width = 95
+      Width = 142
       Align = alRight
       BevelOuter = bvNone
       ClientHeight = 415
-      ClientWidth = 95
+      ClientWidth = 142
       ParentBackground = False
       TabOrder = 0
       object BtnExecute: TButton
-        Left = 8
-        Height = 25
-        Top = 20
-        Width = 80
+        Left = 12
+        Height = 38
+        Top = 30
+        Width = 120
         Caption = 'Execute'
         TabOrder = 0
         OnClick = BtnExecuteClick
@@ -73,8 +74,8 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         object TabSheetSQL: TTabSheet
           BorderWidth = 5
           Caption = 'SQL Command'
-          ClientHeight = 368
-          ClientWidth = 757
+          ClientHeight = 0
+          ClientWidth = 0
           object Memo: TMemo
             Left = 0
             Height = 368
@@ -90,32 +91,32 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       end
       object Panel1: TPanel
         Left = 0
-        Height = 21
-        Top = 394
+        Height = 32
+        Top = 383
         Width = 765
         Align = alBottom
         BevelOuter = bvLowered
-        ClientHeight = 21
+        ClientHeight = 32
         ClientWidth = 765
         ParentBackground = False
         TabOrder = 1
         object Label3: TLabel
-          Left = 7
+          Left = 10
           Height = 13
-          Top = 4
+          Top = 6
           Width = 79
           Caption = 'Execute Time:'
           Font.Color = clWindowText
-          Font.Height = -11
+          Font.Height = -17
           Font.Name = 'Tahoma'
           Font.Style = [fsBold]
           ParentColor = False
           ParentFont = False
         end
         object lbExecutedTime: TLabel
-          Left = 91
+          Left = 136
           Height = 13
-          Top = 4
+          Top = 6
           Width = 66
           Caption = '00:00:00:000'
           ParentColor = False
@@ -126,16 +127,16 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Left = 0
       Height = 415
       Top = 0
-      Width = 209
+      Width = 314
       Align = alLeft
       BevelOuter = bvNone
       ClientHeight = 415
-      ClientWidth = 209
+      ClientWidth = 314
       ParentBackground = False
       TabOrder = 2
       object labSql: TLabel
         Left = 0
-        Height = 23
+        Height = 34
         Top = 0
         Width = 209
         Align = alTop
@@ -143,7 +144,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Caption = ' .: TABLES'
         Color = clBtnShadow
         Font.Color = clWhite
-        Font.Height = 24
+        Font.Height = 36
         Font.Name = 'Segoe UI'
         Layout = tlCenter
         ParentColor = False
@@ -152,7 +153,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       end
       object Label1: TLabel
         Left = 0
-        Height = 23
+        Height = 34
         Top = 232
         Width = 209
         Align = alTop
@@ -160,7 +161,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Caption = ' .: FIELDS'
         Color = clBtnShadow
         Font.Color = clWhite
-        Font.Height = -16
+        Font.Height = -24
         Font.Name = 'Segoe UI'
         Layout = tlCenter
         ParentColor = False
@@ -169,7 +170,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       end
       object Label2: TLabel
         Left = 0
-        Height = 23
+        Height = 34
         Top = 153
         Width = 209
         Align = alTop
@@ -177,7 +178,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Caption = ' .: SQL TYPE'
         Color = clBtnShadow
         Font.Color = clWhite
-        Font.Height = -16
+        Font.Height = -24
         Font.Name = 'Segoe UI'
         Layout = tlCenter
         ParentColor = False
@@ -186,7 +187,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       end
       object lbTables: TListBox
         Left = 0
-        Height = 130
+        Height = 195
         Top = 23
         Width = 209
         Align = alTop
@@ -211,27 +212,27 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       end
       object pSQLTypes: TPanel
         Left = 0
-        Height = 56
+        Height = 84
         Top = 176
         Width = 209
         Align = alTop
         BevelOuter = bvNone
-        ClientHeight = 56
+        ClientHeight = 84
         ClientWidth = 209
         ParentBackground = False
         TabOrder = 2
         object rbInsert: TRadioButton
-          Left = 88
+          Left = 132
           Height = 17
-          Top = 8
+          Top = 12
           Width = 47
           Caption = 'Insert'
           TabOrder = 0
         end
         object rbSelect: TRadioButton
-          Left = 8
+          Left = 12
           Height = 17
-          Top = 8
+          Top = 12
           Width = 47
           Caption = 'Select'
           Checked = True
@@ -239,17 +240,17 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
           TabStop = True
         end
         object rbDelete: TRadioButton
-          Left = 88
+          Left = 132
           Height = 17
-          Top = 32
+          Top = 48
           Width = 49
           Caption = 'Delete'
           TabOrder = 2
         end
         object rbUpdate: TRadioButton
-          Left = 8
+          Left = 12
           Height = 17
-          Top = 32
+          Top = 48
           Width = 53
           Caption = 'Update'
           TabOrder = 3
@@ -259,20 +260,20 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
   end
   object PnlAction: TPanel
     Left = 5
-    Height = 41
-    Top = 710
+    Height = 62
+    Top = 689
     Width = 1069
     Align = alBottom
     BevelOuter = bvNone
-    ClientHeight = 41
+    ClientHeight = 62
     ClientWidth = 1069
     ParentBackground = False
     TabOrder = 1
     object BtnOk: TButton
-      Left = 905
-      Height = 25
-      Top = 8
-      Width = 75
+      Left = 823
+      Height = 38
+      Top = 12
+      Width = 112
       Anchors = [akTop, akRight]
       Caption = 'Ok'
       Default = True
@@ -280,10 +281,10 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       OnClick = BtnOkClick
     end
     object BtnCancelar: TButton
-      Left = 986
-      Height = 25
-      Top = 8
-      Width = 75
+      Left = 945
+      Height = 38
+      Top = 12
+      Width = 112
       Anchors = [akTop, akRight]
       Cancel = True
       Caption = 'Cancel'
@@ -293,8 +294,8 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
   end
   object PageControlResult: TPageControl
     Left = 5
-    Height = 290
-    Top = 420
+    Height = 435
+    Top = 275
     Width = 1069
     ActivePage = TabSheetTable
     Align = alBottom
@@ -303,8 +304,8 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
     object TabSheetTable: TTabSheet
       BorderWidth = 5
       Caption = 'RecordSet'
-      ClientHeight = 264
-      ClientWidth = 1061
+      ClientHeight = 0
+      ClientWidth = 0
       object DBGridRecord: TDBGrid
         Left = 0
         Height = 264
@@ -315,7 +316,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Columns = <>
         TabOrder = 0
         TitleFont.Color = clWindowText
-        TitleFont.Height = -11
+        TitleFont.Height = -17
         TitleFont.Name = 'Tahoma'
       end
     end
@@ -324,7 +325,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
     Enabled = False
     Interval = 200
     OnTimer = tmCloseTimer
-    Left = 341
-    Top = 240
+    Left = 512
+    Top = 360
   end
 end

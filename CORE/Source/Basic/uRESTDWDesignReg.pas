@@ -26,20 +26,35 @@ unit uRESTDWDesignReg;
 interface
 
 uses
-  {$IFDEF RESTDWLAZARUS}
-    StdCtrls, ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
-    LResources, LazFileUtils,  FormEditingIntf, PropEdits, lazideintf,
-    ProjectIntf, ComponentEditors, fpWeb, TypInfo,
+  {$IFDEF FPC}
+    {$IFNDEF RESTDWLAMW}StdCtrls, {$ENDIF}
+    ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
+    LResources, LazFileUtils,
+    {$IFNDEF RESTDWLAMW}
+     FormEditingIntf, PropEdits, lazideintf,
+     ProjectIntf, ComponentEditors,
+    {$ENDIF}
+    fpWeb, TypInfo,
   {$ELSE}
+   {$IFNDEF RESTDWLAMW}
     Windows,
-   {$IFDEF DELPHIXE2UP}
+    {$IFDEF DELPHIXE2UP}
      vcl.Graphics,
-   {$ELSE}
-     Graphics, DbTables,
+    {$ELSE}
+     {$IFNDEF RESTDWLAMW}
+      Graphics,
+      DbTables,
+     {$ENDIF}
+    {$ENDIF}
+    {$IFNDEF RESTDWLAMW}
+     ToolsApi, DesignEditors, DSDesign, DesignIntf, ColnEdit,
+    {$ENDIF}
    {$ENDIF}
-  ToolsApi, DesignEditors, DSDesign, DesignIntf, ColnEdit,
   {$ENDIF}
-  Db, SysUtils, Classes, Menus,
+  Db, SysUtils, Classes,
+  {$IFNDEF RESTDWLAMW}
+   Menus,
+  {$ENDIF}
   uRESTDWBasicClass,     uRESTDWDatamodule,   uRESTDWServerEvents,  uRESTDWBasicDB,
   uRESTDWServerContext,  uRESTDWServerRoutes, uRESTDWMassiveBuffer, uRESTDWMemoryDataset,
   uRESTDWBufferDb,       uRESTDWAbout,        uRESTDWDriverBase,    uRESTDWAuthenticators;
@@ -56,6 +71,7 @@ Var
 Type
  TAddFields = Procedure (All: Boolean) of Object;
 
+{$IFNDEF RESTDWLAMW}
 Type
  TRESTDWFieldsList = Class(TStringProperty)
  Public
@@ -163,7 +179,9 @@ Type
 
 End;
 {$ENDIF}
+{$ENDIF}
 
+{$IFNDEF RESTDWLAMW}
 Type
  TRESTDWServerContextEditor = Class(TComponentEditor)
 Public
@@ -179,9 +197,10 @@ Public
  Function  GetVerb    (Index : Integer): String; Override;
  Procedure ExecuteVerb(Index : Integer); Override;
 End;
-
+{$ENDIF}
 
 {$IFDEF RESTDWLAZARUS}
+{$IFNDEF RESTDWLAMW}
 Type
  TRESTDWCGIApplicationDescriptor = Class(TProjectDescriptor)
  Public
@@ -216,6 +235,7 @@ Type
                                       ResourceName : String) : String;Override;
  End;
 {$ENDIF}
+{$ENDIF}
 
 Procedure Register;
 
@@ -232,18 +252,22 @@ Resourcestring
   rsRESTDWDatamodule        = 'REST Dataware - Datamodule';
   rsRESTDWDatamoduleADa     = 'REST Dataware - Datamodule%sA Datamodule for REST Dataware Web Components.';
 
+{$IFNDEF RESTDWLAMW}
 Var
  PDRESTDWCGIApplication : TRESTDWCGIApplicationDescriptor;
  PDRESTDWDatamodule     : TRESTDWDatamodule;
+ {$ENDIF}
 {$ENDIF}
 
 Implementation
 
 uses
   {$IFDEF RESTDWLAZARUS} utemplateproglaz,{$ENDIF}
-   uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic, uRESTDWResponseTranslator,
-   uRESTDWFieldSourceEditor, uRESTDWSqlEditor, uRESTDWUpdSqlEditor,
-   uRESTDWJSONViewer;
+   uRESTDWConsts, uRESTDWPoolermethod, uRESTDWBasic
+  {$IFNDEF RESTDWLAMW}
+   , uRESTDWResponseTranslator, uRESTDWFieldSourceEditor,
+   uRESTDWSqlEditor, uRESTDWUpdSqlEditor, uRESTDWJSONViewer
+  {$ENDIF};
 
 {$IFDEF DELPHIXE3UP}
 Var
@@ -291,6 +315,7 @@ Begin
 End;
 {$ELSE}
 {$IFDEF RESTDWLAZARUS}
+{$IFNDEF RESTDWLAMW}
 Constructor TRESTDWCGIApplicationDescriptor.Create;
 Begin
  inherited Create;
@@ -399,8 +424,10 @@ Begin
 End;
 {$ENDIF}
 {$ENDIF}
+{$ENDIF}
 
 
+{$IFNDEF RESTDWLAMW}
 {$IFNDEF RESTDWLAZARUS}
 Procedure TDSDesignerDW.BeginUpdateFieldDefs;
 Var
@@ -538,7 +565,9 @@ Begin
  Result := True;
 End;
 {$ENDIF}
+{$ENDIF}
 
+{$IFNDEF RESTDWLAMW}
 Function TPoolersListCDF.GetAttributes : TPropertyAttributes;
 Begin
   // editor, sorted list, multiple selection
@@ -724,14 +753,22 @@ Function TRESTDWContextRulesEditor.GetVerbCount: Integer;
 Begin
  Result := 1;
 End;
+{$ENDIF}
 
 Procedure Register;
 Begin
+ {$IFDEF FPC}
+  {$I RESTDataWareComponents_LAMW.lrs}
+ {$ENDIF}
  {$IFNDEF RESTDWLAZARUS}
-  RegisterNoIcon([TServerMethodDataModule]);
-  RegisterCustomModule(TServerMethodDataModule, TCustomModule);
+  {$IFNDEF RESTDWLAMW}
+   RegisterNoIcon([TServerMethodDataModule]);
+   RegisterCustomModule(TServerMethodDataModule, TCustomModule);
+  {$ENDIF}
  {$ELSE}
-  FormEditingHook.RegisterDesignerBaseClass(TServerMethodDataModule);
+  {$IFNDEF RESTDWLAMW}
+   FormEditingHook.RegisterDesignerBaseClass(TServerMethodDataModule);
+  {$ENDIF}
 //  PDRESTDWCGIApplication    := TRESTDWCGIApplicationDescriptor.Create;
 //  RegisterProjectDescriptor (PDRESTDWCGIApplication);
 //  PDRESTDWCGIDatamodule     := TRESTDWCGIDatamodule.Create;
@@ -741,21 +778,30 @@ Begin
  {$ENDIF}
 // RegisterComponents('REST Dataware - Service',      [TRESTDWServiceNotification]);
  RegisterComponents('REST Dataware - Client',         [TRESTDWClientEvents]);
- RegisterComponents('REST Dataware - API',            [TRESTDWServerEvents,       TRESTDWServerContext, TRESTDWServerRoutes,
+ RegisterComponents('REST Dataware - API',            [TRESTDWServerEvents,
+                                                       TRESTDWServerContext,
+                                                       TRESTDWServerRoutes,
                                                        TRESTDWContextRules]);
+ {$IFNDEF RESTDWLAMW}
  RegisterComponents('REST Dataware - Tools',          [TRESTDWResponseTranslator, TRESTDWBufferDB]);
+ {$ENDIF}
  RegisterComponents('REST Dataware - DB',             [TRESTDWPoolerDB,           TRESTDWMemTable,      TRESTDWClientSQL,
                                                        TRESTDWTable,              TRESTDWUpdateSQL,     TRESTDWMassiveSQLCache,
                                                        TRESTDWStoredProcedure,    TRESTDWMassiveCache,  TRESTDWBatchMove]);
  RegisterComponents('REST Dataware - Authenticators', [TRESTDWAuthBasic,       TRESTDWAuthToken,     TRESTDWAuthOAuth]);
 // AddIDEMenu;//Menu do REST Debugger
  {$IFNDEF RESTDWLAZARUS}
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
-//  RegisterPackageWizard(TCustomMenuItemDW.Create);//Request Debbuger
+  {$IFNDEF RESTDWLAMW}
+   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
+ //  RegisterPackageWizard(TCustomMenuItemDW.Create);//Request Debbuger
+  {$ENDIF}
  {$ELSE}
-  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
+  {$IFNDEF RESTDWLAMW}
+   RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfo),   Nil, 'AboutInfo', TDWAboutDialogProperty);
+  {$ENDIF}
 //  RegisterPropertyEditor(TypeInfo(TRESTDWAboutInfoDS), Nil, 'AboutInfo', TDWAboutDialogProperty);
  {$ENDIF}
+ {$IFNDEF RESTDWLAMW}
   RegisterPropertyEditor(TypeInfo(TComponent),        TRESTDWDriverBase,         'Connection',      TDriverConnectionListProperty);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWTable,              'Tablename',       TTableList);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientEvents,       'ServerEventName', TServerEventsList);
@@ -763,22 +809,24 @@ Begin
   RegisterPropertyEditor(TypeInfo(TStrings),          TRESTDWClientSQL,          'RelationFields',  TRESTDWFieldsRelationEditor);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientSQL,          'SequenceField',   TRESTDWFieldsList);
   RegisterPropertyEditor(TypeInfo(String),            TRESTDWClientSQL,          'UpdateTableName', TTableList);
-
   RegisterComponentEditor(TRESTDWServerEvents,        TComponentEditorClass(TRESTDWServerEventsEditor));
   RegisterComponentEditor(TRESTDWClientEvents,        TComponentEditorClass(TRESTDWClientEventsEditor));
   RegisterComponentEditor(TRESTDWResponseTranslator,  TComponentEditorClass(TRESTDWJSONViewer));
   RegisterPropertyEditor (TypeInfo(TRESTDWComponent), TRESTDWResponseTranslator, 'ClientREST', TRESTDWClientRESTList);
   RegisterComponentEditor(TRESTDWServerContext,       TComponentEditorClass(TRESTDWServerContextEditor));
   RegisterComponentEditor(TRESTDWContextRules,        TComponentEditorClass(TRESTDWContextRulesEditor));
+ {$ENDIF}
  {$IFNDEF RESTDWLAZARUS}
-  RegisterComponentEditor(TRESTDWClientSQL,         TRESTDWClientSQLEditor);
-  RegisterComponentEditor(TRESTDWServerContext,     TRESTDWServerContextEditor);
-  RegisterComponentEditor(TRESTDWContextRules,      TRESTDWContextRulesEditor);
+  {$IFNDEF RESTDWLAMW}
+   RegisterComponentEditor(TRESTDWClientSQL,         TRESTDWClientSQLEditor);
+   RegisterComponentEditor(TRESTDWServerContext,     TRESTDWServerContextEditor);
+   RegisterComponentEditor(TRESTDWContextRules,      TRESTDWContextRulesEditor);
+  {$ENDIF}
  {$ENDIF}
 End;
 
 { TRESTDWServerEventsEditor }
-
+{$IFNDEF RESTDWLAMW}
 procedure TRESTDWServerEventsEditor.ExecuteVerb(Index: Integer);
 begin
  Inherited;
@@ -860,7 +908,6 @@ Begin
  Finally
  End;
 End;
-
 
 Function TServerEventsListCV.GetAttributes: TPropertyAttributes;
 begin
@@ -984,20 +1031,24 @@ Begin
    End;
   End;
 End;
+{$ENDIF}
 
 {$IFDEF RESTDWLAZARUS}
  Procedure UnlistPublishedProperty (ComponentClass:TPersistentClass; const PropertyName:String);
  var
    pi : PPropInfo;
  begin
+  {$IFNDEF RESTDWLAMW}
    pi := TypInfo.GetPropInfo (ComponentClass, PropertyName);
    if (pi <> nil) then
      RegisterPropertyEditor (pi^.PropType, ComponentClass, PropertyName, PropEdits.THiddenPropertyEditor);
+  {$ENDIF}
  end;
 {$ENDIF}
 
 { TRESTDWClientRESTList }
 
+{$IFNDEF RESTDWLAMW}
 procedure TRESTDWClientRESTList.GetValues(Proc: TGetStrProc);
 Var
  I         : Integer;
@@ -1045,7 +1096,6 @@ begin
     while i < comp.ComponentCount do begin
       if drv.compConnIsValid(comp.Components[i]) then
         List.Add(comp.Components[i].Name);
-
       i := i + 1;
     end;
   end;
@@ -1065,54 +1115,56 @@ begin
     Values.Free;
   end;
 end;
+{$ENDIF}
 
 initialization
-  {$IFDEF DELPHIXE3UP}
- 	RegisterAboutBox;
+ {$IFDEF DELPHIXE3UP}
+  RegisterAboutBox;
   AddSplash;
  {$ENDIF}
  {$IFDEF RESTDWLAZARUS}
-   {$I RESTDataWareComponents.lrs}
+  {$IFNDEF RESTDWLAMW}
+   UnlistPublishedProperty(TRESTDWClientSQL,  'FieldDefs');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'Options');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceName');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceField');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'OnWriterProcess');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'FieldDefs');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'Options');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'CachedUpdates');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'MasterSource');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'MasterFields');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'DetailFields');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'ActiveStoredUsage');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'Adapter');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'ChangeAlerter');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'ChangeAlertName');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'DataSetField');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'FetchOptions');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'ObjectView');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'ResourceOptions');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'StoreDefs');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'UpdateOptions');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'LocalSQL');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'FieldOptions');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'Constraints');
+   UnlistPublishedProperty(TRESTDWClientSQL,  'ConstraintsEnabled');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'StoreDefs');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceName');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceField');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'OnWriterProcess');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'UpdateOptions');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'FetchOptions');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'ObjectView');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'ResourceOptions');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'CachedUpdates');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'MasterSource');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'MasterFields');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'DetailFields');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'ActiveStoredUsage');
+   UnlistPublishedProperty(TRESTDWStoredProcedure, 'Adapter');
+  {$ENDIF}
  {$ENDIF}
- UnlistPublishedProperty(TRESTDWClientSQL,  'FieldDefs');
- UnlistPublishedProperty(TRESTDWClientSQL,  'Options');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceName');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceField');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'OnWriterProcess');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'FieldDefs');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'Options');
- UnlistPublishedProperty(TRESTDWClientSQL,  'CachedUpdates');
- UnlistPublishedProperty(TRESTDWClientSQL,  'MasterSource');
- UnlistPublishedProperty(TRESTDWClientSQL,  'MasterFields');
- UnlistPublishedProperty(TRESTDWClientSQL,  'DetailFields');
- UnlistPublishedProperty(TRESTDWClientSQL,  'ActiveStoredUsage');
- UnlistPublishedProperty(TRESTDWClientSQL,  'Adapter');
- UnlistPublishedProperty(TRESTDWClientSQL,  'ChangeAlerter');
- UnlistPublishedProperty(TRESTDWClientSQL,  'ChangeAlertName');
- UnlistPublishedProperty(TRESTDWClientSQL,  'DataSetField');
- UnlistPublishedProperty(TRESTDWClientSQL,  'FetchOptions');
- UnlistPublishedProperty(TRESTDWClientSQL,  'ObjectView');
- UnlistPublishedProperty(TRESTDWClientSQL,  'ResourceOptions');
- UnlistPublishedProperty(TRESTDWClientSQL,  'StoreDefs');
- UnlistPublishedProperty(TRESTDWClientSQL,  'UpdateOptions');
- UnlistPublishedProperty(TRESTDWClientSQL,  'LocalSQL');
- UnlistPublishedProperty(TRESTDWClientSQL,  'FieldOptions');
- UnlistPublishedProperty(TRESTDWClientSQL,  'Constraints');
- UnlistPublishedProperty(TRESTDWClientSQL,  'ConstraintsEnabled');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'StoreDefs');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceName');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'SequenceField');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'OnWriterProcess');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'UpdateOptions');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'FetchOptions');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'ObjectView');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'ResourceOptions');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'CachedUpdates');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'MasterSource');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'MasterFields');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'DetailFields');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'ActiveStoredUsage');
- UnlistPublishedProperty(TRESTDWStoredProcedure, 'Adapter');
 
 Finalization
  {$IFDEF DELPHIXE3UP}UnregisterAboutBox; {$ENDIF}

@@ -34,6 +34,7 @@ uses
     Types,
     SysUtils;
 
+{$IFNDEF RESTDWLAMW}
 const
   {$IF Defined(WIN32)}
   LIB_CRYPTO_110 = 'libcrypto-1_1.dll';
@@ -92,8 +93,9 @@ const
   LIB_SSL_300 = 'libssl.so';
   _PU = '';
   {$ELSE}
-    {$MESSAGE Error 'Unsupported platform'}
+   {$MESSAGE Error 'Unsupported platform'}
   {$IFEND}
+{$ENDIF}
 
 const
   OPENSSL_VER_1100   = $1010000f; // 1.1.0
@@ -22452,10 +22454,12 @@ function SSL_get_mode(s: PSSL): Integer;
 function DTLSv1_get_timeout(s: PSSL; timeval: PTimeVal): LongInt;
 procedure DTLSv1_handle_timeout(s: PSSL);
 
+{$IFNDEF RESTDWLAMW}
 function LoadCrypto : boolean;
 function LoadSSL : boolean;
 
 procedure UnloadCrypto;
+{$ENDIF}
 procedure UnloadSSL;
 
 function SslGetImports (Handle: THandle; List: array of TOSSLImports): string ;  { V8.35 }
@@ -22467,6 +22471,7 @@ resourcestring
   eossl_libnotfound1 = 'Failed libraries not found %s';
   eossl_libnotfound2 = 'Failed libraries not found %s or %s';
 
+{$IFNDEF RESTDWLAMW}
 function LoadCrypto : boolean;
 var
   Erros : string;
@@ -22580,6 +22585,7 @@ begin
       raise Exception.Create(Format(eossl_libnotfound1,[LIB_SSL_110]))
   end;
 end;
+{$ENDIF}
 
 procedure UnloadSSL;
 begin

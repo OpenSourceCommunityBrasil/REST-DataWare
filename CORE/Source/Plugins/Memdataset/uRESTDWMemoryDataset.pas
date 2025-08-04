@@ -1017,7 +1017,7 @@ Begin
      dwftAutoInc   : Result := SizeOf(Longint);
      dwftLargeint  : Result := {$IFDEF FPC}8{$ELSE}{$IF CompilerVersion <= 22}8{$ELSE}64{$IFEND}{$ENDIF}; //Field Size é 64 Bits
      dwftBCD,                                                                           //Result := SizeOf(TBcd);
-     dwftFMTBCD    : Result := {$IFDEF FPC}8{$ELSE}SizeOf(DWBCD){$ENDIF};
+     dwftFMTBCD    : Result := SizeOf(Currency);
      dwftTimeStampOffset : Begin
                             Inc(Result,SizeOf(Double));
                             Inc(Result,SizeOf(Byte));
@@ -1943,10 +1943,14 @@ Var
  {$IFDEF FPC}
  vSingle      : DWSingle;
  vDataType    : Byte;
+ vBCD         : TBCD;
+ vBCDA        : DWLongDouble;
  {$ENDIF}
- vBCD         : Real;
  vDouble      : DWFloat;
+ vLongDouble  : DWCurrency;
  vTimeStamp   : TSQLTimeStamp;
+ vTimeStampV  : TTimeStamp;
+ vDateTimeInt : DWInteger;
  vDateTimeRec : TDateTimeRec;
  vDWFieldType : Byte;
 Begin
@@ -2244,6 +2248,12 @@ Begin
                cLen := SizeOf(vBCD);
                Move(Pointer(@vBCD)^, Pointer(Buffer)^, cLen);
               End
+             Else If vDataType = dwftBCD Then
+              Begin
+               Move(aDataBytes[1], Pointer(@vLongDouble)^, SizeOf(vLongDouble));
+               cLen := SizeOf(vLongDouble);
+               Move(Pointer(@vLongDouble)^, Pointer(Buffer)^, cLen);
+              End
              Else
               Move(aDataBytes[1], Pointer(Buffer)^, cLen-1);
             End
@@ -2253,7 +2263,7 @@ Begin
              If Length(TRESTDWBytes(Buffer)) = 0 Then
               SetLength(TRESTDWBytes(Buffer), cLen);
              cLen := SizeOf(TDateTimeRec);
-             Move(aDataBytes[1], Pointer(@vDouble)^, SizeOf(vDouble));
+             Move(aDataBytes[1], Pointer(@vDouble)^, SizeOf(DWDouble));
              Case Field.datatype Of
               ftTime     : Begin
                             vDateTimeRec.Time := DateTimeToTimeStamp(vDouble).Time;
@@ -2590,6 +2600,7 @@ Var
                                    End
                                   Else
                                    Begin
+                                    vDateTime           := 0;
                                     vDateTime           := IncMillisecond(vDateTime, vDateTimeInt);
                                     vDateFloat          := vDateTime;
                                    End;
