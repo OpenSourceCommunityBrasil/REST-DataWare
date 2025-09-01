@@ -563,7 +563,7 @@ begin
             else
               vParam.Clear;
           end
-          else if vParam.RESTDWDataTypeParam in [dwftFloat,dwftBCD,dwftFMTBcd,dwftSingle,dwftExtended] then begin
+          else if vParam.RESTDWDataTypeParam in [dwftFloat,dwftBCD,dwftFMTBcd{$IFNDEF FPC},dwftExtended{$ENDIF}] then begin
             if (Trim(DWParams[I].Value) <> '') and (not DWParams[I].IsNull) then
               vParam.Value  := StrToFloat(BuildFloatString(DWParams[I].Value))
             else
@@ -1323,7 +1323,7 @@ begin
                End;
              End;
           end
-          else if vParam.RESTDWDataTypeParam in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
+          else if vParam.RESTDWDataTypeParam in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd] then begin
             if (not (MassiveDataset.AtualRec.PrimaryValues[X].IsNull)) then
               vParam.AsFloat := StrToFloat(BuildFloatString(MassiveDataset.AtualRec.PrimaryValues[X].Value));
           end
@@ -1393,7 +1393,7 @@ begin
         else
           vParam.Clear;
       end
-      else if vParam.RESTDWDataTypeParam in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
+      else if vParam.RESTDWDataTypeParam in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd] then begin
         if (not (MassiveDataset.Fields.FieldByName(vParam.Name).IsNull)) then
           vParam.AsFloat := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(vParam.Name).Value))
         else
@@ -4179,7 +4179,7 @@ begin
                 else
                   vParam.Clear;
               end
-              else if vParam.RESTDWDataTypeParam in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd,dwftSingle] then begin
+              else if vParam.RESTDWDataTypeParam in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd] then begin
                 if (not (MassiveDataset.Params.ItemsString[vParam.Name].IsNull)) then
                   vParam.AsFloat := StrToFloat(BuildFloatString(MassiveDataset.Params.ItemsString[vParam.Name].Value))
                 else
@@ -4268,7 +4268,7 @@ begin
                 else
                   vParam.Clear;
               end
-              else if vParam.RESTDWDataTypeParam in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd, dwftSingle] then begin
+              else if vParam.RESTDWDataTypeParam in [dwftFloat, dwftCurrency, dwftBCD, dwftFMTBcd] then begin
                 if (not (MassiveDataset.Fields.FieldByName(vParam.Name).IsNull)) then
                   vParam.AsFloat := StrToFloat(BuildFloatString(MassiveDataset.Fields.FieldByName(vParam.Name).Value))
                 else

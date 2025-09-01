@@ -1,4 +1,4 @@
-unit uRESTDWStorageBin;
+﻿unit uRESTDWStorageBin;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -248,15 +248,23 @@ Procedure TRESTDWStorageBin.LoadDWMemFromStream(IDataset : IRESTDWMemTable;
     If (Not (Assigned(DataSet.FindField(FFieldNames[Index]))) And
        Not(FindDef(FFieldNames[Index]))) Then
      Begin
-      VFDef          := DataSet.FieldDefs.AddFieldDef;
-      VFDef.Name     := FFieldNames[Index];
-      VFDef.DataType := DWFieldTypeToFieldType(FFieldTypes[Index]);
-      VFDef.Size     := FFieldSize[Index];
+      If FFieldTypes[Index] = {$IFDEF FPC}45{$ELSE}dwftExtended{$ENDIF} Then
+       Begin
+        DataSet.FieldDefs.Add(FFieldNames[Index], DWFieldTypeToFieldType(FFieldTypes[Index]));
+        VFDef := DataSet.FieldDefs[DataSet.FieldDefs.Count -1];
+       End
+      Else
+       Begin
+        VFDef          := DataSet.FieldDefs.AddFieldDef;
+        VFDef.Name     := FFieldNames[Index];
+        VFDef.DataType := DWFieldTypeToFieldType(FFieldTypes[Index]);
+       End;
+      If FFieldTypes[Index] <> dwftExtended Then
+       VFDef.Size     := FFieldSize[Index];
       VFDef.Required := FFieldAttrs[Index] and 1 > 0;
       Case FFieldTypes[Index] of
         dwftFloat,
-        dwftCurrency,
-        dwftSingle    : VFDef.Precision := FFieldPrecision[Index];
+        dwftCurrency  : VFDef.Precision := FFieldPrecision[Index];
         dwftBCD,
         dwftFMTBcd    : Begin
                         {$IFNDEF FPC}
@@ -327,26 +335,22 @@ Begin
    FFieldNames[I] := vFieldName;
    // field type
    AStream.Read(vFieldType, SizeOf(vFieldType));
-   FFieldTypes[I] := vFieldType;
+   If vFieldType in [{$IFDEF FPC}45, {$ENDIF}dwftExtended] Then
+    FFieldTypes[I] := {$IFDEF FPC}Integer(ftFMTBcd){$ELSE}Integer(ftExtended){$ENDIF}
+   Else
+    FFieldTypes[I] := vFieldType;
    // field size
    AStream.Read(vFieldSize, SizeOf(vFieldSize));
    FFieldSize[I] := vFieldSize;
    // field precision
    AStream.Read(vFieldPrecision, SizeOf(vFieldPrecision));
    {$IFDEF FPC}
-    If vFieldType in [dwftSingle, dwftFloat, dwftFMTBcd, dwftBCD] Then
-     If vFieldType in [dwftFloat, dwftFMTBcd, dwftBCD] Then
-      Begin
-       If (vFieldPrecision    < 12) Or
-          (FFieldPrecision[I] =  0) Then
-        FFieldPrecision[I] := 12;
-      End
-     Else
-      Begin
-       If (vFieldPrecision    < 8) Or
-          (FFieldPrecision[I] = 0) Then
-        FFieldPrecision[I] := 8;
-      End;
+    If vFieldType in [dwftFloat, dwftFMTBcd, dwftBCD] Then
+     Begin
+      If (vFieldPrecision    < 12) Or
+         (FFieldPrecision[I] =  0) Then
+       FFieldPrecision[I] := 12;
+     End;
    {$ELSE}
     FFieldPrecision[I] := vFieldPrecision;
     If vFieldType in [dwftSingle] Then
@@ -425,6 +429,7 @@ Var
  vInt64        : DWInt64;
  vSingle       : DWSingle;
  vDouble       : DWDouble;
+ vExtended     : DWLongDouble;
  vWord         : DWWord;
  vCurrency     : DWCurrency;
  vTimeStamp    : {$IFDEF FPC} TTimeStamp {$ELSE} TSQLTimeStamp {$ENDIF};
@@ -469,12 +474,12 @@ Var
                             dwftSmallint,
                             dwftWord,
                             dwftInteger,
-                            dwftSingle,
+//                            dwftSingle,
                             dwftExtended,
                             dwftFloat,
                             dwftOraTimeStamp,
                             dwftBCD,
-                            dwftFMTBcd,
+//                            dwftFMTBcd,
                             dwftCurrency,
                             dwftDate,
                             dwftTime,
@@ -653,22 +658,22 @@ Begin
                                        Move(vVarBytes[0], PData^, Sizeof(Boolean) + Sizeof(vInt));
                                       End;
                                    End;
-           // 4 - Bytes - Flutuantes
-           dwftSingle             :Begin          // Gledston
-                                     vLength := SizeOf(vDouble);
-                                     stream.Read(vDouble, vLength);
-                                     If aField <> Nil Then
-                                      Begin
-                                       //Move(vSingle,PData^,Sizeof(vSingle));
-                                       SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(vDouble));
-                                       //Move Null para Bytes
-                                       Move(vBoolean, vVarBytes[0], Sizeof(Boolean));
-                                       //Move Bytes do Dado para Bytes
-                                       Move(vDouble, vVarBytes[1], Sizeof(vDouble));
-                                       //Move Bytes para Buffer
-                                       Move(vVarBytes[0], PData^, Length(vVarBytes));
-                                      End;
-                                   End;
+//           // 4 - Bytes - Flutuantes
+//           dwftSingle             :Begin          // Gledston
+//                                     vLength := SizeOf(vDouble);
+//                                     stream.Read(vDouble, vLength);
+//                                     If aField <> Nil Then
+//                                      Begin
+//                                       //Move(vSingle,PData^,Sizeof(vSingle));
+//                                       SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(vDouble));
+//                                       //Move Null para Bytes
+//                                       Move(vBoolean, vVarBytes[0], Sizeof(Boolean));
+//                                       //Move Bytes do Dado para Bytes
+//                                       Move(vDouble, vVarBytes[1], Sizeof(vDouble));
+//                                       //Move Bytes para Buffer
+//                                       Move(vVarBytes[0], PData^, Length(vVarBytes));
+//                                      End;
+//                                   End;
            // 8 - Bytes - Inteiros
            dwftLargeint,
            dwftAutoInc,
@@ -686,7 +691,13 @@ Begin
                                       End;
                                    End;
            // 8 - Bytes - Flutuantes
-           dwftFloat              :Begin
+           dwftFloat
+           {$IFDEF FPC}
+            , 45 //Extended
+           {$ENDIF}
+           , dwftExtended
+
+                                   :Begin
                                      stream.Read(vDouble, SizeOf(vDouble));
                                      If aField <> Nil Then
                                       Begin
@@ -699,23 +710,23 @@ Begin
                                        Move(vVarBytes[0], PData^, Length(vVarBytes));
                                       End;
                                    End;
-           //dwftExtended           :Begin
-           //                          stream.Read(vDouble, SizeOf(Extended));
-           //                          If aField <> Nil Then
-           //                           Begin
-           //                            SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(Extended));
-           //                            //Move Null para Bytes
-           //                            Move(vBoolean, vVarBytes[0], Sizeof(Boolean));
-           //                            //Move Bytes do Dado para Bytes
-           //                            Move(vDouble, vVarBytes[1], Sizeof(Extended));
-           //                            //Move Bytes para Buffer
-           //                            {$IFDEF FPC}
-           //                              PRESTDWBytes(pData)^ := vVarBytes;
-           //                            {$ELSE}
-           //                              Move(vVarBytes[0], PData^, Sizeof(Boolean) + Sizeof(vDouble));
-           //                            {$ENDIF}
-           //                           End;
-           //                        End;
+//           dwftExtended           :Begin
+//                                     stream.Read(vExtended, SizeOf(vExtended));
+//                                     If aField <> Nil Then
+//                                      Begin
+//                                       SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(vExtended));
+//                                       //Move Null para Bytes
+//                                       Move(vBoolean, vVarBytes[0], Sizeof(Boolean));
+//                                       //Move Bytes do Dado para Bytes
+//                                       Move(vExtended, vVarBytes[1], Sizeof(vExtended));
+//                                       //Move Bytes para Buffer
+//                                       {$IFDEF FPC}
+//                                         PRESTDWBytes(pData)^ := vVarBytes;
+//                                       {$ELSE}
+//                                         Move(vVarBytes[0], PData^, Sizeof(Boolean) + Sizeof(vExtended));
+//                                       {$ENDIF}
+//                                      End;
+//                                   End;
            // 8 - Bytes - Date, Time, DateTime, TimeStamp
            dwftDate,
            dwftTime,
@@ -822,7 +833,7 @@ Begin
                                       End;
                                    End;
           // 8 - Bytes - Currency
-          dwftFMTBcd              :Begin
+          {$IFNDEF FPC}dwftFMTBcd : Begin
                                      stream.Read(vCurrency, SizeOf(vCurrency));
                                      {$IFDEF FPC}
                                       vBCD := CurrToBcd(vCurrency);
@@ -841,6 +852,7 @@ Begin
                                      //Move Bytes para Buffer
                                      Move(vVarBytes[0], PData^, Sizeof(Boolean) + Sizeof(vBCD));
                                    End;
+          {$ENDIF}
            //N Bytes - String Blobs
           dwftWideMemo,
           dwftFmtMemo,
@@ -1340,6 +1352,7 @@ Var
  vSingle       : DWSingle;
  vDouble       : DWDouble;
  vCurrency     : DWCurrency;
+ vExtended     : DWLongDouble;
  vBCD          : DWBCD;
  vMemoryStream : TMemoryStream;
  vBoolean      : Boolean;
@@ -1456,11 +1469,11 @@ Begin
                               Move(PData^, vInt, Sizeof(vInt));
                               Stream.Write(vByte, Sizeof(vInt));
                              End;
-        // 4 - Bytes - Flutuantes
-        dwftSingle         : Begin
-                              Move(PData^, vDouble, Sizeof(vDouble));
-                              Stream.Write(vDouble, Sizeof(vDouble));
-                             End;
+//        // 4 - Bytes - Flutuantes
+//        dwftSingle         : Begin
+//                              Move(PData^, vDouble, Sizeof(vDouble));
+//                              Stream.Write(vDouble, Sizeof(vDouble));
+//                             End;
         // 8 - Bytes - Inteiros
         dwftLargeint,
         dwftAutoInc,
@@ -1506,6 +1519,10 @@ Begin
                                 Move(PData^, vCurrency, Sizeof(vCurrency));
                                 Stream.Write(vCurrency, Sizeof(vCurrency));
                                End;
+       dwftExtended          : Begin
+                                Move(PData^, vExtended, Sizeof(vExtended));
+                                Stream.Write(vExtended, Sizeof(vExtended));
+                               End;
         // 8 - Bytes - Currency
        dwftBCD               : Begin
                                 {$IFDEF FPC}
@@ -1520,6 +1537,7 @@ Begin
                                 {$ENDIF}
                                 Stream.Write(vCurrency, Sizeof(vCurrency));
                                End;
+      {$IFNDEF FPC}
         // 8 - Bytes - Currency
        dwftFMTBcd            : Begin
                                 Move(PData^, vBCD, Sizeof(vBCD));
@@ -1534,6 +1552,7 @@ Begin
                                 {$ENDIF}
                                 Stream.Write(vCurrency, Sizeof(vCurrency));
                                End;
+      {$ENDIF}
         // N Bytes - Blobs
 //       dwftWideMemo,
 //       dwftFmtMemo,
@@ -1601,6 +1620,7 @@ Var
  vInt          : DWInteger;
  vDouble       : DWDouble;
  vWord         : DWWord;
+ vExtended     : DWLongDouble;
  vSingle       : DWSingle;
  vCurrency     : DWCurrency;
  vMemoryStream : TMemoryStream;
@@ -1674,10 +1694,10 @@ Begin
                           AStream.Write(vInt, Sizeof(vInt));
                          End;
     // 4 - Bytes - Flutuantes
-   dwftSingle          : Begin
-                          vSingle := ADataset.Fields[i].Value;
-                          AStream.Write(vSingle, SizeOf(vSingle));
-                         End;
+//   dwftSingle          : Begin
+//                          vSingle := ADataset.Fields[i].Value;
+//                          AStream.Write(vSingle, SizeOf(vSingle));
+//                         End;
    // 8 - Bytes - Inteiros
    dwftLargeint,
    dwftAutoInc,
@@ -1690,10 +1710,19 @@ Begin
                           AStream.Write(vInt64, Sizeof(vInt64));
                          End;
    // 8 - Bytes - Flutuantes
-   dwftFloat        : Begin
-                          vDouble := ADataset.Fields[i].AsFloat;
-                          AStream.Write(vDouble, Sizeof(vDouble));
-                         End;
+   dwftFloat
+   {$IFDEF FPC}
+    , 45, dwftExtended
+   {$ENDIF}         : Begin
+                       vDouble := ADataset.Fields[i].AsFloat;
+                       AStream.Write(vDouble, Sizeof(vDouble));
+                      End;
+   {$IFNDEF FPC}
+   dwftExtended     : Begin
+                       vExtended := ADataset.Fields[i]{$IFNDEF FPC}.AsExtended{$ELSE}.AsFloat{$ENDIF};
+                       AStream.Write(vExtended, Sizeof(vExtended));
+                      End;
+   {$ENDIF}
    // 8 - Bytes - Date, Time, DateTime, TimeStamp
    dwftDate,
    dwftTime,
@@ -1717,8 +1746,10 @@ Begin
     {$ENDIF}
     // 8 - Bytes - Currency
    dwftCurrency,
-   dwftBCD,
-   dwftFMTBcd          : Begin
+   dwftBCD
+   {$IFNDEF FPC}
+    , dwftFMTBcd
+   {$ENDIF}            : Begin
                           {$IFDEF FPC}
                           If ADataset.Fields[i].Isnull Then
                            vCurrency := 0

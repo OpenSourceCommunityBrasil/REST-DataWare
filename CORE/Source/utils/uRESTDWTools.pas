@@ -551,80 +551,91 @@ end;
 Function DWFieldTypeToFieldType(DWFieldType : Byte) : TFieldType;
 Begin
  Result := ftUnknown;
- Case DWFieldType Of
-  dwftString          : Result := ftString;
-  dwftSmallint        : Result := ftSmallint;
-  dwftInteger         : Result := ftInteger;
-  dwftWord            : Result := ftWord;
-  dwftBoolean         : Result := ftBoolean;
-  dwftFloat           : Result := ftFloat;
-  dwftCurrency        : Result := ftCurrency;
-  dwftDate            : Result := ftDate;
-  dwftTime            : Result := ftTime;
-  dwftDateTime        : Result := ftDateTime;
-  dwftBytes           : Result := ftBytes;
-  dwftVarBytes        : Result := ftVarBytes;
-  dwftAutoInc         : Result := ftAutoInc;
-  dwftBlob            : Result := ftBlob;
-  dwftMemo            : Result := ftMemo;
-  dwftGraphic         : Result := ftGraphic;
-  dwftFmtMemo         : Result := ftFmtMemo;
-  dwftParadoxOle      : Result := ftParadoxOle;
-  dwftDBaseOle        : Result := ftDBaseOle;
-  dwftTypedBinary     : Result := ftTypedBinary;
-  dwftCursor          : Result := ftCursor;
-  dwftFixedChar       : Result := ftFixedChar;
-  dwftLargeint        : Result := ftLargeint;
-  dwftADT             : Result := ftADT;
-  dwftArray           : Result := ftArray;
-  dwftReference       : Result := ftReference;
-  dwftDataSet         : Result := ftDataSet;
-  dwftOraBlob         : Result := ftOraBlob;
-  dwftOraClob         : Result := ftOraClob;
-  dwftVariant         : Result := ftVariant;
-  dwftInterface       : Result := ftInterface;
-  dwftIDispatch       : Result := ftIDispatch;
-  dwftGuid            : Result := ftGuid;
-  dwftBCD             : Result := ftBCD;
-  dwftFMTBcd          : Result := ftFMTBcd;
-  {$IFDEF DELPHI2010UP}
-    dwftTimeStamp       : Result := ftTimeStamp;
-    dwftWideString      : Result := ftWideString;
-    dwftFixedWideChar   : Result := ftFixedWideChar;
-    dwftWideMemo        : Result := ftWideMemo;
-    dwftOraTimeStamp    : Result := ftOraTimeStamp;
-    dwftOraInterval     : Result := ftOraInterval;
-    dwftLongWord        : Result := ftLongWord;
-    dwftShortint        : Result := ftShortint;
-    dwftByte            : Result := ftByte;
-    //dwftExtended        : Result := ftExtended; gledston
-    dwftConnection      : Result := ftConnection;
-    dwftParams          : Result := ftParams;
-    dwftStream          : Result := ftStream;
-    dwftTimeStampOffset : Result := ftTimeStampOffset;
-    dwftObject          : Result := ftObject;
-    dwftSingle          : Result := ftSingle;
-  {$ELSE}
-    {$IFDEF DELPHIXEUP}
-    dwftFixedWideChar   : Result := ftFixedWideChar;
-    dwftWideMemo        : Result := ftWideMemo;
-    {$ELSE}
-    dwftFixedWideChar   : Result := ftFixedChar;
-    dwftWideMemo        : Result := ftMemo;
+ {$IFDEF FPC}
+ If DWFieldType = 45 Then //Extended come from Delphi
+  Result := ftFMTBcd
+ Else
+  Begin
+ {$ENDIF}
+   Case DWFieldType Of
+    dwftString          : Result := ftString;
+    dwftSmallint        : Result := ftSmallint;
+    dwftInteger         : Result := ftInteger;
+    dwftWord            : Result := ftWord;
+    dwftBoolean         : Result := ftBoolean;
+    dwftFloat           : Result := ftFloat;
+    dwftCurrency        : Result := ftCurrency;
+    dwftDate            : Result := ftDate;
+    dwftTime            : Result := ftTime;
+    dwftDateTime        : Result := ftDateTime;
+    dwftBytes           : Result := ftBytes;
+    dwftVarBytes        : Result := ftVarBytes;
+    dwftAutoInc         : Result := ftAutoInc;
+    dwftBlob            : Result := ftBlob;
+    dwftMemo            : Result := ftMemo;
+    dwftGraphic         : Result := ftGraphic;
+    dwftFmtMemo         : Result := ftFmtMemo;
+    dwftParadoxOle      : Result := ftParadoxOle;
+    dwftDBaseOle        : Result := ftDBaseOle;
+    dwftTypedBinary     : Result := ftTypedBinary;
+    dwftCursor          : Result := ftCursor;
+    dwftFixedChar       : Result := ftFixedChar;
+    dwftLargeint        : Result := ftLargeint;
+    dwftADT             : Result := ftADT;
+    dwftArray           : Result := ftArray;
+    dwftReference       : Result := ftReference;
+    dwftDataSet         : Result := ftDataSet;
+    dwftOraBlob         : Result := ftOraBlob;
+    dwftOraClob         : Result := ftOraClob;
+    dwftVariant         : Result := ftVariant;
+    dwftInterface       : Result := ftInterface;
+    dwftIDispatch       : Result := ftIDispatch;
+    dwftGuid            : Result := ftGuid;
+    dwftBCD             : Result := ftBCD;
+    dwftExtended        : Result := {$IFDEF FPC}ftFMTBcd{$ELSE}ftExtended{$ENDIF};
+    {$IFNDEF FPC}
+     dwftFMTBcd         : Result := ftFMTBcd;
     {$ENDIF}
-    dwftTimeStamp       : Result := ftDateTime; // ftTimeStamp nao definido 3.2.4
-    dwftWideString      : Result := ftWideString;
-    dwftOraTimeStamp    : Result := ftDateTime; // ftTimeStamp nao definido 3.2.4
-    dwftOraInterval     : Result := ftInteger;
-    dwftLongWord        : Result := ftWord;
-    dwftShortint        : Result := ftInteger;
-    dwftByte            : Result := ftTypedBinary;
-    dwftExtended        : Result := ftFloat;
-    dwftStream          : Result := ftBlob;
-    dwftTimeStampOffset : Result := ftDateTime; // ftTimeStamp nao definido 3.2.4
-    dwftSingle          : Result := ftFloat;
-  {$ENDIF}
- End;
+    {$IFDEF DELPHI2010UP}
+     dwftTimeStamp       : Result := ftTimeStamp;
+     dwftWideString      : Result := ftWideString;
+     dwftFixedWideChar   : Result := ftFixedWideChar;
+     dwftWideMemo        : Result := ftWideMemo;
+     dwftOraTimeStamp    : Result := ftOraTimeStamp;
+     dwftOraInterval     : Result := ftOraInterval;
+     dwftLongWord        : Result := ftLongWord;
+     dwftShortint        : Result := ftShortint;
+     dwftByte            : Result := ftByte;
+     //dwftExtended        : Result := ftExtended; gledston
+     dwftConnection      : Result := ftConnection;
+     dwftParams          : Result := ftParams;
+     dwftStream          : Result := ftStream;
+     dwftTimeStampOffset : Result := ftTimeStampOffset;
+     dwftObject          : Result := ftObject;
+ //    dwftSingle          : Result := ftSingle;
+    {$ELSE}
+     {$IFDEF DELPHIXEUP}
+      dwftFixedWideChar   : Result := ftFixedWideChar;
+      dwftWideMemo        : Result := ftWideMemo;
+     {$ELSE}
+      dwftFixedWideChar   : Result := ftFixedChar;
+      dwftWideMemo        : Result := ftMemo;
+     {$ENDIF}
+     dwftTimeStamp       : Result := ftDateTime; // ftTimeStamp nao definido 3.2.4
+     dwftWideString      : Result := ftWideString;
+     dwftOraTimeStamp    : Result := ftDateTime; // ftTimeStamp nao definido 3.2.4
+     dwftOraInterval     : Result := ftInteger;
+     dwftLongWord        : Result := ftWord;
+     dwftShortint        : Result := ftInteger;
+     dwftByte            : Result := ftTypedBinary;
+     dwftStream          : Result := ftBlob;
+     dwftTimeStampOffset : Result := ftDateTime; // ftTimeStamp nao definido 3.2.4
+ //    dwftSingle          : Result := ftFloat;
+    {$ENDIF}
+   End;
+ {$IFDEF FPC}
+  End;
+ {$ENDIF}
 End;
 
 Function FieldTypeToDWFieldType(FieldType  : TFieldType)   : Byte;
@@ -667,7 +678,7 @@ Begin
   ftIDispatch       : Result := dwftIDispatch;
   ftGuid            : Result := dwftGuid;
   ftTimeStamp       : Result := dwftTimeStamp;
-  ftFMTBcd          : Result := dwftFMTBcd;
+  ftFMTBcd          : Result := {$IFDEF FPC}45{$ELSE}dwftExtended{$ENDIF};
   {$IFDEF DELPHI2010UP} // Delphi 2010 acima
    ftFixedWideChar   : Result := dwftFixedWideChar;
    ftWideMemo        : Result := dwftWideMemo;

@@ -29,6 +29,11 @@ package RESTDWCore;
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 
+requires
+  rtl,
+  soaprtl,
+  dbrtl;
+
 contains
   uRESTDWBasic in '..\..\Source\Basic\uRESTDWBasic.pas',
   uRESTDWBasicDB in '..\..\Source\Basic\uRESTDWBasicDB.pas',

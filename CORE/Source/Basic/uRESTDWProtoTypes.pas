@@ -69,6 +69,7 @@ uses
   dwftGuid            = Integer(DB.ftGuid);
   dwftTimeStamp       = Integer(DB.ftTimeStamp);
   dwftFMTBcd          = Integer(DB.ftFMTBcd);
+  dwftSingle          = Integer(DB.ftFloat);
   {$IFDEF DELPHI2006UP}
   dwftFixedWideChar   = Integer(DB.ftFixedWideChar);
   dwftWideMemo        = Integer(DB.ftWideMemo);
@@ -84,18 +85,17 @@ uses
   dwftLongWord        = Integer(DB.ftLongWord); //42
   dwftShortint        = Integer(DB.ftShortint); //43
   dwftByte            = Integer(DB.ftByte); //44
-  dwftExtended        = Integer(DB.ftFloat); //45
+  dwftExtended        = Integer(DB.ftExtended); //45
   dwftStream          = Integer(DB.ftStream); //48
   dwftTimeStampOffset = Integer(DB.ftTimeStampOffset); //49
-  dwftSingle          = Integer(DB.ftSingle); //51
   {$ELSE}
   dwftLongWord        = Integer(42);
   dwftShortint        = Integer(43);
   dwftByte            = Integer(44);
-  dwftExtended        = Integer(45);
+  dwftExtended        = Integer(ftFMTBcd);
   dwftStream          = Integer(48);
   dwftTimeStampOffset = Integer(49);
-  dwftSingle          = Integer(51);
+//  dwftSingle          = Integer(51);
   {$ENDIF}
   {Unsupported types}
   dwftUnknown         = Integer(DB.ftUnknown);
