@@ -569,7 +569,7 @@ Begin
     dwftTime            : Result := ftTime;
     dwftDateTime        : Result := ftDateTime;
     dwftBytes           : Result := ftBytes;
-    dwftVarBytes        : Result := ftVarBytes;
+    dwftVarBytes        : Result := ftString;
     dwftAutoInc         : Result := ftAutoInc;
     dwftBlob            : Result := ftBlob;
     dwftMemo            : Result := ftMemo;
@@ -668,7 +668,7 @@ Begin
   ftWideString      : Result := dwftWideString;
   ftLargeint        : Result := dwftLargeint;
   ftADT             : Result := dwftADT;
-  ftArray           : Result := dwftArray;
+  ftArray           : Result := dwftVarBytes;
   ftReference       : Result := dwftReference;
   ftDataSet         : Result := dwftDataSet;
   ftOraBlob         : Result := dwftOraBlob;

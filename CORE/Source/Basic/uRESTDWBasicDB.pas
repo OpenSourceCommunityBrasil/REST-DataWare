@@ -817,13 +817,13 @@ Type
   Property    FieldDefs;
   Property    ReadData             : Boolean               Read GetReadData;
   Property    MasterDetailList     : TMasterDetailList     Read vMasterDetailList         Write vMasterDetailList;
+  Property    BinaryRequest        : Boolean               Read vBinaryRequest; //            Write vBinaryRequest;
  Published
   Property MasterDataSet           : TRESTDWClientSQL      Read vMasterDataSet            Write SetMasterDataSet;
   {$IFDEF FPC}
   Property DatabaseCharSet;
   {$ENDIF}
   Property MasterCascadeDelete     : Boolean               Read vCascadeDelete            Write vCascadeDelete;
-  Property BinaryRequest           : Boolean               Read vBinaryRequest            Write vBinaryRequest;
   Property Datapacks               : Integer               Read vDatapacks                Write SetDatapacks;
   Property OnGetDataError          : TOnEventConnection    Read vOnGetDataError           Write vOnGetDataError;         //Recebe os Erros de ExecSQL ou de GetData
   Property AfterScroll             : TOnAfterScroll        Read vOnAfterScroll            Write vOnAfterScroll;

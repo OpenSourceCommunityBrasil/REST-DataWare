@@ -602,10 +602,13 @@ Begin
         Begin
           result.Name := cNames.Get(index).toString;
           Try
-           result.Value := TJSONObject(vJSONObject).Get(result.Name).toString;
+           IF (TJSONObject(vJSONObject).Get(result.Name) <> Nil)   And
+              (TJSONObject(vJSONObject).Get(result.Name) <> CNULL) Then
+            result.Value := TJSONObject(vJSONObject).Get(result.Name).toString;
           Except
+           result.Value := '';
           End;
-         result.ClassName := TJSONObject(vJSONObject).Get(result.Name).ClassName;
+         result.ClassName := cNames.Get(index).ClassName;
         End;
       End
      Else
@@ -676,7 +679,7 @@ Begin
   If Trim(result.ClassName) = '' Then
     result.ClassName := vClassName;
   // Correção para null value
-  result.isnull := (result.Value = 'null'); // or (Result.Value = '');
+  result.isnull := (result.Value = 'null') or (Result.Value = '');
   If result.isnull Then
     result.Value := '';
 End;

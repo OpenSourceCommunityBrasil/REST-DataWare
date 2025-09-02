@@ -160,10 +160,22 @@ Begin
    AStream.Read(vFieldType, SizeOf(vFieldType));
    vFieldDef.DataType := DWFieldTypeToFieldType(vFieldType);
    FFieldTypes[I] := vFieldType;
+
+   If vFieldType in [{$IFDEF FPC}45, {$ENDIF}dwftExtended] Then
+    FFieldTypes[I] := {$IFDEF FPC}Integer(ftFMTBcd){$ELSE}Integer(ftExtended){$ENDIF}
+   Else
+    FFieldTypes[I] := vFieldType;
    // field size
    AStream.Read(vInt, SizeOf(vInt));
+   If vFieldType = dwftVarBytes Then //Max Array Size
+    Begin
+     FFieldTypes[I] := Integer(ftString);
+     FFieldSize[I]  := 255;
+     vInt           := FFieldSize[I];
+    End
+   Else
+    FFieldSize[I] := vInt;
    vFieldDef.Size := vInt;
-   FFieldSize[I]  := vInt;
    // field precision
    AStream.Read(vInt, SizeOf(vInt));
    FFieldPrecision[I] := vInt;
@@ -341,7 +353,13 @@ Begin
     FFieldTypes[I] := vFieldType;
    // field size
    AStream.Read(vFieldSize, SizeOf(vFieldSize));
-   FFieldSize[I] := vFieldSize;
+   If vFieldType = dwftVarBytes Then //Max Array Size
+    Begin
+     FFieldTypes[I] := Integer(ftString);
+     FFieldSize[I]  := 255;
+    End
+   Else
+    FFieldSize[I] := vFieldSize;
    // field precision
    AStream.Read(vFieldPrecision, SizeOf(vFieldPrecision));
    {$IFDEF FPC}
@@ -589,8 +607,9 @@ Begin
                                    End;
                                  End;
            // N Bytes - Strings
+           dwftVarBytes,
            dwftFixedChar,
-           dwftString            :Begin
+           dwftString            : Begin
                                     stream.Read(vInt64, SizeOf(vInt64));
                                     vString := '';
                                     If vInt64 > 0 Then
@@ -611,7 +630,7 @@ Begin
                                         Move(vString[InitStrPos], pData^, Length(vString));
                                       {$ENDIF}
                                      End;
-                                  End;
+                                   End;
            // 1 - Byte - Inteiro
            dwftByte,
            dwftShortint           :Begin
@@ -888,7 +907,7 @@ Begin
           dwftStream,
           dwftOraBlob,
           dwftBlob,
-          dwftBytes               :Begin
+          dwftBytes               : Begin
                                      SetLength(vBytes, 0);
                                      stream.Read(vInt64, SizeOf(DWInt64));
                                      If vInt64 > 0 Then
@@ -906,7 +925,7 @@ Begin
                                      Finally
                                       SetLength(vBytes, 0);
                                      End;
-                                   End;
+                                    End;
           // N Bytes - Others
           Else
             Begin
@@ -975,6 +994,7 @@ Begin
    If (FFieldTypes[i] In [dwftFixedChar,
                           dwftWideString,
                           dwftString,
+                          dwftVarBytes,
                           dwftFixedWideChar]) Then
     Begin
      AStream.Read(vInt64, Sizeof(vInt64));
@@ -1291,7 +1311,7 @@ Begin
     dwftWideString : vByte := FieldTypeToDWFieldType(ftString);
     dwftSingle     : vByte := FieldTypeToDWFieldType(ftFloat);
    End;
- AStream.Write(vByte, SizeOf(vByte));
+   AStream.Write(vByte, SizeOf(vByte));
    // fieldsize
    vInt := ADataset.Fields[i].Size;
    AStream.Write(vInt, SizeOf(vInt));
@@ -1427,6 +1447,7 @@ Begin
                                 Stream.Write(vString[1], vInt64);
                               {$ENDIF}
                              End;
+        dwftVarBytes,
         dwftString         : Begin
                               {$IFDEF RESTDWANDROID}
                                vString := MarshaledAString(PData);
@@ -1658,6 +1679,7 @@ Begin
                            AStream.Write(vString[InitStrPos], vInt64);
                          End;
      // N - Bytes
+    dwftVarBytes,
     dwftString         : Begin
                           vString  := ADataset.Fields[i].AsString;
                           If EncodeStrs Then
