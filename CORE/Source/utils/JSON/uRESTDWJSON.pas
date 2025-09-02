@@ -358,7 +358,7 @@ Type
     function toString (indentFactor, indent : integer) : string; overload;
     function toList () : TList;
   private
-    myArrayList : TList;
+   myArrayList  : TList;
    aJSONTokener : JSONTokener;
   end;
 
@@ -765,11 +765,14 @@ var
   c, b : char;
   s , sb: string;
 begin
-  c := nextClean();
+ Result := Nil;
+ c := nextClean();
 
         case (c) of
             '"', #39: begin
-                result := _String.create (nextString(c));
+                s := nextString(c);
+                If s <> '' Then
+                 result := _String.create(s);
                 exit;
             end;
             '{': begin
@@ -1055,7 +1058,8 @@ begin
       end else if (c <> ':') then begin
           raise x.syntaxError('Expected a ":" after a key');
       end;
-      self.myHashMap.AddObject(key, x.nextValue());
+      If key <> '' Then
+       self.myHashMap.AddObject(key, x.nextValue());
 
       (*
        * Pairs are separated by ','. We will also tolerate ';'.
@@ -1063,14 +1067,13 @@ begin
 
       case (x.nextClean()) of
       ';', ',': begin
-          if (x.nextClean() = '}') then begin
-              exit;
-          end;
-          x.back();
-      end;
+                 if (x.nextClean() = '}') then
+                  exit;
+                 x.back();
+                end;
       '}': begin
-          exit;
-      end
+            exit;
+           end
       else begin
           raise x.syntaxError('Expected a "," or "}"');
       end
@@ -1085,19 +1088,18 @@ var
  i : integer;
 begin
   self.myHashMap := TStringlist.create;
-  for i := 0 to map.Count -1 do begin
-    self.myHashMap.AddObject(map[i],map.Objects[i]);
-  end;
+  for i := 0 to map.Count -1 do
+   self.myHashMap.AddObject(map[i], map.Objects[i]);
 end;
 
 
 constructor TJSONObject.create(s: string);
 var
-  token : JSOnTokener;
+ token : JSOnTokener;
 begin
   token :=  JSONTokener.create(s);
   create (token);
-  token.free;
+  FreeAndNil(token);
 end;
 
 
@@ -1142,15 +1144,17 @@ end;
      * @raises (NoSuchElementException if the key is not found.)
      *)
 function TJSONObject.get(key: string): TZAbstractObject;
-var
+Var
  o : TZAbstractObject;
 begin
-  o := opt(key);
-  if (o = nil) then begin
-      raise NoSuchElementException.create('TJSONObject[' +
-          quote(key) + '] not found.');
-  end;
-  result := o;
+ o := opt(key);
+ If (o = nil) Then
+  Begin
+   Raise NoSuchElementException.create('TJSONObject[' +
+         quote(key) + '] not found.');
+   Exit;
+  End;
+ Result := o;
 end;
 
 
@@ -1309,9 +1313,8 @@ var
  i : integer;
 begin
   result := TStringList.Create;
-  for i := 0 to myHashMap.Count -1 do begin
-    result.add (myHashMap[i]);
-  end;
+  for i := 0 to myHashMap.Count -1 do
+   result.add (myHashMap[i]);
 end;
 
 function TJSONObject.length: integer;
@@ -1824,7 +1827,15 @@ begin
               o := _keys[i];
               sb := sb + quote(o);
               sb := sb + ':';
-              sb:= sb + valueToString(TZAbstractObject(myHashMap.Objects[myHashMap.IndexOf(o)]));
+              If myHashMap.IndexOf(o) > -1 Then
+               Begin
+                If Assigned(myHashMap.Objects[myHashMap.IndexOf(o)]) Then
+                 sb:= sb + valueToString(TZAbstractObject(myHashMap.Objects[myHashMap.IndexOf(o)]))
+                Else
+                 sb:= sb + 'null';
+               End
+              Else
+               sb:= sb + 'null';
           end;
           sb := sb + '}';
           result := sb;
@@ -1924,20 +1935,25 @@ end;
 
 class function TJSONObject.valueToString(value: TZAbstractObject): string;
 begin
-  if ((value = nil) or (value.equals(null))) then begin
+ Try
+  if ((value = nil) or (TZAbstractObject(Pointer(@value)^) = cNull)) then begin
       result := 'null';
       exit;
   end;
-  if (value is _Number) then begin
-      result := numberToString(_Number(value));
+  if ((TZAbstractObject(Pointer(@value)^) is _Number) Or
+      (TZAbstractObject(Pointer(@value)^).ClassParent = _Number)) then begin
+      result := numberToString(_Number(TZAbstractObject(Pointer(@value)^)));
       exit;
   end;
-  if ((value is _Boolean) or (value is TJSONObject) or
-          (value is TJSONArray)) then begin
-      result := value.toString();
+  if ((TZAbstractObject(Pointer(@value)^) is _Boolean) or (value is TJSONObject) or
+          (TZAbstractObject(Pointer(@value)^) is TJSONArray)) then begin
+      result := TZAbstractObject(Pointer(@value)^).toString();
       exit;
   end;
-  result := quote(value.toString());
+  result := quote(TZAbstractObject(Pointer(@value)^).toString());
+ Except
+  Result := 'null';
+ End;
 end;
 
 
@@ -2179,6 +2195,8 @@ end;
      * @raises (ParseException Expected a ',' or ']')
      *)
 constructor TJSONArray.create(x: JSONTokener);
+Var
+ vAbstractObject : TZAbstractObject;
 begin
   create;
   if (x.nextClean() <> '[') then begin
@@ -2194,7 +2212,9 @@ begin
           myArrayList.add(nil);
       end else begin
           x.back();
-          myArrayList.add(x.nextValue());
+          vAbstractObject := x.nextValue();
+          If Assigned(vAbstractObject) Then
+           myArrayList.add(vAbstractObject);
       end;
       case (x.nextClean()) of
       ';',',': begin
@@ -2263,11 +2283,9 @@ begin
   while myArrayList.Count > 0 do begin
     obj := TObject(myArrayList[0]);
     myArrayList [0] := nil;
-    if (obj <> CONST_FALSE)
-      and (obj <> CONST_TRUE)
-      and (obj <> CNULL) then begin
-        obj.Free;
-    end;
+    If (obj <> CONST_FALSE) And
+       (obj <> CONST_TRUE)  Then
+     FreeAndNil(obj);
     myArrayList.Delete(0);
   end;
   FreeAndNil(myArrayList);
@@ -2470,7 +2488,10 @@ begin
         if (i > 0) then begin
             sb := sb + separator;
         end;
-        s := TJSONObject.valueToString(TZAbstractObject( myArrayList[i]));
+        If Assigned(myArrayList[i]) Then
+         s := TJSONObject.valueToString(TZAbstractObject( myArrayList[i]))
+        Else
+         s := 'null';
         sb:= sb + s;
     end;
     result := sb;
@@ -2990,10 +3011,16 @@ procedure TJSONObject.clean;
 begin
   while myHashMap.Count > 0 do begin
       if (myHashMap.Objects [0] <> CONST_FALSE)
+        and (myHashMap.Objects [0] <> Nil)
         and (myHashMap.Objects [0] <> CONST_TRUE)
-        and (myHashMap.Objects [0] <> CNULL) then begin
-        myHashMap.Objects [0].Free;
-      end;
+        and (myHashMap.Objects [0] <> CNULL) then
+       begin
+        If Assigned(myHashMap.Objects[0]) Then
+         Begin
+          myHashMap.Objects[0].Free;
+          myHashMap.Objects[0] := Nil;
+         End;
+       end;
       myHashMap.Objects [0] := nil;
       myHashMap.Delete(0);
   end;
@@ -3032,12 +3059,12 @@ end;
 
 
 initialization
-  CONST_FALSE :=  _Boolean.create (false);
-  CONST_TRUE :=  _Boolean.create (true);
-  CNULL := NULL.create;
+ CONST_FALSE :=  _Boolean.create (false);
+ CONST_TRUE  :=  _Boolean.create (true);
+ CNULL       := NULL.create;
 
 finalization
-  CONST_FALSE.free;
-  CONST_TRUE.Free;
-  CNULL.free;
+  FreeAndNil(CONST_FALSE);
+  FreeAndNil(CONST_TRUE);
+  FreeAndNil(CNULL);
 end.

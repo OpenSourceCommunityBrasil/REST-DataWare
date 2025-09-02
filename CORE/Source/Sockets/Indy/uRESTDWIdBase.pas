@@ -3281,7 +3281,6 @@ Begin
    {$IFEND}
   vAuthRealm   := AResponseInfo.AuthRealm;
   vContentType := ARequestInfo.ContentType;
-
   If CommandExec  (TComponent(AContext),
                    RemoveBackslashCommands(ARequestInfo.URI),
                    ARequestInfo.RawHTTPCommand,
@@ -3898,10 +3897,8 @@ Var
        If Assigned(bJsonOBJ) Then
         FreeAndNil(bJsonOBJ);
       End;
-     {$IFNDEF FPC} //TODO XyberX
      If Assigned(bJsonValue) Then
       FreeAndNil(bJsonValue);
-     {$ENDIF}
     End;
   Finally
    If vTempValue <> '' Then
