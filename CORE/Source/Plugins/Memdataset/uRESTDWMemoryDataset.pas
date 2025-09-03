@@ -521,6 +521,7 @@ Type
     {$ELSE}
     FFilterExpression : TRDWABExprParser;
     {$ENDIF}
+    Procedure CalcOffSets;
     Function  AddRecord          : TRESTDWMTMemoryRecord;
     Function  InsertRecord(Index : Integer) : TRESTDWMTMemoryRecord;
     Function  FindRecordID(ID    : Integer) : TRESTDWMTMemoryRecord;
@@ -584,6 +585,7 @@ Type
                                   Buffer     : PRESTDWMTMemBuffer);
     Function  GetActiveRecBuf    (Var RecBuf : PRESTDWMTMemBuffer) : Boolean;   Virtual;
     Procedure InitFieldDefsFromFields;
+    Procedure InitFieldDefsFromFieldsInternal;
     Procedure RecordToBuffer     (Rec        : TRESTDWMTMemoryRecord;
                                   Buffer     : PRESTDWMTMemBuffer);
     Procedure SetMemoryRecordData(Buffer     : PRESTDWMTMemBuffer;
@@ -838,75 +840,6 @@ Type
     Property  OnNewRecord;
     Property  OnPostError;
   End;
-
-{$IFNDEF FPC}
-  {$IF CompilerVersion > 24}
-  TExtendedField = Class(TNumericField)
-  Protected
-   Function  GetAsExtended : Extended;
-   Function  GetAsString   : String;  Override;
-   Function  GetAsVariant  : Variant; Override;
-   Procedure SetAsExtended(Const AValue : Extended);
-   Procedure SetAsString  (Const AValue : String);  Override;
-   Procedure SetVarValue  (Const AValue : Variant); Override;
-  Private
-   vSize,
-   vPrecision : Integer;
-  Public
-   Constructor Create(AOwner: TComponent); override;
-   {$IFNDEF SUPPORTS_CLASS_HELPERS}
-   Property  AsExtended    : Extended Read GetAsExtended Write SetAsExtended;
-   {$ENDIF}
-   Property  Value         : Extended Read GetAsExtended Write SetAsExtended;
-   Property  Size          : Integer  Read vSize         Write vSize;
-  Published
-   Property  Precision     : Integer  Read vPrecision    Write vPrecision;
-  End;
-  {$ELSE}
-  TExtendedField = Class(TNumericField)
-  Protected
-   {$IFDEF COMPILER17_UP}
-   Function GetAsExtended : Extended; Override;
-   {$ENDIF}
-   Function GetAsVariant  : Variant;  Override;
-  End;
-  {$IFEND}
-{$ELSE}
-TExtendedField = Class(TNumericField)
-Private
- vSize,
- vPrecision : Integer;
-Protected
- Function GetAsString   : String;  Override;
- Function GetAsVariant  : Variant;  Override;
-Public
- Constructor Create(AOwner: TComponent); override;
- Property  Size          : Integer  Read vSize         Write vSize;
-Published
- Property  Precision     : Integer  Read vPrecision    Write vPrecision;
-End;
-{$ENDIF}
-
-{$IFNDEF FPC}
-  TSQLTimeStampOffsetField = Class(TSQLTimeStampField)
-  Protected
-   {$IF CompilerVersion < 25}
-   Procedure GetText    (Var Text     : String;
-                         DisplayText  : Boolean); Override;
-   {$IFEND}
-   {$IFDEF FPC}
-   Procedure SetAsString(const Value: string); override;
-   {$ELSE}
-   {$IF CompilerVersion < 25}
-   Procedure SetAsString(const Value: string); override;
-   {$ELSE}
-   Procedure SetAsString(Const AValue : String);  Override;
-   {$IFEND}
-   {$ENDIF}
-  End;
-{$ENDIF}
-
-
   TRESTDWMTMemBlobStream = Class(TStream)
   Private
    FField      : TBlobField;
@@ -1001,7 +934,72 @@ End;
    Property    AutoRefreshOnFilterChanged : Boolean       Read fAutoRefreshOnFilterChanged Write fAutoRefreshOnFilterChanged;
    Property    RecordCount                : Integer       Read GetFilteredRecordCount;
   End;
-
+ Type
+  {$IFNDEF FPC}
+    {$IF CompilerVersion > 24}
+    TExtendedField = Class(TNumericField)
+    Protected
+     Function  GetAsExtended : Extended;
+     Function  GetAsString   : String;  Override;
+     Function  GetAsVariant  : Variant; Override;
+     Procedure SetAsExtended(Const AValue : Extended);
+     Procedure SetAsString  (Const AValue : String);  Override;
+     Procedure SetVarValue  (Const AValue : Variant); Override;
+    Private
+     vSize,
+     vPrecision : Integer;
+    Public
+     Constructor Create(AOwner: TComponent); override;
+     {$IFNDEF SUPPORTS_CLASS_HELPERS}
+     Property  AsExtended    : Extended Read GetAsExtended Write SetAsExtended;
+     {$ENDIF}
+     Property  Value         : Extended Read GetAsExtended Write SetAsExtended;
+     Property  Size          : Integer  Read vSize         Write vSize;
+    Published
+     Property  Precision     : Integer  Read vPrecision    Write vPrecision;
+    End;
+    {$ELSE}
+    TExtendedField = Class(TNumericField)
+    Protected
+     {$IFDEF COMPILER17_UP}
+     Function GetAsExtended : Extended; Override;
+     {$ENDIF}
+     Function GetAsVariant  : Variant;  Override;
+    End;
+    {$IFEND}
+  {$ELSE}
+  TExtendedField = Class(TNumericField)
+  Private
+   vSize,
+   vPrecision : Integer;
+  Protected
+   Function GetAsString   : String;  Override;
+   Function GetAsVariant  : Variant;  Override;
+  Public
+   Constructor Create(AOwner: TComponent); override;
+   Property  Size          : Integer  Read vSize         Write vSize;
+  Published
+   Property  Precision     : Integer  Read vPrecision    Write vPrecision;
+  End;
+  {$ENDIF}
+  {$IFNDEF FPC}
+    TSQLTimeStampOffsetField = Class(TSQLTimeStampField)
+    Protected
+     {$IF CompilerVersion < 25}
+     Procedure GetText    (Var Text     : String;
+                           DisplayText  : Boolean); Override;
+     {$IFEND}
+     {$IFDEF FPC}
+     Procedure SetAsString(const Value: string); override;
+     {$ELSE}
+     {$IF CompilerVersion < 25}
+     Procedure SetAsString(const Value: string); override;
+     {$ELSE}
+     Procedure SetAsString(Const AValue : String);  Override;
+     {$IFEND}
+     {$ENDIF}
+    End;
+  {$ENDIF}
 Var
  DefaultFieldClasses : Array[TFieldType] Of TFieldClass = (nil,                      { ftUnknown }
                                                            TStringField,             { ftString }
@@ -1808,66 +1806,128 @@ Begin
 //  Result := TRESTDWMTMemoryRecord(TRecordList(Pointer(@FRecords)^)[Index]);
 End;
 
-procedure TRESTDWMemTable.InitFieldDefsFromFields;
+Procedure TRESTDWMemTable.CalcOffSets;
 Var
- I        : Integer;
- Offset   : Integer;
- Field    : TField;
- vFieldType : TFieldType;
+ I, Offset        : Integer;
+ vFieldType       : TFieldType;
  FieldDefsUpdated : Boolean;
- FieldLen : Word;
- Procedure CalcOffSets;
+ FieldLen         : Word;
+Begin
+ Offset := 0;
+ {$IFNDEF FPC}
+ If Fields.Count > 0 Then
+  Begin
+   SetLength(FOffsets, Fields.Count);
+   Try
+    For I := 0 to Fields.Count - 1 do
+     Begin
+      FOffsets[I] := Offset;
+      If Fields[I].datatype in ftSupported - ftBlobTypes then
+       Begin
+        FieldLen := CalcFieldLen(Fields[I].datatype, Fields[I].Size);
+        Inc(Offset, FieldLen);
+       End;
+     End;
+   Finally
+   End;
+  End
+ Else
+  Begin
+   {$ENDIF}
+   SetLength(FOffsets, FieldDefs.Count);
+   FieldDefs.Update;
+   FieldDefsUpdated := FieldDefs.Updated;
+   Try
+    FieldDefs.Updated := True;
+    // Performance optimization: FieldDefList.Updated returns False is FieldDefs.Updated is False
+    For I := 0 to FieldDefs.Count - 1 do
+     Begin
+      FOffsets[I] := Offset;
+      If FieldDefs[I].datatype in ftSupported - ftBlobTypes then
+       Begin
+        FieldLen := CalcFieldLen(FieldDefs[I].datatype, FieldDefs[I].Size);
+        Inc(Offset, FieldLen);
+        vFieldType := FieldDefs[I].DataType;
+        If vFieldType in [ftFloat, ftBCD, ftFMTBcd] then
+         Begin
+          If FieldDefs[I].Precision < 16 Then
+           FieldDefs[I].Precision := 16;
+         End;
+       End;
+     End;
+   Finally
+    FieldDefs.Updated := FieldDefsUpdated;
+   End;
+   {$IFNDEF FPC}
+  End;
+  {$ENDIF}
+End;
+
+Procedure TRESTDWMemTable.InitFieldDefsFromFieldsInternal;
+Var
+ vFDef : TFieldDef;
+ I     : Integer;
+ Function FindDef(aName : String) : Boolean;
  Var
   I : Integer;
  Begin
-  {$IFNDEF FPC}
-  If Fields.Count > 0 Then
+  Result := False;
+  For I := 0 To FieldDefs.Count -1 Do
    Begin
-    SetLength(FOffsets, Fields.Count);
-    Try
-     For I := 0 to Fields.Count - 1 do
-      Begin
-       FOffsets[I] := Offset;
-       If Fields[I].datatype in ftSupported - ftBlobTypes then
-        Begin
-         FieldLen := CalcFieldLen(Fields[I].datatype, Fields[I].Size);
-         Inc(Offset, FieldLen);
-        End;
-      End;
-    Finally
-    End;
-   End
-  Else
-   Begin
-    {$ENDIF}
-    SetLength(FOffsets, FieldDefs.Count);
-    FieldDefs.Update;
-    FieldDefsUpdated := FieldDefs.Updated;
-    Try
-     FieldDefs.Updated := True;
-     // Performance optimization: FieldDefList.Updated returns False is FieldDefs.Updated is False
-     For I := 0 to FieldDefs.Count - 1 do
-      Begin
-       FOffsets[I] := Offset;
-       If FieldDefs[I].datatype in ftSupported - ftBlobTypes then
-        Begin
-         FieldLen := CalcFieldLen(FieldDefs[I].datatype, FieldDefs[I].Size);
-         Inc(Offset, FieldLen);
-         vFieldType := FieldDefs[I].DataType;
-         If vFieldType in [ftFloat, ftBCD, ftFMTBcd] then
-          Begin
-           If FieldDefs[I].Precision < 16 Then
-            FieldDefs[I].Precision := 16;
-          End;
-        End;
-      End;
-    Finally
-     FieldDefs.Updated := FieldDefsUpdated;
-    End;
-    {$IFNDEF FPC}
+    Result := Lowercase(FieldDefs[I].Name) = Lowercase(aName);
+    If Result Then
+     Break;
    End;
-   {$ENDIF}
  End;
+Begin
+ For I := 0 To Fields.Count -1 Do
+  Begin
+   If Not FindDef(Fields[I].FieldName) Then
+    Begin
+     If Integer(Fields[I].DataType) = {$IFDEF FPC}45{$ELSE}dwftExtended{$ENDIF} Then
+      Begin
+       FieldDefs.Add(Fields[I].FieldName, DWFieldTypeToFieldType(Integer(Fields[I].DataType)));
+       VFDef := FieldDefs[FieldDefs.Count -1];
+      End
+       Else
+        Begin
+         VFDef          := FieldDefs.AddFieldDef;
+         VFDef.Name     := Fields[I].FieldName;
+         VFDef.DataType := DWFieldTypeToFieldType(Integer(Fields[I].DataType));
+        End;
+       If Integer(Fields[I].DataType) <> dwftExtended Then
+        VFDef.Size     := Fields[I].Size;
+       VFDef.Required := Fields[I].Required;
+       Case Integer(Fields[I].DataType) of
+         dwftFloat,
+         dwftCurrency  : VFDef.Precision := TExtendedField(Fields[I]).Precision;
+         dwftBCD,
+         dwftFMTBcd    : Begin
+                         {$IFNDEF FPC}
+                          VFDef.Size := 0;
+                          VFDef.Precision := 0;
+                         {$ELSE}
+                          VFDef.Precision := TExtendedField(Fields[I]).Precision;
+                         {$ENDIF}
+                         End;
+  {
+         dwftWideString : Begin
+                           If VFDef.Size > 7100 Then
+                            Begin
+                             VFDef.Size := 7100;
+                             FFieldSize[Index] := VFDef.Size;
+                            End;
+                          End;
+  }
+       End;
+    End;
+  End;
+End;
+
+procedure TRESTDWMemTable.InitFieldDefsFromFields;
+Var
+ I        : Integer;
+ Field    : TField;
 Begin
  If FieldDefs.Count = 0 then
   Begin
@@ -1879,11 +1939,13 @@ Begin
     End;
    FreeIndexList;
   End;
- Offset := 0;
- SetLength(FOffsets, Offset);
- Inherited InitFieldDefsFromFields;
+ {$IFDEF FPC}
+  SetLength(FOffsets, 0);
   { Calculate fields offsets }
- CalcOffSets;
+  CalcOffSets;
+ {$ENDIF}
+ InitFieldDefsFromFieldsInternal;
+//  Inherited InitFieldDefsFromFields;
 End;
 
 function TRESTDWMemTable.FindFieldIndex(Field: TField): Integer;
@@ -2391,9 +2453,7 @@ Begin
       {$IFEND}
     {$ENDIF}
      Case Field.datatype Of
-      ftGuid,//      : Result := Result and (StrLen({$IFNDEF FPC}{$IF CompilerVersion <= 22}PAnsiChar(Data)
-             //                               {$ELSE}PChar(Data){$IFEND}
-             //                                {$ELSE}PAnsiChar(Data){$ENDIF}) > 0);
+      ftGuid,
       ftString,
       ftFixedChar
       {$IF DEFINED(FPC) OR DEFINED(DELPHI10_0UP)}
@@ -5433,63 +5493,38 @@ Begin
   Inc(FRowsChanged);
 End;
 
-procedure TRESTDWMemTable.OpenCursor(InfoQuery: Boolean);
+Procedure TRESTDWMemTable.OpenCursor(InfoQuery: Boolean);
 Begin
-  Try
-    If FDataSet <> nil then
-    Begin
-      If FLoadStructure then
-        CopyStructure(FDataSet, FAutoIncAsInteger)
-      Else If FApplyMode <> amNone then
-      Begin
-        AddStatusField;
-        HideStatusField;
-      End;
-    End;
-  Except
-    SysUtils.Abort;
-    Exit;
-  End;
-  If not InfoQuery then
+ Try
+  If FDataSet <> nil then
+   Begin
+    If FLoadStructure then
+     CopyStructure(FDataSet, FAutoIncAsInteger)
+    Else If FApplyMode <> amNone then
+     Begin
+      AddStatusField;
+      HideStatusField;
+     End;
+   End;
+ Except
+  SysUtils.Abort;
+  Exit;
+ End;
+ If not InfoQuery then
   Begin
-    If FieldCount > 0 then
-      FieldDefs.Clear;
-    InitFieldDefsFromFields;
+   If FieldCount > 0 then
+    FieldDefs.Clear;
+   InitFieldDefsFromFieldsInternal;
+   SetLength(FOffsets, 0);
+   { Calculate fields offsets }
+   CalcOffSets;
+//   Inherited InitFieldDefsFromFields;
   End;
-  FActive := True;
-  inherited OpenCursor(InfoQuery);
+ FActive := True;
+ Inherited OpenCursor(InfoQuery);
 End;
 
 procedure TRESTDWMemTable.InternalOpen;
- {$IFDEF FPC}
-  Procedure CalcOffSets;
-  Var
-   I, FieldLen,
-   Offset : Integer;
-  Begin
-   Offset := 0;
-   If Fields.Count > 0 Then
-    Begin
-     SetLength(FOffsets, 0);
-     SetLength(FOffsets, Fields.Count);
-     Try
-      For I := 0 to Fields.Count - 1 do
-       Begin
-        FOffsets[I] := Offset;
-        If Fields[I].datatype in ftSupported - ftBlobTypes then
-         Begin
-          FieldLen := CalcFieldLen(Fields[I].datatype, Fields[I].Size);
-          If Offset + FieldLen<= high(Offset) then
-           Inc(Offset, FieldLen)
-          Else
-           Raise ERangeError.CreateResFmt(@RsEFieldOffsetOverflow, [I]);
-         End;
-       End;
-     Finally
-     End;
-    End;
-  End;
- {$ENDIF}
 Begin
  BookmarkSize := SizeOf(TRESTDWMTBookmarkData);
  FieldDefs.Updated := False;
@@ -5663,7 +5698,8 @@ Begin
  If (csDesigning in ComponentState)
     {$IFNDEF FPC}and Assigned(Designer){$ENDIF} Then
   DesignNotify('', 102);
- Inherited InitFieldDefsFromFields;
+ InitFieldDefsFromFieldsInternal;
+// Inherited InitFieldDefsFromFields;
 End;
 
 Function TRESTDWMemTable.IsLookup(Index: Integer): Boolean;

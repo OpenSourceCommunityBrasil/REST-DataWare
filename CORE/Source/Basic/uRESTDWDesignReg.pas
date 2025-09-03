@@ -237,6 +237,11 @@ Type
 {$ENDIF}
 {$ENDIF}
 
+{$IFDEF FPC}
+Var
+ FieldClasses : TFpList;
+{$ENDIF}
+
 Procedure Register;
 
 {$IFDEF RESTDWLAZARUS}
@@ -755,8 +760,37 @@ Begin
 End;
 {$ENDIF}
 
+{$IFDEF FPC}
+Procedure RegField(const FieldClass: TFieldClass);
+Begin
+ If FieldClasses = Nil Then
+  FieldClasses := TFpList.Create;
+ If (FieldClass <> Nil)                     And
+    (FieldClasses.IndexOf(FieldClass) = -1) Then
+  Begin
+   FieldClasses.Add(FieldClass);
+   RegisterNoIcon([FieldClass]);
+   RegisterClass(FieldClass);
+  End;
+End;
+
+Procedure RegFields(const AFieldClasses: array of TFieldClass);
+Var
+ I : Integer;
+Begin
+ For I := Low(AFieldClasses) To High(AFieldClasses) Do
+  RegField(AFieldClasses[I]);
+End;
+{$ENDIF}
+
 Procedure Register;
 Begin
+ {$IFDEF FPC}
+//  RegFields(DefaultFieldClasses);
+  RegField(TExtendedField);
+ {$ELSE}
+//  RegisterFields([TExtendedField]);
+ {$ENDIF}
  {$IFDEF FPC}
   {$I RESTDataWareComponents_LAMW.lrs}
  {$ENDIF}
