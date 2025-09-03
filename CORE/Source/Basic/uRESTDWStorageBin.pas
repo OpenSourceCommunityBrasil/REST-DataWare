@@ -381,8 +381,8 @@ Begin
    // field is persistent or no fields persistet
    FFieldExists[I]    := (ADataSet.FindField(FFieldNames[I]) <> nil); // or (vNoFields);
     // create fieldsDefs like fields persistent
-   If ((vNoFields) Or (Not FFieldExists[I])) Then
-    CreateFieldDefs(ADataSet, I);
+//   If ((vNoFields) Or (Not FFieldExists[I])) Then
+   CreateFieldDefs(ADataSet, I);
   End;
  ADataSet.Open;
  // provider flags deve ser recolocado depois dos fields criados  se nao existiam
