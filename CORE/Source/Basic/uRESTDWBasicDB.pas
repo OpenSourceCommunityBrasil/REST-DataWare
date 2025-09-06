@@ -742,7 +742,7 @@ Type
   vBookmark : Integer;
   vActive,
   vInactive : Boolean;
-  Procedure   InternalPost; overload; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
+  Procedure   InternalPost; override; // Gilberto Rocha 12/04/2019 - usado para poder fazer datasource.dataset.Post
   procedure   InternalOpen; override; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Open
   Function    GetRecordCount : Integer; Override;
   procedure   InternalRefresh; overload; // Gilberto Rocha 03/09/2021 - usado para poder fazer datasource.dataset.Refresh
@@ -9069,7 +9069,7 @@ end;
 
 Procedure TRESTDWClientSQL.InternalPost;
 Begin
- Inherited;
+ Inherited InternalPost;
 End;
 
 procedure TRESTDWClientSQL.InternalOpen;
