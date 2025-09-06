@@ -60,6 +60,7 @@ Const
  SMinIndexes              = 'The minimum amount of indexes is 1';
  SIndexNotFound           = 'Index ''%s'' not found';
  SUniDirectional          = 'Operation cannot be performed on an unidirectional dataset';
+ SFieldRequired           = 'Field ''%s'' must have a value';
 
  Type
   TCompareFunc  = Function(subValue,
@@ -648,6 +649,7 @@ Type
     Procedure InternalDelete; Override;
     Procedure InternalPost;   Override;
     Procedure InternalClose;  Override;
+    procedure CheckRequiredFields;
     Procedure InternalHandleException; Override;
     Procedure InternalInitFieldDefs;   Override;
     Procedure InternalOpen;            Override;
@@ -817,6 +819,7 @@ Type
     Property  IndexName         : String             Read GetIndexName       Write SetIndexName;
     Property  IndexFieldNames   : String             Read GetIndexFieldNames Write SetIndexFieldNames;
     Property  MaxIndexesCount   : Integer            Read FMaxIndexesCount   Write SetMaxIndexesCount default 2;
+    Property  Filter;
     Property  BeforeOpen;
     Property  AfterOpen;
     Property  BeforeClose;
@@ -972,9 +975,11 @@ Type
   Private
    vSize,
    vPrecision : Integer;
+   Procedure SetAsExtended(Const AValue : Extended);
   Protected
-   Function GetAsString   : String;  Override;
-   Function GetAsVariant  : Variant;  Override;
+   Function  GetAsString   : String;  Override;
+   Procedure SetAsString  (Const AValue : String);  Override;
+//   Function GetAsVariant  : Variant;  Override;
   Public
    Constructor Create(AOwner: TComponent); override;
    Property  Size          : Integer  Read vSize         Write vSize;
@@ -1423,6 +1428,26 @@ Begin
  vPrecision := 8;
 End;
 
+{$IFDEF FPC}
+Procedure TExtendedField.SetAsExtended(Const AValue : Extended);
+Begin
+ SetData(@AValue, True);
+End;
+
+Procedure TExtendedField.SetAsString(Const AValue : String);
+Var
+ x : Extended;
+Begin
+ If AValue = '' Then
+  Clear
+ Else
+  Begin
+   x := StrToFloat(AValue);
+   SetAsExtended(x);
+  End;
+End;
+{$ENDIF}
+
 Function TExtendedField.GetAsString: string;
 Var
  x : Extended;
@@ -1512,13 +1537,6 @@ Begin
  If (Pos(S[P + 1], '-+') > 0)  Then
   SetLength(S, P - 1);
  Inherited SetAsString(S);
-End;
-{$ENDIF}
-
-{$IFDEF FPC}
-Function TExtendedField.GetAsVariant : Variant;
-Begin
- Result := Extended(Value); //_RealSupportManager._VarFromReal(Value);
 End;
 {$ENDIF}
 
@@ -2699,8 +2717,9 @@ Begin
              End
             Else If Field.datatype = ftExtended Then
              Begin
-              Move(aDataBytes[1], Pointer(@vLongDouble)^, SizeOf(DWLongDouble));
-              PExtended(Buffer)^ := vLongDouble;
+              If Length(TRESTDWBytes(Buffer)) = 0 Then
+               SetLength(TRESTDWBytes(Buffer), cLen);
+              Move(aDataBytes[1], Pointer(Buffer)^, SizeOf(DWLongDouble));
              End
             Else
              Begin
@@ -3084,6 +3103,8 @@ Var
                dwftFloat,
                {$IFNDEF FPC}
                 dwftFMTBCD,
+               {$ELSE}
+                45,
                {$ENDIF}
                dwftBCD,
                dwftCurrency,
@@ -5421,6 +5442,18 @@ Begin
       Inc(FRowsChanged);
   End;
 End;
+
+procedure TRESTDWMemTable.CheckRequiredFields;
+var
+  I: Integer;
+begin
+  for I := 0 to Fields.Count - 1 do
+    if Fields[I].Required and not Fields[I].ReadOnly and (Fields[I].FieldKind = fkData) and Fields[I].IsNull then
+    begin
+      Fields[I].FocusControl;
+      DatabaseErrorFmt(SFieldRequired, [Fields[I].DisplayName]);
+    end;
+end;
 
 procedure TRESTDWMemTable.InternalPost;
 var
