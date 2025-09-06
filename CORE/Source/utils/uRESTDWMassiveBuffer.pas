@@ -1535,9 +1535,9 @@ Procedure TMassiveDatasetBuffer.BuildLine(Var Dataset         : TRESTDWClientSQL
                          End;
                        End;
                      End;
-        {$IFDEF DELPHIXEUP}ftSingle, ftFMTBcd,{$ENDIF}
-         ftFloat, ftCurrency,
-         ftBCD : Begin
+        {$IFDEF DELPHIXEUP}ftSingle, {$ENDIF}
+         ftFloat,  ftCurrency,
+         ftFMTBcd, ftBCD : Begin
                   If Not UpdateTag Then
                    Begin
                     If Field.IsNull Then

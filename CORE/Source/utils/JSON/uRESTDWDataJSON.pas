@@ -1424,6 +1424,7 @@ Var
  vReal        : Real;
  bJsonValue   : TRESTDWJSONInterfaceObject;
  JSONBase     : TRESTDWJSONBase;
+ vString,
  DecimalLocal : String;
 begin
   {$IF Defined(RESTDWLAZARUS) or not Defined(DELPHIXEUP)}
@@ -1439,12 +1440,15 @@ begin
    Begin
     For I := 0 To bJsonValue.PairCount -1 Do
      Begin
+      vString := Trim(bJsonValue.pairs[I].Value);
       If (Lowercase(bJsonValue.pairs[I].classname) = Lowercase('TJSONObject'))   Or
          (Lowercase(bJsonValue.pairs[I].classname) = Lowercase('TDWJSONObject')) Or
          (Lowercase(bJsonValue.pairs[I].classname) = Lowercase('TJSONArray'))    Or
-         (Lowercase(bJsonValue.pairs[I].classname) = Lowercase('TDWJSONArray'))  Then
+         (Lowercase(bJsonValue.pairs[I].classname) = Lowercase('TDWJSONArray'))  Or
+         ((Lowercase(bJsonValue.pairs[I].classname) = '_string') And (vString <> '') And
+          ((vString[InitStrPos] = '[')) And (vString[Length(vString) - FinalStrPos] = ']')) Then
        Begin
-        JSONBase     := TRESTDWJSONBase.Create(bJsonValue.pairs[I].Value);
+        JSONBase     := TRESTDWJSONBase.Create(vString);
 //        If bJsonValue.pairs[I].Name <> '' Then
         If Assigned(JSONBase) Then
          If bJsonValue.pairs[I].Name <> '' Then
@@ -1478,7 +1482,8 @@ begin
           If (bJsonValue.pairs[I].Value <> cNullvalue)    And
              (bJsonValue.pairs[I].Value <> cNullvalueTag) Then
            Begin
-            vReal := StrToFloat(StringReplace(bJsonValue.pairs[I].Value, '.', DecimalLocal, [rfReplaceAll]));
+            vReal := StrToFloat(StringReplace(StringReplace(bJsonValue.pairs[I].Value, '.', DecimalLocal, [rfReplaceAll]),
+                                                                                       '"', '', [rfReplaceAll]));
             AddFloat(bJsonValue.pairs[I].Name, vReal);
            End
           Else

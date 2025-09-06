@@ -2284,7 +2284,8 @@ begin
     obj := TObject(myArrayList[0]);
     myArrayList [0] := nil;
     If (obj <> CONST_FALSE) And
-       (obj <> CONST_TRUE)  Then
+       (obj <> CONST_TRUE)  And
+       (obj <> CNULL)       Then
      FreeAndNil(obj);
     myArrayList.Delete(0);
   end;
