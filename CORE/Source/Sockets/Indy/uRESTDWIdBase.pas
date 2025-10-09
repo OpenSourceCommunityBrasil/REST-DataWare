@@ -516,12 +516,12 @@ Begin
     If Assigned(HttpRequest.IOHandler) Then
      HttpRequest.IOHandler.CloseGracefully;
     HttpRequest.Disconnect(false);
-    If Assigned(ssl) Then
-     FreeAndNil(ssl);
     HttpRequest.Free;
    Except
    End;
   End;
+  If Assigned(ssl) Then
+   FreeAndNil(ssl);
  Inherited;
 End;
 

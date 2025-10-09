@@ -44,7 +44,7 @@ uses
   FFieldSize,
   FFieldPrecision : Array of Integer;
   FFieldTypes,
-  FFieldAttrs     : Array of Byte;
+  FFieldAttrs     : TFieldAttrs;
   FFieldExists    : Array of Boolean;
   Procedure SaveRecordToStream       (ADataset    : TDataset;
                                       Var AStream : TStream);
@@ -382,6 +382,7 @@ Begin
    FFieldExists[I]    := (ADataSet.FindField(FFieldNames[I]) <> nil); // or (vNoFields);
     // create fieldsDefs like fields persistent
 //   If ((vNoFields) Or (Not FFieldExists[I])) Then
+   ADataSet.FieldAttrs := FFieldAttrs;
    CreateFieldDefs(ADataSet, I);
   End;
  ADataSet.Open;
@@ -481,9 +482,9 @@ Var
    Begin
     vLength := Dataset.GetCalcFieldLen(aField.DataType, aField.Size);
     {$IFDEF FPC}
-     FillChar(PData^, vLength -1, #0);
+     FillChar(PData^, vLength, #0);
     {$ELSE}
-     FillChar(pData^, vLength -1, 0);
+     FillChar(pData^, vLength, 0);
     {$ENDIF}
    End
   Else If (vDWFieldType In [dwftLongWord,
@@ -610,11 +611,13 @@ Begin
            dwftVarBytes,
            dwftFixedChar,
            dwftString            : Begin
+                                    SetLength(vString, 0);
                                     stream.Read(vInt64, SizeOf(vInt64));
                                     vString := '';
                                     If vInt64 > 0 Then
                                      Begin
                                       SetLength(vString, vInt64);
+//                                      FillChar(Pointer(@vString)^, vInt64, 0);
                                       {$IFDEF FPC}
                                        stream.Read(Pointer(vString)^, vInt64);
                                        If EncodeStrs Then
@@ -627,7 +630,10 @@ Begin
                                        If EncodeStrs Then
                                         vString := DecodeStrings(vString);
                                        If aField <> Nil Then
-                                        Move(vString[InitStrPos], pData^, Length(vString));
+                                        Begin
+//                                         FillChar(pData^, vInt64, 0);
+                                         Move(Pointer(vString)^, pData^, vInt64);
+                                        End;
                                       {$ENDIF}
                                      End;
                                    End;
@@ -717,14 +723,16 @@ Begin
            , dwftExtended
 
                                    :Begin
+                                     vDouble := 0;
                                      stream.Read(vDouble, SizeOf(vDouble));
                                      If aField <> Nil Then
                                       Begin
-                                       SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(vDouble));
+                                       SetLength(vVarBytes, Sizeof(Boolean) + Sizeof(vExtended));
                                        //Move Null para Bytes
                                        Move(vBoolean, vVarBytes[0], Sizeof(Boolean));
                                        //Move Bytes do Dado para Bytes
-                                       Move(vDouble, vVarBytes[1], Sizeof(vDouble));
+                                       vExtended := vDouble;
+                                       Move(vExtended, vVarBytes[1], Sizeof(vExtended));
                                        //Move Bytes para Buffer
                                        Move(vVarBytes[0], PData^, Length(vVarBytes));
                                       End;
@@ -958,7 +966,8 @@ Begin
    Try
     Dataset.SetMemoryRecordData(pActualRecord, i);
    Finally
-    Dispose(pActualRecord);//FreeMem(PRESTDWMTMemBuffer(@PActualRecord));
+    Reallocmem(pActualRecord, 0);
+//    Dispose(pActualRecord);//FreeMem(PRESTDWMTMemBuffer(@PActualRecord));
    End;
   End;
 End;
@@ -1541,8 +1550,8 @@ Begin
                                 Stream.Write(vCurrency, Sizeof(vCurrency));
                                End;
        dwftExtended          : Begin
-                                Move(PData^, vExtended, Sizeof(vExtended));
-                                Stream.Write(vExtended, Sizeof(vExtended));
+                                Move(PData^, vDouble, Sizeof(vDouble));
+                                Stream.Write(vDouble, Sizeof(vDouble));
                                End;
         // 8 - Bytes - Currency
        dwftBCD               : Begin
@@ -1741,8 +1750,8 @@ Begin
                       End;
    {$IFNDEF FPC}
    dwftExtended     : Begin
-                       vExtended := ADataset.Fields[i]{$IFNDEF FPC}.AsExtended{$ELSE}.AsFloat{$ENDIF};
-                       AStream.Write(vExtended, Sizeof(vExtended));
+                       vDouble := ADataset.Fields[i]{$IFNDEF FPC}.AsExtended{$ELSE}.AsFloat{$ENDIF};
+                       AStream.Write(vDouble, Sizeof(vDouble));
                       End;
    {$ENDIF}
    // 8 - Bytes - Date, Time, DateTime, TimeStamp

@@ -963,7 +963,7 @@ Begin
          Dispose(PMassiveValue(TList(Self).Items[Index]));
         {$ELSE}
          If Assigned(TMassiveValue(TList(Self).Items[Index]^)) Then
-          FreeAndNil(TMassiveValue(TList(Self).Items[Index]^));
+          TMassiveValue(TList(Self).Items[Index]^).Free;
          Dispose(TList(Self).Items[Index]);
         {$ENDIF}
        Except

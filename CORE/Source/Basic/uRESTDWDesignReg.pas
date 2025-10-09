@@ -787,9 +787,13 @@ Procedure Register;
 Begin
  {$IFDEF FPC}
 //  RegFields(DefaultFieldClasses);
-  RegField(TExtendedField);
+  RegField(TRESTDWNumericField);
+  RegField(TStringFieldRESTDW);
+//  RegField(TRESTDWSQLTimeStampOffsetField);
  {$ELSE}
-//  RegisterFields([TExtendedField]);
+  RegisterFields([TRESTDWNumericField]);
+  RegisterFields([TStringFieldRESTDW]);
+//  RegisterFields(DefaultFieldClasses);
  {$ENDIF}
  {$IFDEF FPC}
   {$I RESTDataWareComponents_LAMW.lrs}
