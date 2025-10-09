@@ -557,8 +557,9 @@ end;
 
 function TRESTDWEventList.GetRecName(Index: String): TRESTDWEvent;
 Var
- I      : Integer;
+ X, Z   : Integer;
  aIndex : String;
+ vExit  : Boolean;
 Begin
  Result := Nil;
  aIndex := Index;
@@ -568,13 +569,29 @@ Begin
       (aIndex[Length(aIndex) - FinalStrPos] = '/') Then
     DeleteStr(aIndex, Length(aIndex) - FinalStrPos, 1);
   End;
- For I := 0 To Self.Count - 1 Do
+ X := 0;
+ Z := Self.Count;
+ vExit := Z = 0;
+ If Not vExit Then
   Begin
-   If (Uppercase(aIndex) = Uppercase(TRESTDWEvent(Items[I]).EventName))                                  Or
-      (Uppercase(aIndex) = Uppercase(TRESTDWEvent(Items[I]).BaseURL + TRESTDWEvent(Items[I]).EventName)) Then
+   While (X <> Z) Do
     Begin
-     Result := TRESTDWEvent(Self.Items[I]);
-     Break;
+// For I := 0 To Self.Count - 1 Do
+     If (Uppercase(aIndex) = Uppercase(TRESTDWEvent(Items[X]).EventName))                                  Or
+        (Uppercase(aIndex) = Uppercase(TRESTDWEvent(Items[X]).BaseURL + TRESTDWEvent(Items[X]).EventName)) Then
+      Begin
+       Result := TRESTDWEvent(Self.Items[X]);
+       Break;
+      End;
+     Dec(Z);
+     If (Uppercase(aIndex) = Uppercase(TRESTDWEvent(Items[Z]).EventName))                                  Or
+        (Uppercase(aIndex) = Uppercase(TRESTDWEvent(Items[Z]).BaseURL + TRESTDWEvent(Items[Z]).EventName)) Then
+      Begin
+       Result := TRESTDWEvent(Self.Items[Z]);
+       Break;
+      End;
+     If Z <> X Then
+      Inc(X);
     End;
   End;
 End;
@@ -651,37 +668,39 @@ Var
  dwParam     : TRESTDWJSONParam;
  I           : Integer;
  vFound      : Boolean;
+ vEvent      : TRESTDWEvent;
 Begin
  vParamNameS := '';
- If vEventList.EventByName[EventName] <> Nil Then
+ vEvent      := vEventList.EventByName[EventName];
+ If vEvent <> Nil Then
   Begin
    If Not Assigned(DWParams) Then
     DWParams := TRESTDWParams.Create;
-   DWParams.DataMode := vEventList.EventByName[EventName].DataMode;
-   For I := 0 To vEventList.EventByName[EventName].vDWParams.Count -1 Do
+   DWParams.DataMode := vEvent.DataMode;
+   For I := 0 To vEvent.vDWParams.Count -1 Do
     Begin
      vParamNameS := '';
-     vFound  := (DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].ParamName] <> Nil);
+     vFound  := (DWParams.ItemsString[vEvent.vDWParams.Items[I].ParamName] <> Nil);
      If vFound Then
-      vParamNameS := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName
+      vParamNameS := vEvent.vDWParams.Items[I].ParamName
      Else
       Begin
-       vFound  := (DWParams.ItemsString[vEventList.EventByName[EventName].vDWParams.Items[I].Alias]   <> Nil);
+       vFound  := (DWParams.ItemsString[vEvent.vDWParams.Items[I].Alias]   <> Nil);
        If vFound Then
-        vParamNameS := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
+        vParamNameS := vEvent.vDWParams.Items[I].Alias;
       End;
      If Not(vFound) Then
       Begin
        dwParam                 := TRESTDWJSONParam.Create(DWParams.Encoding);
-       dwParam.Alias           := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
-       dwParam.ParamName       := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
-       dwParam.ObjectDirection := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectDirection;
-       dwParam.ObjectValue     := vEventList.EventByName[EventName].vDWParams.Items[I].ObjectValue;
-       dwParam.Encoded         := vEventList.EventByName[EventName].vDWParams.Items[I].Encoded;
+       dwParam.Alias           := vEvent.vDWParams.Items[I].Alias;
+       dwParam.ParamName       := vEvent.vDWParams.Items[I].ParamName;
+       dwParam.ObjectDirection := vEvent.vDWParams.Items[I].ObjectDirection;
+       dwParam.ObjectValue     := vEvent.vDWParams.Items[I].ObjectValue;
+       dwParam.Encoded         := vEvent.vDWParams.Items[I].Encoded;
        dwParam.DataMode        := DWParams.DataMode;
-       If (vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue <> '')  And
+       If (vEvent.vDWParams.Items[I].DefaultValue <> '')  And
           (Trim(dwParam.AsString) = '') Then
-        dwParam.Value          := vEventList.EventByName[EventName].vDWParams.Items[I].DefaultValue;
+        dwParam.Value          := vEvent.vDWParams.Items[I].DefaultValue;
        DWParams.Add(dwParam);
       End
      Else
@@ -689,13 +708,13 @@ Begin
        If (DWParams.ItemsString[vParamNameS].ParamName             =  '') Or
           ((DWParams.ItemsString[vParamNameS].ParamName            <> '') And
            (Lowercase(DWParams.ItemsString[vParamNameS].ParamName) <>
-            Lowercase(vEventList.EventByName[EventName].vDWParams.Items[I].ParamName))) Then
+            Lowercase(vEvent.vDWParams.Items[I].ParamName))) Then
         Begin
-         DWParams.ItemsString[vParamNameS].Alias      := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
-         DWParams.ItemsString[vParamNameS].ParamName  := vEventList.EventByName[EventName].vDWParams.Items[I].ParamName;
+         DWParams.ItemsString[vParamNameS].Alias      := vEvent.vDWParams.Items[I].Alias;
+         DWParams.ItemsString[vParamNameS].ParamName  := vEvent.vDWParams.Items[I].ParamName;
         End;
        If DWParams.ItemsString[vParamNameS].Alias      = '' Then
-        DWParams.ItemsString[vParamNameS].Alias       := vEventList.EventByName[EventName].vDWParams.Items[I].Alias;
+        DWParams.ItemsString[vParamNameS].Alias       := vEvent.vDWParams.Items[I].Alias;
       End;
     End;
   End

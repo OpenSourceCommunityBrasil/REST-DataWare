@@ -8565,9 +8565,9 @@ Begin
      vActive := False;
     If Not vActive Then
      SetActiveDB(True);
+    If vActive Then
+     Inherited Open;
    End;
-  If vActive Then
-   Inherited Open;
  Finally
   vInBlockEvents  := False;
  End;

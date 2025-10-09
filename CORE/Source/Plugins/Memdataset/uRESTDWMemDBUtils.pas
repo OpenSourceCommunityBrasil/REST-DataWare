@@ -41,6 +41,10 @@ Type
                  {$IFDEF RTL200_UP}TBookmark{$ELSE}TBookmarkStr{$ENDIF RTL200_UP}
                  {$ENDIF};
 
+
+Type
+ TFieldListArray = Array of TField;
+
 type
   IRESTDWDataControl = interface
     ['{8B6910C8-D5FD-40BA-A427-FC54FE7B85E5}']
@@ -163,7 +167,8 @@ uses
   System.Generics.Collections,
   {$ENDIF RTL240_UP}
   {$IFDEF RESTDWVCL}uRESTDWMemVCLUtils, {$ENDIF}
-  uRESTDWMemTypes, uRESTDWMemConsts, uRESTDWMemResources;
+  uRESTDWMemTypes, uRESTDWMemConsts, uRESTDWMemResources,
+  uRESTDWConsts;
 
 { TRESTDWDataLink }
 procedure TRESTDWDataLink.FocusControl(Field: TFieldRef);
@@ -365,12 +370,12 @@ end;
 function DataSetLocateThrough(DataSet: TDataSet; const KeyFields: string;
   const KeyValues: Variant; Options: TLocateOptions): Boolean;
 var
-  FieldCount: Integer;
-  Fields: TList{$IFDEF RTL240_UP}<TField>{$ENDIF RTL240_UP};
+  FieldCount : Integer;
+  Fields     : TFieldListArray;
   Bookmark: TBookmarkType;
   function CompareField(Field: TField; const Value: Variant): Boolean;
   var
-    S: string;
+   S, A : string;
   begin
     if Field.DataType in [ftString{$IFDEF UNICODE}, ftWideString{$ENDIF UNICODE}] then
     begin
@@ -379,12 +384,13 @@ var
       else
       begin
         S := Field.AsString;
+        A := Copy(Value, InitStrPos, Field.Size);
         if loPartialKey in Options then
           Delete(S, Length(Value) + 1, MaxInt);
         if loCaseInsensitive in Options then
-          Result := AnsiSameText(S, Value)
+          Result := Uppercase(S) = Uppercase(A)
         else
-          Result := AnsiSameStr(S, Value);
+          Result := S = A;
       end;
     end
     else
@@ -404,15 +410,33 @@ var
         Result := Result and CompareField(TField(Fields[I]), KeyValues[I]);
     end;
   end;
+ procedure GetFieldList(List: TFieldListArray; const FieldNames: string);
+ var
+  I, Len,
+  Pos     : Integer;
+  Field   : TField;
+ begin
+  Len := FieldNames.Length;
+  Pos := 1;
+  I := 0;
+  while Pos <= Len do
+   begin
+    Field := DataSet.FieldByName(ExtractFieldName(FieldNames, Pos));
+    SetLength(Fields, I+1);
+    Fields[I] := Field;
+    Inc(I);
+   end;
+ End;
 begin
   Result := False;
+  SetLength(Fields, 0);
   DataSet.CheckBrowseMode;
   if DataSet.IsEmpty then
     Exit;
-  Fields := TList{$IFDEF RTL240_UP}<TField>{$ENDIF RTL240_UP}.Create;
+//  Fields := TList.Create;
   try
-    DataSet.GetFieldList(Fields, KeyFields);
-    FieldCount := Fields.Count;
+    GetFieldList(Fields, KeyFields);
+    FieldCount := Length(Fields);
     Result := CompareRecord;
     if Result then
       Exit;
@@ -446,7 +470,8 @@ begin
       DataSet.EnableControls;
     end;
   finally
-    Fields.Free;
+   SetLength(Fields, 0);
+//   Fields.Free;
   end;
 end;
 { DataSetSortedSearch. Navigate on sorted DataSet routine. }

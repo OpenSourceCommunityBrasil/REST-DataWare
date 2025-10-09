@@ -6683,14 +6683,14 @@ End;
 
 Procedure TRESTDWParams.SetCriptOptions(Use  : Boolean;
                                         Key  : String);
-Var
- I : Integer;
+//Var
+// I : Integer;
 Begin
- For I := 0 To Count -1 Do
-  Begin
+// For I := 0 To Count -1 Do
+//  Begin
 //   Items[I].CriptOptions.Use := Use;
 //   Items[I].CriptOptions.Key := Key;
-  End;
+//  End;
 End;
 
 end.

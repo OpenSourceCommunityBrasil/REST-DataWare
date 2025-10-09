@@ -7244,6 +7244,7 @@ Var
  vErrorMessage,
  vStrAcceptedRoutes : String;
  vDWRoutes          : TRESTDWRoutes;
+ vEvent             : TRESTDWEvent;
 Begin
  Result        := False;
  vRejected     := False;
@@ -7288,40 +7289,41 @@ Begin
              Break;
             End;
           End;
-         If (TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes.RouteIsActive(RequestType)) Or
-            (TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes.RouteIsActive(rtAll))      Then
+         vEvent := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler];
+         If (vEvent.Routes.RouteIsActive(RequestType)) Or
+            (vEvent.Routes.RouteIsActive(rtAll))      Then
           Begin
            vResult := '';
            TRESTDWServerEvents(ServerMethodsClass.Components[i]).CreateDWParams(Pooler, Params);
-           IF TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes.RouteNeedAuthorization(RequestType) Or
-              TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes.RouteNeedAuthorization(rtAll)       Then
+           IF vEvent.Routes.RouteNeedAuthorization(RequestType) Or
+              vEvent.Routes.RouteNeedAuthorization(rtAll)       Then
            Begin
-            If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest) Then
-             TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnAuthRequest(Params, vRejected, vErrorMessage, ErrorCode, RequestHeader);
+            If Assigned(vEvent.OnAuthRequest) Then
+             vEvent.OnAuthRequest(Params, vRejected, vErrorMessage, ErrorCode, RequestHeader);
            End
           Else
            Vrejected := False;
            If Not vRejected Then
             Begin
-             TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].CompareParams(Params);
+             vEvent.CompareParams(Params);
              Try
               If RequestType <> rtOption Then
                Begin
                 vResultA      := TStringList.Create;
                 Try
-                 If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnBeforeExecute) Then
-                  TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnBeforeExecute(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler]);
-                 If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEventByType) Then
-                  TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEventByType(Params, vResultA, RequestType, ErrorCode, RequestHeader)
-                 Else If Assigned(TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent) Then
-                  TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].OnReplyEvent(Params, vResultA);
+                 If Assigned(vEvent.OnBeforeExecute) Then
+                  vEvent.OnBeforeExecute(vEvent);
+                 If Assigned(vEvent.OnReplyEventByType) Then
+                  vEvent.OnReplyEventByType(Params, vResultA, RequestType, ErrorCode, RequestHeader)
+                 Else If Assigned(vEvent.OnReplyEvent) Then
+                  vEvent.OnReplyEvent(Params, vResultA);
                 Finally
                  vResult := vResultA.Text;
                  vResultA.Free;
                 End;
                End;
-              DataMode := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].DataMode;
-              ContentType := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].defaultcontenttype;
+              DataMode := vEvent.DataMode;
+              ContentType := vEvent.defaultcontenttype;
               If Trim(ContentType) = '' Then
                ContentType := cDefaultContentType;
              Except
@@ -7357,7 +7359,7 @@ Begin
          Else
           Begin
            vStrAcceptedRoutes := '';
-           vDWRoutes := TRESTDWServerEvents(ServerMethodsClass.Components[i]).Events.EventByName[Pooler].Routes;
+           vDWRoutes := vEvent.Routes;
            If vDWRoutes.RouteIsActive(rtGet) Then
             Begin
              If vStrAcceptedRoutes <> '' Then

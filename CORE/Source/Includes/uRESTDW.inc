@@ -514,6 +514,7 @@
 {$IFNDEF RESTDWLAMW}
 {$IFNDEF FPC}
   {$IFDEF DELPHIXE5UP}
+   {$DEFINE SUPPORTS_CLASS_HELPERS}
    {$IF Declared(FireMonkeyVersion) or Defined(FRAMEWORK_FMX)
         Declared(FMX.Types.TFmxObject) or Defined(LINUX64)}
      {$DEFINE HAS_FMX}
