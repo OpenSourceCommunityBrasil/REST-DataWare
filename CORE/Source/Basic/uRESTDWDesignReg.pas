@@ -791,9 +791,8 @@ Begin
   RegField(TStringFieldRESTDW);
 //  RegField(TRESTDWSQLTimeStampOffsetField);
  {$ELSE}
-  RegisterFields([TRESTDWNumericField]);
   RegisterFields([TStringFieldRESTDW]);
-//  RegisterFields(DefaultFieldClasses);
+  RegisterFields([TRESTDWNumericField]);
  {$ENDIF}
  {$IFDEF FPC}
   {$I RESTDataWareComponents_LAMW.lrs}
