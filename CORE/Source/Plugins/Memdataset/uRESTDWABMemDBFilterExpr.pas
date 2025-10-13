@@ -123,6 +123,9 @@ const
      {$IFDEF DELPHI2010UP}
       ,ord(DB.ftSingle)      // ftSingle
      {$ENDIF}
+     {$IFDEF DELPHI2025UP}
+      ,ord(DB.ftLargeint)      // ftSingle
+     {$ENDIF}
     {$ELSE}
      ,ord(DB.ftUnknown)     // ftObject
     {$ENDIF}

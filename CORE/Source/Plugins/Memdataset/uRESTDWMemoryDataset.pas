@@ -991,11 +991,11 @@ Type
   Protected
    Function  GetAsString   : String;  Override;
    Procedure SetAsString  (Const AValue : String);  Override;
-//   Function GetAsVariant  : Variant;  Override;
+   Function  GetAsFloat    : Double;  Override;
   Public
    Constructor Create(AOwner: TComponent); override;
-   Property  Size          : Integer  Read vSize         Write vSize;
   Published
+   Property  Size          : Integer  Read vSize         Write vSize;
    Property  Precision     : Integer  Read vPrecision    Write vPrecision;
   End;
   {$ENDIF}
@@ -1022,9 +1022,8 @@ Type
  Type
   TStringFieldRESTDW = Class(TStringField)
  Protected
-  Function  CopyToNull(const aValue  : String;
-                       aBegin, aQtde : Integer) : String;
-  Function  GetAsString    : String;  Override;
+  Function  CopyToNull(aValue : String) : String;
+  Function  GetAsString  : String;  Override;
   {$IFNDEF FPC}
    {$IFNDEF NEXTGEN}
     Function GetValue(var aValue: AnsiString): Boolean;
@@ -1123,7 +1122,11 @@ Var
                                                            {$IFDEF DELPHIXE2UP},
                                                            TSQLTimeStampOffsetField, { ftTimeStampOffset }
                                                            nil,                      { ftObject }
-                                                           TSingleField              { ftSingle }{$ENDIF});
+                                                           TSingleField              { ftSingle }
+                                                           {$ENDIF}
+                                                           {$IFDEF DELPHI2025UP},
+                                                            TLargeIntField
+                                                           {$ENDIF});
 
 
 Implementation
@@ -1579,8 +1582,8 @@ Begin
  {$IFNDEF FPC}
   SetLength(Data, Size);
  {$ENDIF}
- If GetData({$IFDEF FPC}Pointer(@{$ENDIF}Data{$IFDEF FPC}){$ENDIF}, True) then
-  Result := CopyToNull(BytesToString(TRESTDWBytes(Data)), InitStrPos, Size);
+  If GetData({$IFDEF FPC}Pointer(@{$ENDIF}Data{$IFDEF FPC}){$ENDIF}, True) then
+   Result := BytesToString(TRESTDWBytes(Data));
  {$IFNDEF FPC}
   SetLength(Data, 0);
  {$ENDIF}
@@ -1604,28 +1607,22 @@ Function TStringfieldRESTDW.GetValue(var aValue: String): Boolean;
 Begin
  Result := False;
  Try
-  aValue := CopyToNull(GetAsString, InitStrPos, Size);
+  aValue := GetAsString;
   Result := True;
  Except
 
  End;
 End;
 
-Function  TStringfieldRESTDW.CopyToNull(Const aValue  : String;
-                                        aBegin, aQtde : Integer) : String;
+Function  TStringfieldRESTDW.CopyToNull(aValue : String) : String;
 Var
- I, A : Integer;
+ I : Integer;
 Begin
  Result := '';
- A      := Length(aValue) - FinalStrPos;
- I      := InitStrPos;
- While I <= A Do
+ For I := InitStrPos To Length(aValue) - FinalStrPos Do
   Begin
    If aValue[I] <> #0 Then
-    Result := Result + aValue[I]
-   Else
-    Break;
-   Inc(I);
+    Result := Result + aValue[I];
   End;
 End;
 
@@ -1638,10 +1635,10 @@ Begin
  {$IFNDEF FPC}
   SetLength(Data, Size);
   If GetData(Data, True) then
-   Result := CopyToNull(BytesToString(TRESTDWBytes(Data)), InitStrPos, Size);
+   Result := CopyToNull(BytesToString(TRESTDWBytes(Data)));
   SetLength(Data, 0);
  {$ELSE}
-  Result := Copy(GetAsAnsiString, InitStrPos, Size);
+  Result := GetAsAnsiString;
  {$ENDIF}
 End;
 
@@ -1709,12 +1706,15 @@ Begin
 End;
 {$ENDIF}
 
-Function TRESTDWNumericField.GetAsString: string;
-Var
- x : DWLongDouble;
-{$IFDEF COMPILER17_UP}
-  Data: TValueBuffer;
+{$IFDEF FPC}
+Function  TRESTDWNumericField.GetAsFloat    : Double;
+Begin
+ If not GetData(@Result, True) then
+  Result := NaN;
+End;
 {$ENDIF}
+
+Function TRESTDWNumericField.GetAsString: string;
  Function BuildMask(Value      : Double;
                     aPrecision : Integer) : String;
  Var
@@ -1728,21 +1728,16 @@ Var
    vString := vString + '0';
   Result := FormatFloat(vString, Value);
  End;
+Var
+ x : DWLongDouble;
 Begin
- {$IFNDEF COMPILER17_UP}
- If Inherited GetData(@x, True) then
+{$IFDEF FPC}
+ x := GetAsFloat;
+{$ELSE}
+ x := GetAsExtended;
+{$ENDIF}
+ If Not isNull then
   Begin
- {$ELSE}
-  SetLength(Data, SizeOf(Extended));
-  If GetData(Data, True) then
-  Begin
-   {$IF CompilerVersion > 28}
-   x := TBitConverter.InTo<Extended>(Data);
-   {$ELSE}
-   x := TBitConverter.ToExtended(Data);
-   {$IFEND}
-//   x := TBitConverter.InTo<Extended>(Data);
-  {$ENDIF}
    If (Length(FloatToStr(x)) > vSize) Then
     Result := FloatToStrF(x, ffGeneral, vSize, vPrecision)
    Else If (Length(FloatToStr(Frac(x))) > vPrecision) Then
@@ -2726,6 +2721,19 @@ Var
  vDateTimeInt : DWInteger;
  vDateTimeRec : TDateTimeRec;
  vDWFieldType : Byte;
+ Function CountToNull(Const aBytes : TRESTDWBytes) : Integer;
+ Var
+  I : Integer;
+ Begin
+  Result := 0;
+  For I := 0 To Length(aBytes) -1 Do
+   Begin
+    If aBytes[I] <> 0 Then
+     Inc(Result)
+    Else
+     Break;
+   End;
+ End;
 Begin
  Result := False;
  If Not GetActiveRecBuf(RecBuf) Then
@@ -2771,7 +2779,7 @@ Begin
                         Begin
                          If Length(TRESTDWBytes(Buffer)) > 0 Then
                           Begin
-                           If (not (Char(TRESTDWBytes(Buffer)[0]) = #0)) Then
+                           If (Not (Char(TRESTDWBytes(Buffer)[0]) = #0)) Then
                             Begin
                              Move(TRESTDWBytes(Buffer)[0], aDataBytes[0], cLen);
                              Result    := (not (Char(TRESTDWBytes(Buffer)[0]) = #0));
@@ -2790,10 +2798,11 @@ Begin
                        Result := Not(Result);
                        If Not(Result) then
                         Begin
+                         cLen      := SizeOf(Boolean);
                          aNullData := False;
                          SetLength(aDataBytes, cLen);
                          Move(Data^, aDataBytes[0], cLen);
-                         Move(aDataBytes[0], Pointer(@aNullData)^, SizeOf(Boolean));
+//                         Move(aDataBytes[0], Pointer(@aNullData)^, SizeOf(Boolean));
                          Result := Not(aNullData);
                         End;
                       End
@@ -2937,7 +2946,8 @@ Begin
          {$IFNDEF FPC}
           {$IF CompilerVersion <= 22}
            If Result Then
-            Result := ((Not(aNullData)) and Not(VarIsNull(Data^)));
+            If Not (Field.datatype in  [ftBoolean]) then
+             Result := ((Not(aNullData)) and Not(VarIsNull(Data^)));
            If (Field.datatype In [ftLargeint, ftInteger, ftSmallint, ftFloat,
                                   ftFMTBCD, ftBCD, ftCurrency, ftDate, ftTime]) Then
             Result := PRESTDWBytes(@Data)^[1] > 0;
@@ -2975,6 +2985,13 @@ Begin
                End;
              End;
             End
+           Else If Field.datatype = ftExtended Then
+            Begin
+             If Length(TRESTDWBytes(Buffer)) = 0 Then
+              SetLength(TRESTDWBytes(Pointer(@Buffer)^), SizeOf(DwLongDouble));
+             Move(aDataBytes[1], vLongDouble, SizeOf(vLongDouble));
+             Move(vLongDouble, Pointer(Buffer)^, cLen-1);
+            End
            Else
             Begin
              If Length(TRESTDWBytes(Buffer)) = 0 Then
@@ -2985,7 +3002,12 @@ Begin
               Move(PRESTDWBytes(@Data)^[0], Pointer(Buffer)^, cLen);
             End;
            {$ELSE}
-            Result := ((Not(aNullData)) and Not(VarIsNull(Data^)));
+            If Not (Field.datatype in  [ftBoolean{$IFNDEF FPC}
+                                                  {$IF CompilerVersion > 21}
+                                                   , ftByte, ftShortint
+                                                  {$IFEND}
+                                                 {$ENDIF}]) then
+             Result := ((Not(aNullData)) and Not(VarIsNull(Data^)));
             If (Field.datatype In [ftAutoInc, ftLargeint, ftInteger, ftSmallint, ftFloat, ftSingle,
                                    ftFMTBCD, ftBCD, ftCurrency]) Then
              Begin
@@ -3026,14 +3048,28 @@ Begin
             Else If Field.datatype = ftExtended Then
              Begin
               If Length(TRESTDWBytes(Buffer)) = 0 Then
-               SetLength(TRESTDWBytes(Pointer(@Buffer)^), SizeOf(DwLongDouble));
+               SetLength(TRESTDWBytes(Pointer(@Buffer)^), SizeOf(vLongDouble));
               Move(aDataBytes[1], vLongDouble, SizeOf(vLongDouble));
-              Move(vLongDouble, Pointer(Buffer)^, cLen-1);
+              Move(Pointer(@vLongDouble)^, Pointer(Buffer)^, SizeOf(vLongDouble));
              End
             Else
              Begin
+//              If Field.datatype in [ftString, ftFixedChar
+//                                    {$IF DEFINED(FPC) OR DEFINED(DELPHI10_0UP)}
+//                                     , ftFixedWideChar , ftWideString{$IFEND}] Then
+//               Begin
+//                cLen := CountToNull(aDataBytes);
+//                If Length(TRESTDWBytes(Buffer)) > cLen Then
+//                 Begin
+//                  SetLength(TRESTDWBytes(Buffer), 0);
+//                  SetLength(TRESTDWBytes(Buffer), cLen);
+//                 End;
+//               End
+//              Else
+//               Begin
               If Length(TRESTDWBytes(Buffer)) = 0 Then
                SetLength(TRESTDWBytes(Buffer), cLen);
+//               End;
               If Field.datatype = ftGuid Then
                Move(PRESTDWBytes(@Data)^[0], Pointer(Buffer)^, cLen -1)
               Else
@@ -3043,6 +3079,8 @@ Begin
           {$ELSE}
            If Length(TRESTDWBytes(Buffer)) = 0 Then
             SetLength(TRESTDWBytes(Buffer), cLen);
+           If Not (Field.datatype in  [ftBoolean]) then
+            Result := ((Not(aNullData)) and Not(VarIsNull(Data^)));
            Result := ((Not(aNullData)) and Not(VarIsNull(Data^)));
            If (Field.datatype In [ftAutoInc, ftLargeint, ftInteger, ftSmallint, ftFloat,
                                   ftFMTBCD, ftBCD, ftCurrency]) Then
@@ -3087,6 +3125,15 @@ Begin
                End;
              End;
             End
+{
+           Else If Field.datatype = ftExtended Then
+            Begin
+             If Length(TRESTDWBytes(Buffer)) = 0 Then
+              SetLength(TRESTDWBytes(Pointer(@Buffer)^), SizeOf(DwLongDouble));
+             Move(aDataBytes[1], vLongDouble, SizeOf(vLongDouble));
+             Move(vLongDouble, Pointer(Buffer)^, cLen-1);
+            End
+}
            Else
             Begin
              If Length(TRESTDWBytes(Buffer)) = 0 Then
@@ -5966,7 +6013,10 @@ Begin
    If FieldDefs[I].DataType = {$IFNDEF FPC}ftExtended{$ELSE}ftFMTBcd{$ENDIF} Then
     Field              := TRESTDWNumericField.Create(Self)
    Else If FieldDefs[I].DataType = {$IFNDEF FPC}ftString{$ELSE}ftFixedChar{$ENDIF} Then
-    Field              := TStringFieldRESTDW.Create(Self)
+    Begin
+     Field             := TStringFieldRESTDW.Create(Self);
+     Field.Size        := FieldDefs[I].Size;
+    End
    Else
     Begin
      {$IFNDEF FPC}
