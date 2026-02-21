@@ -7,7 +7,7 @@
         <TargetedPlatforms>33811</TargetedPlatforms>
         <AppType>Package</AppType>
         <FrameworkType>None</FrameworkType>
-        <ProjectVersion>20.1</ProjectVersion>
+        <ProjectVersion>20.3</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <ProjectName Condition="'$(ProjectName)'==''">RESTDWCore</ProjectName>
     </PropertyGroup>
@@ -130,12 +130,12 @@
         <DCC_DcuOutput>..\..\compiled</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
-        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
         <BT_BuildType>Debug</BT_BuildType>
         <EnabledSysJars>activity-1.1.0.dex.jar;annotation-1.2.0.dex.jar;appcompat-1.2.0.dex.jar;appcompat-resources-1.2.0.dex.jar;asynclayoutinflater-1.0.0.dex.jar;billing-4.0.0.dex.jar;biometric-1.1.0.dex.jar;browser-1.0.0.dex.jar;cloud-messaging.dex.jar;collection-1.1.0.dex.jar;coordinatorlayout-1.0.0.dex.jar;core-1.5.0-rc02.dex.jar;core-common-2.1.0.dex.jar;core-runtime-2.1.0.dex.jar;cursoradapter-1.0.0.dex.jar;customview-1.0.0.dex.jar;documentfile-1.0.0.dex.jar;drawerlayout-1.0.0.dex.jar;firebase-annotations-16.0.0.dex.jar;firebase-common-20.0.0.dex.jar;firebase-components-17.0.0.dex.jar;firebase-datatransport-18.0.0.dex.jar;firebase-encoders-17.0.0.dex.jar;firebase-encoders-json-18.0.0.dex.jar;firebase-iid-interop-17.1.0.dex.jar;firebase-installations-17.0.0.dex.jar;firebase-installations-interop-17.0.0.dex.jar;firebase-measurement-connector-19.0.0.dex.jar;firebase-messaging-22.0.0.dex.jar;fmx.dex.jar;fragment-1.2.5.dex.jar;google-play-licensing.dex.jar;interpolator-1.0.0.dex.jar;javax.inject-1.dex.jar;legacy-support-core-ui-1.0.0.dex.jar;legacy-support-core-utils-1.0.0.dex.jar;lifecycle-common-2.2.0.dex.jar;lifecycle-livedata-2.0.0.dex.jar;lifecycle-livedata-core-2.2.0.dex.jar;lifecycle-runtime-2.2.0.dex.jar;lifecycle-service-2.0.0.dex.jar;lifecycle-viewmodel-2.2.0.dex.jar;lifecycle-viewmodel-savedstate-2.2.0.dex.jar;listenablefuture-1.0.dex.jar;loader-1.0.0.dex.jar;localbroadcastmanager-1.0.0.dex.jar;play-services-ads-20.1.0.dex.jar;play-services-ads-base-20.1.0.dex.jar;play-services-ads-identifier-17.0.0.dex.jar;play-services-ads-lite-20.1.0.dex.jar;play-services-base-17.5.0.dex.jar;play-services-basement-17.6.0.dex.jar;play-services-cloud-messaging-16.0.0.dex.jar;play-services-drive-17.0.0.dex.jar;play-services-games-21.0.0.dex.jar;play-services-location-18.0.0.dex.jar;play-services-maps-17.0.1.dex.jar;play-services-measurement-base-18.0.0.dex.jar;play-services-measurement-sdk-api-18.0.0.dex.jar;play-services-places-placereport-17.0.0.dex.jar;play-services-stats-17.0.0.dex.jar;play-services-tasks-17.2.0.dex.jar;print-1.0.0.dex.jar;room-common-2.1.0.dex.jar;room-runtime-2.1.0.dex.jar;savedstate-1.0.0.dex.jar;slidingpanelayout-1.0.0.dex.jar;sqlite-2.0.1.dex.jar;sqlite-framework-2.0.1.dex.jar;swiperefreshlayout-1.0.0.dex.jar;transport-api-3.0.0.dex.jar;transport-backend-cct-3.0.0.dex.jar;transport-runtime-3.0.0.dex.jar;user-messaging-platform-1.0.0.dex.jar;vectordrawable-1.1.0.dex.jar;vectordrawable-animated-1.1.0.dex.jar;versionedparcelable-1.1.1.dex.jar;viewpager-1.0.0.dex.jar;work-runtime-2.1.0.dex.jar</EnabledSysJars>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android64)'!=''">
-        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
         <BT_BuildType>Debug</BT_BuildType>
         <EnabledSysJars>activity-1.1.0.dex.jar;annotation-1.2.0.dex.jar;appcompat-1.2.0.dex.jar;appcompat-resources-1.2.0.dex.jar;asynclayoutinflater-1.0.0.dex.jar;billing-4.0.0.dex.jar;biometric-1.1.0.dex.jar;browser-1.0.0.dex.jar;cloud-messaging.dex.jar;collection-1.1.0.dex.jar;coordinatorlayout-1.0.0.dex.jar;core-1.5.0-rc02.dex.jar;core-common-2.1.0.dex.jar;core-runtime-2.1.0.dex.jar;cursoradapter-1.0.0.dex.jar;customview-1.0.0.dex.jar;documentfile-1.0.0.dex.jar;drawerlayout-1.0.0.dex.jar;firebase-annotations-16.0.0.dex.jar;firebase-common-20.0.0.dex.jar;firebase-components-17.0.0.dex.jar;firebase-datatransport-18.0.0.dex.jar;firebase-encoders-17.0.0.dex.jar;firebase-encoders-json-18.0.0.dex.jar;firebase-iid-interop-17.1.0.dex.jar;firebase-installations-17.0.0.dex.jar;firebase-installations-interop-17.0.0.dex.jar;firebase-measurement-connector-19.0.0.dex.jar;firebase-messaging-22.0.0.dex.jar;fmx.dex.jar;fragment-1.2.5.dex.jar;google-play-licensing.dex.jar;interpolator-1.0.0.dex.jar;javax.inject-1.dex.jar;legacy-support-core-ui-1.0.0.dex.jar;legacy-support-core-utils-1.0.0.dex.jar;lifecycle-common-2.2.0.dex.jar;lifecycle-livedata-2.0.0.dex.jar;lifecycle-livedata-core-2.2.0.dex.jar;lifecycle-runtime-2.2.0.dex.jar;lifecycle-service-2.0.0.dex.jar;lifecycle-viewmodel-2.2.0.dex.jar;lifecycle-viewmodel-savedstate-2.2.0.dex.jar;listenablefuture-1.0.dex.jar;loader-1.0.0.dex.jar;localbroadcastmanager-1.0.0.dex.jar;play-services-ads-20.1.0.dex.jar;play-services-ads-base-20.1.0.dex.jar;play-services-ads-identifier-17.0.0.dex.jar;play-services-ads-lite-20.1.0.dex.jar;play-services-base-17.5.0.dex.jar;play-services-basement-17.6.0.dex.jar;play-services-cloud-messaging-16.0.0.dex.jar;play-services-drive-17.0.0.dex.jar;play-services-games-21.0.0.dex.jar;play-services-location-18.0.0.dex.jar;play-services-maps-17.0.1.dex.jar;play-services-measurement-base-18.0.0.dex.jar;play-services-measurement-sdk-api-18.0.0.dex.jar;play-services-places-placereport-17.0.0.dex.jar;play-services-stats-17.0.0.dex.jar;play-services-tasks-17.2.0.dex.jar;print-1.0.0.dex.jar;room-common-2.1.0.dex.jar;room-runtime-2.1.0.dex.jar;savedstate-1.0.0.dex.jar;slidingpanelayout-1.0.0.dex.jar;sqlite-2.0.1.dex.jar;sqlite-framework-2.0.1.dex.jar;swiperefreshlayout-1.0.0.dex.jar;transport-api-3.0.0.dex.jar;transport-backend-cct-3.0.0.dex.jar;transport-runtime-3.0.0.dex.jar;user-messaging-platform-1.0.0.dex.jar;vectordrawable-1.1.0.dex.jar;vectordrawable-animated-1.1.0.dex.jar;versionedparcelable-1.1.1.dex.jar;viewpager-1.0.0.dex.jar;work-runtime-2.1.0.dex.jar</EnabledSysJars>
     </PropertyGroup>
@@ -218,12 +218,12 @@
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <DCC_DcuOutput>..\..\compiled</DCC_DcuOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.1.0.116;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.1.0.131;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_MinorVer>1</VerInfo_MinorVer>
         <DCC_Description>REST Dataware - Core</DCC_Description>
-        <VerInfo_Build>116</VerInfo_Build>
+        <VerInfo_Build>131</VerInfo_Build>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
     </PropertyGroup>
@@ -236,6 +236,9 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="rtl.dcp"/>
+        <DCCReference Include="soaprtl.dcp"/>
+        <DCCReference Include="dbrtl.dcp"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasic.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicDB.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicTypes.pas"/>
@@ -343,7 +346,7 @@
                 <Platform value="Win64">True</Platform>
                 <Platform value="Win64x">False</Platform>
             </Platforms>
-            <Deployment Version="4">
+            <Deployment Version="5">
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
@@ -363,28 +366,13 @@
                 </DeployFile>
                 <DeployFile LocalName="..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\19.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\23.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>RESTDWCore.bpl</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\23.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="OSX32">
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="Win32">
                         <Operation>0</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="AndroidClasses">
-                    <Platform Name="Android">
-                        <RemoteDir>classes</RemoteDir>
-                        <Operation>64</Operation>
-                    </Platform>
-                    <Platform Name="Android64">
-                        <RemoteDir>classes</RemoteDir>
-                        <Operation>64</Operation>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="AndroidFileProvider">
@@ -394,12 +382,6 @@
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\xml</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="AndroidGDBServer">
-                    <Platform Name="Android">
-                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -492,6 +474,16 @@
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\values-v31</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStylesV35">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-v35</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values-v35</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>

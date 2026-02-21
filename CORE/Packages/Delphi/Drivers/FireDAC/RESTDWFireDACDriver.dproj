@@ -2,13 +2,14 @@
     <PropertyGroup>
         <ProjectGuid>{51492283-F4E3-4B42-AF62-715E4F0BADAF}</ProjectGuid>
         <MainSource>RESTDWFireDACDriver.dpk</MainSource>
-        <ProjectVersion>19.5</ProjectVersion>
+        <ProjectVersion>20.3</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Package</AppType>
+        <ProjectName Condition="'$(ProjectName)'==''">RESTDWFireDACDriver</ProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -50,6 +51,11 @@
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
         <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64x' and '$(Base)'=='true') or '$(Base_Win64x)'!=''">
+        <Base_Win64x>true</Base_Win64x>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
@@ -130,6 +136,13 @@
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64x)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
@@ -189,7 +202,7 @@
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
-            <Deployment Version="4">
+            <Deployment Version="5">
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
@@ -218,16 +231,6 @@
                         <Operation>0</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="AndroidClasses">
-                    <Platform Name="Android">
-                        <RemoteDir>classes</RemoteDir>
-                        <Operation>64</Operation>
-                    </Platform>
-                    <Platform Name="Android64">
-                        <RemoteDir>classes</RemoteDir>
-                        <Operation>64</Operation>
-                    </Platform>
-                </DeployClass>
                 <DeployClass Name="AndroidFileProvider">
                     <Platform Name="Android">
                         <RemoteDir>res\xml</RemoteDir>
@@ -235,12 +238,6 @@
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\xml</RemoteDir>
-                        <Operation>1</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="AndroidGDBServer">
-                    <Platform Name="Android">
-                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -296,6 +293,16 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="AndroidSplashImageDefV21">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-anydpi-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-anydpi-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="AndroidSplashStyles">
                     <Platform Name="Android">
                         <RemoteDir>res\values</RemoteDir>
@@ -316,6 +323,76 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="AndroidSplashStylesV31">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-v31</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values-v31</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStylesV35">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-v35</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values-v35</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_AdaptiveIcon">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-anydpi-v26</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-anydpi-v26</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_AdaptiveIconBackground">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_AdaptiveIconForeground">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_AdaptiveIconMonochrome">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_AdaptiveIconV33">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-anydpi-v33</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-anydpi-v33</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="Android_Colors">
                     <Platform Name="Android">
                         <RemoteDir>res\values</RemoteDir>
@@ -323,6 +400,16 @@
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_ColorsDark">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-night-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values-night-v21</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -493,6 +580,56 @@
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_VectorizedNotificationIcon">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-anydpi-v24</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-anydpi-v24</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_VectorizedSplash">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_VectorizedSplashDark">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-night-anydpi-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-night-anydpi-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_VectorizedSplashV31">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-anydpi-v31</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-anydpi-v31</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_VectorizedSplashV31Dark">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-night-anydpi-v31</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-night-anydpi-v31</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -671,6 +808,9 @@
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="Win64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64x">
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -934,16 +1074,19 @@
                 <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win64x" Name="$(PROJECTNAME)"/>
             </Deployment>
             <Platforms>
                 <Platform value="Android">False</Platform>
                 <Platform value="Android64">False</Platform>
                 <Platform value="iOSDevice64">False</Platform>
                 <Platform value="iOSSimARM64">False</Platform>
+                <Platform value="Linux64">False</Platform>
                 <Platform value="OSX64">False</Platform>
                 <Platform value="OSXARM64">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">True</Platform>
+                <Platform value="Win64x">False</Platform>
             </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

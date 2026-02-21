@@ -332,9 +332,7 @@ Begin
  vNoFields :=  (ADataSet.Fields.Count = 0);
  ADataSet.Close;
  If vNoFields Then
- begin
   ADataSet.FieldDefs.Clear;
- end;
  For I := 0 To vFieldsCount-1 Do
   Begin
    // field kind
@@ -347,7 +345,7 @@ Begin
    FFieldNames[I] := vFieldName;
    // field type
    AStream.Read(vFieldType, SizeOf(vFieldType));
-   If vFieldType in [{$IFDEF FPC}45, {$ENDIF}dwftExtended] Then
+   If vFieldType in [Integer(ftFloat), {$IFDEF FPC}45, {$ENDIF}dwftExtended] Then
     FFieldTypes[I] := {$IFDEF FPC}Integer(ftFMTBcd){$ELSE}Integer(ftExtended){$ENDIF}
    Else
     FFieldTypes[I] := vFieldType;
@@ -474,11 +472,11 @@ Var
   If (vDWFieldType In [dwftFixedWideChar,
                        dwftWideString,
                        dwftFixedChar,
-                       dwftString,
-                       dwftOraClob,
-                       dwftWideMemo,
-                       dwftFmtMemo,
-                       dwftMemo]) Then
+                       dwftString]) Then
+//                       dwftOraClob,
+//                       dwftWideMemo,
+//                       dwftFmtMemo,
+//                       dwftMemo]) Then
    Begin
     vLength := Dataset.GetCalcFieldLen(aField.DataType, aField.Size);
     {$IFDEF FPC}
@@ -546,10 +544,10 @@ Begin
    vActualRecord := Dataset.GetMemoryRecord(i);
    For b := 0 To vFieldCount Do
     Begin
-     vBoolean      := False;
+     vBoolean  := False;
      stream.Read(vBoolean, SizeOf(boolean));
      SetLength(vVarBytes, 0);
-     aField := vDataset.FindField(FFieldNames[b]);
+     aField    := vDataset.FindField(FFieldNames[b]);
      If aField <> Nil Then
       Begin
        aIndex := aField.FieldNo - 1;
@@ -573,9 +571,12 @@ Begin
             pData := Pointer(pActualRecord + Dataset.GetOffSets(aField));
           End;
         End;
-       tratarNulos;
-       If Not vBoolean Then
-        Continue;
+       If vDWFieldType <> dwftBoolean Then
+        Begin
+         tratarNulos;
+         If Not vBoolean Then
+          Continue;
+        End;
        If (pData <> Nil) Or (aField = Nil) Then
         Begin
          // N Bytes - WideString
@@ -624,7 +625,7 @@ Begin
                                         vString := DecodeStrings(vString,  Dataset.GetDatabaseCharSet);
                                        vString := GetStringEncode(vString, Dataset.GetDatabaseCharSet);
                                        If aField <> Nil Then
-                                        Move(Pointer(vString)^, pData^, Length(vString));
+                                        Move(Pointer(vString)^, pData^, vInt64);
                                       {$ELSE}
                                        stream.Read(vString[InitStrPos], vInt64);
                                        If EncodeStrs Then
@@ -640,19 +641,20 @@ Begin
            // 1 - Byte - Inteiro
            dwftByte,
            dwftShortint           :Begin
-                                     stream.Read(vByte, SizeOf(vByte));
-                                     If aField <> Nil Then
-                                      Move(vByte, PData^, Sizeof(vByte));
+                                    stream.Read(vByte, SizeOf(vByte));
+                                    If aField <> Nil Then
+                                     Move(vByte, PData^, Sizeof(vByte));
                                    End;
                                    // 1 - Byte - Boolean
           dwftBoolean             :Begin
                                      setlength(vVarBytes, 0);
-                                     setlength(vVarBytes, 2);
+                                     setlength(vVarBytes, Sizeof(Boolean));
+//                                     Move(vBoolean, vVarBytes[0], Sizeof(Boolean));
+//                                     stream.Read(vBoolean,        SizeOf(vBoolean));
                                      Move(vBoolean, vVarBytes[0], Sizeof(Boolean));
-                                     stream.Read(vBoolean,        SizeOf(vBoolean));
-                                     Move(vBoolean, vVarBytes[1], Sizeof(Boolean));
+//                                     Move(vBoolean, vVarBytes[1], Sizeof(Boolean));
                                      If aField <> Nil Then
-                                      Move(vVarBytes[0], PData^, Sizeof(vBoolean) + Sizeof(vBoolean));
+                                      Move(vVarBytes[0], PData^, Sizeof(vBoolean));
                                    End;
            // 2 - Bytes
            dwftSmallint,
@@ -884,33 +886,34 @@ Begin
           dwftWideMemo,
           dwftFmtMemo,
           dwftOraClob,
-          dwftMemo                :Begin
-                                     stream.Read(vInt64, SizeOf(vInt64));
-                                     vString := '';
-                                     If vInt64 > 0 Then
-                                      Begin
-                                       SetLength(vString, vInt64);
-                                       {$IFDEF FPC}
-                                        stream.Read(Pointer(vString)^, vInt64);
-                                        If EncodeStrs Then
-                                         vString := DecodeStrings(vString, csUndefined);
-                                        vString := GetStringEncode(vString, csUndefined);
-                                       {$ELSE}
-                                        stream.Read(vString[InitStrPos], vInt64);
-                                        If EncodeStrs Then
-                                         vString := DecodeStrings(vString);
-                                       {$ENDIF}
-                                       vInt64 := Length(vString) + 1;
-                                       Try
-                                        SetLength(vBytes, vInt64);
-                                        Move(vString[InitStrPos], vBytes[0], vInt64);
-                                        If aField <> Nil Then
-                                         PRESTDWBytes(pData)^ := vBytes;
-                                       Finally
-                                        SetLength(vBytes, 0);
-                                       End;
-                                      End;
-                                   End;
+          dwftMemo,
+//          dwftMemo                :Begin
+//                                     stream.Read(vInt64, SizeOf(vInt64));
+//                                     vString := '';
+//                                     If vInt64 > 0 Then
+//                                      Begin
+//                                       SetLength(vString, vInt64);
+//                                       {$IFDEF FPC}
+//                                        stream.Read(Pointer(vString)^, vInt64);
+//                                        If EncodeStrs Then
+//                                         vString := DecodeStrings(vString, csUndefined);
+//                                        vString := GetStringEncode(vString, csUndefined);
+//                                       {$ELSE}
+//                                        stream.Read(vString[InitStrPos], vInt64);
+//                                        If EncodeStrs Then
+//                                         vString := DecodeStrings(vString);
+//                                       {$ENDIF}
+//                                       vInt64 := Length(vString) + 1;
+//                                       Try
+//                                        SetLength(vBytes, vInt64);
+//                                        Move(vString[InitStrPos], vBytes[0], vInt64);
+//                                        If aField <> Nil Then
+//                                         PRESTDWBytes(pData)^ := vBytes;
+//                                       Finally
+//                                        SetLength(vBytes, 0);
+//                                       End;
+//                                      End;
+//                                   End;
            // N Bytes - Others Blobs
           dwftStream,
           dwftOraBlob,
@@ -997,8 +1000,11 @@ Begin
    vField := ADataset.Fields[i];
    vField.Clear;
    AStream.Read(vBoolean, Sizeof(Byte));
-   If Not vBoolean Then // is null
-    Continue;
+   If FFieldTypes[i] <> dwftBoolean Then
+    Begin
+     If Not vBoolean Then
+     Continue;
+    End;
     // N - Bytes
    If (FFieldTypes[i] In [dwftFixedChar,
                           dwftWideString,
@@ -1407,19 +1413,22 @@ Begin
      If (aIndex >= 0) And (PActualRecord <> Nil) Then
       Begin
        vDataType := vDataSet.FieldDefs[aIndex].DataType;
-       {$IFNDEF FPC}
-        {$IF compilerversion < 21}
-         vBoolean  := vDataSet.Fields[B].Size > 0;
-        {$ELSE}
-         vBoolean  := vDataSet.Fields[B].IsNull;
-        {$IFEND}
-       {$ELSE}
-        vBoolean  := vDataSet.Fields[B].IsNull;
-       {$ENDIF}
-       vBoolean := Not vBoolean;
-       Stream.Write(vBoolean, SizeOf(boolean));
-       If Not vBoolean Then
-        Continue;
+       If vDataType <> ftBoolean Then
+        Begin
+         {$IFNDEF FPC}
+          {$IF compilerversion < 21}
+           vBoolean  := vDataSet.Fields[B].Size > 0;
+          {$ELSE}
+           vBoolean  := vDataSet.Fields[B].IsNull;
+          {$IFEND}
+         {$ELSE}
+          vBoolean  := vDataSet.Fields[B].IsNull;
+         {$ENDIF}
+         vBoolean := Not vBoolean;
+         Stream.Write(vBoolean, SizeOf(boolean));
+         If Not vBoolean Then
+          Continue;
+        End;
        If Dataset.DataTypeSuported(vDataType) Then
         Begin
          If Dataset.DataTypeIsBlobTypes(vDataType) Then
@@ -1664,11 +1673,15 @@ Begin
  vMemoryStream := nil;
  For i := 0 To ADataset.FieldCount - 1 Do
   Begin
-   vBoolean := ADataset.Fields[i].IsNull;
-   vBoolean := Not vBoolean;
-   AStream.Write(vBoolean, SizeOf(boolean));
-   If Not vBoolean Then
-    Continue;
+   vBoolean := True;
+   If ADataset.Fields[i].DataType <> ftBoolean Then
+    Begin
+     vBoolean := ADataset.Fields[i].IsNull;
+     vBoolean := Not vBoolean;
+     AStream.Write(vBoolean, SizeOf(boolean));
+     If Not vBoolean Then
+      Continue;
+    End;
    vDWFieldType := FieldTypeToDWFieldType(ADataset.Fields[i].DataType);
    // N - Bytes
    Case vDWFieldType Of
