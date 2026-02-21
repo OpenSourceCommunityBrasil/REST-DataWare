@@ -343,7 +343,9 @@ End;
 Function GetDelphiGlobalKey : String;
 Begin
  Result := '';
- {$IF DEFINED(DELPHI12UP)} // delphi 11 Alexandria
+ {$IF DEFINED(DELPHI13UP)} // delphi 12 Athens
+  Result := '\Software\Embarcadero\BDS\37.0\Globals';
+ {$ELSEIF DEFINED(DELPHI12UP)} // delphi 12 Athens
   Result := '\Software\Embarcadero\BDS\23.0\Globals';
  {$ELSEIF DEFINED(DELPHI11UP)} // delphi 11 Alexandria
   Result := '\Software\Embarcadero\BDS\22.0\Globals';

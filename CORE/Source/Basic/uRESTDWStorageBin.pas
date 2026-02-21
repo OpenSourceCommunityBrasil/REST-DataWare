@@ -1819,12 +1819,15 @@ Begin
                            vInt64 := vMemoryStream.Size;
                            AStream.Write(vInt64, SizeOf(vInt64));
                            SetLength(vBytes, vInt64);
-                           Try
-                            vMemoryStream.Position := 0;
-                            vMemoryStream.Read(vBytes[0], vInt64);
-                           Except
-                           End;
-                           AStream.Write(vBytes[0], vInt64);
+                           if vInt64 > 0 then
+                            begin
+                             Try
+                              vMemoryStream.Position := 0;
+                              vMemoryStream.Read(vBytes[0], vInt64);
+                             Except
+                             End;
+                             AStream.Write(vBytes[0], vInt64);
+                            end;
                           Finally
                            SetLength(vBytes, 0);
                            FreeAndNil(vMemoryStream);
