@@ -162,17 +162,6 @@ Type
   End;
 
   {
-  TStreamField = Class(TBlobField)
-  Private
-   FStream               : TStream;
-   Function GetAsStream  : TStream;
-  Public
-   Constructor Create(AOwner : TComponent); Override;
-   Destructor  Destroy; Override;
-   Procedure   Put;
-   Property    Value         : TStream    Read GetAsStream;
-  End;
-
   TdwcolorOptions = Set Of (dwcoAllowedSharp, dwcoShowWebSharp, dwcoSysColors);
   TColorField = class(TIntegerField)
   Private
@@ -548,7 +537,11 @@ Type
     Procedure ClearChanges;
     Function  GetFieldData            (FieldNo              : Integer;
                                        Var Buffer           : TValueBuffer): Boolean; overload;{$IFNDEF FPC}override;{$ENDIF}
-
+    {$IFDEF FPC}
+    Function  GetFieldData            (Field                : TField;
+                                       Buffer               : Pointer;
+                                       NativeFormat         : Boolean): Boolean; Overload; Override;
+    {$ENDIF}
     Procedure DoBeforeApply           (ADataset             : TDataset;
                                        RowsPending          : Integer);
     Procedure DoAfterApply            (ADataset             : TDataset;
@@ -853,6 +846,24 @@ Type
     Property  OnNewRecord;
     Property  OnPostError;
   End;
+  TBlobStream = class(TMemoryStream)
+  private
+    FFieldIndex: Integer;
+    FRecNo: Integer;
+    FDataSet: TRESTDWMemtable;
+  public
+    destructor Destroy; Override;
+  end;
+  TStreamField = Class(TBlobField)
+  Private
+   FStream               : TStream;
+   Function GetAsStream  : TStream;
+  Public
+   Constructor Create(AOwner : TComponent); Override;
+   Destructor  Destroy; Override;
+   Procedure   Put;
+   Property    Value         : TStream    Read GetAsStream;
+  End;
   TRESTDWMTMemBlobStream = Class(TStream)
   Private
    FField      : TBlobField;
@@ -989,9 +1000,12 @@ Type
    vPrecision : Integer;
    Procedure SetAsExtended(Const AValue : Extended);
   Protected
-   Function  GetAsString   : String;  Override;
+   Function  GetAsString   : String;                Override;
    Procedure SetAsString  (Const AValue : String);  Override;
-   Function  GetAsFloat    : Double;  Override;
+   Procedure SetAsFloat   (AValue: Double);         Override;
+   Function  GetAsFloat    : Double;                Override;
+   Procedure SetVarValue  (Const AValue : Variant); Override;
+   Function  GetAsVariant  : Variant;               Override;
   Public
    Constructor Create(AOwner: TComponent); override;
   Published
@@ -1000,29 +1014,30 @@ Type
   End;
   {$ENDIF}
   {$IFNDEF FPC}
-    TRESTDWSQLTimeStampOffsetField = Class(TSQLTimeStampField)
-    Protected
+   TRESTDWSQLTimeStampOffsetField = Class(TSQLTimeStampField)
+   Protected
+    {$IF CompilerVersion < 25}
+    Procedure GetText    (Var Text     : String;
+                          DisplayText  : Boolean); Override;
+    {$IFEND}
+    {$IFDEF FPC}
+    Procedure SetAsString(const Value: string); override;
+    {$ELSE}
      {$IF CompilerVersion < 25}
-     Procedure GetText    (Var Text     : String;
-                           DisplayText  : Boolean); Override;
-     {$IFEND}
-     {$IFDEF FPC}
-     Procedure SetAsString(const Value: string); override;
+      Procedure SetAsString(const Value: string); override;
      {$ELSE}
-     {$IF CompilerVersion < 25}
-     Procedure SetAsString(const Value: string); override;
-     {$ELSE}
-     Procedure SetAsString(Const AValue : String);  Override;
+      Procedure SetAsString(Const AValue : String);  Override;
      {$IFEND}
-     {$ENDIF}
-     Public
-      Constructor Create(AOwner: TComponent); override;
-    End;
+    {$ENDIF}
+    Public
+     Constructor Create(AOwner: TComponent); override;
+   End;
   {$ENDIF}
  Type
   TStringFieldRESTDW = Class(TStringField)
  Protected
-  Function  CopyToNull(aValue : String) : String;
+  Function  CopyToNull(aValue : String) : String;Overload;
+  Function  CopyToNull(aValue : TRESTDWBytes) : TRESTDWBytes;Overload;
   Function  GetAsString  : String;  Override;
   {$IFNDEF FPC}
    {$IFNDEF NEXTGEN}
@@ -1032,6 +1047,7 @@ Type
     Function GetValue(var aValue: String): Boolean;
    {$ENDIF !NEXTGEN}
   {$ELSE}
+   Function GetAsAnsiString : AnsiString; override;
    Function GetValue(var aValue: String): Boolean;
   {$ENDIF}
   Function  GetAsVariant  : Variant; Override;
@@ -1087,8 +1103,8 @@ Var
                                                            {$IFNDEF FPC}TArrayField,{ ftArray }{$ELSE}Nil,{$ENDIF}
                                                            {$IFNDEF FPC}TReferenceField,{ ftReference }{$ELSE}Nil,{$ENDIF}
                                                            {$IFNDEF FPC}TDataSetField,{ ftDataSet }{$ELSE}Nil,{$ENDIF}
-                                                           TBlobField,               { ftOraBlob }
-                                                           TMemoField,               { ftOraClob }
+                                                           TStreamField, //TBlobField,               { ftOraBlob }
+                                                           TStreamField, //TMemoField,               { ftOraClob }
                                                            TVariantField,            { ftVariant }
                                                            {$IFNDEF FPC}TInterfaceField,{ ftInterface }{$ELSE}Nil,{$ENDIF}
                                                            {$IFNDEF FPC}TIDispatchField,{ ftIDispatch }{$ELSE}Nil,{$ENDIF}
@@ -1099,7 +1115,7 @@ Var
                                                            {$IFNDEF FPC}
                                                            {$IFDEF DELPHI2010UP},
                                                            TWideStringField,         { ftFixedWideChar }
-                                                           TWideMemoField,           { ftWideMemo }
+                                                           TStreamField, //TWideMemoField,           { ftWideMemo }
                                                            TSQLTimeStampField,       { ftOraTimeStamp }
                                                            TStringFieldRESTDW        { ftOraInterval }
                                                            {$ENDIF}
@@ -1114,10 +1130,10 @@ Var
                                                            TRESTDWNumericField,
                                                            nil,                      { ftConnection }
                                                            nil,                      { ftParams }
-                                                           TBlobField                { ftStream }
+                                                           TStreamField              //TBlobField                { ftStream }
                                                            {$ENDIF}
                                                            {$ELSE},
-                                                           TBlobField                { ftStream }
+                                                           TStreamField              //TBlobField                { ftStream }
                                                            {$ENDIF}
                                                            {$IFDEF DELPHIXE2UP},
                                                            TSQLTimeStampOffsetField, { ftTimeStampOffset }
@@ -1227,12 +1243,10 @@ Begin
    Result := Size;
    vDWFieldType := FieldTypeToDWFieldType(FieldType);    //Gledston - Alterei a partir deste ponto
    Case vDWFieldType of
-     {$IFNDEF FPC}
      dwftString    : Begin
 //                      Inc(Result, Size); //2 Bytes de Boolean
                       Exit;
                      End;
-     {$ENDIF}
      dwftSmallint  : Result := SizeOf(Smallint);
      dwftInteger   : Result := SizeOf(Integer);
      dwftWord      : Result := SizeOf(Word);
@@ -1442,12 +1456,6 @@ Begin
 // Result := _RealSupportManager._VarFromReal(GetAsExtended);
 End;
 
-Function TRESTDWNumericField.GetAsVariant : Variant;
-Begin
- Result := GetAsExtended;
-// Result := _RealSupportManager._VarFromReal(GetAsExtended);
-End;
-
 Procedure TRESTDWNumericField.SetAsExtended(Const AValue : Extended);
 Var
  pData : TRESTDWMTValueBuffer;
@@ -1546,15 +1554,6 @@ Begin
   End;
 End;
 
-Procedure TRESTDWNumericField.SetAsFloat (AValue: Double);
-Begin
- SetAsExtended(AValue);
-End;
-
-Procedure TRESTDWNumericField.SetVarValue(Const AValue : Variant);
-Begin
- SetAsExtended(AValue);
-End;
 {$ELSE}
 Function TRESTDWNumericField.GetAsVariant : Variant;
 Begin
@@ -1562,6 +1561,22 @@ Begin
 End;
 {$IFEND}
 {$ENDIF}
+
+Function TRESTDWNumericField.GetAsVariant : Variant;
+Begin
+ Result := {$IFDEF FPC}GetAsFloat{$ELSE}GetAsExtended{$ENDIF};
+End;
+
+Procedure TRESTDWNumericField.SetVarValue(Const AValue : Variant);
+Begin
+ SetAsExtended(AValue);
+End;
+
+Procedure TRESTDWNumericField.SetAsFloat (AValue: Double);
+Begin
+ SetAsExtended(AValue);
+End;
+
 Constructor TRESTDWNumericField.Create(AOwner: TComponent);
 Begin
  Inherited;
@@ -1574,21 +1589,19 @@ Begin
  vPrecision := 8;
 End;
 
-{$IFNDEF FPC}
 Function TStringfieldRESTDW.GetAsAnsiString : AnsiString;
 Var
  Data : TValueBuffer;
 Begin
  {$IFNDEF FPC}
   SetLength(Data, Size);
- {$ENDIF}
-  If GetData({$IFDEF FPC}Pointer(@{$ENDIF}Data{$IFDEF FPC}){$ENDIF}, True) then
+  If GetData(Data, True) then
    Result := BytesToString(TRESTDWBytes(Data));
- {$IFNDEF FPC}
   SetLength(Data, 0);
+ {$ELSE}
+  Result := GetAsString;
  {$ENDIF}
 End;
-{$ENDIF}
 
 Function  TStringfieldRESTDW.GetAsVariant  : Variant;
 Begin
@@ -1614,6 +1627,23 @@ Begin
  End;
 End;
 
+Function  TStringfieldRESTDW.CopyToNull(aValue : TRESTDWBytes) : TRESTDWBytes;
+Var
+ I : Integer;
+Begin
+ SetLength(Result, 0);
+ For I := 0 To Length(aValue) - 1 Do
+  Begin
+   If aValue[I] <> 0 Then
+    Begin
+     SetLength(Result, Length(Result) +1);
+     Result[I] := aValue[I];
+    End
+   Else
+    Break;
+  End;
+End;
+
 Function  TStringfieldRESTDW.CopyToNull(aValue : String) : String;
 Var
  I : Integer;
@@ -1627,22 +1657,28 @@ Begin
 End;
 
 Function  TStringfieldRESTDW.GetAsString   : String;
-{$IFNDEF FPC}
 Var
- Data : TValueBuffer;
-{$ENDIF}
+ aData,
+ bData  : TRESTDWBytes;
 Begin
- {$IFNDEF FPC}
-  SetLength(Data, Size);
-  If GetData(Data, True) then
-   Result := CopyToNull(BytesToString(TRESTDWBytes(Data)));
-  SetLength(Data, 0);
- {$ELSE}
-  Result := GetAsAnsiString;
- {$ENDIF}
+ Try
+  SetLength(aData, Size);
+  If TRESTDWMemtable(Dataset).InternalGetFieldData(Self, TRESTDWMTValueBuffer(aData), Size) then
+   Begin
+    bData  := CopyToNull(aData);
+    Result := BytesToString(bData);
+    SetLength(bData, 0);
+   End;
+  SetLength(aData, 0);
+ Finally
+ End;
 End;
 
 Procedure TStringfieldRESTDW.SetAsAnsiString(const AValue: AnsiString);
+Var
+ pData : TRESTDWBytes;
+ X     : String;
+ I     : Integer;
 Begin
  {$IFNDEF FPC}
   {$IF Defined(HAS_FMX)}
@@ -1655,7 +1691,14 @@ Begin
    SetData(@AValue, True);
   {$IFEND}
  {$ELSE}
-  Inherited SetAsAnsiString(AValue);
+  Inherited SetAsString(AValue);
+{
+  SetLength(pData, Size);
+  x        := aValue;
+  I        := Length(X);
+  Move(Pointer(@x)^, pData[0], I);
+  TRESTDWMemtable(Dataset).InternalSetFieldData(Self, @pData, TRESTDWMTValueBuffer(Pointer(@pData)^));
+}
  {$ENDIF}
 End;
 
@@ -1808,27 +1851,29 @@ End;
 
 Function TRESTDWMTMemoryRecord.GetIndex: Integer;
 Begin
-  // If FMemoryData <> nil then
-  // Result := FMemoryData.FRecords.IndexOf(Self)
-  // Else
+// If FMemoryData <> Nil then
+//  Result := FMemoryData.FRecords.IndexOf(Self)
+// Else
  Result := FIndex;
 End;
 
 Procedure TRESTDWMTMemoryRecord.SetMemoryData(Value: TRESTDWMemTable; UpdateParent: Boolean);
 var
-  I: Integer;
-  DataSize: Integer;
+ I, DataSize: Integer;
 Begin
  If FMemoryData <> Value then
   Begin
-//   If Value <> Nil then
-//    FMemoryData := Value;
    If FMemoryData <> nil then
     Begin
      If FMemoryData.BlobFieldCount > 0 Then
-      Finalize(FBlobs[0], FMemoryData.BlobFieldCount);
+      Begin
+//       {$IFDEF FPC}
+        SetLength(FBlobs, 0); //Finalize(FBlobs, FMemoryData.BlobFieldCount);
+//       {$ELSE}
+//        Finalize(FBlobs);
+//       {$ENDIF}
+      End;
      FMemoryData.FRecords.Remove(Self);
-     SetLength(FBlobs, 0);
      {$IFDEF FPC}
       ReallocMem(FData, 0);
      {$ELSE}
@@ -1907,7 +1952,7 @@ Begin
  FFetch             := False;
 End;
 
-destructor TRESTDWMemTable.Destroy;
+Destructor TRESTDWMemTable.Destroy;
 var
  I        : Integer;
  PFValues : TPVariant;
@@ -2278,13 +2323,7 @@ Begin
       {$ENDIF}
      End
     Else
-     Begin
-      {$IFDEF FPC}
-       Result := Pointer(PRESTDWMTMemBuffer(Buffer + FOffsets[Index]));
-      {$ELSE}
-       Result := Pointer(PRESTDWMTMemBuffer(Buffer) + FOffsets[Index]);
-      {$ENDIF}
-     End;
+     Result := Pointer(PRESTDWMTMemBuffer(Buffer) + FOffsets[Index]);
   End;
 End;
 
@@ -2690,6 +2729,9 @@ Begin
       RecBuf := PRESTDWMTMemBuffer(TempBuffer);//PRESTDWMTMemBuffer(ActiveBuffer);//PRESTDWMTMemBuffer(CalcBuffer);
     dsFilter:
       RecBuf := PRESTDWMTMemBuffer(TempBuffer);
+   {$IFDEF FPC}
+    dsBlockRead : RecBuf := PRESTDWMTMemBuffer(ActiveBuffer);
+   {$ENDIF}
   Else
     RecBuf := nil;
   End;
@@ -2795,7 +2837,7 @@ Begin
                     {$IF CompilerVersion > 21}
                      If Not (Field.datatype in  [ftByte, ftShortint]) then
                       Begin
-                       Result := Not(Result);
+                       Result := False;
                        If Not(Result) then
                         Begin
                          cLen      := SizeOf(Boolean);
@@ -3081,18 +3123,22 @@ Begin
             SetLength(TRESTDWBytes(Buffer), cLen);
            If Not (Field.datatype in  [ftBoolean]) then
             Result := ((Not(aNullData)) and Not(VarIsNull(Data^)));
-           Result := ((Not(aNullData)) and Not(VarIsNull(Data^)));
            If (Field.datatype In [ftAutoInc, ftLargeint, ftInteger, ftSmallint, ftFloat,
                                   ftFMTBCD, ftBCD, ftCurrency]) Then
             Begin
              vDataType := FieldTypeToDWFieldType(Field.DataType);
-             If Length(TRESTDWBytes(Buffer)) = 0 Then
-              SetLength(TRESTDWBytes(Buffer), cLen);
              If vDataType = dwftBCD Then
               Begin
                Move(aDataBytes[1], Pointer(@vLongDouble)^, SizeOf(vLongDouble));
                cLen := SizeOf(vLongDouble);
                Move(Pointer(@vLongDouble)^, Pointer(Buffer)^, cLen);
+              End
+             Else If vDataType = 45 Then
+              Begin
+               If Length(TRESTDWBytes(Buffer)) = 0 Then
+                SetLength(TRESTDWBytes(Pointer(@Buffer)^), SizeOf(DwLongDouble));
+               Move(aDataBytes[1], vLongDouble, SizeOf(vLongDouble));
+               Move(vLongDouble, Pointer(Buffer)^, cLen-1);
               End
              Else
               Move(aDataBytes[1], Pointer(Buffer)^, cLen-1);
@@ -3104,6 +3150,11 @@ Begin
               SetLength(TRESTDWBytes(Buffer), cLen);
              cLen := SizeOf(TDateTimeRec);
              Move(aDataBytes[1], Pointer(@vDouble)^, SizeOf(DWDouble));
+             vDataType := FieldTypeToDWFieldType(Field.DataType);
+             //Em Lazarus é assim
+             Move(Pointer(@vDouble)^, Pointer(Buffer)^, cLen);
+             {
+             //Em Delphi eh diferente
              Case Field.datatype Of
               ftTime     : Begin
                             vDateTimeRec.Time := DateTimeToTimeStamp(vDouble).Time;
@@ -3124,16 +3175,15 @@ Begin
                 Move(Pointer(@vTimeStamp)^, Pointer(Buffer)^, cLen);
                End;
              End;
+             }
             End
-{
-           Else If Field.datatype = ftExtended Then
+           Else If vDataType = dwftExtended Then
             Begin
              If Length(TRESTDWBytes(Buffer)) = 0 Then
               SetLength(TRESTDWBytes(Pointer(@Buffer)^), SizeOf(DwLongDouble));
              Move(aDataBytes[1], vLongDouble, SizeOf(vLongDouble));
              Move(vLongDouble, Pointer(Buffer)^, cLen-1);
             End
-}
            Else
             Begin
              If Length(TRESTDWBytes(Buffer)) = 0 Then
@@ -3148,7 +3198,12 @@ Begin
         End;
       End
      Else
-      Result := False;
+      Begin
+       If (Length(TRESTDWBytes(Buffer)) = 0) And
+          (cLen > 0) Then
+        SetLength(TRESTDWBytes(Buffer), cLen);
+       Result := False;
+      End;
     End;
   End
  Else
@@ -3301,6 +3356,7 @@ Begin
    If I >= 0 Then
     Begin
      Case GetFieldDef(I) of
+       dwftStream           : Result := TStreamField;
        dwftExtended         : Result := TRESTDWNumericField;
        dwftString           : Result := TStringFieldRESTDW;
        {$IFNDEF FPC}
@@ -3326,6 +3382,7 @@ Function TRESTDWMemTable.GetFieldData(Field        : TField;
                                         Buffer       : Pointer
                                        {$ENDIF}): Boolean;
 Var
+ vResult   : Boolean;
  aDataSize : Integer;
  aPointer  : Pointer;
 Begin
@@ -3337,24 +3394,29 @@ Begin
    SetLength(TRESTDWBytes(Buffer), aDataSize);
  {$ENDIF}
  aPointer := @Buffer;
- Result := InternalGetFieldData(Field, TRESTDWMTValueBuffer(aPointer^));
+ vResult  := False;
+ Try
+  vResult  := InternalGetFieldData(Field, TRESTDWMTValueBuffer(aPointer^));
+ Finally
+  Result   := vResult;
+ End;
 End;
 
 procedure TRESTDWMemTable.InternalSetFieldData(Field                : TField;
                                                Buffer               : Pointer;
                                                Const ValidateBuffer : TRESTDWMTValueBuffer);
 Var
-  PActualRecord  : PRESTDWMTMemBuffer;
-  aState         : TDataSetState;
-  Data			     : {$IFDEF FPC}PAnsiChar{$ELSE}PByte{$ENDIF};
-  aBytes		     : TRESTDWBytes;
-  pBytes		     : PRESTDWBytes;
-  VarData		     : Variant;
+  PActualRecord   : PRESTDWMTMemBuffer;
+  aState          : TDataSetState;
+  Data		  : {$IFDEF FPC}PAnsiChar{$ELSE}PByte{$ENDIF};
+  aBytes	  : TRESTDWBytes;
+  pBytes	  : PRESTDWBytes;
+  VarData	  : Variant;
   aResult,
   vBoolean,
-  IsData		      : Boolean;
+  IsData	  : Boolean;
   aIndex,
-  cLen	   	      : Integer;
+  cLen	   	  : Integer;
   vDateTimeInt    : DWInteger;
   vDateFloat      : DWFloat;
   vDateLongDouble : DWLongDouble;
@@ -3446,19 +3508,13 @@ Var
                dwftFixedWideChar,
                dwftFixedChar,
                dwftString         : Begin
-//                                     SetLength(String(Pointer(@Data)^), cLen);
                                      {$IFDEF FPC}
                                       FillChar(Data^, cLen, #0);
                                      {$ELSE}
                                       FillChar(Data^, cLen, 0);
                                      {$ENDIF}
- //                                     cLen := Length(String(buffer^));
-//                                     If Length(String(Pointer(@Buffer)^)) > 0 Then
-//                                      Move(buffer^, data^, cLen)
                                      If Length(TRESTDWBytes(ValidateBuffer)) > 0 Then
                                       Move(TRESTDWBytes(ValidateBuffer)[0], data^, cLen);
-//                                      Move(Pointer(@ValidateBuffer)^, data^, cLen);
-//                                     PChar(data)^ := PChar(buffer)^;
                                     End;
                dwftWord,
                dwftAutoInc,
@@ -3617,7 +3673,7 @@ Begin
     If Length(fblobs) > Index Then
      Result := @fblobs[Index];
   End
- Else
+ Else If Length(fblobs) > Index Then
   Result := @fblobs[Index];
 End;
 
@@ -3638,26 +3694,26 @@ Begin
   {$IFEND}
  {$ELSE}
   If Length(TRESTDWBytes(Buffer)) > 0 Then
-   InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer[0]){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer)
+   InternalSetFieldData(Field, Buffer, TRESTDWMTValueBuffer(Pointer(@Buffer)^))
   Else
-   InternalSetFieldData(Field, {$IFDEF RTL240_UP}PByte(@Buffer){$ELSE}Buffer{$ENDIF RTL240_UP}, Buffer);
+   InternalSetFieldData(Field, Buffer, Buffer);
  {$ENDIF}
 End;
+
 {$IFNDEF NEXTGEN}
 {$IFDEF RTL240_UP}
-
 Procedure TRESTDWMemTable.SetFieldData(Field: TField; Buffer: Pointer);
 var
   ValidateBuffer: TRESTDWMTValueBuffer;
 Begin
-  If (Buffer <> nil) and (Field.FieldNo > 0) and (Field.DataSize > 0) then
+ If (Buffer <> nil) and (Field.FieldNo > 0) and (Field.DataSize > 0) then
   Begin
-    SetLength(ValidateBuffer, Field.DataSize);
-    Move(Buffer^, ValidateBuffer[0], Field.DataSize);
+   SetLength(ValidateBuffer, Field.DataSize);
+   Move(Buffer^, ValidateBuffer[0], Length(TValueBuffer(Buffer))); //;Field.DataSize);
   End
-  Else
-    ValidateBuffer := nil;
-  InternalSetFieldData(Field, Buffer, ValidateBuffer);
+ Else
+  ValidateBuffer := nil;
+ InternalSetFieldData(Field, Buffer, ValidateBuffer);
 End;
 {$ENDIF RTL240_UP}
 {$ENDIF ~NEXTGEN}
@@ -3752,8 +3808,9 @@ Begin
   Result := FBlobs[Field.Offset];
 End;
 
-procedure TRESTDWMemTable.SetBlobData(Field: TField;
-  Buffer: PRESTDWMTMemBuffer; Value: TMemBlobData);
+procedure TRESTDWMemTable.SetBlobData(Field  : TField;
+                                      Buffer : PRESTDWMTMemBuffer;
+                                      Value  : TMemBlobData);
 Begin
  If Buffer = PRESTDWMTMemBuffer(ActiveBuffer) then
   Begin
@@ -3792,16 +3849,18 @@ Begin
   Result := TRESTDWMTMemBlobStream.Create(Field as TBlobField, Mode);
 End;
 
-function TRESTDWMemTable.BookmarkValid(aBookmark: TBookmark): Boolean;
+Function TRESTDWMemTable.BookmarkValid(aBookmark: TBookmark): Boolean;
 Begin
-  Result := (aBookmark <> nil) and FActive and
-    (FindRecordID({$IFDEF FPC}NativeInt(@aBookmark[0]){$ELSE}TRESTDWMTBookmarkData
-    ({$IFDEF RTL200_UP}Pointer(@aBookmark[0]
-    ){$ELSE}aBookmark{$ENDIF RTL200_UP}^){$ENDIF}) <> nil);
+ Result := (aBookmark <> Nil) And
+           (FActive)          And
+           (FindRecordID({$IFDEF FPC}NativeInt(@aBookmark[0])
+                          {$ELSE}TRESTDWMTBookmarkData({$IFDEF RTL200_UP}Pointer(@aBookmark[0])
+                                                       {$ELSE}aBookmark
+                                                       {$ENDIF RTL200_UP}^)
+                         {$ENDIF}) <> Nil);
 End;
 
-function TRESTDWMemTable.CompareBookmarks(aBookmark1, aBookmark2: TBookmark
-  ): Integer;
+Function TRESTDWMemTable.CompareBookmarks(aBookmark1, aBookmark2: TBookmark): Integer;
 Begin
   If (aBookmark1 = nil) and (aBookmark2 = nil) then
     Result := 0
@@ -5736,9 +5795,11 @@ var
  I : Integer;
 Begin
  Move(Buffer^, Rec.Data^, FRecordSize);
-  For I := 0 to BlobFieldCount - 1 do
+ For I := 0 to BlobFieldCount - 1 Do
+  Begin
    If Assigned(FBlobs[I]) Then
     Rec.FBlobs[I] := FBlobs[I];
+  End;
 End;
 
 procedure TRESTDWMemTable.SetMemoryRecordData(Buffer : PRESTDWMTMemBuffer;
@@ -6016,6 +6077,11 @@ Begin
     Begin
      Field             := TStringFieldRESTDW.Create(Self);
      Field.Size        := FieldDefs[I].Size;
+    End
+   Else If FieldDefs[I].DataType in [{$IFNDEF FPC}ftStream, {$ENDIF}ftBlob, ftMemo, ftWideMemo] Then
+    Begin
+     Field             := TStreamField.Create(Self);
+//     Field.Size        := FieldDefs[I].Size;
     End
    Else
     Begin
@@ -7166,11 +7232,20 @@ Begin
  FDataset := ADataset;
 End;
 
+{$IFDEF FPC}
+Function  TRESTDWMemTable.GetFieldData(Field        : TField;
+                                       Buffer       : Pointer;
+                                       NativeFormat : Boolean): Boolean;
+Begin
+ Result := InternalGetFieldData(Field, TRESTDWMTValueBuffer(Buffer));
+End;
+{$ENDIF}
+
 Function  TRESTDWMemTable.GetFieldData(FieldNo              : Integer;
                                        Var Buffer           : TValueBuffer): Boolean;
 Begin
 {$IFDEF FPC}
- Inherited GetFieldData(Fields[FieldNo], Pointer(@Buffer));
+ Result := InternalGetFieldData(Fields[FieldNo], TRESTDWMTValueBuffer(Buffer)); //Inherited GetFieldData(Fields[FieldNo], Pointer(@Buffer));
 {$ELSE}
  Inherited GetFieldData(FieldNo, Buffer);
 {$ENDIF}
@@ -7769,6 +7844,84 @@ Begin
   End;
 End;
 
+Destructor TBlobStream.Destroy;
+begin
+// If Assigned(FDataSet) Then
+//  FDataSet.SetBlobStream(Self);
+ Inherited Destroy;
+end;
+
+Constructor TStreamField.Create(AOwner: TComponent);
+Begin
+ Inherited Create(AOwner);
+ FStream := TBlobStream.Create;
+ TBlobStream(FStream).FDataSet := TRESTDWMemtable(AOwner);
+End;
+
+Destructor TStreamField.Destroy;
+Begin
+ TBlobStream(FStream).FDataSet := Nil;
+ FStream.Free;
+ Inherited Destroy;
+End;
+
+Procedure TStreamField.Put;
+Var
+ Field  : TField;
+Begin
+ If Not DataSet.IsEmpty Then
+  Begin
+   With (DataSet as TRESTDWMemtable), TBlobStream(FStream) do
+    Begin
+     Field       := DataSet.FindField(FieldName);
+     FFieldIndex := Field.Offset;
+     FRecNo      := RecNo;
+//     SetBlobStream(FStream);
+    End;
+  End;
+End;
+
+Function TStreamField.GetAsStream: TStream;
+Var
+ aBytes : TRESTDWBytes;
+ Field  : TField;
+ {$IFDEF FPC}
+  vStream : TStream;
+ {$ENDIF}
+begin
+ If Not DataSet.IsEmpty then
+  Begin
+   Result := FStream;
+   With (DataSet as TRESTDWMemTable), TBlobStream(FStream) do
+    Begin
+     Clear;
+     Field       := DataSet.FindField(FieldName);
+     FFieldIndex := Field.Offset;
+     FRecNo := RecNo;
+     {$IFDEF FPC}
+      vStream := DataSet.CreateBlobStream(Field, bmRead);
+      If Assigned(vStream) Then
+       Begin
+        vStream.Position := 0;
+        SetLength(aBytes, vStream.Size);
+        vStream.Read(aBytes, Length(aBytes));
+        vStream.Free;
+       End;
+     {$ELSE}
+      DataSet.GetBlobFieldData(Field.Offset, TBlobByteData(aBytes));
+     {$ENDIF}
+     If Not Assigned(Result) Then
+      Result := TBlobStream.Create;
+     TBlobStream(Result).Clear;
+     If Length(aBytes) > 0 Then
+      TBlobStream(Result).Write(aBytes, Length(aBytes));
+    End;
+   Result.Position := 0;
+  End
+ Else
+  Result := nil;
+end;
+
 { TRESTDWStorageBase }
 
 constructor TRESTDWStorageBase.Create(AOwner: TComponent);
@@ -7828,9 +7981,10 @@ Begin
      Begin
       If Assigned(TRESTDWMTMemoryRecord(TList(Self).Items[Index]^)) Then
        Begin
-        vItem := @TRESTDWMTMemoryRecord(TList(Self).Items[Index]^);
+        vItem := TList(Self).Items[Index];
         vItem^.Free;
         Dispose(vItem);
+        vItem := Nil;
        End;
      End;
    Except

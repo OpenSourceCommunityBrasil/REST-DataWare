@@ -98,6 +98,7 @@ End;
   Property   Items[Index  : Integer]       : TMassiveValue Read GetRec Write PutRec; Default;
 End;
 
+ PMassiveField = ^TMassiveField;
  TMassiveField = Class(TObject)
  Private
   vMassiveFields : TList;
@@ -116,7 +117,8 @@ End;
   Function    GetOldValue    : Variant;
   Procedure   SetValue(Value : Variant);
   Function    GetModified    : Boolean;
-  Procedure   SetFieldType(Value : TObjectValue);
+  Procedure   SetFieldType        (Value : TObjectValue);
+  Procedure   SetAutoGenerateValue(Value : Boolean);
  Protected
  Public
   Constructor Create(MassiveFields : TList; FieldIndex : Integer);
@@ -125,7 +127,7 @@ End;
   Procedure   LoadFromStream(Stream : TMemoryStream);
   Procedure   SaveToStream  (var Stream : TMemoryStream);
   Property    Required          : Boolean      Read vRequired          Write vRequired;
-  Property    AutoGenerateValue : Boolean      Read vAutoGenerateValue Write vAutoGenerateValue;
+  Property    AutoGenerateValue : Boolean      Read vAutoGenerateValue Write SetAutoGenerateValue;
   Property    KeyField          : Boolean      Read vKeyField          Write vKeyField;
   Property    ReadOnly          : Boolean      Read vReadOnly          Write vReadOnly;
   Property    FieldType         : TObjectValue Read vFieldType         Write SetFieldType;
@@ -137,7 +139,6 @@ End;
   Property    Modified          : Boolean      Read GetModified;
 End;
 
- PMassiveField  = ^TMassiveField;
  TMassiveFields = Class(TList)
  Private
   vMassiveDataset : TMassiveDataset;
@@ -151,7 +152,8 @@ End;
   Procedure   Delete(Index : Integer);                          Overload;
   Procedure   Delete(FieldName : String);                       Overload;
   Function    Add   (Item  : TMassiveField) : Integer;          Overload;
-  Function    FieldByName(FieldName : String) : TMassiveField;
+  Function    FieldByName (FieldName : String) : TMassiveField; Overload;
+  Function    FieldByNameP(FieldName : String) : PMassiveField; Overload;
   Property    Items[Index  : Integer]       : TMassiveField Read GetRec Write PutRec; Default;
 End;
 
@@ -552,6 +554,11 @@ Begin
   End;
 End;
 
+Procedure TMassiveField.SetAutoGenerateValue(Value : Boolean);
+Begin
+ vAutoGenerateValue := Value;
+End;
+
 Procedure TMassiveField.SaveToStream(var Stream: TMemoryStream);
 Var
  vRecNo : Integer;
@@ -724,7 +731,7 @@ Begin
  Inherited;
 End;
 
-Function TMassiveFields.FieldByName(FieldName : String): TMassiveField;
+Function TMassiveFields.FieldByName(FieldName : String) : TMassiveField;
 Var
  I           : Integer;
  vFieldName,
@@ -759,6 +766,46 @@ Begin
    If vResult Then
     Begin
      Result := TMassiveField(TList(Self).Items[I]^);
+     Break;
+    End;
+  End;
+End;
+
+Function TMassiveFields.FieldByNameP(FieldName : String) : PMassiveField;
+Var
+ I           : Integer;
+ vFieldName,
+ vFieldNameB : String;
+ vResult     : Boolean;
+ Function StrCompField(A, B : String) : Boolean;
+ Var
+  I,  X : Integer;
+ Begin
+  Result := Length(A) > 0;
+  X      := 0;
+  For I := 1 To Length(A) Do
+   Begin
+    Result := I <= Length(B);
+    If Result Then
+     Begin
+      Result := A[I] = B[X];
+      If Not Result Then
+       Break;
+     End
+    Else
+     Break;
+   End;
+ End;
+Begin
+ Result      := Nil;
+ vFieldNameB := UpperCase(Trim(FieldName));
+ For I := 0 To Self.Count -1 Do
+  Begin
+   vFieldName := UpperCase(Trim(Items[I].vFieldName));
+   vResult    := vFieldName = vFieldNameB;
+   If vResult Then
+    Begin
+     Result := TList(Self).Items[I];
      Break;
     End;
   End;
@@ -1710,8 +1757,9 @@ End;
 
 Procedure TMassiveDatasetBuffer.MassiveCheck(Dataset : TRESTDWClientSQLBase);
 Var
- I : Integer;
- MassiveField : TMassiveField;
+ I                  : Integer;
+ MassiveField       : PMassiveField;
+ vAutoGenerateValue : Boolean;
 Begin
  vMasterCompTag    := '';
  vMyCompTag        := Dataset.Componenttag;
@@ -1740,26 +1788,28 @@ Begin
           (vReflectChanges And ((Dataset.Fields[I].ReadOnly)  Or
          (Not(Dataset.Fields[I].ProviderFlags = []))))      Then
       Begin
-       MassiveField                    := vMassiveFields.FieldByName(Dataset.Fields[I].FieldName);
-       If MassiveField = Nil Then
+       MassiveField                    := vMassiveFields.FieldByNameP(Dataset.Fields[I].FieldName);
+       If MassiveField^ = Nil Then
         Begin
-         MassiveField                   := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
-         vMassiveFields.Add(MassiveField);
+         New(MassiveField);
+         MassiveField^                  := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
+         vMassiveFields.Add(MassiveField^);
         End;
-       MassiveField.vReadOnly          := Dataset.Fields[I].ReadOnly;
-       MassiveField.vRequired          := Dataset.Fields[I].Required;
-       MassiveField.vKeyField          := pfInKey in Dataset.Fields[I].ProviderFlags;
-       MassiveField.vFieldName         := Dataset.Fields[I].FieldName;
-       MassiveField.vFieldType         := FieldTypeToObjectValue(Dataset.Fields[I].DataType);
-       MassiveField.vSize              := Dataset.Fields[I].DataSize;
+       MassiveField^.vReadOnly          := Dataset.Fields[I].ReadOnly;
+       MassiveField^.vRequired          := Dataset.Fields[I].Required;
+       MassiveField^.vKeyField          := pfInKey in Dataset.Fields[I].ProviderFlags;
+       MassiveField^.vFieldName         := Dataset.Fields[I].FieldName;
+       MassiveField^.vFieldType         := FieldTypeToObjectValue(Dataset.Fields[I].DataType);
+       MassiveField^.vSize              := Dataset.Fields[I].DataSize;
        {$IFDEF DELPHIXEUP}
-        MassiveField.vAutoGenerateValue := ((Dataset.Fields[I].AutoGenerateValue = arAutoInc) Or
-                                            (Lowercase(Dataset.Fields[I].FieldName) = Lowercase(vSequenceField)));
-        If Not (MassiveField.vAutoGenerateValue) Then
-         MassiveField.vAutoGenerateValue := ((Dataset.Fields[I].FieldKind = fkInternalCalc) Or
+        vAutoGenerateValue               := ((Dataset.Fields[I].AutoGenerateValue = arAutoInc) Or
                                              (Lowercase(Dataset.Fields[I].FieldName) = Lowercase(vSequenceField)));
+        MassiveField^.AutoGenerateValue := vAutoGenerateValue;
+        If Not (MassiveField^.AutoGenerateValue) Then
+         MassiveField^.AutoGenerateValue := ((Dataset.Fields[I].FieldKind = fkInternalCalc) Or
+                                            (Lowercase(Dataset.Fields[I].FieldName) = Lowercase(vSequenceField)));
        {$ELSE}
-        MassiveField.vAutoGenerateValue := ((Dataset.Fields[I].FieldKind = fkInternalCalc) Or
+        MassiveField^.AutoGenerateValue := ((Dataset.Fields[I].FieldKind = fkInternalCalc) Or
                                             (Lowercase(Dataset.Fields[I].FieldName) = Lowercase(vSequenceField)));
        {$ENDIF}
       End
@@ -1787,18 +1837,19 @@ Begin
      If vMassiveFields.Count > 0 Then
       Begin
        vMassiveLine.vMassiveMode       := mmBrowse;
-       MassiveField                    := vMassiveFields.FieldByName(RESTDWFieldBookmark);
+       MassiveField                    := vMassiveFields.FieldByNameP(RESTDWFieldBookmark);
        If MassiveField = Nil Then
         Begin
-         MassiveField                  := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
+         New(MassiveField);
+         MassiveField^                 := TMassiveField.Create(vMassiveFields, vMassiveFields.Count);
          vMassiveFields.Add(MassiveField);
         End;
-       MassiveField.vRequired          := False;
-       MassiveField.vKeyField          := False;
-       MassiveField.vFieldName         := RESTDWFieldBookmark;
-       MassiveField.vFieldType         := ovString;
-       MassiveField.vSize              := 60;
-       MassiveField.vAutoGenerateValue := True;
+       MassiveField^.vRequired          := False;
+       MassiveField^.vKeyField          := False;
+       MassiveField^.vFieldName         := RESTDWFieldBookmark;
+       MassiveField^.vFieldType         := ovString;
+       MassiveField^.vSize              := 60;
+       MassiveField^.vAutoGenerateValue := True;
       End;
     End;
    If Dataset      Is TRESTDWClientSQL Then

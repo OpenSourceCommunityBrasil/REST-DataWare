@@ -428,6 +428,13 @@ Uses
 
 { TRESTDWDrvStoreProc }
 
+Function FixFieldName(FieldName : String) : String;
+Begin
+ Result := FieldName;
+ If Pos('_', Result) > 0 Then
+  Result := Format('"%s"', [Result]);
+End;
+
 Function TRESTDWDrvStoreProc.getStoredProcName : String;
 Begin
  Try
@@ -1757,182 +1764,200 @@ function TRESTDWDriverBase.ApplyUpdates(MassiveDataset: TMassiveDatasetBuffer;
                                         var Error: Boolean;
                                         var MessageError: String;
                                         var RowsAffected: Integer): TRESTDWJSONValue;
-var
-  vTempQuery: TRESTDWDrvQuery;
-  vResultReflection: string;
-  vStateResource, vMassiveLine: boolean;
-
-  function LoadMassive(var Query: TRESTDWDrvQuery): boolean;
-  var
-    A, B: integer;
-  begin
-    Result := False;
-    try
-      MassiveDataset.First;
-      if Assigned(FServerMethod) then begin
-        if Assigned(FServerMethod.OnMassiveBegin) then
-          FServerMethod.OnMassiveBegin(MassiveDataset);
-      end;
-      B := 1;
-      Result := True;
-      for A := 1 to MassiveDataset.RecordCount do begin
-        if not connInTransaction then begin
-          connStartTransaction;
-          if Assigned(FServerMethod) then begin
-            if Assigned(FServerMethod.OnMassiveAfterStartTransaction) then
-              FServerMethod.OnMassiveAfterStartTransaction(MassiveDataset);
-          end;
-        end;
-        Query.SQL.Clear;
-        if Assigned(FServerMethod) then begin
-          vMassiveLine := False;
-          if Assigned(FServerMethod.OnMassiveProcess) then begin
-            FServerMethod.OnMassiveProcess(MassiveDataset,vMassiveLine);
-            if vMassiveLine then begin
-              MassiveDataset.Next;
-              Continue;
-            end;
-          end;
-        end;
-        PrepareDataQuery(Query, MassiveDataset, Params, MassiveDataset.ReflectChanges, vResultReflection, Error, MessageError);
-        try
-          if (not (MassiveDataset.ReflectChanges)) or
-             ((MassiveDataset.ReflectChanges) and
-             (MassiveDataset.MassiveMode in [mmExec, mmDelete])) then
-            Query.ExecSQL;
-        except
-          On E: Exception do begin
-            Error := True;
-            Result := False;
-            MessageError := E.Message;
-            if connInTransaction then
-              connRollback;
-            Exit;
-          end;
-        end;
-
-        if B >= CommitRecords then begin
-          try
-            if connInTransaction then begin
-              if Assigned(FServerMethod) then begin
-                if Assigned(FServerMethod.OnMassiveAfterBeforeCommit) then
-                  FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
-              end;
-              connCommit;
-              if Assigned(FServerMethod) then begin
-                if Assigned(FServerMethod.OnMassiveAfterAfterCommit) then
-                  FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
-              end;
-            end;
-          except
-            On E: Exception do begin
-              Error := True;
-              Result := False;
-              MessageError := E.Message;
-              if connInTransaction then
-                connRollback;
-              Break;
-            end;
-          end;
-          B := 1;
-        end
-        else
-          Inc(B);
-        MassiveDataset.Next;
-      end;
-      try
-        if connInTransaction then begin
-          if Assigned(FServerMethod) then begin
-            if Assigned(FServerMethod.OnMassiveAfterBeforeCommit) then
-              FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
-          end;
+Var
+ vTempQuery        : TRESTDWDrvQuery;
+ vResultReflection : String;
+ vStateResource,
+ vMassiveLine      : Boolean;
+ Function LoadMassive(var Query: TRESTDWDrvQuery): boolean;
+ Var
+  A, B: integer;
+ Begin
+  Result := False;
+  Try
+   MassiveDataset.First;
+   If Assigned(FServerMethod) then
+    Begin
+     If Assigned(FServerMethod.OnMassiveBegin) Then
+      FServerMethod.OnMassiveBegin(MassiveDataset);
+    End;
+   B := 1;
+   Result := True;
+   For A := 1 to MassiveDataset.RecordCount Do
+    Begin
+     If not connInTransaction Then
+      Begin
+       connStartTransaction;
+       If Assigned(FServerMethod) Then
+        Begin
+         If Assigned(FServerMethod.OnMassiveAfterStartTransaction) Then
+          FServerMethod.OnMassiveAfterStartTransaction(MassiveDataset);
+        End;
+      End;
+     Query.SQL.Clear;
+     If Assigned(FServerMethod) Then
+      Begin
+       vMassiveLine := False;
+       If Assigned(FServerMethod.OnMassiveProcess) Then
+        Begin
+         FServerMethod.OnMassiveProcess(MassiveDataset,vMassiveLine);
+         If vMassiveLine Then
+          Begin
+           MassiveDataset.Next;
+           Continue;
+          End;
+        End;
+      End;
+     PrepareDataQuery(Query, MassiveDataset, Params, MassiveDataset.ReflectChanges, vResultReflection, Error, MessageError);
+     Try
+      If (Not(MassiveDataset.ReflectChanges)) Or
+         ((MassiveDataset.ReflectChanges)     And
+          (MassiveDataset.MassiveMode In [mmExec, mmDelete])) Then
+       Query.ExecSQL;
+     Except
+      On E: Exception do
+       Begin
+        Error := True;
+        Result := False;
+        MessageError := E.Message;
+        If connInTransaction Then
+         connRollback;
+        Exit;
+       End;
+     End;
+     If B >= CommitRecords Then
+      Begin
+       Try
+        If connInTransaction Then
+         Begin
+          If Assigned(FServerMethod) Then
+           Begin
+            If Assigned(FServerMethod.OnMassiveAfterBeforeCommit) Then
+             FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
+           End;
           connCommit;
-          if Assigned(FServerMethod) then begin
-            if Assigned(FServerMethod.OnMassiveAfterAfterCommit) then
-              FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
-          end;
-        end;
-      except
-        On E: Exception do begin
+          If Assigned(FServerMethod) Then
+           Begin
+            If Assigned(FServerMethod.OnMassiveAfterAfterCommit) Then
+             FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
+           End;
+         End;
+       Except
+        On E: Exception Do
+         Begin
           Error := True;
           Result := False;
           MessageError := E.Message;
-          if connInTransaction then
-            connRollback;
-        end;
-      end;
-    finally
-      if Assigned(FServerMethod) then begin
-        if Assigned(FServerMethod.OnMassiveEnd) then
-          FServerMethod.OnMassiveEnd(MassiveDataset);
-      end;
-      Query.SQL.Clear;
-    end;
-  end;
-begin
- {$IFNDEF RESTDWLAZARUS}inherited;{$ENDIF}
-  try
-    Result := nil;
-    Error := False;
-    vTempQuery := getQuery;
+          If connInTransaction Then
+           connRollback;
+          Break;
+         End;
+       End;
+       B := 1;
+      End
+     Else
+      Inc(B);
+     MassiveDataset.Next;
+    End;
+    Try
+     If connInTransaction Then
+      Begin
+       If Assigned(FServerMethod) Then
+        Begin
+         If Assigned(FServerMethod.OnMassiveAfterBeforeCommit) Then
+          FServerMethod.OnMassiveAfterBeforeCommit(MassiveDataset);
+        End;
+       connCommit;
+       If Assigned(FServerMethod) Then
+        Begin
+         If Assigned(FServerMethod.OnMassiveAfterAfterCommit) Then
+          FServerMethod.OnMassiveAfterAfterCommit(MassiveDataset);
+        End;
+      End;
+    Except
+     On E: Exception Do
+      Begin
+       Error := True;
+       Result := False;
+       MessageError := E.Message;
+       If connInTransaction Then
+        connRollback;
+      End;
+    End;
+  Finally
+   If Assigned(FServerMethod) Then
+    Begin
+     If Assigned(FServerMethod.OnMassiveEnd) Then
+      FServerMethod.OnMassiveEnd(MassiveDataset);
+    End;
+    Query.SQL.Clear;
+  End;
+ End;
+Begin
+ {$IFNDEF RESTDWLAZARUS}Inherited;{$ENDIF}
+ Try
+  Result := nil;
+  Error := False;
+  vTempQuery := getQuery;
+  vStateResource := isConnected;
+  If Not vStateResource Then
+   Connect;
+  vTempQuery.SQL.Clear;
+  vResultReflection := '';
+  If LoadMassive(vTempQuery) Then
+   Begin
+    If (SQL <> '') And (vResultReflection = '') Then
+     Begin
+      Try
+       vTempQuery.SQL.Clear;
+       vTempQuery.SQL.Add(SQL);
+       vTempQuery.ImportParams(Params);
+       vTempQuery.Open;
+       If Result = Nil Then
+        Result := TRESTDWJSONValue.Create;
+       Result.Encoding := Encoding;
+       Result.Encoded := EncodeStringsJSON;
+       Result.Utf8SpecialChars := True;
+       Result.LoadFromDataset('RESULTDATA', TDataSet(vTempQuery.Owner),EncodeStringsJSON);
+       Error := False;
+       If Not vStateResource Then
+        Disconect;
+      Except
+       On E: Exception Do
+        Begin
+         Try
+          Error := True;
+          MessageError := E.Message;
+          If Result = Nil Then
+           Result := TRESTDWJSONValue.Create;
+          Result.Encoded := True;
+          Result.SetValue(GetPairJSONStr('NOK', MessageError));
+          If connInTransaction Then
+           connRollback;
+         Except
 
-    vStateResource := isConnected;
-    if not vStateResource then
-      Connect;
-
-    vTempQuery.SQL.Clear;
-    vResultReflection := '';
-    if LoadMassive(vTempQuery) then begin
-      if (SQL <> '') and (vResultReflection = '') then begin
-        try
-          vTempQuery.SQL.Clear;
-          vTempQuery.SQL.Add(SQL);
-          vTempQuery.ImportParams(Params);
-          vTempQuery.Open;
-
-          if Result = nil then
-            Result := TRESTDWJSONValue.Create;
-          Result.Encoding := Encoding;
-          Result.Encoded := EncodeStringsJSON;
-          Result.Utf8SpecialChars := True;
-          Result.LoadFromDataset('RESULTDATA', TDataSet(vTempQuery.Owner),EncodeStringsJSON);
-          Error := False;
-          if not vStateResource then
-            Disconect;
-        except
-          On E: Exception do begin
-            try
-              Error := True;
-              MessageError := E.Message;
-              if Result = nil then
-                Result := TRESTDWJSONValue.Create;
-              Result.Encoded := True;
-              Result.SetValue(GetPairJSONStr('NOK', MessageError));
-              if connInTransaction then
-                connRollback;
-            except
-
-            end;
-            Disconect;
-          end;
-        end;
-      end
-      else if (vResultReflection <> '') then begin
-        if Result = nil then
-          Result := TRESTDWJSONValue.Create;
-        Result.Encoding := Encoding;
-        Result.Encoded := EncodeStringsJSON;
-        Result.SetValue('[' + vResultReflection + ']');
-        Error := False;
-      end;
-    end;
-  finally
-    FreeAndNil(BufferBase);
-    RowsAffected := vTempQuery.RowsAffected;
-    vTempQuery.Close;
-    FreeAndNil(vTempQuery);
-  end;
-end;
+         End;
+         Disconect;
+        End;
+      End;
+     End
+    Else If (vResultReflection <> '') Then
+     Begin
+      If Result = Nil Then
+       Result := TRESTDWJSONValue.Create;
+      Result.Encoding := Encoding;
+      Result.Encoded := EncodeStringsJSON;
+      Result.SetValue('[' + vResultReflection + ']');
+      Error := False;
+     End;
+   End;
+ Finally
+  FreeAndNil(BufferBase);
+  RowsAffected := vTempQuery.RowsAffected;
+  vTempQuery.Close;
+  FreeAndNil(vTempQuery);
+ End;
+End;
 
 function TRESTDWDriverBase.ApplyUpdatesTB(Massive : String; Params : TRESTDWParams; var Error : Boolean; var MessageError : String; var RowsAffected : Integer) : TRESTDWJSONValue;
 var
@@ -3986,8 +4011,7 @@ begin
         vLineSQL := Format('INSERT INTO %s ',[MassiveDataset.TableName + ' (%s) VALUES (%s)']);
       for I := 0 to MassiveDataset.Fields.Count - 1 do begin
         if ((((MassiveDataset.Fields.Items[I].AutoGenerateValue) and
-           (MassiveDataset.AtualRec.MassiveMode = mmInsert) and
-           (MassiveDataset.Fields.Items[I].ReadOnly)) or
+           (MassiveDataset.AtualRec.MassiveMode = mmInsert)) or
            (MassiveDataset.Fields.Items[I].ReadOnly)) and
            (not (MassiveDataset.ReflectChanges))) or
            ((MassiveDataset.ReflectChanges) and
@@ -3996,21 +4020,21 @@ begin
            (Lowercase(MassiveDataset.Fields.Items[I].FieldName) =  Lowercase(RESTDWFieldBookmark)))) then
           Continue;
         if vFields = '' then begin
-          vFields := MassiveDataset.Fields.Items[I].FieldName;
+          vFields := FixFieldName(MassiveDataset.Fields.Items[I].FieldName);
           if not MassiveDataset.ReflectChanges then
             vParamsSQL := ':' + MassiveDataset.Fields.Items[I].FieldName;
         end
         else begin
-          vFields := vFields + ', ' + MassiveDataset.Fields.Items[I].FieldName;
+          vFields := vFields + ', ' + FixFieldName(MassiveDataset.Fields.Items[I].FieldName);
           if not MassiveDataset.ReflectChanges then
             vParamsSQL := vParamsSQL + ', :' + MassiveDataset.Fields.Items[I].FieldName;
         end;
         if MassiveDataset.ReflectChanges then begin
           if MassiveDataset.Fields.Items[I].KeyField then
             if vParamsSQL = '' then
-              vParamsSQL := MassiveDataset.Fields.Items[I].FieldName + ' is null '
+              vParamsSQL := FixFieldName(MassiveDataset.Fields.Items[I].FieldName) + ' is null '
             else
-              vParamsSQL := vParamsSQL + ' and ' + MassiveDataset.Fields.Items[I].FieldName + ' is null ';
+              vParamsSQL := vParamsSQL + ' and ' + FixFieldName(MassiveDataset.Fields.Items[I].FieldName) + ' is null ';
         end;
       end;
 
@@ -4035,9 +4059,9 @@ begin
         for I := 0 to MassiveDataset.AtualRec.UpdateFieldChangesCount - 1 do begin
           if Lowercase(MassiveDataset.AtualRec.UpdateFieldChanges[I]) <> Lowercase(RESTDWFieldBookmark) then begin
             if vFields = '' then
-              vFields := MassiveDataset.AtualRec.UpdateFieldChanges[I] + ' = :' + MassiveDataset.AtualRec.UpdateFieldChanges[I]
+              vFields := FixFieldName(MassiveDataset.AtualRec.UpdateFieldChanges[I]) + ' = :' + MassiveDataset.AtualRec.UpdateFieldChanges[I]
             else
-              vFields := vFields + ', ' + MassiveDataset.AtualRec.UpdateFieldChanges[I] + ' = :' + MassiveDataset.AtualRec.UpdateFieldChanges[I];
+              vFields := vFields + ', ' + FixFieldName(MassiveDataset.AtualRec.UpdateFieldChanges[I]) + ' = :' + MassiveDataset.AtualRec.UpdateFieldChanges[I];
           end;
         end;
       end
@@ -4065,9 +4089,9 @@ begin
       try
         for I := 0 to bPrimaryKeys.Count - 1 do begin
           if I = 0 then
-            vParamsSQL := 'WHERE ' + bPrimaryKeys[I] + ' = :DWKEY_' + bPrimaryKeys[I]
+            vParamsSQL := 'WHERE ' + FixFieldName(bPrimaryKeys[I]) + ' = :DWKEY_' + bPrimaryKeys[I]
           else
-            vParamsSQL := vParamsSQL + ' AND ' + bPrimaryKeys[I] + ' = :DWKEY_' + bPrimaryKeys[I];
+            vParamsSQL := vParamsSQL + ' AND ' + FixFieldName(bPrimaryKeys[I]) + ' = :DWKEY_' + bPrimaryKeys[I];
         end;
       finally
         FreeAndNil(bPrimaryKeys);
@@ -4080,9 +4104,9 @@ begin
       try
         for I := 0 to bPrimaryKeys.Count - 1 do begin
           if I = 0 then
-            vParamsSQL := 'WHERE ' + bPrimaryKeys[I] + ' = :' + bPrimaryKeys[I]
+            vParamsSQL := 'WHERE ' + FixFieldName(bPrimaryKeys[I]) + ' = :' + bPrimaryKeys[I]
           else
-            vParamsSQL := vParamsSQL + ' AND ' + bPrimaryKeys[I] + ' = :' + bPrimaryKeys[I];
+            vParamsSQL := vParamsSQL + ' AND ' + FixFieldName(bPrimaryKeys[I]) + ' = :' + bPrimaryKeys[I];
         end;
       finally
         FreeAndNil(bPrimaryKeys);
