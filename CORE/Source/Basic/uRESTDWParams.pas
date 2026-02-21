@@ -637,8 +637,8 @@ Begin
                     If (Pos('.', vTempValue) > 0) Or
                        (Pos(':', vTempValue) > 0) Or
                        (Pos('/', vTempValue) > 0) Or
-                       (Pos('\', vTempValue) > 0)
-                       //(Pos('-', vTempValue) > 0)
+                       (Pos('\', vTempValue) > 0) Or
+                       (Pos('-', vTempValue) > 0)
 //                     Or (vTempValue.CountChar('-')>1) //Testar XyberX
                        Then
                      Field.AsDateTime := StrToDateTime(vTempValue)

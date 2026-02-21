@@ -458,8 +458,11 @@ Begin
  {$IFDEF ver350} // delphi 11
   Result := '\Software\Embarcadero\BDS\22.0\Globals';
  {$ENDIF}
- {$IFDEF ver360} // delphi 11
+ {$IFDEF ver360} // delphi 12
   Result := '\Software\Embarcadero\BDS\23.0\Globals';
+ {$ENDIF}
+ {$IFDEF ver370} // delphi 13
+  Result := '\Software\Embarcadero\BDS\37.0\Globals';
  {$ENDIF}
 End;
 
