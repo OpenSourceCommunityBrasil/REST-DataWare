@@ -29,6 +29,9 @@ jobs:
       
     - name: Build Indy package on Windows
       run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
+
+    - name: Build Taurus package on Linux
+      run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySocketsTaurus.lpk"
       
     - name: Build ShellServices package on Windows
       run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"   
