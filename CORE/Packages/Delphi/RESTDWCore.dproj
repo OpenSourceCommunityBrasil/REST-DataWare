@@ -218,12 +218,12 @@
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <DCC_DcuOutput>..\..\compiled</DCC_DcuOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.1.0.131;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=XyberPower Desenvolvimento;FileDescription=$(MSBuildProjectName);FileVersion=2.1.0.144;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_MinorVer>1</VerInfo_MinorVer>
         <DCC_Description>REST Dataware - Core</DCC_Description>
-        <VerInfo_Build>131</VerInfo_Build>
+        <VerInfo_Build>144</VerInfo_Build>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
     </PropertyGroup>
@@ -239,6 +239,9 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="soaprtl.dcp"/>
         <DCCReference Include="dbrtl.dcp"/>
+        <DCCReference Include="FireDAC.dcp"/>
+        <DCCReference Include="FireDACCommonDriver.dcp"/>
+        <DCCReference Include="FireDACCommon.dcp"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasic.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicDB.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWBasicTypes.pas"/>
@@ -302,7 +305,6 @@
         <DCCReference Include="..\..\Source\utils\uRESTDWURLFunctions.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWPropertyPersist.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWStorageBin.pas"/>
-        <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWProtoTypes.pas"/>
         <DCCReference Include="..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas"/>
         <DCCReference Include="..\..\Source\Database_Drivers\uRESTDWDriverBase.pas"/>
@@ -367,6 +369,12 @@
                 <DeployFile LocalName="..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\19.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\23.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\23.0\Bpl\RESTDWCore.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>RESTDWCore.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="OSX32">
                         <Operation>1</Operation>

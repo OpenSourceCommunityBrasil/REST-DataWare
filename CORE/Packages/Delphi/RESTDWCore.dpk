@@ -32,7 +32,10 @@ package RESTDWCore;
 requires
   rtl,
   soaprtl,
-  dbrtl;
+  dbrtl,
+  FireDAC,
+  FireDACCommonDriver,
+  FireDACCommon;
 
 contains
   uRESTDWBasic in '..\..\Source\Basic\uRESTDWBasic.pas',
@@ -95,7 +98,9 @@ contains
   uRESTDWURLFunctions in '..\..\Source\utils\uRESTDWURLFunctions.pas',
   uRESTDWPropertyPersist in '..\..\Source\Basic\uRESTDWPropertyPersist.pas',
   uRESTDWStorageBin in '..\..\Source\Basic\uRESTDWStorageBin.pas',
-  uRESTDWMemoryDataset in '..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas',
+  {$IFDEF RESTDWMEMTABLE}
+   uRESTDWMemoryDataset in '..\..\Source\Plugins\Memdataset\uRESTDWMemoryDataset.pas',
+  {$ENDIF}
   uRESTDWProtoTypes in '..\..\Source\Basic\uRESTDWProtoTypes.pas',
   uRESTDWExprParser in '..\..\Source\Plugins\Memdataset\uRESTDWExprParser.pas',
   uRESTDWDriverBase in '..\..\Source\Database_Drivers\uRESTDWDriverBase.pas',

@@ -34,7 +34,7 @@ Uses
  {$IFDEF RESTDWFMX}System.IOUtils,{$ENDIF}
  SysUtils, Classes, Db, Variants,
  {$IFNDEF RESTDWLAZARUS}SyncObjs,{$ENDIF}
- uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWJSONObject,
+ uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWBasicDbTypes, uRESTDWProtoTypes, uRESTDWJSONObject,
  uRESTDWParams, uRESTDWMassiveBuffer, uRESTDWDataUtils,
  uRESTDWTools, uRESTDWConsts, uRESTDWMessageCoderMIME,
  uRESTDWZlib, uRESTDWMimeTypes, uRESTDWAbout, uRESTDWAuthenticators, uRESTDWBasicClass;

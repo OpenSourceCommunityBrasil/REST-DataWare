@@ -28,7 +28,7 @@ interface
 {$ENDIF}
 Uses
   SysUtils, Classes, Variants,
-  {$IFDEF RESTDWFMX} system.json, {$ELSE} uRESTDWJSON, {$ENDIF}
+  {$IFNDEF FPC} system.json, {$ELSE} uRESTDWJSON, {$ENDIF}
   uRESTDWConsts;
 
 Type
@@ -115,8 +115,7 @@ Begin
   result := stringreplace(Astr, Asubstr, '', [rfReplaceAll, rfIgnoreCase]);
 End;
 
-{$IFDEF RESTDWFMX}
-
+{$IFNDEF FPC}
 Function GetElementJSON(bArray: TJSONObject; Value: String): String;
 Var
   I: Integer;
@@ -140,7 +139,7 @@ End;
 
 Function TRESTDWJSONInterfaceObject.OpenArray(key: String) : TRESTDWJSONInterfaceArray;
 Var
- {$IFDEF RESTDWFMX}
+ {$IFNDEF FPC}
   vEIndex: Integer;
   aJSONObject: TJSONObject;
  {$ENDIF}
@@ -148,7 +147,7 @@ Var
  aJSONArray : TJSONArray;
 Begin
   result := TRESTDWJSONInterfaceArray.Create;
-  {$IFDEF RESTDWFMX}
+  {$IFNDEF FPC}
   If TJSONObject(JSONObject).ClassName = 'TJSONObject' Then
    Begin
     aJSONObject := TJSONObject.ParseJSONValue(TJSONObject(JSONObject).ToJSON) as TJSONObject;
@@ -172,7 +171,7 @@ End;
 
 Function TRESTDWJSONInterfaceObject.OpenArray(Index: Integer)
   : TRESTDWJSONInterfaceArray;
-{$IFDEF RESTDWFMX}
+{$IFNDEF FPC}
 Var
   vEIndex: Integer;
   aJSONObject: TJSONObject;
@@ -182,7 +181,7 @@ Begin
   result := TRESTDWJSONInterfaceArray.Create;
   If Assigned(vJSONObject) Then
    FreeAndNil(vJSONObject);
-  {$IFDEF RESTDWFMX}
+  {$IFNDEF FPC}
   If TJSONObject(JSONObject).ClassName = 'TJSONObject' Then
   Begin
     aJSONObject := TJSONObject.ParseJSONValue(TJSONObject(JSONObject).ToJSON)
@@ -226,7 +225,7 @@ Begin
   result := 0;
   If vJSONObject = Nil then
     Exit;
-  {$IFDEF RESTDWFMX}
+  {$IFNDEF FPC}
   result := TJSONArray(vJSONObject).Size;
   {$ELSE}
   If TJSONObject(vJSONObject).ClassName = 'TJSONObject' Then
@@ -242,7 +241,7 @@ End;
 Function TRESTDWJSONInterfaceArray.GetObject(Index: Integer)
   : TRESTDWJSONInterfaceBase;
 Var
- {$IFDEF RESTDWFMX}
+ {$IFNDEF FPC}
   aJSONObject : TJSONArray;
   aJSONValue  : TJSONValue;
  {$ELSE}
@@ -255,7 +254,7 @@ Begin
   vClassName := TJSONObject(vJSONObject).ClassName;
   If (Uppercase(TJSONObject(vJSONObject).ClassName) = Uppercase('TJSONArray')) Then
    Begin
-    {$IFDEF RESTDWFMX}
+    {$IFNDEF FPC}
     aJSONValue := TJSONObject.ParseJSONValue(TJSONObject(JSONObject).Get(Index).ToJSON);
     If aJSONValue is TJSONObject Then
      result.vJSONObject := TJSONBaseClass(aJSONValue as TJSONObject)
@@ -289,7 +288,7 @@ Begin
   Else If (Uppercase(TJSONObject(vJSONObject).ClassName)
     = Uppercase('TJSONObject')) Then
    Begin
-    {$IFDEF RESTDWFMX}
+    {$IFNDEF FPC}
     result.vJSONObject := TJSONBaseClass
       (TJSONObject.ParseJSONValue(TJSONObject(vJSONObject).Get(Index)
       .JSONValue.ToJSON) as TJSONArray);
@@ -322,7 +321,7 @@ Begin
   Begin
     If Assigned(vJSONObject) Then
      FreeAndNil(vJSONObject);
-    {$IFDEF RESTDWFMX}
+    {$IFNDEF FPC}
     If JSONValue[InitStrPos] = '[' then
       vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue(JSONValue) as TJSONArray)
     Else If JSONValue[InitStrPos] = '{' then
@@ -351,7 +350,7 @@ Function TRESTDWJSONInterfaceObject.GetPairN(Index: String): TRESTDWJSONPair;
 Var
   I: Integer;
   vElementName, vClassName: String;
-  {$IFDEF RESTDWFMX}
+  {$IFNDEF FPC}
   aJSONObject: TJSONObject;
   vValueJSON: String;
   {$ELSE}
@@ -366,7 +365,7 @@ Begin
     Exit;
   End;
   vClassName := TJSONObject(vJSONObject).ClassName;
-  {$IFDEF RESTDWFMX}
+  {$IFNDEF FPC}
   If (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceObject')) Or
     (Uppercase(vClassName) = Uppercase('TJSONObject')) Or
     (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceBase')) Then
@@ -509,32 +508,31 @@ End;
 Function TRESTDWJSONInterfaceObject.GetPair(Index: Integer): TRESTDWJSONPair;
 Var
   vElementName, vClassName: String;
-  {$IFDEF RESTDWFMX}
+  {$IFNDEF FPC}
   aJSONObject: TJSONObject;
   vValueJSON: String;
   {$ELSE}
    cNames : TJSONArray;
   {$ENDIF}
 Begin
-  result.isnull := False;
-  result.Value  :=  'null';
-  If vJSONObject = Nil Then
+ result.isnull := False;
+ result.Value  :=  'null';
+ If vJSONObject = Nil Then
   Begin
-    result.isnull := True;
-    Exit;
+   result.isnull := True;
+   Exit;
   End;
   vClassName := TJSONObject(vJSONObject).ClassName;
-  {$IFDEF RESTDWFMX}
+  {$IFNDEF FPC}
   If (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceObject')) Or
-    (Uppercase(vClassName) = Uppercase('TJSONObject')) Or
-    (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceBase')) Then
-  Begin
+     (Uppercase(vClassName) = Uppercase('TJSONObject')) Or
+     (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceBase')) Then
+   Begin
     If vClassName <> '_String' Then
-    Begin
+     Begin
       If (TJSONObject(vJSONObject).Count > index) Then
       Begin
-        result.Name := removestr(TJSONObject(vJSONObject).Pairs[index]
-          .JsonString.Value, '"');
+        result.Name := removestr(TJSONObject(vJSONObject).Pairs[index].JsonString.Value, '"');
         If TJSONObject(vJSONObject).Pairs[index].JSONValue is TJSONObject Then
         Begin
           result.ClassName := 'TJSONObject';
@@ -542,8 +540,7 @@ Begin
             .JSONValue.toString;
           // removestr(TJSONObject(vJSONObject).Pairs[index].JsonValue.tostring, '"');
           If (vValueJSON = '') Or (Trim(vValueJSON) = '""') then
-            result.Value := TJSONObject(vJSONObject).Pairs[index]
-              .JSONValue.Value
+            result.Value := TJSONObject(vJSONObject).Pairs[index].JSONValue.Value
           else
             result.Value := vValueJSON;
         End
@@ -558,36 +555,51 @@ Begin
           else
             result.Value := vValueJSON;
         End;
-      End;
-    End
+       End;
+     End
     Else
-    Begin
+     Begin
       result.Value := TJSONObject(vJSONObject).Pairs[index].JSONValue.Value;
       // removestr(TJSONObject(vJSONObject).Pairs[index].JsonValue.tostring, '"');
-      result.ClassName := TJSONObject(vJSONObject).Pairs[index]
-        .JSONValue.ClassName;
-    End;
-  End
+      result.ClassName := TJSONObject(vJSONObject).Pairs[index].JSONValue.ClassName;
+     End;
+   End
   Else If Uppercase(vClassName) = Uppercase('TJSONArray') Then
-  Begin
-    aJSONObject := TJSONObject.ParseJSONValue(TJSONObject(vJSONObject)
-      .Get(index).ToJSON) as TJSONObject;
-    result.Name := removestr(aJSONObject.Value, '"');
-    If (aJSONObject.toString = '') Or (Trim(aJSONObject.toString) = '""') then
-      result.Value := ''
+   Begin
+    vClassName := TJSONObject(vJSONObject).Get(index).classname;
+    If Uppercase(vClassName) = Uppercase('TJSONArray') Then
+     Begin
+      aJSONObject := TJSONObject.ParseJSONValue(TJSONObject(vJSONObject).Get(index).ToJSON) as TJSONObject;
+      result.Name := removestr(aJSONObject.Value, '"');
+      If (aJSONObject.toString = '') Or (Trim(aJSONObject.toString) = '""') then
+       result.Value := ''
+      Else
+       result.Value := aJSONObject.toString;
+      result.ClassName := 'TJSONArray';
+      FreeAndNil(aJSONObject);
+     End
     Else
-      result.Value := aJSONObject.toString;
-    result.ClassName := 'TJSONArray';
-    FreeAndNil(aJSONObject);
-  End
+     Begin
+      result.Name  := '';
+      vValueJSON   := TJSONObject(vJSONObject).Get(index).tostring;
+      result.Value := removestr(vValueJSON, '""');
+      If vClassName = 'NULL' Then
+       result.ClassName := 'TJSONValue'
+      Else
+       result.ClassName := vClassName;
+     End;
+   End
   Else
-  Begin
+   Begin
     result.Name := '';
     result.Value := TJSONValue(vJSONObject).Value;
     If (result.Value = '') Or (Trim(result.Value) = '""') then
-      result.Value := TJSONObject(vJSONObject).ToJSON;
-    result.ClassName := 'TJSONValue';
-  End;
+     result.Value := removestr(TJSONObject(vJSONObject).ToJSON, '"');
+    If vClassName = 'NULL' Then
+     result.ClassName := 'TJSONValue'
+    Else
+     result.ClassName := vClassName;
+   End;
   {$ELSE}
   If (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceObject')) Or
     (Uppercase(vClassName) = Uppercase('TJSONObject')) Or
@@ -619,10 +631,10 @@ Begin
      If cNames <> Nil Then
       FreeAndNil(cNames);
     End
-    Else
+   Else
     Begin
-      result.Value := TJSONObject(vJSONObject).toString;
-      result.ClassName := TJSONObject(vJSONObject).ClassName;
+     result.Value := TJSONObject(vJSONObject).toString;
+     result.ClassName := TJSONObject(vJSONObject).ClassName;
     End;
   End
   Else If Uppercase(vClassName) = Uppercase('TJSONArray') Then
@@ -647,27 +659,41 @@ Begin
      End
     Else
     Begin
-     vClassName := TJSONArray(vJSONObject).optJSONObject(index).ClassName;
-     result.ClassName := 'TJSONArray';
-     cNames := TJSONObject(TJSONArray(vJSONObject).optJSONObject(index)).names;
-     If (cNames.length > 0) And (Uppercase(vClassName) = Uppercase('TJSONArray')) Then
+     If Not Assigned(TJSONArray(vJSONObject).optJSONObject(index)) Then
       Begin
-       If (cNames.length > index) Then
-        Begin
-         result.Name := cNames.Get(index).toString;
-         result.Value := TJSONObject(TJSONArray(vJSONObject).optJSONObject(index)).Get(result.Name).toString;
-        End;
-      End
-     Else
-      Begin
+       vClassName := TJSONArray(vJSONObject).get(index).ClassName;
+       If vClassName = 'NULL' Then
+        result.ClassName := 'tjsonstring';
        result.Name := TJSONArray(vJSONObject).Get(index).toString;
-       If (Trim(result.Name) = '') Or
+       If (Trim(result.Name) = '') Or (UpperCase(Trim(result.Name)) = 'NULL') Or
           ((Pos('{', result.Name) > 0) Or (Pos('[', result.Name) > 0)) Then
         result.Name := 'arrayobj' + IntToStr(Index);
        result.Value := TJSONArray(vJSONObject).opt(Index).toString;
+      End
+     Else
+      Begin
+       vClassName := TJSONArray(vJSONObject).optJSONObject(index).ClassName;
+       result.ClassName := 'TJSONArray';
+       cNames := TJSONObject(TJSONArray(vJSONObject).optJSONObject(index)).names;
+       If (cNames.length > 0) And (Uppercase(vClassName) = Uppercase('TJSONArray')) Then
+        Begin
+         If (cNames.length > index) Then
+          Begin
+           result.Name := cNames.Get(index).toString;
+           result.Value := TJSONObject(TJSONArray(vJSONObject).optJSONObject(index)).Get(result.Name).toString;
+          End;
+        End
+       Else
+        Begin
+         result.Name := TJSONArray(vJSONObject).Get(index).toString;
+         If (Trim(result.Name) = '') Or
+            ((Pos('{', result.Name) > 0) Or (Pos('[', result.Name) > 0)) Then
+          result.Name := 'arrayobj' + IntToStr(Index);
+         result.Value := TJSONArray(vJSONObject).opt(Index).toString;
+        End;
+       If Assigned(cNames) Then
+        FreeAndNil(cNames);
       End;
-     If Assigned(cNames) Then
-      FreeAndNil(cNames);
     End;
   End
   Else
@@ -679,7 +705,7 @@ Begin
   If Trim(result.ClassName) = '' Then
     result.ClassName := vClassName;
   // Correção para null value
-  result.isnull := (result.Value = 'null') or (Result.Value = '');
+  result.isnull := ((result.Value = 'null') or (Result.Value = ''));
   If result.isnull Then
     result.Value := '';
 End;
@@ -693,7 +719,7 @@ Begin
   result := 0;
   If vJSONObject = Nil Then
     Exit;
-  {$IFDEF RESTDWFMX}
+  {$IFNDEF FPC}
   If vJSONObject <> Nil Then
     result := TJSONObject(vJSONObject).Count;
   {$ELSE}
@@ -820,18 +846,18 @@ Begin
 End;
 
 function TRESTDWJSONInterfaceBase.PairCount: Integer;
-{$IFNDEF RESTDWFMX}
+{$IFDEF FPC}
 Var
  cNames : TJSONArray;
 {$ENDIF}
 begin
-  {$IFDEF RESTDWFMX}
+ {$IFNDEF FPC}
   result := TJSONObject(vJSONObject).Count;
-  {$ELSE}
-   cNames := TJSONObject(vJSONObject).names;
-   result := cNames.length;
-   FreeAndNil(cNames);
-  {$ENDIF}
+ {$ELSE}
+  cNames := TJSONObject(vJSONObject).names;
+  result := cNames.length;
+  FreeAndNil(cNames);
+ {$ENDIF}
 end;
 
 end.

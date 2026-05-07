@@ -33,7 +33,7 @@ Interface
 Uses
   {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
   SysUtils, Classes,
-  uRESTDWMassiveBuffer, uRESTDWComponentEvents, uRESTDWBasicTypes, uRESTDWBasic,
+  uRESTDWMassiveBuffer, uRESTDWComponentEvents, uRESTDWBasicDbTypes, uRESTDWBasic,
   uRESTDWProtoTypes, uRESTDWTools, uRESTDWJSONObject, uRESTDWConsts,
   uRESTDWDataUtils, uRESTDWParams;
 

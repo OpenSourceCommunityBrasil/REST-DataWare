@@ -1,4 +1,4 @@
-unit uRESTDWZeosDriver;
+﻿unit uRESTDWZeosDriver;
 
 {$I ..\Includes\uRESTDW.inc}
 
@@ -37,14 +37,14 @@ uses
   {$ENDIF}
 
   {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
-    ZMemTable,
+   ZMemTable,
   {$ELSE}
-    uRESTDWMemoryDataset,
+   uRESTDWMemoryDataset,
   {$ENDIF}
   Classes, SysUtils, DB, Variants,
   ZConnection, ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset,
   ZAbstractDataset, ZStoredProcedure, ZEncoding, ZDatasetUtils,
-  uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWZeosPhysLink
+  uRESTDWDriverBase, uRESTDWBasicDbTypes, uRESTDWProtoTypes, uRESTDWZeosPhysLink
   ;
 
 const
@@ -111,7 +111,7 @@ type
   protected
     procedure setConnection(AValue: TComponent); override;
 
-    function getConectionType : TRESTDWDatabaseType; override;
+    function getConnectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
     Procedure zAfterPost(DataSet: TDataSet);
   public
@@ -171,26 +171,29 @@ begin
   inherited setConnection(AValue);
 end;
 
-function TRESTDWZeosDriver.getConectionType: TRESTDWDatabaseType;
-var
-  prot : string;
-  i : integer;
-begin
-  Result:=inherited getConectionType;
-  if not Assigned(Connection) then
-    Exit;
-
-  prot := LowerCase(TZConnection(Connection).Protocol);
-
-  i := 0;
-  while i < Length(rdwZeosProtocols) do begin
-    if Pos(rdwZeosProtocols[i],prot) > 0 then begin
-      Result := rdwZeosDbType[i];
-      Break;
-    end;
-    i := i + 1;
-  end;
-end;
+Function TRESTDWZeosDriver.getConnectionType: TRESTDWDatabaseType;
+Var
+  prot : String;
+  i    : integer;
+Begin
+ Result:=inherited getConnectionType;
+ If Not Assigned(Connection) Then
+  Exit;
+ If Result = dbtUndefined Then
+  Begin
+   prot := LowerCase(TZConnection(Connection).Protocol);
+   i := 0;
+   While i < Length(rdwZeosProtocols) Do
+    Begin
+     If Pos(rdwZeosProtocols[i],prot) > 0 Then
+      Begin
+       Result := rdwZeosDbType[i];
+       Break;
+      End;
+     i := i + 1;
+    End;
+  End;
+End;
 
 function TRESTDWZeosDriver.getQuery(AUnidir: boolean): TRESTDWDrvQuery;
 var
@@ -521,27 +524,20 @@ end;
 
 procedure TRESTDWZeosQuery.SaveToStream(stream: TStream);
 var
-  qry : TZAbstractRODataset;
-  {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
-    memtable : TZMemTable;
-  {$ELSE}
-    memtable : TRESTDWMemtable;
-  {$ENDIF}
+  qry      : TZAbstractRODataset;
+  memtable : TZMemTable;
 begin
   qry := TZQuery(Self.Owner);
-  {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
-    memtable := TZMemTable.Create(nil);
-  {$ELSE}
-    memtable := TRESTDWMemtable.Create(nil);
-  {$ENDIF}
+  memtable := TZMemTable.Create(nil);
   try
-    {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
-      memtable.AssignDataFrom(qry);
-    {$ELSE}
-      memtable.Assign(qry);
-    {$ENDIF}
-    memtable.SaveToStream(stream);
-    stream.Position := 0;
+   {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
+    memtable.AssignDataFrom(qry);
+   {$ELSE}
+    memtable.Assign(qry);
+   {$ENDIF}
+   //TODO SaveTostream
+//   memtable.SaveToStream(stream);
+   stream.Position := 0;
   finally
     FreeAndNil(memtable);
   end;

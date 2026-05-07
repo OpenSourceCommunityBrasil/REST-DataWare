@@ -833,7 +833,7 @@ Begin
         {$IFDEF DELPHI2010UP}
          vRESTDWBytes := StringUtf8ToBytes(DecodeStrings(vTempString{$IFDEF FPC}, csUndefined{$ENDIF}));
          If Length(vRESTDWBytes) > 0 Then
-          vTempString:= TEncoding.UTF8.Getstring(vRESTDWBytes)
+          vTempString:= TEncoding.UTF8.Getstring(TBytes(vRESTDWBytes))
          Else
           vTempString:= '';
          SetLength(vRESTDWBytes, 0);

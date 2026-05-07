@@ -32,7 +32,7 @@ interface
 
 Uses
  SysUtils, Classes, Db,
- uRESTDWDataUtils, uRESTDWParams, uRESTDWBasicTypes, uRESTDWProtoTypes,
+ uRESTDWDataUtils, uRESTDWParams, uRESTDWBasicDbTypes, uRESTDWProtoTypes,
  uRESTDWConsts, uRESTDWMassiveBuffer, uRESTDWAuthenticators;
 
  Type

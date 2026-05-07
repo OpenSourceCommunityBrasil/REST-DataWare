@@ -86,7 +86,7 @@ type
     procedure setConnection(AValue: TComponent); override;
 
   public
-    function getConectionType : TRESTDWDatabaseType; override;
+    function getConnectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
@@ -139,7 +139,7 @@ end;
 
  { TRESTDWIBDACDriver }
 
-function TRESTDWIBDACDriver.getConectionType : TRESTDWDatabaseType;
+function TRESTDWIBDACDriver.getConnectionType : TRESTDWDatabaseType;
 begin
   // somente Firebird
   Result := dbtFirebird;

@@ -31,9 +31,12 @@ Interface
 
 Uses
   Classes, SysUtils, TypInfo, DB, Variants, StrUtils,
-  uRESTDWMemoryDataset, uRESTDWParams, uRESTDWAbout, uRESTDWComponentEvents,
+  {$IFDEF RESTDWMEMTABLE}
+   uRESTDWMemoryDataset,
+  {$ENDIF}
+  uRESTDWParams, uRESTDWAbout, uRESTDWComponentEvents,
   uRESTDWJSONInterface, uRESTDWBufferBase, uRESTDWConsts, uRESTDWDatamodule,
-  uRESTDWBasicTypes, uRESTDWProtoTypes, uRESTDWTools, uRESTDWStorageBin,
+  uRESTDWBasicTypes, uRESTDWBasicDbTypes, uRESTDWProtoTypes, uRESTDWTools, uRESTDWStorageBin,
   uRESTDWMassiveBuffer;
 
 Type
@@ -261,8 +264,8 @@ Type
   destructor Destroy; override;
 
   Function  compConnIsValid (comp   : TComponent) : Boolean;Virtual;
-  Function  getConectionType        : TRESTDWDatabaseType;  Virtual;
-  Procedure setConectionType(aValue : TRESTDWDatabaseType); Virtual;
+  Function  getConnectionType       : TRESTDWDatabaseType;  Virtual;
+  Procedure setConnectionType(aValue : TRESTDWDatabaseType); Virtual;
   Function  getDatabaseInfo         : TRESTDWDatabaseInfo;  Virtual;
   Function  getQuery                : TRESTDWDrvQuery; Overload; Virtual;
   Function  getQuery       (AUnidir : Boolean) : TRESTDWDrvQuery; Overload; Virtual;
@@ -403,7 +406,7 @@ Type
   Property StorageDataType     : TRESTDWStorageBase      Read FStorageDataType       Write FStorageDataType;
  Published
   Property Connection          : TComponent              Read FConnection            Write setConnection;
-  Property ConectionType       : TRESTDWDatabaseType     Read getConectionType       Write setConectionType;
+  Property ConnectionType      : TRESTDWDatabaseType     Read getConnectionType      Write setConnectionType;
   Property StrsTrim            : Boolean                 Read vStrsTrim              Write vStrsTrim;
   Property StrsEmpty2Null      : Boolean                 Read vStrsEmpty2Null        Write vStrsEmpty2Null;
   Property StrsTrim2Len        : Boolean                 Read vStrsTrim2Len          Write vStrsTrim2Len;
@@ -934,7 +937,7 @@ Begin
  Result := -1;
  drv    := TRESTDWDriverBase(Self.Owner);
  Try
-  If drv.getConectionType = dbtMySQL Then
+  If drv.getConnectionType = dbtMySQL Then
    Begin
     Close;
     SQL.Clear;
@@ -953,12 +956,12 @@ End;
 
 { TRESTDWDriverBase }
 
-Procedure TRESTDWDriverBase.setConectionType(aValue : TRESTDWDatabaseType);
+Procedure TRESTDWDriverBase.setConnectionType(aValue : TRESTDWDatabaseType);
 Begin
  vDatabaseType := aValue;
 End;
 
-function TRESTDWDriverBase.getConectionType : TRESTDWDatabaseType;
+function TRESTDWDriverBase.getConnectionType : TRESTDWDatabaseType;
 Begin
  Result := vDatabaseType;//        : TRESTDWDatabaseType;
 // Result := dbtUndefined;
@@ -981,7 +984,7 @@ Begin
  // ex: no MySQL temos o MariaDB
  // ex: no Firebird temos a versao HQBird
  sVersion := '';
- connType := getConectionType;
+ connType := getConnectionType;
  lst := TStringList.Create;
  qry := getQuery;
  Try
@@ -1463,7 +1466,7 @@ Var
  connType : TRESTDWDatabaseType;
 Begin
  Result := -1;
- connType := getConectionType;
+ connType := getConnectionType;
  With Query Do
   Begin
    Close;
@@ -2611,7 +2614,7 @@ begin
   Error := False;
   Result := '';
   aResult := TRESTDWJSONValue.Create;
-  vTempQuery := getQuery(not Execute);
+  vTempQuery := getQuery(Execute);
   vDataSet := TDataSet(vTempQuery.Owner);
   try
     vStateResource := isConnected;
@@ -2890,7 +2893,7 @@ Begin
     Delete(vTable, InitStrPos, Pos('.', vTable));
   end;
 }
- connType := getConectionType;
+ connType := getConnectionType;
  Try
   vStateResource := isConnected;
   If Not vStateResource Then
@@ -2985,7 +2988,7 @@ Begin
    vSchema := Copy(vTable, InitStrPos, Pos('.', vTable)-1);
    Delete(vTable, InitStrPos, Pos('.', vTable));
   End;
- connType := getConectionType;
+ connType := getConnectionType;
  Try
   vStateResource := isConnected;
   If Not vStateResource Then
@@ -3082,7 +3085,7 @@ Begin
    vSchema := Copy(vTable, InitStrPos, Pos('.', vTable)-1);
    Delete(vTable, InitStrPos, Pos('.', vTable));
   End;
- connType := getConectionType;
+ connType := getConnectionType;
  Try
   vStateResource := isConnected;
   If Not vStateResource Then
@@ -3237,7 +3240,7 @@ Begin
  If Not Assigned(ProcNames) Then
   ProcNames := TStringList.Create;
  vSchema := '';
- connType := getConectionType;
+ connType := getConnectionType;
  Try
   vStateResource := isConnected;
   If Not vStateResource Then
@@ -3524,7 +3527,7 @@ Begin
    vSchema := Copy(vProc, InitStrPos, Pos('.', vProc)-1);
    Delete(vProc, InitStrPos, Pos('.', vProc));
   End;
- connType := getConectionType;
+ connType := getConnectionType;
  Try
   vStateResource := isConnected;
   If Not vStateResource Then
@@ -3949,7 +3952,6 @@ begin
   vStrsTrim2Len        := vParamCreate;
   vEncodeStrings       := vParamCreate;
   vCompression         := vParamCreate;
-
   // fernando banhos 25/10/2022
   // algumas rotinas de paramscreate foram retiradas devido
   // incompatibilidade com outros drivers

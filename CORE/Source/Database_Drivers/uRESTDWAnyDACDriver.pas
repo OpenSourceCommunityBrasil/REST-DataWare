@@ -87,7 +87,7 @@ type
   TRESTDWAnyDACDriver = class(TRESTDWDriverBase)
   protected
     Function compConnIsValid(comp : TComponent) : boolean; override;
-    function getConectionType : TRESTDWDatabaseType; override;
+    function getConnectionType : TRESTDWDatabaseType; override;
   public
     function getQuery : TRESTDWDrvQuery; override;
     function getQuery(AUnidir : boolean) : TRESTDWDrvQuery; override;
@@ -138,12 +138,12 @@ end;
 
  { TRESTDWAnyDACDriver }
 
-function TRESTDWAnyDACDriver.getConectionType : TRESTDWDatabaseType;
+function TRESTDWAnyDACDriver.getConnectionType : TRESTDWDatabaseType;
 var
   conn : string;
   i: integer;
 begin
-  Result:=inherited getConectionType;
+  Result:=inherited getConnectionType;
   if not Assigned(Connection) then
     Exit;
 
