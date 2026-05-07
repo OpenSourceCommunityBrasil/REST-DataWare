@@ -178,9 +178,9 @@ Uses
                                    Var stream : TStream); Virtual;
    Procedure LoadDatasetFromStream(Dataset    : TDataset;
                                    stream     : TStream); Virtual;
-   Procedure SaveDWMemToStream    (Dataset    : IRESTDWMemTable;
+   Procedure SaveDWMemToStream    (Dataset    : TDataset;
                                    Var stream : TStream); Virtual;
-   Procedure LoadDWMemFromStream  (Dataset    : IRESTDWMemTable;
+   Procedure LoadDWMemFromStream  (Dataset    : TDataset;
                                    stream     : TStream); Virtual;
   Public
    Constructor Create        (AOwner     : TComponent); Override;
@@ -217,7 +217,7 @@ Begin
 
 End;
 
-Procedure TRESTDWStorageBase.LoadDWMemFromStream(Dataset : IRESTDWMemTable;
+Procedure TRESTDWStorageBase.LoadDWMemFromStream(Dataset : TDataset;
                                                  stream  : TStream);
 Begin
 
@@ -240,21 +240,7 @@ End;
 
 Procedure TRESTDWStorageBase.LoadFromStream(Dataset: TDataset; stream: TStream);
 Begin
- {$IFDEF RESTDWMEMTABLE}
-  LoadDatasetFromStream(Dataset, stream);
-  If Dataset.Active then
-   TRESTDWMemTable(Dataset).SortOnFields;
- {$ELSE} //TODO LoadFromStream
-  {$IFDEF UNIDACMEM}
-
-  {$ENDIF}
-  {$IFDEF ZEOSMEM}
-
-  {$ENDIF}
-  {$IFDEF RESTFDMEMTABLE}
-
-  {$ENDIF}
- {$ENDIF}
+ LoadDWMemFromStream(TRESTDWMemtable(Dataset), stream);
 End;
 
 Procedure TRESTDWStorageBase.SaveDatasetToStream(Dataset: TDataset; Var stream: TStream);
@@ -262,8 +248,8 @@ Begin
 
 End;
 
-Procedure TRESTDWStorageBase.SaveDWMemToStream(Dataset: IRESTDWMemTable;
-  Var stream: TStream);
+Procedure TRESTDWStorageBase.SaveDWMemToStream(Dataset    : TDataset;
+                                               Var Stream : TStream);
 Begin
 
 End;
@@ -285,22 +271,7 @@ End;
 
 Procedure TRESTDWStorageBase.SaveToStream(Dataset: TDataset; Var stream: TStream);
 Begin
- {$IFDEF RESTDWMEMTABLE}
-  If Dataset.InheritsFrom(TRESTDWMemTable) then
-    SaveDWMemToStream(TRESTDWMemTable(Dataset), stream)
-  Else
-    SaveDatasetToStream(Dataset, stream);
- {$ELSE} //TODO SaveFromStream
-  {$IFDEF UNIDACMEM}
-
-  {$ENDIF}
-  {$IFDEF ZEOSMEM}
-
-  {$ENDIF}
-  {$IFDEF RESTFDMEMTABLE}
-
-  {$ENDIF}
- {$ENDIF}
+ SaveDatasetToStream(Dataset, stream);
 End;
 
 Constructor TConnectionDefs.Create;

@@ -391,13 +391,6 @@ Type
     FDefaultIndex,
     FCurrentIndexDef  : TRESTDWDatasetIndex;
     FFieldDefClass    : TFieldClass;
-    {$IFDEF FPC}
-    vDatabaseCharSet                   : TDatabaseCharSet;
-    Procedure SetDatabaseCharSet(Value : TDatabaseCharSet);
-    Function  GetDatabaseCharSet       : TDatabaseCharSet;
-    {$ELSE}
-    FFilterExpression : TRDWABExprParser;
-    {$ENDIF}
     Procedure CalcOffSets;
     Function  AddRecord          : TRESTDWMTMemoryRecord;
     Function  InsertRecord(Index : Integer) : TRESTDWMTMemoryRecord;
@@ -408,7 +401,6 @@ Type
                               Compare : TCompareRecords);
     Procedure Sort;
     Function  CalcRecordSize    : Integer;
-    Function  GetMemoryRecord(Index : Integer) : TRESTDWMTMemoryRecord;
     Function  GetCapacity       : Integer;
     Function  RecordFilter      : Boolean;
     Procedure SetCapacity(Value : Integer);
@@ -473,8 +465,6 @@ Type
     Procedure InitFieldDefsFromFieldsInternal;
     Procedure RecordToBuffer         (Rec                   : TRESTDWMTMemoryRecord;
                                       Buffer                : PRESTDWMTMemBuffer);
-    Procedure SetMemoryRecordData    (Buffer                : PRESTDWMTMemBuffer;
-                                      Pos                   : Integer);  Virtual;
     Procedure SetAutoIncFields       (Buffer                : PRESTDWMTMemBuffer);            Virtual;
     Function  CompareRecords         (Item1,
                                       Item2                 : TRESTDWMTMemoryRecord): Integer;Virtual;
@@ -487,8 +477,6 @@ Type
      Function  AllocRecBuf                   : TRecBuf; override;
      Procedure FreeRecBuf        (Var Buffer : TRecBuf); Override;
     {$ENDIF NEXTGEN}
-    Function  AllocRecordBuffer : TRecordBuffer;{$IFNDEF NEXTGEN}Override;{$ENDIF}
-    Procedure FreeRecordBuffer   (Var Buffer : TRecordBuffer);{$IFNDEF NEXTGEN}Override;{$ENDIF}
     Procedure InternalInitRecord (Buffer     :{$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}); Override;
     Function  GetRecord          (Buffer     :{$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF};
                                   GetMode    : TGetMode;
@@ -502,10 +490,6 @@ Type
     Procedure SetBookmarkData    (Buffer     :{$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF};
                                   Data       : TRESTDWMTBookmark); Overload;Override;
     Procedure InitRecord         (Buffer     :{$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}); Overload;Override;
-    Procedure InternalAddRecord  (Buffer     : {$IFDEF FPC}Pointer{$ELSE}
-                                               {$IFDEF RESTDWANDROID}TRecBuf{$ELSE}
-                                               {$IF CompilerVersion >22}Pointer{$ELSE}TRecordBuffer{$IFEND}{$ENDIF}{$ENDIF};
-                                  aAppend    : Boolean); Overload;
     Function  GetCurrentRecord   (Buffer     :{$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF}): Boolean; Overload;Override;
     Procedure ClearCalcFields    (Buffer     :{$IFDEF NEXTGEN}NativeInt{$ELSE}TRecordBuffer{$ENDIF}); Override;
     Function  GetRecordSize                  : Word; Override;
@@ -539,7 +523,6 @@ Type
     Procedure InternalOpen;            Override;
     Procedure OpenCursor(InfoQuery : Boolean);Overload;Override;
     Function  IsCursorOpen         : Boolean; Override;
-    Function  GetRecordCount       : Integer; Override;
     Function  GetRecNo             : Integer; Override;
     Procedure SetRecNo  (Value     : Integer);Override;
     Procedure DoAfterOpen;                    Override;
@@ -549,15 +532,8 @@ Type
                                      Var Value     : Variant)    : Boolean;Virtual;
     Procedure Notification          (AComponent    : TComponent;
                                      Operation     : TOperation);Override;
-    Function DataTypeSuported       (datatype      : TFieldType) : Boolean;
-    Function DataTypeIsBlobTypes    (datatype      : TFieldType) : Boolean;
-    Function GetOffSets             (aField        : TField)     : Word;Overload;
-    Function GetOffSets             (Index         : Integer)    : Word;Overload;
-    Function GetOffSetsBlobs  : Word;
     Function GetBlobRec             (Field         : TField;
                                      Rec           : TRESTDWMTMemoryRecord) : TMemBlobData;
-    Function GetCalcFieldLen        (FieldType     : TFieldType;
-                                     Size          : Word)       : Word;
     procedure ClearIndexes;
     Function  GetDataset       : TDataset;
     Procedure SetIndexName(AValue : String);
@@ -565,12 +541,35 @@ Type
     FLastID           : Integer;
     FBlobs            : TMemBlobArray;
     FRecords          : TRecordList;
-    Property  Records [Index : Integer] : TRESTDWMTMemoryRecord Read GetMemoryRecord;
+    {$IFDEF FPC}
+    vDatabaseCharSet                   : TDatabaseCharSet;
+    Procedure SetDatabaseCharSet(Value : TDatabaseCharSet);
+    Function  GetDatabaseCharSet       : TDatabaseCharSet;
+    {$ELSE}
+    FFilterExpression : TRDWABExprParser;
+    {$ENDIF}
     Constructor Create(AOwner : TComponent);Override;
     Destructor  Destroy;Override;
+    Function    AllocRecordBuffer : TRecordBuffer;{$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Procedure   FreeRecordBuffer    (Var Buffer           : TRecordBuffer);{$IFNDEF NEXTGEN}Override;{$ENDIF}
+    Function    GetMemoryRecord     (Index                : Integer) : TRESTDWMTMemoryRecord;
+    Procedure   InternalAddRecord   (Buffer               : {$IFDEF FPC}Pointer{$ELSE}
+                                                             {$IFDEF RESTDWANDROID}TRecBuf{$ELSE}
+                                                             {$IF CompilerVersion >22}Pointer{$ELSE}TRecordBuffer{$IFEND}{$ENDIF}{$ENDIF};
+                                     aAppend              : Boolean); Overload;
+    Function    DataTypeSuported    (datatype             : TFieldType) : Boolean;
+    Function    DataTypeIsBlobTypes (datatype             : TFieldType) : Boolean;
+    Function    GetCalcFieldLen     (FieldType            : TFieldType;
+                                     Size                 : Word)        : Word;
     Function    InternalGetFieldData(Field                : TField;
                                      Var Buffer           : TRESTDWMTValueBuffer;
                                      cSize                : Integer = 0) : Boolean;
+    Function    GetOffSets          (aField               : TField)     : Word;Overload;
+    Function    GetOffSets          (Index                : Integer)    : Word;Overload;
+    Function    GetOffSetsBlobs                           : Word;
+    Procedure   SetMemoryRecordData (Buffer               : PRESTDWMTMemBuffer;
+                                     Pos                  : Integer);  Virtual;
+    Function    GetRecordCount       : Integer; Override;
     Function    BookmarkValid   (aBookmark    : TBookmark)       : Boolean;Override;
     Function    CompareBookmarks(aBookmark1,
                                  aBookmark2   : TBookmark)       : Integer;Override;
@@ -682,6 +681,7 @@ Type
     Property  RESTDWIndexDefs[Aindex : Integer] : TRESTDWDatasetIndex Read GetBufIndexDef;
     Property  FieldAttrs             : TFieldAttrs                    Read FFieldAttrs        Write FFieldAttrs;
     Property  BlobFieldCount;
+    Property  Records [Index : Integer] : TRESTDWMTMemoryRecord Read GetMemoryRecord;
   published
     Property  Capacity               : Integer                        Read GetCapacity        Write SetCapacity    Default 0;
     Property  Active;
@@ -1895,7 +1895,7 @@ End;
 
 function TRESTDWMemTable.AddRecord: TRESTDWMTMemoryRecord;
 Begin
-  Result := TRESTDWMTMemoryRecord.Create(Nil);
+ Result := TRESTDWMTMemoryRecord.Create(TRESTDWMemTableAE(Self));
 End;
 
 function TRESTDWMemTable.FindRecordID(ID: Integer): TRESTDWMTMemoryRecord;
