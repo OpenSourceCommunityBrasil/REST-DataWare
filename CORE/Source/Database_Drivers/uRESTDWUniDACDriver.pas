@@ -100,7 +100,7 @@ type
     FTransaction : TUniTransaction;
   protected
     procedure setConnection(AValue: TComponent); override;
-    function getConectionType : TRESTDWDatabaseType; override;
+    function getConnectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
   public
     constructor Create(AOwner : TComponent); override;
@@ -154,25 +154,28 @@ end;
 
  { TRESTDWUniDACDriver }
 
-function TRESTDWUniDACDriver.getConectionType : TRESTDWDatabaseType;
+function TRESTDWUniDACDriver.getConnectionType : TRESTDWDatabaseType;
 var
   prot : string;
   i : integer;
 begin
-  Result:=inherited getConectionType;
-  if not Assigned(Connection) then
-    Exit;
-
-  prot := LowerCase(TUniConnection(Connection).ProviderName);
-
-  i := 0;
-  while i < Length(rdwUniDACProtocols) do begin
-    if Pos(rdwUniDACProtocols[i],prot) > 0 then begin
-      Result := rdwUniDACDbType[i];
-      Break;
-    end;
-    i := i + 1;
-  end;
+ Result := Inherited getConnectionType;
+ If Not Assigned(Connection) Then
+  Exit;
+ If Result = dbtUndefined Then
+  Begin
+   prot := LowerCase(TUniConnection(Connection).ProviderName);
+   i := 0;
+   While i < Length(rdwUniDACProtocols) Do
+    Begin
+     If Pos(rdwUniDACProtocols[i],prot) > 0 Then
+      Begin
+       Result := rdwUniDACDbType[i];
+       Break;
+      End;
+     i := i + 1;
+    End;
+  End;
 end;
 
 function TRESTDWUniDACDriver.getQuery : TRESTDWDrvQuery;

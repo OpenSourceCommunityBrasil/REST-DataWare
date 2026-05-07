@@ -27,14 +27,14 @@ interface
 
 uses
   {$IFDEF FPC}
-    {$IFNDEF RESTDWLAMW}StdCtrls, {$ENDIF}
+   {$IFNDEF RESTDWLAMW}StdCtrls, {$ENDIF}
     ComCtrls, Forms, ExtCtrls, DBCtrls, DBGrids, Dialogs, Controls,
     LResources, LazFileUtils,
-    {$IFNDEF RESTDWLAMW}
-     FormEditingIntf, PropEdits, lazideintf,
-     ProjectIntf, ComponentEditors,
-    {$ENDIF}
-    fpWeb, TypInfo,
+   {$IFNDEF RESTDWLAMW}
+    FormEditingIntf, PropEdits, lazideintf,
+    ProjectIntf, ComponentEditors,
+   {$ENDIF}
+   fpWeb, TypInfo,
   {$ELSE}
    {$IFNDEF RESTDWLAMW}
     Windows,
@@ -56,8 +56,9 @@ uses
    Menus,
   {$ENDIF}
   uRESTDWBasicClass,     uRESTDWDatamodule,   uRESTDWServerEvents,  uRESTDWBasicDB,
-  uRESTDWServerContext,  uRESTDWServerRoutes, uRESTDWMassiveBuffer, uRESTDWMemoryDataset,
-  uRESTDWBufferDb,       uRESTDWAbout,        uRESTDWDriverBase,    uRESTDWAuthenticators;
+  uRESTDWServerContext,  uRESTDWServerRoutes, uRESTDWMassiveBuffer,
+  uRESTDWMemoryDataset,  uRESTDWBufferDb,     uRESTDWAbout,         uRESTDWDriverBase,
+  uRESTDWAuthenticators;
 
 {$IFNDEF RESTDWDELPHINET}
 Const
@@ -151,7 +152,7 @@ End;
 
 {$IFNDEF RESTDWLAZARUS}
 Type
- TDSDesignerDW = Class(TDSDesigner)
+ TRESTDWDesigner = Class(TDSDesigner)
  Private
  Public
   {$IFDEF DELPHI2006UP}
@@ -431,10 +432,9 @@ End;
 {$ENDIF}
 {$ENDIF}
 
-
 {$IFNDEF RESTDWLAMW}
 {$IFNDEF RESTDWLAZARUS}
-Procedure TDSDesignerDW.BeginUpdateFieldDefs;
+Procedure TRESTDWDesigner.BeginUpdateFieldDefs;
 Var
  Idx: Integer;
 Begin
@@ -446,21 +446,21 @@ Begin
   End;
 End;
 
-Procedure TDSDesignerDW.EndUpdateFieldDefs;
+Procedure TRESTDWDesigner.EndUpdateFieldDefs;
 Begin
  Inherited;
  If TRESTDWClientSQL(DataSet).Active Then
    TRESTDWClientSQL(DataSet).Close;
 End;
 
-Procedure TDSDesignerDW.InitializeMenu(Menu: TPopupMenu);
+Procedure TRESTDWDesigner.InitializeMenu(Menu: TPopupMenu);
 Begin
  Inherited;
  // Ao clicar duas vezes no componente RESTDWClientSQL
  // ou ao selecionar no popup menu opção "Fields Editor".
 End;
 
-Procedure TDSDesignerDW.UpdateMenus(Menu: TPopupMenu; EditState: TEditState);
+Procedure TRESTDWDesigner.UpdateMenus(Menu: TPopupMenu; EditState: TEditState);
 Begin
  // Ao acionar o popup menu dos Fields persistents: (Add, Add All, New Field)
  Inherited;
@@ -478,7 +478,7 @@ begin
     TRESTDWClientSQL(Component).Close;
     TRESTDWClientSQL(Component).CreateDatasetFromList;
   {$ENDIF}
-  ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TDSDesignerDW);
+  ShowFieldsEditor(Designer, TRESTDWClientSQL(Component), TRESTDWDesigner);
  Finally
   {$IFDEF DELPHIXEUP}
    TRESTDWClientSQL(Component).SetInDesignEvents(False);
@@ -511,9 +511,9 @@ Begin
 End;
 
 {$IFDEF DELPHI2006UP}
-Function  TDSDesignerDW.DoCreateField(const FieldName: WideString; Origin: string): TField;
+Function  TRESTDWDesigner.DoCreateField(const FieldName: WideString; Origin: string): TField;
 {$ELSE}
-Function  TDSDesignerDW.DoCreateField(const FieldName: String; Origin: string): TField;
+Function  TRESTDWDesigner.DoCreateField(const FieldName: String; Origin: string): TField;
 {$ENDIF}
 Var
   F: TField;
@@ -560,12 +560,12 @@ Begin
   End;
 End;
 
-Function TDSDesignerDW.SupportsAggregates: Boolean;
+Function TRESTDWDesigner.SupportsAggregates: Boolean;
 Begin
  Result := True;
 End;
 
-Function TDSDesignerDW.SupportsInternalCalc: Boolean;
+Function TRESTDWDesigner.SupportsInternalCalc: Boolean;
 Begin
  Result := True;
 End;
@@ -792,9 +792,11 @@ Begin
   RegField(TStreamField);
 //  RegField(TRESTDWSQLTimeStampOffsetField);
  {$ELSE}
-  RegisterFields([TStringFieldRESTDW]);
-  RegisterFields([TRESTDWNumericField]);
-  RegisterFields([TStreamField]);
+  {$IFDEF RESTDWMEMTABLE}
+   RegisterFields([TStringFieldRESTDW]);
+   RegisterFields([TRESTDWNumericField]);
+   RegisterFields([TStreamField]);
+  {$ENDIF}
  {$ENDIF}
  {$IFDEF FPC}
   {$I RESTDataWareComponents_LAMW.lrs}
@@ -824,7 +826,7 @@ Begin
  {$IFNDEF RESTDWLAMW}
  RegisterComponents('REST Dataware - Tools',          [TRESTDWResponseTranslator, TRESTDWBufferDB]);
  {$ENDIF}
- RegisterComponents('REST Dataware - DB',             [TRESTDWPoolerDB,           TRESTDWMemTable,      TRESTDWClientSQL,
+ RegisterComponents('REST Dataware - DB',             [TRESTDWPoolerDB, TRESTDWMemTable, TRESTDWClientSQL,
                                                        TRESTDWTable,              TRESTDWUpdateSQL,     TRESTDWMassiveSQLCache,
                                                        TRESTDWStoredProcedure,    TRESTDWMassiveCache,  TRESTDWBatchMove]);
  RegisterComponents('REST Dataware - Authenticators', [TRESTDWAuthBasic,       TRESTDWAuthToken,     TRESTDWAuthOAuth]);

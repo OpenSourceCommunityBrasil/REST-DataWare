@@ -22498,7 +22498,7 @@ begin
     {$IFDEF FPC}
       Pointer(OpenSSL_version_num) := GetProcAddress(RESTDW_CRYPYO_DLL_Handle, 'OpenSSL_version_num');
     {$ELSE}
-      OpenSSL_version_num := GetProcAddress(RESTDW_CRYPYO_DLL_Handle, 'OpenSSL_version_num');
+    //  OpenSSL_version_num := GetProcAddress(RESTDW_CRYPYO_DLL_Handle, 'OpenSSL_version_num');
     {$ENDIF}
     if @OpenSSL_version_num = nil then begin
       FreeLibrary(RESTDW_CRYPYO_DLL_Handle);

@@ -33,7 +33,7 @@ uses
   FireDAC.Phys.RESTDWBase;
 
 type
-  {$IFDEF DELPHI10_3UP}
+  {$IFDEF DELPHI11UP}
   [ComponentPlatformsAttribute(pfidWindows or pfidOSX or pfidLinux)]
   {$ENDIF}
   TRESTDWFireDACPhysLink = class(TFDPhysRDWBaseDriverLink)
@@ -100,13 +100,13 @@ end;
 
 {-------------------------------------------------------------------------------}
 initialization
-  {$IFDEF DELPHI10_2UP}
+  {$IFDEF DELPHI11UP}
   FDRegisterDriverClass(TFDPhysRDWDriver);
   {$ELSE}
   FDPhysManager().RegisterDriverClass(TFDPhysRDWDriver);
   {$ENDIF}
 finalization
-  {$IFDEF DELPHI10_2UP}
+  {$IFDEF DELPHI11UP}
   FDUnregisterDriverClass(TFDPhysRDWDriver);
   {$ENDIF}
 

@@ -29,10 +29,11 @@ Interface
 {$IFDEF FPC}
  {$MODE OBJFPC}{$H+}
 {$ENDIF}
+
 uses
   SysUtils, Classes, DB, Variants, uRESTDWProtoTypes, uRESTDWMemDBUtils,
   uRESTDWMemExprParser, {$IFNDEF FPC}uRESTDWABMemDBFilterExpr,{$ENDIF}
-  uRESTDWAbout, uRESTDWConsts;
+  uRESTDWAbout, uRESTDWConsts, uRESTDWBasicDbTypes;
 
 Const
  ftBlobTypes    = [ftBlob, ftMemo, ftGraphic, ftFmtMemo, ftParadoxOle, ftDBaseOle,
@@ -61,8 +62,6 @@ Const
  SIndexNotFound           = 'Index ''%s'' not found';
  SUniDirectional          = 'Operation cannot be performed on an unidirectional dataset';
  SFieldRequired           = 'Field ''%s'' must have a value';
- Type
-  TFieldAttrs   = Array of Byte;
 
  Type
   TCompareFunc  = Function(subValue,
@@ -102,147 +101,35 @@ Type
  TApplyRecordEvent     = Procedure(Dataset    : TDataset;
                                    RecStatus  : TRecordStatus;
                                    FoundApply : Boolean) Of Object;
- TMemBlobData          = TRESTDWBytes;
- PMemBlobData          = ^TRESTDWBytes;
- TMemBlobArray         = Array Of TMemBlobData;
- PMemBlobArray         = ^TMemBlobArray;
- PRESTDWMTMemoryRecord = ^TRESTDWMTMemoryRecord;
- TRESTDWMTMemoryRecord = Class;
  TLoadMode             = (lmCopy, lmAppend);
  TSaveLoadState        = (slsNone, slsLoading, slsSaving);
  TCompareRecords       = Function(Item1, Item2 : TRESTDWMTMemoryRecord) : Integer Of Object;
  TIntArray             = Array Of Integer;
  TRESTDWMTBookmarkData = Integer;
- TRESTDWMemTable       = Class;
- {$IFNDEF FPC}
-  {$IF CompilerVersion > 21}
-    PRESTDWMTMemBuffer    = PByte;
-    TRESTDWMTBookmark     = TBookmark;
-    TRESTDWMTValueBuffer  = TValueBuffer;
-    TRESTDWMTRecordBuffer = TRecordBuffer;
-  {$ELSE}
-   {$IFDEF UNICODE}
-    PRESTDWMTMemBuffer    = PByte;
-   {$ELSE}
-     PRESTDWMTMemBuffer   = PAnsiChar;
-   {$ENDIF UNICODE}
-   TRESTDWMTBookmark      = Pointer;
-   TRESTDWMTValueBuffer   = Pointer;
-   TRESTDWMTRecordBuffer  = Pointer;
-  {$IFEND}
- {$ELSE}
-  TValueBuffer            = Array of Byte;
-  PRESTDWMTMemBuffer      = PByte;
-  TRESTDWMTBookmark       = Pointer;
-  TRESTDWMTValueBuffer    = Pointer;
-  TRESTDWMTRecordBuffer   = TRecordBuffer;
- {$ENDIF}
-  PBlobBuffer = ^TBlobBuffer;
-  TBlobBuffer = Packed Record
-    FieldNo,
-    OrgBufID  : Integer;
-    Buffer    : Pointer;
-    Size      : Int64;
-  end;
-  PRESTDWBlobField = ^TRESTDWBlobField;
-  TRESTDWBlobField = Packed Record
-   ConnBlobBuffer : Array[0..11] Of Byte; // DB specific data is stored here
-   BlobBuffer     : PBlobBuffer;
-  End;
-  PRESTDWRecLinkItem = ^TRESTDWRecLinkItem;
-  TRESTDWRecLinkItem = Packed Record
-   Prior             : PRESTDWRecLinkItem;
-   Next              : PRESTDWRecLinkItem;
-  End;
-  PRESTDWBookmark       = ^TRESTDWBookmark;
-  TRESTDWBookmark       = Packed Record
-   BookmarkData      : PRESTDWRecLinkItem;
-   BookmarkInt       : Integer; // Was used by TArrayBufIndex
-   BookmarkFlag      : TBookmarkFlag;
-  End;
-
-  {
-  TdwcolorOptions = Set Of (dwcoAllowedSharp, dwcoShowWebSharp, dwcoSysColors);
-  TColorField = class(TIntegerField)
-  Private
-   FOptions : TdwcolorOptions;
-  Protected
-   Function    GetIdentText    (AValue       : Integer;
-                                Var Text     : String) : Boolean; Virtual;Overload;
-   Procedure   GetText         (Var Text     : String;
-                                DisplayText  : Boolean);          Override;
-   Function    SetAsIdentString(Const AValue : String) : Boolean; Virtual;
-   Procedure   SetAsString     (Const AValue : String);           Override;
-  Public
-   Constructor Create          (AOwner       : TComponent);       Override;
-  Published
-   Property    MaxValue Stored False;
-   Property    MinValue Stored False;
-   Property    Options : TdwcolorOptions Read FOptions Write FOptions Default [dwcoAllowedSharp];
-  End;
-}
-  IRESTDWMemTable = Interface
-    Function GetRecordCount               : Integer;
-    Function GetMemoryRecord  (Index      : Integer)      : TRESTDWMTMemoryRecord;
-    Function GetOffSets       (aField     : TField)       : Word;Overload;
-    Function GetOffSets       (Index      : Integer)      : Word;Overload;
-    Function GetOffSetsBlobs              : Word;
-    Function DataTypeSuported(datatype    : TFieldType)   : Boolean; // new
-    Function DataTypeIsBlobTypes(datatype : TFieldType)   : Boolean; // new
-    Function GetBlobRec         (Field    : TField;
-                                 Rec      : TRESTDWMTMemoryRecord) : TMemBlobData;
-    Function CreateBlobStream   (Field    : TField;
-                                 Mode     : TBlobStreamMode)       : TStream;
-    Function GetCalcFieldLen    (FieldType: TFieldType;
-                                 Size     : Word)                  : Word;
-    Procedure InternalAddRecord (Buffer   : {$IFDEF FPC}Pointer{$ELSE}
-                                            {$IFDEF RESTDWANDROID}TRecBuf{$ELSE}
-                                            {$IF CompilerVersion >22}Pointer{$ELSE}TRecordBuffer{$IFEND}{$ENDIF}{$ENDIF};
-                                 aAppend  : Boolean);
-    Procedure InitRecord        (Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF});
-    Function  AllocRecordBuffer           : TRecordBuffer;
-    Procedure SetMemoryRecordData(Buffer  : PRESTDWMTMemBuffer;
-                                  Pos     : Integer);
-    Procedure AfterLoad;
-    Function  GetDataset                  : TDataset;
-    Function  GetBlob           (RecNo, Index    : Integer) : PMemBlobData;
-    Procedure Loaded;
-    {$IFDEF FPC}
-    Function  GetDatabaseCharSet          : TDatabaseCharSet;
-    {$ENDIF}
-  End;
-  TRESTDWStorageBase = class(TRESTDWComponent)
-  Private
-   {$IFDEF FPC}
-    FDatabaseCharSet: TDatabaseCharSet;
-   {$ENDIF}
-   FEncodeStrs: Boolean;
-  Protected
-   Procedure SaveDatasetToStream  (Dataset    : TDataset;
-                                   Var stream : TStream); Virtual;
-   Procedure LoadDatasetFromStream(Dataset    : TDataset;
-                                   stream     : TStream); Virtual;
-   Procedure SaveDWMemToStream    (Dataset    : IRESTDWMemTable;
-                                   Var stream : TStream); Virtual;
-   Procedure LoadDWMemFromStream  (Dataset    : IRESTDWMemTable;
-                                   stream     : TStream); Virtual;
-  Public
-   Constructor Create        (AOwner     : TComponent); Override;
-   Procedure   SaveToStream  (Dataset    : TDataset;
-                              Var Stream : TStream);
-   Procedure   LoadFromStream(Dataset    : TDataset;
-                              Stream     : TStream);
-   Procedure   SaveToFile    (Dataset    : TDataset;
-                              FileName   : String);
-   Procedure   LoadFromFile  (Dataset    : TDataset;
-                              FileName   : String);
-  Public
-   Property  EncodeStrs      : Boolean          Read FEncodeStrs      Write FEncodeStrs;
-  Published
-   {$IFDEF FPC}
-    Property DatabaseCharSet : TDatabaseCharSet Read FDatabaseCharSet Write FDatabaseCharSet;
-   {$ENDIF}
-  End;
+ PBlobBuffer = ^TBlobBuffer;
+ TBlobBuffer = Packed Record
+   FieldNo,
+   OrgBufID  : Integer;
+   Buffer    : Pointer;
+   Size      : Int64;
+ End;
+ PRESTDWBlobField = ^TRESTDWBlobField;
+ TRESTDWBlobField = Packed Record
+  ConnBlobBuffer : Array[0..11] Of Byte; // DB specific data is stored here
+  BlobBuffer     : PBlobBuffer;
+ End;
+ PRESTDWRecLinkItem = ^TRESTDWRecLinkItem;
+ TRESTDWRecLinkItem = Packed Record
+  Prior             : PRESTDWRecLinkItem;
+  Next              : PRESTDWRecLinkItem;
+ End;
+ PRESTDWBookmark       = ^TRESTDWBookmark;
+ TRESTDWBookmark       = Packed Record
+  BookmarkData      : PRESTDWRecLinkItem;
+  BookmarkInt       : Integer; // Was used by TArrayBufIndex
+  BookmarkFlag      : TBookmarkFlag;
+ End;
+  TRESTDWMemTable = Class;
   PRecordList = ^TRecordList;
   TRecordList = Class(TList)
   Private
@@ -462,7 +349,6 @@ Type
     FBookmarkOfs,
     FBlobOfs,
     FRecBufSize,
-    FLastID,
     FRowsOriginal,
     FRowsChanged,
     FRowsAffected     : Integer;
@@ -471,7 +357,6 @@ Type
     FDeletedValues,
     FIndexList        : TList;
     FSrcAutoIncField  : TField;
-    FRecords          : TRecordList;
     FDataSet          : TDataset;
     FFieldAttrs       : TFieldAttrs;
     FFetch,
@@ -502,7 +387,6 @@ Type
     FNullmaskSize     : Byte;
     FFilterParser     : TExprParser;
     FStorageDataType  : TRESTDWStorageBase;
-    FBlobs            : TMemBlobArray;
     FIndexes          : TRESTDWDataSetIndexDefs;
     FDefaultIndex,
     FCurrentIndexDef  : TRESTDWDatasetIndex;
@@ -556,7 +440,9 @@ Type
     Procedure InternalSetFieldData    (Field                : TField;
                                        Buffer               : Pointer;
                                        Const ValidateBuffer : TRESTDWMTValueBuffer);
+   {$IFDEF FPC}
     Procedure SetProviderFlags;
+   {$ENDIF}
   Protected
     Function IsLookup                 (Index                : Integer)     : Boolean;
     Function GetFieldDef              (Index                : Integer)     : Integer;
@@ -675,8 +561,11 @@ Type
     procedure ClearIndexes;
     Function  GetDataset       : TDataset;
     Procedure SetIndexName(AValue : String);
-    Property  Records [Index   : Integer] : TRESTDWMTMemoryRecord Read GetMemoryRecord;
   Public
+    FLastID           : Integer;
+    FBlobs            : TMemBlobArray;
+    FRecords          : TRecordList;
+    Property  Records [Index : Integer] : TRESTDWMTMemoryRecord Read GetMemoryRecord;
     Constructor Create(AOwner : TComponent);Override;
     Destructor  Destroy;Override;
     Function    InternalGetFieldData(Field                : TField;
@@ -792,6 +681,7 @@ Type
     Property  RESTDWIndexes  [Aindex : Integer] : TRESTDWIndex        Read GetBufIndex;
     Property  RESTDWIndexDefs[Aindex : Integer] : TRESTDWDatasetIndex Read GetBufIndexDef;
     Property  FieldAttrs             : TFieldAttrs                    Read FFieldAttrs        Write FFieldAttrs;
+    Property  BlobFieldCount;
   published
     Property  Capacity               : Integer                        Read GetCapacity        Write SetCapacity    Default 0;
     Property  Active;
@@ -877,8 +767,10 @@ Type
    FPosition   : Longint;
    Function  GetBlobSize : Longint;
    Function  GetBlobFromRecord(Field : TField) : TMemBlobData;
+   {$IFDEF FPC}
    Procedure SetBlobFromRecord(Field : TField;
                                Value : TMemBlobData);
+   {$ENDIF}
   Public
    Constructor Create(Field : TBlobField;
                       Mode  : TBlobStreamMode);
@@ -890,31 +782,6 @@ Type
    Function   Seek   (Offset: Longint;
                       Origin: Word)    : Longint;Override;
    Procedure  Truncate;
-  End;
-  TRESTDWMTMemoryRecord = Class(TPersistent)
-  Private
-   FMemoryData : TRESTDWMemTable;
-   FIndex,
-   FID         : Integer;
-   FData       : Pointer;
-   FBlobs      : TMemBlobArray;
-   FIsNull     : Boolean;
-   Function  GetIndex : Integer;
-   Procedure SetMemoryData(Value        : TRESTDWMemTable;
-                           UpdateParent : Boolean);
-  Protected
-   Procedure SetIndex     (Value        : Integer);         Virtual;
-  Public
-   Constructor Create     (MemoryData   : TRESTDWMemTable); Virtual;
-   Constructor CreateEx   (MemoryData   : TRESTDWMemTable;
-                           UpdateParent : Boolean);         Virtual;
-   Destructor  Destroy;Override;
-   Property    MemoryData : TRESTDWMemTable Read FMemoryData;
-   Property    ID         : Integer         Read FID         Write FID;
-   Property    Index      : Integer         Read GetIndex    Write SetIndex;
-   Property    Data       : Pointer         Read FData       Write FData;
-   Property    Blobs      : TMemBlobArray   Read FBlobs      Write FBlobs;
-   Property    IsNull     : Boolean         Read FIsNull     Write FIsNull;
   End;
   TSortOrder        = (soAsc, soDesc);
   //Possible sorting case sensitivity values
@@ -1145,6 +1012,10 @@ Var
                                                            {$ENDIF});
 
 
+
+ Procedure CalcDataSize(FieldDef : TFieldDef; Var DataSize: Integer);Overload;
+ Procedure CalcDataSize(Field    : TField;    Var DataSize: Integer);Overload;
+
 Implementation
 
 Uses
@@ -1155,8 +1026,9 @@ Uses
   FMTBcd,
   {$IFDEF RESTDWVCL}uRESTDWMemVCLUtils,{$ENDIF}
   uRESTDWMemResources,
-  uRESTDWTools, uRESTDWBasicTypes, uRESTDWStorageBin
-  {$IFNDEF FPC}, SqlTimSt{$ENDIF};
+  uRESTDWTools, uRESTDWStorageBin
+  {$IFNDEF FPC}, SqlTimSt{$ENDIF},
+  uRESTDWBasicTypes;
 
 Const
  GuidSize = 38;
@@ -1390,28 +1262,6 @@ End;
 Procedure ErrorFmt(const Msg: string; const Args: array of const);
 Begin
  DatabaseErrorFmt(Msg, Args);
-End;
-
-// === { TRESTDWMTMemoryRecord } ====================================================
-Constructor TRESTDWMTMemoryRecord.Create(MemoryData: TRESTDWMemTable);
-Begin
- FIsNull := True;
- FIndex := -1;
- CreateEx(MemoryData, True);
-End;
-
-Constructor TRESTDWMTMemoryRecord.CreateEx(MemoryData: TRESTDWMemTable; UpdateParent: Boolean);
-Begin
- Inherited Create;
- SetMemoryData(MemoryData, UpdateParent);
-End;
-
-Destructor TRESTDWMTMemoryRecord.Destroy;
-Begin
- SetMemoryData(Nil, False);
-// Finalize(FBlobs);
-// SetLength(FBlobs, 0);
- Inherited Destroy;
 End;
 
 {$IFNDEF FPC}
@@ -1849,70 +1699,6 @@ End;
 {$ENDIF}
 
 
-Function TRESTDWMTMemoryRecord.GetIndex: Integer;
-Begin
-// If FMemoryData <> Nil then
-//  Result := FMemoryData.FRecords.IndexOf(Self)
-// Else
- Result := FIndex;
-End;
-
-Procedure TRESTDWMTMemoryRecord.SetMemoryData(Value: TRESTDWMemTable; UpdateParent: Boolean);
-var
- I, DataSize: Integer;
-Begin
- If FMemoryData <> Value then
-  Begin
-   If FMemoryData <> nil then
-    Begin
-     If FMemoryData.BlobFieldCount > 0 Then
-      Begin
-//       {$IFDEF FPC}
-        SetLength(FBlobs, 0); //Finalize(FBlobs, FMemoryData.BlobFieldCount);
-//       {$ELSE}
-//        Finalize(FBlobs);
-//       {$ENDIF}
-      End;
-     FMemoryData.FRecords.Remove(Self);
-     {$IFDEF FPC}
-      ReallocMem(FData, 0);
-     {$ELSE}
-      FreeMem(FData, SizeOf(FData));
-//      ReallocMem(FData, 0);
-     {$ENDIF}
-     FMemoryData := Nil;
-    End;
-   If Value <> Nil then
-    Begin
-     If UpdateParent then
-      Begin
-       Value.FRecords.Add(Self);
-       Inc(Value.FLastID);
-       FID := Value.FLastID;
-      End;
-     FMemoryData := Value;
-     If Value.BlobFieldCount > 0 then
-      Begin
-       SetLength(FBlobs, 0);
-       SetLength(FBlobs, Value.BlobFieldCount);
-      End;
-     DataSize := 0;
-     For I := 0 to Value.Fields.Count - 1 do
-      CalcDataSize(Value.Fields[I], DataSize);
-     ReallocMem(FData, DataSize);
-    End;
-  End;
-End;
-
-Procedure TRESTDWMTMemoryRecord.SetIndex(Value: Integer);
-var
-  CurIndex: Integer;
-Begin
-  CurIndex := GetIndex;
-  If (CurIndex >= 0) and (CurIndex <> Value) then
-    FMemoryData.FRecords.Move(CurIndex, Value);
-  FIndex := Value;
-End;
 // === { TRESTDWMemTable } ======================================================
 // Function TRESTDWMemTable.FieldByName(const FieldName: string): TField;
 // Begin
@@ -2109,7 +1895,7 @@ End;
 
 function TRESTDWMemTable.AddRecord: TRESTDWMTMemoryRecord;
 Begin
-  Result := TRESTDWMTMemoryRecord.Create(Self);
+  Result := TRESTDWMTMemoryRecord.Create(Nil);
 End;
 
 function TRESTDWMemTable.FindRecordID(ID: Integer): TRESTDWMTMemoryRecord;
@@ -2134,8 +1920,7 @@ End;
 
 function TRESTDWMemTable.GetMemoryRecord(Index: Integer): TRESTDWMTMemoryRecord;
 Begin
-  Result := TRESTDWMTMemoryRecord(FRecords[Index]);
-//  Result := TRESTDWMTMemoryRecord(TRecordList(Pointer(@FRecords)^)[Index]);
+ Result := TRESTDWMTMemoryRecord(FRecords[Index]);
 End;
 
 Procedure TRESTDWMemTable.CalcOffSets;
@@ -3081,7 +2866,7 @@ Begin
                             End;
                Else
                 Begin
-                 vTimeStamp := DateTimeToSQLTimeStamp(vDouble);
+                 vTimeStamp := TSQLTimeStamp(DateTimeToSQLTimeStamp(vDouble));
                  cLen := SizeOf(vTimeStamp);
                  Move(Pointer(@vTimeStamp)^, Pointer(Buffer)^, cLen);
                 End;
@@ -4843,7 +4628,7 @@ Var
 Begin
  // Release unneeded blob buffers, in order to save memory
  // TDataSet has own buffer of records, so do not release blobs until they can be referenced
- With FDataSet Do
+ With TRESTDWMemtable(FDataSet) Do
   Begin
    h := Length(FBlobs);
    If h > 0 Then //Free in batches, starting with oldest (at beginning)
@@ -4883,7 +4668,7 @@ End;
 Function TDoubleLinkedBufIndex.GetCurrentBuffer: Pointer;
 Begin
 // pointer(FLastRecBuf) + FDataset.BufferOffset;
- Result := Pointer(FDataset.ActiveBuffer); //Todo XyberX
+ Result := Pointer(TRESTDWMemtable(FDataSet).ActiveBuffer); //Todo XyberX
 End;
 
 Function TDoubleLinkedBufIndex.GetCurrentRecord : TRecordBuffer;
@@ -4899,7 +4684,7 @@ End;
 Function TDoubleLinkedBufIndex.GetSpareBuffer : TRecordBuffer;
 Begin
 // Pointer(FLastRecBuf) + FDataset.BufferOffset;
- Result := Pointer(FDataset.ActiveBuffer); //Todo XyberX
+ Result := Pointer(TRESTDWMemtable(FDataSet).ActiveBuffer); //Todo XyberX
 End;
 
 Function TDoubleLinkedBufIndex.GetSpareRecord : TRecordBuffer;
@@ -5272,7 +5057,7 @@ Procedure TDoubleLinkedBufIndex.AddRecord;
 Var
  ARecord : TRecordBuffer;
 Begin
- ARecord                              := FDataset.IntAllocRecordBuffer;
+ ARecord                              := TRESTDWMemtable(FDataSet).IntAllocRecordBuffer;
  {$IFNDEF FPC}
   {$IF CompilerVersion >= 20}
    FLastRecBuf[IndNr].next              := Pointer(ARecord);
@@ -5547,9 +5332,9 @@ Begin
  If Active and Not Refreshing then
   FetchAll;
   if IsUniDirectional then
-    B:=TUniDirectionalBufIndex.Create(self)
+    B := TUniDirectionalBufIndex.Create(Nil)
   else
-    B:=TDoubleLinkedBufIndex.Create(self);
+    B := TDoubleLinkedBufIndex.Create(Nil);
   F.FBufferIndex:=B;
   with B do
     begin
@@ -6010,6 +5795,7 @@ Begin
  {$ENDIF}
 End;
 
+{$IFDEF FPC}
 Procedure TRESTDWMemTable.SetProviderFlags;
 Var
  I : Integer;
@@ -6039,6 +5825,7 @@ Begin
     End;
   End;
 End;
+{$ENDIF}
 
 procedure TRESTDWMemTable.InternalOpen;
 Begin
@@ -7229,7 +7016,7 @@ End;
 constructor TRESTDWIndex.Create(const ADataset: TRESTDWMemtable);
 Begin
  Inherited Create;
- FDataset := ADataset;
+ FDataset := TRESTDWMemtable(ADataset);
 End;
 
 {$IFDEF FPC}
@@ -7721,6 +7508,7 @@ Begin
   End;
 End;
 
+{$IFDEF FPC}
 Procedure TRESTDWMTMemBlobStream.SetBlobFromRecord(Field: TField; Value: TMemBlobData);
 Var
   Rec: TRESTDWMTMemoryRecord;
@@ -7743,6 +7531,7 @@ Begin
 
   End;
 End;
+{$ENDIF}
 
 Function TRESTDWMTMemBlobStream.Read(Var Buffer; Count: Longint): Longint;
 Var
@@ -7922,25 +7711,6 @@ begin
   Result := nil;
 end;
 
-{ TRESTDWStorageBase }
-
-constructor TRESTDWStorageBase.Create(AOwner: TComponent);
-Begin
-  inherited Create(AOwner);
-  FEncodeStrs := True;
-End;
-
-Procedure TRESTDWStorageBase.LoadDatasetFromStream(Dataset: TDataset; stream: TStream);
-Begin
-
-End;
-
-Procedure TRESTDWStorageBase.LoadDWMemFromStream(Dataset: IRESTDWMemTable;
-  stream: TStream);
-Begin
-
-End;
-
 Destructor TRecordList.Destroy;
 Begin
   ClearAll;
@@ -8005,66 +7775,6 @@ Begin
  End;
  Inherited Clear;
 End;
-
-Procedure TRESTDWStorageBase.LoadFromFile(Dataset: TDataset; FileName: String);
-Var
- vFileStream : TFileStream;
-Begin
- If not FileExists(FileName) then
-  Exit;
- vFileStream := TFileStream.Create(FileName,fmOpenRead or fmShareDenyWrite);
- Try
-  LoadFromStream(Dataset,TStream(vFileStream));
- Finally
-  vFileStream := Nil;
-  vFileStream.Free;
- End;
-End;
-
-Procedure TRESTDWStorageBase.LoadFromStream(Dataset: TDataset; stream: TStream);
-Begin
- If Dataset.InheritsFrom(TRESTDWMemTable) then
-  LoadDWMemFromStream(TRESTDWMemTable(Dataset), stream)
- Else
-  LoadDatasetFromStream(Dataset, stream);
- If Dataset.Active then
-  TRESTDWMemTable(Dataset).SortOnFields;
-End;
-
-Procedure TRESTDWStorageBase.SaveDatasetToStream(Dataset: TDataset; Var stream: TStream);
-Begin
-
-End;
-
-Procedure TRESTDWStorageBase.SaveDWMemToStream(Dataset: IRESTDWMemTable;
-  Var stream: TStream);
-Begin
-
-End;
-
-Procedure TRESTDWStorageBase.SaveToFile(Dataset: TDataset; FileName: String);
-Var
- vFileStream : TFileStream;
-Begin
- Try
-  vFileStream := TFileStream.Create(FileName,fmCreate);
-  Try
-   SaveToStream(Dataset,TStream(vFileStream));
-  Except
-  End;
- Finally
-  vFileStream.Free;
- End;
-End;
-
-Procedure TRESTDWStorageBase.SaveToStream(Dataset: TDataset; Var stream: TStream);
-Begin
-  If Dataset.InheritsFrom(TRESTDWMemTable) then
-    SaveDWMemToStream(TRESTDWMemTable(Dataset), stream)
-  Else
-    SaveDatasetToStream(Dataset, stream);
-End;
-
 
 { TRESTDWMemTableEx }
 

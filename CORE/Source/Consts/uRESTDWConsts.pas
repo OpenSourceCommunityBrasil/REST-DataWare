@@ -293,8 +293,9 @@ Type
  TRESTDWJSONTypes     = Set of TRESTDWJSONType;
  TRESTDWMaxLineAction = (maException, maSplit);
  TRESTDWOSType        = (otUnknown, otUnix, otWindows, otDotNet);
- TRESTDWSSLVersion    = (sslvSSLv2, sslvSSLv23,  sslvSSLv3, sslvTLSv1, sslvTLSv1_1, sslvTLSv1_2);
+ TRESTDWSSLVersion    = (SSLv2, SSLv23, SSLv3, TLSv1, TLSv1_1, TLSv1_2, TLSv1_3);
  TRESTDWSSLVersions   = set of TRESTDWSSLVersion;
+ TRESTDWSSLMode       = (sslUnassigned, sslClient, sslServer, sslBoth);
  TTypeObject          = (toDataset,   toParam, toMassive, toVariable,  toObject);
  TCaseType            = (ctNone,      ctUpperCase,        ctLowerCase, ctCamelCase);
  TRESTDWRouteData     = (crAll, crGet, crPost, crPut, crPatch, crDelete, crOption);

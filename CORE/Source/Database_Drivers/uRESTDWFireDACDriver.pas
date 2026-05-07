@@ -26,7 +26,7 @@
 interface
 
 uses
-  Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicTypes,
+  Classes, SysUtils, uRESTDWDriverBase, uRESTDWBasicdbTypes,
   FireDAC.Comp.Client, FireDAC.Comp.DataSet, FireDAC.Stan.StorageBin,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.DApt.Intf, FireDAC.DApt,
   FireDAC.Stan.Param, FireDAC.DatS, DB, uRESTDWBasicDB, uRESTDWProtoTypes,
@@ -94,7 +94,7 @@ type
   protected
 
   public
-    function getConectionType : TRESTDWDatabaseType; override;
+    function getConnectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
     function getQuery : TRESTDWDrvQuery; override;
     function getQuery(AUnidir : boolean) : TRESTDWDrvQuery; override;
@@ -154,26 +154,28 @@ begin
   {$ENDIF}
 end;
 
-function TRESTDWFireDACDriver.getConectionType: TRESTDWDatabaseType;
+function TRESTDWFireDACDriver.getConnectionType: TRESTDWDatabaseType;
 var
   conn : string;
   i: integer;
 begin
-  Result:=inherited getConectionType;
+  Result := inherited getConnectionType;
   if not Assigned(Connection) then
     Exit;
-
-  conn := LowerCase(TFDConnection(Connection).DriverName);
-
-  i := 0;
-  while i < Length(rdwFireDACDrivers) do begin
-    if Pos(rdwFireDACDrivers[i],conn) > 0 then begin
-      Result := rdwFireDACDbType[i];
-      Break;
-    end;
-    i := i + 1;
-  end;
-
+  If Result = dbtUndefined Then
+   Begin
+    conn := LowerCase(TFDConnection(Connection).DriverName);
+    i := 0;
+    While i < Length(rdwFireDACDrivers) do
+     Begin
+      If Pos(rdwFireDACDrivers[i], conn) > 0 then
+       Begin
+        Result := rdwFireDACDbType[i];
+        Break;
+       End;
+      i := i + 1;
+     End;
+   End;
   // Eloy
   case Result of
     dbtODBC:
@@ -207,7 +209,6 @@ begin
   qry.ResourceOptions.ParamCreate  := True;
   qry.ResourceOptions.StoreItems   := [siMeta,siData,siDelta];
   qry.FetchOptions.Mode            := fmAll;
-
   Result := TRESTDWFireDACQuery.Create(qry);
 end;
 
@@ -499,7 +500,6 @@ var
 begin
   qry := TFDQuery(Self.Owner);
   qry.SaveToStream(stream, sfBinary);
-
   stream.Position := 0;
 end;
 

@@ -40,6 +40,24 @@
 {$ENDIF}
 
 {$IFNDEF FPC}
+ {$if CompilerVersion < 26}
+  {$DEFINE RESTDWMEMTABLE}
+ {$ELSE}
+  {.$DEFINE RESTDWMEMTABLE}
+  {$DEFINE RESTFDMEMTABLE}
+  {.$DEFINE UNIDACMEM}
+  {.$DEFINE ZEOSMEM}
+ {$IFEND}
+ {$DEFINE USE_TAURUS_TLS}
+{$ELSE}
+ //For Lazarus
+ {$DEFINE RESTDWMEMTABLE}
+ {.$DEFINE UNIDACMEM}
+ {.$DEFINE ZEOSMEM}
+{$ENDIF}
+
+
+{$IFNDEF FPC}
  {$IFDEF VER370 or CompilerVersion >= 37}
   {$DEFINE DELPHI13UP}
   {$DEFINE DELPHI12UP}
@@ -165,6 +183,7 @@
  {$ENDIF ~VER330}
 
  {$IFDEF VER320 or CompilerVersion >= 32}
+  {$DEFINE DELPHI10_3UP}
   {$DEFINE DELPHI10_2UP}
   {$DEFINE DELPHI10_1UP}
   {$DEFINE DELPHI10_0UP}
@@ -187,6 +206,8 @@
  {$ENDIF ~VER320}
 
  {$IFDEF VER310 or CompilerVersion >= 31}
+  {$DEFINE DELPHI10_3UP}
+  {$DEFINE DELPHI10_2UP}
   {$DEFINE DELPHI10_1UP}
   {$DEFINE DELPHI10_0UP}
   {$DEFINE DELPHIXE8UP}
@@ -208,6 +229,9 @@
  {$ENDIF ~VER310}
 
 {$IFDEF VER300 or CompilerVersion >= 30}
+  {$DEFINE DELPHI10_3UP}
+  {$DEFINE DELPHI10_2UP}
+  {$DEFINE DELPHI10_1UP}
   {$DEFINE DELPHI10_0UP}
   {$DEFINE DELPHIXE8UP}
   {$DEFINE DELPHIXE7UP}
@@ -782,14 +806,3 @@
 // Warnings
 {$IFOPT X+} {$DEFINE EXTENDEDSYNTAX_ON} {$ENDIF}
 
-// for Delphi/BCB trial versions remove the point from the line below
-{.$UNDEF SUPPORTS_WEAKPACKAGEUNIT}
-
-(* End of Compiler settings *)
-(* REST DataWare Generic Definitions *)
-
-  {$DEFINE RESTDWMEMTABLE}
-
-(* End of REST DataWare Generic Definitions *)
-
-(******************************************************************************)
