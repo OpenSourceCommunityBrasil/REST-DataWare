@@ -33,33 +33,45 @@ Uses
   {$IFDEF RESTDWWINDOWS}Windows,{$ENDIF}
   {$IFNDEF RESTDWLAZARUS}SyncObjs,{$ENDIF}
   {$IF not Defined(RESTDWLAZARUS) AND not Defined(RESTDWLAMW) AND not Defined(DELPHIXEUP)}uRESTDWMassiveBuffer,{$IFEND}
+  {$IFDEF USE_TAURUS_TLS}
+  TaurusTLS, TaurusTLSHeaders_types, TaurusTLSHeaders_evp,  TaurusTLSHeaders_bio, TaurusTLSHeaders_rand,
+  TaurusTLSHeaders_bn,    TaurusTLSHeaders_x509, TaurusTLSHeaders_err, TaurusTLSLoader,
+  {$ENDIF}
   SysUtils, Classes, Db, Variants,
   uRESTDWBasic, uRESTDWBasicDB, uRESTDWComponentEvents, uRESTDWBasicTypes,
   uRESTDWJSONObject, uRESTDWParams, uRESTDWBasicClass, uRESTDWAbout,
-  uRESTDWConsts, uRESTDWProtoTypes, uRESTDWDataUtils, uRESTDWTools, uRESTDWZlib,
+  uRESTDWProtoTypes, uRESTDWDataUtils, uRESTDWTools, uRESTDWZlib,
   uRESTDWAuthenticators,
   IdContext, IdHeaderList, IdTCPConnection, IdHTTPServer, IdCustomHTTPServer,
   IdSSLOpenSSL, IdSSL, IdAuthentication, IdTCPClient, IdHTTPHeaderInfo,
   IdComponent, IdBaseComponent, IdHTTP, IdMultipartFormData, IdMessageCoder,
-  IdMessage, IdGlobalProtocols, IdGlobal, IdStack;
+  IdMessage, IdGlobalProtocols, IdGlobal, IdStack, uRESTDWConsts;
 
 Type
- PIdSSLVersions = ^TIdSSLVersions;
+ TRESTDWVersionsBase = Array of Integer;
+ PRESTDWSSLVersions = ^TRESTDWSSLVersion;
 
+Type
  TRESTDWIdProxyRequest = Class(TRESTDWProxyBase)
  Private
+  {$IFDEF USE_TAURUS_TLS}
+  vUseTaurus                       : Boolean;
+  {$ENDIF}
   vCipherList,
   vaSSLRootCertFile,
   ASSLPrivateKeyFile,
   ASSLPrivateKeyPassword,
   ASSLCertFile                     : String;
-  aSSLMethod                       : TIdSSLVersion;
+  aSSLMethod                       : TRESTDWSSLVersion;
   HTTPServer                       : TIdHTTPServer;
-  lHandler                         : TIdServerIOHandlerSSLOpenSSL;
+  lHandler                         : TComponent;//TIdServerIOHandlerSSLOpenSSL;
   vSSLVerifyMode                   : TIdSSLVerifyModeSet;
   vSSLVerifyDepth                  : Integer;
-  vSSLMode                         : TIdSSLMode;
-  aSSLVersions                     : TIdSSLVersions;
+  vSSLMode                         : TRESTDWSSLMode;
+  aSSLVersions                     : TRESTDWSSLVersions;
+  Function  GetSSlVersion          : Integer;
+  Function  GetSSlVersions         : TRESTDWVersionsBase;
+  Function  GetSSlMode             : Integer;
   Procedure aCommandGet             (AContext         : TIdContext;
                                      ARequestInfo     : TIdHTTPRequestInfo;
                                      AResponseInfo    : TIdHTTPResponseInfo);
@@ -87,32 +99,41 @@ Type
   Constructor Create                (AOwner           : TComponent);Override;
   Destructor  Destroy; override;
  Published
+  {$IFDEF USE_TAURUS_TLS}
+  Property UseTaurus               : Boolean             Read vUseTaurus               Write vUseTaurus;
+  {$ENDIF}
   Property SSLPrivateKeyFile       : String              Read aSSLPrivateKeyFile       Write aSSLPrivateKeyFile;
   Property SSLPrivateKeyPassword   : String              Read aSSLPrivateKeyPassword   Write aSSLPrivateKeyPassword;
   Property SSLCertFile             : String              Read aSSLCertFile             Write aSSLCertFile;
   Property SSLRootCertFile         : String              Read vaSSLRootCertFile        Write vaSSLRootCertFile;
   Property SSLVerifyMode           : TIdSSLVerifyModeSet Read vSSLVerifyMode           Write vSSLVerifyMode;
   Property SSLVerifyDepth          : Integer             Read vSSLVerifyDepth          Write vSSLVerifyDepth;
-  Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
-  Property SSLMethod               : TIdSSLVersion       Read aSSLMethod               Write aSSLMethod;
-  Property SSLVersions             : TIdSSLVersions      Read aSSLVersions             Write aSSLVersions;
+  Property SSLMode                 : TRESTDWSSLMode      Read vSSLMode                 Write vSSLMode;
+  Property SSLMethod               : TRESTDWSSLVersion   Read aSSLMethod               Write aSSLMethod;
+  Property SSLVersions             : TRESTDWSSLVersions  Read aSSLVersions             Write aSSLVersions;
   Property CipherList              : String              Read vCipherList              Write vCipherList;
 End;
 
  TRESTDWIdServicePooler = Class(TRESTServicePoolerBase)
  Private
+  {$IFDEF USE_TAURUS_TLS}
+  vUseTaurus                       : Boolean;
+  {$ENDIF}
   vCipherList,
   vaSSLRootCertFile,
   ASSLPrivateKeyFile,
   ASSLPrivateKeyPassword,
   ASSLCertFile                     : String;
-  aSSLMethod                       : TIdSSLVersion;
+  aSSLMethod                       : TRESTDWSSLVersion;
   HTTPServer                       : TIdHTTPServer;
-  lHandler                         : TIdServerIOHandlerSSLOpenSSL;
+  lHandler                         : TComponent;//TIdServerIOHandlerSSLOpenSSL;
   vSSLVerifyMode                   : TIdSSLVerifyModeSet;
   vSSLVerifyDepth                  : Integer;
-  vSSLMode                         : TIdSSLMode;
-  aSSLVersions                     : TIdSSLVersions;
+  vSSLMode                         : TRESTDWSSLMode;
+  aSSLVersions                     : TRESTDWSSLVersions;
+  Function  GetSSlVersion          : Pointer;
+  Function  GetSSlMode             : Pointer;
+  Function  GetSSlVersions         : Pointer;
   Procedure aCommandGet             (AContext         : TIdContext;
                                      ARequestInfo     : TIdHTTPRequestInfo;
                                      AResponseInfo    : TIdHTTPResponseInfo);
@@ -145,15 +166,18 @@ End;
   Constructor Create                (AOwner           : TComponent);Override;
   Destructor  Destroy; override;
  Published
+  {$IFDEF USE_TAURUS_TLS}
+  Property UseTaurus               : Boolean             Read vUseTaurus               Write vUseTaurus;
+  {$ENDIF}
   Property SSLPrivateKeyFile       : String              Read aSSLPrivateKeyFile       Write aSSLPrivateKeyFile;
   Property SSLPrivateKeyPassword   : String              Read aSSLPrivateKeyPassword   Write aSSLPrivateKeyPassword;
   Property SSLCertFile             : String              Read aSSLCertFile             Write aSSLCertFile;
   Property SSLRootCertFile         : String              Read vaSSLRootCertFile        Write vaSSLRootCertFile;
   Property SSLVerifyMode           : TIdSSLVerifyModeSet Read vSSLVerifyMode           Write vSSLVerifyMode;
   Property SSLVerifyDepth          : Integer             Read vSSLVerifyDepth          Write vSSLVerifyDepth;
-  Property SSLMode                 : TIdSSLMode          Read vSSLMode                 Write vSSLMode;
-  Property SSLMethod               : TIdSSLVersion       Read aSSLMethod               Write aSSLMethod;
-  Property SSLVersions             : TIdSSLVersions      Read aSSLVersions             Write aSSLVersions;
+  Property SSLMode                 : TRESTDWSSLMode      Read vSSLMode                 Write vSSLMode;
+  Property SSLMethod               : TRESTDWSSLVersion   Read aSSLMethod               Write aSSLMethod;
+  Property SSLVersions             : TRESTDWSSLVersions  Read aSSLVersions             Write aSSLVersions;
   Property CipherList              : String              Read vCipherList              Write vCipherList;
 End;
 
@@ -267,9 +291,13 @@ End;
   vHostCert        : String;
   vPortCert        : Integer;
   vOnGetpassword   : TOnGetpassword;
-  vSSLVersions     : TIdSSLVersions;
-  ssl              : TIdSSLIOHandlerSocketOpenSSL;
-  vCertMode        : TIdSSLMode;
+  vUseTaurus       : Boolean;
+  ssl              : TComponent;//TIdSSLIOHandlerSocketOpenSSL;
+  vSSLVersions     : TRESTDWSSLVersions;
+  vCertMode        : TRESTDWSSLMode;
+  Function  GetSSlVersion  : Integer;
+  Function  GetSSlMode     : Integer;
+  Function  GetSSlVersions : TRESTDWVersionsBase;
   Procedure SetParams;
   Procedure SetUseSSL         (Value              : Boolean);Override;
   Procedure SetHeaders        (AHeaders           : TStringList);Overload;Override;
@@ -430,8 +458,8 @@ End;
                         IgnoreEvents      : Boolean        = False):Integer;Overload;Override;
  Published
   Property VerifyCert               : Boolean                     Read GetVerifyCert             Write SetVerifyCert;
-  Property SSLVersions              : TIdSSLVersions              Read vSSLVersions              Write vSSLVersions;
-  Property CertMode                 : TIdSSLMode                  Read vCertMode                 Write vCertMode;
+  Property SSLVersions              : TRESTDWSSLVersions          Read vSSLVersions              Write vSSLVersions;
+  Property CertMode                 : TRESTDWSSLMode              Read vCertMode                 Write vCertMode;
   Property CertFile                 : String                      Read vCertFile                 Write vCertFile;
   Property KeyFile                  : String                      Read vKeyFile                  Write vKeyFile;
   Property RootCertFile             : String                      Read vRootCertFile             Write vRootCertFile;
@@ -458,10 +486,20 @@ End;
 
  TRESTDWIdClientPooler = Class(TRESTClientPoolerBase)
  Private
-  vCipherList                      : String;
-  aSSLMethod                       : TIdSSLVersion;
+  {$IFDEF USE_TAURUS_TLS}
+  vUseTaurus                       : Boolean;
+  {$ENDIF}
+  vCipherList,
+  vaSSLRootCertFile,
+  ASSLPrivateKeyFile,
+  ASSLPrivateKeyPassword,
+  ASSLCertFile                     : String;
+  aSSLMethod                       : TRESTDWSSLVersion;
   HttpRequest                      : TRESTDWIdClientREST;
-  vSSLMode                         : TIdSSLMode;
+  vSSLMode                         : TRESTDWSSLMode;
+  Function    GetSSlVersion        : Integer;
+  Function    GetSSlMode           : Integer;
+  Function    GetSSlVersions       : TRESTDWVersionsBase;
   Function    SendEvent            (EventData              : String;
                                     Var Params             : TRESTDWParams;
                                     EventType              : TSendEvent = sePOST;
@@ -489,8 +527,12 @@ End;
                                     AMessageErro : String): Boolean;
   Procedure Abort;Override;
  Published
-  Property SSLMode                 : TIdSSLMode               Read vSSLMode                 Write vSSLMode;
-  Property CipherList              : String                   Read vCipherList              Write vCipherList;
+  Property SSLPrivateKeyFile       : String              Read aSSLPrivateKeyFile       Write aSSLPrivateKeyFile;
+  Property SSLPrivateKeyPassword   : String              Read aSSLPrivateKeyPassword   Write aSSLPrivateKeyPassword;
+  Property SSLCertFile             : String              Read aSSLCertFile             Write aSSLCertFile;
+  Property SSLRootCertFile         : String              Read vaSSLRootCertFile        Write vaSSLRootCertFile;
+  Property SSLMode                 : TRESTDWSSLMode      Read vSSLMode                 Write vSSLMode;
+  Property SSLMethod               : TRESTDWSSLVersion   Read aSSLMethod               Write aSSLMethod;
 End;
 
   TRESTDWIdPoolerList = Class(TRESTDWPoolerListBase)
@@ -516,12 +558,12 @@ Begin
     If Assigned(HttpRequest.IOHandler) Then
      HttpRequest.IOHandler.CloseGracefully;
     HttpRequest.Disconnect(false);
-    If Assigned(ssl) Then
-     FreeAndNil(ssl);
     HttpRequest.Free;
    Except
    End;
   End;
+  If Assigned(ssl) Then
+   FreeAndNil(ssl);
  Inherited;
 End;
 
@@ -2914,6 +2956,21 @@ Begin
   vOnGetpassword(Password);
 End;
 
+Function TRESTDWIdClientREST.GetSSlMode : Integer;
+Begin
+ Result := 0;
+End;
+
+Function TRESTDWIdClientREST.GetSSlVersion : Integer;
+Begin
+ Result := 0;
+End;
+
+Function TRESTDWIdClientREST.GetSSlVersions : TRESTDWVersionsBase;
+Begin
+ Result := Nil;
+End;
+
 Function TRESTDWIdClientREST.GetVerifyCert : boolean;
 Begin
  Result := vVerifyCert;
@@ -2925,20 +2982,41 @@ Begin
 End;
 
 Procedure TRESTDWIdClientREST.SetCertOptions;
+{$IFDEF USE_TAURUS_TLS}
+Var
+ vRESTDWVersionsBase : TRESTDWVersionsBase;
+{$ENDIF}
 Begin
  If Assigned(ssl) Then
   Begin
    {$IFDEF FPC}
-    ssl.OnGetPassword          := @Getpassword;
+    TIdSSLIOHandlerSocketOpenSSL(ssl).OnGetPassword          := @Getpassword;
    {$ELSE}
-    ssl.OnGetPassword         := Getpassword;
+    vRESTDWVersionsBase := GetSSlVersions;
+    {$IFDEF USE_TAURUS_TLS}
+     If vUseTaurus Then
+      Begin
+      End
+     Else
+      Begin
+       TIdSSLIOHandlerSocketOpenSSL(ssl).OnGetPassword           := Getpassword;
+       TIdSSLIOHandlerSocketOpenSSL(ssl).SSLOptions.CertFile     := vCertFile;
+       TIdSSLIOHandlerSocketOpenSSL(ssl).SSLOptions.KeyFile      := vKeyFile;
+       TIdSSLIOHandlerSocketOpenSSL(ssl).SSLOptions.RootCertFile := vRootCertFile;
+       TIdSSLIOHandlerSocketOpenSSL(ssl).Host                    := vHostCert;
+       TIdSSLIOHandlerSocketOpenSSL(ssl).Port                    := vPortCert;
+       TIdSSLIOHandlerSocketOpenSSL(ssl).SSLOptions.Mode         := TIdSSLMode(GetSSlMode);;
+      End;
+    {$ELSE}
+     TIdSSLIOHandlerSocketOpenSSL(ssl).OnGetPassword           := Getpassword;
+     TIdSSLIOHandlerSocketOpenSSL(ssl).SSLOptions.CertFile     := vCertFile;
+     TIdSSLIOHandlerSocketOpenSSL(ssl).SSLOptions.KeyFile      := vKeyFile;
+     TIdSSLIOHandlerSocketOpenSSL(ssl).SSLOptions.RootCertFile := vRootCertFile;
+     TIdSSLIOHandlerSocketOpenSSL(ssl).Host                    := vHostCert;
+     TIdSSLIOHandlerSocketOpenSSL(ssl).Port                    := vPortCert;
+     TIdSSLIOHandlerSocketOpenSSL(ssl).SSLOptions.Mode         := TIdSSLMode(GetSSlMode);;
+    {$ENDIF}
    {$ENDIF}
-   ssl.SSLOptions.CertFile     := vCertFile;
-   ssl.SSLOptions.KeyFile      := vKeyFile;
-   ssl.SSLOptions.RootCertFile := vRootCertFile;
-   ssl.Host                    := vHostCert;
-   ssl.Port                    := vPortCert;
-   ssl.SSLOptions.Mode         := vCertMode;
   End;
 End;
 
@@ -3041,6 +3119,10 @@ Begin
 End;
 
 Procedure TRESTDWIdClientREST.SetUseSSL(Value : Boolean);
+{$IFDEF USE_TAURUS_TLS}
+Var
+ vRESTDWVersionsBase : TRESTDWVersionsBase;
+{$ENDIF}
 Begin
  Inherited;
  If Assigned(HttpRequest) Then
@@ -3049,29 +3131,50 @@ Begin
   Begin
    If ssl = Nil Then
     Begin
-     ssl                := TIdSSLIOHandlerSocketOpenSSL.Create(HttpRequest);
      {$IFDEF FPC}
-      ssl.OnVerifyPeer  := @IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
+      ssl                                             := TIdSSLIOHandlerSocketOpenSSL.Create(HttpRequest);
+      TIdSSLIOHandlerSocketOpenSSL(ssl).OnVerifyPeer  := @IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
+      TIdSSLIOHandlerSocketOpenSSL(ssl).OnGetPassword := @Getpassword;
+      If Assigned(HttpRequest) Then
+       HttpRequest.IOHandler                          := TIdSSLIOHandlerSocketOpenSSL(ssl);
      {$ELSE}
-      ssl.OnVerifyPeer := IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
+      {$IFDEF USE_TAURUS_TLS}
+       If vUseTaurus Then
+        Begin
+        End
+       Else
+        Begin
+         ssl                                                               := TIdSSLIOHandlerSocketOpenSSL.Create(HttpRequest);
+         TIdSSLIOHandlerSocketOpenSSL(ssl).OnVerifyPeer                    := IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
+         TIdSSLIOHandlerSocketOpenSSL(ssl).SSLOptions.Method               := TIdSSLVersion(GetSSlVersion);//aSSLMethod;
+         TIdSSLIOHandlerSocketOpenSSL(ssl).SSLOptions.SSLVersions          := TIdSSLVersions(Pointer(@vRESTDWVersionsBase)^);
+         TIdSSLIOHandlerSocketOpenSSL(ssl).SSLOptions.Mode                 := TIdSSLMode(GetSSlMode);//vSSLMode;
+         TIdSSLIOHandlerSocketOpenSSL(ssl).OnGetPassword                   := Getpassword;
+         If Assigned(HttpRequest) Then
+          HttpRequest.IOHandler                                            := TIdSSLIOHandlerSocketOpenSSL(ssl);
+        End;
+      {$ELSE}
+       ssl                                             := TIdSSLIOHandlerSocketOpenSSL.Create(HttpRequest);
+       TIdSSLIOHandlerSocketOpenSSL(ssl).OnVerifyPeer  := @IdSSLIOHandlerSocketOpenSSL1VerifyPeer;
+       TIdSSLIOHandlerSocketOpenSSL(ssl).OnGetPassword := @Getpassword;
+       If Assigned(HttpRequest) Then
+        HttpRequest.IOHandler                          := TIdSSLIOHandlerSocketOpenSSL(ssl);
+      {$ENDIF}
      {$ENDIF}
     End;
-    ssl.SSLOptions.SSLVersions := vSSLVersions;
    SetCertOptions;
-   If Assigned(HttpRequest) Then
-    HttpRequest.IOHandler := ssl;
-   If sslvSSLv2 in vSSLVersions Then
-    ssl.SSLOptions.Method := sslvSSLv2
-   Else If sslvSSLv23 in vSSLVersions Then
-    ssl.SSLOptions.Method := sslvSSLv23
-   Else If sslvSSLv3 in vSSLVersions Then
-    ssl.SSLOptions.Method := sslvSSLv3
-   Else If sslvTLSv1 in vSSLVersions Then
-    ssl.SSLOptions.Method := sslvTLSv1
-   Else If sslvTLSv1_1 in vSSLVersions Then
-    ssl.SSLOptions.Method := sslvTLSv1_1
-   Else If sslvTLSv1_2 in vSSLVersions Then
-    ssl.SSLOptions.Method := sslvTLSv1_2;
+//   If sslvSSLv2 in vSSLVersions Then
+//    ssl.SSLOptions.Method := sslvSSLv2
+//   Else If sslvSSLv23 in vSSLVersions Then
+//    ssl.SSLOptions.Method := sslvSSLv23
+//   Else If sslvSSLv3 in vSSLVersions Then
+//    ssl.SSLOptions.Method := sslvSSLv3
+//   Else If sslvTLSv1 in vSSLVersions Then
+//    ssl.SSLOptions.Method := sslvTLSv1
+//   Else If sslvTLSv1_1 in vSSLVersions Then
+//    ssl.SSLOptions.Method := sslvTLSv1_1
+//   Else If sslvTLSv1_2 in vSSLVersions Then
+//    ssl.SSLOptions.Method := sslvTLSv1_2;
   End
  Else
   Begin
@@ -3395,8 +3498,8 @@ Constructor TRESTDWIdServicePooler.Create(AOwner: TComponent);
 Begin
  Inherited;
  SetSocketKind('Standalone - Indy');
+ lHandler                         := Nil;
  HTTPServer                       := TIdHTTPServer.Create(Nil);
- lHandler                         := TIdServerIOHandlerSSLOpenSSL.Create(Nil);
  {$IFDEF FPC}
  HTTPServer.OnQuerySSLPort        := @IdHTTPServerQuerySSLPort;
  HTTPServer.OnCommandGet          := @aCommandGet;
@@ -3556,6 +3659,8 @@ Begin
 End;
 
 Procedure TRESTDWIdServicePooler.SetActive(Value: Boolean);
+Var
+ vRESTDWVersionsBase : Pointer;
 Begin
  If (Value)                   And
     (Not (HTTPServer.Active)) Then
@@ -3564,27 +3669,69 @@ Begin
       raise Exception.Create(cServerMethodClassNotAssigned);
 
    Try
-    If (ASSLPrivateKeyFile <> '')     And
-       (ASSLPrivateKeyPassword <> '') And
-       (ASSLCertFile <> '')           Then
+    If (ASSLCertFile <> '')   Then
      Begin
-      lHandler.SSLOptions.Method                := aSSLMethod;
-      lHandler.SSLOptions.SSLVersions           := PIdSSLVersions(@SSLVersions)^;
-      {$IFDEF FPC}
-       lHandler.OnGetPassword                   := @GetSSLPassword;
-       lHandler.OnVerifyPeer                    := @SSLVerifyPeer;
+      vRESTDWVersionsBase := GetSSlVersions;
+      {$IFDEF USE_TAURUS_TLS}
+       If vUseTaurus Then
+        Begin
+         If (Assigned(lHandler) And (lHandler is TIdServerIOHandlerSSLOpenSSL)) Then
+          FreeAndNil(lHandler);
+         If Not Assigned(lHandler) Then
+          lHandler := TTaurusTLSServerIOHandler.Create(Nil);
+         TTaurusTLSServerIOHandler(lHandler).SSLOptions.MinTLSVersion   := TTaurusTLSSSLVersion(Pointer(GetSSlVersion)^);//vSSLMode;
+         TTaurusTLSServerIOHandler(lHandler).SSLOptions.Mode            := TTaurusTLSSSLMode(Pointer(GetSSlMode)^);//vSSLMode;
+         TTaurusTLSServerIOHandler(lHandler).DefaultCert.PublicKey      := ASSLCertFile;
+         TTaurusTLSServerIOHandler(lHandler).DefaultCert.PrivateKey     := ASSLPrivateKeyFile;
+         TTaurusTLSServerIOHandler(lHandler).SSLOptions.VerifyDepth     := vSSLVerifyDepth;
+         TTaurusTLSServerIOHandler(lHandler).DefaultCert.RootKey        := vASSLRootCertFile;
+         TTaurusTLSServerIOHandler(lHandler).SSLOptions.CipherList      := vCipherList;
+         TTaurusTLSServerIOHandler(lHandler).SSLOptions.VerifyHostname  := False;
+         HTTPServer.IOHandler                                           := TTaurusTLSServerIOHandler(lHandler);
+        End
+       Else
+        Begin
+         If (Assigned(lHandler) And (lHandler is TTaurusTLSServerIOHandler)) Then
+          FreeAndNil(lHandler);
+         If Not Assigned(lHandler) Then
+          lHandler := TIdServerIOHandlerSSLOpenSSL.Create(Nil);
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.SSLVersions  := TIdSSLVersions(Pointer(vRESTDWVersionsBase)^);
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.Method       := TIdSSLVersion(Pointer(GetSSlVersion)^);//aSSLMethod;
+         {$IFDEF FPC}
+          TIdServerIOHandlerSSLOpenSSL(lHandler).OnGetPassword          := @GetSSLPassword;
+          TIdServerIOHandlerSSLOpenSSL(lHandler).OnVerifyPeer           := @SSLVerifyPeer;
+         {$ELSE}
+          TIdServerIOHandlerSSLOpenSSL(lHandler).OnGetPassword          := GetSSLPassword;
+          TIdServerIOHandlerSSLOpenSSL(lHandler).OnVerifyPeer           := SSLVerifyPeer;
+         {$ENDIF}
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.CertFile     := ASSLCertFile;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.KeyFile      := ASSLPrivateKeyFile;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.VerifyMode   := vSSLVerifyMode;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.VerifyDepth  := vSSLVerifyDepth;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.RootCertFile := vASSLRootCertFile;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.Mode         := TIdSSLMode(Pointer(GetSSlMode)^);//vSSLMode;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.CipherList   := vCipherList;
+         HTTPServer.IOHandler                                           := TIdServerIOHandlerSSLOpenSSL(lHandler);
+        End;
       {$ELSE}
-       lHandler.OnGetPassword                  := GetSSLPassword;
-       lHandler.OnVerifyPeer                   := SSLVerifyPeer;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.SSLVersions           := TIdSSLVersions(Pointer(vRESTDWVersionsBase)^);
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.Method                := TIdSSLVersion(Pointer(GetSSlVersion)^);//aSSLMethod;
+       {$IFDEF FPC}
+        TIdServerIOHandlerSSLOpenSSL(lHandler).OnGetPassword                   := @GetSSLPassword;
+        TIdServerIOHandlerSSLOpenSSL(lHandler).OnVerifyPeer                    := @SSLVerifyPeer;
+       {$ELSE}
+        TIdServerIOHandlerSSLOpenSSL(lHandler).OnGetPassword                  := GetSSLPassword;
+        TIdServerIOHandlerSSLOpenSSL(lHandler).OnVerifyPeer                   := SSLVerifyPeer;
+       {$ENDIF}
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.CertFile              := ASSLCertFile;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.KeyFile               := ASSLPrivateKeyFile;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.VerifyMode            := vSSLVerifyMode;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.VerifyDepth           := vSSLVerifyDepth;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.RootCertFile          := vASSLRootCertFile;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.Mode                  := TIdSSLMode(Pointer(GetSSlMode)^);//vSSLMode;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.CipherList            := vCipherList;
+       HTTPServer.IOHandler                                                    := TIdServerIOHandlerSSLOpenSSL(lHandler);
       {$ENDIF}
-      lHandler.SSLOptions.CertFile              := ASSLCertFile;
-      lHandler.SSLOptions.KeyFile               := ASSLPrivateKeyFile;
-      lHandler.SSLOptions.VerifyMode            := vSSLVerifyMode;
-      lHandler.SSLOptions.VerifyDepth           := vSSLVerifyDepth;
-      lHandler.SSLOptions.RootCertFile          := vASSLRootCertFile;
-      lHandler.SSLOptions.Mode                  := vSSLMode;
-      lHandler.SSLOptions.CipherList            := vCipherList;
-      HTTPServer.IOHandler := lHandler;
      End
     Else
      HTTPServer.IOHandler  := Nil;
@@ -3596,7 +3743,7 @@ Begin
       With HTTPServer.Bindings.Add do
        Begin
         IP := ServerIPVersionConfig.IPv4Address;
-        IPVersion := Id_IPv4;
+        IPVersion := TIdIPVersion(Id_IPv4);
         Port := ServicePort;
        End;
      End;
@@ -3606,7 +3753,7 @@ Begin
       With HTTPServer.Bindings.Add do
        Begin
         IP := ServerIPVersionConfig.IPv6Address;
-        IPVersion := Id_IPv6;
+        IPVersion := TIdIPVersion(Id_IPv6);
         Port := ServicePort;
        End;
      End;
@@ -3629,6 +3776,180 @@ End;
 Procedure TRESTDWIdServicePooler.GetSSLPassWord(var Password:String);
 Begin
  Password := aSSLPrivateKeyPassword;
+End;
+
+Function  TRESTDWIdServicePooler.GetSSlMode             : Pointer;
+{$IFDEF USE_TAURUS_TLS}
+ Var
+  bSSLMode     : TIdSSLMode;
+  aTaurSSLMode : TTaurusTLSSSLMode;
+{$ENDIF}
+Begin
+ Result := Nil;
+ {$IFDEF USE_TAURUS_TLS}
+  If vUseTaurus Then
+   Begin
+    If vSSLMode = sslUnassigned Then
+     aTaurSSLMode := TTaurusTLSSSLMode(sslmUnassigned)
+    Else If vSSLMode = sslClient Then
+     aTaurSSLMode := TTaurusTLSSSLMode(sslmClient)
+    Else If vSSLMode = sslServer Then
+     aTaurSSLMode := TTaurusTLSSSLMode(sslmServer)
+    Else If vSSLMode = sslBoth Then
+     aTaurSSLMode := TTaurusTLSSSLMode(sslmBoth);
+    Result := @aTaurSSLMode;
+   End
+  Else
+   Begin
+    If vSSLMode = sslUnassigned Then
+     bSSLMode := sslmUnassigned
+    Else If vSSLMode = sslClient Then
+     bSSLMode := sslmClient
+    Else If vSSLMode = sslServer Then
+     bSSLMode := sslmServer
+    Else If vSSLMode = sslBoth Then
+     bSSLMode := sslmBoth;
+    Result := @bSSLMode;
+   End;
+ {$ELSE}
+  If vSSLMode = sslUnassigned Then
+   SSLMode := sslUnassigned
+  Else If vSSLMode = sslClient Then
+   SSLMode := sslClient
+  Else If vSSLMode = sslServer Then
+   SSLMode := sslServer
+  Else If vSSLMode = sslBoth Then
+   SSLMode := sslBoth;
+  Result := @SSLMode;
+ {$ENDIF}
+End;
+
+Function  TRESTDWIdServicePooler.GetSSlVersion          : Pointer;
+Var
+ SSLVersion : TIdSSLVersion;
+ {$IFDEF USE_TAURUS_TLS}
+  MinSSLVersion : TTaurusTLSSSLVersion;
+ {$ENDIF}
+Begin
+ Result := Nil;
+ {$IFDEF USE_TAURUS_TLS}
+  If vUseTaurus Then
+   Begin
+    If SSLv2 in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(SSLv2);
+    If SSLv23  in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(SSLv23);
+    If SSLv3   in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(SSLv3);
+    If TLSv1   in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(TLSv1);
+    If TLSv1_1 in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(TLSv1_1);
+    If TLSv1_2 in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(TLSv1_2);
+    If TLSv1_3 in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(TLSv1_3);
+    Result := @MinSSLVersion;
+   End
+  Else
+   Begin
+    If aSSLMethod = SSLv2 Then
+     SSLVersion := sslvSSLv2;
+    If aSSLMethod = SSLv23 Then
+     SSLVersion := sslvSSLv23;
+    If aSSLMethod = SSLv3 Then
+     SSLVersion := sslvSSLv3;
+    If aSSLMethod = TLSv1 Then
+     SSLVersion := sslvTLSv1;
+    If aSSLMethod = TLSv1_1 Then
+     SSLVersion := sslvTLSv1_1;
+    If aSSLMethod = TLSv1_2 Then
+     SSLVersion := sslvTLSv1_2;
+    If aSSLMethod = TLSv1_3 Then
+     Raise Exception.Create('Indy no have TLS 1.3 Support...');
+    Result := @SSLVersion;
+   End;
+ {$ELSE}
+  If aSSLMethod = SSLv2 Then
+   SSLVersion := sslvSSLv2;
+  If aSSLMethod = SSLv23 Then
+   SSLVersion := sslvSSLv23;
+  If aSSLMethod = SSLv3 Then
+   SSLVersion := sslvSSLv3;
+  If aSSLMethod = TLSv1 Then
+   SSLVersion := sslvTLSv1;
+  If aSSLMethod = TLSv1_1 Then
+   SSLVersion := sslvTLSv1_1;
+  If aSSLMethod = TLSv1_2 Then
+   SSLVersion := sslvTLSv1_2;
+  If aSSLMethod = TLSv1_3 Then
+   Raise Exception.Create('Indy no have TLS 1.3 Support...');
+  Result := @SSLVersion;
+ {$ENDIF}
+End;
+
+Function  TRESTDWIdServicePooler.GetSSlVersions         : Pointer;
+Var
+ bSSLVersions : TIdSSLVersions;
+ {$IFDEF USE_TAURUS_TLS}
+  MinSSLVersion : TTaurusTLSSSLVersion;
+ {$ENDIF}
+Begin
+ bSSLVersions := [];
+ {$IFDEF USE_TAURUS_TLS}
+  If vUseTaurus Then
+   Begin
+    If SSLv2 in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(SSLv2);
+    If SSLv23  in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(SSLv23);
+    If SSLv3   in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(SSLv3);
+    If TLSv1   in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(TLSv1);
+    If TLSv1_1 in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(TLSv1_1);
+    If TLSv1_2 in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(TLSv1_2);
+    If TLSv1_3 in aSSLVersions Then
+     MinSSLVersion := TTaurusTLSSSLVersion(TLSv1_3);
+    Result := @MinSSLVersion;
+   End
+  Else
+   Begin
+    If SSLv2 in aSSLVersions Then
+     bSSLVersions := bSSLVersions + [sslvSSLv2];
+    If SSLv23  in aSSLVersions Then
+     bSSLVersions := bSSLVersions + [sslvSSLv23];
+    If SSLv3   in aSSLVersions Then
+     bSSLVersions := bSSLVersions + [sslvSSLv3];
+    If TLSv1   in aSSLVersions Then
+     bSSLVersions := bSSLVersions + [sslvTLSv1];
+    If TLSv1_1 in aSSLVersions Then
+     bSSLVersions := bSSLVersions + [sslvTLSv1_1];
+    If TLSv1_2 in aSSLVersions Then
+     bSSLVersions := bSSLVersions + [sslvTLSv1_2];
+    If TLSv1_3 in aSSLVersions Then
+     Raise Exception.Create('Indy no have TLS 1.3 Support...');
+    Result := @SSLVersions;
+   End;
+ {$ELSE}
+  If SSLv2 in aSSLVersions Then
+   bSSLVersions := bSSLVersions + [sslvSSLv2];
+  If SSLv23  in aSSLVersions Then
+   bSSLVersions := bSSLVersions + [sslvSSLv23];
+  If SSLv3   in aSSLVersions Then
+   bSSLVersions := bSSLVersions + [sslvSSLv3];
+  If TLSv1   in aSSLVersions Then
+   bSSLVersions := bSSLVersions + [sslvTLSv1];
+  If TLSv1_1 in aSSLVersions Then
+   bSSLVersions := bSSLVersions + [sslvTLSv1_1];
+  If TLSv1_2 in aSSLVersions Then
+   bSSLVersions := bSSLVersions + [sslvTLSv1_2];
+  If TLSv1_3 in aSSLVersions Then
+   Raise Exception.Create('Indy no have TLS 1.3 Support...');
+  Result := @bSSLVersions;
+ {$ENDIF}
 End;
 
 { TRESTDWIdClientPooler }
@@ -3687,6 +4008,21 @@ Begin
  Inherited;
 End;
 
+Function TRESTDWIdClientPooler.GetSSlMode : Integer;
+Begin
+ Result := 0;
+End;
+
+Function TRESTDWIdClientPooler.GetSSlVersion : Integer;
+Begin
+ Result := 0;
+End;
+
+Function TRESTDWIdClientPooler.GetSSlVersions : TRESTDWVersionsBase;
+Begin
+ Result := Nil;
+End;
+
 function TRESTDWIdClientPooler.IsServerLive(Aip: String; Aport: Integer;
   AMessageErro: String): Boolean;
 var
@@ -3729,6 +4065,8 @@ Procedure TRESTDWIdClientPooler.ReconfigureConnection(aTypeRequest           : T
                                                       aEncoding              : TEncodeSelect;
                                                       aAccessTag             : String;
                                                       aAuthenticationOptions : TRESTDWClientAuthOptionParams);
+Var
+ vRESTDWVersionsBase : TRESTDWVersionsBase;
 Begin
  {$IFNDEF RESTDWLAZARUS}
   {$IFNDEF FPC}
@@ -3737,8 +4075,22 @@ Begin
  {$ENDIF}
  If (UseSSL) Then
   Begin
-   HttpRequest.CertMode    := vSSLMode;
-   HttpRequest.SSLVersions := PIdSSLVersions(@SSLVersions)^;
+   vRESTDWVersionsBase := GetSSlVersions;
+   {$IFDEF USE_TAURUS_TLS}
+    If vUseTaurus Then
+     Begin
+     End
+    Else
+     Begin
+      HttpRequest.CertMode              := TRESTDWSSLMode(GetSSlMode);//vSSLMode;
+      HttpRequest.SSLVersions           := TRESTDWSSLVersions(Pointer(@vRESTDWVersionsBase)^);
+      HttpRequest.CertFile              := ASSLCertFile;
+      HttpRequest.KeyFile               := ASSLPrivateKeyFile;
+      HttpRequest.RootCertFile          := vASSLRootCertFile;
+//      HttpRequest.CipherList            := vCipherList;
+     End;
+   {$ELSE}
+   {$ENDIF}
   End;
 End;
 
@@ -4635,7 +4987,7 @@ Begin
   FreeAndNil(HttpRequest);
  HttpRequest      := TRESTDWIdClientREST.Create(Nil);
  If (TypeRequest = trHttps) Then
-  HttpRequest.SSLVersions := PIdSSLVersions(@SSLVersions)^;
+  HttpRequest.SSLVersions := SSLVersions;//PIdSSLVersions(@SSLVersions)^;
  HttpRequest.UserAgent := UserAgent;
  SetCharsetRequest(HttpRequest, Encoding);
  SetParams(ProxyOptions, RequestTimeout, ConnectTimeout, AuthenticationOptions);
@@ -4644,11 +4996,9 @@ Begin
  If BinaryRequest Then
   If HttpRequest.DefaultCustomHeader.IndexOfName('binaryrequest') = -1 Then
     HttpRequest.DefaultCustomHeader.Add('binaryrequest=true');
-
  If aBinaryCompatibleMode Then
   If HttpRequest.DefaultCustomHeader.IndexOfName('BinaryCompatibleMode') = -1 Then
     HttpRequest.DefaultCustomHeader.Add('BinaryCompatibleMode=true');
-
  LastErrorMessage := '';
  LastErrorCode    := -1;
  Try
@@ -4802,6 +5152,21 @@ begin
 end;
 
 { TRESTDWIdProxyRequest }
+
+Function  TRESTDWIdProxyRequest.GetSSlVersion          : Integer;
+Begin
+ Result := 0;
+End;
+
+Function  TRESTDWIdProxyRequest.GetSSlVersions         : TRESTDWVersionsBase;
+Begin
+ Result := Nil;
+End;
+
+Function  TRESTDWIdProxyRequest.GetSSlMode             : Integer;
+Begin
+ Result := 0;
+End;
 
 Procedure TRESTDWIdProxyRequest.aCommandGet(AContext      : TIdContext;
                                            ARequestInfo  : TIdHTTPRequestInfo;
@@ -5003,6 +5368,10 @@ Begin
  HTTPServer                       := TIdHTTPServer.Create(Nil);
  ClientHttpBase                   := TRESTDWClientHttpBase;
  lHandler                         := TIdServerIOHandlerSSLOpenSSL.Create(Nil);
+ {$IFDEF USE_TAURUS_TLS}
+  vUseTaurus                      := False;
+ {$ENDIF}
+
  {$IFDEF FPC}
  HTTPServer.OnQuerySSLPort        := @IdHTTPServerQuerySSLPort;
  HTTPServer.OnCommandGet          := @aCommandGet;
@@ -5125,6 +5494,8 @@ Begin
 End;
 
 procedure TRESTDWIdProxyRequest.SetActive(Value : Boolean);
+Var
+ vRESTDWVersionsBase : TRESTDWVersionsBase;
 Begin
  If (Value)                   And
     (Not (HTTPServer.Active)) Then
@@ -5134,26 +5505,56 @@ Begin
 
    Try
     If (ASSLPrivateKeyFile <> '')     And
-       (ASSLPrivateKeyPassword <> '') And
+//       (ASSLPrivateKeyPassword <> '') And
        (ASSLCertFile <> '')           Then
      Begin
-      lHandler.SSLOptions.Method                := aSSLMethod;
-      lHandler.SSLOptions.SSLVersions           := PIdSSLVersions(@SSLVersions)^;
-      {$IFDEF FPC}
-       lHandler.OnGetPassword                   := @GetSSLPassword;
-       lHandler.OnVerifyPeer                    := @SSLVerifyPeer;
+      vRESTDWVersionsBase := GetSSlVersions;
+      {$IFDEF USE_TAURUS_TLS}
+       If vUseTaurus Then
+        Begin
+        End
+       Else
+        Begin
+                                                                                    //TODO SSL
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.Method                := TIdSSLVersion(GetSSlVersion);//aSSLMethod;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.SSLVersions           := TIdSSLVersions(Pointer(@vRESTDWVersionsBase)^);
+//         PRESTDWSSLVersions(@SSLVersions)^;
+         {$IFDEF FPC}
+          TIdServerIOHandlerSSLOpenSSL(lHandler).OnGetPassword                   := @GetSSLPassword;
+          TIdServerIOHandlerSSLOpenSSL(lHandler).OnVerifyPeer                    := @SSLVerifyPeer;
+         {$ELSE}
+          TIdServerIOHandlerSSLOpenSSL(lHandler).OnGetPassword                   := GetSSLPassword;
+          TIdServerIOHandlerSSLOpenSSL(lHandler).OnVerifyPeer                    := SSLVerifyPeer;
+         {$ENDIF}
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.CertFile              := ASSLCertFile;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.KeyFile               := ASSLPrivateKeyFile;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.VerifyMode            := vSSLVerifyMode;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.VerifyDepth           := vSSLVerifyDepth;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.RootCertFile          := vASSLRootCertFile;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.Mode                  := TIdSSLMode(GetSSlMode);//vSSLMode;
+         TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.CipherList            := vCipherList;
+         HTTPServer.IOHandler                                                    := TIdServerIOHandlerSSLOpenSSL(lHandler);
+        End;
       {$ELSE}
-       lHandler.OnGetPassword                  := GetSSLPassword;
-       lHandler.OnVerifyPeer                   := SSLVerifyPeer;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.Method                := TIdSSLVersion(GetSSlVersion);//aSSLMethod;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.SSLVersions           := TIdSSLVersions(Pointer(@vRESTDWVersionsBase)^);
+//         PRESTDWSSLVersions(@SSLVersions)^;
+       {$IFDEF FPC}
+        TIdServerIOHandlerSSLOpenSSL(lHandler).OnGetPassword                   := @GetSSLPassword;
+        TIdServerIOHandlerSSLOpenSSL(lHandler).OnVerifyPeer                    := @SSLVerifyPeer;
+       {$ELSE}
+        TIdServerIOHandlerSSLOpenSSL(lHandler).OnGetPassword                   := GetSSLPassword;
+        TIdServerIOHandlerSSLOpenSSL(lHandler).OnVerifyPeer                    := SSLVerifyPeer;
+       {$ENDIF}
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.CertFile              := ASSLCertFile;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.KeyFile               := ASSLPrivateKeyFile;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.VerifyMode            := vSSLVerifyMode;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.VerifyDepth           := vSSLVerifyDepth;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.RootCertFile          := vASSLRootCertFile;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.Mode                  := TIdSSLMode(GetSSlMode);//vSSLMode;
+       TIdServerIOHandlerSSLOpenSSL(lHandler).SSLOptions.CipherList            := vCipherList;
+       HTTPServer.IOHandler                                                    := TIdServerIOHandlerSSLOpenSSL(lHandler);
       {$ENDIF}
-      lHandler.SSLOptions.CertFile              := ASSLCertFile;
-      lHandler.SSLOptions.KeyFile               := ASSLPrivateKeyFile;
-      lHandler.SSLOptions.VerifyMode            := vSSLVerifyMode;
-      lHandler.SSLOptions.VerifyDepth           := vSSLVerifyDepth;
-      lHandler.SSLOptions.RootCertFile          := vASSLRootCertFile;
-      lHandler.SSLOptions.Mode                  := vSSLMode;
-      lHandler.SSLOptions.CipherList            := vCipherList;
-      HTTPServer.IOHandler := lHandler;
      End
     Else
      HTTPServer.IOHandler  := Nil;
@@ -5165,7 +5566,7 @@ Begin
       With HTTPServer.Bindings.Add do
        Begin
         IP := ServerIPVersionConfig.IPv4Address;
-        IPVersion := Id_IPv4;
+        IPVersion := TIdIpVersion(Id_IPv4);
         Port := ServicePort;
        End;
      End;
@@ -5175,7 +5576,7 @@ Begin
       With HTTPServer.Bindings.Add do
        Begin
         IP := ServerIPVersionConfig.IPv6Address;
-        IPVersion := Id_IPv6;
+        IPVersion := TIdIpVersion(Id_IPv6);
         Port := ServicePort;
        End;
      End;

@@ -153,6 +153,7 @@ Type
  {$IFDEF RESTDWLAZARUS}
   DWSmallint      = Smallint;
   DWInteger       = Longint;
+  DWLongint       = Largeint;
   DWInt16         = Integer;
   DWInt64         = Int64;
   DWInt32         = Int32;
@@ -174,6 +175,7 @@ Type
   DWInt16         = Integer;
   DWInt64         = Int64;
   DWInt32         = Longint;
+  DWLongint       = Longint;
   DWFloat         = Real;
   DWSingle        = Single;
   DWDouble        = Double;

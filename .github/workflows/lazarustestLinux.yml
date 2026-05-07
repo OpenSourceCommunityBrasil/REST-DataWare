@@ -4,37 +4,67 @@ on:
   pull_request:
   push:
     paths-ignore:
-    - "README.md"
+      - "README.md"
     branches:
       - dev
 
 jobs:
   build:
     runs-on: ${{ matrix.operating-system }}
+
     strategy:
+      fail-fast: false
       matrix:
         operating-system: [ubuntu-latest]
         lazarus-versions: [dist, stable, 2.2.4, 2.2.6]
+
     steps:
-    - name: Checkout source code
-      uses: actions/checkout@v2
-    - name: Install Lazarus
-      uses: gcarreno/setup-lazarus@v3
-      with:
-        lazarus-version: ${{ matrix.lazarus-versions }}
-        include-packages: "Indy10, ZeosDBO"
-        with-cache: false
-    - name: Build the Main package on Linux
-      run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
-      
-    - name: Build Indy package on Linux
-      run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
-      
-    - name: Build ShellServices package on Linux
-      run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"   
-      
-    - name: Build ZeosDriver package on Linux
-      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"    
-      
-    - name: Build LazarusDriver package on Linux
-      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Install Lazarus
+        uses: gcarreno/setup-lazarus@v3
+        with:
+          lazarus-version: ${{ matrix.lazarus-versions }}
+          include-packages: "Indy10, ZeosDBO"
+          with-cache: false
+
+      - name: Install TaurusTLS runtime package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sudo apt-get update
+          sudo apt-get install -y git libssl-dev
+
+          git clone --depth 1 https://github.com/TurboPack/indy_extras.git "$RUNNER_TEMP/indy_extras"
+
+          TAURUS_LAZ_DIR="$RUNNER_TEMP/indy_extras/TaurusTLS/Packages/lazarus"
+
+          echo "Taurus Lazarus package dir: $TAURUS_LAZ_DIR"
+
+          test -f "$TAURUS_LAZ_DIR/taurustlsrt.lpk"
+
+          lazbuild --primary-config-path="$HOME/.lazarus" \
+            --add-package-link="$TAURUS_LAZ_DIR/taurustlsrt.lpk"
+
+          lazbuild --primary-config-path="$HOME/.lazarus" \
+            -B "$TAURUS_LAZ_DIR/taurustlsrt.lpk"
+
+      - name: Build the Main package on Linux
+        run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
+
+      - name: Build Indy package on Linux
+        run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
+
+      - name: Build Taurus package on Linux
+        run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySocketsTaurus.lpk"
+
+      - name: Build ShellServices package on Linux
+        run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"
+
+      - name: Build ZeosDriver package on Linux
+        run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"
+
+      - name: Build LazarusDriver package on Linux
+        run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"

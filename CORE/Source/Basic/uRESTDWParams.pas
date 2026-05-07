@@ -637,8 +637,8 @@ Begin
                     If (Pos('.', vTempValue) > 0) Or
                        (Pos(':', vTempValue) > 0) Or
                        (Pos('/', vTempValue) > 0) Or
-                       (Pos('\', vTempValue) > 0)
-                       //(Pos('-', vTempValue) > 0)
+                       (Pos('\', vTempValue) > 0) Or
+                       (Pos('-', vTempValue) > 0)
 //                     Or (vTempValue.CountChar('-')>1) //Testar XyberX
                        Then
                      Field.AsDateTime := StrToDateTime(vTempValue)
@@ -833,7 +833,7 @@ Begin
         {$IFDEF DELPHI2010UP}
          vRESTDWBytes := StringUtf8ToBytes(DecodeStrings(vTempString{$IFDEF FPC}, csUndefined{$ENDIF}));
          If Length(vRESTDWBytes) > 0 Then
-          vTempString:= TEncoding.UTF8.Getstring(vRESTDWBytes)
+          vTempString:= TEncoding.UTF8.Getstring(TBytes(vRESTDWBytes))
          Else
           vTempString:= '';
          SetLength(vRESTDWBytes, 0);
@@ -6683,14 +6683,14 @@ End;
 
 Procedure TRESTDWParams.SetCriptOptions(Use  : Boolean;
                                         Key  : String);
-Var
- I : Integer;
+//Var
+// I : Integer;
 Begin
- For I := 0 To Count -1 Do
-  Begin
+// For I := 0 To Count -1 Do
+//  Begin
 //   Items[I].CriptOptions.Use := Use;
 //   Items[I].CriptOptions.Key := Key;
-  End;
+//  End;
 End;
 
 end.

@@ -81,7 +81,7 @@ type
   protected
     procedure setConnection(AValue: TComponent); override;
 
-    function getConectionType : TRESTDWDatabaseType; override;
+    function getConnectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
   public
     constructor Create(AOwner : TComponent); override;
@@ -255,7 +255,7 @@ begin
   inherited setConnection(AValue);
 end;
 
-function TRESTDWInterbaseDriver.getConectionType: TRESTDWDatabaseType;
+function TRESTDWInterbaseDriver.getConnectionType: TRESTDWDatabaseType;
 begin
   Result := dbtInterbase;
 end;

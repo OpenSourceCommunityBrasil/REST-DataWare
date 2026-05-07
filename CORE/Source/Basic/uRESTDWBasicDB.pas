@@ -33,11 +33,33 @@ Uses
  {$IFDEF RESTDWLAZARUS}memds,{$ENDIF}
  {$IFDEF RESTDWFMX}System.UITypes, {$ENDIF}
  SysUtils, Classes, Db, SyncObjs, Variants,
- uRESTDWDataUtils, uRESTDWBasicTypes, uRESTDWProtoTypes,
- uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWAbout, uRESTDWConsts,
+ uRESTDWDataUtils, uRESTDWProtoTypes,
+ uRESTDWPoolermethod, uRESTDWComponentEvents, uRESTDWAbout,
  uRESTDWResponseTranslator, uRESTDWBasicClass, uRESTDWJSONObject, uRESTDWParams,
- uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWMasterDetailData,
- uRESTDWMemoryDataset, uRESTDWBufferBase, uRESTDWDriverBase, uRESTDWTools;
+ uRESTDWBasic, uRESTDWMassiveBuffer, uRESTDWBasicTypes, uRESTDWBasicDbTypes, uRESTDWMasterDetailData
+ {$IFDEF UNIDACMEM}
+  , DADump, UniDump, VirtualTable, MemDS,
+ {$ENDIF}
+ {$IFDEF ZEOSMEM}
+  , ZAbstractRODataset, ZAbstractDataset, ZMemTable, ZDataset,
+ {$ENDIF}
+ {$IFNDEF FPC}
+  {$IF CompilerVersion > 22} // Delphi 2010 pra cima
+   {$IFDEF RESTFDMEMTABLE}
+    , FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+    FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+    FireDAC.Comp.DataSet, FireDAC.Comp.Client,
+    {$IFNDEF FPC}
+     {$IF CompilerVersion > 26} // Delphi XE6 pra cima
+      FireDAC.Stan.StorageBin,
+     {$IFEND}
+    {$ENDIF}
+   {$ENDIF}
+  {$IFEND}
+ {$ENDIF}
+ {$IFDEF RESTDWMEMTABLE}
+  , uRESTDWMemoryDataset,
+ {$ENDIF} uRESTDWBufferBase, uRESTDWDriverBase, uRESTDWConsts, uRESTDWTools;
 
 Type
  TOnExecuteData           = Procedure                                        Of Object;
@@ -684,8 +706,30 @@ Type
   vMasterDetailList     : TMasterDetailList;                 //DataSet MasterDetail Function
   vMassiveDataset       : TMassiveDataset;
   vLastOpen             : Integer;
-  Procedure CloneDefinitions     (Source  : TRESTDWMemtable;
-                                  aSelf   : TRESTDWMemtable); //Fields em Definições
+  Procedure CloneDefinitions     (Source  : {$IFDEF UNIDACMEM}
+                                             TVirtualTable
+                                            {$ENDIF}
+                                            {$IFDEF ZEOSMEM}
+                                             TZMemTable
+                                            {$ENDIF}
+                                            {$IFDEF RESTFDMEMTABLE}
+                                             TFDMemtable
+                                            {$ENDIF}
+                                            {$IFDEF RESTDWMEMTABLE}
+                                             TRESTDWMemtable
+                                            {$ENDIF};
+                                  aSelf   : {$IFDEF UNIDACMEM}
+                                             TVirtualTable
+                                            {$ENDIF}
+                                            {$IFDEF ZEOSMEM}
+                                             TZMemTable
+                                            {$ENDIF}
+                                            {$IFDEF RESTFDMEMTABLE}
+                                             TFDMemtable
+                                            {$ENDIF}
+                                            {$IFDEF RESTDWMEMTABLE}
+                                             TRESTDWMemtable
+                                            {$ENDIF}); //Fields em Definições
   Procedure   OnChangingSQL      (Sender  : TObject);       //Quando Altera o SQL da Lista
   Procedure   OnBeforeChangingSQL(Sender  : TObject);
   Procedure   SetActiveDB        (Value   : Boolean);       //Seta o Estado do Dataset
@@ -5229,10 +5273,8 @@ End;
 Function TRESTDWDatabasebaseBase.BuildConnection(aBinaryRequest : Boolean) : TRESTDWPoolerMethodClient;
 Begin
  Result                       := nil;
-
  if Assigned(vOnBuildConnection) then
   vOnBuildConnection(Self);
-
  Result                       := TRESTDWPoolerMethodClient.Create(Nil);
  Result.PoolerNotFoundMessage := PoolerNotFoundMessage;
  Result.AuthenticationOptions.Assign(AuthenticationOptions);
@@ -8361,8 +8403,30 @@ Begin
  vCreateDS := True;
  SetInBlockEvents(True);
  Try
-  TRESTDWMemtable(Self).Close;
-  TRESTDWMemtable(Self).Open;
+  {$IFDEF UNIDACMEM}
+   TVirtualTable(Self)
+  {$ENDIF}
+  {$IFDEF ZEOSMEM}
+   TZMemTable(Self)
+  {$ENDIF}
+  {$IFDEF RESTFDMEMTABLE}
+   TFDMemtable(Self)
+  {$ENDIF}
+  {$IFDEF RESTDWMEMTABLE}
+   TRESTDWMemtable(Self)
+  {$ENDIF}.Close;
+  {$IFDEF UNIDACMEM}
+   TVirtualTable(Self)
+  {$ENDIF}
+  {$IFDEF ZEOSMEM}
+   TZMemTable(Self)
+  {$ENDIF}
+  {$IFDEF RESTFDMEMTABLE}
+   TFDMemtable(Self)
+  {$ENDIF}
+  {$IFDEF RESTDWMEMTABLE}
+   TRESTDWMemtable(Self)
+  {$ENDIF}.Open;
   vCreateDS := False;
   vActive   := Not vCreateDS;
  Finally
@@ -8379,9 +8443,9 @@ Begin
  vCreateDS := True;
  SetInBlockEvents(True);
  Try
-
-  EmptyTable;
-
+  {$IFDEF RESTDWMEMTABLE}
+   EmptyTable;
+  {$ENDIF}
   vCreateDS := False;
   vActive   := Not vCreateDS;
  Finally
@@ -8391,8 +8455,30 @@ End;
 Class Procedure TRESTDWTable.CreateEmptyDataset(Const Dataset : TDataset);
 Begin
  Try
-  TRESTDWMemtable(Dataset).Close;
-  TRESTDWMemtable(Dataset).Open;
+  {$IFDEF UNIDACMEM}
+   TVirtualTable(Self)
+  {$ENDIF}
+  {$IFDEF ZEOSMEM}
+   TZMemTable(Self)
+  {$ENDIF}
+  {$IFDEF RESTFDMEMTABLE}
+   TFDMemtable(Self)
+  {$ENDIF}
+  {$IFDEF RESTDWMEMTABLE}
+   TRESTDWMemtable(Self)
+  {$ENDIF}.Close;
+  {$IFDEF UNIDACMEM}
+   TVirtualTable(Self)
+  {$ENDIF}
+  {$IFDEF ZEOSMEM}
+   TZMemTable(Self)
+  {$ENDIF}
+  {$IFDEF RESTFDMEMTABLE}
+   TFDMemtable(Self)
+  {$ENDIF}
+  {$IFDEF RESTDWMEMTABLE}
+   TRESTDWMemtable(Self)
+  {$ENDIF}.Open;
  Finally
  End;
 End;
@@ -8400,8 +8486,30 @@ End;
 Class Procedure TRESTDWClientSQL.CreateEmptyDataset(Const Dataset : TDataset);
 Begin
  Try
-  TRESTDWMemtable(Dataset).Close;
-  TRESTDWMemtable(Dataset).Open;
+  {$IFDEF UNIDACMEM}
+   TVirtualTable(Self)
+  {$ENDIF}
+  {$IFDEF ZEOSMEM}
+   TZMemTable(Self)
+  {$ENDIF}
+  {$IFDEF RESTFDMEMTABLE}
+   TFDMemtable(Self)
+  {$ENDIF}
+  {$IFDEF RESTDWMEMTABLE}
+   TRESTDWMemtable(Self)
+  {$ENDIF}.Close;
+  {$IFDEF UNIDACMEM}
+   TVirtualTable(Self)
+  {$ENDIF}
+  {$IFDEF ZEOSMEM}
+   TZMemTable(Self)
+  {$ENDIF}
+  {$IFDEF RESTFDMEMTABLE}
+   TFDMemtable(Self)
+  {$ENDIF}
+  {$IFDEF RESTDWMEMTABLE}
+   TRESTDWMemtable(Self)
+  {$ENDIF}.Open;
  Finally
  End;
 End;
@@ -8441,13 +8549,35 @@ Var
  I        : Integer;
  FieldDef : TFieldDef;
 Begin
- TRESTDWMemtable(Self).Close;
+ {$IFDEF UNIDACMEM}
+  TVirtualTable(Self).Close;
+ {$ENDIF}
+ {$IFDEF ZEOSMEM}
+  TZMemTable(Self).Close;
+ {$ENDIF}
+ {$IFDEF RESTFDMEMTABLE}
+  TFDMemtable(Self).Close;
+ {$ENDIF}
+ {$IFDEF RESTDWMEMTABLE}
+  TRESTDWMemtable(Self).Close;
+ {$ENDIF}
  For I := 0 To Length(vFieldsList) -1 Do
   Begin
    FieldDef := FieldDefExist(Self, vFieldsList[I].FieldName);
    If FieldDef = Nil Then
     Begin
-     FieldDef          := TRESTDWMemtable(Self).FieldDefs.AddFieldDef;
+     FieldDef          := {$IFDEF UNIDACMEM}
+                           TVirtualTable(Self)
+                          {$ENDIF}
+                          {$IFDEF ZEOSMEM}
+                           TZMemTable(Self)
+                          {$ENDIF}
+                          {$IFDEF RESTFDMEMTABLE}
+                           TFDMemtable(Self)
+                          {$ENDIF}
+                          {$IFDEF RESTDWMEMTABLE}
+                           TRESTDWMemtable(Self)
+                          {$ENDIF}.FieldDefs.AddFieldDef;
      FieldDef.Name     := vFieldsList[I].FieldName;
      FieldDef.DataType := vFieldsList[I].DataType;
      FieldDef.Size     := vFieldsList[I].Size;
@@ -8565,9 +8695,9 @@ Begin
      vActive := False;
     If Not vActive Then
      SetActiveDB(True);
+    If vActive Then
+     Inherited Open;
    End;
-  If vActive Then
-   Inherited Open;
  Finally
   vInBlockEvents  := False;
  End;
@@ -9699,8 +9829,30 @@ Begin
 // {$ENDIF}
 End;
 
-Procedure TRESTDWClientSQL.CloneDefinitions(Source  : TRESTDWMemtable;
-                                            aSelf   : TRESTDWMemtable); //Fields em Definições
+Procedure TRESTDWClientSQL.CloneDefinitions(Source  : {$IFDEF UNIDACMEM}
+                                                       TVirtualTable
+                                                      {$ENDIF}
+                                                      {$IFDEF ZEOSMEM}
+                                                       TZMemTable
+                                                      {$ENDIF}
+                                                      {$IFDEF RESTFDMEMTABLE}
+                                                       TFDMemtable
+                                                      {$ENDIF}
+                                                      {$IFDEF RESTDWMEMTABLE}
+                                                       TRESTDWMemtable
+                                                      {$ENDIF};
+                                            aSelf   : {$IFDEF UNIDACMEM}
+                                                       TVirtualTable
+                                                      {$ENDIF}
+                                                      {$IFDEF ZEOSMEM}
+                                                       TZMemTable
+                                                      {$ENDIF}
+                                                      {$IFDEF RESTFDMEMTABLE}
+                                                       TFDMemtable
+                                                      {$ENDIF}
+                                                      {$IFDEF RESTDWMEMTABLE}
+                                                       TRESTDWMemtable
+                                                      {$ENDIF}); //Fields em Definições
 Var
  I, A : Integer;
 Begin
@@ -9842,7 +9994,7 @@ Var
        Begin
         If Not FindField(vFieldA).IsNull Then
          Begin
-          {$IFDEF DELPHI10_2UP}
+          {$IFDEF DELPHI11UP}
             Value.ParamByName(vFieldD).AsGUID := FindField(vFieldA).AsGUID;
           {$ELSE}
             Value.ParamByName(vFieldD).AsString := FindField(vFieldA).AsString;
@@ -9922,7 +10074,7 @@ Var
        Begin
         If Not FindField(vFieldA).IsNull Then
          Begin
-          {$IFDEF DELPHI10_2UP}
+          {$IFDEF DELPHI11UP}
            Value.ParamByName(vFieldD).AsGUID := FindField(vFieldA).AsGUID;
           {$ELSE}
            Value.ParamByName(vFieldD).AsString := FindField(vFieldA).AsString;
@@ -10288,7 +10440,7 @@ Begin
     If DataSet = Nil Then
      Begin
       vRESTDataBase.ExecuteCommandTB(vActualPoolerMethodClient, vTablename, vParams, vError, vMessageError, LDataSetList,
-                                     vRowsAffected, BinaryRequest,  True, Fields.Count = 0, Nil);
+                                     vRowsAffected, BinaryRequest, BinaryCompatibleMode, Fields.Count = 0, Nil);
       If LDataSetList <> Nil Then
        Begin
         If BinaryRequest Then
@@ -10588,7 +10740,7 @@ Begin
       For I := 0 To 1 Do
        Begin
         vRESTDataBase.ExecuteCommand(vActualPoolerMethodClient, vSQL, vParams, vError, vMessageError, LDataSetList,
-                                     vRowsAffected, False, BinaryRequest,  True, vMetaData, vRESTDataBase.RESTClientPooler);
+                                     vRowsAffected, False, BinaryRequest, BinaryCompatibleMode, vMetaData, vRESTDataBase.RESTClientPooler);
         If Not(vError) or (vMessageError <> cInvalidAuth) Then
          Break;
        End;

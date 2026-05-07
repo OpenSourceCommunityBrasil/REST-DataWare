@@ -33,7 +33,8 @@ requires
   RESTDWCore,
   IndySystem,
   IndyCore,
-  IndyProtocols;
+  IndyProtocols,
+  TaurusTLS_RT;
 
 contains
   uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas';

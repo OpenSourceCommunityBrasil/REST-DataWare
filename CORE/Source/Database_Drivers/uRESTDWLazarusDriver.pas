@@ -1,4 +1,4 @@
-unit uRESTDWLazarusDriver;
+﻿unit uRESTDWLazarusDriver;
 
 {
   REST Dataware .
@@ -25,7 +25,7 @@ interface
 
 uses
   LResources, SQLDB, Classes, SysUtils, DB,
-  uRESTDWDriverBase, uRESTDWProtoTypes, uRESTDWBasicTypes;
+  uRESTDWDriverBase, uRESTDWProtoTypes, uRESTDWBasicDbTypes;
 
 const
   rdwLazSQLConnector : array[0..9] of string = (('mssql'),('sybase'),
@@ -73,7 +73,7 @@ type
   protected
     procedure setConnection(AValue: TComponent); override;
 
-    function getConectionType : TRESTDWDatabaseType; override;
+    function getConnectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
   public
     constructor Create(AOwner : TComponent); override;
@@ -241,12 +241,12 @@ begin
   inherited setConnection(AValue);
 end;
 
-function TRESTDWLazarusDriver.getConectionType: TRESTDWDatabaseType;
+function TRESTDWLazarusDriver.getConnectionType: TRESTDWDatabaseType;
 var
   conn : string;
   i: integer;
 begin
-  Result:=inherited getConectionType;
+  Result:=inherited getConnectionType;
   if not Assigned(Connection) then
     Exit;
 

@@ -120,7 +120,7 @@ type
   protected
     procedure InternalPrepare; override;
     procedure InternalUnprepare; override;
-    function InternalOpen{$IFDEF DELPHI10_3UP}(var ACount: TFDCounter){$ENDIF}: Boolean; override;
+    function InternalOpen{$IFDEF DELPHI11UP}(var ACount: TFDCounter){$ENDIF}: Boolean; override;
     function InternalNextRecordSet: Boolean; override;
     procedure InternalClose; override;
     procedure InternalExecute(ATimes, AOffset: integer;
@@ -537,16 +537,16 @@ begin
   Result := False;
 end;
 
-function TFDPhysRDWCommand.InternalOpen{$IFDEF DELPHI10_3UP}(var ACount: TFDCounter){$ENDIF}: Boolean;
+function TFDPhysRDWCommand.InternalOpen{$IFDEF DELPHI11UP}(var ACount: TFDCounter){$ENDIF}: Boolean;
 begin
-  {$IFDEF DELPHI10_3UP}
+  {$IFDEF DELPHI11UP}
   ACount := -1;
   {$ENDIF}
   Result := False;
   case GetMetaInfoKind of
     mkNone:
       begin
-        {$IFDEF DELPHI10_3UP}
+        {$IFDEF DELPHI11UP}
         ACount := RDWExecuteComand;
         Result := ACount >= 0;
         {$ELSE}
@@ -555,7 +555,7 @@ begin
       end;
     mkTables:
       begin
-        {$IFDEF DELPHI10_3UP}
+        {$IFDEF DELPHI11UP}
         ACount := RDWGetTables;
         Result := ACount >= 0;
         {$ELSE}
@@ -566,7 +566,7 @@ begin
       end;
     mkPrimaryKeyFields:
       begin
-        {$IFDEF DELPHI10_3UP}
+        {$IFDEF DELPHI11UP}
         ACount := RDWGetPKTablesFields(GetBaseObjectName);
         Result := ACount >= 0;
         {$ELSE}
@@ -577,7 +577,7 @@ begin
       end;
     mkTableFields:
       begin
-        {$IFDEF DELPHI10_3UP}
+        {$IFDEF DELPHI11UP}
         ACount := RDWGetTablesFields(GetBaseObjectName);
         Result := ACount >= 0;
         {$ELSE}

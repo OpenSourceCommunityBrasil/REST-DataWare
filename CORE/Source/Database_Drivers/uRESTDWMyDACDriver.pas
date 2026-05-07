@@ -81,7 +81,7 @@ type
     FTransaction : TMyTransaction;
   protected
     procedure setConnection(AValue: TComponent); override;
-    function getConectionType : TRESTDWDatabaseType; override;
+    function getConnectionType : TRESTDWDatabaseType; override;
     Function compConnIsValid(comp : TComponent) : boolean; override;
   public
     constructor Create(AOwner : TComponent); override;
@@ -135,7 +135,7 @@ end;
 
  { TRESTDWMyDACDriver }
 
-function TRESTDWMyDACDriver.getConectionType : TRESTDWDatabaseType;
+function TRESTDWMyDACDriver.getConnectionType : TRESTDWDatabaseType;
 begin
   // somente MySQL
   Result := dbtMySQL;
