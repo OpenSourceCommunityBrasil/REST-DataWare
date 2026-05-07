@@ -3781,7 +3781,7 @@ End;
 Function  TRESTDWIdServicePooler.GetSSlMode             : Pointer;
 {$IFDEF USE_TAURUS_TLS}
  Var
-  SSLMode      : TIdSSLMode;
+  bSSLMode     : TIdSSLMode;
   aTaurSSLMode : TTaurusTLSSSLMode;
 {$ENDIF}
 Begin
@@ -3802,14 +3802,14 @@ Begin
   Else
    Begin
     If vSSLMode = sslUnassigned Then
-     SSLMode := sslmUnassigned
+     bSSLMode := sslmUnassigned
     Else If vSSLMode = sslClient Then
-     SSLMode := sslmClient
+     bSSLMode := sslmClient
     Else If vSSLMode = sslServer Then
-     SSLMode := sslmServer
+     bSSLMode := sslmServer
     Else If vSSLMode = sslBoth Then
-     SSLMode := sslmBoth;
-    Result := @SSLMode;
+     bSSLMode := sslmBoth;
+    Result := @bSSLMode;
    End;
  {$ELSE}
   If vSSLMode = sslUnassigned Then

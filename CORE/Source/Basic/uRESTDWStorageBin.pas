@@ -33,17 +33,17 @@ interface
 
 uses
   {$IFNDEF RESTDWLAZARUS}{$IFNDEF RESTDWFPC}SqlTimSt, {$ENDIF}{$ENDIF}
-  FmtBcd, DB, Variants, Classes, SysUtils, uRESTDWBasicDbTypes
+  FmtBcd, DB, Variants, Classes, SysUtils, uRESTDWBasicDbTypes,
   {$IFDEF UNIDACMEM}
-   , DADump, UniDump, VirtualTable, MemDS,
+   DADump, UniDump, VirtualTable, MemDS,
   {$ENDIF}
   {$IFDEF ZEOSMEM}
-   , ZAbstractRODataset, ZAbstractDataset, ZMemTable, ZDataset,
+   ZAbstractRODataset, ZAbstractDataset, ZMemTable, ZDataset,
   {$ENDIF}
   {$IFNDEF FPC}
    {$IF CompilerVersion > 22} // Delphi 2010 pra cima
     {$IFDEF RESTFDMEMTABLE}
-     , FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+     FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
      FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
      FireDAC.Comp.DataSet, FireDAC.Comp.Client,
      {$IFNDEF FPC}
@@ -54,9 +54,7 @@ uses
     {$ENDIF}
    {$IFEND}
   {$ENDIF}
-  {$IFDEF RESTDWMEMTABLE}
-   , uRESTDWMemoryDataset,
-  {$ENDIF}
+  uRESTDWMemoryDataset,
   uRESTDWConsts, uRESTDWTools, uRESTDWBasicTypes;
 
  Type
@@ -73,14 +71,14 @@ uses
                                       Var AStream : TStream);
   Procedure LoadRecordFromStream     (ADataset    : TDataset;
                                       AStream     : TStream);
-  Function  SaveRecordDWMemToStream  (Dataset     : IRESTDWMemTable;
+  Function  SaveRecordDWMemToStream  (Dataset     : TRESTDWMemTable;
                                       stream      : TStream) : Longint;
-  Procedure LoadRecordDWMemFromStream(Dataset     : IRESTDWMemTable;
+  Procedure LoadRecordDWMemFromStream(Dataset     : TRESTDWMemTable;
                                       Stream      : TStream);
  Public
-  Procedure SaveDWMemToStream        (IDataset    : IRESTDWMemTable;
+  Procedure SaveDWMemToStream        (IDataset    : TDataset;
                                       Var AStream : TStream); Override;
-  Procedure LoadDWMemFromStream      (IDataset    : IRESTDWMemTable;
+  Procedure LoadDWMemFromStream      (IDataset    : TDataset;
                                       AStream     : TStream); Override;
   Procedure SaveDatasetToStream      (ADataset    : TDataset;
                                       Var AStream : TStream); Override;
@@ -259,7 +257,7 @@ Begin
  End;
 End;
 
-Procedure TRESTDWStorageBin.LoadDWMemFromStream(IDataset : IRESTDWMemTable;
+Procedure TRESTDWStorageBin.LoadDWMemFromStream(IDataset : TDataset;
                                                 AStream  : TStream);
  Procedure CreateFieldDefs(DataSet : TDataSet;
                            Index   : Integer);
@@ -360,7 +358,7 @@ Begin
              {$ENDIF}
              {$IFDEF RESTDWMEMTABLE}
               TRESTDWMemtable
-             {$ENDIF}(IDataset.GetDataset);
+             {$ENDIF}(IDataset);
  // field count
  AStream.Position := 0;
  AStream.Read(vFieldsCount, SizeOf(vFieldsCount));
@@ -459,7 +457,7 @@ Begin
   End;
  ADataSet.DisableControls;
  Try
-  LoadRecordDWMemFromStream(IDataset, AStream);
+  LoadRecordDWMemFromStream(TRESTDWMemtable(IDataset), AStream);
  Finally
   ADataSet.EnableControls;
   AStream := Nil;
@@ -467,7 +465,7 @@ Begin
  End;
 End;
 
-Procedure TRESTDWStorageBin.LoadRecordDWMemFromStream(Dataset : IRESTDWMemTable;
+Procedure TRESTDWStorageBin.LoadRecordDWMemFromStream(Dataset : TRESTDWMemTable;
                                                       stream  : TStream);
 Var
  I, B,
@@ -536,7 +534,7 @@ Var
 //                       dwftFmtMemo,
 //                       dwftMemo]) Then
    Begin
-    vLength := Dataset.GetCalcFieldLen(aField.DataType, aField.Size);
+    vLength := TRESTDWMemtable(Dataset).GetCalcFieldLen(aField.DataType, aField.Size);
     {$IFDEF FPC}
      FillChar(PData^, vLength, #0);
     {$ELSE}
@@ -597,20 +595,20 @@ Begin
                   {$ENDIF}
                   {$IFDEF RESTDWMEMTABLE}
                    TRESTDWMemtable
-                  {$ENDIF}(Dataset.GetDataset);
+                  {$ENDIF}(Dataset);
  stream.Read(vRecCount, SizeOf(vRecCount));
  vRecCount     := vRecCount - 1;
  vFieldCount   := Length(FFieldNames);
  vFieldCount   := vFieldCount - 1;
  For i := 0 To vRecCount Do
   Begin
-   pActualRecord := PRESTDWMTMemBuffer(Dataset.AllocRecordBuffer);
+   pActualRecord := PRESTDWMTMemBuffer(TRESTDWMemtable(vDataset).AllocRecordBuffer);
    {$IFDEF RESTDWANDROID}
-    Dataset.InternalAddRecord(nativeint(pActualRecord), True);
+    TRESTDWMemtable(vDataset).InternalAddRecord(nativeint(pActualRecord), True);
    {$ELSE}
-    Dataset.InternalAddRecord(pActualRecord, True);
+    TRESTDWMemtable(vDataset).InternalAddRecord(pActualRecord, True);
    {$ENDIF}
-   vActualRecord := Dataset.GetMemoryRecord(i);
+   vActualRecord := TRESTDWMemtable(vDataset).GetMemoryRecord(i);
    For b := 0 To vFieldCount Do
     Begin
      vBoolean  := False;
@@ -1358,7 +1356,7 @@ Begin
  AStream.Position := 0;
 End;
 
-Procedure TRESTDWStorageBin.SaveDWMemToStream(IDataset    : IRESTDWMemTable;
+Procedure TRESTDWStorageBin.SaveDWMemToStream(IDataset    : TDataset;
                                               Var AStream : TStream);
 Var
  ADataset     : {$IFDEF UNIDACMEM}
@@ -1392,7 +1390,7 @@ Begin
              {$ENDIF}
              {$IFDEF RESTDWMEMTABLE}
               TRESTDWMemtable
-             {$ENDIF}(IDataset.GetDataset);
+             {$ENDIF}(IDataset);
  AStream.Size := 0;
  If not ADataset.Active Then
   ADataset.Open
@@ -1457,14 +1455,14 @@ Begin
  // marcando position recordcount = 0
  vRecordCount := 0;
  AStream.WriteBuffer(vRecordCount, SizeOf(vRecordCount));
- vRecordCount := SaveRecordDWMemToStream(IDataSet,AStream);
+ vRecordCount := SaveRecordDWMemToStream(TRESTDWMemtable(IDataSet), AStream);
  // salvando novo valor de recordcount
  AStream.Position := i;
  AStream.WriteBuffer(vRecordCount, SizeOf(vRecordCount));
  AStream.Position := 0;
 End;
 
-Function TRESTDWStorageBin.SaveRecordDWMemToStream(Dataset : IRESTDWMemTable;
+Function TRESTDWStorageBin.SaveRecordDWMemToStream(Dataset : TRESTDWMemTable;
                                                    stream  : TStream) : Longint;
 Var
  vDataSet      : {$IFDEF UNIDACMEM}
@@ -1518,9 +1516,9 @@ Begin
                 {$ENDIF}
                 {$IFDEF RESTDWMEMTABLE}
                  TRESTDWMemtable
-                {$ENDIF}(dataset.GetDataset);
+                {$ENDIF}(dataset);
  vFieldCount := vDataSet.Fields.Count - 1;
- Result      := dataset.GetRecordCount - 1;
+ Result      := TRESTDWMemtable(DataSet).GetRecordCount - 1;
  For I := 0 To Result Do
   Begin
    vActualRecord := Dataset.GetMemoryRecord(I);
@@ -1554,7 +1552,7 @@ Begin
         Begin
          {$IFDEF RESTDWMEMTABLE}
           If Dataset.DataTypeIsBlobTypes(vDataType) Then
-           PData    := Pointer(@PMemBlobArray(PActualRecord + Dataset.GetOffSetsBlobs)^[vDataSet.Fields[B].Offset])
+           PData    := Pointer(@PMemBlobArray(PActualRecord + TRESTDWMemtable(DataSet).GetOffSetsBlobs)^[vDataSet.Fields[B].Offset])
           Else
            PData    := Pointer(PActualRecord + dataset.GetOffSets(vDataSet.Fields[B]));
          {$ENDIF}
