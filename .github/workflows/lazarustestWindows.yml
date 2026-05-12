@@ -4,40 +4,64 @@ on:
   pull_request:
   push:
     paths-ignore:
-    - "README.md"
+      - "README.md"
     branches:
       - dev
 
 jobs:
   build:
     runs-on: ${{ matrix.operating-system }}
+
     strategy:
+      fail-fast: false
       matrix:
         operating-system: [windows-latest]
         lazarus-versions: [dist, stable, 2.2.0]
-    steps:
-    - name: Checkout source code
-      uses: actions/checkout@v2
-    - name: Install Lazarus
-      uses: gcarreno/setup-lazarus@v3.2
-      with:
-        lazarus-version: ${{ matrix.lazarus-versions }}
-        include-packages: "Indy10, ZeosDBO"
-        with-cache: false
-    - name: Build the Main package on Windows
-      run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
-      
-    - name: Build Indy package on Windows
-      run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
 
-    - name: Build Taurus package on Linux
-      run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySocketsTaurus.lpk"
-      
-    - name: Build ShellServices package on Windows
-      run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"   
-      
-    - name: Build ZeosDriver package on Windows
-      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"    
-      
-    - name: Build LazarusDriver package on Windows
-      run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Install Lazarus
+        uses: gcarreno/setup-lazarus@v3.2
+        with:
+          lazarus-version: ${{ matrix.lazarus-versions }}
+          include-packages: "Indy10, ZeosDBO"
+          with-cache: false
+
+      - name: Install TaurusTLS runtime package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          git clone --depth 1 https://github.com/TurboPack/indy_extras.git "$env:RUNNER_TEMP\indy_extras"
+
+          $TaurusLazDir = Join-Path $env:RUNNER_TEMP "indy_extras\TaurusTLS\Packages\lazarus"
+          $TaurusRtPkg = Join-Path $TaurusLazDir "taurustlsrt.lpk"
+
+          Write-Host "Taurus Lazarus package dir: $TaurusLazDir"
+
+          if (-not (Test-Path $TaurusRtPkg)) {
+            throw "Arquivo taurustlsrt.lpk não encontrado em: $TaurusRtPkg"
+          }
+
+          lazbuild "--primary-config-path=$env:USERPROFILE\AppData\Local\lazarus" "--add-package-link=$TaurusRtPkg"
+          lazbuild "--primary-config-path=$env:USERPROFILE\AppData\Local\lazarus" -B "$TaurusRtPkg"
+
+      - name: Build the Main package on Windows
+        run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
+
+      - name: Build Indy package on Windows
+        run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySockets.lpk"
+
+      - name: Build Taurus package on Windows
+        run: lazbuild -B "CORE/Packages/Lazarus/Connectors/Indy/RESTDWIndySocketsTaurus.lpk"
+
+      - name: Build ShellServices package on Windows
+        run: lazbuild -B "CORE/Packages/Lazarus/ShellTools/RESTDWShellServices.lpk"
+
+      - name: Build ZeosDriver package on Windows
+        run: lazbuild -B "CORE/Packages/Lazarus/Drivers/zeos/RESTDWZeosDriver.lpk"
+
+      - name: Build LazarusDriver package on Windows
+        run: lazbuild -B "CORE/Packages/Lazarus/Drivers/lazdriver/RESTDWLazarusDriver.lpk"
