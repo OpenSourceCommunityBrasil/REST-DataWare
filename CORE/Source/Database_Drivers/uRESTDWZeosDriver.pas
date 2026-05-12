@@ -530,13 +530,9 @@ begin
   qry := TZQuery(Self.Owner);
   memtable := TZMemTable.Create(nil);
   try
-   {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
-    memtable.AssignDataFrom(qry);
-   {$ELSE}
-    memtable.Assign(qry);
-   {$ENDIF}
+   memtable.AssignDataFrom(qry);
    //TODO SaveTostream
-//   memtable.SaveToStream(stream);
+   memtable.SaveToStream(stream);
    stream.Position := 0;
   finally
     FreeAndNil(memtable);
@@ -579,25 +575,13 @@ end;
 procedure TRESTDWZeosTable.SaveToStream(stream: TStream);
 var
   qry : TZTable;
-  {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
-    memtable : TZMemTable;
-  {$ELSE}
-    memtable : TRESTDWMemtable;
-  {$ENDIF}
+  memtable : TZMemTable;
 begin
-  qry := TZTable(Self.Owner);
-  {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
-    memtable := TZMemTable.Create(nil);
-  {$ELSE}
-    memtable := TRESTDWMemtable.Create(nil);
-  {$ENDIF}
+  qry := TZTable.Create(Self.Owner);
+  memtable := TZMemTable.Create(nil);
   try
-    {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
-      memtable.AssignDataFrom(qry);
-    {$ELSE}
-      memtable.Assign(qry);
-    {$ENDIF}
-    memtable.SaveToStream(stream);
+    memtable.Assign(qry);
+    memtable .SaveToStream(stream);
     stream.Position := 0;
   finally
     FreeAndNil(memtable);

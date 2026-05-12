@@ -658,8 +658,8 @@ Begin
                                     {$IFDEF FPC}
                                      stream.Read(Pointer(vString)^, vInt64);
                                      If EncodeStrs Then
-                                      vString := DecodeStrings(vString,  Dataset.GetDatabaseCharSet);
-                                     vString := GetStringEncode(vString, Dataset.GetDatabaseCharSet);
+                                      vString := DecodeStrings(vString,  csUndefined);
+                                     vString := GetStringEncode(vString, csUndefined);
                                      vInt64 := (Length(vString) + 1) * SizeOf(WideChar);
                                      If aField <> Nil Then
                                       Move(Pointer(WideString(vString))^, PData^, vInt64);
@@ -689,8 +689,8 @@ Begin
                                       {$IFDEF FPC}
                                        stream.Read(Pointer(vString)^, vInt64);
                                        If EncodeStrs Then
-                                        vString := DecodeStrings(vString,  Dataset.GetDatabaseCharSet);
-                                       vString := GetStringEncode(vString, Dataset.GetDatabaseCharSet);
+                                        vString := DecodeStrings(vString,  csUndefined);
+                                       vString := GetStringEncode(vString, csUndefined);
                                        If aField <> Nil Then
                                         Move(Pointer(vString)^, pData^, vInt64);
                                       {$ELSE}
