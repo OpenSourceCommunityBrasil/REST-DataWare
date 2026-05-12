@@ -541,12 +541,8 @@ Type
     FLastID           : Integer;
     FBlobs            : TMemBlobArray;
     FRecords          : TRecordList;
-    {$IFDEF FPC}
-    vDatabaseCharSet                   : TDatabaseCharSet;
-    Procedure SetDatabaseCharSet(Value : TDatabaseCharSet);
-    Function  GetDatabaseCharSet       : TDatabaseCharSet;
-    {$ELSE}
-    FFilterExpression : TRDWABExprParser;
+    {$IFNDEF FPC}
+     FFilterExpression : TRDWABExprParser;
     {$ENDIF}
     Constructor Create(AOwner : TComponent);Override;
     Destructor  Destroy;Override;
@@ -691,9 +687,6 @@ Type
     Property  FieldDefs;
     {$IFNDEF FPC}
      Property ObjectView default False;
-    {$ENDIF}
-    {$IFDEF FPC}
-    Property DatabaseCharSet    : TDatabaseCharSet   Read GetDatabaseCharSet Write SetDatabaseCharSet;
     {$ENDIF}
     Property  DatasetClosed     : Boolean            Read FDataSetClosed     Write FDataSetClosed    Default False;
     Property  KeyFieldNames     : String             Read FKeyFieldNames     Write FKeyFieldNames;
@@ -6109,18 +6102,6 @@ function TRESTDWMemTable.IsSequenced: Boolean;
 Begin
   Result := not Filtered;
 End;
-
-{$IFDEF FPC}
-function TRESTDWMemTable.GetDatabaseCharSet: TDatabaseCharSet;
-Begin
- Result := vDatabaseCharSet;
-End;
-
-procedure TRESTDWMemTable.SetDatabaseCharSet(Value: TDatabaseCharSet);
-Begin
- vDatabaseCharSet := Value;
-End;
-{$ENDIF}
 
 function TRESTDWMemTable.Locate(const KeyFields: String;
   const KeyValues: Variant; Options: TLocateOptions): Boolean;

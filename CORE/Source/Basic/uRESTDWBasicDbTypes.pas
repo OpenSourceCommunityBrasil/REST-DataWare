@@ -126,9 +126,6 @@ Uses
    Function  GetDataset                  : TDataset;
    Function  GetBlob           (RecNo, Index    : Integer) : PMemBlobData;
    Procedure Loaded;
-   {$IFDEF FPC}
-   Function  GetDatabaseCharSet          : TDatabaseCharSet;
-   {$ENDIF}
  End;
  Type
   TConnectionDefs = Class(TPersistent)

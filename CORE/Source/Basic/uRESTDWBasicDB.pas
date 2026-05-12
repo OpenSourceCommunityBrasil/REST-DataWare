@@ -313,9 +313,13 @@ End;
 Type
  TRESTDWDatabasebaseBase = Class(TRESTDWComponent)
  Private
+  {$IFDEF USE_TAURUS_TLS}
+   vUseTaurus           : Boolean;
+  {$ENDIF}
   vOnBuildConnection    : TOnBuildConnection;
   vClientIpVersion      : TRESTDWClientIpVersions;
   vSSLVersions          : TRESTDWSSLVersions;
+  aSSLMethod            : TRESTDWSSLVersion;
   vOnWorkBegin,
   vOnWork               : TOnWork;
   vOnWorkEnd            : TOnWorkEnd;
@@ -350,7 +354,6 @@ Type
   vTimeOut              : Integer;
   vConnectTimeOut       : Integer;
   vEncoding             : TEncodeSelect;             //Enconding se usar CORS usar UTF8 - Alexandre Abade
-  vUseSSL,
   vHandleRedirects,
   vFailOver,
   vProxy,                                            //Diz se tem servidor Proxy
@@ -383,17 +386,6 @@ Type
                                      aBinaryRequest         : Boolean = False) : Boolean;//Tenta Conectar o Servidor para saber se posso executar comandos
   Function  GetStateDB : Boolean;
   Procedure SetMyIp(Value : String);
-  Procedure ReconfigureConnection   (Var Connection         : TRESTDWPoolerMethodClient;
-                                     Var ConnectionExec     : TRESTClientPoolerBase;
-                                     TypeRequest            : Ttyperequest;
-                                     WelcomeMessage,
-                                     Host                   : String;
-                                     Port                   : Integer;
-                                     Compression,
-                                     EncodeStrings          : Boolean;
-                                     Encoding               : TEncodeSelect;
-                                     AccessTag              : String;
-                                     AuthenticationOptions  : TRESTDWClientAuthOptionParams);
   Function  GetRestPoolers                                  : TStringList;          //Retorna a Lista de DataSet Sources do Pooler
   Procedure SetDataRoute            (Value                  : String);
   Function  BuildConnection         (aBinaryRequest         : Boolean) : TRESTDWPoolerMethodClient;
@@ -401,7 +393,19 @@ Type
  Protected
   Procedure Loaded; override;
  Public
-  Function    IsServerLive          (Aip                    : String;
+  Procedure ReconfigureConnection  (Var aConnection        : TRESTDWPoolerMethodClient;
+                                    Var aRESTClientPooler  : TRESTClientPoolerBase;
+                                    aTypeRequest           : Ttyperequest;
+                                    aWelcomeMessage,
+                                    aHost                  : String;
+                                    aPort                  : Integer;
+                                    aCompression,
+                                    aEncodeStrings         : Boolean;
+                                    aEncoding              : TEncodeSelect;
+                                    aAccessTag             : String;
+                                    aAuthenticationOptions : TRESTDWClientAuthOptionParams);Virtual;
+  Procedure SetSSL;                 Virtual;
+  Function  IsServerLive            (Aip                    : String;
                                      Aport                  : Integer;
                                      AMessageErro           : String): Boolean; Virtual;
   Procedure SetConnection           (Value                  : Boolean;
@@ -540,7 +544,10 @@ Type
   Property FailOverConnections     : TListDefConnections        Read vFailOverConnections     Write vFailOverConnections;
   Property FailOverReplaceDefaults : Boolean                    Read vFailOverReplaceDefaults Write vFailOverReplaceDefaults;
   Property ClientConnectionDefs    : TClientConnectionDefs      Read vClientConnectionDefs    Write vClientConnectionDefs;
-  Property UseSSL                  : Boolean                    Read vUseSSL                  Write vUseSSL;
+  {$IFDEF USE_TAURUS_TLS}
+  Property UseTaurus               : Boolean                    Read vUseTaurus               Write vUseTaurus;
+  {$ENDIF}
+  Property SSLMethod               : TRESTDWSSLVersion          Read aSSLMethod               Write aSSLMethod;
   Property SSLVersions             : TRESTDWSSLVersions         Read vSSLVersions             Write vSSLVersions;
   Property UserAgent               : String                     Read vUserAgent               Write vUserAgent;
   Property ClientIpVersion         : TRESTDWClientIpVersions    Read vClientIpVersion         Write SetIpVersion default civIPv4;
@@ -797,6 +804,11 @@ Type
   Procedure   AbortData;
  Public
   //Métodos
+  {$IFDEF FPC}
+  vDatabaseCharSet                   : TDatabaseCharSet;
+  Procedure SetDatabaseCharSet(Value : TDatabaseCharSet);
+  Function  GetDatabaseCharSet       : TDatabaseCharSet;
+  {$ENDIF}
   Procedure   SetInactive      (Const Value            : Boolean);
   Procedure   Post; Override;
   Function    OpenJson         (JsonValue              : String = '';
@@ -865,7 +877,7 @@ Type
  Published
   Property MasterDataSet           : TRESTDWClientSQL      Read vMasterDataSet            Write SetMasterDataSet;
   {$IFDEF FPC}
-  Property DatabaseCharSet;
+  Property DatabaseCharSet         : TDatabaseCharSet   Read GetDatabaseCharSet Write SetDatabaseCharSet;
   {$ENDIF}
   Property MasterCascadeDelete     : Boolean               Read vCascadeDelete            Write vCascadeDelete;
   Property Datapacks               : Integer               Read vDatapacks                Write SetDatapacks;
@@ -1046,6 +1058,11 @@ Type
   Procedure Notification(AComponent: TComponent; Operation: TOperation); override;
  Public
   //Métodos
+  {$IFDEF FPC}
+  vDatabaseCharSet                   : TDatabaseCharSet;
+  Procedure SetDatabaseCharSet(Value : TDatabaseCharSet);
+  Function  GetDatabaseCharSet       : TDatabaseCharSet;
+  {$ENDIF}
   Procedure   Post; Override;
   Function    OpenJson         (JsonValue              : String = '';
                                 Const ElementRoot      : String = '';
@@ -1105,7 +1122,7 @@ Type
  Published
   Property MasterDataSet           : TRESTDWClientSQLBase  Read vMasterDataSet            Write SetMasterDataSet;
   {$IFDEF FPC}
-  Property DatabaseCharSet;
+  Property DatabaseCharSet         : TDatabaseCharSet   Read GetDatabaseCharSet Write SetDatabaseCharSet;
   {$ENDIF}
 //  Property BinaryCompatibleMode;
   Property MasterCascadeDelete     : Boolean               Read vCascadeDelete            Write vCascadeDelete;
@@ -3151,16 +3168,16 @@ Var
     If vDWParams <> Nil Then
      Begin
       {$IFDEF FPC}
-      vTempLineParams := EncodeStrings(vDWParams.ToJSON, TRESTDWClientSQL(Value).DatabaseCharSet);
+       vTempLineParams := EncodeStrings(vDWParams.ToJSON, TRESTDWClientSQL(Value).DatabaseCharSet);
       {$ELSE}
-      vTempLineParams := EncodeStrings(vDWParams.ToJSON);
+       vTempLineParams := EncodeStrings(vDWParams.ToJSON);
       {$ENDIF}
       FreeAndNil(vDWParams);
      End;
     {$IFDEF FPC}
-    vTempLineSQL      := EncodeStrings(TRESTDWClientSQL(Value).SQL.Text, TRESTDWClientSQL(Value).DatabaseCharSet);
+     vTempLineSQL      := EncodeStrings(TRESTDWClientSQL(Value).SQL.Text, TRESTDWClientSQL(Value).DatabaseCharSet);
     {$ELSE}
-    vTempLineSQL      := EncodeStrings(TRESTDWClientSQL(Value).SQL.Text);
+     vTempLineSQL      := EncodeStrings(TRESTDWClientSQL(Value).SQL.Text);
     {$ENDIF}
     Result            := Format(TDatasetRequestJSON, [vTempLineSQL, vTempLineParams,
                                                       BooleanToString(TRESTDWClientSQL(Value).BinaryRequest),
@@ -3835,6 +3852,9 @@ Begin
  vRESTConnectionDB             := BuildConnection(BinaryRequest);
  PoolerMethodClient            := vRESTConnectionDB;
  vRESTConnectionDB.SSLVersions := SSLVersions;
+ {$IFDEF FPC}
+ vRESTConnectionDB.DatabaseCharSet := RESTClientPooler.DatabaseCharSet;
+ {$ENDIF}
  CopyParams(vRESTConnectionDB, vRESTClientPooler);
  Try
    Try
@@ -4145,7 +4165,6 @@ Begin
  Inherited;
  vIgnoreEchoPooler         := False;
  vRESTClientPooler         := Nil;
- vUseSSL                   := False;
  vHandleRedirects          := False;
  vRedirectMaximum          := 0;
  vConnected                := False;
@@ -4911,41 +4930,18 @@ Begin
  SetConnection(False);
 End;
 
-Procedure TRESTDWDatabasebaseBase.ReconfigureConnection(Var Connection        : TRESTDWPoolerMethodClient;
-                                                        Var ConnectionExec    : TRESTClientPoolerBase;
-                                                        TypeRequest           : Ttyperequest;
-                                                        WelcomeMessage,
-                                                        Host                  : String;
-                                                        Port                  : Integer;
-                                                        Compression,
-                                                        EncodeStrings         : Boolean;
-                                                        Encoding              : TEncodeSelect;
-                                                        AccessTag             : String;
-                                                        AuthenticationOptions : TRESTDWClientAuthOptionParams);
+Procedure TRESTDWDatabasebaseBase.ReconfigureConnection(Var aConnection        : TRESTDWPoolerMethodClient;
+                                                        Var aRESTClientPooler : TRESTClientPoolerBase;
+                                                        aTypeRequest           : Ttyperequest;
+                                                        aWelcomeMessage,
+                                                        aHost                  : String;
+                                                        aPort                  : Integer;
+                                                        aCompression,
+                                                        aEncodeStrings         : Boolean;
+                                                        aEncoding              : TEncodeSelect;
+                                                        aAccessTag             : String;
+                                                        aAuthenticationOptions : TRESTDWClientAuthOptionParams);
 Begin
- Connection.TypeRequest               := TypeRequest;
- Connection.WelcomeMessage            := WelcomeMessage;
- Connection.Host                      := Host;
- Connection.Port                      := Port;
- Connection.Compression               := Compression;
- Connection.EncodeStrings             := EncodeStrings;
- Connection.Encoding                  := Encoding;
- Connection.AccessTag                 := AccessTag;
- If assigned(ConnectionExec) Then
-  Begin
-   ConnectionExec.Host                  := Connection.Host;
-   ConnectionExec.Port                  := Connection.Port;
-   ConnectionExec.DataCompression       := Connection.Compression;
-   ConnectionExec.TypeRequest           := Connection.TypeRequest;
-   ConnectionExec.WelcomeMessage        := Connection.WelcomeMessage;
-   ConnectionExec.EncodedStrings        := Connection.EncodeStrings;
-   ConnectionExec.SetAccessTag(Connection.AccessTag);
-   ConnectionExec.Encoding              := Connection.Encoding;
-   ConnectionExec.AuthenticationOptions.Assign(AuthenticationOptions);
-   {$IFDEF FPC}
-    ConnectionExec.DatabaseCharSet := csUndefined;
-   {$ENDIF}
-  End;
 End;
 
 Function  TRESTDWDatabasebaseBase.TryConnect(Connection     : TRESTDWPoolerMethodClient;
@@ -4998,8 +4994,14 @@ Var
   End;
  End;
 Begin
- vErrorBoolean                := False;
- vMessageError                := '';
+ ReconfigureConnection(Connection,     vRESTClientPooler,
+                       vTypeRequest,   vWelcomeMessage,
+                       PoolerService,  PoolerPort,
+                       vCompression,  vEncodeStrings,
+                       vEncoding,     vAccessTag,
+                       AuthenticationOptions);
+ vErrorBoolean                    := False;
+ vMessageError                    := '';
  Try
   Try
    If Assigned(vRESTClientPooler) Then
@@ -5265,7 +5267,6 @@ Begin
    RESTClientPooler.ContentEncoding := ConnectionDB.ContentEncoding;
    RESTClientPooler.AuthenticationOptions.Assign(ConnectionDB.AuthenticationOptions);
    RESTClientPooler.SSLVersions     := ConnectionDB.SSLVersions;
-   RESTClientPooler.UseSSL          := UseSSL;
    RESTClientPooler.WelcomeMessage  := ConnectionDB.WelcomeMessage;
   End;
 End;
@@ -5312,7 +5313,6 @@ Var
  vRESTConnectionDB : TRESTDWPoolerMethodClient;
 Begin
  vRESTConnectionDB := nil;
-
  If (csLoading in ComponentState) then
   Value := False;
  If (Value) And Not(vConnected) then
@@ -5369,13 +5369,16 @@ Begin
   End;
 End;
 
+Procedure TRESTDWDatabasebaseBase.SetSSL;
+Begin
+
+End;
+
 procedure TRESTDWDatabasebaseBase.SetIpVersion(IpV: TRESTDWClientIpVersions);
 begin
  vClientIpVersion := IpV;
-
- if Assigned(RESTClientPooler) then
+ If Assigned(RESTClientPooler) Then
   RESTClientPooler.ClientIpVersion := IpV;
-
 end;
 
 Procedure TRESTDWDatabasebaseBase.SetPoolerPort(Value : Integer);
@@ -5854,6 +5857,18 @@ Begin
  vNotRepage := Value;
 End;
 
+{$IFDEF FPC}
+function TRESTDWClientSQL.GetDatabaseCharSet: TDatabaseCharSet;
+Begin
+ Result := vDatabaseCharSet;
+End;
+
+procedure TRESTDWClientSQL.SetDatabaseCharSet(Value: TDatabaseCharSet);
+Begin
+ vDatabaseCharSet := Value;
+End;
+{$ENDIF}
+
 Procedure TRESTDWClientSQL.Setnotrepage(Value: Boolean);
 Begin
  vNotRepage := Value;
@@ -5996,6 +6011,9 @@ Begin
  vMassiveDataset                   := TMassiveDatasetBuffer.Create(Self);
 // vActionCursor                     := crHourGlass;
  vUpdateSQL                        := Nil;
+ {$IFDEF FPC}
+  vDatabaseCharSet                 := csUndefined;
+ {$ENDIF}
  SetComponentTAG;
 End;
 
@@ -6093,6 +6111,9 @@ Begin
   Inherited AfterDelete             := OldAfterDelete;
  {$ENDIF}
  vMassiveDataset                   := TMassiveDatasetBuffer.Create(Self);
+ {$IFDEF FPC}
+  vDatabaseCharSet                 := csUndefined;
+ {$ENDIF}
 // vActionCursor                     := crHourGlass;
  vUpdateSQL                        := Nil;
  SetComponentTAG;
@@ -6423,7 +6444,7 @@ Begin
           JSONValue.Encoding := vRESTDataBase.Encoding;
           JSONValue.Encoded  := vRESTDataBase.EncodedStrings;
           {$IFDEF FPC}
-          JSONValue.DatabaseCharSet := DatabaseCharSet;
+           JSONValue.DatabaseCharSet := DatabaseCharSet;
           {$ENDIF}
           JSONValue.Utf8SpecialChars := True;
           If vInternalLast Then
@@ -6549,7 +6570,7 @@ Begin
           JSONValue.Encoded  := vRESTDataBase.EncodedStrings;
           JSONValue.ServerFieldList := ServerFieldList;
           {$IFDEF FPC}
-           JSONValue.DatabaseCharSet    := DatabaseCharSet;
+           JSONValue.DatabaseCharSet := DatabaseCharSet;
            JSONValue.NewFieldList       := @NewFieldList;
            JSONValue.CreateDataSet      := @CreateDataSet;
            JSONValue.NewDataField       := @NewDataField;
@@ -9393,12 +9414,13 @@ Begin
     TRESTDWMemtable(Self).Close;
     TRESTDWMemtable(Self).Open;
    {$ELSE}
-    {$IFNDEF RESTDWUNIDACMEM}
-     If Self is TMemDataset Then
-      TMemDataset(Self).CreateTable;
-    {$ELSE}
+    {$IFDEF RESTDWUNIDACMEM}
      TVirtualTable(Self).Close;
      TVirtualTable(Self).Open;
+    {$ENDIF}
+    {$IFDEF ZEOSMEM}
+     TZMemtable(Self).Close;
+     TZMemtable(Self).Open;
     {$ENDIF}
    {$ENDIF}
   {$ENDIF}
@@ -9424,12 +9446,13 @@ Begin
     TRESTDWMemtable(Self).Close;
     TRESTDWMemtable(Self).Open;
    {$ELSE}
-    {$IFNDEF RESTDWUNIDACMEM}
-     If Self is TMemDataset Then
-      TMemDataset(Self).CreateTable;
-    {$ELSE}
+    {$IFDEF RESTDWUNIDACMEM}
      TVirtualTable(Self).Close;
      TVirtualTable(Self).Open;
+    {$ENDIF}
+    {$IFDEF ZEOSMEM}
+     TZMemtable(Self).Close;
+     TZMemtable(Self).Open;
     {$ENDIF}
    {$ENDIF}
   {$ENDIF}
@@ -10123,6 +10146,18 @@ Begin
   End;
 End;
 
+{$IFDEF FPC}
+function TRESTDWTable.GetDatabaseCharSet: TDatabaseCharSet;
+Begin
+ Result := vDatabaseCharSet;
+End;
+
+procedure TRESTDWTable.SetDatabaseCharSet(Value: TDatabaseCharSet);
+Begin
+ vDatabaseCharSet := Value;
+End;
+{$ENDIF}
+
 Procedure TRESTDWTable.Post;
 Begin
  {$IFDEF FPC}
@@ -10181,7 +10216,7 @@ Begin
      LDataSetList.Encoding := esUtf8;
      LDataSetList.ServerFieldList := ServerFieldList;
      {$IFDEF FPC}
-      LDataSetList.DatabaseCharSet    := DatabaseCharSet;
+      LDataSetList.DatabaseCharSet   := DatabaseCharSet;
       LDataSetList.NewFieldList       := @NewFieldList;
       LDataSetList.CreateDataSet      := @CreateDataSet;
       LDataSetList.NewDataField       := @NewDataField;
@@ -10263,7 +10298,7 @@ Begin
      LDataSetList.Encoding := esUtf8;
      LDataSetList.ServerFieldList := ServerFieldList;
      {$IFDEF FPC}
-      LDataSetList.DatabaseCharSet    := DatabaseCharSet;
+      LDataSetList.DatabaseCharSet   := DatabaseCharSet;
       LDataSetList.NewFieldList       := @NewFieldList;
       LDataSetList.CreateDataSet      := @CreateDataSet;
       LDataSetList.NewDataField       := @NewDataField;
@@ -10396,7 +10431,7 @@ Begin
       Try
        LDataSetList.ServerFieldList := ServerFieldList;
        {$IFDEF FPC}
-        LDataSetList.DatabaseCharSet    := DatabaseCharSet;
+        LDataSetList.DatabaseCharSet   := DatabaseCharSet;
         LDataSetList.NewFieldList       := @NewFieldList;
         LDataSetList.CreateDataSet      := @CreateDataSet;
         LDataSetList.NewDataField       := @NewDataField;
@@ -10475,7 +10510,7 @@ Begin
        LDataSetList.OnWriterProcess := OnWriterProcess;
        LDataSetList.ServerFieldList := ServerFieldList;
        {$IFDEF FPC}
-        LDataSetList.DatabaseCharSet    := DatabaseCharSet;
+        LDataSetList.DatabaseCharSet   := DatabaseCharSet;
         LDataSetList.NewFieldList       := @NewFieldList;
         LDataSetList.CreateDataSet      := @CreateDataSet;
         LDataSetList.NewDataField       := @NewDataField;
@@ -10739,6 +10774,9 @@ Begin
        vMetaData := FieldDefs.Count = 0;
       For I := 0 To 1 Do
        Begin
+        {$IFDEF FPC}
+         vRESTDataBase.RESTClientPooler.DatabaseCharSet := DatabaseCharSet;
+        {$ENDIF}
         vRESTDataBase.ExecuteCommand(vActualPoolerMethodClient, vSQL, vParams, vError, vMessageError, LDataSetList,
                                      vRowsAffected, False, BinaryRequest, BinaryCompatibleMode, vMetaData, vRESTDataBase.RESTClientPooler);
         If Not(vError) or (vMessageError <> cInvalidAuth) Then
@@ -10781,7 +10819,7 @@ Begin
        LDataSetList.OnWriterProcess     := OnWriterProcess;
        LDataSetList.ServerFieldList := ServerFieldList;
        {$IFDEF FPC}
-        LDataSetList.DatabaseCharSet    := DatabaseCharSet;
+        LDataSetList.DatabaseCharSet   := DatabaseCharSet;
         LDataSetList.NewFieldList       := @NewFieldList;
         LDataSetList.CreateDataSet      := @CreateDataSet;
         LDataSetList.NewDataField       := @NewDataField;
@@ -10832,7 +10870,7 @@ Begin
          SetInBlockEvents(True);
          Try
           TRESTDWClientSQLBase(Self).DisableControls;
-          TRESTDWClientSQLBase(Self).LoadFromStream(TMemoryStream(vStream));
+          TRESTDWClientSQLBase(Self).LoadFromStream(vStream);
           If TRESTDWClientSQLBase(Self).Active Then
            Begin
             TRESTDWClientSQLBase(Self).SetInBlockEvents(True); // Novavix

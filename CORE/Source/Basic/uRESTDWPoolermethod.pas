@@ -74,6 +74,7 @@ Uses
    vRedirectMaximum        : Integer;
    vOnBeforeGetToken       : TOnBeforeGetToken;
    vActualClientPoolerExec : TRESTClientPoolerBase;
+   aSSLMethod              : TRESTDWSSLVersion;
    vSSLVersions            : TRESTDWSSLVersions;
    Procedure SetOnWork     (Value : TOnWork);
    Procedure SetOnWorkBegin(Value : TOnWork);
@@ -384,10 +385,11 @@ Uses
    Property CriptOptions          : TCripto                    Read vCripto                Write vCripto;
    Property UserAgent             : String                     Read vUserAgent             Write vUserAgent;
    Property DataRoute             : String                     Read vDataRoute             Write vDataRoute;
-   Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams      Write SetAuthOptionParams;
+   Property AuthenticationOptions : TRESTDWClientAuthOptionParams Read vAuthOptionParams   Write SetAuthOptionParams;
    Property OnBeforeGetToken      : TOnBeforeGetToken          Read vOnBeforeGetToken      Write vOnBeforeGetToken;
    Property PoolerNotFoundMessage : String                     Read vPoolerNotFoundMessage Write vPoolerNotFoundMessage;
-   Property SSLVersions           : TRESTDWSSLVersions         Read vSSLVersions             Write vSSLVersions;
+   Property SSLMethod             : TRESTDWSSLVersion          Read aSSLMethod             Write aSSLMethod;
+   Property SSLVersions           : TRESTDWSSLVersions         Read vSSLVersions           Write vSSLVersions;
   End;
 
 implementation

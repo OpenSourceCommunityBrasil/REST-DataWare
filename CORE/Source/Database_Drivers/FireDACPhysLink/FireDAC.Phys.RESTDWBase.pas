@@ -120,7 +120,7 @@ type
   protected
     procedure InternalPrepare; override;
     procedure InternalUnprepare; override;
-    function InternalOpen{$IFDEF DELPHI11UP}(var ACount: TFDCounter){$ENDIF}: Boolean; override;
+    function InternalOpen(var ACount: TFDCounter): Boolean; override;
     function InternalNextRecordSet: Boolean; override;
     procedure InternalClose; override;
     procedure InternalExecute(ATimes, AOffset: integer;
@@ -537,7 +537,7 @@ begin
   Result := False;
 end;
 
-function TFDPhysRDWCommand.InternalOpen{$IFDEF DELPHI11UP}(var ACount: TFDCounter){$ENDIF}: Boolean;
+function TFDPhysRDWCommand.InternalOpen(var ACount: TFDCounter): Boolean;
 begin
   {$IFDEF DELPHI11UP}
   ACount := -1;

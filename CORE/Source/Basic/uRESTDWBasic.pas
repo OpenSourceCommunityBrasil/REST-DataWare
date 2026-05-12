@@ -200,12 +200,12 @@ End;
   vFailOverReplaceDefaults,
   vEncodeStrings,
   vDatacompress,
-  vUseSSL,
   vAuthentication      : Boolean;
   {$IFDEF FPC}
   vDatabaseCharSet     : TDatabaseCharSet;
   {$ENDIF}
   vFailOverConnections : TFailOverConnections;
+  aSSLMethod           : TRESTDWSSLVersion;
   vSSLVersions         : TRESTDWSSLVersions;
   Function    SendEvent      (EventData        : String)          : String;Overload;
   Procedure   SetDataRoute   (Value : String);
@@ -272,14 +272,14 @@ End;
   Property OnBeforeExecute         : TOnBeforeExecute              Read vOnBeforeExecute         Write vOnBeforeExecute;
   Property OnBeforeGetToken        : TOnBeforeGetToken             Read vOnBeforeGetToken        Write vOnBeforeGetToken;
   Property FailOver                : Boolean                       Read vFailOver                Write vFailOver;
-  Property UseSSL                  : Boolean                       Read vUseSSL                  Write vUseSSL;
+  Property SSLMethod               : TRESTDWSSLVersion             Read aSSLMethod               Write aSSLMethod;
+  Property SSLVersions             : TRESTDWSSLVersions            Read vSSLVersions             Write vSSLVersions;
   Property FailOverConnections     : TFailOverConnections          Read vFailOverConnections     Write vFailOverConnections;
   Property FailOverReplaceDefaults : Boolean                       Read vFailOverReplaceDefaults Write vFailOverReplaceDefaults;
   Property BinaryRequest           : Boolean                       Read vBinaryRequest           Write vBinaryRequest;
   Property CriptOptions            : TCripto                       Read vCripto                  Write vCripto;
   Property UserAgent               : String                        Read vUserAgent               Write vUserAgent;
   Property PoolerNotFoundMessage   : String                        Read vPoolerNotFoundMessage   Write vPoolerNotFoundMessage;
-  Property SSLVersions             : TRESTDWSSLVersions            Read vSSLVersions             Write vSSLVersions;
   {$IFDEF FPC}
   Property DatabaseCharSet         : TDatabaseCharSet              Read vDatabaseCharSet         Write vDatabaseCharSet;
   {$ENDIF}
@@ -1530,7 +1530,6 @@ Begin
  vFailOver                             := False;
  vFailOverReplaceDefaults              := False;
  vPropThreadRequest                    := False;
- vUseSSL                               := False;
  vFailOverConnections                  := TFailOverConnections.Create(Self, TRESTDWConnectionServerCP);
  vPoolerNotFoundMessage                := cPoolerNotFound;
  vClientIpVersion                      := civIPv4;
