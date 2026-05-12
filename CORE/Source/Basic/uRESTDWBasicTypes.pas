@@ -257,8 +257,7 @@ Uses
    vBinaryLoadRequest                 : Boolean;
    vOnWriterProcess                   : TOnWriterProcess;
    Function  OnEditingState : Boolean;
-  Public
-   Property    BinaryCompatibleMode   : Boolean Read vBinaryCompatibleMode;
+  Public   
    Procedure   BaseOpen;
    Procedure   BaseClose;
    Procedure   ForceInternalCalc;
@@ -269,6 +268,7 @@ Uses
    Procedure   PrepareDetailsNew;                       Virtual;Abstract;
    Procedure   PrepareDetails(ActiveMode : Boolean);    Virtual;Abstract;
    Constructor Create(AOwner: TComponent);Override;
+   Property    BinaryCompatibleMode   : Boolean Read vBinaryCompatibleMode;
    Property    InLoadFromStream  : Boolean       Read vLoadFromStream;
    Property    BinaryLoadRequest : Boolean       Read vBinaryLoadRequest;
    Property    OnLoadStream      : Boolean       Read vOnLoadStream       Write vOnLoadStream;
