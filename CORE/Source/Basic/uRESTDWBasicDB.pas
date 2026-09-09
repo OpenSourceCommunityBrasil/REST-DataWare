@@ -1,6 +1,6 @@
 unit uRESTDWBasicDB;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -835,7 +835,7 @@ Type
   Procedure   Open               (strSQL  : String);Overload; Virtual;//Método Open que será utilizado no Componente
   Procedure   ExecOrOpen;                                        //Método Open que será utilizado no Componente
   Procedure   Close; Virtual;                                    //Método Close que será utilizado no Componente
-  Procedure   CreateDataSet;
+  Procedure   CreateDataSet         (Const aDataset  : TDataset);
   Class Procedure CreateEmptyDataset(Const Dataset : TDataset);
   Procedure   CreateDatasetFromList;
   Procedure   ExecSQL;Overload;                                        //Método ExecSQL que será utilizado no Componente
@@ -1086,7 +1086,7 @@ Type
   Function    FieldExist         (Value   : String) : TField;
   Procedure   Open; Overload; //Virtual;                     //Método Open que será utilizado no Componente
   Procedure   Close; Virtual;                                    //Método Close que será utilizado no Componente
-  Procedure   CreateDataSet;
+  Procedure   CreateDataSet         (Const aDataset : TDataset);
   Class Procedure CreateEmptyDataset(Const Dataset : TDataset);
   Procedure   CreateDatasetFromList;
   Function    ParamByName          (Value : String) : TParam;    //Retorna o Parametro de Acordo com seu nome
@@ -5858,14 +5858,17 @@ Begin
 End;
 
 {$IFDEF FPC}
-function TRESTDWClientSQL.GetDatabaseCharSet: TDatabaseCharSet;
+Function TRESTDWClientSQL.GetDatabaseCharSet: TDatabaseCharSet;
 Begin
  Result := vDatabaseCharSet;
 End;
 
-procedure TRESTDWClientSQL.SetDatabaseCharSet(Value: TDatabaseCharSet);
+Procedure TRESTDWClientSQL.SetDatabaseCharSet(Value: TDatabaseCharSet);
 Begin
  vDatabaseCharSet := Value;
+ {$IFDEF RESTDWMEMTABLE}
+ TRESTDWMemTable(Self).DatabaseCharSet := Value;
+ {$ENDIF}
 End;
 {$ENDIF}
 
@@ -8419,7 +8422,7 @@ Begin
   vSQL.Add(Value[I]);
 End;
 
-Procedure TRESTDWTable.CreateDataSet;
+Procedure TRESTDWTable.CreateDataSet(Const aDataset : TDataset);
 Begin
  vCreateDS := True;
  SetInBlockEvents(True);
@@ -8459,13 +8462,14 @@ Begin
  vInactive := Value;
 End;
 
-Procedure TRESTDWClientSQL.CreateDataSet;
+Procedure TRESTDWClientSQL.CreateDataSet(Const aDataset : TDataset);
 Begin
  vCreateDS := True;
  SetInBlockEvents(True);
  Try
   {$IFDEF RESTDWMEMTABLE}
    EmptyTable;
+   TRESTDWMemTable(aDataset).CreateDataset;
   {$ENDIF}
   vCreateDS := False;
   vActive   := Not vCreateDS;
@@ -8562,7 +8566,7 @@ Begin
    Else
     FieldDef.Required    :=  vFieldsList[I].Required;
   End;
- CreateDataset;
+ CreateDataset(TDataset(Self));
 End;
 
 Procedure TRESTDWClientSQL.CreateDatasetFromList;
@@ -8614,7 +8618,7 @@ Begin
    Else
     FieldDef.Required    :=  vFieldsList[I].Required;
   End;
- CreateDataset;
+ CreateDataset(TDataset(Self));
 End;
 
 procedure TRESTDWTable.CleanFieldList;
@@ -10669,7 +10673,7 @@ Var
       Begin
        For J := 0 To vTempDS.Fields.Count - 1 Do
         Begin
-         vFieldDefinition.FieldName := vTempDS.Fields[J].Name;
+         vFieldDefinition.FieldName := vTempDS.Fields[J].FieldName;
          vFieldDefinition.DataType  := vTempDS.Fields[J].DataType;
          If (vFieldDefinition.DataType <> ftFloat) Then
           vFieldDefinition.Size     := vTempDS.Fields[J].Size
@@ -10684,6 +10688,7 @@ Var
          vFieldDefinition.Required   := vTempDS.Fields[J].Required;
          NewDataField(vFieldDefinition);
         End;
+        
       End;
     End;
   Finally

@@ -1,22 +1,22 @@
 unit uRESTDWBasicDbTypes;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -32,101 +32,9 @@ unit uRESTDWBasicDbTypes;
 Interface
 
 Uses
-  {$IFNDEF FPC}
-   {$IF CompilerVersion < 21}
-    DbTables,
-   {$IFEND}
-  {$ENDIF}
- SysUtils,  Classes, Db, FMTBcd,
+ SysUtils, Classes, Db,
  uRESTDWAbout, uRESTDWProtoTypes, uRESTDWConsts, uRESTDWTools;
 
- Type
-  TRESTDWMemTableAE     = Class
- End;
-  TFieldAttrs           = Array of Byte;
-  TMemBlobData          = TRESTDWBytes;
-  TMemBlobArray         = Array Of TMemBlobData;
-  PMemBlobArray         = ^TMemBlobArray;
-
- {$IFNDEF FPC}
-  {$IF CompilerVersion > 21}
-    PRESTDWMTMemBuffer    = PByte;
-    TRESTDWMTBookmark     = TBookmark;
-    TRESTDWMTValueBuffer  = TValueBuffer;
-    TRESTDWMTRecordBuffer = TRecordBuffer;
-  {$ELSE}
-   {$IFDEF UNICODE}
-    PRESTDWMTMemBuffer    = PByte;
-   {$ELSE}
-     PRESTDWMTMemBuffer   = PAnsiChar;
-   {$ENDIF UNICODE}
-   TRESTDWMTBookmark      = Pointer;
-   TRESTDWMTValueBuffer   = Pointer;
-   TRESTDWMTRecordBuffer  = Pointer;
-  {$IFEND}
- {$ELSE}
-  TValueBuffer            = Array of Byte;
-  PRESTDWMTMemBuffer      = PByte;
-  TRESTDWMTBookmark       = Pointer;
-  TRESTDWMTValueBuffer    = Pointer;
-  TRESTDWMTRecordBuffer   = TRecordBuffer;
- {$ENDIF}
- PMemBlobData          = ^TRESTDWBytes;
- Type
-  PRESTDWMTMemoryRecord = ^TRESTDWMTMemoryRecord;
-  TRESTDWMTMemoryRecord = Class(TPersistent)
- Private
-  FMemoryData : TRESTDWMemTableAE;
-  FIndex,
-  FID         : Integer;
-  FData       : Pointer;
-  FIsNull     : Boolean;
-  Function  GetIndex : Integer;
-  Procedure SetMemoryData(Value        : TRESTDWMemTableAE;
-                          UpdateParent : Boolean);
- Protected
-  Procedure SetIndex     (Value        : Integer);         Virtual;
- Public
-  FBlobs      : TMemBlobArray;
-  Constructor Create     (MemoryData   : TRESTDWMemTableAE); Virtual;
-  Constructor CreateEx   (MemoryData   : TRESTDWMemTableAE;
-                          UpdateParent : Boolean);         Virtual;
-  Destructor  Destroy;Override;
-  Property    MemoryData : TRESTDWMemTableAE Read FMemoryData;
-  Property    ID         : Integer         Read FID         Write FID;
-  Property    Index      : Integer         Read GetIndex    Write SetIndex;
-  Property    Data       : Pointer         Read FData       Write FData;
-  Property    Blobs      : TMemBlobArray   Read FBlobs      Write FBlobs;
-  Property    IsNull     : Boolean         Read FIsNull     Write FIsNull;
- End;
- Type
-  IRESTDWMemTable = Interface
-   Function GetRecordCount               : Integer;
-   Function GetMemoryRecord  (Index      : Integer)      : TRESTDWMTMemoryRecord;
-   Function GetOffSets       (aField     : TField)       : Word;Overload;
-   Function GetOffSets       (Index      : Integer)      : Word;Overload;
-   Function GetOffSetsBlobs              : Word;
-   Function DataTypeSuported(datatype    : TFieldType)   : Boolean; // new
-   Function DataTypeIsBlobTypes(datatype : TFieldType)   : Boolean; // new
-   Function GetBlobRec         (Field    : TField;
-                                Rec      : TRESTDWMTMemoryRecord) : TMemBlobData;
-   Function CreateBlobStream   (Field    : TField;
-                                Mode     : TBlobStreamMode)       : TStream;
-   Function GetCalcFieldLen    (FieldType: TFieldType;
-                                Size     : Word)                  : Word;
-   Procedure InternalAddRecord (Buffer   : {$IFDEF FPC}Pointer{$ELSE}
-                                           {$IFDEF RESTDWANDROID}TRecBuf{$ELSE}
-                                           {$IF CompilerVersion >22}Pointer{$ELSE}TRecordBuffer{$IFEND}{$ENDIF}{$ENDIF};
-                                aAppend  : Boolean);
-   Procedure InitRecord        (Buffer   : {$IFDEF NEXTGEN}TRecBuf{$ELSE}TRecordBuffer{$ENDIF});
-   Function  AllocRecordBuffer           : TRecordBuffer;
-   Procedure SetMemoryRecordData(Buffer  : PRESTDWMTMemBuffer;
-                                 Pos     : Integer);
-   Procedure AfterLoad;
-   Function  GetDataset                  : TDataset;
-   Function  GetBlob           (RecNo, Index    : Integer) : PMemBlobData;
-   Procedure Loaded;
- End;
  Type
   TConnectionDefs = Class(TPersistent)
   Private
@@ -201,7 +109,7 @@ Uses
 
 implementation
 
-Uses uRESTDWMemoryDataset, uRESTDWDataJSON, uRESTDWJSONInterface;
+Uses uRESTDWJSONInterface;
 
 constructor TRESTDWStorageBase.Create(AOwner: TComponent);
 Begin
@@ -237,7 +145,7 @@ End;
 
 Procedure TRESTDWStorageBase.LoadFromStream(Dataset: TDataset; stream: TStream);
 Begin
- LoadDWMemFromStream(TRESTDWMemtable(Dataset), stream);
+ LoadDatasetFromStream(Dataset, stream);
 End;
 
 Procedure TRESTDWStorageBase.SaveDatasetToStream(Dataset: TDataset; Var stream: TStream);
@@ -398,93 +306,6 @@ Begin
  Finally
   FreeAndNil(bJsonValue);
  End;
-End;
-
-// === { TRESTDWMTMemoryRecord } ====================================================
-Constructor TRESTDWMTMemoryRecord.Create(MemoryData: TRESTDWMemTableAE);
-Begin
- FIsNull := True;
- FIndex := -1;
- CreateEx(MemoryData, True);
-End;
-
-Constructor TRESTDWMTMemoryRecord.CreateEx(MemoryData: TRESTDWMemTableAE; UpdateParent: Boolean);
-Begin
- Inherited Create;
- SetMemoryData(MemoryData, UpdateParent);
-End;
-
-Destructor TRESTDWMTMemoryRecord.Destroy;
-Begin
- SetMemoryData(Nil, False);
-// Finalize(FBlobs);
-// SetLength(FBlobs, 0);
- Inherited Destroy;
-End;
-
-Function TRESTDWMTMemoryRecord.GetIndex: Integer;
-Begin
-// If FMemoryData <> Nil then
-//  Result := FMemoryData.FRecords.IndexOf(Self)
-// Else
- Result := FIndex;
-End;
-
-Procedure TRESTDWMTMemoryRecord.SetMemoryData(Value: TRESTDWMemTableAE; UpdateParent: Boolean);
-var
- I, DataSize: Integer;
-Begin
- If FMemoryData <> Value then
-  Begin
-   If FMemoryData <> nil then
-    Begin
-     If TRESTDWMemTable(FMemoryData).BlobFieldCount > 0 Then
-      Begin
-//       {$IFDEF FPC}
-        SetLength(FBlobs, 0); //Finalize(FBlobs, FMemoryData.BlobFieldCount);
-//       {$ELSE}
-//        Finalize(FBlobs);
-//       {$ENDIF}
-      End;
-     TRESTDWMemTable(FMemoryData).FRecords.Remove(Self);
-     {$IFDEF FPC}
-      ReallocMem(FData, 0);
-     {$ELSE}
-      FreeMem(FData, SizeOf(FData));
-//      ReallocMem(FData, 0);
-     {$ENDIF}
-     FMemoryData := Nil;
-    End;
-   If Value <> Nil then
-    Begin
-     If UpdateParent then
-      Begin
-       TRESTDWMemTable(Value).FRecords.Add(Self);
-       Inc(TRESTDWMemTable(Value).FLastID);
-       FID := TRESTDWMemTable(Value).FLastID;
-      End;
-     FMemoryData := Value;
-     If TRESTDWMemTable(Value).BlobFieldCount > 0 then
-      Begin
-       SetLength(FBlobs, 0);
-       SetLength(FBlobs, TRESTDWMemTable(Value).BlobFieldCount);
-      End;
-     DataSize := 0;
-     For I := 0 to TRESTDWMemTable(Value).Fields.Count - 1 do
-      CalcDataSize(TRESTDWMemTable(Value).Fields[I], DataSize);
-     ReallocMem(FData, DataSize);
-    End;
-  End;
-End;
-
-Procedure TRESTDWMTMemoryRecord.SetIndex(Value: Integer);
-var
-  CurIndex: Integer;
-Begin
- CurIndex := GetIndex;
- If (CurIndex >= 0) and (CurIndex <> Value) then
-  TRESTDWMemTable(FMemoryData).FRecords.Move(CurIndex, Value);
- FIndex := Value;
 End;
 
 end.

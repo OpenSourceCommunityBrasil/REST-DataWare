@@ -1,21 +1,21 @@
 unit uRESTDWDataUtils;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Flávio Motta               - Member Tester and DEMO Developer.
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -723,7 +723,7 @@ Begin
  If trim(vServerSignature) <> '' Then
   viss := Format('"iss":"%s", ', [vServerSignature]);
  vBuildData  := '';
- //Por enquanto igual mais no futuro haverá diferenças
+ //Por enquanto igual mais no futuro haver diferenas
  Case vRDWTokenType Of
   rdwTS,
   rdwPersonal : Begin
@@ -992,7 +992,7 @@ Begin
  vHeader         := '';
  vBody           := '';
  vStringComparer := '';
- Value           := StringReplace(Value, ' ', '+', [rfReplaceAll]); //Remove espaços na Token e add os caracteres "+" em seu lugar
+ Value           := StringReplace(Value, ' ', '+', [rfReplaceAll]); //Remove espaos na Token e add os caracteres "+" em seu lugar
  vHeader         := Copy(Value, InitStrPos, Pos('.', Value) -1);
  Delete(Value, InitStrPos, Pos('.', Value));
  vBody           := Copy(Value, InitStrPos, Pos('.', Value) -1);
@@ -2023,7 +2023,7 @@ Begin
     vParams.Text := StringReplace(Cmd, '&', sLineBreak, [rfReplaceAll]);
     If vParams.count = 0 Then
      If Trim(Cmd) <> '' Then
-      vParams.DelimitedText := StringReplace(Cmd, sLineBreak, '&', [rfReplaceAll]); //Alterações enviadas por "joaoantonio19"
+      vParams.DelimitedText := StringReplace(Cmd, sLineBreak, '&', [rfReplaceAll]); //Alteraes enviadas por "joaoantonio19"
    Finally
     encodestrings  := False;
     For I := 0 To vParams.Count - 1 Do

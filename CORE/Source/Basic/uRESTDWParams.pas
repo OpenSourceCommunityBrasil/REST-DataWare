@@ -1,21 +1,21 @@
 unit uRESTDWParams;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Flávio Motta               - Member Tester and DEMO Developer.
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -47,6 +47,7 @@ End;
 Type
  TDWParamExpType    = (tdwpxt_All, tdwpxt_IN, tdwpxt_OUT, tdwpxt_INOUT);
  TProcedureEvent    = Procedure Of Object;
+ TProcedureDbEvent  = Procedure(Const aDataset : TDataset) Of Object;
  TNewDataField      = Procedure (FieldDefinition : TFieldDefinition) Of Object;
  TFieldExist        = Function  (Const Dataset   : TDataset;
                                  Value           : String) : TField  Of Object;
@@ -62,7 +63,7 @@ Type
  TRESTDWJSONValue = Class
  Private
   vFieldExist      : TFieldExist;
-  vCreateDataset,
+  vCreateDataset   : TProcedureDbEvent;
   vNewFieldList    : TProcedureEvent;
   vNewDataField    : TNewDataField;
   vSetInitDataset  : TSetInitDataset;
@@ -120,8 +121,8 @@ Type
   Function  GetFieldExist                    : TFieldExist;
   Function  aFieldExist       (Const Dataset : TDataset;
                                Value         : String) : TField;
-  Function  GetCreateDataSet                   : TProcedureEvent;
-  Procedure aCreateDataSet;
+  Function  GetCreateDataSet                   : TProcedureDbEvent;
+  Procedure aCreateDataSet    (Const aDataset  : TDataset);
   Procedure aSetInitDataset   (Const Value   : Boolean);
   Function  GetSetInitDataset : TSetInitDataset;
   Procedure aSetRecordCount    (aJsonCount,
@@ -221,7 +222,7 @@ Type
   Property ServerFieldList    : TFieldsList        Read vFieldsList          Write SetFieldsList;
   Property NewFieldList       : TProcedureEvent    Read GetNewFieldList      Write vNewFieldList;
   Property FieldExist         : TFieldExist        Read GetFieldExist        Write vFieldExist;
-  Property CreateDataset      : TProcedureEvent    Read GetCreateDataSet       Write vCreateDataset;
+  Property CreateDataset      : TProcedureDbEvent  Read GetCreateDataSet     Write vCreateDataset;
   Property NewDataField       : TNewDataField      Read GetNewDataField      Write vNewDataField;
   Property SetInitDataset     : TSetInitDataset    Read GetSetInitDataset    Write vSetInitDataset;
   Property SetRecordCount     : TSetRecordCount    Read GetSetRecordCount    Write vSetRecordCount;
@@ -422,7 +423,7 @@ Type
   // Propriedades Novas
   Property Value              : Variant          Read GetVariantValue     Write SetVariantValue;
   Property DefaultValue       : Variant          Read vDefaultValue       Write vDefaultValue;
-  // Novas definições por tipo
+  // Novas definies por tipo
   Property AsBCD              : Currency         Read GetAsBCD            Write SetAsBCD;
   Property AsFMTBCD           : Currency         Read GetAsFMTBCD         Write SetAsFMTBCD;
   Property AsBoolean          : Boolean          Read GetAsBoolean        Write SetAsBoolean;
@@ -1061,105 +1062,116 @@ Begin
   End;
 End;
 
-Function TRESTDWJSONValue.FormatValue(bValue : String) : String;
+Function TRESTDWJSONValue.FormatValue(bValue : String) : String; //corrigida by Gledston 06/08/2026
 Var
- aResult    : String;
- vInsertTag : Boolean;
+  aResult    : String;
+  vInsertTag : Boolean;
 Begin
- aResult    := bValue;
- vInsertTag := vObjectValue In [ovDate,    ovTime,    ovDateTime,
-                                ovTimestamp];
- If Trim(aResult) <> '' Then
+  aResult    := bValue;
+  vInsertTag := vObjectValue In [ovDate, ovTime, ovDateTime, ovTimestamp];
+
+  If Trim(aResult) <> '' Then
   Begin
-   If (aResult[InitStrPos] = '"') And
-      (aResult[Length(aResult) - FinalStrPos] = '"') Then
+    If (Length(aResult) >= 2) And 
+       (aResult[InitStrPos] = '"') And
+       (aResult[Length(aResult) - FinalStrPos] = '"') Then
     Begin
-     Delete(aResult, 1, 1);
-     Delete(aResult, Length(aResult), 1);
+      Delete(aResult, 1, 1);
+      Delete(aResult, Length(aResult), 1);
     End;
   End;
- If Not vEncoded Then
+
+  // SANITIZAO: Remove sujeiras de fechamento de JSON (']', '}') anexadas ao Base64/bValue
+  aResult := Trim(aResult);
+  If vObjectValue In [ovBlob, ovStream, ovGraphic, ovOraBlob, ovOraClob] Then
   Begin
-   If Trim(aResult) <> '' Then
-    If Not(((Pos('{', aResult) > 0) And (Pos('}', aResult) > 0))  Or
-           ((Pos('[', aResult) > 0) And (Pos(']', aResult) > 0))) Then
-     If Not(vObjectValue In [ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob]) Then
-      aResult := StringToJsonString(aResult);
+    While (Length(aResult) > 0) And (aResult[Length(aResult)] In [']', '}', '"', #10, #13, ' ']) Do
+      Delete(aResult, Length(aResult), 1);
   End;
- If vNullValue Then
-  aResult := cNullvalue
- Else If ((Trim(aResult) = '') or (Trim(bValue) = cNullvalueTag)) And vInsertTag Then
-  aResult := cBlankStringJSON;
- If DataMode = dmDataware Then
+
+  If Not vEncoded Then
   Begin
-   If (vTypeObject  = toDataset) Then
-    Result := Format(TValueFormatJSON, ['ObjectType',  GetObjectName(vTypeObject), 'Direction',
-                                             GetDirectionName(vObjectDirection),        'Encoded',
-                                             EncodedString, 'ValueType', GetValueType(vObjectValue),
-                                             vtagName,      GetValueJSON(aResult)])
-   Else If (vObjectValue = ovObject) And (vEncoded)  Then
-    Result := Format(TValueFormatJSONValueS, ['ObjectType',  GetObjectName(vTypeObject), 'Direction',
-                                              GetDirectionName(vObjectDirection),        'Encoded',
-                                              EncodedString, 'ValueType', GetValueType(vObjectValue),
-                                              vtagName,      GetValueJSON(aResult)]) //TValueFormatJSON
-   Else If (vObjectValue = ovObject) Then
-    Result := Format(TValueFormatJSONValue, ['ObjectType',  GetObjectName(vTypeObject), 'Direction',
-                                             GetDirectionName(vObjectDirection),        'Encoded',
-                                             EncodedString, 'ValueType', GetValueType(vObjectValue),
-                                             vtagName,      GetValueJSON(aResult)]) //TValueFormatJSON
-   Else
-    Begin
-     If vNullValue Then
-      Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject), 'Direction',
-                                                 GetDirectionName(vObjectDirection),       'Encoded',
-                                                 EncodedString, 'ValueType', GetValueType(vObjectValue),
-                                                 vtagName,      GetValueJSON(aResult)])
-     Else If (vObjectValue in [ovString,   ovGuid,    ovWideString, ovMemo,
-                               ovWideMemo, ovFmtMemo, ovFixedChar])  Or (vInsertTag) Then
-      Result := Format(TValueFormatJSONValueS, ['ObjectType', GetObjectName(vTypeObject), 'Direction',
-                                                GetDirectionName(vObjectDirection),       'Encoded',
-                                                EncodedString, 'ValueType', GetValueType(vObjectValue),
+    If Trim(aResult) <> '' Then
+      If Not ((aResult.StartsWith('{') and aResult.EndsWith('}')) Or
+              (aResult.StartsWith('[') and aResult.EndsWith(']'))) Then
+        If Not (vObjectValue In [ovStream, ovBlob, ovGraphic, ovOraBlob, ovOraClob]) Then
+          aResult := StringToJsonString(aResult);
+  End;
+
+  If vNullValue Then
+    aResult := cNullvalue
+  Else If ((Trim(aResult) = '') Or (Trim(bValue) = cNullvalueTag)) And vInsertTag Then
+    aResult := cBlankStringJSON;
+
+  If DataMode = dmDataware Then
+  Begin
+    If (vTypeObject = toDataset) Then
+      Result := Format(TValueFormatJSON, ['ObjectType', GetObjectName(vTypeObject), 
+                                           'Direction', GetDirectionName(vObjectDirection), 
+                                           'Encoded', EncodedString, 
+                                           'ValueType', GetValueType(vObjectValue),
+                                           vtagName, GetValueJSON(aResult)])
+    Else If (vObjectValue = ovObject) And (vEncoded) Then
+      Result := Format(TValueFormatJSONValueS, ['ObjectType', GetObjectName(vTypeObject), 
+                                                'Direction', GetDirectionName(vObjectDirection), 
+                                                'Encoded', EncodedString, 
+                                                'ValueType', GetValueType(vObjectValue),
                                                 vtagName, GetValueJSON(aResult)])
-     Else If (vObjectValue In [ovFloat, ovCurrency, ovBCD, ovFMTBcd, ovExtended]) Then
+    Else If (vObjectValue = ovObject) Then
+      Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject), 
+                                               'Direction', GetDirectionName(vObjectDirection), 
+                                               'Encoded', EncodedString, 
+                                               'ValueType', GetValueType(vObjectValue),
+                                               vtagName, GetValueJSON(aResult)])
+    Else
+    Begin
+      If vNullValue Then
+        Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject), 
+                                                 'Direction', GetDirectionName(vObjectDirection), 
+                                                 'Encoded', EncodedString, 
+                                                 'ValueType', GetValueType(vObjectValue),
+                                                 vtagName, GetValueJSON(aResult)])
+      Else If (vObjectValue In [ovString, ovGuid, ovWideString, ovMemo,
+                                ovWideMemo, ovFmtMemo, ovFixedChar,
+                                ovBlob, ovStream, ovGraphic, ovOraBlob, ovOraClob]) Or (vInsertTag) Then
       Begin
-       Result := Format(TValueFormatJSONValueS, ['ObjectType', GetObjectName(vTypeObject), 'Direction',
-                                                 GetDirectionName(vObjectDirection),       'Encoded',
-                                                 EncodedString, 'ValueType', GetValueType(vObjectValue),
-                                                 vtagName, GetValueJSON(BuildStringFloat(aResult, DataMode, vFloatDecimalFormat))]);
+        If (Trim(bValue) = cNullvalueTag) Or (aResult = cBlankStringJSON) Then
+          aResult := '';
+
+        Result := Format(TValueFormatJSONValueS, ['ObjectType', GetObjectName(vTypeObject), 
+                                                  'Direction', GetDirectionName(vObjectDirection), 
+                                                  'Encoded', EncodedString, 
+                                                  'ValueType', GetValueType(vObjectValue),
+                                                  vtagName, GetValueJSON(aResult)]);
       End
-     Else
+      Else If (vObjectValue In [ovFloat, ovCurrency, ovBCD, ovFMTBcd, ovExtended]) Then
       Begin
-       If (vObjectValue In [ovBlob, ovStream, ovGraphic, ovOraBlob, ovOraClob]) Then
-        Begin
-         If aResult <> '' Then
-          Begin
-           If (((((aResult <> cBlankStringJSON) And
-              Not((aResult[InitStrPos] = '"')    And
-                  (aResult[Length(aResult) - FinalStrPos] = '"'))))   And
-               (vEncoded)) Or (Not(vEncoded)     And (aResult = ''))) Or
-               (Pos('"', aResult) = 0)           Then
-            aResult := '"' + aResult + '"'
-           Else If (aResult = '') Then
-            aResult := cBlankStringJSON;
-          End
-         Else
-          aResult := cBlankStringJSON;
-        End;
-       If (Trim(bValue) = cNullvalueTag) Then
-        Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject), 'Direction',
-                                                 GetDirectionName(vObjectDirection),       'Encoded',
-                                                 EncodedString, 'ValueType', GetValueType(vObjectValue),
-                                                 vtagName,      GetValueJSON(Trim(bValue))])
-       Else
-        Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject), 'Direction',
-                                                 GetDirectionName(vObjectDirection),       'Encoded',
-                                                 EncodedString, 'ValueType', GetValueType(vObjectValue),
-                                                 vtagName,      GetValueJSON(aResult)]);
+        aResult := StringReplace(BuildStringFloat(aResult, DataMode, vFloatDecimalFormat), ',', '.', [rfReplaceAll]);
+        Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject), 
+                                                 'Direction', GetDirectionName(vObjectDirection), 
+                                                 'Encoded', EncodedString, 
+                                                 'ValueType', GetValueType(vObjectValue),
+                                                 vtagName, GetValueJSON(aResult)]);
+      End
+      Else
+      Begin
+        If (Trim(bValue) = cNullvalueTag) Then
+          Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject), 
+                                                   'Direction', GetDirectionName(vObjectDirection), 
+                                                   'Encoded', EncodedString, 
+                                                   'ValueType', GetValueType(vObjectValue),
+                                                   vtagName, GetValueJSON(Trim(bValue))])
+        Else
+          Result := Format(TValueFormatJSONValue, ['ObjectType', GetObjectName(vTypeObject), 
+                                                   'Direction', GetDirectionName(vObjectDirection), 
+                                                   'Encoded', EncodedString, 
+                                                   'ValueType', GetValueType(vObjectValue),
+                                                   vtagName, GetValueJSON(aResult)]);
       End;
     End;
   End
- Else
-  Result := aResult;
+  Else
+    Result := aResult;
 End;
 
 Function TRESTDWJSONValue.GetValueJSON(bValue : String): String;
@@ -1444,7 +1456,7 @@ Var
                                          {$IFDEF DELPHIXEUP}ftWideMemo,{$ENDIF}
                                          ftFmtMemo, ftFixedChar] Then
          Begin
-          If bValue.Fields[i].IsNull Then
+          If (bValue.Fields[i].IsNull) Then
            vTempValue := Format('%s%s', [vTempField, cNullvalue])
           Else
            Begin
@@ -1760,7 +1772,7 @@ Begin
   End;
 End;
 
-Function TRESTDWJSONValue.GetCreateDataSet : TProcedureEvent;
+Function TRESTDWJSONValue.GetCreateDataSet : TProcedureDbEvent;
 Begin
  Result := Nil;
  If Assigned(vCreateDataset) Then
@@ -1779,7 +1791,7 @@ Begin
   End;
 End;
 
-Procedure TRESTDWJSONValue.aCreateDataSet;
+Procedure TRESTDWJSONValue.aCreateDataSet(Const aDataset : TDataset);
 Begin
 
 End;
@@ -2127,7 +2139,7 @@ Var
  vSizeChar : Integer;
  {$ENDIF}
 Begin
- // Recebe o parametro "DataType" para fazer a tipagem na função que gera a linha "GenerateLine"
+ // Recebe o parametro "DataType" para fazer a tipagem na funo que gera a linha "GenerateLine"
  // Tiago Istuque - Por Nemi Vieira - 29/01/2019
  vDataType        := DataType;
  vTypeObject      := toDataset;
@@ -2192,7 +2204,7 @@ Var
  vSizeChar : Integer;
  {$ENDIF}
 Begin
- // Recebe o parametro "DataType" para fazer a tipagem na função que gera a linha "GenerateLine"
+ // Recebe o parametro "DataType" para fazer a tipagem na funo que gera a linha "GenerateLine"
  // Tiago Istuque - Por Nemi Vieira - 29/01/2019
  vDataType        := DataType;
  vTypeObject      := toDataset;
@@ -2902,8 +2914,8 @@ Var
  vLocFieldExist       : TFieldExist;
  vLocSetRecordCount   : TSetRecordCount;
  vLocSetInitDataset   : TSetInitDataset;
- vLocNewFieldList,
- vLocCreateDataset    : TProcedureEvent;
+ vLocNewFieldList     : TProcedureEvent;
+ vLocCreateDataset    : TProcedureDbEvent;
  vLocFieldListCount   : TFieldListCount;
  Function ReadFieldDefs(Var vResult      : String;
                         JSONObject,
@@ -2966,7 +2978,12 @@ Var
                      ((bJsonValueB.PairCount > 0) And (I <= bJsonValueB.PairCount))  Do
                 Begin
                  vStringData := bJsonValueB.Pairs[I].Value;
-                 FreeAndNil(bJsonValueB);
+                 {$IFNDEF FPC}
+                  bJsonValueB.DisposeOf;
+                 {$ELSE}
+                  bJsonValueB.Free;
+                 {$ENDIF}
+                 bJsonValueB := Nil;
                  If (vStringData[InitStrPos] = '{') Or
                     (vStringData[InitStrPos] = '[') Then
                   bJsonValueB := TRESTDWJSONInterfaceObject.Create(vStringData)
@@ -2979,7 +2996,13 @@ Var
                  Inc(I);
                 End;
                If Assigned(bJsonValueB) Then
-                bJsonValueB.Free;
+                Begin
+                 {$IFNDEF FPC}
+                  bJsonValueB.DisposeOf;
+                 {$ELSE}
+                  bJsonValueB.Free;
+                 {$ENDIF}
+                End;
                vResult := vStringDataTemp;
               End;
   //           vResult := vStringDataB;
@@ -3009,9 +3032,9 @@ Var
              vDWFieldDef.ElementName  := bJsonValue.pairs[A].Name;
              vDWFieldDef.ElementIndex := A;
              vDWFieldDef.FieldName    := vDWFieldDef.ElementName;
-             vDWFieldDef.FieldSize    := Length(bJsonValue.pairs[A].Value);
-             If vDWFieldDef.FieldSize = 0 Then
-              vDWFieldDef.FieldSize   := 100;
+             vDWFieldDef.FieldSize    := 255;
+             If Length(bJsonValue.pairs[A].Value) > vDWFieldDef.FieldSize Then
+              vDWFieldDef.FieldSize   := Length(bJsonValue.pairs[A].Value);
              vDWFieldDef.DataType     := ovString;
             End;
           End;
@@ -3078,7 +3101,7 @@ Begin
     vFieldDefinition := TFieldDefinition.Create;
     If DestDS.Fields.Count = 0 Then
      DestDS.FieldDefs.Clear;
-    //Removendo campos inválidos
+    //Removendo campos invlidos
     For J := DestDS.Fields.Count - 1 DownTo 0 Do
      Begin
       If DestDS.Fields[J].FieldKind = fkData Then
@@ -3114,10 +3137,10 @@ Begin
            Begin
             vFieldDefinition.FieldName  := vTempValue;
             vFieldDefinition.DataType   := ObjectValueToFieldType(ResponseTranslator.FieldDefs[J].DataType);
-            If (vFieldDefinition.DataType <> ftFloat) Then
-             vFieldDefinition.Size     := ResponseTranslator.FieldDefs[J].FieldSize
-            Else
-             vFieldDefinition.Size         := 0;
+            If Not(vFieldDefinition.DataType in [ftInteger, ftFloat]) Then
+             vFieldDefinition.Size     := ResponseTranslator.FieldDefs[J].FieldSize;
+//            Else
+//             vFieldDefinition.Size         := 0;
             If (vFieldDefinition.DataType In [ftFloat, ftCurrency, ftBCD,
                                               {$IFDEF DELPHIXEUP}ftExtended, ftSingle,{$ENDIF}
                                               ftFMTBcd]) Then
@@ -3141,13 +3164,16 @@ Begin
 //            FieldDef.Name     := vTempValue;
           FieldDef.DataType := ObjectValueToFieldType(ResponseTranslator.FieldDefs[J].DataType);
           If FieldDef.DataType in [ftString, ftWideString] Then
-           FieldDef.Size := 255;
+           IF ResponseTranslator.FieldDefs[J].FieldSize <= 0 Then
+            FieldDef.Size := 255
+           Else
+            FieldDef.Size := ResponseTranslator.FieldDefs[J].FieldSize;
           If Not (FieldDef.DataType in [ftFloat,ftCurrency
                                        {$IFDEF DELPHIXEUP},ftExtended,ftSingle{$ENDIF}]) Then
            Begin
             If (FieldDef.Size > ResponseTranslator.FieldDefs[J].FieldSize) then // ajuste em 20/12/2018 Thiago Pedro
              ResponseTranslator.FieldDefs[J].FieldSize := FieldDef.Size
-            Else
+            Else If Not(vFieldDefinition.DataType In [ftInteger]) Then
              FieldDef.Size     := ResponseTranslator.FieldDefs[J].FieldSize;
             If FieldDef.DataType in [ftString, ftWideString] Then
              If FieldDef.Size > 4000 Then
@@ -3170,7 +3196,7 @@ Begin
      vLocSetInBlockEvents(True);
      Inactive := True;
      If Assigned(vLocCreateDataSet) Then
-      vLocCreateDataSet();
+      vLocCreateDataSet(DestDS);
      If Not DestDS.Active Then
       DestDS.Open;
      If Not DestDS.Active Then
@@ -3508,8 +3534,8 @@ Var
  vLocFieldExist        : TFieldExist;
  vLocSetRecordCount    : TSetRecordCount;
  vLocSetInitDataset    : TSetInitDataset;
- vLocNewFieldList,
- vLocCreateDataSet     : TProcedureEvent;
+ vLocNewFieldList      : TProcedureEvent;
+ vLocCreateDataSet     : TProcedureDbEvent;
  vLocFieldListCount    : TFieldListCount;
  vLocGetInDesignEvents : TGetInDesignEvents;
  Function FieldIndex(FieldName: String): Integer;
@@ -3673,7 +3699,7 @@ Begin
      vLocSetInBlockEvents(True);
      Inactive := True;
      If Assigned(vLocCreateDataSet) Then
-      vLocCreateDataSet();
+      vLocCreateDataSet(Nil);
      If Not DestDS.Active Then
       DestDS.Open;
      If Not DestDS.Active Then
@@ -4246,7 +4272,7 @@ Begin
     SizeOfString := Length(aValue);
     vTempValue   := '';
     SetString(vTempValue, PChar(@aValue[0]), SizeOfString);
-{ //Comentado deleção de nulos
+{ //Comentado deleo de nulos
     While pos(#0, vTempValue) > 0 Do
      Delete(vTempValue, pos(#0, vTempValue), 1);
 }
@@ -4256,7 +4282,7 @@ Begin
    {$ENDIF} // Delphi 2010 pra cima
   End;
  {$ENDIF}
- If Not(Pos('"TAGJSON":}', vTempValue) > 0) Then
+ If Not(Pos('"TAGJSON":"}', vTempValue) > 0) Then
   Result := vTempValue;
 End;
 
@@ -4385,7 +4411,7 @@ Begin
  vObjectValue       := ovString;
  vtagName           := 'TAGJSON';
  vBinary            := True;
- vUtf8SpecialChars  := True; //Adicionado por padrão para special Chars
+ vUtf8SpecialChars  := True; //Adicionado por padro para special Chars
  vNullValue         := vBinary;
  vDataMode          := dmDataware;
  vOnWriterProcess   := Nil;
@@ -6694,3 +6720,4 @@ Begin
 End;
 
 end.
+

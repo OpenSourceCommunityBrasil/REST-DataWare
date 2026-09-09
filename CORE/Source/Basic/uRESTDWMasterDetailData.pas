@@ -1,26 +1,26 @@
 unit uRESTDWMasterDetailData;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Ivan Cesar                 - Admin - Administrador  do pacote.
- Joanan Mendonça Jr. (jlmj) - Admin - Administrador  do pacote.
+ Joanan Mendona Jr. (jlmj) - Admin - Administrador  do pacote.
  Giovani da Cruz            - Admin - Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Alexandre Souza            - Admin - Administrador do Grupo de Organização.
+ Alexandre Souza            - Admin - Administrador do Grupo de Organizao.
  Mizael Rocha               - Member Tester and DEMO Developer.
- Flávio Motta               - Member Tester and DEMO Developer.
+ Flvio Motta               - Member Tester and DEMO Developer.
  Itamar Gaucho              - Member Tester and DEMO Developer.
  Ico Menezes                - Member Tester and DEMO Developer.
 }

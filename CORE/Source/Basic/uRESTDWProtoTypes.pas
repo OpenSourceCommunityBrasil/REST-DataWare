@@ -1,19 +1,19 @@
 unit uRESTDWProtoTypes;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
  Membros do Grupo :
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -28,9 +28,9 @@ interface
 
 uses
   {$IFNDEF FPC}
-   {$IF CompilerVersion < 21}
+   {$IFNDEF DELPHI2010UP}
     DbTables,
-   {$IFEND}
+   {$ENDIF}
   {$ENDIF}
   SysUtils,  Classes, Db, FMTBcd;
  Const
@@ -92,7 +92,11 @@ uses
   dwftLongWord        = Integer(42);
   dwftShortint        = Integer(43);
   dwftByte            = Integer(44);
+  {$IFDEF FPC}
+  dwftExtended        = Integer(45);
+  {$ELSE}
   dwftExtended        = Integer(ftFMTBcd);
+  {$ENDIF}
   dwftStream          = Integer(48);
   dwftTimeStampOffset = Integer(49);
 //  dwftSingle          = Integer(51);
@@ -299,6 +303,337 @@ Type
  {$ELSE}
   TRESTDWStreamSize = DWInt32;
  {$ENDIF}
+
+const
+ RESTDW_NATIVE_SIGNATURE_0 = Ord('R');
+ RESTDW_NATIVE_SIGNATURE_1 = Ord('E');
+ RESTDW_NATIVE_SIGNATURE_2 = Ord('S');
+ RESTDW_NATIVE_SIGNATURE_3 = Ord('T');
+ RESTDW_NATIVE_SIGNATURE_4 = Ord('D');
+ RESTDW_NATIVE_SIGNATURE_5 = Ord('W');
+ RESTDW_NATIVE_FORMAT       = Ord('N');
+ RESTDW_NATIVE_VERSION      = 2;
+ RESTDW_NATIVE_NULL_SIZE    = -1;
+ RESTDW_NATIVE_FLAG_COMPRESSED = 1;
+
+ RESTDW_COMPILER_OLDDELPHI = Ord('O');
+ RESTDW_COMPILER_NEWDELPHI = Ord('N');
+ RESTDW_COMPILER_LAZARUS   = Ord('L');
+ RESTDW_COMPILER_FPC       = Ord('F');
+
+ RESTDW_ARCH_UNKNOWN       = 0;
+ RESTDW_ARCH_32            = 32;
+ RESTDW_ARCH_64            = 64;
+
+ RESTDW_PLATFORM_UNKNOWN   = 0;
+ RESTDW_PLATFORM_WINDOWS   = 1;
+ RESTDW_PLATFORM_LINUX     = 2;
+ RESTDW_PLATFORM_MACOS     = 3;
+ RESTDW_PLATFORM_FREEBSD   = 4;
+ RESTDW_PLATFORM_ANDROID   = 5;
+ RESTDW_PLATFORM_IOS       = 6;
+
+ RESTDW_TYPE_UNKNOWN       = 0;
+ RESTDW_TYPE_STRING        = 1;
+ RESTDW_TYPE_SMALLINT      = 2;
+ RESTDW_TYPE_INTEGER       = 3;
+ RESTDW_TYPE_WORD          = 4;
+ RESTDW_TYPE_BOOLEAN       = 5;
+ RESTDW_TYPE_FLOAT         = 6;
+ RESTDW_TYPE_CURRENCY      = 7;
+ RESTDW_TYPE_BCD           = 8;
+ RESTDW_TYPE_DATE          = 9;
+ RESTDW_TYPE_TIME          = 10;
+ RESTDW_TYPE_DATETIME      = 11;
+ RESTDW_TYPE_BYTES         = 12;
+ RESTDW_TYPE_VARBYTES      = 13;
+ RESTDW_TYPE_AUTOINC       = 14;
+ RESTDW_TYPE_BLOB          = 15;
+ RESTDW_TYPE_MEMO          = 16;
+ RESTDW_TYPE_GRAPHIC       = 17;
+ RESTDW_TYPE_FMTMEMO       = 18;
+ RESTDW_TYPE_PARADOXOLE    = 19;
+ RESTDW_TYPE_DBASEOLE      = 20;
+ RESTDW_TYPE_TYPEDBINARY   = 21;
+ RESTDW_TYPE_CURSOR        = 22;
+ RESTDW_TYPE_FIXEDCHAR     = 23;
+ RESTDW_TYPE_WIDESTRING    = 24;
+ RESTDW_TYPE_LARGEINT      = 25;
+ RESTDW_TYPE_ADT           = 26;
+ RESTDW_TYPE_ARRAY         = 27;
+ RESTDW_TYPE_REFERENCE     = 28;
+ RESTDW_TYPE_DATASET       = 29;
+ RESTDW_TYPE_ORABLOB       = 30;
+ RESTDW_TYPE_ORACLOB       = 31;
+ RESTDW_TYPE_VARIANT       = 32;
+ RESTDW_TYPE_INTERFACE     = 33;
+ RESTDW_TYPE_IDISPATCH     = 34;
+ RESTDW_TYPE_GUID          = 35;
+ RESTDW_TYPE_TIMESTAMP     = 36;
+ RESTDW_TYPE_FMTBCD        = 37;
+ RESTDW_TYPE_FIXEDWIDECHAR = 38;
+ RESTDW_TYPE_WIDEMEMO      = 39;
+ RESTDW_TYPE_ORATIMESTAMP  = 40;
+ RESTDW_TYPE_ORAINTERVAL   = 41;
+ RESTDW_TYPE_LONGWORD      = 42;
+ RESTDW_TYPE_SHORTINT      = 43;
+ RESTDW_TYPE_BYTE          = 44;
+ RESTDW_TYPE_EXTENDED      = 45;
+ RESTDW_TYPE_SINGLE        = 46;
+ RESTDW_TYPE_TIMESTAMPOS   = 47;
+
+Type
+ TRESTDWNativeHeader = Packed Record
+  Signature    : Array[0..5] Of Byte;
+  FormatType   : Byte;
+  Version      : Byte;
+  CompilerType : Byte;
+  PlatformType : Byte;
+  Architecture : Byte;
+  Flags        : Byte;
+ End;
+
+ TRESTDWNativeValueHeader = Packed Record
+  DataType : Byte;
+  DataSize : Longint;
+ End;
+
+Function RESTDWNativeCompilerType : Byte;
+Function RESTDWNativePlatformType : Byte;
+Function RESTDWNativeArchitecture : Byte;
+Function RESTDWNativeDataType(AFieldType : TFieldType) : Byte;
+Procedure RESTDWInitNativeHeader(Var AHeader : TRESTDWNativeHeader);
+Function RESTDWIsNativeHeader(Const AHeader : TRESTDWNativeHeader) : Boolean;
+Function RESTDWNativeHeaderCompatible(Const AHeader : TRESTDWNativeHeader) : Boolean;
+Function RESTDWStreamHasNativeHeader(AStream : TStream) : Boolean;
+Procedure RESTDWWriteNativePayload(ASource, ADest : TStream; ACompress : Boolean);
+Function RESTDWReadNativePayload(ASource, ADest : TStream; Var AHeader : TRESTDWNativeHeader) : Boolean;
+
 implementation
+
+Uses
+ uRESTDWZlib;
+
+Function RESTDWNativeCompilerType : Byte;
+Begin
+ {$IFDEF RESTDWLAZARUS}
+ Result := RESTDW_COMPILER_LAZARUS;
+ {$ELSE}
+  {$IFDEF FPC}
+  Result := RESTDW_COMPILER_FPC;
+  {$ELSE}
+   {$IFDEF DELPHI2009UP}
+   Result := RESTDW_COMPILER_NEWDELPHI;
+   {$ELSE}
+   Result := RESTDW_COMPILER_OLDDELPHI;
+   {$ENDIF}
+  {$ENDIF}
+ {$ENDIF}
+End;
+
+Function RESTDWNativePlatformType : Byte;
+Begin
+ Result := RESTDW_PLATFORM_UNKNOWN;
+ {$IFDEF RESTDWWINDOWS}
+ Result := RESTDW_PLATFORM_WINDOWS;
+ {$ENDIF}
+ {$IFDEF RESTDWLINUX}
+ Result := RESTDW_PLATFORM_LINUX;
+ {$ENDIF}
+ {$IFDEF RESTDWMACOS}
+ Result := RESTDW_PLATFORM_MACOS;
+ {$ENDIF}
+ {$IFDEF RESTDWFREEBSD}
+ Result := RESTDW_PLATFORM_FREEBSD;
+ {$ENDIF}
+ {$IFDEF RESTDWANDROID}
+ Result := RESTDW_PLATFORM_ANDROID;
+ {$ENDIF}
+ {$IFDEF RESTDWIOS}
+ Result := RESTDW_PLATFORM_IOS;
+ {$ENDIF}
+End;
+
+Function RESTDWNativeArchitecture : Byte;
+Begin
+ {$IFDEF CPU64}
+ Result := RESTDW_ARCH_64;
+ {$ELSE}
+  {$IFDEF CPUX64}
+  Result := RESTDW_ARCH_64;
+  {$ELSE}
+  Result := RESTDW_ARCH_32;
+  {$ENDIF}
+ {$ENDIF}
+End;
+
+Function RESTDWNativeDataType(AFieldType : TFieldType) : Byte;
+Begin
+ Case Integer(AFieldType) Of
+  dwftString        : Result := RESTDW_TYPE_STRING;
+  dwftSmallint      : Result := RESTDW_TYPE_SMALLINT;
+  dwftInteger       : Result := RESTDW_TYPE_INTEGER;
+  dwftWord          : Result := RESTDW_TYPE_WORD;
+  dwftBoolean       : Result := RESTDW_TYPE_BOOLEAN;
+  dwftFloat         : Result := RESTDW_TYPE_FLOAT;
+  dwftCurrency      : Result := RESTDW_TYPE_CURRENCY;
+  dwftBCD           : Result := RESTDW_TYPE_BCD;
+  dwftDate          : Result := RESTDW_TYPE_DATE;
+  dwftTime          : Result := RESTDW_TYPE_TIME;
+  dwftDateTime      : Result := RESTDW_TYPE_DATETIME;
+  dwftBytes         : Result := RESTDW_TYPE_BYTES;
+  dwftVarBytes      : Result := RESTDW_TYPE_VARBYTES;
+  dwftAutoInc       : Result := RESTDW_TYPE_AUTOINC;
+  dwftBlob          : Result := RESTDW_TYPE_BLOB;
+  dwftMemo          : Result := RESTDW_TYPE_MEMO;
+  dwftGraphic       : Result := RESTDW_TYPE_GRAPHIC;
+  dwftFmtMemo       : Result := RESTDW_TYPE_FMTMEMO;
+  dwftParadoxOle    : Result := RESTDW_TYPE_PARADOXOLE;
+  dwftDBaseOle      : Result := RESTDW_TYPE_DBASEOLE;
+  dwftTypedBinary   : Result := RESTDW_TYPE_TYPEDBINARY;
+  dwftFixedChar     : Result := RESTDW_TYPE_FIXEDCHAR;
+  dwftWideString    : Result := RESTDW_TYPE_WIDESTRING;
+  dwftLargeint      : Result := RESTDW_TYPE_LARGEINT;
+  dwftOraBlob       : Result := RESTDW_TYPE_ORABLOB;
+  dwftOraClob       : Result := RESTDW_TYPE_ORACLOB;
+  dwftVariant       : Result := RESTDW_TYPE_VARIANT;
+  dwftInterface     : Result := RESTDW_TYPE_INTERFACE;
+  dwftIDispatch     : Result := RESTDW_TYPE_IDISPATCH;
+  dwftGuid          : Result := RESTDW_TYPE_GUID;
+  dwftTimeStamp     : Result := RESTDW_TYPE_TIMESTAMP;
+  dwftFMTBcd        : Result := RESTDW_TYPE_FMTBCD;
+  dwftFixedWideChar : Result := RESTDW_TYPE_FIXEDWIDECHAR;
+  dwftWideMemo      : Result := RESTDW_TYPE_WIDEMEMO;
+  dwftOraTimeStamp  : Result := RESTDW_TYPE_ORATIMESTAMP;
+  dwftOraInterval   : Result := RESTDW_TYPE_ORAINTERVAL;
+  dwftLongWord      : Result := RESTDW_TYPE_LONGWORD;
+  dwftShortint      : Result := RESTDW_TYPE_SHORTINT;
+  dwftByte          : Result := RESTDW_TYPE_BYTE;
+  {$IFDEF DELPHI2010UP}
+  dwftExtended      : Result := RESTDW_TYPE_EXTENDED;
+  {$ENDIF}
+  dwftTimeStampOffset : Result := RESTDW_TYPE_TIMESTAMPOS;
+ Else
+  Result := RESTDW_TYPE_UNKNOWN;
+ End;
+End;
+
+Procedure RESTDWInitNativeHeader(Var AHeader : TRESTDWNativeHeader);
+Begin
+ FillChar(AHeader, SizeOf(AHeader), 0);
+ AHeader.Signature[0] := RESTDW_NATIVE_SIGNATURE_0;
+ AHeader.Signature[1] := RESTDW_NATIVE_SIGNATURE_1;
+ AHeader.Signature[2] := RESTDW_NATIVE_SIGNATURE_2;
+ AHeader.Signature[3] := RESTDW_NATIVE_SIGNATURE_3;
+ AHeader.Signature[4] := RESTDW_NATIVE_SIGNATURE_4;
+ AHeader.Signature[5] := RESTDW_NATIVE_SIGNATURE_5;
+ AHeader.FormatType   := RESTDW_NATIVE_FORMAT;
+ AHeader.Version      := RESTDW_NATIVE_VERSION;
+ AHeader.CompilerType := RESTDWNativeCompilerType;
+ AHeader.PlatformType := RESTDWNativePlatformType;
+ AHeader.Architecture := RESTDWNativeArchitecture;
+End;
+
+Function RESTDWIsNativeHeader(Const AHeader : TRESTDWNativeHeader) : Boolean;
+Begin
+ Result := (AHeader.Signature[0] = RESTDW_NATIVE_SIGNATURE_0) And
+           (AHeader.Signature[1] = RESTDW_NATIVE_SIGNATURE_1) And
+           (AHeader.Signature[2] = RESTDW_NATIVE_SIGNATURE_2) And
+           (AHeader.Signature[3] = RESTDW_NATIVE_SIGNATURE_3) And
+           (AHeader.Signature[4] = RESTDW_NATIVE_SIGNATURE_4) And
+           (AHeader.Signature[5] = RESTDW_NATIVE_SIGNATURE_5) And
+           (AHeader.FormatType = RESTDW_NATIVE_FORMAT) And
+           (AHeader.Version = RESTDW_NATIVE_VERSION);
+End;
+
+Function RESTDWNativeHeaderCompatible(Const AHeader : TRESTDWNativeHeader) : Boolean;
+Begin
+ Result := RESTDWIsNativeHeader(AHeader) And
+           (AHeader.CompilerType = RESTDWNativeCompilerType) And
+           (AHeader.PlatformType = RESTDWNativePlatformType) And
+           (AHeader.Architecture = RESTDWNativeArchitecture);
+End;
+
+Function RESTDWStreamHasNativeHeader(AStream : TStream) : Boolean;
+Var
+ LHeader : TRESTDWNativeHeader;
+ LPos    : Int64;
+Begin
+ Result := False;
+ If (AStream = Nil) Or (AStream.Size < SizeOf(LHeader)) Then
+  Exit;
+ LPos := AStream.Position;
+ Try
+  AStream.Position := 0;
+  If AStream.Read(LHeader, SizeOf(LHeader)) = SizeOf(LHeader) Then
+   Result := RESTDWIsNativeHeader(LHeader);
+ Finally
+  AStream.Position := LPos;
+ End;
+End;
+
+Procedure RESTDWWriteNativePayload(ASource, ADest : TStream; ACompress : Boolean);
+Var
+ LHeader : TRESTDWNativeHeader;
+ LTemp   : TMemoryStream;
+Begin
+ If (ASource = Nil) Or (ADest = Nil) Then
+  Exit;
+ RESTDWInitNativeHeader(LHeader);
+ If ACompress Then
+  LHeader.Flags := LHeader.Flags Or RESTDW_NATIVE_FLAG_COMPRESSED;
+ ADest.Size := 0;
+ ADest.Position := 0;
+ ADest.WriteBuffer(LHeader, SizeOf(LHeader));
+ ASource.Position := 0;
+ If ACompress Then
+  Begin
+   LTemp := TMemoryStream.Create;
+   Try
+    ZCompressStream(ASource, LTemp);
+    LTemp.Position := 0;
+    ADest.CopyFrom(LTemp, LTemp.Size);
+   Finally
+    LTemp.Free;
+   End;
+  End
+ Else
+  ADest.CopyFrom(ASource, ASource.Size);
+ ADest.Position := 0;
+End;
+
+Function RESTDWReadNativePayload(ASource, ADest : TStream; Var AHeader : TRESTDWNativeHeader) : Boolean;
+Var
+ LTemp : TMemoryStream;
+Begin
+ Result := False;
+ If (ASource = Nil) Or (ADest = Nil) Or (ASource.Size < SizeOf(AHeader)) Then
+  Exit;
+ ASource.Position := 0;
+ If ASource.Read(AHeader, SizeOf(AHeader)) <> SizeOf(AHeader) Then
+  Exit;
+ If Not RESTDWIsNativeHeader(AHeader) Then
+  Begin
+   ASource.Position := 0;
+   Exit;
+  End;
+ ADest.Size := 0;
+ If (AHeader.Flags And RESTDW_NATIVE_FLAG_COMPRESSED) <> 0 Then
+  Begin
+   LTemp := TMemoryStream.Create;
+   Try
+    LTemp.CopyFrom(ASource, ASource.Size - ASource.Position);
+    LTemp.Position := 0;
+    ZDecompressStream(LTemp, ADest);
+   Finally
+    LTemp.Free;
+   End;
+  End
+ Else
+  ADest.CopyFrom(ASource, ASource.Size - ASource.Position);
+ ADest.Position := 0;
+ Result := True;
+End;
+
 end.
 

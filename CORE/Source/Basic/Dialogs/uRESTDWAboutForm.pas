@@ -1,6 +1,6 @@
 unit uRESTDWAboutForm;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 interface
 
