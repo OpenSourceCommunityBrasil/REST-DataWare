@@ -1,0 +1,11 @@
+REST Dataware FCM - iOS
+
+OpenSSL.Api_11 referencia:
+  libcrypto-ios.a
+  libssl-ios.a
+
+Essas bibliotecas estaticas nao estavam presentes no material fornecido.
+O FCM nao usa Firebase iOS SDK, APNS SDK, Keychain ou SecTrust.
+
+A dependencia externa de baixo nivel e somente o OpenSSL requerido pelo motor
+REST Dataware.

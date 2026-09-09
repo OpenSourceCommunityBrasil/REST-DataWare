@@ -1,0 +1,63 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{A3E5AAE7-6D40-4E6A-A4F6-EC924D62A801}</ProjectGuid>
+        <MainSource>RESTDWInstallerVCL.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Base</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <AppType>Application</AppType>
+        <FrameworkType>VCL</FrameworkType>
+        <ProjectVersion>20.4</ProjectVersion>
+        <Icon_MainIcon>..\..\Resources\RESTDWInstaller.ico</Icon_MainIcon>
+        <ProjectName Condition="'$(ProjectName)'==''">RESTDWInstallerVCL</ProjectName>
+        <TargetedPlatforms>1</TargetedPlatforms>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Winapi;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UnitSearchPath>..\..\Common;..\Common;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_ExeOutput>..\..\..</DCC_ExeOutput>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <SanitizedProjectName>RESTDWInstallerVCL</SanitizedProjectName>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <BT_BuildType>Debug</BT_BuildType>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="uRESTDWInstallerVCLWizard.pas"/>
+        <DCCReference Include="..\..\Common\uRESTDWInstallerCore.pas"/>
+        <DCCReference Include="..\..\Common\uRESTDWInstallerConfig.pas"/>
+        <DCCReference Include="..\Common\uRESTDWDelphiInstall.pas"/>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">RESTDWInstallerVCL.dpr</Source>
+                </Source>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+</Project>
