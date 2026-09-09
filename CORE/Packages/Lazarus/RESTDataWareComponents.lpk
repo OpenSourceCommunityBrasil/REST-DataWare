@@ -10,7 +10,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\..\Source;..\..\Source\Basic\Crypto;..\..\Source\Includes;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\SQLEditor;..\..\Source\Wizards\lazarus"/>
-        <OtherUnitFiles Value="..\..\Source;..\..\Source\Plugins\HTMLEditor;..\..\Source\Plugins\HTMLEditor\WebView;..\..\Source\Basic;..\..\Source\Basic\Crypto;..\..\Source\Basic\Dialogs;..\..\Source\Basic\Mechanics;..\..\Source\Consts;..\..\Source\utils;..\..\Source\utils\JSON;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\Memdataset;..\..\Source\Plugins\SQLEditor;..\..\Source\Wizards\lazarus;..\..\Source\Database_Drivers;..\..\Source\Plugins\SelfSigned;..\..\Source\utils\SSL"/>
+        <OtherUnitFiles Value="..\..\Source;..\..\Source\Plugins;..\..\Source\Plugins\HTMLEditor;..\..\Source\Plugins\HTMLEditor\WebView;..\..\Source\Plugins\HTMLEditor\PrivateSynEdit;..\..\Source\Basic;..\..\Source\Basic\Crypto;..\..\Source\Basic\Dialogs;..\..\Source\Basic\Mechanics;..\..\Source\Consts;..\..\Source\utils;..\..\Source\utils\JSON;..\..\Source\Plugins\DMDados;..\..\Source\Plugins\JSONViewer;..\..\Source\Plugins\Memdataset;..\..\Source\Plugins\SQLEditor;..\..\Source\Wizards\lazarus;..\..\Source\Database_Drivers;..\..\Source\Plugins\SelfSigned;..\..\Source\utils\SSL"/>
         <UnitOutputDirectory Value="..\..\compiledlaz"/>
       </SearchPaths>
       <CodeGeneration>
