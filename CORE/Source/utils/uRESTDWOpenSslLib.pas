@@ -2,22 +2,22 @@ unit uRESTDWOpenSslLib;
 
 { Cross-platform unified OpenSSL 1.1.1 import and helper library unit for OpenSSL }
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Flávio Motta               - Member Tester and DEMO Developer.
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -50,42 +50,42 @@ const
   LIB_CRYPTO_300 = 'libcrypto-3-x64.dll';
   LIB_SSL_300 = 'libssl-3-x64.dll';
   _PU = '';
-  {$ELSEIF Defined(ANDROID64)}
+  {$ELSEIF Defined(ANDROID64) or (Defined(CPUAARCH64) and Defined(ANDROID))}
   LIB_CRYPTO_110 = 'libcrypto-android64.a';
   LIB_SSL_110 = 'libssl-android64.a';
 
   LIB_CRYPTO_300 = 'libcrypto-android64.a';
   LIB_SSL_300 = 'libssl-android64.a';
   _PU = '';
-  {$ELSEIF Defined(ANDROID32)}
+  {$ELSEIF Defined(ANDROID32) or (Defined(CPUARM) and Defined(ANDROID))}
   LIB_CRYPTO_110 = 'libcrypto-android32.a';
   LIB_SSL_110 = 'libssl-android32.a';
 
   LIB_CRYPTO_300 = 'libcrypto-android32.a';
   LIB_SSL_300 = 'libssl-android32.a';
   _PU = '';
-  {$ELSEIF Defined(IOS)}
+  {$ELSEIF Defined(IOS) or Defined(IOS64) or Defined(DCCIOS32) or Defined(DCCIOSARM64)}
   LIB_CRYPTO_110 = 'libcrypto-ios.a';
   LIB_SSL_110 = 'libssl-ios.a';
 
   LIB_CRYPTO_300 = 'libcrypto-ios.a';
   LIB_SSL_300 = 'libssl-ios.a';
   _PU = '';
-  {$ELSEIF Defined(MACOS32)}
+  {$ELSEIF Defined(MACOS32) or (Defined(CPUI386) and Defined(DARWIN))}
   LIB_CRYPTO_110 = 'libssl-merged-osx32.dylib';
   LIB_SSL_110 = 'libssl-merged-osx32.dylib';
 
   LIB_CRYPTO_300 = 'libssl-merged-osx32.dylib';
   LIB_SSL_300 = 'libssl-merged-osx32.dylib';
   _PU = '_';
-  {$ELSEIF Defined(MACOS64)}
+  {$ELSEIF Defined(MACOS64) or (Defined(CPUX86_64) and Defined(DARWIN)) or (Defined(CPUAARCH64) and Defined(DARWIN))}
   LIB_CRYPTO_110 = 'libcrypto-osx64.a';
   LIB_SSL_110 = 'libssl-osx64.a';
 
   LIB_CRYPTO_300 = 'libcrypto-osx64.a';
   LIB_SSL_300 = 'libssl-osx64.a';
   _PU = '';
-  {$ELSEIF Defined(LINUX)}
+  {$ELSEIF Defined(LINUX) or Defined(FREEBSD)}
   LIB_CRYPTO_110 = 'libcrypto.so';
   LIB_SSL_110 = 'libssl.so';
 

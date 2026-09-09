@@ -1,43 +1,38 @@
 unit uRESTDWJSONInterface;
 
-{$I ..\..\Includes\uRESTDW.inc}
-{
-  REST Dataware .
-  Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
-  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
-  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
-  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
-
-  Membros do Grupo :
-
-  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
-  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
-  Flávio Motta               - Member Tester and DEMO Developer.
-  Mobius One                 - Devel, Tester and Admin.
-  Gustavo                    - Criptografia and Devel.
-  Eloy                       - Devel.
-  Roniery                    - Devel.
-}
+{$I uRESTDW.inc}
 
 interface
 
 {$IFDEF FPC}
  {$MODE OBJFPC}{$H+}
 {$ENDIF}
+
+{$IFDEF FPC}
+ {$DEFINE RESTDWLEGACYJSON}
+{$ENDIF}
+{$IFNDEF FPC}
+ {$IFNDEF DELPHIXE7UP}
+  {$DEFINE RESTDWLEGACYJSON}
+ {$ENDIF}
+{$ENDIF}
+
 Uses
   SysUtils, Classes, Variants,
-  {$IFNDEF FPC} system.json, {$ELSE} uRESTDWJSON, {$ENDIF}
+  {$IFDEF RESTDWLEGACYJSON}
+  uRESTDWJSON,
+  {$ELSE}
+  System.JSON,
+  {$ENDIF}
   uRESTDWConsts;
 
 Type
   TElementType = (etObject, etArray, etString, etNumeric, etBoolean);
 
-  TJSONBaseClass = class
-  end;
+  TJSONBaseClass = Class
+  End;
 
-  TJSONBaseObjectClass = class
+  TJSONBaseObjectClass = Class
   Private
     vJSONObject: TJSONBaseClass;
     Function GetObject: TJSONObject;
@@ -65,7 +60,6 @@ Type
   End;
 
   TRESTDWJSONInterfaceBase = Class(TJSONBaseObjectClass)
-  Private
   Public
     Constructor Create(ParentJSON: TJSONBaseClass);
     Destructor Destroy; Override;
@@ -86,7 +80,7 @@ Type
     Function GetObject(Index: Integer): TRESTDWJSONInterfaceBase;
     Function ToJSON: String;
     Constructor Create;
-    Destructor  Destroy; Override;
+    Destructor Destroy; Override;
   End;
 
   TRESTDWJSONInterfaceObject = Class(TJSONBaseObjectClass)
@@ -97,767 +91,688 @@ Type
     Procedure PutPairN(Index: String; Item: TRESTDWJSONPair); Overload;
   Public
     Constructor Create(JSONValue: String); Overload;
-    Destructor  Destroy; Override;
+    Destructor Destroy; Override;
     Function PairCount: Integer;
     Function ToJSON: String;
     Function ClassType: TClass;
-    Function OpenArray(key: String): TRESTDWJSONInterfaceArray; Overload;
+    Function OpenArray(Key: String): TRESTDWJSONInterfaceArray; Overload;
     Function OpenArray(Index: Integer): TRESTDWJSONInterfaceArray; Overload;
     Property Pairs[Index: Integer]: TRESTDWJSONPair Read GetPair Write PutPair;
-    Property PairByName[Index: String]: TRESTDWJSONPair Read GetPairN
-      Write PutPairN;
+    Property PairByName[Index: String]: TRESTDWJSONPair Read GetPairN Write PutPairN;
   End;
 
 implementation
 
-Function removestr(Astr: string; Asubstr: string): string;
+Function EmptyPair: TRESTDWJSONPair;
 Begin
-  result := stringreplace(Astr, Asubstr, '', [rfReplaceAll, rfIgnoreCase]);
+  Result.isnull := True;
+  Result.ClassName := '';
+  Result.Name := '';
+  Result.Value := '';
 End;
 
-{$IFNDEF FPC}
-Function GetElementJSON(bArray: TJSONObject; Value: String): String;
+Function FirstJSONChar(Const Value: String): Char;
 Var
   I: Integer;
-  aJSONObject: TJSONObject;
 Begin
-  result := '';
-  For I := 0 To bArray.Count - 1 do
-  Begin
-    aJSONObject := TJSONObject.ParseJSONValue(bArray.Get(I).ToJSON)
-      as TJSONObject;
-    If Uppercase(Value) = Uppercase
-      (removestr(aJSONObject.Pairs[0].JsonString.Value, '"')) Then
-    Begin
-      result := aJSONObject.Pairs[0].JSONValue.ToJSON;
-      Break;
-    End;
-    FreeAndNil(aJSONObject);
+  Result := #0;
+  For I := 1 To Length(Value) Do
+   Begin
+    If Value[I] > ' ' Then
+     Begin
+      Result := Value[I];
+      Exit;
+     End;
+   End;
+End;
+
+{$IFDEF RESTDWLEGACYJSON}
+
+Function LegacyValueToJSON(Value: TZAbstractObject): String;
+Begin
+  Result := '';
+  If Value = Nil Then
+    Exit;
+  Result := Value.toString;
+End;
+
+Function LegacyValueIsNull(Value: TZAbstractObject): Boolean;
+Begin
+  Result := (Value = Nil) Or (Value = CNULL) Or (Value is NULL);
+End;
+
+Function LegacyCloneValue(Value: TZAbstractObject): TJSONBaseClass;
+Var
+  S: String;
+  C: Char;
+Begin
+  Result := Nil;
+  If LegacyValueIsNull(Value) Then
+    Exit;
+  S := Value.toString;
+  C := FirstJSONChar(S);
+  If C = '{' Then
+    Result := TJSONBaseClass(TJSONObject.Create(S))
+  Else If C = '[' Then
+    Result := TJSONBaseClass(TJSONArray.Create(S))
+  Else If Value is _String Then
+    Result := TJSONBaseClass(_String(Value).Clone)
+  Else
+    Result := TJSONBaseClass(Value.Clone);
+End;
+
+Function LegacyObjectNameAt(AObject: TJSONObject; Index: Integer): String;
+Var
+  Names: TJSONArray;
+Begin
+  Result := '';
+  If (AObject = Nil) Or (Index < 0) Then
+    Exit;
+  Names := AObject.names;
+  Try
+    If (Names <> Nil) And (Index < Names.length) Then
+      Result := Names.Get(Index).toString;
+  Finally
+    Names.Free;
   End;
 End;
+
+Function LegacyPairFromValue(Const AName: String;
+  Value: TZAbstractObject): TRESTDWJSONPair;
+Begin
+  Result := EmptyPair;
+  Result.Name := AName;
+  If LegacyValueIsNull(Value) Then
+   Begin
+    Result.ClassName := 'TJSONValue';
+    Exit;
+   End;
+  Result.ClassName := Value.ClassName;
+  Result.Value := LegacyValueToJSON(Value);
+  Result.isnull := False;
+End;
+
+{$ELSE}
+
+Function NativeValueIsNull(Value: TJSONValue): Boolean;
+Begin
+  Result := (Value = Nil) Or (Value is TJSONNull);
+End;
+
+Function NativeValueText(Value: TJSONValue): String;
+Begin
+  Result := '';
+  If Value = Nil Then
+    Exit;
+  If (Value is TJSONObject) Or (Value is TJSONArray) Then
+    Result := Value.ToJSON
+  Else If Value is TJSONNull Then
+    Result := ''
+  Else
+    Result := Value.Value;
+End;
+
+Function NativeCloneValue(Value: TJSONValue): TJSONBaseClass;
+Var
+  Parsed: TJSONValue;
+Begin
+  Result := Nil;
+  If NativeValueIsNull(Value) Then
+    Exit;
+  Parsed := TJSONObject.ParseJSONValue(Value.ToJSON);
+  If Parsed <> Nil Then
+    Result := TJSONBaseClass(Parsed);
+End;
+
+Function NativePairFromValue(Const AName: String;
+  Value: TJSONValue): TRESTDWJSONPair;
+Begin
+  Result := EmptyPair;
+  Result.Name := AName;
+  If NativeValueIsNull(Value) Then
+   Begin
+    Result.ClassName := 'TJSONValue';
+    Exit;
+   End;
+  Result.ClassName := Value.ClassName;
+  Result.Value := NativeValueText(Value);
+  Result.isnull := False;
+End;
+
 {$ENDIF}
 
-Function TRESTDWJSONInterfaceObject.OpenArray(key: String) : TRESTDWJSONInterfaceArray;
-Var
- {$IFNDEF FPC}
-  vEIndex: Integer;
-  aJSONObject: TJSONObject;
- {$ENDIF}
- cJSON      : String;
- aJSONArray : TJSONArray;
-Begin
-  result := TRESTDWJSONInterfaceArray.Create;
-  {$IFNDEF FPC}
-  If TJSONObject(JSONObject).ClassName = 'TJSONObject' Then
-   Begin
-    aJSONObject := TJSONObject.ParseJSONValue(TJSONObject(JSONObject).ToJSON) as TJSONObject;
-    aJSONArray := TJSONObject.ParseJSONValue(TJSONObject(aJSONObject).Get(key).JSONValue.ToJSON) as TJSONArray;
-    result.vJSONObject := TJSONBaseClass(aJSONArray);
-    FreeAndNil(aJSONObject);
-   End
-  Else
-   Begin
-    aJSONArray := TJSONObject.ParseJSONValue(GetElementJSON(TJSONObject(JSONObject), key)) as TJSONArray;
-    result.vJSONObject := TJSONBaseClass(aJSONArray);
-    // (Key).ToJSON) as TJSONArray);
-   End;
-  {$ELSE}
-   If Assigned(result.vJSONObject) Then
-    FreeAndNil(result.vJSONObject);
-   cJSON              := TJSONObject(vJSONObject).getString(key);
-   result.vJSONObject := TJSONBaseClass(TJSONArray.create(cJSON));
-  {$ENDIF}
-End;
-
-Function TRESTDWJSONInterfaceObject.OpenArray(Index: Integer)
-  : TRESTDWJSONInterfaceArray;
-{$IFNDEF FPC}
-Var
-  vEIndex: Integer;
-  aJSONObject: TJSONObject;
-  aJSONArray: TJSONArray;
-  {$ENDIF}
-Begin
-  result := TRESTDWJSONInterfaceArray.Create;
-  If Assigned(vJSONObject) Then
-   FreeAndNil(vJSONObject);
-  {$IFNDEF FPC}
-  If TJSONObject(JSONObject).ClassName = 'TJSONObject' Then
-  Begin
-    aJSONObject := TJSONObject.ParseJSONValue(TJSONObject(JSONObject).ToJSON)
-      as TJSONObject;
-    aJSONArray := TJSONObject.ParseJSONValue(TJSONObject(aJSONObject)
-      .Pairs[Index].JSONValue.ToJSON) as TJSONArray;
-    result.vJSONObject := TJSONBaseClass(aJSONArray);
-    FreeAndNil(aJSONObject);
-  End
-  Else
-  Begin
-    aJSONArray := TJSONObject.ParseJSONValue(TJSONObject(aJSONObject)
-      .Pairs[Index].JSONValue.ToJSON) as TJSONArray;
-    result.vJSONObject := TJSONBaseClass(aJSONArray);
-    // (Key).ToJSON) as TJSONArray);
-  End;
-  {$ELSE}
-  If TJSONObject(JSONObject).ClassName = 'TJSONObject' Then
-    result.vJSONObject := TJSONBaseClass(TJSONObject(vJSONObject)
-      .opt(TJSONObject(vJSONObject).names.Get(Index).toString))
-  Else If TJSONObject(JSONObject).ClassName = 'TJSONArray' Then
-    result.vJSONObject := TJSONBaseClass(TJSONArray(vJSONObject).Get(Index));
-  {$ENDIF}
-End;
-
-Constructor TRESTDWJSONInterfaceArray.Create;
-Begin
- Inherited Create;
- vJSONObject := Nil;
-End;
-
-Destructor TRESTDWJSONInterfaceArray.Destroy;
-Begin
-  If Assigned(vJSONObject) Then
-   FreeAndNil(vJSONObject);
-  inherited;
-End;
-
-Function TRESTDWJSONInterfaceArray.ElementCount: Integer;
-Begin
-  result := 0;
-  If vJSONObject = Nil then
-    Exit;
-  {$IFNDEF FPC}
-  result := TJSONArray(vJSONObject).Size;
-  {$ELSE}
-  If TJSONObject(vJSONObject).ClassName = 'TJSONObject' Then
-   Begin
-    If TJSONObject(vJSONObject).names <> Nil Then
-     result := TJSONObject(vJSONObject).names.length;
-   End
-  Else If TJSONObject(vJSONObject).ClassName = 'TJSONArray' Then
-   result := TJSONArray(vJSONObject).length;
-  {$ENDIF}
-End;
-
-Function TRESTDWJSONInterfaceArray.GetObject(Index: Integer)
-  : TRESTDWJSONInterfaceBase;
-Var
- {$IFNDEF FPC}
-  aJSONObject : TJSONArray;
-  aJSONValue  : TJSONValue;
- {$ELSE}
- cNames : TJSONArray;
- {$ENDIF}
- vJsonString,
- vClassName  : String;
-Begin
-  result := TRESTDWJSONInterfaceBase.Create(Nil);
-  vClassName := TJSONObject(vJSONObject).ClassName;
-  If (Uppercase(TJSONObject(vJSONObject).ClassName) = Uppercase('TJSONArray')) Then
-   Begin
-    {$IFNDEF FPC}
-    aJSONValue := TJSONObject.ParseJSONValue(TJSONObject(JSONObject).Get(Index).ToJSON);
-    If aJSONValue is TJSONObject Then
-     result.vJSONObject := TJSONBaseClass(aJSONValue as TJSONObject)
-    Else
-     result.vJSONObject := TJSONBaseClass(aJSONValue);
-    {$ELSE}
-    If TJSONArray(vJSONObject).isnull(Index) Then
-     result.vJSONObject := Nil
-    Else
-     Begin
-      If TJSONArray(vJSONObject).optJSONArray(Index) = Nil Then
-       Begin
-        vJsonString := TJSONArray(vJSONObject).optString(Index);
-        If vJsonString <> '' Then
-         Begin
-          If vJsonString[InitStrPos] = '[' Then
-           result.vJSONObject := TJSONBaseClass(TJSONArray.create(vJsonString))
-          Else If vJsonString[InitStrPos] = '{' Then
-           result.vJSONObject := TJSONBaseClass(TJSONObject.create(vJsonString))
-          Else
-           result.vJSONObject := TJSONBaseClass(TJSONObject.create(Format('{"%d"="%s"}', [Index, vJsonString])));
-         End
-        Else
-         result.vJSONObject := Nil;
-       End
-      Else
-       result.vJSONObject := TJSONBaseClass(TJSONArray.create(TJSONArray(vJSONObject).optJSONArray(Index).toString));
-     End;
-    {$ENDIF}
-   End
-  Else If (Uppercase(TJSONObject(vJSONObject).ClassName)
-    = Uppercase('TJSONObject')) Then
-   Begin
-    {$IFNDEF FPC}
-    result.vJSONObject := TJSONBaseClass
-      (TJSONObject.ParseJSONValue(TJSONObject(vJSONObject).Get(Index)
-      .JSONValue.ToJSON) as TJSONArray);
-    {$ELSE}
-     cNames := TJSONObject(vJSONObject).names;
-     vJsonString := TJSONObject(vJSONObject).opt(cNames.Get(Index).toString).toString;
-     If vJsonString[InitStrPos] = '[' Then
-      result.vJSONObject := TJSONBaseClass(TJSONArray.create(vJsonString))
-     Else If vJsonString[InitStrPos] = '{' Then
-      result.vJSONObject := TJSONBaseClass(TJSONObject.create(vJsonString))
-     Else
-      result.vJSONObject := Nil;
-     If Assigned(cNames) Then
-      FreeAndNil(cNames);
-    {$ENDIF}
-   End
-  Else
-   result.vJSONObject := TJSONBaseClass(TJSONObject(vJSONObject));
-End;
-
-Function TRESTDWJSONInterfaceArray.ToJSON: String;
-Begin
-  result := TJSONObject(Self).toString;
-End;
-
-Constructor TRESTDWJSONInterfaceObject.Create(JSONValue: String);
+Constructor TJSONBaseObjectClass.Create;
 Begin
   Inherited Create;
-  If JSONValue <> '' Then
-  Begin
-    If Assigned(vJSONObject) Then
-     FreeAndNil(vJSONObject);
-    {$IFNDEF FPC}
-    If JSONValue[InitStrPos] = '[' then
-      vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue(JSONValue) as TJSONArray)
-    Else If JSONValue[InitStrPos] = '{' then
-      vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue(JSONValue) as TJSONObject)
-    Else
-      vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue('{}') 	  as TJSONObject)
-    {$ELSE}
-    If JSONValue[InitStrPos] = '[' then
-      vJSONObject := TJSONBaseClass(TJSONArray.Create(JSONValue))
-    Else If JSONValue[InitStrPos] = '{' then
-      vJSONObject := TJSONBaseClass(TJSONObject.Create(JSONValue))
-    Else
-      vJSONObject := TJSONBaseClass(TJSONObject.Create('{}'))
-    {$ENDIF}
-  End;
+  vJSONObject := Nil;
 End;
 
-Destructor TRESTDWJSONInterfaceObject.Destroy;
+Destructor TJSONBaseObjectClass.Destroy;
 Begin
- If Assigned(vJSONObject) Then
-  FreeAndNil(vJSONObject);
- Inherited;
-End;
-
-Function TRESTDWJSONInterfaceObject.GetPairN(Index: String): TRESTDWJSONPair;
-Var
-  I: Integer;
-  vElementName, vClassName: String;
-  {$IFNDEF FPC}
-  aJSONObject: TJSONObject;
-  vValueJSON: String;
-  {$ELSE}
-  cNames : TJSONArray;
-  {$ENDIF}
-Begin
-  result.isnull := False;
-  result.Value  :=  'null';
-  If vJSONObject = Nil Then
-  Begin
-    result.isnull := True;
-    Exit;
-  End;
-  vClassName := TJSONObject(vJSONObject).ClassName;
-  {$IFNDEF FPC}
-  If (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceObject')) Or
-    (Uppercase(vClassName) = Uppercase('TJSONObject')) Or
-    (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceBase')) Then
-  Begin
-    If vClassName <> '_String' Then
-    Begin
-      For I := 0 To TJSONObject(vJSONObject).Count - 1 Do
-      Begin
-        result.Name := removestr(TJSONObject(vJSONObject)
-          .Pairs[I].JsonString.Value, '"');
-        If LowerCase(result.Name) <> LowerCase(Index) Then
-        Begin
-          result.Name := '';
-          Continue;
-        End;
-        If TJSONObject(vJSONObject).Pairs[I].JSONValue is TJSONObject Then
-        Begin
-          result.ClassName := 'TJSONObject';
-          vValueJSON := TJSONObject(vJSONObject).Pairs[I].JSONValue.toString;
-          If (vValueJSON = '') Or (Trim(vValueJSON) = '""') then
-            result.Value := TJSONObject(vJSONObject).Pairs[I].JSONValue.Value
-          Else
-            result.Value := vValueJSON;
-        End
-        Else
-        Begin
-          result.ClassName := TJSONObject(vJSONObject).Pairs[I]
-            .JSONValue.ClassName;
-          vValueJSON := TJSONObject(vJSONObject).Pairs[I].JSONValue.Value;
-          If (vValueJSON = '') Or (Trim(vValueJSON) = '""') then
-            result.Value := TJSONObject(vJSONObject).Pairs[I].JSONValue.toString
-          Else
-            result.Value := vValueJSON;
-        End;
-        Break;
-      End;
-    End;
-  End
-  Else If Uppercase(vClassName) = Uppercase('TJSONArray') Then
-  Begin
-    For I := 0 To TJSONObject(vJSONObject).Count - 1 Do
-    Begin
-      aJSONObject := TJSONObject.ParseJSONValue(TJSONObject(vJSONObject).Get(I)
-        .ToJSON) as TJSONObject;
-      result.Name := removestr(aJSONObject.Value, '"');
-      If LowerCase(result.Name) <> LowerCase(Index) Then
-      Begin
-        FreeAndNil(aJSONObject);
-        result.Name := '';
-        Continue;
-      End;
-      If (aJSONObject.toString = '') Or (Trim(aJSONObject.toString) = '""') then
-        result.Value := ''
-      Else
-        result.Value := aJSONObject.toString;
-      result.ClassName := 'TJSONArray';
-      FreeAndNil(aJSONObject);
-      Break;
-    End;
-  End;
-  {$ELSE}
-  If (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceObject')) Or
-    (Uppercase(vClassName) = Uppercase('TJSONObject')) Or
-    (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceBase')) Then
-  Begin
-    If vClassName <> '_String' Then
-    Begin
-     cNames := TJSONObject(vJSONObject).names;
-      For I := 0 To cNames.length - 1 Do
-       Begin
-        If LowerCase(cNames.Get(I).toString) <>
-          LowerCase(Index) Then
-          Continue;
-        result.Name := cNames.Get(I).toString;
-        result.Value := TJSONObject(vJSONObject).Get(result.Name).toString;
-        result.ClassName := TJSONObject(vJSONObject).Get(result.Name).ClassName;
-        Break;
-       End;
-     If Assigned(cNames) Then
-      FreeAndNil(cNames);
-    End;
-  End
-  Else If Uppercase(vClassName) = Uppercase('TJSONArray') Then
-  Begin
-    For I := 0 To TJSONArray(vJSONObject).length - 1 Do
-    Begin
-      If LowerCase(TJSONArray(vJSONObject).Get(I).ClassName) <>
-        LowerCase('_String') Then
-      Begin
-        vClassName := TJSONArray(vJSONObject).optJSONObject(I).ClassName;
-        result.ClassName := 'TJSONArray';
-        cNames := TJSONArray(vJSONObject).optJSONObject(I).names;
-        If ((cNames.length > 0)
-           And (Uppercase(vClassName) = Uppercase('TJSONArray'))) Then
-         Begin
-          If (TJSONObject(TJSONArray(vJSONObject).optJSONObject(I))
-            .names.length > I) Then
-          Begin
-            If LowerCase(TJSONObject(TJSONArray(vJSONObject).optJSONObject(I))
-              .names.Get(0).toString) <> LowerCase(Index) Then
-            Begin
-              result.ClassName := '';
-              Continue;
-            End;
-            result.Name := TJSONObject(TJSONArray(vJSONObject).optJSONObject(I))
-              .names.Get(0).toString;
-            result.Value := TJSONObject(TJSONArray(vJSONObject).optJSONObject(I)
-              ).Get(result.Name).toString;
-            Break;
-          End;
-         End
-        Else
-         Begin
-          result.Name := TJSONArray(vJSONObject).Get(I).toString;
-          If LowerCase(result.Name) <> LowerCase(Index) Then
-          Begin
-            result.Name := '';
-            Continue;
-          End;
-          If (Trim(result.Name) = '') Or
-            ((Pos('{', result.Name) > 0) Or (Pos('[', result.Name) > 0)) Then
-            result.Name := 'arrayobj' + IntToStr(I);
-          result.Value := TJSONArray(vJSONObject).opt(I).toString;
-          Break;
-         End;
-        if Assigned(cNames) then
-         FreeAndNil(cNames)
-      End;
-    End;
-  End;
-  {$ENDIF}
-  If Trim(result.ClassName) = '' Then
-    result.ClassName := vClassName;
-  // Correção para null value
-  result.isnull := (result.Value = 'null'); // or (Result.Value = '');
-  If result.isnull Then
-    result.Value := '';
-End;
-
-Function TRESTDWJSONInterfaceObject.GetPair(Index: Integer): TRESTDWJSONPair;
-Var
-  vElementName, vClassName: String;
-  {$IFNDEF FPC}
-  aJSONObject: TJSONObject;
-  vValueJSON: String;
-  {$ELSE}
-   cNames : TJSONArray;
-  {$ENDIF}
-Begin
- result.isnull := False;
- result.Value  :=  'null';
- If vJSONObject = Nil Then
-  Begin
-   result.isnull := True;
-   Exit;
-  End;
-  vClassName := TJSONObject(vJSONObject).ClassName;
-  {$IFNDEF FPC}
-  If (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceObject')) Or
-     (Uppercase(vClassName) = Uppercase('TJSONObject')) Or
-     (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceBase')) Then
-   Begin
-    If vClassName <> '_String' Then
-     Begin
-      If (TJSONObject(vJSONObject).Count > index) Then
-      Begin
-        result.Name := removestr(TJSONObject(vJSONObject).Pairs[index].JsonString.Value, '"');
-        If TJSONObject(vJSONObject).Pairs[index].JSONValue is TJSONObject Then
-        Begin
-          result.ClassName := 'TJSONObject';
-          vValueJSON := TJSONObject(vJSONObject).Pairs[index]
-            .JSONValue.toString;
-          // removestr(TJSONObject(vJSONObject).Pairs[index].JsonValue.tostring, '"');
-          If (vValueJSON = '') Or (Trim(vValueJSON) = '""') then
-            result.Value := TJSONObject(vJSONObject).Pairs[index].JSONValue.Value
-          else
-            result.Value := vValueJSON;
-        End
-        Else
-        Begin
-          result.ClassName := TJSONObject(vJSONObject).Pairs[index]
-            .JSONValue.ClassName;
-          vValueJSON := TJSONObject(vJSONObject).Pairs[index].JSONValue.Value;
-          If (vValueJSON = '') Or (Trim(vValueJSON) = '""') then
-            result.Value := TJSONObject(vJSONObject).Pairs[index]
-              .JSONValue.toString
-          else
-            result.Value := vValueJSON;
-        End;
-       End;
-     End
-    Else
-     Begin
-      result.Value := TJSONObject(vJSONObject).Pairs[index].JSONValue.Value;
-      // removestr(TJSONObject(vJSONObject).Pairs[index].JsonValue.tostring, '"');
-      result.ClassName := TJSONObject(vJSONObject).Pairs[index].JSONValue.ClassName;
-     End;
-   End
-  Else If Uppercase(vClassName) = Uppercase('TJSONArray') Then
-   Begin
-    vClassName := TJSONObject(vJSONObject).Get(index).classname;
-    If Uppercase(vClassName) = Uppercase('TJSONArray') Then
-     Begin
-      aJSONObject := TJSONObject.ParseJSONValue(TJSONObject(vJSONObject).Get(index).ToJSON) as TJSONObject;
-      result.Name := removestr(aJSONObject.Value, '"');
-      If (aJSONObject.toString = '') Or (Trim(aJSONObject.toString) = '""') then
-       result.Value := ''
-      Else
-       result.Value := aJSONObject.toString;
-      result.ClassName := 'TJSONArray';
-      FreeAndNil(aJSONObject);
-     End
-    Else
-     Begin
-      result.Name  := '';
-      vValueJSON   := TJSONObject(vJSONObject).Get(index).tostring;
-      result.Value := removestr(vValueJSON, '""');
-      If vClassName = 'NULL' Then
-       result.ClassName := 'TJSONValue'
-      Else
-       result.ClassName := vClassName;
-     End;
-   End
-  Else
-   Begin
-    result.Name := '';
-    result.Value := TJSONValue(vJSONObject).Value;
-    If (result.Value = '') Or (Trim(result.Value) = '""') then
-     result.Value := removestr(TJSONObject(vJSONObject).ToJSON, '"');
-    If vClassName = 'NULL' Then
-     result.ClassName := 'TJSONValue'
-    Else
-     result.ClassName := vClassName;
-   End;
-  {$ELSE}
-  If (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceObject')) Or
-    (Uppercase(vClassName) = Uppercase('TJSONObject')) Or
-    (Uppercase(vClassName) = Uppercase('TRESTDWJSONInterfaceBase')) Then
-  Begin
-   If vClassName <> '_String' Then
-    Begin
-     cNames := TJSONObject(vJSONObject).names;
-     If cNames.length > 0 Then
-      Begin
-       If (cNames.length > index) Then
-        Begin
-          result.Name := cNames.Get(index).toString;
-          Try
-           IF (TJSONObject(vJSONObject).Get(result.Name) <> Nil)   And
-              (TJSONObject(vJSONObject).Get(result.Name) <> CNULL) Then
-            result.Value := TJSONObject(vJSONObject).Get(result.Name).toString;
-          Except
-           result.Value := '';
-          End;
-         result.ClassName := cNames.Get(index).ClassName;
-        End;
-      End
-     Else
-      Begin
-       result.Value := TJSONObject(vJSONObject).toString;
-       result.ClassName := TJSONObject(vJSONObject).ClassName;
-      End;
-     If cNames <> Nil Then
-      FreeAndNil(cNames);
-    End
-   Else
-    Begin
-     result.Value := TJSONObject(vJSONObject).toString;
-     result.ClassName := TJSONObject(vJSONObject).ClassName;
-    End;
-  End
-  Else If Uppercase(vClassName) = Uppercase('TJSONArray') Then
-  Begin
-    If LowerCase(TJSONArray(vJSONObject).Get(index).ClassName) = LowerCase('_String') Then
-     Begin
-      result.ClassName := '_String';
-      result.Name := 'arrayobj' + IntToStr(Index);
-      result.Value := TJSONArray(vJSONObject).Get(index).toString;
-     End
-    Else If LowerCase(TJSONArray(vJSONObject).Get(index).ClassName) = LowerCase('_Integer') Then
-     Begin
-      result.ClassName := '_Integer';
-      result.Name := 'arrayobj' + IntToStr(Index);
-      result.Value := TJSONArray(vJSONObject).Get(index).toString;
-     End
-    Else If LowerCase(TJSONArray(vJSONObject).Get(index).ClassName) = LowerCase('_Double') Then
-     Begin
-      result.ClassName := '_Double';
-      result.Name := 'arrayobj' + IntToStr(Index);
-      result.Value := TJSONArray(vJSONObject).Get(index).toString;
-     End
-    Else
-    Begin
-     If Not Assigned(TJSONArray(vJSONObject).optJSONObject(index)) Then
-      Begin
-       vClassName := TJSONArray(vJSONObject).get(index).ClassName;
-       If vClassName = 'NULL' Then
-        result.ClassName := 'tjsonstring';
-       result.Name := TJSONArray(vJSONObject).Get(index).toString;
-       If (Trim(result.Name) = '') Or (UpperCase(Trim(result.Name)) = 'NULL') Or
-          ((Pos('{', result.Name) > 0) Or (Pos('[', result.Name) > 0)) Then
-        result.Name := 'arrayobj' + IntToStr(Index);
-       result.Value := TJSONArray(vJSONObject).opt(Index).toString;
-      End
-     Else
-      Begin
-       vClassName := TJSONArray(vJSONObject).optJSONObject(index).ClassName;
-       result.ClassName := 'TJSONArray';
-       cNames := TJSONObject(TJSONArray(vJSONObject).optJSONObject(index)).names;
-       If (cNames.length > 0) And (Uppercase(vClassName) = Uppercase('TJSONArray')) Then
-        Begin
-         If (cNames.length > index) Then
-          Begin
-           result.Name := cNames.Get(index).toString;
-           result.Value := TJSONObject(TJSONArray(vJSONObject).optJSONObject(index)).Get(result.Name).toString;
-          End;
-        End
-       Else
-        Begin
-         result.Name := TJSONArray(vJSONObject).Get(index).toString;
-         If (Trim(result.Name) = '') Or
-            ((Pos('{', result.Name) > 0) Or (Pos('[', result.Name) > 0)) Then
-          result.Name := 'arrayobj' + IntToStr(Index);
-         result.Value := TJSONArray(vJSONObject).opt(Index).toString;
-        End;
-       If Assigned(cNames) Then
-        FreeAndNil(cNames);
-      End;
-    End;
-  End
-  Else
-  Begin
-    result.Value := TJSONObject(vJSONObject).toString;
-    result.ClassName := TJSONObject(vJSONObject).ClassName;
-  End;
-  {$ENDIF}
-  If Trim(result.ClassName) = '' Then
-    result.ClassName := vClassName;
-  // Correção para null value
-  result.isnull := ((result.Value = 'null') or (Result.Value = ''));
-  If result.isnull Then
-    result.Value := '';
-End;
-
-Function TRESTDWJSONInterfaceObject.PairCount: Integer;
-{$IFNDEF RESTDWFMX}
-Var
- cNames : TJSONArray;
-{$ENDIF}
-Begin
-  result := 0;
-  If vJSONObject = Nil Then
-    Exit;
-  {$IFNDEF FPC}
   If vJSONObject <> Nil Then
-    result := TJSONObject(vJSONObject).Count;
-  {$ELSE}
-  If TJSONObject(vJSONObject).ClassName = 'TJSONObject' Then
-   Begin
-    cNames := TJSONObject(vJSONObject).names;
-    If cNames <> Nil Then
-     Begin
-      result := cNames.length;
-      FreeAndNil(cNames);
-     End;
-   End
-  Else
-    result := TJSONArray(vJSONObject).length;
-  {$ENDIF}
+    FreeAndNil(vJSONObject);
+  Inherited;
 End;
-
-Procedure TRESTDWJSONInterfaceObject.PutPairN(Index: String;
-  Item: TRESTDWJSONPair);
-Begin
-
-End;
-
-Procedure TRESTDWJSONInterfaceObject.PutPair(Index: Integer;
-  Item: TRESTDWJSONPair);
-Begin
-
-End;
-
-Function TRESTDWJSONInterfaceObject.ClassType: TClass;
-Begin
-  If TJSONObject(vJSONObject).ClassType = TJSONObject Then
-    result := TRESTDWJSONInterfaceObject
-  Else If TJSONObject(vJSONObject).ClassType = TJSONArray Then
-    result := TRESTDWJSONInterfaceArray
-  Else If TJSONObject(vJSONObject).ClassType = TRESTDWJSONInterfaceBase Then
-    result := TRESTDWJSONInterfaceBase
-  Else
-    result := TJSONObject(vJSONObject).ClassType;
-End;
-
-Function TRESTDWJSONInterfaceObject.ToJSON: String;
-Begin
-  result := TJSONObject(vJSONObject).toString;
-End;
-
-{ TRESTDWJSONValueInterface }
-
-Function TRESTDWJSONValueInterface.GetPair(Index: Integer): TRESTDWJSONPair;
-Begin
-  result.Name := TJSONObject(Self).toString;
-  result.Value := TJSONObject(Self).toString;
-  result.ClassName := TJSONObject(Self).ClassName;
-End;
-
-procedure TRESTDWJSONValueInterface.PutPair(Index: Integer; Value: TRESTDWJSONPair);
-begin
-
-end;
-
-constructor TJSONBaseArrayClass.Create;
-begin
-  If Assigned(vJSONObject) Then
-   FreeAndNil(vJSONObject);
-  inherited;
-end;
-
-destructor TJSONBaseArrayClass.Destroy;
-begin
-  If Assigned(vJSONObject) Then
-   FreeAndNil(vJSONObject);
-  inherited;
-end;
-
-Function TJSONBaseArrayClass.GetObject: TJSONArray;
-Begin
-  result := TJSONArray(vJSONObject);
-End;
-
-procedure TJSONBaseArrayClass.SetObject(Value: TJSONArray);
-begin
- If Assigned(Value) then
-  vJSONObject := TJSONBaseClass(Value);
-end;
-
-{ TJSONBaseObjectClass }
-
-constructor TJSONBaseObjectClass.Create;
-begin
- Inherited Create;
- vJSONObject := Nil;
-end;
-
-destructor TJSONBaseObjectClass.Destroy;
-begin
-  If Assigned(vJSONObject) Then
-   FreeAndNil(vJSONObject);
- Inherited;
-end;
 
 Function TJSONBaseObjectClass.GetObject: TJSONObject;
 Begin
-  result := TJSONObject(vJSONObject);
+  Result := TJSONObject(vJSONObject);
 End;
 
 Procedure TJSONBaseObjectClass.SetObject(Value: TJSONObject);
 Begin
+  If Pointer(vJSONObject) = Pointer(Value) Then
+    Exit;
+  If vJSONObject <> Nil Then
+    FreeAndNil(vJSONObject);
   vJSONObject := TJSONBaseClass(Value);
 End;
 
-{ TRESTDWJSONInterfaceBase }
+Constructor TJSONBaseArrayClass.Create;
+Begin
+  Inherited Create;
+  vJSONObject := Nil;
+End;
 
-constructor TRESTDWJSONInterfaceBase.Create(ParentJSON: TJSONBaseClass);
-begin
+Destructor TJSONBaseArrayClass.Destroy;
+Begin
+  If vJSONObject <> Nil Then
+    FreeAndNil(vJSONObject);
+  Inherited;
+End;
+
+Function TJSONBaseArrayClass.GetObject: TJSONArray;
+Begin
+  Result := TJSONArray(vJSONObject);
+End;
+
+Procedure TJSONBaseArrayClass.SetObject(Value: TJSONArray);
+Begin
+  If Pointer(vJSONObject) = Pointer(Value) Then
+    Exit;
+  If vJSONObject <> Nil Then
+    FreeAndNil(vJSONObject);
+  vJSONObject := TJSONBaseClass(Value);
+End;
+
+Constructor TRESTDWJSONInterfaceBase.Create(ParentJSON: TJSONBaseClass);
+Begin
   Inherited Create;
   vJSONObject := ParentJSON;
-end;
+End;
 
 Destructor TRESTDWJSONInterfaceBase.Destroy;
 Begin
-  If Assigned(vJSONObject) Then
-   FreeAndNil(vJSONObject);
-  inherited;
+  Inherited;
 End;
 
-function TRESTDWJSONInterfaceBase.PairCount: Integer;
-{$IFDEF FPC}
+Function TRESTDWJSONInterfaceBase.PairCount: Integer;
+{$IFDEF RESTDWLEGACYJSON}
 Var
- cNames : TJSONArray;
+  Names: TJSONArray;
 {$ENDIF}
-begin
- {$IFNDEF FPC}
-  result := TJSONObject(vJSONObject).Count;
- {$ELSE}
-  cNames := TJSONObject(vJSONObject).names;
-  result := cNames.length;
-  FreeAndNil(cNames);
- {$ENDIF}
-end;
+Begin
+  Result := 0;
+  If vJSONObject = Nil Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  If TObject(vJSONObject) is TJSONObject Then
+   Begin
+    Names := TJSONObject(vJSONObject).names;
+    Try
+      If Names <> Nil Then
+        Result := Names.length;
+    Finally
+      Names.Free;
+    End;
+   End
+  Else If TObject(vJSONObject) is TJSONArray Then
+    Result := TJSONArray(vJSONObject).length
+  Else
+    Result := 1;
+{$ELSE}
+  If TObject(vJSONObject) is TJSONObject Then
+    Result := TJSONObject(vJSONObject).Count
+  Else If TObject(vJSONObject) is TJSONArray Then
+    Result := TJSONArray(vJSONObject).Size
+  Else
+    Result := 1;
+{$ENDIF}
+End;
+
+Constructor TRESTDWJSONInterfaceArray.Create;
+Begin
+  Inherited Create;
+End;
+
+Destructor TRESTDWJSONInterfaceArray.Destroy;
+Begin
+  Inherited;
+End;
+
+Function TRESTDWJSONInterfaceArray.ElementCount: Integer;
+Begin
+  Result := 0;
+  If vJSONObject = Nil Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  If TObject(vJSONObject) is TJSONArray Then
+    Result := TJSONArray(vJSONObject).length
+  Else If TObject(vJSONObject) is TJSONObject Then
+    Result := TJSONObject(vJSONObject).length;
+{$ELSE}
+  If TObject(vJSONObject) is TJSONArray Then
+    Result := TJSONArray(vJSONObject).Size
+  Else If TObject(vJSONObject) is TJSONObject Then
+    Result := TJSONObject(vJSONObject).Count;
+{$ENDIF}
+End;
+
+Function TRESTDWJSONInterfaceArray.GetObject(Index: Integer): TRESTDWJSONInterfaceBase;
+{$IFDEF RESTDWLEGACYJSON}
+Var
+  Value: TZAbstractObject;
+  Name: String;
+{$ELSE}
+Var
+  Value: TJSONValue;
+{$ENDIF}
+Begin
+  Result := TRESTDWJSONInterfaceBase.Create(Nil);
+  If (vJSONObject = Nil) Or (Index < 0) Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  If TObject(vJSONObject) is TJSONArray Then
+   Begin
+    If Index >= TJSONArray(vJSONObject).length Then
+      Exit;
+    Value := TJSONArray(vJSONObject).opt(Index);
+    Result.vJSONObject := LegacyCloneValue(Value);
+   End
+  Else If TObject(vJSONObject) is TJSONObject Then
+   Begin
+    If Index >= TJSONObject(vJSONObject).length Then
+      Exit;
+    Name := LegacyObjectNameAt(TJSONObject(vJSONObject), Index);
+    If Name = '' Then
+      Exit;
+    Value := TJSONObject(vJSONObject).opt(Name);
+    Result.vJSONObject := LegacyCloneValue(Value);
+   End;
+{$ELSE}
+  If TObject(vJSONObject) is TJSONArray Then
+   Begin
+    If Index >= TJSONArray(vJSONObject).Size Then
+      Exit;
+    Value := TJSONArray(vJSONObject).Get(Index);
+    Result.vJSONObject := NativeCloneValue(Value);
+   End
+  Else If TObject(vJSONObject) is TJSONObject Then
+   Begin
+    If Index >= TJSONObject(vJSONObject).Count Then
+      Exit;
+    Value := TJSONObject(vJSONObject).Pairs[Index].JSONValue;
+    Result.vJSONObject := NativeCloneValue(Value);
+   End;
+{$ENDIF}
+End;
+
+Function TRESTDWJSONInterfaceArray.ToJSON: String;
+Begin
+  Result := '';
+  If vJSONObject = Nil Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  Result := TZAbstractObject(vJSONObject).toString;
+{$ELSE}
+  Result := TJSONValue(vJSONObject).ToJSON;
+{$ENDIF}
+End;
+
+Constructor TRESTDWJSONInterfaceObject.Create(JSONValue: String);
+{$IFNDEF RESTDWLEGACYJSON}
+Var
+  Parsed: TJSONValue;
+{$ENDIF}
+Begin
+  Inherited Create;
+  If Trim(JSONValue) = '' Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  If FirstJSONChar(JSONValue) = '[' Then
+    vJSONObject := TJSONBaseClass(TJSONArray.Create(JSONValue))
+  Else If FirstJSONChar(JSONValue) = '{' Then
+    vJSONObject := TJSONBaseClass(TJSONObject.Create(JSONValue))
+  Else
+    vJSONObject := TJSONBaseClass(TJSONObject.Create('{}'));
+{$ELSE}
+  Parsed := TJSONObject.ParseJSONValue(JSONValue);
+  If Parsed <> Nil Then
+    vJSONObject := TJSONBaseClass(Parsed)
+  Else
+    vJSONObject := TJSONBaseClass(TJSONObject.ParseJSONValue('{}'));
+{$ENDIF}
+End;
+
+Destructor TRESTDWJSONInterfaceObject.Destroy;
+Begin
+  Inherited;
+End;
+
+Function TRESTDWJSONInterfaceObject.PairCount: Integer;
+Begin
+  Result := 0;
+  If vJSONObject = Nil Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  If TObject(vJSONObject) is TJSONObject Then
+    Result := TJSONObject(vJSONObject).length
+  Else If TObject(vJSONObject) is TJSONArray Then
+    Result := TJSONArray(vJSONObject).length
+  Else
+    Result := 1;
+{$ELSE}
+  If TObject(vJSONObject) is TJSONObject Then
+    Result := TJSONObject(vJSONObject).Count
+  Else If TObject(vJSONObject) is TJSONArray Then
+    Result := TJSONArray(vJSONObject).Size
+  Else
+    Result := 1;
+{$ENDIF}
+End;
+
+Function TRESTDWJSONInterfaceObject.GetPair(Index: Integer): TRESTDWJSONPair;
+{$IFDEF RESTDWLEGACYJSON}
+Var
+  Name: String;
+  Value: TZAbstractObject;
+{$ELSE}
+Var
+  Value: TJSONValue;
+{$ENDIF}
+Begin
+  Result := EmptyPair;
+  If (vJSONObject = Nil) Or (Index < 0) Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  If TObject(vJSONObject) is TJSONObject Then
+   Begin
+    If Index >= TJSONObject(vJSONObject).length Then
+      Exit;
+    Name := LegacyObjectNameAt(TJSONObject(vJSONObject), Index);
+    If Name = '' Then
+      Exit;
+    Value := TJSONObject(vJSONObject).opt(Name);
+    Result := LegacyPairFromValue(Name, Value);
+   End
+  Else If TObject(vJSONObject) is TJSONArray Then
+   Begin
+    If Index >= TJSONArray(vJSONObject).length Then
+      Exit;
+    Value := TJSONArray(vJSONObject).opt(Index);
+    Result := LegacyPairFromValue('arrayobj' + IntToStr(Index), Value);
+   End
+  Else
+    Result := LegacyPairFromValue('', TZAbstractObject(vJSONObject));
+{$ELSE}
+  If TObject(vJSONObject) is TJSONObject Then
+   Begin
+    If Index >= TJSONObject(vJSONObject).Count Then
+      Exit;
+    Value := TJSONObject(vJSONObject).Pairs[Index].JSONValue;
+    Result := NativePairFromValue(TJSONObject(vJSONObject).Pairs[Index].JsonString.Value, Value);
+   End
+  Else If TObject(vJSONObject) is TJSONArray Then
+   Begin
+    If Index >= TJSONArray(vJSONObject).Size Then
+      Exit;
+    Value := TJSONArray(vJSONObject).Get(Index);
+    Result := NativePairFromValue('arrayobj' + IntToStr(Index), Value);
+   End
+  Else
+    Result := NativePairFromValue('', TJSONValue(vJSONObject));
+{$ENDIF}
+End;
+
+Function TRESTDWJSONInterfaceObject.GetPairN(Index: String): TRESTDWJSONPair;
+{$IFDEF RESTDWLEGACYJSON}
+Var
+  I: Integer;
+  Name: String;
+  Value: TZAbstractObject;
+{$ELSE}
+Var
+  I: Integer;
+{$ENDIF}
+Begin
+  Result := EmptyPair;
+  If (vJSONObject = Nil) Or (Trim(Index) = '') Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  If TObject(vJSONObject) is TJSONObject Then
+   Begin
+    For I := 0 To TJSONObject(vJSONObject).length - 1 Do
+     Begin
+      Name := LegacyObjectNameAt(TJSONObject(vJSONObject), I);
+      If SameText(Name, Index) Then
+       Begin
+        Value := TJSONObject(vJSONObject).opt(Name);
+        Result := LegacyPairFromValue(Name, Value);
+        Exit;
+       End;
+     End;
+   End
+  Else If TObject(vJSONObject) is TJSONArray Then
+   Begin
+    For I := 0 To TJSONArray(vJSONObject).length - 1 Do
+     Begin
+      Value := TJSONArray(vJSONObject).opt(I);
+      If Value is TJSONObject Then
+       Begin
+        Name := LegacyObjectNameAt(TJSONObject(Value), 0);
+        If SameText(Name, Index) Then
+         Begin
+          Result := LegacyPairFromValue(Name, TJSONObject(Value).opt(Name));
+          Exit;
+         End;
+       End;
+     End;
+   End;
+{$ELSE}
+  If TObject(vJSONObject) is TJSONObject Then
+   Begin
+    For I := 0 To TJSONObject(vJSONObject).Count - 1 Do
+     Begin
+      If SameText(TJSONObject(vJSONObject).Pairs[I].JsonString.Value, Index) Then
+       Begin
+        Result := NativePairFromValue(
+          TJSONObject(vJSONObject).Pairs[I].JsonString.Value,
+          TJSONObject(vJSONObject).Pairs[I].JSONValue);
+        Exit;
+       End;
+     End;
+   End
+  Else If TObject(vJSONObject) is TJSONArray Then
+   Begin
+    For I := 0 To TJSONArray(vJSONObject).Size - 1 Do
+     Begin
+      If TJSONArray(vJSONObject).Get(I) is TJSONObject Then
+       Begin
+        If TJSONObject(TJSONArray(vJSONObject).Get(I)).Count > 0 Then
+         Begin
+          If SameText(TJSONObject(TJSONArray(vJSONObject).Get(I)).Pairs[0].JsonString.Value, Index) Then
+           Begin
+            Result := NativePairFromValue(
+              TJSONObject(TJSONArray(vJSONObject).Get(I)).Pairs[0].JsonString.Value,
+              TJSONObject(TJSONArray(vJSONObject).Get(I)).Pairs[0].JSONValue);
+            Exit;
+           End;
+         End;
+       End;
+     End;
+   End;
+{$ENDIF}
+End;
+
+Procedure TRESTDWJSONInterfaceObject.PutPair(Index: Integer; Item: TRESTDWJSONPair);
+Var
+  Current: TRESTDWJSONPair;
+Begin
+  Current := GetPair(Index);
+  If Current.Name <> '' Then
+    PutPairN(Current.Name, Item);
+End;
+
+Procedure TRESTDWJSONInterfaceObject.PutPairN(Index: String; Item: TRESTDWJSONPair);
+{$IFDEF RESTDWLEGACYJSON}
+Var
+  OldValue: TZAbstractObject;
+{$ELSE}
+Var
+  OldPair: TJSONPair;
+  NewValue: TJSONValue;
+{$ENDIF}
+Begin
+  If (vJSONObject = Nil) Or (Trim(Index) = '') Then
+    Exit;
+  If Not (TObject(vJSONObject) is TJSONObject) Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  OldValue := TJSONObject(vJSONObject).remove(Index);
+  If (OldValue <> Nil) And (OldValue <> CNULL) Then
+    OldValue.Free;
+  If Item.isnull Then
+    TJSONObject(vJSONObject).put(Index, CNULL)
+  Else
+    TJSONObject(vJSONObject).put(Index, Item.Value);
+{$ELSE}
+  OldPair := TJSONObject(vJSONObject).RemovePair(Index);
+  OldPair.Free;
+  If Item.isnull Then
+    NewValue := TJSONNull.Create
+  Else
+    NewValue := TJSONString.Create(Item.Value);
+  TJSONObject(vJSONObject).AddPair(Index, NewValue);
+{$ENDIF}
+End;
+
+Function TRESTDWJSONInterfaceObject.OpenArray(Key: String): TRESTDWJSONInterfaceArray;
+{$IFDEF RESTDWLEGACYJSON}
+Var
+  Value: TZAbstractObject;
+{$ELSE}
+Var
+  Value: TJSONValue;
+{$ENDIF}
+Begin
+  Result := TRESTDWJSONInterfaceArray.Create;
+  If (vJSONObject = Nil) Or (Trim(Key) = '') Then
+    Exit;
+  If Not (TObject(vJSONObject) is TJSONObject) Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  Value := TJSONObject(vJSONObject).opt(Key);
+  If Value is TJSONArray Then
+    Result.vJSONObject := LegacyCloneValue(Value);
+{$ELSE}
+  Value := TJSONObject(vJSONObject).GetValue(Key);
+  If Value is TJSONArray Then
+    Result.vJSONObject := NativeCloneValue(Value);
+{$ENDIF}
+End;
+
+Function TRESTDWJSONInterfaceObject.OpenArray(Index: Integer): TRESTDWJSONInterfaceArray;
+{$IFDEF RESTDWLEGACYJSON}
+Var
+  Name: String;
+  Value: TZAbstractObject;
+{$ELSE}
+Var
+  Value: TJSONValue;
+{$ENDIF}
+Begin
+  Result := TRESTDWJSONInterfaceArray.Create;
+  If (vJSONObject = Nil) Or (Index < 0) Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  If TObject(vJSONObject) is TJSONObject Then
+   Begin
+    If Index >= TJSONObject(vJSONObject).length Then
+      Exit;
+    Name := LegacyObjectNameAt(TJSONObject(vJSONObject), Index);
+    If Name = '' Then
+      Exit;
+    Value := TJSONObject(vJSONObject).opt(Name);
+   End
+  Else If TObject(vJSONObject) is TJSONArray Then
+   Begin
+    If Index >= TJSONArray(vJSONObject).length Then
+      Exit;
+    Value := TJSONArray(vJSONObject).opt(Index);
+   End
+  Else
+    Exit;
+  If Value is TJSONArray Then
+    Result.vJSONObject := LegacyCloneValue(Value);
+{$ELSE}
+  If TObject(vJSONObject) is TJSONObject Then
+   Begin
+    If Index >= TJSONObject(vJSONObject).Count Then
+      Exit;
+    Value := TJSONObject(vJSONObject).Pairs[Index].JSONValue;
+   End
+  Else If TObject(vJSONObject) is TJSONArray Then
+   Begin
+    If Index >= TJSONArray(vJSONObject).Size Then
+      Exit;
+    Value := TJSONArray(vJSONObject).Get(Index);
+   End
+  Else
+    Exit;
+  If Value is TJSONArray Then
+    Result.vJSONObject := NativeCloneValue(Value);
+{$ENDIF}
+End;
+
+Function TRESTDWJSONInterfaceObject.ClassType: TClass;
+Begin
+  Result := TRESTDWJSONInterfaceBase;
+  If vJSONObject = Nil Then
+    Exit;
+  If TObject(vJSONObject) is TJSONObject Then
+    Result := TRESTDWJSONInterfaceObject
+  Else If TObject(vJSONObject) is TJSONArray Then
+    Result := TRESTDWJSONInterfaceArray
+  Else
+    Result := TObject(vJSONObject).ClassType;
+End;
+
+Function TRESTDWJSONInterfaceObject.ToJSON: String;
+Begin
+  Result := '';
+  If vJSONObject = Nil Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  Result := TZAbstractObject(vJSONObject).toString;
+{$ELSE}
+  Result := TJSONValue(vJSONObject).ToJSON;
+{$ENDIF}
+End;
+
+Function TRESTDWJSONValueInterface.GetPair(Index: Integer): TRESTDWJSONPair;
+Begin
+  Result := EmptyPair;
+  If vJSONObject = Nil Then
+    Exit;
+{$IFDEF RESTDWLEGACYJSON}
+  Result := LegacyPairFromValue('', TZAbstractObject(vJSONObject));
+{$ELSE}
+  Result := NativePairFromValue('', TJSONValue(vJSONObject));
+{$ENDIF}
+End;
+
+Procedure TRESTDWJSONValueInterface.PutPair(Index: Integer; Value: TRESTDWJSONPair);
+Begin
+End;
 
 end.
