@@ -1,21 +1,21 @@
 unit uRESTDWSqlEditor;
 
-{$I ..\..\..\Source\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Flávio Motta               - Member Tester and DEMO Developer.
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -50,8 +50,10 @@ Const
   private
     FRESTDWDatabase : TRESTDWDatabasebaseBase;
     FEvent : TSimpleEvent;
+    FLock : TCriticalSection;
     FMustDie : boolean;
     FTipoEvento : string;
+    FTipoRetorno : string;
     FBuscar : string;
     FMemString : TStringList;
     FOnFimEvento : TOnTrhFimBusca;
@@ -134,6 +136,7 @@ Const
   pNewSQL            : PointerString;
   FThrBancoDados     : TThrBancoDados;
   FResModal          : Cardinal;
+  FTablesLoading     : Boolean;
   Procedure SetFields;
   Function  BuildSQL : String;
   Procedure SetDatabase(Value : TRESTDWDatabasebaseBase);
@@ -247,7 +250,8 @@ end;
 
 procedure TFrmDWSqlEditor.FormActivate(Sender: TObject);
 begin
- CarregarTabelas;
+ If (Not FTablesLoading) And (lbTables.Count = 0) Then
+  CarregarTabelas;
 end;
 
 {$IFNDEF FPC}
@@ -302,6 +306,7 @@ begin
  DataSource       := TDataSource.Create(Self);
  vLastSelect      := '';
  FResModal        := mrNone;
+ FTablesLoading   := False;
 
  RESTDWDatabase := nil;
 
@@ -317,12 +322,15 @@ begin
  DataSource.DataSet        := RESTDWClientSQLB;
  DBGridRecord.DataSource   := DataSource;
 
- If Assigned(RESTDWClientSQL) Then Begin
+ If Assigned(RESTDWClientSQL) Then
+  Begin
    RESTDWDatabase            := RESTDWClientSQL.DataBase;
    RESTDWClientSQLB.DataBase := RESTDWDatabase;
- end;
+  End;
 
  FThrBancoDados.RESTDWDatabase := RESTDWDatabase;
+ If Assigned(RESTDWDatabase) Then
+  SetarControles(True);
 end;
 
 Procedure TFrmDWSqlEditor.SetFields;
@@ -340,17 +348,20 @@ End;
 procedure TFrmDWSqlEditor.thrOnFimEvento(Sender: TObject; evento: string;
   lstString: TStringList);
 begin
-  if evento = 'T' then begin
-    lbTables.Items.Text := lstString.Text;
-    If lbTables.Count > 0 Then Begin
-      SetarControles(True);
-      lbTables.ItemIndex := 0;
-      SetFields;
+ If evento = 'T' Then
+  Begin
+   FTablesLoading := False;
+   lbTables.Items.Text := lstString.Text;
+   If lbTables.Count > 0 Then
+    Begin
+     lbTables.ItemIndex := 0;
+     SetFields;
     End;
-  end
-  else if evento = 'F' then begin
-    lbFields.Items.Text := lstString.Text;
-  end;
+  End
+ Else If evento = 'F' Then
+  Begin
+   lbFields.Items.Text := lstString.Text;
+  End;
 end;
 
 procedure TFrmDWSqlEditor.thrOnTerminate(Sender: TObject);
@@ -508,7 +519,10 @@ End;
 
 procedure TFrmDWSqlEditor.CarregarTabelas;
 begin
-  FThrBancoDados.buscarTabelas;
+ If FThrBancoDados = Nil Then
+  Exit;
+ FTablesLoading := True;
+ FThrBancoDados.buscarTabelas;
 end;
 
 procedure TFrmDWSqlEditor.MemoDragDrop(Sender, Source: TObject; X,
@@ -525,24 +539,34 @@ end;
 
 procedure TThrBancoDados.buscarFieldsNames(tabela: string);
 begin
+ FLock.Acquire;
+ Try
   FTipoEvento := 'F';
   FBuscar := tabela;
   FEvent.SetEvent;
+ Finally
+  FLock.Release;
+ End;
 end;
 
 procedure TThrBancoDados.buscarTabelas;
 begin
+ FLock.Acquire;
+ Try
   FTipoEvento := 'T';
   FBuscar := '';
   FEvent.SetEvent;
+ Finally
+  FLock.Release;
+ End;
 end;
 
 procedure TThrBancoDados.callFimBusca;
 var
   vTipo : string;
 begin
-  vTipo := FTipoEvento;
-  FTipoEvento := ''; // limpando para nao cair no while do Execute
+  vTipo := FTipoRetorno;
+  FTipoRetorno := '';
   if Assigned(FOnFimEvento) then
     FOnFimEvento(Self,vTipo,FMemString);
 end;
@@ -552,6 +576,7 @@ begin
   FRESTDWDatabase := nil;
   FMustDie := False;
   FEvent := TSimpleEvent.Create;
+  FLock := TCriticalSection.Create;
   FMemString := TStringList.Create;
   FreeOnTerminate := True;
   {$IFDEF FPC}
@@ -565,11 +590,15 @@ destructor TThrBancoDados.Destroy;
 begin
   FMemString.Free;
   FEvent.Free;
+  FLock.Free;
 
   inherited;
 end;
 
 procedure TThrBancoDados.Execute;
+var
+  vTipoEvento,
+  vBuscar : String;
 begin
   while not Terminated do begin
     {$IF (NOT DEFINED(FPC)) AND (CompilerVersion < 21)}
@@ -578,25 +607,44 @@ begin
       FEvent.WaitFor(INFINITE);
     {$IFEND}
 
+    FLock.Acquire;
+    Try
+      FEvent.ResetEvent;
+      vTipoEvento := FTipoEvento;
+      vBuscar := FBuscar;
+      FTipoEvento := '';
+      FBuscar := '';
+    Finally
+      FLock.Release;
+    End;
+
     if FMustDie then begin
       Terminate;
       Break;
     end;
 
+    If vTipoEvento = '' Then
+      Continue;
+
     FMemString.Clear;
     try
       if FRESTDWDatabase <> nil then begin
-        if FTipoEvento = 'T' then
+        if vTipoEvento = 'T' then
           FRESTDWDatabase.GetTableNames(FMemString)
-        else if FTipoEvento = 'F' then
-          FRESTDWDatabase.GetFieldNames(FBuscar,FMemString);
+        else if vTipoEvento = 'F' then
+          FRESTDWDatabase.GetFieldNames(vBuscar,FMemString);
       end;
     except
 
     end;
 
-    if FMemString.Count > 0 then
-      Synchronize({$IFDEF FPC}@{$ENDIF}callFimBusca);
+    if FMustDie then begin
+      Terminate;
+      Break;
+    end;
+
+    FTipoRetorno := vTipoEvento;
+    Synchronize({$IFDEF FPC}@{$ENDIF}callFimBusca);
 
     if FMustDie then begin
       Terminate;
@@ -615,9 +663,15 @@ end;
 
 procedure TThrBancoDados.threadDie;
 begin
+ FLock.Acquire;
+ Try
   FTipoEvento := '';
+  FBuscar := '';
   FMustDie := True;
   FEvent.SetEvent;
+ Finally
+  FLock.Release;
+ End;
 end;
 
 end.
