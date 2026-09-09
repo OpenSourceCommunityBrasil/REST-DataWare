@@ -1,6 +1,6 @@
 ﻿Unit uRESTDWConsts;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware.
@@ -59,9 +59,9 @@ Const
  GOffsetFromUTC   : TDateTime = 0{$IFDEF HAS_DEPRECATED}deprecated{$ENDIF};
 
  // controle de versão
- RESTDWVersionINFO               = 'v2.1.0-';
- RESTDWRelease                   = '3975';
- RESTDWCodeProject               = 'Final Fantasy X - SourceForge';
+ RESTDWVersionINFO               = 'v2.1.1 Alpha -';
+ RESTDWRelease                   = '4059';
+ RESTDWCodeProject               = 'Phoenix';
  RESTDWVersao                    = RESTDWVersionINFO + RESTDWRelease + '(' + RESTDWCodeProject + ')';
  RESTDWDialogoTitulo             = 'REST DataWare Components ' + RESTDWVersao;
  RESTDWSobreTitulo               = 'REST DataWare '+ RESTDWVersao;

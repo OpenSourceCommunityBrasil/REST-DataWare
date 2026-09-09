@@ -10,8 +10,8 @@
 
 Unit RDWCGIWizard;
 
-{$I ..\Includes\uRESTDW.inc}
-{$I ..\Includes\RDWWIZ.inc}
+{$I uRESTDW.inc}
+{$I RDWWIZ.inc}
 
 Interface
 
