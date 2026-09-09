@@ -10,7 +10,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\..\..\..\Source\Includes"/>
-        <OtherUnitFiles Value="..\..\..\..\Source\Database_Drivers;..\..\..\..\Source\Database_Drivers\ZeosPhysLink"/>
+        <OtherUnitFiles Value="..\..\..\..\Source\Database_Drivers;..\..\..\..\Source\Database_Drivers\ZeosPhysLink;..\..\..\..\Source\Basic"/>
         <UnitOutputDirectory Value="..\..\..\..\compiledlaz"/>
       </SearchPaths>
       <CodeGeneration>

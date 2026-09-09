@@ -1069,9 +1069,11 @@ Var
 Begin
  D := TColorDialog.Create(Self);
  Try
+  {$IFNDEF FPC}
   D.Options :=
    D.Options +
    [cdFullOpen,cdAnyColor];
+  {$ENDIF}
   D.Color := ColorToRGB(FColorPreview.Color);
   LRGB := ColorToRGB(D.Color);
   D.CustomColors.Values['ColorA'] :=
