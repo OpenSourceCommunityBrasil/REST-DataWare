@@ -1,29 +1,29 @@
-unit uRESTDWMemResources;
+Unit uRESTDWMemResources;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
  Roniery                    - Devel.
 }
 
-interface
+Interface
 //=== used in several files ==================================================
 resourcestring
   RsENoCharset = 'No matching charset';
@@ -1476,8 +1476,8 @@ resourcestring
 //=== JvgXMLSerializer.pas ===================================================
 resourcestring
   { RUSSIAN
-  RsOpenXMLTagNotFound = 'Îòêðûâàþùèé òåã íå íàéäåí: <%s>';
-  RsCloseXMLTagNotFound = 'Çàêðûâàþùèé òåã íå íàéäåí: </%s>';
+  RsOpenXMLTagNotFound = '   : <%s>';
+  RsCloseXMLTagNotFound = '   : </%s>';
   RsUncknownProperty = 'Uncknown property: %s'
   }
   RsOpenXMLTagNotFound = 'Open tag not found: <%s>';
@@ -2607,7 +2607,7 @@ resourcestring
   SExprBadCompare = 'Relational operators require a field and a constant';
 }
 {$IFDEF UNITVERSIONING}
-const
+Const
   UnitVersioning: TUnitVersionInfo = (
     RCSfile: '$URL$';
     Revision: '$Revision$';
@@ -2615,11 +2615,11 @@ const
     LogPath: 'JVCL\run'
   );
 {$ENDIF UNITVERSIONING}
-implementation
+Implementation
 {$IFDEF UNITVERSIONING}
- initialization
-  RegisterUnitVersion(HInstance, UnitVersioning);
- finalization
-  UnregisterUnitVersion(HInstance);
+Initialization
+ RegisterUnitVersion(HInstance, UnitVersioning);
+Finalization
+ UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-end.
+End.

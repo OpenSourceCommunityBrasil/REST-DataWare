@@ -1,21 +1,21 @@
-unit uRESTDWMemDBUtils;
+Unit uRESTDWMemDBUtils;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -28,7 +28,7 @@ Interface
  {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-uses
+Uses
   {$IFDEF MSWINDOWS}
   Windows,
   {$ENDIF MSWINDOWS}
@@ -43,32 +43,32 @@ Type
 
 
 Type
- TFieldListArray = Array of TField;
+ TFieldListArray = Array Of TField;
 
-type
-  IRESTDWDataControl = interface
+Type
+  IRESTDWDataControl = Interface
     ['{8B6910C8-D5FD-40BA-A427-FC54FE7B85E5}']
-    function GetDataLink: TDataLink;
-  end;
-  TRESTDWDataLink = class(TDataLink)
-  protected
-    procedure FocusControl(Field: TFieldRef); overload; override;
-    procedure FocusControl(const Field: TField); reintroduce; overload; virtual;
-  end;
+    Function GetDataLink: TDataLink;
+  End;
+  TRESTDWDataLink = Class(TDataLink)
+  Protected
+    Procedure FocusControl(Field: TFieldRef); overload; override;
+    Procedure FocusControl(Const Field: TField); reintroduce; overload; virtual;
+  End;
   TCommit = (ctNone, ctStep, ctAll);
-  TRESTDWDBProgressEvent = procedure(UserData: Integer; var Cancel: Boolean; Line: Integer) of object;
-  EJvScriptError = class(Exception)
-  private
+  TRESTDWDBProgressEvent = Procedure(UserData: Integer; Var Cancel: Boolean; Line: Integer) Of object;
+  EJvScriptError = Class(Exception)
+  Private
     FErrPos: Integer;
-  public
+  Public
     // The dummy parameter is only there for BCB compatibility so that
     // when the hpp file gets generated, this constructor generates
     // a C++ constructor that doesn't already exist
-    constructor Create(const AMessage: string; AErrPos: Integer; DummyForBCB: Integer = 0); overload;
+    Constructor Create(Const AMessage: string; AErrPos: Integer; DummyForBCB: Integer = 0); overload;
     property ErrPos: Integer read FErrPos;
-  end;
-  TRESTDWLocateObject = class(TObject)
-  private
+  End;
+  TRESTDWLocateObject = Class(TObject)
+  Private
     FDataSet: TDataSet;
     FLookupField: TField;
     FLookupValue: string;
@@ -76,64 +76,64 @@ type
     FCaseSensitive: Boolean;
     FBookmark: TBookmark;
     FIndexSwitch: Boolean;
-    procedure SetDataSet(Value: TDataSet);
-  protected
-    function MatchesLookup(Field: TField): Boolean;
-    procedure CheckFieldType(Field: TField); virtual;
-    procedure ActiveChanged; virtual;
-    function LocateKey: Boolean; virtual;
-    function LocateFull: Boolean; virtual;
-    function UseKey: Boolean; virtual;
-    function FilterApplicable: Boolean; virtual;
+    Procedure SetDataSet(Value: TDataSet);
+  Protected
+    Function MatchesLookup(Field: TField): Boolean;
+    Procedure CheckFieldType(Field: TField); virtual;
+    Procedure ActiveChanged; virtual;
+    Function LocateKey: Boolean; virtual;
+    Function LocateFull: Boolean; virtual;
+    Function UseKey: Boolean; virtual;
+    Function FilterApplicable: Boolean; virtual;
     property LookupField: TField read FLookupField;
     property LookupValue: string read FLookupValue;
     property LookupExact: Boolean read FLookupExact;
     property CaseSensitive: Boolean read FCaseSensitive;
     property Bookmark: TBookmark read FBookmark write FBookmark;
-  public
+  Public
 //    function Locate(const KeyField, KeyValue: string; Exact,
 //      CaseSensitive: Boolean; DisableControls: Boolean = True;
 //      RightTrimmedLookup: Boolean = False): Boolean;
     property DataSet: TDataSet read FDataSet write SetDataSet;
     property IndexSwitch: Boolean read FIndexSwitch write FIndexSwitch;
-  end;
-  TCreateLocateObject = function: TRESTDWLocateObject;
-var
+  End;
+  TCreateLocateObject = Function: TRESTDWLocateObject;
+Var
   CreateLocateObject: TCreateLocateObject = nil;
-function CreateLocate(DataSet: TDataSet): TRESTDWLocateObject;
+Function CreateLocate(DataSet: TDataSet): TRESTDWLocateObject;
 { Utility routines }
-function IsDataSetEmpty(DataSet: TDataSet): Boolean;
-procedure RefreshQuery(Query: TDataSet);
-function DataSetSortedSearch(DataSet: TDataSet;
-  const Value, FieldName: string; CaseInsensitive: Boolean): Boolean;
-function DataSetSectionName(DataSet: TDataSet): string;
-function DataSetLocateThrough(DataSet: TDataSet; const KeyFields: string;
-  const KeyValues: Variant; Options: TLocateOptions): Boolean;
+Function IsDataSetEmpty(DataSet: TDataSet): Boolean;
+Procedure RefreshQuery(Query: TDataSet);
+Function DataSetSortedSearch(DataSet: TDataSet;
+  Const Value, FieldName: string; CaseInsensitive: Boolean): Boolean;
+Function DataSetSectionName(DataSet: TDataSet): string;
+Function DataSetLocateThrough(DataSet: TDataSet; Const KeyFields: string;
+  Const KeyValues: Variant; Options: TLocateOptions): Boolean;
 
-procedure AssignRecord(Source, Dest: TDataSet; ByName: Boolean);
-procedure CheckRequiredField(Field: TField);
-procedure CheckRequiredFields(const Fields: array of TField);
-procedure GotoBookmarkEx(DataSet: TDataSet; const Bookmark: TBookmark; Mode: TResyncMode = [rmExact, rmCenter]; ForceScrollEvents: Boolean = False);
+Procedure AssignRecord(Source, Dest: TDataSet; ByName: Boolean);
+Procedure CheckRequiredField(Field: TField);
+Procedure CheckRequiredFields(Const Fields: array Of TField);
+Procedure GotoBookmarkEx(DataSet: TDataSet; Const Bookmark: TBookmark; Mode: TResyncMode = [rmExact, rmCenter]; ForceScrollEvents: Boolean = False);
 { SQL expressions }
-function DateToSQL(Value: TDateTime): string;
-function FormatSQLDateRange(Date1, Date2: TDateTime;
-  const FieldName: string): string;
-function FormatSQLDateRangeEx(Date1, Date2: TDateTime;
-  const FieldName: string): string;
-function FormatSQLNumericRange(const FieldName: string;
+Function DateToSQL(Value: TDateTime): string;
+Function FormatSQLDateRange(Date1, Date2: TDateTime;
+  Const FieldName: string): string;
+Function FormatSQLDateRangeEx(Date1, Date2: TDateTime;
+  Const FieldName: string): string;
+Function FormatSQLNumericRange(Const FieldName: string;
   LowValue, HighValue, LowEmpty, HighEmpty: Double; Inclusive: Boolean): string;
-function StrMaskSQL(const Value: string): string;
-const
+Function StrMaskSQL(Const Value: string): string;
+Const
   TrueExpr = '0=0';
   {$NODEFINE TrueExpr}
-const
+Const
   { Server Date formats}
   sdfStandard16 = '''"''mm''/''dd''/''yyyy''"'''; {"mm/dd/yyyy"}
   sdfStandard32 = '''''''dd/mm/yyyy'''''''; {'dd/mm/yyyy'}
   sdfOracle = '"TO_DATE(''"dd/mm/yyyy"'', ''DD/MM/YYYY'')"';
   sdfInterbase = '"CAST(''"mm"/"dd"/"yyyy"'' AS DATE)"';
   sdfMSSQL = '"CONVERT(datetime, ''"mm"/"dd"/"yyyy"'', 103)"';
-const
+Const
   ServerDateFmt: string = sdfStandard16;
 {.$NODEFINE ftNonTextTypes}
 (*$HPPEMIT 'namespace JvDBUtils'*)
@@ -142,14 +142,14 @@ const
 (*$HPPEMIT '        << ftBytes << ftVarBytes << ftBlob << ftMemo << ftGraphic \'*)
 (*$HPPEMIT '        << ftFmtMemo << ftParadoxOle << ftDBaseOle << ftTypedBinary << ftCursor )'*)
 (*$HPPEMIT '}'*)
-type
+Type
   Largeint = Longint;
   {$NODEFINE Largeint}
-function NameDelimiter(C: Char): Boolean;
-function IsLiteral(C: Char): Boolean;
-procedure _DBError(const Msg: string);
+Function NameDelimiter(C: Char): Boolean;
+Function IsLiteral(C: Char): Boolean;
+Procedure _DBError(Const Msg: string);
 {$IFDEF UNITVERSIONING}
-const
+Const
   UnitVersioning: TUnitVersionInfo = (
     RCSfile: '$URL$';
     Revision: '$Revision$';
@@ -157,8 +157,8 @@ const
     LogPath: 'JVCL\run'
   );
 {$ENDIF UNITVERSIONING}
-implementation
-uses
+Implementation
+Uses
   Math,
   {$IFDEF HAS_UNIT_SYSTEM_UITYPES}
   System.UITypes,
@@ -171,96 +171,96 @@ uses
   uRESTDWConsts;
 
 { TRESTDWDataLink }
-procedure TRESTDWDataLink.FocusControl(Field: TFieldRef);
-begin
+Procedure TRESTDWDataLink.FocusControl(Field: TFieldRef);
+Begin
   FocusControl(Field^);
-end;
-procedure TRESTDWDataLink.FocusControl(const Field: TField);
-begin
-end;
+End;
+Procedure TRESTDWDataLink.FocusControl(Const Field: TField);
+Begin
+End;
 { Utility routines }
-function NameDelimiter(C: Char): Boolean;
-begin
+Function NameDelimiter(C: Char): Boolean;
+Begin
   Result := RESTDWCharInSet(C, [' ', ',', ';', ')', '.', Cr, Lf]);
-end;
-function IsLiteral(C: Char): Boolean;
-begin
+End;
+Function IsLiteral(C: Char): Boolean;
+Begin
   Result := RESTDWCharInSet(C, ['''', '"']);
-end;
-procedure _DBError(const Msg: string);
-begin
+End;
+Procedure _DBError(Const Msg: string);
+Begin
   DatabaseError(Msg);
-end;
-constructor EJvScriptError.Create(const AMessage: string; AErrPos: Integer; DummyForBCB: Integer);
-begin
-  inherited Create(AMessage);
+End;
+Constructor EJvScriptError.Create(Const AMessage: string; AErrPos: Integer; DummyForBCB: Integer);
+Begin
+  Inherited Create(AMessage);
   FErrPos := AErrPos;
-end;
+End;
 // (rom) better use Windows dialogs which are localized
-function SetToBookmark(ADataSet: TDataSet; ABookmark: TBookmark): Boolean;
-begin
+Function SetToBookmark(ADataSet: TDataSet; ABookmark: TBookmark): Boolean;
+Begin
   Result := False;
-  if ADataSet.Active and (ABookmark <> nil) and not (ADataSet.Bof and ADataSet.Eof) and
-    ADataSet.BookmarkValid(ABookmark) then
-  try
+  If ADataSet.Active and (ABookmark <> nil) and not (ADataSet.Bof and ADataSet.Eof) and
+    ADataSet.BookmarkValid(ABookmark) Then
+  Try
     ADataSet.GotoBookmark(ABookmark);
     Result := True;
-  except
-  end;
-end;
+  Except
+  End;
+End;
 { Refresh Query procedure }
-procedure RefreshQuery(Query: TDataSet);
-var
+Procedure RefreshQuery(Query: TDataSet);
+Var
   BookMk: TBookmark;
-begin
+Begin
   Query.DisableControls;
-  try
-    if Query.Active then
+  Try
+    If Query.Active Then
       BookMk := Query.GetBookmark
-    else
+    Else
       BookMk := nil;
-    try
+    Try
       Query.Close;
       Query.Open;
       SetToBookmark(Query, BookMk);
-    finally
-      if BookMk <> nil then
+    Finally
+      If BookMk <> nil Then
         Query.FreeBookmark(BookMk);
-    end;
-  finally
+    End;
+  Finally
     Query.EnableControls;
-  end;
-end;
-procedure TRESTDWLocateObject.SetDataSet(Value: TDataSet);
-begin
+  End;
+End;
+Procedure TRESTDWLocateObject.SetDataSet(Value: TDataSet);
+Begin
   ActiveChanged;
   FDataSet := Value;
-end;
-function TRESTDWLocateObject.LocateFull: Boolean;
-begin
+End;
+Function TRESTDWLocateObject.LocateFull: Boolean;
+Begin
   Result := False;
   DataSet.First;
-  while not DataSet.Eof do
-  begin
-    if MatchesLookup(FLookupField) then
-    begin
+  While not DataSet.Eof Do
+  Begin
+    If MatchesLookup(FLookupField) Then
+    Begin
       Result := True;
       Break;
-    end;
+    End;
     DataSet.Next;
-  end;
-end;
-function TRESTDWLocateObject.LocateKey: Boolean;
-begin
+  End;
+End;
+Function TRESTDWLocateObject.LocateKey: Boolean;
+Begin
   Result := False;
-end;
-function TRESTDWLocateObject.FilterApplicable: Boolean;
-begin
+End;
+Function TRESTDWLocateObject.FilterApplicable: Boolean;
+Begin
   Result := FLookupField.FieldKind in [fkData, fkInternalCalc];
-end;
-procedure TRESTDWLocateObject.CheckFieldType(Field: TField);
-begin
-end;
+End;
+Procedure TRESTDWLocateObject.CheckFieldType(Field: TField);
+Begin
+End;
 //function TRESTDWLocateObject.Locate(const KeyField, KeyValue: string;
 //  Exact, CaseSensitive: Boolean; DisableControls: Boolean; RightTrimmedLookup: Boolean): Boolean;
 //var
@@ -332,28 +332,28 @@ end;
 //      DataSet.EnableControls;
 //  end;
 //end;
-function TRESTDWLocateObject.UseKey: Boolean;
-begin
+Function TRESTDWLocateObject.UseKey: Boolean;
+Begin
   Result := False;
-end;
-procedure TRESTDWLocateObject.ActiveChanged;
-begin
-end;
-function TRESTDWLocateObject.MatchesLookup(Field: TField): Boolean;
-var
+End;
+Procedure TRESTDWLocateObject.ActiveChanged;
+Begin
+End;
+Function TRESTDWLocateObject.MatchesLookup(Field: TField): Boolean;
+Var
   Temp: string;
-begin
+Begin
   Temp := Field.AsString;
-  if not LookupExact then
+  If not LookupExact Then
     SetLength(Temp, Min(Length(FLookupValue), Length(Temp)));
-  if CaseSensitive then
+  If CaseSensitive Then
     Result := AnsiSameStr(Temp, LookupValue)
-  else
+  Else
     Result := AnsiSameText(Temp, LookupValue);
-end;
-function CreateLocate(DataSet: TDataSet): TRESTDWLocateObject;
-begin
-  if Assigned(CreateLocateObject) then
+End;
+Function CreateLocate(DataSet: TDataSet): TRESTDWLocateObject;
+Begin
+  If Assigned(CreateLocateObject) Then
    Begin
     {$IFDEF FPC}
      Result := CreateLocateObject();
@@ -361,99 +361,99 @@ begin
      Result := CreateLocateObject;
     {$ENDIF}
    End
-  else
+  Else
     Result := TRESTDWLocateObject.Create;
-  if (Result <> nil) and (DataSet <> nil) then
+  If (Result <> nil) and (DataSet <> nil) Then
     Result.DataSet := DataSet;
-end;
+End;
 { DataSet locate routines }
-function DataSetLocateThrough(DataSet: TDataSet; const KeyFields: string;
-  const KeyValues: Variant; Options: TLocateOptions): Boolean;
-var
+Function DataSetLocateThrough(DataSet: TDataSet; Const KeyFields: string;
+  Const KeyValues: Variant; Options: TLocateOptions): Boolean;
+Var
   FieldCount : Integer;
   Fields     : TFieldListArray;
   Bookmark: TBookmarkType;
-  function CompareField(Field: TField; const Value: Variant): Boolean;
-  var
+  Function CompareField(Field: TField; Const Value: Variant): Boolean;
+  Var
    S, A : string;
-  begin
-    if Field.DataType in [ftString{$IFDEF UNICODE}, ftWideString{$ENDIF UNICODE}] then
-    begin
-      if Value = Null then
+  Begin
+    If Field.DataType in [ftString{$IFDEF UNICODE}, ftWideString{$ENDIF UNICODE}] Then
+    Begin
+      If Value = Null Then
         Result := Field.IsNull
-      else
-      begin
+      Else
+      Begin
         S := Field.AsString;
         A := Copy(Value, InitStrPos, Field.Size);
-        if loPartialKey in Options then
+        If loPartialKey in Options Then
           Delete(S, Length(Value) + 1, MaxInt);
-        if loCaseInsensitive in Options then
+        If loCaseInsensitive in Options Then
           Result := Uppercase(S) = Uppercase(A)
-        else
+        Else
           Result := S = A;
-      end;
-    end
-    else
+      End;
+    End
+    Else
       Result := (Field.Value = Value);
-  end;
-  function CompareRecord: Boolean;
-  var
+  End;
+  Function CompareRecord: Boolean;
+  Var
     I: Integer;
-  begin
+  Begin
     // Works with the KeyValues variant like TCustomClientDataSet.LocateRecord
-    if (FieldCount = 1) and not VarIsArray(KeyValues) then
+    If (FieldCount = 1) and not VarIsArray(KeyValues) Then
       Result := CompareField(TField(Fields[0]), KeyValues)
-    else
-    begin
+    Else
+    Begin
       Result := True;
-      for I := 0 to FieldCount - 1 do
+      For I := 0 To FieldCount - 1 Do
         Result := Result and CompareField(TField(Fields[I]), KeyValues[I]);
-    end;
-  end;
- procedure GetFieldList(List: TFieldListArray; const FieldNames: string);
- var
+    End;
+  End;
+ Procedure GetFieldList(List: TFieldListArray; Const FieldNames: string);
+ Var
   I, Len,
   Pos     : Integer;
   Field   : TField;
- begin
+ Begin
   Len := FieldNames.Length;
   Pos := 1;
   I := 0;
-  while Pos <= Len do
-   begin
+  While Pos <= Len Do
+   Begin
     Field := DataSet.FieldByName(ExtractFieldName(FieldNames, Pos));
     SetLength(Fields, I+1);
     Fields[I] := Field;
     Inc(I);
-   end;
+   End;
  End;
-begin
+Begin
   Result := False;
   SetLength(Fields, 0);
   DataSet.CheckBrowseMode;
-  if DataSet.IsEmpty then
+  If DataSet.IsEmpty Then
     Exit;
 //  Fields := TList.Create;
-  try
+  Try
     GetFieldList(Fields, KeyFields);
     FieldCount := Length(Fields);
     Result := CompareRecord;
-    if Result then
+    If Result Then
       Exit;
     DataSet.DisableControls;
-    try
+    Try
       Bookmark := TBookmarkType(DataSet.Bookmark);
-      try
+      Try
         DataSet.First;
-        while not DataSet.Eof do
-        begin
+        While not DataSet.Eof Do
+        Begin
           Result := CompareRecord;
-          if Result then
+          If Result Then
             Break;
           DataSet.Next;
-        end;
-      finally
-        if not Result and DataSet.BookmarkValid(TBookmark(Bookmark)) then
+        End;
+      Finally
+        If not Result and DataSet.BookmarkValid(TBookmark(Bookmark)) Then
          Begin
           {$IFNDEF FPC}
             {$IF CompilerVersion > 21}
@@ -465,239 +465,239 @@ begin
            DataSet.Bookmark := TBookmark(Bookmark);
           {$ENDIF}
          End;
-      end;
-    finally
+      End;
+    Finally
       DataSet.EnableControls;
-    end;
-  finally
+    End;
+  Finally
    SetLength(Fields, 0);
 //   Fields.Free;
-  end;
-end;
+  End;
+End;
 { DataSetSortedSearch. Navigate on sorted DataSet routine. }
-function DataSetSortedSearch(DataSet: TDataSet; const Value,
+Function DataSetSortedSearch(DataSet: TDataSet; Const Value,
   FieldName: string; CaseInsensitive: Boolean): Boolean;
-var
+Var
   L, H, I: Longint;
   CurrentPos: Longint;
   CurrentValue: string;
   BookMk: TBookmark;
   Field: TField;
-  function UpStr(const Value: string): string;
-  begin
-    if CaseInsensitive then
+  Function UpStr(Const Value: string): string;
+  Begin
+    If CaseInsensitive Then
       Result := AnsiUpperCase(Value)
-    else
+    Else
       Result := Value;
-  end;
-  function GetCurrentStr: string;
-  begin
+  End;
+  Function GetCurrentStr: string;
+  Begin
     Result := Field.AsString;
-    if Length(Result) > Length(Value) then
+    If Length(Result) > Length(Value) Then
       SetLength(Result, Length(Value));
     Result := UpStr(Result);
-  end;
-begin
+  End;
+Begin
   Result := False;
-  if DataSet = nil then
+  If DataSet = nil Then
     Exit;
   Field := DataSet.FindField(FieldName);
-  if Field = nil then
+  If Field = nil Then
     Exit;
-  if Field.DataType in [ftString{$IFDEF UNICODE}, ftWideString{$ENDIF UNICODE}] then
-  begin
+  If Field.DataType in [ftString{$IFDEF UNICODE}, ftWideString{$ENDIF UNICODE}] Then
+  Begin
     DataSet.DisableControls;
     BookMk := DataSet.GetBookmark;
-    try
+    Try
       L := 0;
       DataSet.First;
       CurrentPos := 0;
       H := DataSet.RecordCount - 1;
-      if Value <> '' then
-      begin
-        while L <= H do
-        begin
+      If Value <> '' Then
+      Begin
+        While L <= H Do
+        Begin
           I := (L + H) shr 1;
-          if I <> CurrentPos then
+          If I <> CurrentPos Then
             DataSet.MoveBy(I - CurrentPos);
           CurrentPos := I;
           CurrentValue := GetCurrentStr;
-          if UpStr(Value) > CurrentValue then
+          If UpStr(Value) > CurrentValue Then
             L := I + 1
-          else
-          begin
+          Else
+          Begin
             H := I - 1;
-            if UpStr(Value) = CurrentValue then
+            If UpStr(Value) = CurrentValue Then
               Result := True;
-          end;
-        end;
-        if Result then
-        begin
-          if L <> CurrentPos then
+          End;
+        End;
+        If Result Then
+        Begin
+          If L <> CurrentPos Then
             DataSet.MoveBy(L - CurrentPos);
-          while (L < DataSet.RecordCount) and
-            (UpStr(Value) <> GetCurrentStr) do
-          begin
+          While (L < DataSet.RecordCount) and
+            (UpStr(Value) <> GetCurrentStr) Do
+          Begin
             Inc(L);
             DataSet.MoveBy(1);
-          end;
-        end;
-      end
-      else
+          End;
+        End;
+      End
+      Else
         Result := True;
-      if not Result then
+      If not Result Then
         SetToBookmark(DataSet, BookMk);
-    finally
+    Finally
       DataSet.FreeBookmark(BookMk);
       DataSet.EnableControls;
-    end;
-  end
-  else
+    End;
+  End
+  Else
     DatabaseErrorFmt('Field %s TypeMismatch', [Field.DisplayName]);
-end;
+End;
 { Save and restore DataSet Fields layout }
-function DataSetSectionName(DataSet: TDataSet): string;
-begin
+Function DataSetSectionName(DataSet: TDataSet): string;
+Begin
  Result := DataSet.Name;
-end;
-function CheckSection(DataSet: TDataSet; const Section: string): string;
-begin
+End;
+Function CheckSection(DataSet: TDataSet; Const Section: string): string;
+Begin
   Result := Section;
-  if Result = '' then
+  If Result = '' Then
     Result := DataSetSectionName(DataSet);
-end;
-function IsDataSetEmpty(DataSet: TDataSet): Boolean;
-begin
+End;
+Function IsDataSetEmpty(DataSet: TDataSet): Boolean;
+Begin
   Result := (not DataSet.Active) or (DataSet.Eof and DataSet.Bof);
-end;
+End;
 { SQL expressions }
-function DateToSQL(Value: TDateTime): string;
-begin
+Function DateToSQL(Value: TDateTime): string;
+Begin
   Result := IntToStr(Trunc(Value));
-end;
-function FormatSQLDateRange(Date1, Date2: TDateTime;
-  const FieldName: string): string;
-begin
+End;
+Function FormatSQLDateRange(Date1, Date2: TDateTime;
+  Const FieldName: string): string;
+Begin
   Result := TrueExpr;
-  if (Date1 = Date2) and (Date1 <> NullDate) then
-  begin
+  If (Date1 = Date2) and (Date1 <> NullDate) Then
+  Begin
     Result := Format('%s = %s', [FieldName, FormatDateTime(ServerDateFmt,
         Date1)]);
-  end
-  else
-  if (Date1 <> NullDate) or (Date2 <> NullDate) then
-  begin
-    if Date1 = NullDate then
+  End
+  Else
+  If (Date1 <> NullDate) or (Date2 <> NullDate) Then
+  Begin
+    If Date1 = NullDate Then
       Result := Format('%s < %s', [FieldName,
         FormatDateTime(ServerDateFmt, IncDay(Date2, 1))])
-    else
-    if Date2 = NullDate then
+    Else
+    If Date2 = NullDate Then
       Result := Format('%s > %s', [FieldName,
         FormatDateTime(ServerDateFmt, IncDay(Date1, -1))])
-    else
+    Else
       Result := Format('(%s < %s) AND (%s > %s)',
         [FieldName, FormatDateTime(ServerDateFmt, IncDay(Date2, 1)),
         FieldName, FormatDateTime(ServerDateFmt, IncDay(Date1, -1))]);
-  end;
-end;
-function FormatSQLDateRangeEx(Date1, Date2: TDateTime;
-  const FieldName: string): string;
-begin
+  End;
+End;
+Function FormatSQLDateRangeEx(Date1, Date2: TDateTime;
+  Const FieldName: string): string;
+Begin
   Result := TrueExpr;
-  if (Date1 <> NullDate) or (Date2 <> NullDate) then
-  begin
-    if Date1 = NullDate then
+  If (Date1 <> NullDate) or (Date2 <> NullDate) Then
+  Begin
+    If Date1 = NullDate Then
       Result := Format('%s < %s', [FieldName,
         FormatDateTime(ServerDateFmt, IncDay(Date2, 1))])
-    else
-    if Date2 = NullDate then
+    Else
+    If Date2 = NullDate Then
       Result := Format('%s >= %s', [FieldName,
         FormatDateTime(ServerDateFmt, Date1)])
-    else
+    Else
       Result := Format('(%s < %s) AND (%s >= %s)',
         [FieldName, FormatDateTime(ServerDateFmt, IncDay(Date2, 1)),
         FieldName, FormatDateTime(ServerDateFmt, Date1)]);
-  end;
-end;
-function FormatSQLNumericRange(const FieldName: string;
+  End;
+End;
+Function FormatSQLNumericRange(Const FieldName: string;
   LowValue, HighValue, LowEmpty, HighEmpty: Double; Inclusive: Boolean): string;
-const
-  Operators: array[Boolean, 1..2] of string = (('>', '<'), ('>=', '<='));
-begin
+Const
+  Operators: array[Boolean, 1..2] Of string = (('>', '<'), ('>=', '<='));
+Begin
   Result := TrueExpr;
-  if (LowValue = HighValue) and (LowValue <> LowEmpty) then
+  If (LowValue = HighValue) and (LowValue <> LowEmpty) Then
     Result := Format('%s = %g', [FieldName, LowValue])
-  else
-  if (LowValue <> LowEmpty) or (HighValue <> HighEmpty) then
-  begin
-    if LowValue = LowEmpty then
+  Else
+  If (LowValue <> LowEmpty) or (HighValue <> HighEmpty) Then
+  Begin
+    If LowValue = LowEmpty Then
       Result := Format('%s %s %g', [FieldName, Operators[Inclusive, 2], HighValue])
-    else
-    if HighValue = HighEmpty then
+    Else
+    If HighValue = HighEmpty Then
       Result := Format('%s %s %g', [FieldName, Operators[Inclusive, 1], LowValue])
-    else
+    Else
       Result := Format('(%s %s %g) AND (%s %s %g)',
         [FieldName, Operators[Inclusive, 2], HighValue,
         FieldName, Operators[Inclusive, 1], LowValue]);
-  end;
-end;
-function StrMaskSQL(const Value: string): string;
-begin
-  if (Pos('*', Value) = 0) and (Pos('?', Value) = 0) and (Value <> '') then
+  End;
+End;
+Function StrMaskSQL(Const Value: string): string;
+Begin
+  If (Pos('*', Value) = 0) and (Pos('?', Value) = 0) and (Value <> '') Then
     Result := '*' + Value + '*'
-  else
+  Else
     Result := Value;
-end;
-procedure CheckRequiredField(Field: TField);
-begin
-  if not Field.ReadOnly and not Field.Calculated and Field.IsNull then
-  begin
+End;
+Procedure CheckRequiredField(Field: TField);
+Begin
+  If not Field.ReadOnly and not Field.Calculated and Field.IsNull Then
+  Begin
     Field.FocusControl;
     DatabaseErrorFmt('Field %s Required', [Field.DisplayName]);
-  end;
-end;
-procedure CheckRequiredFields(const Fields: array of TField);
-var
+  End;
+End;
+Procedure CheckRequiredFields(Const Fields: array Of TField);
+Var
   I: Integer;
-begin
-  for I := Low(Fields) to High(Fields) do
+Begin
+  For I := Low(Fields) To High(Fields) Do
     CheckRequiredField(Fields[I]);
-end;
-type
-  TDataSetAccess = class(TDataSet);
-procedure GotoBookmarkEx(DataSet: TDataSet; const Bookmark: TBookmark; Mode: TResyncMode; ForceScrollEvents: Boolean);
-var
+End;
+Type
+  TDataSetAccess = Class(TDataSet);
+Procedure GotoBookmarkEx(DataSet: TDataSet; Const Bookmark: TBookmark; Mode: TResyncMode; ForceScrollEvents: Boolean);
+Var
   DS: TDataSetAccess;
-begin
-	if (DataSet <> nil) and (Bookmark <> nil) then
-	begin
+Begin
+	If (DataSet <> nil) and (Bookmark <> nil) Then
+	Begin
     DS := TDataSetAccess(DataSet);
 		DS.CheckBrowseMode;
-		if ForceScrollEvents or (rmCenter in Mode) then DS.DoBeforeScroll;
+		If ForceScrollEvents or (rmCenter in Mode) Then DS.DoBeforeScroll;
 		DS.InternalGotoBookmark({$IFNDEF RTL240_UP}Pointer{$ENDIF}(Bookmark));
 		DS.Resync(Mode);
-		if ForceScrollEvents or (rmCenter in Mode) then DS.DoAfterScroll;
-	end;
-end;
-procedure AssignRecord(Source, Dest: TDataSet; ByName: Boolean);
-var
+		If ForceScrollEvents or (rmCenter in Mode) Then DS.DoAfterScroll;
+	End;
+End;
+Procedure AssignRecord(Source, Dest: TDataSet; ByName: Boolean);
+Var
   I: Integer;
   F, FSrc: TField;
-begin
-  if not (Dest.State in dsEditModes) then
+Begin
+  If not (Dest.State in dsEditModes) Then
     _DBError('Not Editing');
-  if ByName then
-  begin
-    for I := 0 to Source.FieldCount - 1 do
-    begin
+  If ByName Then
+  Begin
+    For I := 0 To Source.FieldCount - 1 Do
+    Begin
       F := Dest.FindField(Source.Fields[I].FieldName);
       FSrc := Source.Fields[i];
-      if (F <> nil) and (F.DataType <> ftAutoInc) then
-      begin
-        if FSrc.IsNull then
+      If (F <> nil) and (F.DataType <> ftAutoInc) Then
+      Begin
+        If FSrc.IsNull Then
           F.Value := FSrc.Value
-        else
-          case F.DataType of
+        Else
+          Case F.DataType Of
              ftString: F.AsString := FSrc.AsString;
              ftInteger: F.AsInteger := FSrc.AsInteger;
              ftBoolean: F.AsBoolean := FSrc.AsBoolean;
@@ -705,24 +705,24 @@ begin
              ftCurrency: F.AsCurrency := FSrc.AsCurrency;
              ftDate: F.AsDateTime := FSrc.AsDateTime;
              ftDateTime: F.AsDateTime := FSrc.AsDateTime;
-          else
+          Else
              F.Value := FSrc.Value;
-          end;
-      end;
-    end;
-  end
-  else
-  begin
-    for I := 0 to Min(Source.FieldDefs.Count - 1, Dest.FieldDefs.Count - 1) do
-    begin
+          End;
+      End;
+    End;
+  End
+  Else
+  Begin
+    For I := 0 To Min(Source.FieldDefs.Count - 1, Dest.FieldDefs.Count - 1) Do
+    Begin
       F := Dest.FindField(Dest.FieldDefs[I].Name);
       FSrc := Source.FindField(Source.FieldDefs[I].Name);
-      if (F <> nil) and (FSrc <> nil) and (F.DataType <> ftAutoInc) then
-      begin
-        if FSrc.IsNull then
+      If (F <> nil) and (FSrc <> nil) and (F.DataType <> ftAutoInc) Then
+      Begin
+        If FSrc.IsNull Then
           F.Value := FSrc.Value
-        else
-          case F.DataType of
+        Else
+          Case F.DataType Of
              ftString: F.AsString := FSrc.AsString;
              ftInteger: F.AsInteger := FSrc.AsInteger;
              ftBoolean: F.AsBoolean := FSrc.AsBoolean;
@@ -730,11 +730,11 @@ begin
              ftCurrency: F.AsCurrency := FSrc.AsCurrency;
              ftDate: F.AsDateTime := FSrc.AsDateTime;
              ftDateTime: F.AsDateTime := FSrc.AsDateTime;
-          else
+          Else
              F.Value := FSrc.Value;
-          end;
-      end;
-    end;
-  end;
-end;
-end.
+          End;
+      End;
+    End;
+  End;
+End;
+End.

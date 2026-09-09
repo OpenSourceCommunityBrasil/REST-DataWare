@@ -1,29 +1,29 @@
-unit uRESTDWMemBase;
-{$I ..\..\Includes\uRESTDW.inc}
+Unit uRESTDWMemBase;
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
  Roniery                    - Devel.
 }
 
-interface
-uses
+Interface
+Uses
   uRESTDWMemConsts,
   {$IFDEF HAS_UNITSCOPE}
   {$IFDEF MSWINDOWS}
@@ -38,7 +38,7 @@ uses
   {$ENDIF ~HAS_UNITSCOPE},
   uRESTDWProtoTypes;
 // Version
-const
+Const
   {$IFDEF UNIX}
   // renamed to DirDelimiter
   // PathSeparator    = '/';
@@ -60,11 +60,11 @@ const
   JclVersion = (JclVersionMajor shl 24) or (JclVersionMinor shl 16) or
     (JclVersionRelease shl 15) or (JclVersionBuild shl 0);
 // EJclError
-type
-  EJclError = class(Exception);
+Type
+  EJclError = Class(Exception);
 // EJclInternalError
-type
-  EJclInternalError = class(EJclError);
+Type
+  EJclInternalError = Class(EJclError);
 // Types
 Type
  {$IFDEF FPC}
@@ -73,7 +73,7 @@ Type
   Float = Single;
  {$ENDIF}
  PFloat = ^Float;
-type
+Type
   {$IFDEF FPC}
    Largeint = Int64;
    SizeInt  = Integer;
@@ -96,37 +96,37 @@ type
     PWideChar = System.PWideChar;
     PPWideChar = ^PWideChar;
     PPAnsiChar = ^PAnsiChar;
-    PInt64 = type System.PInt64;
+    PInt64 = Type System.PInt64;
    {$ENDIF}
   PPInt64 = ^PInt64;
   PPPAnsiChar = ^PPAnsiChar;
 {$IFNDEF FPC}
-type
+Type
   PLargeInteger = ^TLargeInteger;
   TLargeInteger = Int64;
 {$ENDIF ~FPC}
 {$IFNDEF COMPILER11_UP}
-type
-  TBytes = array of Byte;
+Type
+  TBytes = array Of Byte;
 {$ENDIF ~COMPILER11_UP}
 // Redefinition of PByteArray to avoid range check exceptions.
-type
-  TJclByteArray = array [0..MaxInt div SizeOf(Byte) - 1] of Byte;
+Type
+  TJclByteArray = array [0..MaxInt div SizeOf(Byte) - 1] Of Byte;
   PJclByteArray = ^TJclByteArray;
   TJclBytes = Pointer; // under .NET System.pas: TBytes = array of Byte;
 // Redefinition of ULARGE_INTEGER to relieve dependency on Windows.pas
-type
+Type
   {$IFNDEF FPC}
   PULARGE_INTEGER = ^ULARGE_INTEGER;
   {$EXTERNALSYM PULARGE_INTEGER}
-  ULARGE_INTEGER = record
-    case Integer of
+  ULARGE_INTEGER = Record
+    Case Integer Of
     0:
      (LowPart: LongWord;
       HighPart: LongWord);
     1:
      (QuadPart: Int64);
-  end;
+  End;
   {$EXTERNALSYM ULARGE_INTEGER}
   {$ENDIF ~FPC}
   TJclULargeInteger = ULARGE_INTEGER;
@@ -136,34 +136,34 @@ type
   {$EXTERNALSYM LONG}
   {$ENDIF ~COMPILER16_UP}
 // Dynamic Array support
-type
-  TDynByteArray          = array of Byte;
-  TDynShortIntArray      = array of Shortint;
-  TDynWordArray          = array of Word;
-  TDynSmallIntArray      = array of Smallint;
-  TDynLongIntArray       = array of Longint;
-  TDynInt64Array         = array of Int64;
-  TDynCardinalArray      = array of Cardinal;
-  TDynIntegerArray       = array of Integer;
-  TDynSizeIntArray       = array of SizeInt;
-  TDynExtendedArray      = array of Extended;
-  TDynDoubleArray        = array of Double;
-  TDynSingleArray        = array of Single;
-  TDynFloatArray         = array of Float;
-  TDynPointerArray       = array of Pointer;
-  TDynStringArray        = array of string;
-  TDynAnsiStringArray    = array of DwString;
-  TDynWideStringArray    = array of DwWideString;
+Type
+  TDynByteArray          = array Of Byte;
+  TDynShortIntArray      = array Of Shortint;
+  TDynWordArray          = array Of Word;
+  TDynSmallIntArray      = array Of Smallint;
+  TDynLongIntArray       = array Of Longint;
+  TDynInt64Array         = array Of Int64;
+  TDynCardinalArray      = array Of Cardinal;
+  TDynIntegerArray       = array Of Integer;
+  TDynSizeIntArray       = array Of SizeInt;
+  TDynExtendedArray      = array Of Extended;
+  TDynDoubleArray        = array Of Double;
+  TDynSingleArray        = array Of Single;
+  TDynFloatArray         = array Of Float;
+  TDynPointerArray       = array Of Pointer;
+  TDynStringArray        = array Of string;
+  TDynAnsiStringArray    = array Of DwString;
+  TDynWideStringArray    = array Of DwWideString;
   {$IFDEF SUPPORTS_UNICODE_STRING}
-  TDynUnicodeStringArray = array of UnicodeString;
+  TDynUnicodeStringArray = array Of UnicodeString;
   {$ENDIF SUPPORTS_UNICODE_STRING}
-  TDynIInterfaceArray    = array of IInterface;
-  TDynObjectArray        = array of TObject;
-  TDynCharArray       = array of Char;
-  TDynAnsiCharArray   = array of DwChar;
-  TDynWideCharArray   = array of WideChar;
+  TDynIInterfaceArray    = array Of IInterface;
+  TDynObjectArray        = array Of TObject;
+  TDynCharArray       = array Of Char;
+  TDynAnsiCharArray   = array Of DwChar;
+  TDynWideCharArray   = array Of WideChar;
 // Cross-Platform Compatibility
-const
+Const
   // line delimiters for a version of Delphi/C++Builder
   NativeLineFeed       = Char(#10);
   NativeCarriageReturn = Char(#13);
@@ -197,18 +197,18 @@ const
    {$IFEND}
   {$ENDIF}
   HexFmt = HexPrefix + HexDigitFmt;
-const
-  BOM_UTF16_LSB: array [0..1] of Byte = ($FF,$FE);
-  BOM_UTF16_MSB: array [0..1] of Byte = ($FE,$FF);
-  BOM_UTF8: array [0..2] of Byte = ($EF,$BB,$BF);
-  BOM_UTF32_LSB: array [0..3] of Byte = ($FF,$FE,$00,$00);
-  BOM_UTF32_MSB: array [0..3] of Byte = ($00,$00,$FE,$FF);
+Const
+  BOM_UTF16_LSB: array [0..1] Of Byte = ($FF,$FE);
+  BOM_UTF16_MSB: array [0..1] Of Byte = ($FE,$FF);
+  BOM_UTF8: array [0..2] Of Byte = ($EF,$BB,$BF);
+  BOM_UTF32_LSB: array [0..3] Of Byte = ($FF,$FE,$00,$00);
+  BOM_UTF32_MSB: array [0..3] Of Byte = ($00,$00,$FE,$FF);
 //  BOM_UTF7_1: array [0..3] of Byte = ($2B,$2F,$76,$38);
 //  BOM_UTF7_2: array [0..3] of Byte = ($2B,$2F,$76,$39);
 //  BOM_UTF7_3: array [0..3] of Byte = ($2B,$2F,$76,$2B);
 //  BOM_UTF7_4: array [0..3] of Byte = ($2B,$2F,$76,$2F);
 //  BOM_UTF7_5: array [0..3] of Byte = ($2B,$2F,$76,$38,$2D);
-type
+Type
   // Unicode transformation formats (UTF) data types
   PUTF7 = ^UTF7;
   UTF7 = DwChar;
@@ -223,8 +223,8 @@ type
   UCS4 = Cardinal;
   PUCS2 = PDWChar;
   UCS2 = WideChar;
-  TUCS2Array = array of UCS2;
-  TUCS4Array = array of UCS4;
+  TUCS2Array = array Of UCS2;
+  TUCS4Array = array Of UCS4;
   // string types
   TUTF8String = DwString;
   {$IFDEF SUPPORTS_UNICODE_STRING}
@@ -234,9 +234,9 @@ type
   TUTF16String = DWWideString;
   TUCS2String = DWWideString;
   {$ENDIF SUPPORTS_UNICODE_STRING}
-var
+Var
   AnsiReplacementCharacter: DwChar;
-const
+Const
   UCS4ReplacementCharacter: UCS4 = $0000FFFD;
   MaximumUCS2: UCS4 = $0000FFFF;
   MaximumUTF16: UCS4 = $0010FFFF;
@@ -246,23 +246,23 @@ const
   SurrogateLowStart = UCS4($DC00);
   SurrogateLowEnd = UCS4($DFFF);
 // basic set types
-type
-  TSetOfAnsiChar = set of DwChar;
+Type
+  TSetOfAnsiChar = set Of DwChar;
 {$IFNDEF HAS_FMX}
-procedure RaiseLastOSError;
+Procedure RaiseLastOSError;
 {$ENDIF ~HAS_FMX}
 {$IFNDEF RTL230_UP}
-procedure CheckOSError(ErrorCode: Cardinal);
+Procedure CheckOSError(ErrorCode: Cardinal);
 {$ENDIF RTL230_UP}
-procedure MoveChar(const Source: string; FromIndex: SizeInt;
-  var Dest: string; ToIndex, Count: SizeInt); overload; // Index: 0..n-1
-function AnsiByteArrayStringLen(Data: TBytes): SizeInt;
-function StringToAnsiByteArray(const S: string): TBytes;
-function AnsiByteArrayToString(const Data: TBytes; Count: SizeInt): string;
-function BytesOf(const Value: DWString): TBytes; overload;
+Procedure MoveChar(Const Source: string; FromIndex: SizeInt;
+  Var Dest: string; ToIndex, Count: SizeInt); overload; // Index: 0..n-1
+Function AnsiByteArrayStringLen(Data: TBytes): SizeInt;
+Function StringToAnsiByteArray(Const S: string): TBytes;
+Function AnsiByteArrayToString(Const Data: TBytes; Count: SizeInt): string;
+Function BytesOf(Const Value: DWString): TBytes; overload;
 {$IFNDEF FPC}
 {$IFNDEF COMPILER11_UP}
-type // Definitions for 32 Bit Compilers
+Type // Definitions for 32 Bit Compilers
   // From BaseTsd.h
   INT_PTR = Integer;
   {$EXTERNALSYM INT_PTR}
@@ -273,12 +273,12 @@ type // Definitions for 32 Bit Compilers
   ULONG_PTR = LongWord;
   {$EXTERNALSYM DWORD_PTR}
 {$ENDIF ~COMPILER11_UP}
-type
+Type
   DWORD_PTR  = LongWord;
   PDWORD_PTR = ^DWORD_PTR;
   {$EXTERNALSYM PDWORD_PTR}
 {$ENDIF ~FPC}
-type
+Type
   TJclAddr32 = Cardinal;
   {$IFDEF FPC}
    TJclAddr64 = QWord;
@@ -299,37 +299,37 @@ type
    {$IFEND}
   {$ENDIF}
   PJclAddr = ^TJclAddr;
-  EJclAddr64Exception = class(EJclError);
-function Addr64ToAddr32(const Value: TJclAddr64): TJclAddr32;
-function Addr32ToAddr64(const Value: TJclAddr32): TJclAddr64;
+  EJclAddr64Exception = Class(EJclError);
+Function Addr64ToAddr32(Const Value: TJclAddr64): TJclAddr32;
+Function Addr32ToAddr64(Const Value: TJclAddr32): TJclAddr64;
 {$IFDEF FPC}
-type
-  HWND = type Windows.HWND;
+Type
+  HWND = Type Windows.HWND;
 {$ENDIF FPC}
  {$IFDEF SUPPORTS_GENERICS}
 //DOM-IGNORE-BEGIN
-type
-  TCompare<T> = function(const Obj1, Obj2: T): Integer;
-  TEqualityCompare<T> = function(const Obj1, Obj2: T): Boolean;
-  THashConvert<T> = function(const AItem: T): Integer;
-  IEqualityComparer<T> = interface
-    function Equals(A, B: T): Boolean;
-    function GetHashCode(Obj: T): Integer;
-  end;
-  TEquatable<T: class> = class(TInterfacedObject, IEquatable<T>, IEqualityComparer<T>)
-  public
+Type
+  TCompare<T> = Function(Const Obj1, Obj2: T): Integer;
+  TEqualityCompare<T> = Function(Const Obj1, Obj2: T): Boolean;
+  THashConvert<T> = Function(Const AItem: T): Integer;
+  IEqualityComparer<T> = Interface
+    Function Equals(A, B: T): Boolean;
+    Function GetHashCode(Obj: T): Integer;
+  End;
+  TEquatable<T: Class> = Class(TInterfacedObject, IEquatable<T>, IEqualityComparer<T>)
+  Public
     { IEquatable<T> }
-    function TestEquals(Other: T): Boolean; overload;
-    function IEquatable<T>.Equals = TestEquals;
+    Function TestEquals(Other: T): Boolean; overload;
+    Function IEquatable<T>.Equals = TestEquals;
     { IEqualityComparer<T> }
-    function TestEquals(A, B: T): Boolean; overload;
-    function IEqualityComparer<T>.Equals = TestEquals;
-    function GetHashCode2(Obj: T): Integer;
-    function IEqualityComparer<T>.GetHashCode = GetHashCode2;
-  end;
+    Function TestEquals(A, B: T): Boolean; overload;
+    Function IEqualityComparer<T>.Equals = TestEquals;
+    Function GetHashCode2(Obj: T): Integer;
+    Function IEqualityComparer<T>.GetHashCode = GetHashCode2;
+  End;
 //DOM-IGNORE-END
 {$ENDIF SUPPORTS_GENERICS}
-const
+Const
   {$IFDEF SUPPORTS_UNICODE}
   AWSuffix = 'W';
   {$ELSE ~SUPPORTS_UNICODE}
@@ -338,185 +338,185 @@ const
 {$IFDEF FPC}
 // FPC emits a lot of warning because the first parameter of its internal
 // GetMem is a var parameter, which is not initialized before the call to GetMem
-procedure GetMem(out P; Size: Longint);
+Procedure GetMem(out P; Size: Longint);
 {$ENDIF FPC}
 
-implementation
+Implementation
 
-uses
+Uses
   uRESTDWMemResources;
 
 {$IFDEF MSWINDOWS}
-function IsDirectory(const FileName: string): Boolean;
-var
+Function IsDirectory(Const FileName: string): Boolean;
+Var
   R: DWORD;
-begin
+Begin
   R := GetFileAttributes(PChar(FileName));
   Result := (R <> DWORD(-1)) and ((R and FILE_ATTRIBUTE_DIRECTORY) <> 0);
-end;
+End;
 {$ENDIF MSWINDOWS}
 {$IFDEF UNIX}
-function IsDirectory(const FileName: string; ResolveSymLinks: Boolean): Boolean;
-var
+Function IsDirectory(Const FileName: string; ResolveSymLinks: Boolean): Boolean;
+Var
   Buf: TStatBuf64;
-begin
+Begin
   Result := False;
-  if GetFileStatus(FileName, Buf, ResolveSymLinks) = 0 then
+  If GetFileStatus(FileName, Buf, ResolveSymLinks) = 0 Then
     Result := S_ISDIR(Buf.st_mode);
-end;
+End;
 {$ENDIF UNIX}
 
-procedure MoveChar(const Source: string; FromIndex: SizeInt;
-  var Dest: string; ToIndex, Count: SizeInt);
-begin
+Procedure MoveChar(Const Source: string; FromIndex: SizeInt;
+  Var Dest: string; ToIndex, Count: SizeInt);
+Begin
   Move(Source[FromIndex + 1], Dest[ToIndex + 1], Count * SizeOf(Char));
-end;
-function AnsiByteArrayStringLen(Data: TBytes): SizeInt;
-var
+End;
+Function AnsiByteArrayStringLen(Data: TBytes): SizeInt;
+Var
   I: SizeInt;
-begin
+Begin
   Result := Length(Data);
-  for I := 0 to Result - 1 do
-    if Data[I] = 0 then
-    begin
+  For I := 0 To Result - 1 Do
+    If Data[I] = 0 Then
+    Begin
       Result := I + 1;
       Break;
-    end;
-end;
-function StringToAnsiByteArray(const S: string): TBytes;
-var
+    End;
+End;
+Function StringToAnsiByteArray(Const S: string): TBytes;
+Var
   I: SizeInt;
   AnsiS: DWString;
-begin
+Begin
   AnsiS := DWString(S); // convert to DWString
   SetLength(Result, Length(AnsiS));
-  for I := 0 to High(Result) do
+  For I := 0 To High(Result) Do
     Result[I] := Byte(AnsiS[I + 1]);
-end;
-function AnsiByteArrayToString(const Data: TBytes; Count: SizeInt): string;
-var
+End;
+Function AnsiByteArrayToString(Const Data: TBytes; Count: SizeInt): string;
+Var
   I: SizeInt;
   AnsiS: DWString;
-begin
-  if Length(Data) < Count then
+Begin
+  If Length(Data) < Count Then
     Count := Length(Data);
   SetLength(AnsiS, Count);
-  for I := 0 to Length(AnsiS) - 1 do
+  For I := 0 To Length(AnsiS) - 1 Do
     PDWChar(@AnsiS[I + 1])^ := DWChar(Data[I]);
   Result := string(AnsiS); // convert to System.String
-end;
-function BytesOf(const Value: DWString): TBytes;
-begin
+End;
+Function BytesOf(Const Value: DWString): TBytes;
+Begin
   SetLength(Result, Length(Value));
-  if Value <> '' then
+  If Value <> '' Then
     Move(Pointer(Value)^, Result[0], Length(Value));
-end;
-function StringOf(const Bytes: array of Byte): DWString;
-begin
-  if Length(Bytes) > 0 then
-  begin
+End;
+Function StringOf(Const Bytes: array Of Byte): DWString;
+Begin
+  If Length(Bytes) > 0 Then
+  Begin
     SetLength(Result, Length(Bytes));
     Move(Bytes[0], Pointer(Result)^, Length(Bytes));
-  end
-  else
+  End
+  Else
     Result := '';
-end;
+End;
 // Cross Platform Compatibility
 {$IFNDEF HAS_FMX}
-procedure RaiseLastOSError;
-begin
+Procedure RaiseLastOSError;
+Begin
 {$IFDEF MSWINDOWS}
   RaiseLastWin32Error;
 {$ENDIF}
-end;
+End;
 {$ENDIF ~HAS_FMX}
 {$IFNDEF RTL230_UP}
-procedure CheckOSError(ErrorCode: Cardinal);
-begin
-  if ErrorCode <> ERROR_SUCCESS then
+Procedure CheckOSError(ErrorCode: Cardinal);
+Begin
+  If ErrorCode <> ERROR_SUCCESS Then
     {$IFDEF RTL170_UP}
     RaiseLastOSError(ErrorCode);
     {$ELSE ~RTL170_UP}
     RaiseLastOSError;
     {$ENDIF ~RTL170_UP}
-end;
+End;
 {$ENDIF RTL230_UP}
 {$OVERFLOWCHECKS OFF}
-function Addr64ToAddr32(const Value: TJclAddr64): TJclAddr32;
-begin
-  if (Value shr 32) = 0 then
+Function Addr64ToAddr32(Const Value: TJclAddr64): TJclAddr32;
+Begin
+  If (Value shr 32) = 0 Then
     Result := Value
-  else
+  Else
     raise EJclAddr64Exception.CreateResFmt(@RsCantConvertAddr64, [HexPrefix, Value]);
-end;
-function Addr32ToAddr64(const Value: TJclAddr32): TJclAddr64;
-begin
+End;
+Function Addr32ToAddr64(Const Value: TJclAddr32): TJclAddr64;
+Begin
   Result := Value;
-end;
+End;
 {$IFDEF OVERFLOWCHECKS_ON}
 {$OVERFLOWCHECKS ON}
 {$ENDIF OVERFLOWCHECKS_ON}
 {$IFDEF SUPPORTS_GENERICS}
 //DOM-IGNORE-BEGIN
 //=== { TEquatable<T> } ======================================================
-function TEquatable<T>.TestEquals(Other: T): Boolean;
-begin
-  if Other = nil then
+Function TEquatable<T>.TestEquals(Other: T): Boolean;
+Begin
+  If Other = nil Then
     Result := False
-  else
+  Else
     Result := GetHashCode = Other.GetHashCode;
-end;
-function TEquatable<T>.TestEquals(A, B: T): Boolean;
-begin
-  if A = nil then
+End;
+Function TEquatable<T>.TestEquals(A, B: T): Boolean;
+Begin
+  If A = nil Then
     Result := B = nil
-  else
-  if B = nil then
+  Else
+  If B = nil Then
     Result := False
-  else
+  Else
     Result := A.GetHashCode = B.GetHashCode;
-end;
-function TEquatable<T>.GetHashCode2(Obj: T): Integer;
-begin
-  if Obj = nil then
+End;
+Function TEquatable<T>.GetHashCode2(Obj: T): Integer;
+Begin
+  If Obj = nil Then
     Result := 0
-  else
+  Else
     Result := Obj.GetHashCode;
-end;
+End;
 //DOM-IGNORE-END
 {$ENDIF SUPPORTS_GENERICS}
-procedure LoadAnsiReplacementCharacter;
+Procedure LoadAnsiReplacementCharacter;
 {$IFDEF MSWINDOWS}
-var
+Var
   CpInfo: TCpInfo;
-begin
+Begin
   CpInfo.MaxCharSize := 0;
-  if GetCPInfo(CP_ACP, CpInfo) then
+  If GetCPInfo(CP_ACP, CpInfo) Then
     AnsiReplacementCharacter := DWChar(Chr(CpInfo.DefaultChar[0]))
-  else
+  Else
     raise EJclInternalError.CreateRes(@RsEReplacementChar);
-end;
+End;
 {$ELSE ~MSWINDOWS}
-begin
+Begin
   AnsiReplacementCharacter := '?';
-end;
+End;
 {$ENDIF ~MSWINDOWS}
 {$IFDEF FPC}
 // FPC emits a lot of warning because the first parameter of its internal
 // GetMem is a var parameter, which is not initialized before the call to GetMem
-procedure GetMem(out P; Size: Longint);
-begin
+Procedure GetMem(out P; Size: Longint);
+Begin
   Pointer(P) := nil;
   GetMem(Pointer(P), Size);
-end;
+End;
 {$ENDIF FPC}
-initialization
-  LoadAnsiReplacementCharacter;
-  {$IFDEF UNITVERSIONING}
-  RegisterUnitVersion(HInstance, UnitVersioning);
-  {$ENDIF UNITVERSIONING}
-finalization
-  {$IFDEF UNITVERSIONING}
-  UnregisterUnitVersion(HInstance);
-  {$ENDIF UNITVERSIONING}
-end.
+Initialization
+ LoadAnsiReplacementCharacter;
+{$IFDEF UNITVERSIONING}
+ RegisterUnitVersion(HInstance, UnitVersioning);
+{$ENDIF UNITVERSIONING}
+Finalization
+{$IFDEF UNITVERSIONING}
+ UnregisterUnitVersion(HInstance);
+{$ENDIF UNITVERSIONING}
+End.

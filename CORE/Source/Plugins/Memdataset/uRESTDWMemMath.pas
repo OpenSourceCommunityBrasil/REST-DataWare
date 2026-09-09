@@ -1,22 +1,22 @@
-unit uRESTDWMemMath;
+Unit uRESTDWMemMath;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -28,8 +28,8 @@ unit uRESTDWMemMath;
  {$ASMMode Intel}
 {$ENDIF}
 
-interface
-uses
+Interface
+Uses
   {$IFDEF HAS_UNITSCOPE}
   System.SysUtils, System.Classes,
   {$ELSE ~HAS_UNITSCOPE}
@@ -38,9 +38,9 @@ uses
   uRESTDWMemBase;
 
 { CRC-16 }
-type
-  TCrc16Table = array [0..255] of Word;
-var
+Type
+  TCrc16Table = array [0..255] Of Word;
+Var
   //  CRC16Polynom = $1021;
   Crc16DefaultTable: TCrc16Table = (
     $0000, $1021, $2042, $3063, $4084, $50A5, $60C6, $70E7,
@@ -77,7 +77,7 @@ var
     $6E17, $7E36, $4E55, $5E74, $2E93, $3EB2, $0ED1, $1EF0
    );
   Crc16DefaultStart: Cardinal = $FFFF;
-const
+Const
   Crc16PolynomCCITT = $1021;
   Crc16PolynomIBM   = $8005;
   Crc16Bits = 16;
@@ -85,27 +85,27 @@ const
   Crc16HighBit = $8000;
   NotCrc16HighBit = $7FFF;
 // for backward compatibility (default polynom = CCITT = $1021)
-function Crc16_P(X: PJclByteArray; N: Integer; Crc: Word = 0): Word; overload;
-function Crc16(const X: array of Byte; N: Integer; Crc: Word = 0): Word; overload;
-function Crc16_A(const X: array of Byte; Crc: Word = 0): Word; overload;
-function CheckCrc16_P(X: PJclByteArray; N: Integer; Crc: Word): Integer; overload;
-function CheckCrc16(var X: array of Byte; N: Integer; Crc: Word): Integer; overload;
-function CheckCrc16_A(var X: array of Byte; Crc: Word): Integer; overload;
+Function Crc16_P(X: PJclByteArray; N: Integer; Crc: Word = 0): Word; overload;
+Function Crc16(Const X: array Of Byte; N: Integer; Crc: Word = 0): Word; overload;
+Function Crc16_A(Const X: array Of Byte; Crc: Word = 0): Word; overload;
+Function CheckCrc16_P(X: PJclByteArray; N: Integer; Crc: Word): Integer; overload;
+Function CheckCrc16(Var X: array Of Byte; N: Integer; Crc: Word): Integer; overload;
+Function CheckCrc16_A(Var X: array Of Byte; Crc: Word): Integer; overload;
 // change the default polynom
-procedure InitCrc16(Polynom, Start: Word); overload;
+Procedure InitCrc16(Polynom, Start: Word); overload;
 // arbitrary polynom
-function Crc16_P(const Crc16Table: TCrc16Table; X: PJclByteArray; N: Integer; Crc: Word = 0): Word; overload;
-function Crc16(const Crc16Table: TCrc16Table; const X: array of Byte; N: Integer; Crc: Word = 0): Word; overload;
-function Crc16_A(const Crc16Table: TCrc16Table; const X: array of Byte; Crc: Word = 0): Word; overload;
-function CheckCrc16_P(const Crc16Table: TCrc16Table; X: PJclByteArray; N: Integer; Crc: Word): Integer; overload;
-function CheckCrc16(const Crc16Table: TCrc16Table; var X: array of Byte; N: Integer; Crc: Word): Integer; overload;
-function CheckCrc16_A(const Crc16Table: TCrc16Table; var X: array of Byte; Crc: Word): Integer; overload;
+Function Crc16_P(Const Crc16Table: TCrc16Table; X: PJclByteArray; N: Integer; Crc: Word = 0): Word; overload;
+Function Crc16(Const Crc16Table: TCrc16Table; Const X: array Of Byte; N: Integer; Crc: Word = 0): Word; overload;
+Function Crc16_A(Const Crc16Table: TCrc16Table; Const X: array Of Byte; Crc: Word = 0): Word; overload;
+Function CheckCrc16_P(Const Crc16Table: TCrc16Table; X: PJclByteArray; N: Integer; Crc: Word): Integer; overload;
+Function CheckCrc16(Const Crc16Table: TCrc16Table; Var X: array Of Byte; N: Integer; Crc: Word): Integer; overload;
+Function CheckCrc16_A(Const Crc16Table: TCrc16Table; Var X: array Of Byte; Crc: Word): Integer; overload;
 // initialize a table
-procedure InitCrc16(Polynom, Start: Word; out Crc16Table: TCrc16Table); overload;
+Procedure InitCrc16(Polynom, Start: Word; out Crc16Table: TCrc16Table); overload;
 { CRC-32 }
-type
-  TCrc32Table = array [0..255] of Cardinal;
-var
+Type
+  TCrc32Table = array [0..255] Of Cardinal;
+Var
   //  CRC32Polynom = $04C11DB7;
   Crc32DefaultTable: TCrc32Table = (
     $00000000, $04C11DB7, $09823B6E, $0D4326D9, $130476DC, $17C56B6B, $1A864DB2, $1E475005,
@@ -142,7 +142,7 @@ var
     $AFB010B1, $AB710D06, $A6322BDF, $A2F33668, $BCB4666D, $B8757BDA, $B5365D03, $B1F740B4
     );
   Crc32DefaultStart: Cardinal = $FFFFFFFF;
-const
+Const
   Crc32PolynomIEEE       = $04C11DB7;
   Crc32PolynomCastagnoli = $1EDC6F41;
   Crc32Koopman           = $741B8CD7;
@@ -151,29 +151,29 @@ const
   Crc32HighBit = $80000000;
   NotCrc32HighBit = $7FFFFFFF;
 // for backward compatibility (default polynom = IEEE = $04C11DB7)
-function Crc32_P(X: PJclByteArray; N: Integer; Crc: Cardinal = 0): Cardinal; overload;
-function Crc32(const X: array of Byte; N: Integer; Crc: Cardinal = 0): Cardinal; overload;
-function Crc32_A(const X: array of Byte; Crc: Cardinal = 0): Cardinal; overload;
-function CheckCrc32_P(X: PJclByteArray; N: Integer; Crc: Cardinal): Integer; overload;
-function CheckCrc32(var X: array of Byte; N: Integer; Crc: Cardinal): Integer; overload;
-function CheckCrc32_A(var X: array of Byte; Crc: Cardinal): Integer; overload;
+Function Crc32_P(X: PJclByteArray; N: Integer; Crc: Cardinal = 0): Cardinal; overload;
+Function Crc32(Const X: array Of Byte; N: Integer; Crc: Cardinal = 0): Cardinal; overload;
+Function Crc32_A(Const X: array Of Byte; Crc: Cardinal = 0): Cardinal; overload;
+Function CheckCrc32_P(X: PJclByteArray; N: Integer; Crc: Cardinal): Integer; overload;
+Function CheckCrc32(Var X: array Of Byte; N: Integer; Crc: Cardinal): Integer; overload;
+Function CheckCrc32_A(Var X: array Of Byte; Crc: Cardinal): Integer; overload;
 // change the default polynom
-procedure InitCrc32(Polynom, Start: Cardinal); overload;
+Procedure InitCrc32(Polynom, Start: Cardinal); overload;
 // arbitrary polynom
-function Crc32_P(const Crc32Table: TCrc32Table; X: PJclByteArray; N: Integer; Crc: Cardinal = 0): Cardinal; overload;
-function Crc32(const Crc32Table: TCrc32Table; const X: array of Byte; N: Integer; Crc: Cardinal = 0): Cardinal; overload;
-function Crc32_A(const Crc32Table: TCrc32Table; const X: array of Byte; Crc: Cardinal = 0): Cardinal; overload;
-function CheckCrc32_P(const Crc32Table: TCrc32Table; X: PJclByteArray; N: Integer; Crc: Cardinal): Integer; overload;
-function CheckCrc32(const Crc32Table: TCrc32Table; var X: array of Byte; N: Integer; Crc: Cardinal): Integer; overload;
-function CheckCrc32_A(const Crc32Table: TCrc32Table; var X: array of Byte; Crc: Cardinal): Integer; overload;
+Function Crc32_P(Const Crc32Table: TCrc32Table; X: PJclByteArray; N: Integer; Crc: Cardinal = 0): Cardinal; overload;
+Function Crc32(Const Crc32Table: TCrc32Table; Const X: array Of Byte; N: Integer; Crc: Cardinal = 0): Cardinal; overload;
+Function Crc32_A(Const Crc32Table: TCrc32Table; Const X: array Of Byte; Crc: Cardinal = 0): Cardinal; overload;
+Function CheckCrc32_P(Const Crc32Table: TCrc32Table; X: PJclByteArray; N: Integer; Crc: Cardinal): Integer; overload;
+Function CheckCrc32(Const Crc32Table: TCrc32Table; Var X: array Of Byte; N: Integer; Crc: Cardinal): Integer; overload;
+Function CheckCrc32_A(Const Crc32Table: TCrc32Table; Var X: array Of Byte; Crc: Cardinal): Integer; overload;
 // initialize a table
-procedure InitCrc32(Polynom, Start: Cardinal; out Crc32Table: TCrc32Table); overload;
+Procedure InitCrc32(Polynom, Start: Cardinal; out Crc32Table: TCrc32Table); overload;
 
-implementation
+Implementation
 {$IFDEF DELPHI64_TEMPORARY}
   {$DEFINE USE_MATH_UNIT}
 {$ENDIF DELPHI64_TEMPORARY}
-uses
+Uses
   {$IFDEF HAS_UNITSCOPE}
   {$IFDEF MSWINDOWS}
   {$IFNDEF FPC}
@@ -193,329 +193,329 @@ uses
   uRESTDWMemResources;
 
 // CRC 16
-function Crc16Corr(const Crc16Table: TCrc16Table; Crc: Word; N: Integer): Integer;
-var
+Function Crc16Corr(Const Crc16Table: TCrc16Table; Crc: Word; N: Integer): Integer;
+Var
   I: Integer;
 //  CrcX : Cardinal;
-begin
+Begin
   // calculate Syndrome
 //  CrcX := CrC;
-  for I := 1 to Crc16Bytes do
+  For I := 1 To Crc16Bytes Do
     // a 16 bit value shr 8 is a Byte, explictit type conversion to Byte adds an ASM instruction
     Crc := Crc16Table[Crc shr (CRC16Bits - 8)] xor Word(Crc shl 8);
   I := -1;
-  repeat
+  Repeat
     Inc(I);
-    if (Crc and 1) <> 0 then
+    If (Crc and 1) <> 0 Then
       Crc := ((Crc xor Crc16Table[1]) shr 1) or Crc16HighBit
 //      Crc16Table[1] = Crc16Polynom
-    else
+    Else
       Crc := (Crc shr 1) and NotCrc16HighBit;
-  until (Crc = Crc16HighBit) or (I = (N + Crc16Bytes) * 8);
-  if Crc <> Crc16HighBit then
+  Until (Crc = Crc16HighBit) or (I = (N + Crc16Bytes) * 8);
+  If Crc <> Crc16HighBit Then
     Result := -1000 // not correctable
-  else
+  Else
     // I = No. of single faulty bit
     // (high bit first,
     // starting from lowest with CRC bits)
     Result := I - Crc16Bits;
     // Result <  0 faulty CRC-bit
     // Result >= 0 No. of faulty data bit
-end;
-function Crc16_P(const Crc16Table: TCrc16Table; X: PJclByteArray; N: Integer; Crc: Word): Word;
-var
+End;
+Function Crc16_P(Const Crc16Table: TCrc16Table; X: PJclByteArray; N: Integer; Crc: Word): Word;
+Var
   I: Integer;
-begin
+Begin
   Result := Crc16DefaultStart;
-  for I := 0 to N - 1 do // The CRC Bytes are located at the end of the information
+  For I := 0 To N - 1 Do // The CRC Bytes are located at the end of the information
     // a 16 bit value shr 8 is a Byte, explictit type conversion to Byte adds an ASM instruction
     Result := Crc16Table[Result shr (CRC16Bits - 8)] xor Word((Result shl 8)) xor X[I];
-  for I := 0 to Crc16Bytes - 1 do
-  begin
+  For I := 0 To Crc16Bytes - 1 Do
+  Begin
     // a 16 bit value shr 8 is a Byte, explictit type conversion to Byte adds an ASM instruction
     Result := Crc16Table[Result shr (CRC16Bits-8)] xor Word((Result shl 8)) xor (Crc shr (CRC16Bits-8));
     Crc := Word(Crc shl 8);
-  end;
-end;
-function Crc16_P(X: PJclByteArray; N: Integer; Crc: Word): Word;
-begin
+  End;
+End;
+Function Crc16_P(X: PJclByteArray; N: Integer; Crc: Word): Word;
+Begin
   Result := Crc16_P(Crc16DefaultTable, X, N, Crc);
-end;
-function CheckCrc16_P(const Crc16Table: TCrc16Table; X: PJclByteArray; N: Integer; Crc: Word): Integer;
+End;
+Function CheckCrc16_P(Const Crc16Table: TCrc16Table; X: PJclByteArray; N: Integer; Crc: Word): Integer;
 // checks and corrects a single bit in up to 2^15-16 Bit -> 2^12-2 = 4094 Byte
-var
+Var
   I, J: Integer;
   C: Byte;
-begin
+Begin
   Crc := Crc16_P(Crc16Table, X, N, Crc);
-  if Crc = 0 then
+  If Crc = 0 Then
     Result := 0 // No CRC-error
-  else
-  begin
+  Else
+  Begin
     J := Crc16Corr(Crc16Table, Crc, N);
-    if J < -(Crc16Bytes * 8 + 1) then
+    If J < -(Crc16Bytes * 8 + 1) Then
       Result := -1 // non-correctable error (more than one wrong bit)
-    else
-    begin
-      if J < 0 then
+    Else
+    Begin
+      If J < 0 Then
         Result := 1 // one faulty Bit in CRC itself
-      else
-      begin // Bit J is faulty
+      Else
+      Begin // Bit J is faulty
         I := J and 7; // I <= 7 (faulty Bit in Byte)
         C := 1 shl I; // C <= 128
         I := J shr 3; // I: Index of faulty Byte
         X[N - 1 - I] := X[N - 1 - I] xor C; // correct faulty bit
         Result := 1; // Correctable error
-      end;
-    end;
-  end;
-end;
-function CheckCrc16_P(X: PJclByteArray; N: Integer; Crc: Word): Integer;
-begin
+      End;
+    End;
+  End;
+End;
+Function CheckCrc16_P(X: PJclByteArray; N: Integer; Crc: Word): Integer;
+Begin
   Result := CheckCrc16_P(Crc16DefaultTable, X, N, Crc);
-end;
-function Crc16(const Crc16Table: TCrc16Table; const X: array of Byte; N: Integer; Crc: Word): Word;
-begin
+End;
+Function Crc16(Const Crc16Table: TCrc16Table; Const X: array Of Byte; N: Integer; Crc: Word): Word;
+Begin
   Result := Crc16_P(Crc16Table, @X, N, Crc);
-end;
-function Crc16(const X: array of Byte; N: Integer; Crc: Word): Word;
-begin
+End;
+Function Crc16(Const X: array Of Byte; N: Integer; Crc: Word): Word;
+Begin
   Result := Crc16_P(Crc16DefaultTable, @X, N, Crc);
-end;
-function CheckCrc16(const Crc16Table: TCrc16Table; var X: array of Byte; N: Integer; Crc: Word): Integer;
-begin
+End;
+Function CheckCrc16(Const Crc16Table: TCrc16Table; Var X: array Of Byte; N: Integer; Crc: Word): Integer;
+Begin
   Result := CheckCRC16_P(Crc16Table, @X, N, CRC);
-end;
-function CheckCrc16(var X: array of Byte; N: Integer; Crc: Word): Integer;
-begin
+End;
+Function CheckCrc16(Var X: array Of Byte; N: Integer; Crc: Word): Integer;
+Begin
   Result := CheckCRC16_P(Crc16DefaultTable, @X, N, CRC);
-end;
-function Crc16_A(const Crc16Table: TCrc16Table; const X: array of Byte; Crc: Word): Word;
-begin
+End;
+Function Crc16_A(Const Crc16Table: TCrc16Table; Const X: array Of Byte; Crc: Word): Word;
+Begin
   Result := Crc16_P(Crc16Table, @X, Length(X), Crc);
-end;
-function Crc16_A(const X: array of Byte; Crc: Word): Word;
-begin
+End;
+Function Crc16_A(Const X: array Of Byte; Crc: Word): Word;
+Begin
   Result := Crc16_P(Crc16DefaultTable, @X, Length(X), Crc);
-end;
-function CheckCrc16_A(const Crc16Table: TCrc16Table; var X: array of Byte; Crc: Word): Integer;
-begin
+End;
+Function CheckCrc16_A(Const Crc16Table: TCrc16Table; Var X: array Of Byte; Crc: Word): Integer;
+Begin
   Result := CheckCrc16_P(Crc16Table, @X, Length(X), Crc);
-end;
-function CheckCrc16_A(var X: array of Byte; Crc: Word): Integer;
-begin
+End;
+Function CheckCrc16_A(Var X: array Of Byte; Crc: Word): Integer;
+Begin
   Result := CheckCrc16_P(Crc16DefaultTable, @X, Length(X), Crc);
-end;
+End;
 // The CRC Table can be generated like this:
 // const Crc16Start0 = 0;  !!
-function Crc16_Bitwise(const X: array of Byte; N: Integer; Crc: Word; Polynom: Word): Word;
-const
+Function Crc16_Bitwise(Const X: array Of Byte; N: Integer; Crc: Word; Polynom: Word): Word;
+Const
   Crc16Start0 = 0;   //Generating the table
-var
+Var
   I, J: Integer;
   Sr, SrHighBit: Word;
   B: Byte;
-begin
+Begin
    Sr := Crc16Start0;
    SrHighBit := 0;
-   for I := 0 to N - 1 + Crc16Bytes do
-   begin
-      if I >= N then
-      begin
+   For I := 0 To N - 1 + Crc16Bytes Do
+   Begin
+      If I >= N Then
+      Begin
          B := Crc shr (Crc16Bits - 8);
          Crc := Crc shl 8;
-      end
-      else
+      End
+      Else
         B := X[I];
-      for J := 1 to 8 do
-      begin
-        if SrHighBit <> 0 then
+      For J := 1 To 8 Do
+      Begin
+        If SrHighBit <> 0 Then
           Sr := Sr xor Polynom;
         SrHighBit := Sr and Crc16HighBit;
         Sr := (Word (Sr shl 1)) or ((B shr 7) and 1);
         B := Byte(B shl 1);
-      end;
-   end;
-   if SrHighBit <> 0 then
+      End;
+   End;
+   If SrHighBit <> 0 Then
       Sr := Sr xor Polynom;
    Result := Sr;
-end;
-procedure InitCrc16(Polynom, Start: Word; out Crc16Table: TCrc16Table);
-var
-  X: array [0..0] of Byte;
+End;
+Procedure InitCrc16(Polynom, Start: Word; out Crc16Table: TCrc16Table);
+Var
+  X: array [0..0] Of Byte;
   I: Integer;
-begin
-   for I := 0 to 255 do
-   begin
+Begin
+   For I := 0 To 255 Do
+   Begin
      X[0] := I;
      Crc16Table[I] := Crc16_Bitwise(X, 1, 0, Polynom); { only with crcstart=0 !!!!}
-   end;
+   End;
    Crc16DefaultStart := Start;
-end;
-procedure InitCrc16(Polynom, Start: Word);
-begin
+End;
+Procedure InitCrc16(Polynom, Start: Word);
+Begin
   InitCrc16(Polynom, Start, Crc16DefaultTable);
-end;
+End;
 // CRC 32
-function Crc32Corr(const Crc32Table: TCrc32Table; Crc: Cardinal; N: Integer): Integer;
-var
+Function Crc32Corr(Const Crc32Table: TCrc32Table; Crc: Cardinal; N: Integer): Integer;
+Var
   I: Integer;
-begin
+Begin
   // calculate Syndrome
-  for I := 1 to Crc32Bytes do
+  For I := 1 To Crc32Bytes Do
     Crc := Crc32Table[Crc shr (CRC32Bits - 8)] xor (Crc shl 8);
   I := -1;
-  repeat
+  Repeat
     Inc(I);
-    if (Crc and 1) <> 0 then
+    If (Crc and 1) <> 0 Then
       Crc := ((Crc xor Crc32Table[1]) shr 1) or Crc32HighBit
 //      Crc32Table[1] = Crc32Polynom
-    else
+    Else
       Crc := (Crc shr 1) and NotCrc32HighBit;
-  until (Crc = Crc32HighBit) or (I = (N + Crc32Bytes) * 8);
-  if Crc <> Crc32HighBit then
+  Until (Crc = Crc32HighBit) or (I = (N + Crc32Bytes) * 8);
+  If Crc <> Crc32HighBit Then
     Result := -1000 // not correctable
-  else
+  Else
     // I = No. of single faulty bit
     // (high bit first,
     // starting from lowest with CRC bits)
     Result := I - Crc32Bits;
     // Result <  0 faulty CRC-bit
     // Result >= 0 No. of faulty data bit
-end;
-function Crc32_P(const Crc32Table: TCrc32Table; X: PJclByteArray; N: Integer; Crc: Cardinal): Cardinal;
-var
+End;
+Function Crc32_P(Const Crc32Table: TCrc32Table; X: PJclByteArray; N: Integer; Crc: Cardinal): Cardinal;
+Var
   I: Integer;
-begin
+Begin
   Result := Crc32DefaultStart;
-  for I := 0 to N - 1 do // The CRC Bytes are located at the end of the information
+  For I := 0 To N - 1 Do // The CRC Bytes are located at the end of the information
     // a 32 bit value shr 24 is a Byte, explictit type conversion to Byte adds an ASM instruction
     Result := Crc32Table[Result shr (CRC32Bits-8)] xor (Result shl 8) xor X[I];
-  for I := 0 to Crc32Bytes - 1 do
-  begin
+  For I := 0 To Crc32Bytes - 1 Do
+  Begin
     // a 32 bit value shr 24 is a Byte, explictit type conversion to Byte adds an ASM instruction
     Result := Crc32Table[Result shr (CRC32Bits-8)] xor (Result shl 8) xor (Crc shr (CRC32Bits-8));
     Crc := Crc shl 8;
-  end;
-end;
-function Crc32_P(X: PJclByteArray; N: Integer; Crc: Cardinal): Cardinal;
-begin
+  End;
+End;
+Function Crc32_P(X: PJclByteArray; N: Integer; Crc: Cardinal): Cardinal;
+Begin
   Result := Crc32_P(Crc32DefaultTable, X, N, Crc);
-end;
-function CheckCrc32_P(const Crc32Table: TCrc32Table; X: PJclByteArray; N: Integer; Crc: Cardinal): Integer;
+End;
+Function CheckCrc32_P(Const Crc32Table: TCrc32Table; X: PJclByteArray; N: Integer; Crc: Cardinal): Integer;
 // checks and corrects a single bit in up to 2^31-32 Bit -> 2^28-4 = 268435452 Byte
-var
+Var
   I, J: Integer;
   C: Byte;
-begin
+Begin
   Crc := Crc32_P(Crc32Table, X, N, Crc);
-  if Crc = 0 then
+  If Crc = 0 Then
     Result := 0 // No CRC-error
-  else
-  begin
+  Else
+  Begin
     J := Crc32Corr(Crc32Table, Crc, N);
-    if J < -(Crc32Bytes * 8 + 1) then
+    If J < -(Crc32Bytes * 8 + 1) Then
       Result := -1 // non-correctable error (more than one wrong bit)
-    else
-    begin
-      if J < 0 then
+    Else
+    Begin
+      If J < 0 Then
         Result := 1 // one faulty Bit in CRC itself
-      else
-      begin // Bit J is faulty
+      Else
+      Begin // Bit J is faulty
         I := J and 7; // I <= 7 (faulty Bit in Byte)
         C := 1 shl I; // C <= 128
         I := J shr 3; // I: Index of faulty Byte
         X[N - 1 - I] := X[N - 1 - I] xor C; // correct faulty bit
         Result := 1; // Correctable error
-      end;
-    end;
-  end;
-end;
-function CheckCrc32_P(X: PJclByteArray; N: Integer; Crc: Cardinal): Integer;
-begin
+      End;
+    End;
+  End;
+End;
+Function CheckCrc32_P(X: PJclByteArray; N: Integer; Crc: Cardinal): Integer;
+Begin
   Result := CheckCrc32_P(Crc32DefaultTable, X, N, Crc);
-end;
-function Crc32(const Crc32Table: TCrc32Table; const X: array of Byte; N: Integer; Crc: Cardinal): Cardinal;
-begin
+End;
+Function Crc32(Const Crc32Table: TCrc32Table; Const X: array Of Byte; N: Integer; Crc: Cardinal): Cardinal;
+Begin
   Result := Crc32_P(Crc32Table, @X, N, Crc);
-end;
-function Crc32(const X: array of Byte; N: Integer; Crc: Cardinal): Cardinal;
-begin
+End;
+Function Crc32(Const X: array Of Byte; N: Integer; Crc: Cardinal): Cardinal;
+Begin
   Result := Crc32_P(Crc32DefaultTable, @X, N, Crc);
-end;
-function CheckCrc32(const Crc32Table: TCrc32Table; var X: array of Byte; N: Integer; Crc: Cardinal): Integer;
-begin
+End;
+Function CheckCrc32(Const Crc32Table: TCrc32Table; Var X: array Of Byte; N: Integer; Crc: Cardinal): Integer;
+Begin
   Result := CheckCRC32_P(Crc32Table, @X, N, CRC);
-end;
-function CheckCrc32(var X: array of Byte; N: Integer; Crc: Cardinal): Integer;
-begin
+End;
+Function CheckCrc32(Var X: array Of Byte; N: Integer; Crc: Cardinal): Integer;
+Begin
   Result := CheckCRC32_P(Crc32DefaultTable, @X, N, CRC);
-end;
-function Crc32_A(const Crc32Table: TCrc32Table; const X: array of Byte; Crc: Cardinal): Cardinal;
-begin
+End;
+Function Crc32_A(Const Crc32Table: TCrc32Table; Const X: array Of Byte; Crc: Cardinal): Cardinal;
+Begin
   Result := Crc32_P(Crc32Table, @X, Length(X), Crc);
-end;
-function Crc32_A(const X: array of Byte; Crc: Cardinal): Cardinal;
-begin
+End;
+Function Crc32_A(Const X: array Of Byte; Crc: Cardinal): Cardinal;
+Begin
   Result := Crc32_P(Crc32DefaultTable, @X, Length(X), Crc);
-end;
-function CheckCrc32_A(const Crc32Table: TCrc32Table; var X: array of Byte; Crc: Cardinal): Integer;
-begin
+End;
+Function CheckCrc32_A(Const Crc32Table: TCrc32Table; Var X: array Of Byte; Crc: Cardinal): Integer;
+Begin
   Result := CheckCrc32_P(Crc32Table, @X, Length(X), Crc);
-end;
-function CheckCrc32_A(var X: array of Byte; Crc: Cardinal): Integer;
-begin
+End;
+Function CheckCrc32_A(Var X: array Of Byte; Crc: Cardinal): Integer;
+Begin
   Result := CheckCrc32_P(Crc32DefaultTable, @X, Length(X), Crc);
-end;
+End;
 // The CRC Table can be generated like this:
 // const Crc32Start0 = 0;  !!
-function Crc32_Bitwise(const X: array of Byte; N: Integer; Crc: Cardinal; Polynom: Cardinal) : Cardinal;
-const
+Function Crc32_Bitwise(Const X: array Of Byte; N: Integer; Crc: Cardinal; Polynom: Cardinal) : Cardinal;
+Const
   Crc32Start0 = 0;   //Generating the table
-var
+Var
   I, J: Integer;
   Sr, SrHighBit: Cardinal;
   B: Byte;
-begin
+Begin
   Sr := Crc32Start0;
   SrHighBit := 0;
-  for I := 0 to N - 1 + Crc32Bytes do
-  begin
-    if I >= N then
-    begin
+  For I := 0 To N - 1 + Crc32Bytes Do
+  Begin
+    If I >= N Then
+    Begin
       B := Crc shr (Crc32Bits - 8);
       Crc := Crc shl 8;
-    end
-    else
+    End
+    Else
        B := X[I];
-    for J := 1 to 8 do
-    begin
-       if SrHighBit <> 0 then
+    For J := 1 To 8 Do
+    Begin
+       If SrHighBit <> 0 Then
          Sr := Sr xor Polynom;
        SrHighBit := Sr and Crc32HighBit;
        Sr := (Sr shl 1) or ((B shr 7) and 1);
        B := Byte(B shl 1);
-    end
-  end;
-  if SrHighBit <> 0 then
+    End
+  End;
+  If SrHighBit <> 0 Then
     Sr := Sr xor Polynom;
   Result := Sr;
-end;
-procedure InitCrc32(Polynom, Start: Cardinal; out Crc32Table: TCrc32Table);
-var
-  X: array [0..0] of Byte;
+End;
+Procedure InitCrc32(Polynom, Start: Cardinal; out Crc32Table: TCrc32Table);
+Var
+  X: array [0..0] Of Byte;
   I: Integer;
-begin
-   for I := 0 to 255 do
-   begin
+Begin
+   For I := 0 To 255 Do
+   Begin
      X[0] := I;
      Crc32Table[I] := Crc32_Bitwise(X, 1, 0, Polynom);
-   end;
+   End;
    Crc32DefaultStart := Start;
-end;
-procedure InitCrc32(Polynom, Start: Cardinal);
-begin
+End;
+Procedure InitCrc32(Polynom, Start: Cardinal);
+Begin
   InitCrc32(Polynom, Start, Crc32DefaultTable);
-end;
+End;
 
-end.
+End.

@@ -1,29 +1,29 @@
-unit uRESTDWMemVCLUtils;
-{$I ..\..\Includes\uRESTDW.inc}
+Unit uRESTDWMemVCLUtils;
+{$I uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
  Roniery                    - Devel.
 }
 
-interface
+Interface
 
-uses
+Uses
   Variants,
   {$IFDEF MSWINDOWS}
   Windows, Messages,
@@ -37,7 +37,7 @@ uses
   uRESTDWMemBase,
   uRESTDWMemTypes;
 
-const
+Const
   MB_OK               = $00000000;
   MB_OKCANCEL         = $00000001;
   MB_ABORTRETRYIGNORE = $00000002;
@@ -55,84 +55,84 @@ const
   MB_ICONSTOP         = MB_ICONHAND;
 
 
-function MsgBox(Handle: THandle; const Caption, Text: string; Flags: Integer): Integer; overload;
+Function MsgBox(Handle: THandle; Const Caption, Text: string; Flags: Integer): Integer; overload;
 // returns True if user clicked Yes
-function MsgYesNo(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
+Function MsgYesNo(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0): Boolean;
 // returns True if user clicked Retry
-function MsgRetryCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
+Function MsgRetryCancel(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0): Boolean;
 // returns IDABORT, IDRETRY or IDIGNORE
-function MsgAbortRetryIgnore(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Integer;
+Function MsgAbortRetryIgnore(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0): Integer;
 // returns IDYES, IDNO or IDCANCEL
-function MsgYesNoCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Integer;
+Function MsgYesNoCancel(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0): Integer;
 // returns True if user clicked OK
-function MsgOKCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
+Function MsgOKCancel(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0): Boolean;
 // dialog without icon
-procedure MsgOK(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
+Procedure MsgOK(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0);
 // dialog with info icon
-procedure MsgInfo(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
+Procedure MsgInfo(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0);
 // dialog with warning icon
-procedure MsgWarn(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
+Procedure MsgWarn(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0);
 // dialog with question icon
-procedure MsgQuestion(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
+Procedure MsgQuestion(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0);
 // dialog with error icon
-procedure MsgError(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
+Procedure MsgError(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0);
 
-implementation
+Implementation
 
-function MsgBox(Handle: THandle; const Caption, Text: string; Flags: Integer): Integer;
-begin
+Function MsgBox(Handle: THandle; Const Caption, Text: string; Flags: Integer): Integer;
+Begin
   {$IFDEF MSWINDOWS}
   Result := Windows.MessageBox(Handle, PChar(Text), PChar(Caption), Flags);
   {$ENDIF MSWINDOWS}
   {$IFDEF UNIX}
   Result := MsgBox(Caption, Text, Flags);
   {$ENDIF UNIX}
-end;
-function MsgYesNo(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
-begin
+End;
+Function MsgYesNo(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0): Boolean;
+Begin
 {$IFNDEF LINUX}
   Result := MsgBox(Handle, Caption, Msg, MB_YESNO or Flags) = IDYES;
  {$ENDIF}
-end;
-function MsgRetryCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
-begin
+End;
+Function MsgRetryCancel(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0): Boolean;
+Begin
 {$IFNDEF LINUX}
   Result := MsgBox(Handle, Caption, Msg, MB_RETRYCANCEL or Flags) = IDRETRY;
   {$ENDIF}
-end;
-function MsgAbortRetryIgnore(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Integer;
-begin
+End;
+Function MsgAbortRetryIgnore(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0): Integer;
+Begin
   Result := MsgBox(Handle, Caption, Msg, MB_ABORTRETRYIGNORE or Flags);
-end;
-function MsgYesNoCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Integer;
-begin
+End;
+Function MsgYesNoCancel(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0): Integer;
+Begin
   Result := MsgBox(Handle, Caption, Msg, MB_YESNOCANCEL or Flags);
-end;
-function MsgOKCancel(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0): Boolean;
-begin
+End;
+Function MsgOKCancel(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0): Boolean;
+Begin
 {$IFNDEF LINUX}
   Result := MsgBox(Handle, Caption, Msg, MB_OKCANCEL or Flags) = IDOK;
 {$ENDIF}
-end;
-procedure MsgOK(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
-begin
+End;
+Procedure MsgOK(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0);
+Begin
   MsgBox(Handle, Caption, Msg, MB_OK or Flags);
-end;
-procedure MsgInfo(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
-begin
+End;
+Procedure MsgInfo(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0);
+Begin
   MsgOK(Handle, Msg, Caption, MB_ICONINFORMATION or Flags);
-end;
-procedure MsgWarn(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
-begin
+End;
+Procedure MsgWarn(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0);
+Begin
   MsgOK(Handle, Msg, Caption, MB_ICONWARNING or Flags);
-end;
-procedure MsgQuestion(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
-begin
+End;
+Procedure MsgQuestion(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0);
+Begin
   MsgOK(Handle, Msg, Caption, MB_ICONQUESTION or Flags);
-end;
-procedure MsgError(Handle: Integer; const Msg, Caption: string; Flags: DWORD = 0);
-begin
+End;
+Procedure MsgError(Handle: Integer; Const Msg, Caption: string; Flags: DWORD = 0);
+Begin
   MsgOK(Handle, Msg, Caption, MB_ICONERROR or Flags);
-end;
+End;
 
-end.
+End.

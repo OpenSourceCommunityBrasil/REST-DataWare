@@ -1,62 +1,62 @@
-unit uRESTDWMemDBFilterExpr;
-{$I ..\..\Includes\uRESTDW.inc}
+Unit uRESTDWMemDBFilterExpr;
+{$I uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
  Roniery                    - Devel.
 }
 
-interface
-uses
+Interface
+Uses
   SysUtils, Classes, Variants, DB{$IFNDEF FPC}, DBCommon {$ENDIF};
-type
-  TJvDBFilterExpression = class(TObject)
-  private
+Type
+  TJvDBFilterExpression = Class(TObject)
+  Private
     FDataSet: TDataSet;
     {$IFNDEF FPC}
     FParser: TExprParser;
     FRoot: PExprNode;
-    function EvalOpNode(N: PExprNode): Boolean;
-    function EvalFuncNode(N: PExprNode): Variant;
-    function EvaluateNode(N: PExprNode): Variant;
+    Function EvalOpNode(N: PExprNode): Boolean;
+    Function EvalFuncNode(N: PExprNode): Variant;
+    Function EvaluateNode(N: PExprNode): Variant;
     {$ENDIF}
-  public
-    constructor Create(ADataSet: TDataSet; const Filter: string; const FilterOptions: TFilterOptions);
-    destructor Destroy; override;
-    function Evaluate: Boolean;
-  end;
-implementation
-uses
+  Public
+    Constructor Create(ADataSet: TDataSet; Const Filter: string; Const FilterOptions: TFilterOptions);
+    Destructor Destroy; override;
+    Function Evaluate: Boolean;
+  End;
+Implementation
+Uses
  {$IFNDEF FPC}SqlTimSt, {$ENDIF}DateUtils, uRESTDWMemResources, uRESTDWBasicTypes, uRESTDWTools;
 
-var
+Var
   FieldTypeMapInitialized: Boolean = False;
   FieldTypeMap: TFieldMap;
-type
-  TExprParserAccess = class
-  protected
+Type
+  TExprParserAccess = Class
+  Protected
     FDecimalSeparator: {$IFNDEF FPC}{$IF CompilerVersion > 17.0}WideChar{$ELSE}Char{$IFEND}{$ELSE}Char{$ENDIF}; // Delphi 2006+ use WideChar
     {$IFNDEF FPC}
     FFilter: TFilterExpr;
     {$ENDIF}
-  end;
-  TFilterExprAccess = class
-  protected
+  End;
+  TFilterExprAccess = Class
+  Protected
     FDataSet: TDataSet;
     FFieldMap: TFieldMap;
     FOptions: TFilterOptions;
@@ -64,213 +64,213 @@ type
     FParserOptions: TParserOptions;
     FNodes: PExprNode;
     {$ENDIF}
-  end;
+  End;
 {------------------------------------------------------------------------------}
-function TrimLeftEx(const S, Blanks: string): string;
-var
+Function TrimLeftEx(Const S, Blanks: string): string;
+Var
   I, Len: Integer;
-begin
+Begin
   Len := Length(S);
   I := 1;
-  while (I <= Len) and (Pos(S[I], Blanks) > 0) do
+  While (I <= Len) and (Pos(S[I], Blanks) > 0) Do
     Inc(I);
   Result := Copy(S, I, MaxInt);
-end;
-function TrimRightEx(const S, Blanks: string): string;
-var
+End;
+Function TrimRightEx(Const S, Blanks: string): string;
+Var
   I: Integer;
-begin
+Begin
   I := Length(S);
-  while (I > 0) and (Pos(S[I], Blanks) > 0) do
+  While (I > 0) and (Pos(S[I], Blanks) > 0) Do
     Dec(I);
   Result := Copy(S, 1, I);
-end;
-function TrimEx(const S, Blanks: string): string;
-var
+End;
+Function TrimEx(Const S, Blanks: string): string;
+Var
   L, R, Len: Integer;
-begin
+Begin
   Len := Length(S);
   L := 1;
-  while (L <= Len) and (Pos(S[L], Blanks) > 0) do
+  While (L <= Len) and (Pos(S[L], Blanks) > 0) Do
     Inc(L);
   R := Len;
-  while (R >= L) and (Pos(S[R], Blanks) > 0) do
+  While (R >= L) and (Pos(S[R], Blanks) > 0) Do
     Dec(R);
   Result := Copy(S, L, R - L + 1);
-end;
+End;
 // Derived from "Like" by Michael Winter
-function IsLike(const MaskStr, S: string): Boolean;
-var
+Function IsLike(Const MaskStr, S: string): Boolean;
+Var
   StringPtr: PChar;
   PatternPtr: PChar;
   StringRes: PChar;
   PatternRes: PChar;
   Index: Integer;
-begin
-  if MaskStr = '' then
-  begin
+Begin
+  If MaskStr = '' Then
+  Begin
     Result := False;
     Exit;
-  end;
+  End;
   Result := MaskStr = '%';
-  if Result or (S = '') then
+  If Result or (S = '') Then
     Exit;
   Index := 1;
   StringPtr := PChar(S) + Index - 1;
   PatternPtr := PChar(MaskStr);
   StringRes := nil;
   PatternRes := nil;
-  repeat
-    repeat
-      case PatternPtr^ of
+  Repeat
+    Repeat
+      Case PatternPtr^ Of
         #0:
-          begin
+          Begin
             Result := StringPtr^ = #0;
-            if Result or (StringRes = nil) or (PatternRes = nil) then
+            If Result or (StringRes = nil) or (PatternRes = nil) Then
               Exit;
             StringPtr := StringRes;
             PatternPtr := PatternRes;
             Break;
-          end;
+          End;
         '%':
-          begin
+          Begin
             Inc(PatternPtr);
             PatternRes := PatternPtr;
             Break;
-          end;
+          End;
         '_':
-          begin
-            if StringPtr^ = #0 then
+          Begin
+            If StringPtr^ = #0 Then
               Exit;
             Inc(StringPtr);
             Inc(PatternPtr);
-          end;
-        else
-          begin
-            if StringPtr^ = #0 then
+          End;
+        Else
+          Begin
+            If StringPtr^ = #0 Then
               Exit;
-            if StringPtr^ <> PatternPtr^ then
-            begin
-              if (StringRes = nil) or (PatternRes = nil) then
+            If StringPtr^ <> PatternPtr^ Then
+            Begin
+              If (StringRes = nil) or (PatternRes = nil) Then
                 Exit;
               StringPtr := StringRes;
               PatternPtr := PatternRes;
               Break;
-            end
-            else
-            begin
+            End
+            Else
+            Begin
               Inc(StringPtr);
               Inc(PatternPtr);
-            end;
-          end;
-      end;
-    until False;
-    repeat
-      case PatternPtr^ of
+            End;
+          End;
+      End;
+    Until False;
+    Repeat
+      Case PatternPtr^ Of
         #0:
-          begin
+          Begin
             Result := True;
             Exit;
-          end;
+          End;
         '%':
-          begin
+          Begin
             Inc(PatternPtr);
             PatternRes := PatternPtr;
-          end;
+          End;
         '_':
-          begin
-            if StringPtr^ = #0 then
+          Begin
+            If StringPtr^ = #0 Then
               Exit;
             Inc(StringPtr);
             Inc(PatternPtr);
-          end;
-        else
-          begin
-            repeat
-              if StringPtr^ = #0 then
+          End;
+        Else
+          Begin
+            Repeat
+              If StringPtr^ = #0 Then
                 Exit;
-              if StringPtr^ = PatternPtr^ then
+              If StringPtr^ = PatternPtr^ Then
                 Break;
               Inc(StringPtr);
-            until False;
+            Until False;
             Inc(StringPtr);
             StringRes := StringPtr;
             Inc(PatternPtr);
             Break;
-          end;
-      end;
-    until False;
-  until False;
-end;
+          End;
+      End;
+    Until False;
+  Until False;
+End;
 {------------------------------------------------------------------------------}
 { TJvDBFilterExpression }
-constructor TJvDBFilterExpression.Create(ADataSet: TDataSet; const Filter: string;
-  const FilterOptions: TFilterOptions);
-var
+Constructor TJvDBFilterExpression.Create(ADataSet: TDataSet; Const Filter: string;
+  Const FilterOptions: TFilterOptions);
+Var
   FieldType: TFieldType;
   {$IFNDEF FPC}
   Nodes: PExprNode;
-  function NodesContainsLeftRight(Root: PExprNode): Boolean;
-  var
+  Function NodesContainsLeftRight(Root: PExprNode): Boolean;
+  Var
     Node: PExprNode;
-  begin
+  Begin
     Result := True;
     Node := Nodes;
-    while Node <> nil do
-    begin
-      if (Node.FLeft = Root) or (Node.FRight = Root) then
+    While Node <> nil Do
+    Begin
+      If (Node.FLeft = Root) or (Node.FRight = Root) Then
         Exit;
       Node := Node.FNext;
-    end;
+    End;
     Result := False;
-  end;
+  End;
   {$ENDIF}
-begin
-  inherited Create;
+Begin
+  Inherited Create;
   FDataSet := ADataSet;
-  if not FieldTypeMapInitialized then
-  begin
+  If not FieldTypeMapInitialized Then
+  Begin
     FieldTypeMapInitialized := True;
-    for FieldType := Low(FieldType) to High(FieldType) do
+    For FieldType := Low(FieldType) To High(FieldType) Do
       FieldTypeMap[FieldType] := Ord(FieldType);
-  end;
+  End;
   {$IFNDEF FPC}
   FParser := TExprParser.Create(ADataSet, Filter, [], [poExtSyntax], '', nil, FieldTypeMap);
   Nodes := TFilterExprAccess(TExprParserAccess(FParser).FFilter).FNodes;
   { Find root node because FNodes is the last added node which must not be the root node.
     The root node is the node which istn't referenced by any other node's Left or Right field. }
-  if Nodes <> nil then
-  begin
+  If Nodes <> nil Then
+  Begin
     FRoot := Nodes;
-    while (FRoot.FNext <> nil) and not ((FRoot.FKind = enOperator) and not NodesContainsLeftRight(FRoot)) do
+    While (FRoot.FNext <> nil) and not ((FRoot.FKind = enOperator) and not NodesContainsLeftRight(FRoot)) Do
       FRoot := FRoot.FNext;
-  end;
+  End;
   {$ENDIF}
-end;
-destructor TJvDBFilterExpression.Destroy;
-begin
+End;
+Destructor TJvDBFilterExpression.Destroy;
+Begin
   {$IFNDEF FPC}
   FParser.Free;
   {$ENDIF}
-  inherited Destroy;
-end;
+  Inherited Destroy;
+End;
 
-function TJvDBFilterExpression.Evaluate: Boolean;
-begin
+Function TJvDBFilterExpression.Evaluate: Boolean;
+Begin
  Result := False;
  {$IFNDEF FPC}
   Result := EvalOpNode(FRoot);
  {$ENDIF}
-end;
+End;
 
 {$IFNDEF FPC}
-function TJvDBFilterExpression.EvaluateNode(N: PExprNode): Variant;
-begin
-  if N = nil then
+Function TJvDBFilterExpression.EvaluateNode(N: PExprNode): Variant;
+Begin
+  If N = nil Then
     Result := Unassigned
-  else
-  begin
-    case N.FKind of
+  Else
+  Begin
+    Case N.FKind Of
       enOperator:
         Result := EvalOpNode(N);
       enConst:
@@ -279,22 +279,22 @@ begin
         Result := FDataSet.FieldByName(N.FData).AsVariant;
       enFunc:
         Result := EvalFuncNode(N);
-    else
+    Else
       raise Exception.CreateRes(@RsInvalidFilterNodeKind);
-    end;
-  end;
-end;
-function TJvDBFilterExpression.EvalOpNode(N: PExprNode): Boolean;
-var
+    End;
+  End;
+End;
+Function TJvDBFilterExpression.EvalOpNode(N: PExprNode): Boolean;
+Var
   I: Integer;
   V: Variant;
-begin
-  if N = nil then
+Begin
+  If N = nil Then
     Result := False
-  else
-  begin
+  Else
+  Begin
     Assert(N.FKind = enOperator);
-    case N.FOperator of
+    Case N.FOperator Of
       coEQ:
         Result := EvaluateNode(N.FLeft) = EvaluateNode(N.FRight);
       coNE:
@@ -320,21 +320,21 @@ begin
       coLIKE:
         Result := IsLike(EvaluateNode(N.FLeft), EvaluateNode(N.FRight));
       coIN:
-        begin
+        Begin
           Result := False;
           V := EvaluateNode(N.FLeft);
-          if N.FArgs <> nil then
-          begin
-            for I := 0 to N.FArgs.Count - 1 do
-            begin
-              if V = EvaluateNode(N.FArgs[I]) then
-              begin
+          If N.FArgs <> nil Then
+          Begin
+            For I := 0 To N.FArgs.Count - 1 Do
+            Begin
+              If V = EvaluateNode(N.FArgs[I]) Then
+              Begin
                 Result := True;
                 Break;
-              end;
-            end;
-          end;
-        end;
+              End;
+            End;
+          End;
+        End;
       coMINUS:
         Result := -EvaluateNode(N.FLeft);
       coADD:
@@ -345,114 +345,114 @@ begin
         Result := EvaluateNode(N.FLeft) * EvaluateNode(N.FRight);
       coDIV:
         Result := EvaluateNode(N.FLeft) / EvaluateNode(N.FRight);
-    else
+    Else
       raise Exception.CreateRes(@RsUnknownFilterOperation);
-    end;
-  end;
-end;
+    End;
+  End;
+End;
 
-function TJvDBFilterExpression.EvalFuncNode(N: PExprNode): Variant;
-var
+Function TJvDBFilterExpression.EvalFuncNode(N: PExprNode): Variant;
+Var
   V: Variant;
-begin
-  if N = nil then
+Begin
+  If N = nil Then
     Result := Unassigned
-  else
-  begin
-    if (N.FArgs <> nil) and (N.FArgs.Count > 0) then
-    begin
+  Else
+  Begin
+    If (N.FArgs <> nil) and (N.FArgs.Count > 0) Then
+    Begin
       V := EvaluateNode(N.FArgs[0]);
-      if CompareText(N.FData, 'UPPER') = 0 then
+      If CompareText(N.FData, 'UPPER') = 0 Then
         Result := AnsiUpperCase(V)
-      else
-      if CompareText(N.FData, 'LOWER') = 0 then
+      Else
+      If CompareText(N.FData, 'LOWER') = 0 Then
         Result := AnsiLowerCase(V)
-      else
-      if CompareText(N.FData, 'TRIM') = 0 then
-      begin
-        if N.FArgs.Count = 1 then
+      Else
+      If CompareText(N.FData, 'TRIM') = 0 Then
+      Begin
+        If N.FArgs.Count = 1 Then
           Result := Trim(V)
-        else
+        Else
           Result := TrimEx(V, EvaluateNode(N.FArgs[1]));
-      end
-      else
-      if CompareText(N.FData, 'TRIMLEFT') = 0 then
-      begin
-        if N.FArgs.Count = 1 then
+      End
+      Else
+      If CompareText(N.FData, 'TRIMLEFT') = 0 Then
+      Begin
+        If N.FArgs.Count = 1 Then
           Result := TrimLeft(V)
-        else
+        Else
           Result := TrimLeftEx(V, EvaluateNode(N.FArgs[1]));
-      end
-      else
-      if CompareText(N.FData, 'TRIMRIGHT') = 0 then
-      begin
-        if N.FArgs.Count = 1 then
+      End
+      Else
+      If CompareText(N.FData, 'TRIMRIGHT') = 0 Then
+      Begin
+        If N.FArgs.Count = 1 Then
           Result := TrimRight(V)
-        else
+        Else
           Result := TrimRightEx(V, EvaluateNode(N.FArgs[1]));
-      end
-      else
-      if CompareText(N.FData, 'SUBSTRING') = 0 then
-      begin
-        if N.FArgs.Count = 2 then
+      End
+      Else
+      If CompareText(N.FData, 'SUBSTRING') = 0 Then
+      Begin
+        If N.FArgs.Count = 2 Then
           Result := Copy(V, Integer(EvaluateNode(N.FArgs[1])), MaxInt)
-        else
+        Else
           Result := Copy(V, Integer(EvaluateNode(N.FArgs[1])), Integer(EvaluateNode(N.FArgs[2])));
-      end
-      else
-      if CompareText(N.FData, 'YEAR') = 0 then
-      begin
-        if VarIsNullEmpty(V) then Result := -1 else
+      End
+      Else
+      If CompareText(N.FData, 'YEAR') = 0 Then
+      Begin
+        If VarIsNullEmpty(V) Then Result := -1 Else
           Result := YearOf(V);
-      end
-      else
-      if CompareText(N.FData, 'MONTH') = 0 then
-      begin
-        if VarIsNullEmpty(V) then Result := -1 else
+      End
+      Else
+      If CompareText(N.FData, 'MONTH') = 0 Then
+      Begin
+        If VarIsNullEmpty(V) Then Result := -1 Else
           Result := MonthOf(V);
-      end
-      else
-      if CompareText(N.FData, 'DAY') = 0 then
-      begin
-        if VarIsNullEmpty(V) then Result := -1 else
+      End
+      Else
+      If CompareText(N.FData, 'DAY') = 0 Then
+      Begin
+        If VarIsNullEmpty(V) Then Result := -1 Else
           Result := DayOf(V);
-      end
-      else
-      if CompareText(N.FData, 'HOUR') = 0 then
-      begin
-        if VarIsNullEmpty(V) then Result := -1 else
+      End
+      Else
+      If CompareText(N.FData, 'HOUR') = 0 Then
+      Begin
+        If VarIsNullEmpty(V) Then Result := -1 Else
           Result := HourOf(V);
-      end
-      else
-      if CompareText(N.FData, 'MINUTE') = 0 then
-      begin
-        if VarIsNullEmpty(V) then Result := -1 else
+      End
+      Else
+      If CompareText(N.FData, 'MINUTE') = 0 Then
+      Begin
+        If VarIsNullEmpty(V) Then Result := -1 Else
           Result := MinuteOf(V);
-      end
-      else
-      if CompareText(N.FData, 'SECOND') = 0 then
-      begin
-        if VarIsNullEmpty(V) then Result := -1 else
+      End
+      Else
+      If CompareText(N.FData, 'SECOND') = 0 Then
+      Begin
+        If VarIsNullEmpty(V) Then Result := -1 Else
           Result := SecondOf(V);
-      end
-      else
-      if CompareText(N.FData, 'TIME') = 0 then
-      begin
-        if VarIsNullEmpty(V) then Result := NULL else
+      End
+      Else
+      If CompareText(N.FData, 'TIME') = 0 Then
+      Begin
+        If VarIsNullEmpty(V) Then Result := NULL Else
           Result := VarSQLTimeStampCreate(TimeOf(V));
-      end
-      else
-      if CompareText(N.FData, 'DATE') = 0 then
-      begin
-        if VarIsNullEmpty(V) then Result := NULL else
+      End
+      Else
+      If CompareText(N.FData, 'DATE') = 0 Then
+      Begin
+        If VarIsNullEmpty(V) Then Result := NULL Else
           Result := VarSQLTimeStampCreate(DateOf(V));
-      end
-      else
+      End
+      Else
         raise Exception.CreateResFmt(@RsUnknownFilterFunction, [N.FData]);
-    end
-    else
+    End
+    Else
       raise Exception.CreateResFmt(@RsMissingFilterFunctionParameters, [N.FData]);
-  end;
-end;
+  End;
+End;
 {$ENDIF}
-end.
+End.
