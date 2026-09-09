@@ -1,0 +1,17 @@
+Package RESTDWNativeLinkADO;
+
+{$R *.res}
+{$R 'RESTDWNativeLinkADO.dcr'}
+{$DESCRIPTION 'REST Dataware NativeLink ADO'}
+{$IMPLICITBUILD ON}
+
+Requires
+ rtl,
+ vcl,
+ dbrtl,
+ adortl,
+ RESTDWNativeDriver;
+
+Contains
+ uRESTDWNativeLinkADO In '..\..\..\..\..\Source\Database_Drivers\Native\NativeLinks\ADO\uRESTDWNativeLinkADO.pas';
+End.

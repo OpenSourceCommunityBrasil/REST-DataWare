@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RESTDataware Visual Web IDE Help</title>
+<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f6f8}
+.hero{background:linear-gradient(135deg,#212529,#495057);color:#fff}
+kbd{white-space:nowrap}
+.card{border:0;box-shadow:0 .125rem .45rem rgba(0,0,0,.08)}
+code{color:#b02a37}
+</style>
+</head>
+<body>
+<header class="hero py-5 mb-4">
+<div class="container">
+<h1 class="display-6 fw-bold">RESTDataware Visual Web IDE</h1>
+<p class="lead mb-0">Complete guide to designing PageProducer pages, editing code, inspecting components, debugging JavaScript and managing projects.</p>
+</div>
+</header>
+
+<main class="container pb-5">
+<div class="row g-4">
+<div class="col-lg-4">
+<div class="card h-100"><div class="card-body">
+<h2 class="h5">Getting started</h2>
+<p><strong>New</strong> creates a complete PageProducer page structure with HTML header/body and the framework hooks expected by the designer.</p>
+<p><strong>Open</strong> loads an HTML page from disk. <strong>Save</strong> is enabled only when something changed and writes the edited page back to disk.</p>
+<p>The IDE asks whether to save modified content before closing or replacing a document.</p>
+</div></div>
+</div>
+
+<div class="col-lg-4">
+<div class="card h-100"><div class="card-body">
+<h2 class="h5">Form Designer</h2>
+<p>The WebViewer is the visual page designer. Click an element to select it instead of navigating the page.</p>
+<p>Drag components from Component Palette to insert them. Selected elements can be removed with <kbd>Delete</kbd>.</p>
+<p>Changes made in Object Inspector are reflected in the page and in the PageProducer source.</p>
+</div></div>
+</div>
+
+<div class="col-lg-4">
+<div class="card h-100"><div class="card-body">
+<h2 class="h5">Component Palette</h2>
+<p>The <strong>Standard</strong> palette comes first and contains Label, Edit, Grid and the common controls.</p>
+<p>Additional component classes and plugins are scanned and exposed in their corresponding palette pages.</p>
+<p>The small selector above the palette changes only the IDE layout: <strong>Classic</strong> or <strong>Dark</strong>. It never changes the rendered web page.</p>
+</div></div>
+</div>
+
+<div class="col-lg-6">
+<div class="card h-100"><div class="card-body">
+<h2 class="h5">Object Inspector</h2>
+<p><strong>Properties</strong> displays valid properties for the selected HTML/component element. Empty optional values are not emitted until a value is supplied.</p>
+<p><strong>Events</strong> lists supported events. Double-clicking an event opens the Code Editor at the existing handler or creates and binds a new handler when necessary.</p>
+<p>Removing an event handler from Object Inspector removes its component reference and cleans an unused empty handler scope when possible.</p>
+</div></div>
+</div>
+
+<div class="col-lg-6">
+<div class="card h-100"><div class="card-body">
+<h2 class="h5">Code Editor</h2>
+<p>Full Code combines HTML, CSS and JavaScript with syntax highlighting. The section editors are also available independently.</p>
+<p>Clicking Project Explorer entries navigates to the matching source position. The tree preserves nodes you expand or collapse.</p>
+<p>When an event is selected from Form Designer, Code Editor opens directly on its handler and Object Inspector remains on Events.</p>
+</div></div>
+</div>
+
+<div class="col-12">
+<div class="card"><div class="card-body">
+<h2 class="h5">JavaScript debugger</h2>
+<div class="table-responsive">
+<table class="table table-striped align-middle">
+<thead><tr><th>Command</th><th>Shortcut</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td>Run / Continue</td><td><kbd>F9</kbd></td><td>Start or continue JavaScript debugging.</td></tr>
+<tr><td>Pause</td><td>Debug menu</td><td>Pause the running page.</td></tr>
+<tr><td>Stop Program</td><td><kbd>Ctrl+F2</kbd></td><td>End the debug session.</td></tr>
+<tr><td>Run to Cursor</td><td><kbd>F4</kbd></td><td>Continue execution to the current JavaScript line.</td></tr>
+<tr><td>Step Into</td><td><kbd>F7</kbd></td><td>Enter the called JavaScript routine.</td></tr>
+<tr><td>Step Over</td><td><kbd>F8</kbd></td><td>Execute the current statement without entering the call.</td></tr>
+<tr><td>Step Out</td><td><kbd>Shift+F8</kbd></td><td>Continue until the current routine returns.</td></tr>
+<tr><td>Evaluate / Modify</td><td><kbd>Ctrl+F7</kbd></td><td>Inspect or change a variable/expression in the paused call frame.</td></tr>
+<tr><td>Toggle Breakpoint</td><td><kbd>F5</kbd></td><td>Add or remove a breakpoint on the current JavaScript line.</td></tr>
+</tbody>
+</table>
+</div>
+<p class="mb-0">You can also double-click the line-number gutter to add/remove a breakpoint. When execution stops, the IDE switches to Full Code and marks the current execution line. While paused, hovering a variable evaluates it; double-click its value hint to open Evaluate/Modify.</p>
+</div></div>
+</div>
+
+<div class="col-lg-6">
+<div class="card h-100"><div class="card-body">
+<h2 class="h5">Project Explorer</h2>
+<p>Shows Page Options, HTML structure, CSS, JavaScript functions, assets and components.</p>
+<p>Single-click navigation opens the Code Editor on the equivalent source location without forcing the whole tree open.</p>
+</div></div>
+</div>
+
+<div class="col-lg-6">
+<div class="card h-100"><div class="card-body">
+<h2 class="h5">Errors and request log</h2>
+<p>Show Errors receives designer/page JavaScript errors with source, line and column. Double-clicking an entry navigates to the related code where applicable.</p>
+<p>The request log records requests. Double-click a log row to inspect request details such as headers and complete payload.</p>
+</div></div>
+</div>
+
+<div class="col-lg-6">
+<div class="card h-100"><div class="card-body">
+<h2 class="h5">Docking and layout</h2>
+<p>Project Explorer, Object Inspector, Show Errors, Form Designer and Component Palette participate in the IDE layout. Dockable panels can be shown again from the View menu.</p>
+<p>Panel sizes and IDE settings are persisted. Classic keeps the Lazarus-style appearance; Dark applies dark designer colors.</p>
+</div></div>
+</div>
+
+<div class="col-lg-6">
+<div class="card h-100"><div class="card-body">
+<h2 class="h5">Page events</h2>
+<p>Select Page Options to access page-level properties and events. Page events can be created from Object Inspector exactly like component events.</p>
+<p>The default new page contains the required HTML structure so it can run immediately in the RESTDataware PageProducer environment.</p>
+</div></div>
+</div>
+</div>
+
+<div class="alert alert-primary mt-4">
+<strong>Tip:</strong> Use Form Designer for visual composition, Object Inspector for properties/events, Project Explorer for navigation, and Full Code whenever you need direct source control.
+</div>
+</main>
+<script src="../bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

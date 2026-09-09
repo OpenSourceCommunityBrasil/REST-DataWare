@@ -1,40 +1,296 @@
-package RESTDWCoreDesign;
+﻿package RESTDWCoreDesign;
+
+
+
+
 
 {$R *.res}
+
+
 {$R 'RESTDWCoreDesign.dcr'}
+{$R 'TRESTDWServerRoutes.dcr'}
+
+
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+
+
 {$ALIGN 8}
+
+
 {$ASSERTIONS ON}
+
+
 {$BOOLEVAL OFF}
+
+
 {$DEBUGINFO OFF}
+
+
 {$EXTENDEDSYNTAX ON}
+
+
 {$IMPORTEDDATA ON}
+
+
 {$IOCHECKS ON}
+
+
 {$LOCALSYMBOLS ON}
+
+
 {$LONGSTRINGS ON}
+
+
 {$OPENSTRINGS ON}
+
+
 {$OPTIMIZATION OFF}
+
+
 {$OVERFLOWCHECKS OFF}
+
+
 {$RANGECHECKS OFF}
+
+
 {$REFERENCEINFO ON}
+
+
 {$SAFEDIVIDE OFF}
+
+
 {$STACKFRAMES ON}
+
+
 {$TYPEDADDRESS OFF}
+
+
 {$VARSTRINGCHECKS ON}
+
+
 {$WRITEABLECONST OFF}
+
+
 {$MINENUMSIZE 1}
+
+
 {$IMAGEBASE $400000}
+
+
 {$DEFINE DEBUG}
+
+
 {$ENDIF IMPLICITBUILDING}
+
+
 {$DESCRIPTION 'REST Dataware - Core Design'}
+
+
 {$DESIGNONLY}
+
+
 {$IMPLICITBUILD OFF}
 
+
+
+
+
 requires
+
+
   dcldb,
+
+
   RESTDWCore;
 
+
+
+
+
 contains
+
+
+  uRESTDWHTMLComponentManager in '..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLComponentManager.pas',
+
+
+  uRESTDWHTMLDesigner in '..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLDesigner.pas',
+
+
+  uRESTDWHTMLDesignerIcons in '..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLDesignerIcons.pas',
+
+
+  uRESTDWHTMLWebAssets in '..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLWebAssets.pas',
+
+
+  uRESTDWHTMLDesignerAI in '..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLDesignerAI.pas',
+
+
+  uRESTDWHTMLIDECompat in '..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLIDECompat.pas',
+
+
+  uRESTDWHTMLJSONCompat in '..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLJSONCompat.pas',
+
+
+  uRESTDWHTMLPageProducerAdapter in '..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLPageProducerAdapter.pas',
+
+
+  uRESTDWHTMLWebView in '..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLWebView.pas',
+
+
+  uRESTDWPrivSynEdit in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEdit.pas',
+
+
+  uRESTDWPrivSynEditCodeFolding in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditCodeFolding.pas',
+
+
+  uRESTDWPrivSynEditHighlighter in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditHighlighter.pas',
+
+
+  uRESTDWPrivSynEditHighlighterOptions in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditHighlighterOptions.pas',
+
+
+  uRESTDWPrivSynEditKbdHandler in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditKbdHandler.pas',
+
+
+  uRESTDWPrivSynEditKeyCmds in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditKeyCmds.pas',
+
+
+  uRESTDWPrivSynEditKeyConst in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditKeyConst.pas',
+
+
+  uRESTDWPrivSynEditMiscClasses in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditMiscClasses.pas',
+
+
+  uRESTDWPrivSynEditMiscProcs in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditMiscProcs.pas',
+
+
+  uRESTDWPrivSynEditStrConst in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditStrConst.pas',
+
+
+  uRESTDWPrivSynEditTextBuffer in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditTextBuffer.pas',
+
+
+  uRESTDWPrivSynEditTypes in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditTypes.pas',
+
+
+  uRESTDWPrivSynEditWordWrap in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditWordWrap.pas',
+
+
+  uRESTDWPrivSynHighlighterCss in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynHighlighterCss.pas',
+
+
+  uRESTDWPrivSynHighlighterHashEntries in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynHighlighterHashEntries.pas',
+
+
+  uRESTDWPrivSynHighlighterHtml in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynHighlighterHtml.pas',
+
+
+  uRESTDWPrivSynHighlighterJScript in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynHighlighterJScript.pas',
+
+
+  uRESTDWPrivSynHighlighterMulti in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynHighlighterMulti.pas',
+
+
+  uRESTDWPrivSynRegExpr in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynRegExpr.pas',
+
+
+  uRESTDWPrivSynTextDrawer in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynTextDrawer.pas',
+
+
+  uRESTDWPrivSynUnicode in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynUnicode.pas',
+
+
+  uRESTDWPrivSynUsp10 in '..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynUsp10.pas',
+
+
+  uRESTDWPrivWVBrowser in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVBrowser.pas',
+
+
+  uRESTDWPrivWVBrowserBase in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVBrowserBase.pas',
+
+
+  uRESTDWPrivWVConstants in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVConstants.pas',
+
+
+  uRESTDWPrivWVCoreWebView2 in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2.pas',
+
+
+  uRESTDWPrivWVCoreWebView2Args in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Args.pas',
+
+
+  uRESTDWPrivWVCoreWebView2CompositionController in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2CompositionController.pas',
+
+
+  uRESTDWPrivWVCoreWebView2Controller in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Controller.pas',
+
+
+  uRESTDWPrivWVCoreWebView2ControllerOptions in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2ControllerOptions.pas',
+
+
+  uRESTDWPrivWVCoreWebView2CookieManager in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2CookieManager.pas',
+
+
+  uRESTDWPrivWVCoreWebView2CustomSchemeRegistration in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2CustomSchemeRegistration.pas',
+
+
+  uRESTDWPrivWVCoreWebView2Delegates in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Delegates.pas',
+
+
+  uRESTDWPrivWVCoreWebView2Environment in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Environment.pas',
+
+
+  uRESTDWPrivWVCoreWebView2EnvironmentOptions in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2EnvironmentOptions.pas',
+
+
+  uRESTDWPrivWVCoreWebView2Find in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Find.pas',
+
+
+  uRESTDWPrivWVCoreWebView2FindOptions in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2FindOptions.pas',
+
+
+  uRESTDWPrivWVCoreWebView2PrintSettings in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2PrintSettings.pas',
+
+
+  uRESTDWPrivWVCoreWebView2Profile in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Profile.pas',
+
+
+  uRESTDWPrivWVCoreWebView2Settings in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Settings.pas',
+
+
+  uRESTDWPrivWVEvents in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVEvents.pas',
+
+
+  uRESTDWPrivWVInterfaces in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVInterfaces.pas',
+
+
+  uRESTDWPrivWVLibFunctions in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVLibFunctions.pas',
+
+
+  uRESTDWPrivWVLoader in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVLoader.pas',
+
+
+  uRESTDWPrivWVLoaderInternal in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVLoaderInternal.pas',
+
+
+  uRESTDWPrivWVMiscFunctions in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVMiscFunctions.pas',
+
+
+  uRESTDWPrivWVTypeLibrary in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVTypeLibrary.pas',
+
+
+  uRESTDWPrivWVTypes in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVTypes.pas',
+
+
+  uRESTDWPrivWVWinControl in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVWinControl.pas',
+
+
+  uRESTDWPrivWVWindowParent in '..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVWindowParent.pas',
+
+
   uRESTDWDesignReg in '..\..\Source\Basic\uRESTDWDesignReg.pas';
+
+
+
+
 
 end.

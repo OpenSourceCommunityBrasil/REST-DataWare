@@ -33,11 +33,11 @@ requires
   RESTDWCore,
   IndySystem,
   IndyCore,
-  IndyProtocols,
-  TaurusTLS_RT;
+  IndyProtocols;
 
 contains
-  uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas';
+  uRESTDWIdBase in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdBase.pas',
+  uRESTDWIdFCMTransport in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdFCMTransport.pas',
+  uRESTDWIdFirebaseCloudMessaging in '..\..\..\..\Source\Sockets\Indy\uRESTDWIdFirebaseCloudMessaging.pas';
 
 end.
-

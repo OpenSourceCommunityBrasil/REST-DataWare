@@ -28,7 +28,10 @@ uses
   uRESTDWJSONInterface, uRESTDWSerialize, uRESTDWMimeTypes, uRESTDWAbout, 
   uRESTDWZlib, uRESTDWMemoryDataset, uRESTDWDesignReg, uRESTDWProtoTypes, 
   uRESTDWSelfSigned, uRESTDWExprParser, uRESTDWAuthenticators, 
-  uRESTDWStorageBin, LazarusPackageIntf;
+  uRESTDWStorageBin, uRESTDWHTMLDesigner, uRESTDWHTMLIDECompat, 
+  uRESTDWHTMLComponentManager, uRESTDWHTMLDesignerAI, 
+  uRESTDWHTMLDesignerIcons, uRESTDWHTMLPageProducerAdapter, 
+  uRESTDWHTMLWebAssets, uRESTDWHTMLWebView, LazarusPackageIntf;
 
 implementation
 

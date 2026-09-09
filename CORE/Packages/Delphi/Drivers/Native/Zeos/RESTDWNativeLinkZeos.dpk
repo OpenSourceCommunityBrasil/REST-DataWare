@@ -1,0 +1,42 @@
+package RESTDWNativeLinkZeos;
+
+{$R *.res}
+{$R 'RESTDWNativeLinkZeos.dcr'}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'REST Dataware NativeLink Zeos'}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  vcl,
+  RESTDWNativeDriver,
+  ZComponent,
+  ZDbc,
+  ZPlain,
+  ZCore,
+  ZParseSql;
+
+contains
+  uRESTDWNativeLinkZeos in '..\..\..\..\..\Source\Database_Drivers\Native\NativeLinks\Zeos\uRESTDWNativeLinkZeos.pas';
+
+end.

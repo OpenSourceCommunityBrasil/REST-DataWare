@@ -8,7 +8,8 @@ unit RESTDWIndySockets;
 interface
 
 uses
-  uRESTDWIdBase, uRESTDWIdReg, LazarusPackageIntf;
+  uRESTDWIdBase, uRESTDWIdReg, uRESTDWIdFirebaseCloudMessaging, 
+  LazarusPackageIntf;
 
 implementation
 
