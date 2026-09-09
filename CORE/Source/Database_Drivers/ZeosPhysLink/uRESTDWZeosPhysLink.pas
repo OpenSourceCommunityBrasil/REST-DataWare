@@ -1,6 +1,6 @@
-unit uRESTDWZeosPhysLink;
+﻿unit uRESTDWZeosPhysLink;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -32,7 +32,7 @@ interface
 {$ENDIF}
 
 uses
-  Classes, SysUtils, ZConnection, uRESTDWAbout, uRESTDWBasicDB, uRESTDWZDbc;
+  Classes, SysUtils, ZConnection, uRESTDWAbout, uRESTDWBasicDB, uRESTDWConsts, uRESTDWZDbc;
 
 type
   TRESTDWZeosPhysLink = class(TRESTDWComponent)
@@ -41,32 +41,83 @@ type
     FDatabase : TRESTDWDatabasebaseBase;
     FOldZeosBeforeConnect : TNotifyEvent;
     procedure setZConnection(const Value: TZConnection);
+    procedure SetDatabase(Const Value : TRESTDWDatabasebaseBase);
   protected
+    procedure Notification(AComponent : TComponent; Operation : TOperation); override;
     procedure OnRESTDWZeosBeforeConnect(Sender : TObject);
+  public
+    Destructor Destroy; Override;
   published
     property ZConnection : TZConnection read FZConnection write setZConnection;
-    property Database : TRESTDWDatabasebaseBase read FDatabase write FDatabase;
+    property Database : TRESTDWDatabasebaseBase read FDatabase write SetDatabase;
   end;
 
 implementation
 
 { TRESTDWZeosPhysLink }
 
-procedure TRESTDWZeosPhysLink.OnRESTDWZeosBeforeConnect(Sender: TObject);
-begin
-  if Assigned(FOldZeosBeforeConnect) then
-    FOldZeosBeforeConnect(FZConnection);
-  TZRESTDWDriver(FZConnection.DbcDriver).Database := FDatabase;
-end;
+Destructor TRESTDWZeosPhysLink.Destroy;
+Begin
+ setZConnection(Nil);
+ SetDatabase(Nil);
+ Inherited Destroy;
+End;
 
-procedure TRESTDWZeosPhysLink.setZConnection(const Value: TZConnection);
-begin
-  FZConnection := Value;
-  FOldZeosBeforeConnect := nil;
-  if (FZConnection <> nil) and (ZConnection.Protocol = 'restdw') then begin
-    FOldZeosBeforeConnect := FZConnection.BeforeConnect;
+procedure TRESTDWZeosPhysLink.Notification(AComponent : TComponent; Operation : TOperation);
+Begin
+ Inherited Notification(AComponent, Operation);
+ If Operation = opRemove Then
+  Begin
+   If AComponent = FZConnection Then
+    Begin
+     FZConnection := Nil;
+     FOldZeosBeforeConnect := Nil;
+    End;
+   If AComponent = FDatabase Then
+    FDatabase := Nil;
+  End;
+End;
+
+procedure TRESTDWZeosPhysLink.OnRESTDWZeosBeforeConnect(Sender : TObject);
+Begin
+ If Assigned(FOldZeosBeforeConnect) Then
+  FOldZeosBeforeConnect(Sender);
+ If FDatabase = Nil Then
+  Raise Exception.Create(cErrorDatabaseNotFound);
+ If (FZConnection = Nil) Or (LowerCase(FZConnection.Protocol) <> 'restdw') Then
+  Exit;
+ SetRESTDWDriverDatabase(FDatabase);
+End;
+
+procedure TRESTDWZeosPhysLink.SetDatabase(Const Value : TRESTDWDatabasebaseBase);
+Begin
+ If FDatabase = Value Then
+  Exit;
+ If FDatabase <> Nil Then
+  FDatabase.RemoveFreeNotification(Self);
+ FDatabase := Value;
+ If FDatabase <> Nil Then
+  FDatabase.FreeNotification(Self);
+End;
+
+procedure TRESTDWZeosPhysLink.setZConnection(Const Value : TZConnection);
+Begin
+ If FZConnection = Value Then
+  Exit;
+ If FZConnection <> Nil Then
+  Begin
+   FZConnection.BeforeConnect := FOldZeosBeforeConnect;
+   FZConnection.RemoveFreeNotification(Self);
+  End;
+ FZConnection := Value;
+ FOldZeosBeforeConnect := Nil;
+ If FZConnection <> Nil Then
+  Begin
+   FZConnection.FreeNotification(Self);
+   FOldZeosBeforeConnect := FZConnection.BeforeConnect;
+   FZConnection.Protocol := 'restdw';
    FZConnection.BeforeConnect := {$IFDEF FPC}@{$ENDIF}OnRESTDWZeosBeforeConnect;
-  end;
-end;
+  End;
+End;
 
 end.

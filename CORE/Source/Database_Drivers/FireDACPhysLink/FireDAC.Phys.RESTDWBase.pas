@@ -1,6 +1,6 @@
 ﻿unit FireDAC.Phys.RESTDWBase;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -26,7 +26,7 @@ interface
 uses
   Classes, SysUtils, FireDAC.Phys, FireDAC.Stan.Intf, FireDAC.Phys.Intf,
   FireDAC.Phys.SQLGenerator, FireDAC.Stan.Util, FireDAC.Stan.Param,
-  FireDAC.DatS, FireDAC.Stan.Option, Variants, uRESTDWProtoTypes,
+  FireDAC.DatS, FireDAC.Stan.Option, FireDAC.Comp.Client, Variants, uRESTDWProtoTypes,
   uRESTDWBasicDB, DB, uRESTDWPoolermethod, FireDAC.Phys.RESTDWMeta,
   uRESTDWBasicTypes, FireDAC.Stan.Error, FireDAC.Stan.Consts,
   uRESTDWMassiveBuffer;
@@ -100,6 +100,7 @@ type
   TFDPhysRDWCommand = class(TFDPhysCommand)
   private
     FStream: TMemoryStream;
+    FDataSet: TFDMemTable;
     FColumnIndex: integer;
     FEncodeStrs: Boolean;
     FFieldCount: integer;
@@ -314,12 +315,14 @@ constructor TFDPhysRDWCommand.Create(AConnection: TFDPhysConnection);
 begin
   inherited Create(AConnection);
   FStream := TMemoryStream.Create;
+  FDataSet := TFDMemTable.Create(nil);
   FInfoMetada := TStringList.Create;
 end;
 
 destructor TFDPhysRDWCommand.Destroy;
 begin
   FInfoMetada.Free;
+  FDataSet.Free;
   FStream.Free;
   inherited;
 end;
@@ -433,39 +436,57 @@ end;
 procedure TFDPhysRDWCommand.InternalClose;
 begin
   FStream.Size := 0;
+  FDataSet.Close;
   FInfoMetada.Clear;
 end;
 
 function TFDPhysRDWCommand.InternalColInfoGet(var AColInfo
   : TFDPhysDataColumnInfo): Boolean;
 var
-  vBoolean : Boolean;
+  oFieldDef: TFieldDef;
+  datType: TFDDataType;
+  datSize: LongWord;
+  datPrec: integer;
+  datScale: integer;
+  datAttrs: TFDDataAttributes;
+  oFmtOpts: TFDFormatOptions;
 begin
+  Result := False;
   if GetMetaInfoKind <> mkNone then
-  begin
-    Result := False;
     Exit;
-  end;
-  if FStream.Size = 0 then
-  begin
-    Result := False;
+  if not FDataSet.Active then
     Exit;
-  end;
-  if FFieldCount = -1 then
-  begin
-    FStream.Position := 0;
-    FStream.Read(FFieldCount, SizeOf(integer));
-    SetLength(FFieldTypes, FFieldCount);
-    FStream.Read(vBoolean, SizeOf(vBoolean));
-    FEncodeStrs := vBoolean;
-  end;
-  if FColumnIndex >= FFieldCount then
-  begin
-    Result := False;
+  if FColumnIndex >= FDataSet.FieldDefs.Count then
     Exit;
-  end;
-  AColInfo := readFieldStream;
-  FColumnIndex := FColumnIndex + 1;
+
+  oFieldDef := FDataSet.FieldDefs[FColumnIndex];
+  oFmtOpts := FOptions.FormatOptions;
+  oFmtOpts.FieldDef2ColumnDef(oFieldDef.DataType, oFieldDef.Size,
+    oFieldDef.Precision, 0, datType, datSize, datPrec, datScale, datAttrs);
+
+  AColInfo.FSourceID := FColumnIndex;
+  AColInfo.FSourceName := oFieldDef.Name;
+  AColInfo.FOriginColName := oFieldDef.Name;
+  AColInfo.FSourceType := datType;
+  AColInfo.FType := datType;
+  AColInfo.FLen := datSize;
+  AColInfo.FPrec := datPrec;
+  AColInfo.FScale := datScale;
+  AColInfo.FAttrs := datAttrs + [caBase];
+  if not (faRequired in oFieldDef.Attributes) then
+    AColInfo.FAttrs := AColInfo.FAttrs + [caAllowNull];
+  if oFieldDef.DataType in [ftBlob, ftMemo, ftGraphic, ftWideMemo, ftOraBlob, ftOraClob] then
+    AColInfo.FAttrs := AColInfo.FAttrs + [caBlobData]
+  else
+    AColInfo.FAttrs := AColInfo.FAttrs + [caSearchable];
+  if oFieldDef.DataType in [ftFixedChar, ftFixedWideChar] then
+    AColInfo.FAttrs := AColInfo.FAttrs + [caFixedLen];
+  AColInfo.FForceRemOpts := [coReadOnly];
+  AColInfo.FForceAddOpts := AColInfo.FForceAddOpts - [coReadOnly];
+  if not (faRequired in oFieldDef.Attributes) then
+    AColInfo.FForceAddOpts := AColInfo.FForceAddOpts + [coAllowNull];
+
+  Inc(FColumnIndex);
   Result := True;
 end;
 
@@ -501,6 +522,8 @@ function TFDPhysRDWCommand.InternalFetchRowSet(ATable: TFDDatSTable;
   AParentRow: TFDDatSRow; ARowsetSize: LongWord): LongWord;
 var
   i: LongWord;
+  j: integer;
+  oRow: TFDDatSRow;
 begin
   Result := 0;
   if GetMetaInfoKind in [mkTables, mkTableFields, mkPrimaryKeyFields] then
@@ -510,25 +533,33 @@ begin
     begin
       FetchMetaRow(ATable, AParentRow, i - 1);
       Inc(Result);
-    end
+    end;
   end
   else if GetMetaInfoKind = mkNone then
   begin
-    if FRecordCount = -1 then
-    begin
-      if FStream.Position = 0 then
-        readStreamFields;
-      FStream.Read(FRecordCount, SizeOf(int64));
-    end;
+    if not FDataSet.Active then
+      Exit;
     for i := 1 to ARowsetSize do
     begin
-      if FStream.Position = FStream.Size then
-        FStream.Size := 0;
-      if FStream.Size = 0 then
+      if FDataSet.Eof then
         Break;
-      FetchRow(ATable, AParentRow);
+      oRow := ATable.NewRow(True);
+      try
+        for j := 0 to FDataSet.FieldCount - 1 do
+        begin
+          if FDataSet.Fields[j].IsNull then
+            oRow.SetData(j, Null)
+          else
+            oRow.SetData(j, FDataSet.Fields[j].Value);
+        end;
+        ATable.Rows.Add(oRow);
+      except
+        FDFree(oRow);
+        raise;
+      end;
+      FDataSet.Next;
       Inc(Result);
-    end
+    end;
   end;
 end;
 
@@ -665,11 +696,22 @@ begin
       try
         vRESTDataBase.ExecuteCommand(vPoolermethod, vSQL, vParams, vError,
           vMessageError, vDataSetList, vRowsAffected, exec, (not exec),
-          (not exec), False, vRESTDataBase.RESTClientPooler);
+          False, False, vRESTDataBase.RESTClientPooler);
 
         FStream.Size := 0;
         if (vDataSetList <> nil) and (not vDataSetList.IsNull) then
+        begin
           vDataSetList.SaveToStream(FStream);
+          if not exec then
+          begin
+            FStream.Position := 0;
+            FDataSet.Close;
+            FDataSet.LoadFromStream(FStream, sfBinary);
+            FDataSet.First;
+            FFieldCount := FDataSet.FieldDefs.Count;
+            FRecordCount := FDataSet.RecordCount;
+          end;
+        end;
       finally
         FreeAndNil(vDataSetList);
         vSQL.Free;

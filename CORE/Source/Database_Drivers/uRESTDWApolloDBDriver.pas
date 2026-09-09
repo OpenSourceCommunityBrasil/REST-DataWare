@@ -1,6 +1,6 @@
 ﻿unit uRESTDWApolloDBDriver;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -378,12 +378,14 @@ begin
   qry.Params[IParam].LoadFromStream(stream,blobtype);
 end;
 
-function TRESTDWApolloDBQuery.ParamCount: Integer;
-var
-  qry : TApolloQuery;
+function TRESTDWApolloDBQuery.ParamCount : Integer;
 begin
-  qry := TApolloQuery(Self.Owner);
-  Result := qry.ParamCount;
+ Result:=TApolloQuery(Self.Owner).ParamCount;
+ If (Result=0) and (Pos(':',SQL.Text)>0) Then
+  Begin
+   Prepare;
+   Result:=TApolloQuery(Self.Owner).ParamCount;
+  End;
 end;
 
 procedure TRESTDWApolloDBQuery.Prepare;
@@ -452,6 +454,14 @@ begin
     vDWMemtable.Free;
   end;
 end;
+
+Initialization
+ RegisterClass(TRESTDWApolloDBDriver);
+ RegisterRESTDWDriverClass(TRESTDWApolloDBDriver);
+
+Finalization
+ UnregisterRESTDWDriverClass(TRESTDWApolloDBDriver);
+ UnRegisterClass(TRESTDWApolloDBDriver);
 
 end.
 

@@ -1,6 +1,6 @@
 unit uRESTDWZToken;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {$IFNDEF FPC}
  {$I ZDbc.inc}

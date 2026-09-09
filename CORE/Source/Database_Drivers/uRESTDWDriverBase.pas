@@ -1,6 +1,6 @@
 ﻿unit uRESTDWDriverBase;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -198,6 +198,9 @@ Type
   Property SQL          : TStrings  Read getSQL;
  End;
   { TRESTDWDriverBase }
+  TRESTDWDriverBase = Class;
+  TRESTDWDriverBaseClass = Class Of TRESTDWDriverBase;
+
   TRESTDWDriverBase = Class(TRESTDWComponent)
  Private
   FConnection          : TComponent;
@@ -424,10 +427,61 @@ Type
   Property OnQueryException    : TOnQueryException       Read vOnQueryException      Write vOnQueryException;
  End;
 
+Procedure RegisterRESTDWDriverClass(AClass : TRESTDWDriverBaseClass);
+Procedure UnregisterRESTDWDriverClass(AClass : TRESTDWDriverBaseClass);
+Function FindRESTDWDriverClass(AConnection : TComponent) : TRESTDWDriverBaseClass;
+
 Implementation
 
 Uses
   uRESTDWBasicDB;
+
+Var
+ GRESTDWDriverClasses : TList;
+
+Procedure RegisterRESTDWDriverClass(AClass : TRESTDWDriverBaseClass);
+Begin
+ If AClass = Nil Then
+  Exit;
+ If GRESTDWDriverClasses = Nil Then
+  GRESTDWDriverClasses := TList.Create;
+ If GRESTDWDriverClasses.IndexOf(Pointer(AClass)) < 0 Then
+  GRESTDWDriverClasses.Add(Pointer(AClass));
+End;
+
+Procedure UnregisterRESTDWDriverClass(AClass : TRESTDWDriverBaseClass);
+Begin
+ If (GRESTDWDriverClasses = Nil) Or (AClass = Nil) Then
+  Exit;
+ GRESTDWDriverClasses.Remove(Pointer(AClass));
+End;
+
+Function FindRESTDWDriverClass(AConnection : TComponent) : TRESTDWDriverBaseClass;
+Var
+ I : Integer;
+ D : TRESTDWDriverBase;
+ C : TRESTDWDriverBaseClass;
+Begin
+ Result := Nil;
+ If AConnection = Nil Then
+  Exit;
+ If GRESTDWDriverClasses = Nil Then
+  Exit;
+ For I := 0 To GRESTDWDriverClasses.Count - 1 Do
+ Begin
+  C := TRESTDWDriverBaseClass(GRESTDWDriverClasses[I]);
+  D := C.Create(Nil);
+  Try
+   If D.compConnIsValid(AConnection) Then
+   Begin
+    Result := C;
+    Exit;
+   End;
+  Finally
+   D.Free;
+  End;
+ End;
+End;
 
 { TRESTDWDrvStoreProc }
 
@@ -725,27 +779,22 @@ Begin
 
 End;
 
-procedure TRESTDWDrvDataset.SaveToStreamCompatibleMode(stream: TStream);
-var
-  qry : TDataSet;
-  stor : TRESTDWStorageBin;
-begin
-  qry := TDataSet(Self.Owner);
-  if FStorageDataType = nil then begin
-    stor := TRESTDWStorageBin.Create(nil);
-    {$IFDEF FPC}
-    stor.DatabaseCharSet := DatabaseCharSet;
-    {$ENDIF}
-    try
-      stor.EncodeStrs := False;
-      stor.SaveToStream(qry, stream);
-    finally
-      stor.Free;
-    end;
-  end
-  else
-    FStorageDataType.SaveToStream(qry,stream);
-end;
+Procedure TRESTDWDrvDataset.SaveToStreamCompatibleMode(Stream : TStream);
+Var
+ Query   : TDataSet;
+ Storage : TRESTDWStorageBin;
+Begin
+ Query := TDataSet(Self.Owner);
+ Storage := TRESTDWStorageBin.Create(Nil);
+ {$IFDEF FPC}
+  Storage.DatabaseCharSet := DatabaseCharSet;
+ {$ENDIF}
+ Try
+  Storage.SaveDatasetToStream(Query, Stream);
+ Finally
+  Storage.Free;
+ End;
+End;
 
 procedure TRESTDWDrvDataset.setParamDataType(IParam: integer;
                                              AValue: TFieldType);
@@ -2884,7 +2933,6 @@ Var
 Begin
  If Not Assigned(TableNames) Then
   TableNames := TStringList.Create;
-
  TableNames.Sorted := True;
  vSchema := '';
 {
@@ -2948,6 +2996,8 @@ Begin
                     End;
 
    End;
+   If Not Assigned(qry) Then
+    Exit;
    While Not qry.Eof Do
     Begin
      vTable := Trim(qry.Fields[fdPos].AsString);
@@ -2956,7 +3006,8 @@ Begin
      qry.Next;
     End;
   Finally
-   FreeAndNil(qry);
+   If Assigned(qry) Then
+    FreeAndNil(qry);
   End;
   If Not vStateResource Then
    Disconect;
@@ -3045,6 +3096,8 @@ Begin
                      qry.Open;
                     End;
    End;
+   If Not Assigned(qry) Then
+    Exit;
    While Not qry.Eof Do
     Begin
      sFields := Trim(qry.Fields[fPos].AsString);
@@ -3215,7 +3268,8 @@ Begin
     end;
    End;
   Finally
-   FreeAndNil(qry);
+   If Assigned(qry) Then
+    FreeAndNil(qry);
   End;
   If Not vStateResource Then
    Disconect;
@@ -3289,6 +3343,8 @@ Begin
                      qry.Open;
                     End;
    End;
+   If Not Assigned(qry) Then
+    Exit;
    While Not qry.Eof Do
     Begin
      sProcs := Trim(qry.Fields[fPos].AsString);
@@ -3297,7 +3353,8 @@ Begin
      qry.Next;
     End;
   Finally
-   FreeAndNil(qry);
+   If Assigned(qry) Then
+    FreeAndNil(qry);
   End;
   If Not vStateResource Then
    Disconect;
@@ -3643,7 +3700,8 @@ Begin
                     End;
    End;
   Finally
-   FreeAndNil(qry);
+   If Assigned(qry) Then
+    FreeAndNil(qry);
   End;
   If Not vStateResource Then
    Disconect;
@@ -3861,7 +3919,7 @@ Begin
  Error           := False;
  BufferInStream  := TRESTDWBufferBase.Create;
  BufferOutStream := TRESTDWBufferBase.Create;
- vTempQuery      := getQuery(True);
+ vTempQuery      := getQuery(False);
  Try
   BufferInStream.LoadToStream(DatapackStream);
   vStateResource := isConnected;
@@ -3902,10 +3960,15 @@ Begin
     vTempQuery.Open;
     vStream := TMemoryStream.Create;
     Try
-     {$IFDEF FPC}
-      vTempQuery.DatabaseCharSet       := DatabaseCharSet;
-     {$ENDIF}
-     vTempQuery.SaveToStreamCompatibleMode(vStream);
+     If Not aBinaryCompatibleMode Then
+      vTempQuery.SaveToStream(vStream)
+     Else
+      Begin
+       {$IFDEF FPC}
+        vTempQuery.DatabaseCharSet       := DatabaseCharSet;
+       {$ENDIF}
+       vTempQuery.SaveToStreamCompatibleMode(vStream);
+      End;
      vStream.Position := 0;
      BufferOutStream.InputStream(vStream);
     Finally
@@ -5185,5 +5248,10 @@ procedure TRDWDrvParam.setValue(const AValue: Variant);
 begin
   FDrvDataset.setParamValue(FIdxParam,AValue);
 end;
+
+Initialization
+
+Finalization
+ FreeAndNil(GRESTDWDriverClasses);
 
 end.

@@ -1,6 +1,6 @@
 ﻿unit uRESTDWAnyDACDriver;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -188,6 +188,7 @@ begin
   qry.FormatOptions.StrsTrim       := StrsTrim;
   qry.FormatOptions.StrsEmpty2Null := StrsEmpty2Null;
   qry.FormatOptions.StrsTrim2Len   := StrsTrim2Len;
+  qry.ResourceOptions.ParamCreate  := True;
 
   Result := TRESTDWAnyDACQuery.Create(qry);
 end;
@@ -447,12 +448,14 @@ begin
   qry.Params[IParam].LoadFromStream(stream,blobtype);
 end;
 
-function TRESTDWAnyDACQuery.ParamCount: Integer;
-var
-  qry : TADQuery;
+function TRESTDWAnyDACQuery.ParamCount : Integer;
 begin
-  qry := TADQuery(Self.Owner);
-  Result := qry.ParamCount;
+ Result:=TADQuery(Self.Owner).ParamCount;
+ If (Result=0) and (Pos(':',SQL.Text)>0) Then
+  Begin
+   Prepare;
+   Result:=TADQuery(Self.Owner).ParamCount;
+  End;
 end;
 
 procedure TRESTDWAnyDACQuery.Prepare;
@@ -529,5 +532,13 @@ begin
 
   stream.Position := 0;
 end;
+
+Initialization
+ RegisterClass(TRESTDWAnyDACDriver);
+ RegisterRESTDWDriverClass(TRESTDWAnyDACDriver);
+
+Finalization
+ UnregisterRESTDWDriverClass(TRESTDWAnyDACDriver);
+ UnRegisterClass(TRESTDWAnyDACDriver);
 
 end.

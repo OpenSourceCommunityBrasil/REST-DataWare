@@ -1,6 +1,6 @@
 ﻿unit uRESTDWInterbaseDriver;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -186,12 +186,14 @@ begin
   qry.Params[IParam].LoadFromStream(stream,blobtype);
 end;
 
-function TRESTDWInterbaseQuery.ParamCount: Integer;
-var
-  qry : TIBQuery;
+function TRESTDWInterbaseQuery.ParamCount : Integer;
 begin
-  qry := TIBQuery(Self.Owner);
-  Result := qry.ParamCount;
+ Result:=TIBQuery(Self.Owner).ParamCount;
+ If (Result=0) and (Pos(':',SQL.Text)>0) Then
+  Begin
+   Prepare;
+   Result:=TIBQuery(Self.Owner).ParamCount;
+  End;
 end;
 
 procedure TRESTDWInterbaseQuery.Prepare;
@@ -441,6 +443,14 @@ begin
     FreeAndNil(memtable);
   end;
 end;
+
+Initialization
+ RegisterClass(TRESTDWInterbaseDriver);
+ RegisterRESTDWDriverClass(TRESTDWInterbaseDriver);
+
+Finalization
+ UnregisterRESTDWDriverClass(TRESTDWInterbaseDriver);
+ UnRegisterClass(TRESTDWInterbaseDriver);
 
 end.
 

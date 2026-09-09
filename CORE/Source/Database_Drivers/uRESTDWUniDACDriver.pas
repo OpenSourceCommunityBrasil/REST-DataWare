@@ -1,6 +1,6 @@
 ﻿unit uRESTDWUniDACDriver;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -29,7 +29,7 @@ uses
   {$IFDEF RESTDWLAZARUS}
     LResources,
   {$ENDIF}
-  Classes, SysUtils, DB,
+  Classes, SysUtils, DB, uRESTDWBasicdbTypes,
   MemDS, DBAccess, Uni, VirtualTable,
   uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWProtoTypes;
 
@@ -389,11 +389,13 @@ begin
 end;
 
 function TRESTDWUniDACQuery.ParamCount : Integer;
-var
-  qry : TUniQuery;
 begin
-  qry := TUniQuery(Self.Owner);
-  Result := qry.ParamCount;
+ Result:=TUniQuery(Self.Owner).ParamCount;
+ If (Result=0) and (Pos(':',SQL.Text)>0) Then
+  Begin
+   Prepare;
+   Result:=TUniQuery(Self.Owner).ParamCount;
+  End;
 end;
 
 function TRESTDWUniDACQuery.getParamDataType(IParam : integer) : TFieldType;
@@ -499,6 +501,14 @@ end;
 initialization
 {$I ..\RESTDWLazarusDrivers.lrs}
 {$ENDIF}
+
+Initialization
+ RegisterClass(TRESTDWUniDACDriver);
+ RegisterRESTDWDriverClass(TRESTDWUniDACDriver);
+
+Finalization
+ UnregisterRESTDWDriverClass(TRESTDWUniDACDriver);
+ UnRegisterClass(TRESTDWUniDACDriver);
 
 end.
 
