@@ -329,7 +329,7 @@
         <UnitName Value="uRESTDWAbout"/>
       </Item74>
       <Item75>
-        <Filename Value="..\..\Source\Basic\ZLib\uRESTDWZlib.pas"/>
+        <Filename Value="..\..\Source\Basic\uRESTDWZlib.pas"/>
         <UnitName Value="uRESTDWZlib"/>
       </Item75>
       <Item76>
