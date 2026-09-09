@@ -1,0 +1,302 @@
+[
+  {
+    "component": "TRESTDWAnyDACDriver",
+    "palette": "REST Dataware - Drivers",
+    "family": "DRIVER",
+    "registration_units": "Database_Drivers/uRESTDWAnyDACDriver.pas"
+  },
+  {
+    "component": "TRESTDWApolloDBDriver",
+    "palette": "REST Dataware - Drivers",
+    "family": "DRIVER",
+    "registration_units": "Database_Drivers/uRESTDWApolloDBDriver.pas"
+  },
+  {
+    "component": "TRESTDWAuthBasic",
+    "palette": "REST Dataware - Authenticators",
+    "family": "AUTH",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWAuthOAuth",
+    "palette": "REST Dataware - Authenticators",
+    "family": "AUTH",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWAuthToken",
+    "palette": "REST Dataware - Authenticators",
+    "family": "AUTH",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWBatchMove",
+    "palette": "REST Dataware - DB",
+    "family": "DATA",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWBufferDB",
+    "palette": "REST Dataware - Tools",
+    "family": "TOOLS",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWClientEvents",
+    "palette": "REST Dataware - Client",
+    "family": "CLIENT",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWClientSQL",
+    "palette": "REST Dataware - DB",
+    "family": "DATA",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWContextRules",
+    "palette": "REST Dataware - API",
+    "family": "API",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWFireDACDriver",
+    "palette": "REST Dataware - Drivers",
+    "family": "DRIVER",
+    "registration_units": "Database_Drivers/uRESTDWFireDACDriver.pas"
+  },
+  {
+    "component": "TRESTDWFireDACPhysLink",
+    "palette": "REST Dataware - PhysLink",
+    "family": "DRIVER",
+    "registration_units": "Database_Drivers/uRESTDWFireDACDriver.pas"
+  },
+  {
+    "component": "TRESTDWFpHttpFirebaseCloudMessaging",
+    "palette": "REST Dataware - Client",
+    "family": "FCM",
+    "registration_units": "Sockets/Fphttp/uRESTDWFphttpReg.pas"
+  },
+  {
+    "component": "TRESTDWHttpDefFirebaseCloudMessaging",
+    "palette": "REST Dataware - Client",
+    "family": "FCM",
+    "registration_units": "Sockets/HttpDef/uRESTDWHttpDefReg.pas"
+  },
+  {
+    "component": "TRESTDWHttpDefServicePooler",
+    "palette": "REST Dataware - Service",
+    "family": "SERVICE",
+    "registration_units": "Sockets/HttpDef/uRESTDWHttpDefReg.pas"
+  },
+  {
+    "component": "TRESTDWIBDACDriver",
+    "palette": "REST Dataware - Drivers",
+    "family": "DRIVER",
+    "registration_units": "Database_Drivers/uRESTDWIbDACDriver.pas"
+  },
+  {
+    "component": "TRESTDWIcsFirebaseCloudMessaging",
+    "palette": "REST Dataware - Client",
+    "family": "FCM",
+    "registration_units": "Sockets/Ics/uRESTDWIcsReg.pas"
+  },
+  {
+    "component": "TRESTDWIcsServicePooler",
+    "palette": "REST Dataware - Service",
+    "family": "SERVICE",
+    "registration_units": "Sockets/Ics/uRESTDWIcsReg.pas"
+  },
+  {
+    "component": "TRESTDWIdClientPooler",
+    "palette": "REST Dataware - Client",
+    "family": "CLIENT",
+    "registration_units": "Sockets/Indy/uRESTDWIdReg.pas"
+  },
+  {
+    "component": "TRESTDWIdClientREST",
+    "palette": "REST Dataware - Client",
+    "family": "CLIENT",
+    "registration_units": "Sockets/Indy/uRESTDWIdReg.pas"
+  },
+  {
+    "component": "TRESTDWIdDatabase",
+    "palette": "REST Dataware - DB",
+    "family": "DATA",
+    "registration_units": "Sockets/Indy/uRESTDWIdReg.pas"
+  },
+  {
+    "component": "TRESTDWIdFirebaseCloudMessaging",
+    "palette": "REST Dataware - Client",
+    "family": "FCM",
+    "registration_units": "Sockets/Indy/uRESTDWIdReg.pas"
+  },
+  {
+    "component": "TRESTDWIdPoolerList",
+    "palette": "REST Dataware - Service",
+    "family": "SERVICE",
+    "registration_units": "Sockets/Indy/uRESTDWIdReg.pas"
+  },
+  {
+    "component": "TRESTDWIdProxyRequest",
+    "palette": "REST Dataware - Service",
+    "family": "SERVICE",
+    "registration_units": "Sockets/Indy/uRESTDWIdReg.pas"
+  },
+  {
+    "component": "TRESTDWIdServicePooler",
+    "palette": "REST Dataware - Service",
+    "family": "SERVICE",
+    "registration_units": "Sockets/Indy/uRESTDWIdReg.pas"
+  },
+  {
+    "component": "TRESTDWInterbaseDriver",
+    "palette": "REST Dataware - Drivers",
+    "family": "DRIVER",
+    "registration_units": "Database_Drivers/uRESTDWInterbaseDriver.pas"
+  },
+  {
+    "component": "TRESTDWLazarusDriver",
+    "palette": "REST Dataware - Drivers",
+    "family": "DRIVER",
+    "registration_units": "Database_Drivers/uRESTDWLazarusDriver.pas"
+  },
+  {
+    "component": "TRESTDWMassiveCache",
+    "palette": "REST Dataware - DB",
+    "family": "DATA",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWMassiveSQLCache",
+    "palette": "REST Dataware - DB",
+    "family": "DATA",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWMemTable",
+    "palette": "REST Dataware - DB",
+    "family": "DATA",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWMyDACDriver",
+    "palette": "REST Dataware - Drivers",
+    "family": "DRIVER",
+    "registration_units": "Database_Drivers/uRESTDWMyDACDriver.pas"
+  },
+  {
+    "component": "TRESTDWPoolerDB",
+    "palette": "REST Dataware - DB",
+    "family": "DATA",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWResponseTranslator",
+    "palette": "REST Dataware - Tools",
+    "family": "TOOLS",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWSelfSigned",
+    "palette": "REST Dataware - Tools",
+    "family": "TOOLS",
+    "registration_units": "Plugins/SelfSigned/uRESTDWSelfSignedReg.pas"
+  },
+  {
+    "component": "TRESTDWServerContext",
+    "palette": "REST Dataware - API",
+    "family": "API",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWServerEvents",
+    "palette": "REST Dataware - API",
+    "family": "API",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWServerRoutes",
+    "palette": "REST Dataware - API",
+    "family": "API",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWServiceNotification",
+    "palette": "REST Dataware - Service",
+    "family": "SERVICE",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWShellService",
+    "palette": "REST Dataware - Service",
+    "family": "SERVICE",
+    "registration_units": "ShellTools/uRESTDWShellServicesRegDelphi.pas; ShellTools/uRESTDWShellServicesRegLazarus.pas"
+  },
+  {
+    "component": "TRESTDWStoredProcedure",
+    "palette": "REST Dataware - DB",
+    "family": "DATA",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWTable",
+    "palette": "REST Dataware - DB",
+    "family": "DATA",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWUniDACDriver",
+    "palette": "REST Dataware - Drivers",
+    "family": "DRIVER",
+    "registration_units": "Database_Drivers/uRESTDWUniDACDriver.pas"
+  },
+  {
+    "component": "TRESTDWUpdateSQL",
+    "palette": "REST Dataware - DB",
+    "family": "DATA",
+    "registration_units": "Basic/uRESTDWDesignReg.pas"
+  },
+  {
+    "component": "TRESTDWZeosDriver",
+    "palette": "REST Dataware - Drivers",
+    "family": "DRIVER",
+    "registration_units": "Database_Drivers/uRESTDWZeosDriver.pas"
+  },
+  {
+    "component": "TRESTDWZeosPhysLink",
+    "palette": "REST Dataware - PhysLink",
+    "family": "DRIVER",
+    "registration_units": "Database_Drivers/uRESTDWZeosDriver.pas"
+  },
+  {
+    "component": "TRESTDWfpHttpServicePooler",
+    "palette": "REST Dataware - Service",
+    "family": "SERVICE",
+    "registration_units": "Sockets/Fphttp/uRESTDWFphttpReg.pas"
+  },
+  {
+    "component": "TRESTDWjClientLAMWClientPooler",
+    "palette": "REST Dataware - Client",
+    "family": "CLIENT",
+    "registration_units": "Sockets/JClient_LAMW/uRESTDWjClientLAMWReg.pas"
+  },
+  {
+    "component": "TRESTDWjClientLAMWClientREST",
+    "palette": "REST Dataware - Client",
+    "family": "CLIENT",
+    "registration_units": "Sockets/JClient_LAMW/uRESTDWjClientLAMWReg.pas"
+  },
+  {
+    "component": "TRESTDWjClientLAMWDatabase",
+    "palette": "REST Dataware - DB",
+    "family": "DATA",
+    "registration_units": "Sockets/JClient_LAMW/uRESTDWjClientLAMWReg.pas"
+  },
+  {
+    "component": "TRESTDWjClientLAMWFirebaseCloudMessaging",
+    "palette": "REST Dataware - Client",
+    "family": "FCM",
+    "registration_units": "Sockets/JClient_LAMW/uRESTDWjClientLAMWReg.pas"
+  }
+]
