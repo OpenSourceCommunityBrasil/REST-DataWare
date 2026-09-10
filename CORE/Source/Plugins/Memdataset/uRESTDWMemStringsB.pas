@@ -1,20 +1,20 @@
-unit uRESTDWMemStringsB;
-{$I ..\..\Includes\uRESTDW.inc}
+Unit uRESTDWMemStringsB;
+{$I uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -26,8 +26,8 @@ unit uRESTDWMemStringsB;
  {$ASMMode Intel}
 {$ENDIF}
 
-interface
-uses
+Interface
+Uses
   {$IFDEF HAS_UNITSCOPE}
   {$IFDEF MSWINDOWS}
   Winapi.Windows,
@@ -50,10 +50,10 @@ uses
   uRESTDWMemBase, Math,
   uRESTDWPrototypes;
 // Exceptions
-type
-  EJclStringError = class(EJclError);
+Type
+  EJclStringError = Class(EJclError);
 // Character constants and sets
-const
+Const
   // Misc. often used character definitions
   NativeNull = Char(#0);
   NativeSoh = Char(#1);
@@ -95,7 +95,7 @@ const
   NativeDoubleQuote = Char('"');
   NativeSingleQuote = Char('''');
   NativeLineBreak = sLineBreak;
-const
+Const
   // CharType return values
   C1_UPPER = $0001; // Uppercase
   C1_LOWER = $0002; // Lowercase
@@ -119,173 +119,173 @@ const
   {$EXTERNALSYM C1_ALPHA}
   {$ENDIF SUPPORTS_EXTSYM}
   {$ENDIF MSWINDOWS}
-type
-  TCharValidator = function(const C: Char): Boolean;
-function ArrayContainsChar(const Chars: array of Char; const C: Char): Boolean; overload;
-function ArrayContainsChar(const Chars: array of Char; const C: Char; out Index: SizeInt): Boolean; overload;
+Type
+  TCharValidator = Function(Const C: Char): Boolean;
+Function ArrayContainsChar(Const Chars: array Of Char; Const C: Char): Boolean; overload;
+Function ArrayContainsChar(Const Chars: array Of Char; Const C: Char; out Index: SizeInt): Boolean; overload;
 // String Test Routines
-function StrIsAlpha(const S: string): Boolean;
-function StrIsAlphaNum(const S: string): Boolean;
-function StrIsAlphaNumUnderscore(const S: string): Boolean;
-function StrContainsChars(const S: string; const Chars: TCharValidator; CheckAll: Boolean): Boolean; overload;
-function StrContainsChars(const S: string; const Chars: array of Char; CheckAll: Boolean): Boolean; overload;
-function StrConsistsOfNumberChars(const S: string): Boolean;
-function StrIsDigit(const S: string): Boolean;
-function StrIsSubset(const S: string; const ValidChars: TCharValidator): Boolean; overload;
-function StrIsSubset(const S: string; const ValidChars: array of Char): Boolean; overload;
-function StrSame(const S1, S2: string; CaseSensitive: Boolean = False): Boolean;
+Function StrIsAlpha(Const S: string): Boolean;
+Function StrIsAlphaNum(Const S: string): Boolean;
+Function StrIsAlphaNumUnderscore(Const S: string): Boolean;
+Function StrContainsChars(Const S: string; Const Chars: TCharValidator; CheckAll: Boolean): Boolean; overload;
+Function StrContainsChars(Const S: string; Const Chars: array Of Char; CheckAll: Boolean): Boolean; overload;
+Function StrConsistsOfNumberChars(Const S: string): Boolean;
+Function StrIsDigit(Const S: string): Boolean;
+Function StrIsSubset(Const S: string; Const ValidChars: TCharValidator): Boolean; overload;
+Function StrIsSubset(Const S: string; Const ValidChars: array Of Char): Boolean; overload;
+Function StrSame(Const S1, S2: string; CaseSensitive: Boolean = False): Boolean;
 // String Transformation Routines
-function StrCenter(const S: string; L: SizeInt; C: Char = ' '): string;
-function StrCharPosLower(const S: string; CharPos: SizeInt): string;
-function StrCharPosUpper(const S: string; CharPos: SizeInt): string;
-function StrDoubleQuote(const S: string): string;
-function StrEnsureNoPrefix(const Prefix, Text: string): string;
-function StrEnsureNoSuffix(const Suffix, Text: string): string;
-function StrEnsurePrefix(const Prefix, Text: string): string;
-function StrEnsureSuffix(const Suffix, Text: string): string;
-function StrEscapedToString(const S: string): string;
-function StrLower(const S: string): string;
-procedure StrLowerInPlace(var S: string);
-procedure StrLowerBuff(S: PChar);
-procedure StrMove(var Dest: string; const Source: string; const ToIndex,
+Function StrCenter(Const S: string; L: SizeInt; C: Char = ' '): string;
+Function StrCharPosLower(Const S: string; CharPos: SizeInt): string;
+Function StrCharPosUpper(Const S: string; CharPos: SizeInt): string;
+Function StrDoubleQuote(Const S: string): string;
+Function StrEnsureNoPrefix(Const Prefix, Text: string): string;
+Function StrEnsureNoSuffix(Const Suffix, Text: string): string;
+Function StrEnsurePrefix(Const Prefix, Text: string): string;
+Function StrEnsureSuffix(Const Suffix, Text: string): string;
+Function StrEscapedToString(Const S: string): string;
+Function StrLower(Const S: string): string;
+Procedure StrLowerInPlace(Var S: string);
+Procedure StrLowerBuff(S: PChar);
+Procedure StrMove(Var Dest: string; Const Source: string; Const ToIndex,
   FromIndex, Count: SizeInt);
-function StrPadLeft(const S: string; Len: SizeInt; C: Char = NativeSpace): string;
-function StrPadRight(const S: string; Len: SizeInt; C: Char = NativeSpace): string;
-function StrProper(const S: string): string;
-procedure StrProperBuff(S: PChar);
-function StrQuote(const S: string; C: Char): string;
-function StrRemoveChars(const S: string; const Chars: TCharValidator): string; overload;
-function StrRemoveChars(const S: string; const Chars: array of Char): string; overload;
-function StrRemoveLeadingChars(const S: string; const Chars: TCharValidator): string; overload;
-function StrRemoveLeadingChars(const S: string; const Chars: array of Char): string; overload;
-function StrRemoveEndChars(const S: string; const Chars: TCharValidator): string; overload;
-function StrRemoveEndChars(const S: string; const Chars: array of Char): string; overload;
-function StrKeepChars(const S: string; const Chars: TCharValidator): string; overload;
-function StrKeepChars(const S: string; const Chars: array of Char): string; overload;
-procedure StrReplace(var S: string; const Search, Replace: string; Flags: TReplaceFlags = []);
-function StrReplaceChar(const S: string; const Source, Replace: Char): string;
-function StrReplaceChars(const S: string; const Chars: TCharValidator; Replace: Char): string; overload;
-function StrReplaceChars(const S: string; const Chars: array of Char; Replace: Char): string; overload;
-function StrReplaceButChars(const S: string; const Chars: TCharValidator; Replace: Char): string; overload;
-function StrReplaceButChars(const S: string; const Chars: array of Char; Replace: Char): string; overload;
-function StrRepeat(const S: string; Count: SizeInt): string;
-function StrReverse(const S: string): string;
-procedure StrReverseInPlace(var S: string);
-function StrSingleQuote(const S: string): string;
-procedure StrSkipChars(var S: PChar; const Chars: TCharValidator); overload;
-procedure StrSkipChars(var S: PChar; const Chars: array of Char); overload;
-procedure StrSkipChars(const S: string; var Index: SizeInt; const Chars: TCharValidator); overload;
-procedure StrSkipChars(const S: string; var Index: SizeInt; const Chars: array of Char); overload;
-function StrSmartCase(const S: string; const Delimiters: TCharValidator): string; overload;
-function StrSmartCase(const S: string; const Delimiters: array of Char): string; overload;
-function StrStringToEscaped(const S: string): string;
-function StrStripNonNumberChars(const S: string): string;
-function StrToHex(const Source: string): string;
-function StrTrimCharLeft(const S: string; C: Char): string;
-function StrTrimCharsLeft(const S: string; const Chars: TCharValidator): string; overload;
-function StrTrimCharsLeft(const S: string; const Chars: array of Char): string; overload;
-function StrTrimCharRight(const S: string; C: Char): string;
-function StrTrimCharsRight(const S: string; const Chars: TCharValidator): string; overload;
-function StrTrimCharsRight(const S: string; const Chars: array of Char): string; overload;
-function StrTrimQuotes(const S: string): string;
-function StrUpper(const S: string): string;
-procedure StrUpperInPlace(var S: string);
-procedure StrUpperBuff(S: PChar);
+Function StrPadLeft(Const S: string; Len: SizeInt; C: Char = NativeSpace): string;
+Function StrPadRight(Const S: string; Len: SizeInt; C: Char = NativeSpace): string;
+Function StrProper(Const S: string): string;
+Procedure StrProperBuff(S: PChar);
+Function StrQuote(Const S: string; C: Char): string;
+Function StrRemoveChars(Const S: string; Const Chars: TCharValidator): string; overload;
+Function StrRemoveChars(Const S: string; Const Chars: array Of Char): string; overload;
+Function StrRemoveLeadingChars(Const S: string; Const Chars: TCharValidator): string; overload;
+Function StrRemoveLeadingChars(Const S: string; Const Chars: array Of Char): string; overload;
+Function StrRemoveEndChars(Const S: string; Const Chars: TCharValidator): string; overload;
+Function StrRemoveEndChars(Const S: string; Const Chars: array Of Char): string; overload;
+Function StrKeepChars(Const S: string; Const Chars: TCharValidator): string; overload;
+Function StrKeepChars(Const S: string; Const Chars: array Of Char): string; overload;
+Procedure StrReplace(Var S: string; Const Search, Replace: string; Flags: TReplaceFlags = []);
+Function StrReplaceChar(Const S: string; Const Source, Replace: Char): string;
+Function StrReplaceChars(Const S: string; Const Chars: TCharValidator; Replace: Char): string; overload;
+Function StrReplaceChars(Const S: string; Const Chars: array Of Char; Replace: Char): string; overload;
+Function StrReplaceButChars(Const S: string; Const Chars: TCharValidator; Replace: Char): string; overload;
+Function StrReplaceButChars(Const S: string; Const Chars: array Of Char; Replace: Char): string; overload;
+Function StrRepeat(Const S: string; Count: SizeInt): string;
+Function StrReverse(Const S: string): string;
+Procedure StrReverseInPlace(Var S: string);
+Function StrSingleQuote(Const S: string): string;
+Procedure StrSkipChars(Var S: PChar; Const Chars: TCharValidator); overload;
+Procedure StrSkipChars(Var S: PChar; Const Chars: array Of Char); overload;
+Procedure StrSkipChars(Const S: string; Var Index: SizeInt; Const Chars: TCharValidator); overload;
+Procedure StrSkipChars(Const S: string; Var Index: SizeInt; Const Chars: array Of Char); overload;
+Function StrSmartCase(Const S: string; Const Delimiters: TCharValidator): string; overload;
+Function StrSmartCase(Const S: string; Const Delimiters: array Of Char): string; overload;
+Function StrStringToEscaped(Const S: string): string;
+Function StrStripNonNumberChars(Const S: string): string;
+Function StrToHex(Const Source: string): string;
+Function StrTrimCharLeft(Const S: string; C: Char): string;
+Function StrTrimCharsLeft(Const S: string; Const Chars: TCharValidator): string; overload;
+Function StrTrimCharsLeft(Const S: string; Const Chars: array Of Char): string; overload;
+Function StrTrimCharRight(Const S: string; C: Char): string;
+Function StrTrimCharsRight(Const S: string; Const Chars: TCharValidator): string; overload;
+Function StrTrimCharsRight(Const S: string; Const Chars: array Of Char): string; overload;
+Function StrTrimQuotes(Const S: string): string;
+Function StrUpper(Const S: string): string;
+Procedure StrUpperInPlace(Var S: string);
+Procedure StrUpperBuff(S: PChar);
 // String Management
-procedure StrAddRef(var S: string);
-procedure StrDecRef(var S: string);
-function StrLength(const S: string): SizeInt;
-function StrRefCount(const S: string): SizeInt;
+Procedure StrAddRef(Var S: string);
+Procedure StrDecRef(Var S: string);
+Function StrLength(Const S: string): SizeInt;
+Function StrRefCount(Const S: string): SizeInt;
 // String Search and Replace Routines
-function StrCharCount(const S: string; C: Char): SizeInt; overload;
-function StrCharsCount(const S: string; const Chars: TCharValidator): SizeInt; overload;
-function StrCharsCount(const S: string; const Chars: array of Char): SizeInt; overload;
-function StrStrCount(const S, SubS: string): SizeInt;
-function StrCompare(const S1, S2: string; CaseSensitive: Boolean = False): SizeInt;
-function StrCompareRange(const S1, S2: string; Index, Count: SizeInt; CaseSensitive: Boolean = True): SizeInt;
-function StrCompareRangeEx(const S1, S2: string; Index, Count: SizeInt; CaseSensitive: Boolean): SizeInt;
-procedure StrFillChar(var S; Count: SizeInt; C: Char);
-function StrRepeatChar(C: Char; Count: SizeInt): string;
-function StrFind(const Substr, S: string; const Index: SizeInt = 1): SizeInt;
-function StrHasPrefix(const S: string; const Prefixes: array of string): Boolean;
-function StrHasSuffix(const S: string; const Suffixes: array of string): Boolean;
-function StrIndex(const S: string; const List: array of string; CaseSensitive: Boolean = False): SizeInt;
-function StrIHasPrefix(const S: string; const Prefixes: array of string): Boolean;
-function StrIHasSuffix(const S: string; const Suffixes: array of string): Boolean;
-function StrILastPos(const SubStr, S: string): SizeInt;
-function StrIPos(const SubStr, S: string): SizeInt;
-function StrIPrefixIndex(const S: string; const Prefixes: array of string): SizeInt;
-function StrIsOneOf(const S: string; const List: array of string): Boolean;
-function StrISuffixIndex(const S: string; const Suffixes: array of string): SizeInt;
-function StrLastPos(const SubStr, S: string): SizeInt;
-function StrMatch(const Substr, S: string; Index: SizeInt = 1): SizeInt;
-function StrMatches(const Substr, S: string; const Index: SizeInt = 1): Boolean;
-function StrNIPos(const S, SubStr: string; N: SizeInt): SizeInt;
-function StrNPos(const S, SubStr: string; N: SizeInt): SizeInt;
-function StrPrefixIndex(const S: string; const Prefixes: array of string): SizeInt;
-function StrSearch(const Substr, S: string; const Index: SizeInt = 1): SizeInt;
-function StrSuffixIndex(const S: string; const Suffixes: array of string): SizeInt;
+Function StrCharCount(Const S: string; C: Char): SizeInt; overload;
+Function StrCharsCount(Const S: string; Const Chars: TCharValidator): SizeInt; overload;
+Function StrCharsCount(Const S: string; Const Chars: array Of Char): SizeInt; overload;
+Function StrStrCount(Const S, SubS: string): SizeInt;
+Function StrCompare(Const S1, S2: string; CaseSensitive: Boolean = False): SizeInt;
+Function StrCompareRange(Const S1, S2: string; Index, Count: SizeInt; CaseSensitive: Boolean = True): SizeInt;
+Function StrCompareRangeEx(Const S1, S2: string; Index, Count: SizeInt; CaseSensitive: Boolean): SizeInt;
+Procedure StrFillChar(Var S; Count: SizeInt; C: Char);
+Function StrRepeatChar(C: Char; Count: SizeInt): string;
+Function StrFind(Const Substr, S: string; Const Index: SizeInt = 1): SizeInt;
+Function StrHasPrefix(Const S: string; Const Prefixes: array Of string): Boolean;
+Function StrHasSuffix(Const S: string; Const Suffixes: array Of string): Boolean;
+Function StrIndex(Const S: string; Const List: array Of string; CaseSensitive: Boolean = False): SizeInt;
+Function StrIHasPrefix(Const S: string; Const Prefixes: array Of string): Boolean;
+Function StrIHasSuffix(Const S: string; Const Suffixes: array Of string): Boolean;
+Function StrILastPos(Const SubStr, S: string): SizeInt;
+Function StrIPos(Const SubStr, S: string): SizeInt;
+Function StrIPrefixIndex(Const S: string; Const Prefixes: array Of string): SizeInt;
+Function StrIsOneOf(Const S: string; Const List: array Of string): Boolean;
+Function StrISuffixIndex(Const S: string; Const Suffixes: array Of string): SizeInt;
+Function StrLastPos(Const SubStr, S: string): SizeInt;
+Function StrMatch(Const Substr, S: string; Index: SizeInt = 1): SizeInt;
+Function StrMatches(Const Substr, S: string; Const Index: SizeInt = 1): Boolean;
+Function StrNIPos(Const S, SubStr: string; N: SizeInt): SizeInt;
+Function StrNPos(Const S, SubStr: string; N: SizeInt): SizeInt;
+Function StrPrefixIndex(Const S: string; Const Prefixes: array Of string): SizeInt;
+Function StrSearch(Const Substr, S: string; Const Index: SizeInt = 1): SizeInt;
+Function StrSuffixIndex(Const S: string; Const Suffixes: array Of string): SizeInt;
 // String Extraction
 /// Returns the string after SubStr
-function StrAfter(const SubStr, S: string): string;
+Function StrAfter(Const SubStr, S: string): string;
 /// Returns the String before SubStr
-function StrBefore(const SubStr, S: string): string;
+Function StrBefore(Const SubStr, S: string): string;
 /// Splits a string at SubStr, returns true when SubStr is found, Left contains the
 /// string before the SubStr and Right the string behind SubStr
-function StrSplit(const SubStr, S: string;var Left, Right : string): boolean;
+Function StrSplit(Const SubStr, S: string;Var Left, Right : string): boolean;
 /// Returns the string between Start and Stop
-function StrBetween(const S: string; const Start, Stop: Char): string;
+Function StrBetween(Const S: string; Const Start, Stop: Char): string;
 /// Returns all but rightmost N characters of the string
-function StrChopRight(const S: string; N: SizeInt): string;{$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
+Function StrChopRight(Const S: string; N: SizeInt): string;{$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
 /// Returns the left Count characters of the string
-function StrLeft(const S: string; Count: SizeInt): string; {$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
+Function StrLeft(Const S: string; Count: SizeInt): string; {$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
 /// Returns the string starting from position Start for the Count Characters
-function StrMid(const S: string; Start, Count: SizeInt): string; {$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
+Function StrMid(Const S: string; Start, Count: SizeInt): string; {$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
 /// Returns the string starting from position N to the end
-function StrRestOf(const S: string; N: SizeInt): string;{$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
+Function StrRestOf(Const S: string; N: SizeInt): string;{$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
 /// Returns the right Count characters of the string
-function StrRight(const S: string; Count: SizeInt): string;{$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
+Function StrRight(Const S: string; Count: SizeInt): string;{$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
 // Character Test Routines
-function CharEqualNoCase(const C1, C2: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsAlpha(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsAlphaNum(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsBlank(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsControl(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsDelete(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsDigit(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsFracDigit(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsHexDigit(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsLower(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsNumberChar(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
-function CharIsNumber(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
-function CharIsPrintable(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsPunctuation(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsReturn(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsSpace(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsUpper(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsValidIdentifierLetter(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsWhiteSpace(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsWildcard(const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharType(const C: Char): Word;
+Function CharEqualNoCase(Const C1, C2: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsAlpha(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsAlphaNum(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsBlank(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsControl(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsDelete(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsDigit(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsFracDigit(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsHexDigit(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsLower(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsNumberChar(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
+Function CharIsNumber(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} {$IFDEF COMPILER16_UP} inline; {$ENDIF} {$ENDIF}
+Function CharIsPrintable(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsPunctuation(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsReturn(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsSpace(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsUpper(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsValidIdentifierLetter(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsWhiteSpace(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsWildcard(Const C: Char): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharType(Const C: Char): Word;
 // Character Transformation Routines
-function CharHex(const C: Char): Byte;
-function CharLower(const C: Char): Char; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharUpper(const C: Char): Char; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharToggleCase(const C: Char): Char;
+Function CharHex(Const C: Char): Byte;
+Function CharLower(Const C: Char): Char; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharUpper(Const C: Char): Char; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharToggleCase(Const C: Char): Char;
 // Character Search and Replace
-function CharPos(const S: string; const C: Char; const Index: SizeInt = 1): SizeInt;
-function CharLastPos(const S: string; const C: Char; const Index: SizeInt = 1): SizeInt;
-function CharIPos(const S: string; C: Char; const Index: SizeInt = 1): SizeInt;
-function CharReplace(var S: string; const Search, Replace: Char): SizeInt;
+Function CharPos(Const S: string; Const C: Char; Const Index: SizeInt = 1): SizeInt;
+Function CharLastPos(Const S: string; Const C: Char; Const Index: SizeInt = 1): SizeInt;
+Function CharIPos(Const S: string; C: Char; Const Index: SizeInt = 1): SizeInt;
+Function CharReplace(Var S: string; Const Search, Replace: Char): SizeInt;
 // PCharVector
-type
+Type
   PCharVector = ^PChar;
-function StringsToPCharVector(var Dest: PCharVector; const Source: TStrings): PCharVector;
-function PCharVectorCount(Source: PCharVector): SizeInt;
-procedure PCharVectorToStrings(const Dest: TStrings; Source: PCharVector);
-procedure FreePCharVector(var Dest: PCharVector);
+Function StringsToPCharVector(Var Dest: PCharVector; Const Source: TStrings): PCharVector;
+Function PCharVectorCount(Source: PCharVector): SizeInt;
+Procedure PCharVectorToStrings(Const Dest: TStrings; Source: PCharVector);
+Procedure FreePCharVector(Var Dest: PCharVector);
 // MultiSz Routines
-type
+Type
   PMultiSz = PChar;
   PAnsiMultiSz = uRESTDWMemAnsiStrings.PAnsiMultiSz;
   PWideMultiSz = uRESTDWMemWideStrings.PWideMultiSz;
@@ -293,183 +293,183 @@ type
   TWideStrings = uRESTDWMemWideStrings.TJclWideStrings;
   TAnsiStringList = uRESTDWMemAnsiStrings.TJclAnsiStringList;
   TWideStringList = uRESTDWMemWideStrings.TJclWideStringList;
-function StringsToMultiSz(var Dest: PMultiSz; const Source: TStrings): PMultiSz;
-procedure MultiSzToStrings(const Dest: TStrings; const Source: PMultiSz);
-function MultiSzLength(const Source: PMultiSz): SizeInt;
-procedure AllocateMultiSz(var Dest: PMultiSz; Len: SizeInt);
-procedure FreeMultiSz(var Dest: PMultiSz);
-function MultiSzDup(const Source: PMultiSz): PMultiSz;
+Function StringsToMultiSz(Var Dest: PMultiSz; Const Source: TStrings): PMultiSz;
+Procedure MultiSzToStrings(Const Dest: TStrings; Const Source: PMultiSz);
+Function MultiSzLength(Const Source: PMultiSz): SizeInt;
+Procedure AllocateMultiSz(Var Dest: PMultiSz; Len: SizeInt);
+Procedure FreeMultiSz(Var Dest: PMultiSz);
+Function MultiSzDup(Const Source: PMultiSz): PMultiSz;
  {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-procedure AllocateAnsiMultiSz(var Dest: PAnsiMultiSz; Len: SizeInt); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-procedure FreeAnsiMultiSz(var Dest: PAnsiMultiSz); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-procedure AllocateWideMultiSz(var Dest: PWideMultiSz; Len: SizeInt); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-procedure FreeWideMultiSz(var Dest: PWideMultiSz); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Procedure AllocateAnsiMultiSz(Var Dest: PAnsiMultiSz; Len: SizeInt); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Procedure FreeAnsiMultiSz(Var Dest: PAnsiMultiSz); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Procedure AllocateWideMultiSz(Var Dest: PWideMultiSz; Len: SizeInt); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Procedure FreeWideMultiSz(Var Dest: PWideMultiSz); {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
 // TStrings Manipulation
-procedure StrIToStrings(S, Sep: string; const List: TStrings; const AllowEmptyString: Boolean = True);
-procedure StrToStrings(S, Sep: string; const List: TStrings; const AllowEmptyString: Boolean = True);
-function StringsToStr(const List: TStrings; const Sep: string; const AllowEmptyString: Boolean = True): string; overload;
-function StringsToStr(const List: TStrings; const Sep: string; const NumberOfItems: SizeInt; const AllowEmptyString:
+Procedure StrIToStrings(S, Sep: string; Const List: TStrings; Const AllowEmptyString: Boolean = True);
+Procedure StrToStrings(S, Sep: string; Const List: TStrings; Const AllowEmptyString: Boolean = True);
+Function StringsToStr(Const List: TStrings; Const Sep: string; Const AllowEmptyString: Boolean = True): string; overload;
+Function StringsToStr(Const List: TStrings; Const Sep: string; Const NumberOfItems: SizeInt; Const AllowEmptyString:
     Boolean = True): string; overload;
-procedure TrimStrings(const List: TStrings; DeleteIfEmpty: Boolean = True);
-procedure TrimStringsRight(const List: TStrings; DeleteIfEmpty: Boolean = True);
-procedure TrimStringsLeft(const List: TStrings; DeleteIfEmpty: Boolean = True);
-function AddStringToStrings(const S: string; Strings: TStrings; const Unique: Boolean): Boolean;
+Procedure TrimStrings(Const List: TStrings; DeleteIfEmpty: Boolean = True);
+Procedure TrimStringsRight(Const List: TStrings; DeleteIfEmpty: Boolean = True);
+Procedure TrimStringsLeft(Const List: TStrings; DeleteIfEmpty: Boolean = True);
+Function AddStringToStrings(Const S: string; Strings: TStrings; Const Unique: Boolean): Boolean;
 // Miscellaneous
 // (OF) moved to JclSysUtils
 // function BooleanToStr(B: Boolean): string;
  // DWString here because it is binary data
-function FileToString(const FileName: string): {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
-procedure StringToFile(const FileName: string; const Contents: {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
+Function FileToString(Const FileName: string): {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
+Procedure StringToFile(Const FileName: string; Const Contents: {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
   Append: Boolean = False);
-function StrToken(var S: string; Separator: Char): string;
-procedure StrTokens(const S: string; const List: TStrings);
-procedure StrTokenToStrings(S: string; Separator: Char; const List: TStrings);
-function StrWord(const S: string; var Index: SizeInt; out Word: string): Boolean; overload;
-function StrWord(var S: PChar; out Word: string): Boolean; overload;
-function StrIdent(const S: string; var Index: SizeInt; out Ident: string): Boolean; overload;
-function StrIdent(var S: PChar; out Ident: string): Boolean; overload;
-function StrToFloatSafe(const S: string): Float;
-function StrToIntSafe(const S: string): Integer;
-procedure StrNormIndex(const StrLen: SizeInt; var Index: SizeInt; var Count: SizeInt); overload;
-function ArrayOf(List: TStrings): TDynStringArray; overload;
-type
-  FormatException = class(EJclError);
-  ArgumentException = class(EJclError);
-  ArgumentNullException = class(EJclError);
-  ArgumentOutOfRangeException = class(EJclError);
-  IToString = interface
+Function StrToken(Var S: string; Separator: Char): string;
+Procedure StrTokens(Const S: string; Const List: TStrings);
+Procedure StrTokenToStrings(S: string; Separator: Char; Const List: TStrings);
+Function StrWord(Const S: string; Var Index: SizeInt; out Word: string): Boolean; overload;
+Function StrWord(Var S: PChar; out Word: string): Boolean; overload;
+Function StrIdent(Const S: string; Var Index: SizeInt; out Ident: string): Boolean; overload;
+Function StrIdent(Var S: PChar; out Ident: string): Boolean; overload;
+Function StrToFloatSafe(Const S: string): Float;
+Function StrToIntSafe(Const S: string): Integer;
+Procedure StrNormIndex(Const StrLen: SizeInt; Var Index: SizeInt; Var Count: SizeInt); overload;
+Function ArrayOf(List: TStrings): TDynStringArray; overload;
+Type
+  FormatException = Class(EJclError);
+  ArgumentException = Class(EJclError);
+  ArgumentNullException = Class(EJclError);
+  ArgumentOutOfRangeException = Class(EJclError);
+  IToString = Interface
     ['{C4ABABB4-1029-46E7-B5FA-99800F130C05}']
-    function ToString: string;
-  end;
-  TCharDynArray = array of Char;
+    Function ToString: string;
+  End;
+  TCharDynArray = array Of Char;
   // The TStringBuilder class is a Delphi implementation of the .NET
   // System.Text.StringBuilder.
   // It is zero based and the methods that have a TObject argument (Append, Insert,
   // AppendFormat) are limited to IToString implementors or Delphi 2009+ RTL.
   // This class is not threadsafe. Any instance of TStringBuilder should not
   // be used in different threads at the same time.
-  TJclStringBuilder = class(TInterfacedObject, IToString)
-  private
+  TJclStringBuilder = Class(TInterfacedObject, IToString)
+  Private
     FChars: TCharDynArray;
     FLength: SizeInt;
     FMaxCapacity: SizeInt;
-    function GetCapacity: SizeInt;
-    procedure SetCapacity(const Value: SizeInt);
-    function GetChars(Index: SizeInt): Char;
-    procedure SetChars(Index: SizeInt; const Value: Char);
-    procedure Set_Length(const Value: SizeInt);
-  protected
-    function AppendPChar(Value: PChar; Count: SizeInt; RepeatCount: SizeInt = 1): TJclStringBuilder;
-    function InsertPChar(Index: SizeInt; Value: PChar; Count: SizeInt; RepeatCount: SizeInt = 1): TJclStringBuilder;
-  public
-    constructor Create(const Value: string; Capacity: SizeInt = 16); overload;
-    constructor Create(Capacity: SizeInt = 16; MaxCapacity: SizeInt = MaxInt); overload;
-    constructor Create(const Value: string; StartIndex, Length, Capacity: SizeInt); overload;
-    function Append(const Value: string): TJclStringBuilder; overload;
-    function Append(const Value: string; StartIndex, Length: SizeInt): TJclStringBuilder; overload;
-    function Append(Value: Boolean): TJclStringBuilder; overload;
-    function Append(Value: Char; RepeatCount: SizeInt = 1): TJclStringBuilder; overload;
-    function Append(const Value: array of Char): TJclStringBuilder; overload;
-    function Append(const Value: array of Char; StartIndex, Length: SizeInt): TJclStringBuilder; overload;
-    function Append(Value: Cardinal): TJclStringBuilder; overload;
-    function Append(Value: Integer): TJclStringBuilder; overload;
-    function Append(Value: Double): TJclStringBuilder; overload;
-    function Append(Value: Int64): TJclStringBuilder; overload;
-    function Append(Obj: TObject): TJclStringBuilder; overload;
-    function AppendFormat(const Fmt: string; const Args: array of const): TJclStringBuilder; overload;
-    function AppendFormat(const Fmt: string; Arg0: Variant): TJclStringBuilder; overload;
-    function AppendFormat(const Fmt: string; Arg0, Arg1: Variant): TJclStringBuilder; overload;
-    function AppendFormat(const Fmt: string; Arg0, Arg1, Arg2: Variant): TJclStringBuilder; overload;
-    function Insert(Index: SizeInt; const Value: string; Count: SizeInt = 1): TJclStringBuilder; overload;
-    function Insert(Index: SizeInt; Value: Boolean): TJclStringBuilder; overload;
-    function Insert(Index: SizeInt; const Value: array of Char): TJclStringBuilder; overload;
-    function Insert(Index: SizeInt; const Value: array of Char; StartIndex, Length: SizeInt): TJclStringBuilder;
+    Function GetCapacity: SizeInt;
+    Procedure SetCapacity(Const Value: SizeInt);
+    Function GetChars(Index: SizeInt): Char;
+    Procedure SetChars(Index: SizeInt; Const Value: Char);
+    Procedure Set_Length(Const Value: SizeInt);
+  Protected
+    Function AppendPChar(Value: PChar; Count: SizeInt; RepeatCount: SizeInt = 1): TJclStringBuilder;
+    Function InsertPChar(Index: SizeInt; Value: PChar; Count: SizeInt; RepeatCount: SizeInt = 1): TJclStringBuilder;
+  Public
+    Constructor Create(Const Value: string; Capacity: SizeInt = 16); overload;
+    Constructor Create(Capacity: SizeInt = 16; MaxCapacity: SizeInt = MaxInt); overload;
+    Constructor Create(Const Value: string; StartIndex, Length, Capacity: SizeInt); overload;
+    Function Append(Const Value: string): TJclStringBuilder; overload;
+    Function Append(Const Value: string; StartIndex, Length: SizeInt): TJclStringBuilder; overload;
+    Function Append(Value: Boolean): TJclStringBuilder; overload;
+    Function Append(Value: Char; RepeatCount: SizeInt = 1): TJclStringBuilder; overload;
+    Function Append(Const Value: array Of Char): TJclStringBuilder; overload;
+    Function Append(Const Value: array Of Char; StartIndex, Length: SizeInt): TJclStringBuilder; overload;
+    Function Append(Value: Cardinal): TJclStringBuilder; overload;
+    Function Append(Value: Integer): TJclStringBuilder; overload;
+    Function Append(Value: Double): TJclStringBuilder; overload;
+    Function Append(Value: Int64): TJclStringBuilder; overload;
+    Function Append(Obj: TObject): TJclStringBuilder; overload;
+    Function AppendFormat(Const Fmt: string; Const Args: array Of Const): TJclStringBuilder; overload;
+    Function AppendFormat(Const Fmt: string; Arg0: Variant): TJclStringBuilder; overload;
+    Function AppendFormat(Const Fmt: string; Arg0, Arg1: Variant): TJclStringBuilder; overload;
+    Function AppendFormat(Const Fmt: string; Arg0, Arg1, Arg2: Variant): TJclStringBuilder; overload;
+    Function Insert(Index: SizeInt; Const Value: string; Count: SizeInt = 1): TJclStringBuilder; overload;
+    Function Insert(Index: SizeInt; Value: Boolean): TJclStringBuilder; overload;
+    Function Insert(Index: SizeInt; Const Value: array Of Char): TJclStringBuilder; overload;
+    Function Insert(Index: SizeInt; Const Value: array Of Char; StartIndex, Length: SizeInt): TJclStringBuilder;
       overload;
-    function Insert(Index: SizeInt; Value: Cardinal): TJclStringBuilder; overload;
-    function Insert(Index: SizeInt; Value: Integer): TJclStringBuilder; overload;
-    function Insert(Index: SizeInt; Value: Double): TJclStringBuilder; overload;
-    function Insert(Index: SizeInt; Value: Int64): TJclStringBuilder; overload;
-    function Insert(Index: SizeInt; Obj: TObject): TJclStringBuilder; overload;
-    function Replace(OldChar, NewChar: Char; StartIndex: SizeInt = 0; Count: SizeInt = -1): TJclStringBuilder;
+    Function Insert(Index: SizeInt; Value: Cardinal): TJclStringBuilder; overload;
+    Function Insert(Index: SizeInt; Value: Integer): TJclStringBuilder; overload;
+    Function Insert(Index: SizeInt; Value: Double): TJclStringBuilder; overload;
+    Function Insert(Index: SizeInt; Value: Int64): TJclStringBuilder; overload;
+    Function Insert(Index: SizeInt; Obj: TObject): TJclStringBuilder; overload;
+    Function Replace(OldChar, NewChar: Char; StartIndex: SizeInt = 0; Count: SizeInt = -1): TJclStringBuilder;
       overload;
-    function Replace(OldValue, NewValue: string; StartIndex: SizeInt = 0; Count: SizeInt = -1): TJclStringBuilder;
+    Function Replace(OldValue, NewValue: string; StartIndex: SizeInt = 0; Count: SizeInt = -1): TJclStringBuilder;
       overload;
-    function Remove(StartIndex, Length: SizeInt): TJclStringBuilder;
-    function EnsureCapacity(Capacity: SizeInt): SizeInt;
-    procedure Clear;
+    Function Remove(StartIndex, Length: SizeInt): TJclStringBuilder;
+    Function EnsureCapacity(Capacity: SizeInt): SizeInt;
+    Procedure Clear;
     { IToString }
-    function ToString: string; {$IFDEF RTL200_UP} override; {$ENDIF RTL200_UP}
+    Function ToString: string; {$IFDEF RTL200_UP} override; {$ENDIF RTL200_UP}
     property __Chars__[Index: SizeInt]: Char read GetChars write SetChars; default;
     property Chars: TCharDynArray read FChars;
     property Length: SizeInt read FLength write Set_Length;
     property Capacity: SizeInt read GetCapacity write SetCapacity;
     property MaxCapacity: SizeInt read FMaxCapacity;
-  end;
+  End;
   {$IFDEF RTL200_UP}
   TStringBuilder = {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}SysUtils.TStringBuilder;
   {$ELSE ~RTL200_UP}
   TStringBuilder = TJclStringBuilder;
   {$ENDIF ~RTL200_UP}
 // DotNetFormat() uses the .NET format style: "{argX}"
-function DotNetFormat(const Fmt: string; const Args: array of const): string; overload;
-function DotNetFormat(const Fmt: string; const Arg0: Variant): string; overload;
-function DotNetFormat(const Fmt: string; const Arg0, Arg1: Variant): string; overload;
-function DotNetFormat(const Fmt: string; const Arg0, Arg1, Arg2: Variant): string; overload;
+Function DotNetFormat(Const Fmt: string; Const Args: array Of Const): string; overload;
+Function DotNetFormat(Const Fmt: string; Const Arg0: Variant): string; overload;
+Function DotNetFormat(Const Fmt: string; Const Arg0, Arg1: Variant): string; overload;
+Function DotNetFormat(Const Fmt: string; Const Arg0, Arg1, Arg2: Variant): string; overload;
 // TJclTabSet
-type
-  TJclTabSet = class (TInterfacedObject, IToString)
-  private
+Type
+  TJclTabSet = Class (TInterfacedObject, IToString)
+  Private
     FData: TObject;
-    function GetCount: SizeInt;
-    function GetStops(Index: SizeInt): SizeInt;
-    function GetTabWidth: SizeInt;
-    function GetZeroBased: Boolean;
-    procedure SetStops(Index, Value: SizeInt);
-    procedure SetTabWidth(Value: SizeInt);
-    procedure SetZeroBased(Value: Boolean);
-  protected
-    function FindStop(Column: SizeInt): SizeInt;
-    function InternalTabStops: TDynSizeIntArray;
-    function InternalTabWidth: SizeInt;
-    procedure RemoveAt(Index: SizeInt);
-  public
-    constructor Create; overload;
-    constructor Create(Data: TObject); overload;
-    constructor Create(TabWidth: SizeInt); overload;
-    constructor Create(const Tabstops: array of SizeInt; ZeroBased: Boolean); overload;
-    constructor Create(const Tabstops: array of SizeInt; ZeroBased: Boolean; TabWidth: SizeInt); overload;
-    destructor Destroy; override;
+    Function GetCount: SizeInt;
+    Function GetStops(Index: SizeInt): SizeInt;
+    Function GetTabWidth: SizeInt;
+    Function GetZeroBased: Boolean;
+    Procedure SetStops(Index, Value: SizeInt);
+    Procedure SetTabWidth(Value: SizeInt);
+    Procedure SetZeroBased(Value: Boolean);
+  Protected
+    Function FindStop(Column: SizeInt): SizeInt;
+    Function InternalTabStops: TDynSizeIntArray;
+    Function InternalTabWidth: SizeInt;
+    Procedure RemoveAt(Index: SizeInt);
+  Public
+    Constructor Create; overload;
+    Constructor Create(Data: TObject); overload;
+    Constructor Create(TabWidth: SizeInt); overload;
+    Constructor Create(Const Tabstops: array Of SizeInt; ZeroBased: Boolean); overload;
+    Constructor Create(Const Tabstops: array Of SizeInt; ZeroBased: Boolean; TabWidth: SizeInt); overload;
+    Destructor Destroy; override;
     // cloning and referencing
-    function Clone: TJclTabSet;
-    function NewReference: TJclTabSet;
+    Function Clone: TJclTabSet;
+    Function NewReference: TJclTabSet;
     // Tab stops manipulation
-    function Add(Column: SizeInt): SizeInt;
-    function Delete(Column: SizeInt): SizeInt;
+    Function Add(Column: SizeInt): SizeInt;
+    Function Delete(Column: SizeInt): SizeInt;
     // Usage
-    function Expand(const S: string): string; overload;
-    function Expand(const S: string; Column: SizeInt): string; overload;
-    procedure OptimalFillInfo(StartColumn, TargetColumn: SizeInt; out TabsNeeded, SpacesNeeded: SizeInt);
-    function Optimize(const S: string): string; overload;
-    function Optimize(const S: string; Column: SizeInt): string; overload;
-    function StartColumn: SizeInt;
-    function TabFrom(Column: SizeInt): SizeInt;
-    function UpdatePosition(const S: string): SizeInt; overload;
-    function UpdatePosition(const S: string; Column: SizeInt): SizeInt; overload;
-    function UpdatePosition(const S: string; var Column, Line: SizeInt): SizeInt; overload;
+    Function Expand(Const S: string): string; overload;
+    Function Expand(Const S: string; Column: SizeInt): string; overload;
+    Procedure OptimalFillInfo(StartColumn, TargetColumn: SizeInt; out TabsNeeded, SpacesNeeded: SizeInt);
+    Function Optimize(Const S: string): string; overload;
+    Function Optimize(Const S: string; Column: SizeInt): string; overload;
+    Function StartColumn: SizeInt;
+    Function TabFrom(Column: SizeInt): SizeInt;
+    Function UpdatePosition(Const S: string): SizeInt; overload;
+    Function UpdatePosition(Const S: string; Column: SizeInt): SizeInt; overload;
+    Function UpdatePosition(Const S: string; Var Column, Line: SizeInt): SizeInt; overload;
     { IToString }
-    function ToString: string; overload; {$IFDEF RTL200_UP} override; {$ENDIF RTL200_UP}
+    Function ToString: string; overload; {$IFDEF RTL200_UP} override; {$ENDIF RTL200_UP}
     // Conversions
-    function ToString(FormattingOptions: SizeInt): string; {$IFDEF RTL200_UP} reintroduce; {$ENDIF RTL200_UP} overload;
-    class function FromString(const S: string): TJclTabSet; {$IFDEF SUPPORTS_STATIC} static; {$ENDIF SUPPORTS_STATIC}
+    Function ToString(FormattingOptions: SizeInt): string; {$IFDEF RTL200_UP} reintroduce; {$ENDIF RTL200_UP} overload;
+    Class Function FromString(Const S: string): TJclTabSet; {$IFDEF SUPPORTS_STATIC} static; {$ENDIF SUPPORTS_STATIC}
     // Properties
     property ActualTabWidth: SizeInt read InternalTabWidth;
     property Count: SizeInt read GetCount;
     property TabStops[Index: SizeInt]: SizeInt read GetStops write SetStops; default;
     property TabWidth: SizeInt read GetTabWidth write SetTabWidth;
     property ZeroBased: Boolean read GetZeroBased write SetZeroBased;
-  end;
+  End;
 // Formatting constants
-const
+Const
   TabSetFormatting_SurroundStopsWithBrackets = 1;
   TabSetFormatting_EmptyBracketsIfNoStops = 2;
   TabSetFormatting_NoTabStops = 4;
@@ -485,36 +485,36 @@ const
   TabSetFormatting_TabWidthOnly = TabSetFormatting_NoTabStops;
   TabSetFormatting_StopsWithoutBracketsAndTabWidth = TabSetFormatting_Default;
 // Tab expansion routines
-function StrExpandTabs(S: string): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
-function StrExpandTabs(S: string; TabWidth: SizeInt): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
-function StrExpandTabs(S: string; TabSet: TJclTabSet): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
+Function StrExpandTabs(S: string): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
+Function StrExpandTabs(S: string; TabWidth: SizeInt): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
+Function StrExpandTabs(S: string; TabSet: TJclTabSet): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
 // Tab optimization routines
-function StrOptimizeTabs(S: string): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
-function StrOptimizeTabs(S: string; TabWidth: SizeInt): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
-function StrOptimizeTabs(S: string; TabSet: TJclTabSet): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
+Function StrOptimizeTabs(S: string): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
+Function StrOptimizeTabs(S: string; TabWidth: SizeInt): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
+Function StrOptimizeTabs(S: string; TabSet: TJclTabSet): string; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF} overload;
 // move to JclBase?
-type
-  NullReferenceException = class(EJclError)
-  public
-    constructor Create; overload;
-  end;
-procedure StrResetLength(var S: DWString); overload;
+Type
+  NullReferenceException = Class(EJclError)
+  Public
+    Constructor Create; overload;
+  End;
+Procedure StrResetLength(Var S: DWString); overload;
 // natural comparison functions
 {$IFNDEF UNICODE_RTL_DATABASE}
 // internal structures published to make function inlining working
-const
+Const
   MaxStrCharCount = Ord(High(Char)) + 1;       // # of chars in one set
   StrLoOffset = MaxStrCharCount * 0;       // offset to lower case chars
   StrUpOffset = MaxStrCharCount * 1;       // offset to upper case chars
   StrReOffset = MaxStrCharCount * 2;       // offset to reverse case chars
   StrCaseMapSize = MaxStrCharCount * 3;       // # of chars is a table
-var
-  StrCaseMap: array [0..StrCaseMapSize - 1] of Char; // case mappings
+Var
+  StrCaseMap: array [0..StrCaseMapSize - 1] Of Char; // case mappings
   StrCaseMapReady: Boolean = False;         // true if case map exists
-  StrCharTypes: array [Char] of Word;
+  StrCharTypes: array [Char] Of Word;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-implementation
-uses
+Implementation
+Uses
   {$IFDEF HAS_UNIT_LIBC}
   Libc,
   {$ENDIF HAS_UNIT_LIBC}
@@ -527,20 +527,20 @@ uses
   {$ENDIF SUPPORTS_UNICODE}
   uRESTDWMemResources, uRESTDWMemStreams, uRESTDWBasicTypes;
 //=== Internal ===============================================================
-type
-  TStrRec = packed record
+Type
+  TStrRec = packed Record
     RefCount: Integer;
     Length: Integer;
-  end;
+  End;
   PStrRec = ^TStrRec;
 {$IFNDEF UNICODE_RTL_DATABASE}
-procedure LoadCharTypes;
-var
+Procedure LoadCharTypes;
+Var
   CurrChar: Char;
   CurrType: Word;
-begin
-  for CurrChar := Low(CurrChar) to High(CurrChar) do
-  begin
+Begin
+  For CurrChar := Low(CurrChar) To High(CurrChar) Do
+  Begin
     {$IFDEF MSWINDOWS}
     CurrType := 0;
     GetStringTypeEx(LOCALE_USER_DEFAULT, CT_CTYPE1, @CurrChar, 1, CurrType);
@@ -548,37 +548,37 @@ begin
     {$ENDIF MSWINDOWS}
     {$IFDEF LINUX}
     CurrType := 0;
-    if isupper(Byte(CurrChar)) <> 0 then
+    If isupper(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_UPPER;
-    if islower(Byte(CurrChar)) <> 0 then
+    If islower(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_LOWER;
-    if isdigit(Byte(CurrChar)) <> 0 then
+    If isdigit(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_DIGIT;
-    if isspace(Byte(CurrChar)) <> 0 then
+    If isspace(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_SPACE;
-    if ispunct(Byte(CurrChar)) <> 0 then
+    If ispunct(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_PUNCT;
-    if iscntrl(Byte(CurrChar)) <> 0 then
+    If iscntrl(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_CNTRL;
-    if isblank(Byte(CurrChar)) <> 0 then
+    If isblank(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_BLANK;
-    if isxdigit(Byte(CurrChar)) <> 0 then
+    If isxdigit(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_XDIGIT;
-    if isalpha(Byte(CurrChar)) <> 0 then
+    If isalpha(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_ALPHA;
     {$DEFINE CHAR_TYPES_INITIALIZED}
     {$ENDIF LINUX}
     StrCharTypes[CurrChar] := CurrType;
-  end;
-end;
-procedure LoadCaseMap;
-var
+  End;
+End;
+Procedure LoadCaseMap;
+Var
   CurrChar, UpCaseChar, LoCaseChar, ReCaseChar: Char;
-begin
-  if not StrCaseMapReady then
-  begin
-    for CurrChar := Low(Char) to High(Char) do
-    begin
+Begin
+  If not StrCaseMapReady Then
+  Begin
+    For CurrChar := Low(Char) To High(Char) Do
+    Begin
       {$IFDEF MSWINDOWS}
       LoCaseChar := CurrChar;
       UpCaseChar := CurrChar;
@@ -591,69 +591,69 @@ begin
       UpCaseChar := Char(toupper(Byte(CurrChar)));
       {$DEFINE CASE_MAP_INITIALIZED}
       {$ENDIF LINUX}
-      if CharIsUpper(CurrChar) then
+      If CharIsUpper(CurrChar) Then
         ReCaseChar := LoCaseChar
-      else
-      if CharIsLower(CurrChar) then
+      Else
+      If CharIsLower(CurrChar) Then
         ReCaseChar := UpCaseChar
-      else
+      Else
         ReCaseChar := CurrChar;
       StrCaseMap[Ord(CurrChar) + StrLoOffset] := LoCaseChar;
       StrCaseMap[Ord(CurrChar) + StrUpOffset] := UpCaseChar;
       StrCaseMap[Ord(CurrChar) + StrReOffset] := ReCaseChar;
-    end;
+    End;
     StrCaseMapReady := True;
-  end;
-end;
+  End;
+End;
 // Uppercases or Lowercases a give string depending on the
 // passed offset. (UpOffset or LoOffset)
-procedure StrCase(var Str: string; const Offset: SizeInt);
-var
+Procedure StrCase(Var Str: string; Const Offset: SizeInt);
+Var
   P: PChar;
   I, L: SizeInt;
-begin
+Begin
   L := Length(Str);
-  if L > 0 then
-  begin
+  If L > 0 Then
+  Begin
     UniqueString(Str);
     P := PChar(Str);
-    for I := 1 to L do
-    begin
+    For I := 1 To L Do
+    Begin
       P^ := StrCaseMap[Offset + Ord(P^)];
       Inc(P);
-    end;
-  end;
-end;
+    End;
+  End;
+End;
 // Internal utility function
 // Uppercases or Lowercases a give null terminated string depending on the
 // passed offset. (UpOffset or LoOffset)
-procedure StrCaseBuff(S: PChar; const Offset: SizeInt);
-var
+Procedure StrCaseBuff(S: PChar; Const Offset: SizeInt);
+Var
   C: Char;
-begin
-  if S <> nil then
-  begin
-    repeat
+Begin
+  If S <> nil Then
+  Begin
+    Repeat
       C := S^;
       S^ := StrCaseMap[Offset + Ord(C)];
       Inc(S);
-    until C = #0;
-  end;
-end;
+    Until C = #0;
+  End;
+End;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-function StrEndW(Str: PWideChar): PWideChar;
-begin
+Function StrEndW(Str: PWideChar): PWideChar;
+Begin
   Result := Str;
-  while Result^ <> #0 do
+  While Result^ <> #0 Do
     Inc(Result);
-end;
-function ArrayContainsChar(const Chars: array of Char; const C: Char): Boolean;
-var
+End;
+Function ArrayContainsChar(Const Chars: array Of Char; Const C: Char): Boolean;
+Var
   idx: SizeInt;
-begin
+Begin
   Result := ArrayContainsChar(Chars, C, idx);
-end;
-function ArrayContainsChar(const Chars: array of Char; const C: Char; out Index: SizeInt): Boolean;
+End;
+Function ArrayContainsChar(Const Chars: array Of Char; Const C: Char; out Index: SizeInt): Boolean;
 { optimized version for sorted arrays
 var
   I, L, H: SizeInt;
@@ -677,315 +677,315 @@ begin
   end;
   Result := False;
 end;}
-begin
+Begin
   Index := High(Chars);
-  while (Index >= Low(Chars)) and (Chars[Index] <> C) do
+  While (Index >= Low(Chars)) and (Chars[Index] <> C) Do
     Dec(Index);
   Result := Index >= Low(Chars);
-end;
+End;
 // String Test Routines
-function StrIsAlpha(const S: string): Boolean;
-var
+Function StrIsAlpha(Const S: string): Boolean;
+Var
   I: SizeInt;
-begin
+Begin
   Result := S <> '';
-  for I := 1 to Length(S) do
-  begin
-    if not CharIsAlpha(S[I]) then
-    begin
+  For I := 1 To Length(S) Do
+  Begin
+    If not CharIsAlpha(S[I]) Then
+    Begin
       Result := False;
       Exit;
-    end;
-  end;
-end;
-function StrIsAlphaNum(const S: string): Boolean;
-var
+    End;
+  End;
+End;
+Function StrIsAlphaNum(Const S: string): Boolean;
+Var
   I: SizeInt;
-begin
+Begin
   Result := S <> '';
-  for I := 1 to Length(S) do
-  begin
-    if not CharIsAlphaNum(S[I]) then
-    begin
+  For I := 1 To Length(S) Do
+  Begin
+    If not CharIsAlphaNum(S[I]) Then
+    Begin
       Result := False;
       Exit;
-    end;
-  end;
-end;
-function StrConsistsofNumberChars(const S: string): Boolean;
-var
+    End;
+  End;
+End;
+Function StrConsistsofNumberChars(Const S: string): Boolean;
+Var
   I: SizeInt;
-begin
+Begin
   Result := S <> '';
-  for I := 1 to Length(S) do
-  begin
-    if not CharIsNumberChar(S[I]) then
-    begin
+  For I := 1 To Length(S) Do
+  Begin
+    If not CharIsNumberChar(S[I]) Then
+    Begin
       Result := False;
       Exit;
-    end;
-  end;
-end;
-function StrContainsChars(const S: string; const Chars: TCharValidator; CheckAll: Boolean): Boolean;
-var
+    End;
+  End;
+End;
+Function StrContainsChars(Const S: string; Const Chars: TCharValidator; CheckAll: Boolean): Boolean;
+Var
   I: SizeInt;
-begin
+Begin
   Result := False;
-  if CheckAll then
-  begin
+  If CheckAll Then
+  Begin
     // this will not work with the current definition of the validator. The validator would need to check each character
     // it requires against the string (which is currently not provided to the Validator). The current implementation of
     // CheckAll will check if all characters in S will be accepted by the provided Validator, which is wrong and incon-
     // sistent with the documentation and the array-based overload.
-    for I := 1 to Length(S) do
-    begin
+    For I := 1 To Length(S) Do
+    Begin
       Result := Chars(S[I]);
-      if not Result then
+      If not Result Then
         Break;
-    end;
-  end
-  else
-  begin
-    for I := 1 to Length(S) do
-    begin
+    End;
+  End
+  Else
+  Begin
+    For I := 1 To Length(S) Do
+    Begin
       Result := Chars(S[I]);
-      if Result then
+      If Result Then
         Break;
-    end;
-  end;
-end;
-function StrContainsChars(const S: string; const Chars: array of Char; CheckAll: Boolean): Boolean;
-var
+    End;
+  End;
+End;
+Function StrContainsChars(Const S: string; Const Chars: array Of Char; CheckAll: Boolean): Boolean;
+Var
   I: SizeInt;
-begin
-  if CheckAll then
-  begin
+Begin
+  If CheckAll Then
+  Begin
     Result := True;
     I := High(Chars);
-    while (I >= 0) and Result do
-    begin
+    While (I >= 0) and Result Do
+    Begin
       Result := CharPos(S, Chars[I]) > 0;
       Dec(I);
-    end;
-  end
-  else
-  begin
+    End;
+  End
+  Else
+  Begin
     Result := False;
-    for I := 1 to Length(S) do
-    begin
+    For I := 1 To Length(S) Do
+    Begin
       Result := ArrayContainsChar(Chars, S[I]);
-      if Result then
+      If Result Then
         Break;
-    end;
-  end;
-end;
-function StrIsAlphaNumUnderscore(const S: string): Boolean;
-var
+    End;
+  End;
+End;
+Function StrIsAlphaNumUnderscore(Const S: string): Boolean;
+Var
   I: SizeInt;
   C: Char;
-begin
-  for I := 1 to Length(S) do
-  begin
+Begin
+  For I := 1 To Length(S) Do
+  Begin
     C := S[I];
-    if not (CharIsAlphaNum(C) or (C = '_')) then
-    begin
+    If not (CharIsAlphaNum(C) or (C = '_')) Then
+    Begin
       Result := False;
       Exit;
-    end;
-  end;
+    End;
+  End;
   Result := Length(S) > 0;
-end;
-function StrIsDigit(const S: string): Boolean;
-var
+End;
+Function StrIsDigit(Const S: string): Boolean;
+Var
   I: SizeInt;
-begin
+Begin
   Result := S <> '';
-  for I := 1 to Length(S) do
-  begin
-    if not CharIsDigit(S[I]) then
-    begin
+  For I := 1 To Length(S) Do
+  Begin
+    If not CharIsDigit(S[I]) Then
+    Begin
       Result := False;
       Exit;
-    end;
-  end;
-end;
-function StrIsSubset(const S: string; const ValidChars: TCharValidator): Boolean;
-var
+    End;
+  End;
+End;
+Function StrIsSubset(Const S: string; Const ValidChars: TCharValidator): Boolean;
+Var
   I: SizeInt;
-begin
-  for I := 1 to Length(S) do
-  begin
+Begin
+  For I := 1 To Length(S) Do
+  Begin
     Result := ValidChars(S[I]);
-    if not Result then
+    If not Result Then
       Exit;
-  end;
+  End;
   Result := Length(S) > 0;
-end;
-function StrIsSubset(const S: string; const ValidChars: array of Char): Boolean;
-var
+End;
+Function StrIsSubset(Const S: string; Const ValidChars: array Of Char): Boolean;
+Var
   I: SizeInt;
-begin
-  for I := 1 to Length(S) do
-  begin
+Begin
+  For I := 1 To Length(S) Do
+  Begin
     Result := ArrayContainsChar(ValidChars, S[I]);
-    if not Result then
+    If not Result Then
       Exit;
-  end;
+  End;
   Result := Length(S) > 0;
-end;
-function StrSame(const S1, S2: string; CaseSensitive: Boolean): Boolean;
-begin
+End;
+Function StrSame(Const S1, S2: string; CaseSensitive: Boolean): Boolean;
+Begin
   Result := StrCompare(S1, S2, CaseSensitive) = 0;
-end;
+End;
 //=== String Transformation Routines =========================================
-function StrCenter(const S: string; L: SizeInt; C: Char = ' '): string;
-begin
-  if Length(S) < L then
-  begin
+Function StrCenter(Const S: string; L: SizeInt; C: Char = ' '): string;
+Begin
+  If Length(S) < L Then
+  Begin
     Result := StringOfChar(C, (L - Length(S)) div 2) + S;
     Result := Result + StringOfChar(C, L - Length(Result));
-  end
-  else
+  End
+  Else
     Result := S;
-end;
-function StrCharPosLower(const S: string; CharPos: SizeInt): string;
-begin
+End;
+Function StrCharPosLower(Const S: string; CharPos: SizeInt): string;
+Begin
   Result := S;
-  if (CharPos > 0) and (CharPos <= Length(S)) then
+  If (CharPos > 0) and (CharPos <= Length(S)) Then
     Result[CharPos] := CharLower(Result[CharPos]);
-end;
-function StrCharPosUpper(const S: string; CharPos: SizeInt): string;
-begin
+End;
+Function StrCharPosUpper(Const S: string; CharPos: SizeInt): string;
+Begin
   Result := S;
-  if (CharPos > 0) and (CharPos <= Length(S)) then
+  If (CharPos > 0) and (CharPos <= Length(S)) Then
     Result[CharPos] := CharUpper(Result[CharPos]);
-end;
-function StrDoubleQuote(const S: string): string;
-begin
+End;
+Function StrDoubleQuote(Const S: string): string;
+Begin
   Result := NativeDoubleQuote + S + NativeDoubleQuote;
-end;
-function StrEnsureNoPrefix(const Prefix, Text: string): string;
-var
+End;
+Function StrEnsureNoPrefix(Const Prefix, Text: string): string;
+Var
   PrefixLen: SizeInt;
-begin
+Begin
   PrefixLen := Length(Prefix);
-  if Copy(Text, 1, PrefixLen) = Prefix then
+  If Copy(Text, 1, PrefixLen) = Prefix Then
     Result := Copy(Text, PrefixLen + 1, Length(Text))
-  else
+  Else
     Result := Text;
-end;
-function StrEnsureNoSuffix(const Suffix, Text: string): string;
-var
+End;
+Function StrEnsureNoSuffix(Const Suffix, Text: string): string;
+Var
   SuffixLen: SizeInt;
   StrLength: SizeInt;
-begin
+Begin
   SuffixLen := Length(Suffix);
   StrLength := Length(Text);
-  if Copy(Text, StrLength - SuffixLen + 1, SuffixLen) = Suffix then
+  If Copy(Text, StrLength - SuffixLen + 1, SuffixLen) = Suffix Then
     Result := Copy(Text, 1, StrLength - SuffixLen)
-  else
+  Else
     Result := Text;
-end;
-function StrEnsurePrefix(const Prefix, Text: string): string;
-var
+End;
+Function StrEnsurePrefix(Const Prefix, Text: string): string;
+Var
   PrefixLen: SizeInt;
-begin
+Begin
   PrefixLen := Length(Prefix);
-  if Copy(Text, 1, PrefixLen) = Prefix then
+  If Copy(Text, 1, PrefixLen) = Prefix Then
     Result := Text
-  else
+  Else
     Result := Prefix + Text;
-end;
-function StrEnsureSuffix(const Suffix, Text: string): string;
-var
+End;
+Function StrEnsureSuffix(Const Suffix, Text: string): string;
+Var
   SuffixLen: SizeInt;
-begin
+Begin
   SuffixLen := Length(Suffix);
-  if Copy(Text, Length(Text) - SuffixLen + 1, SuffixLen) = Suffix then
+  If Copy(Text, Length(Text) - SuffixLen + 1, SuffixLen) = Suffix Then
     Result := Text
-  else
+  Else
     Result := Text + Suffix;
-end;
-function StrEscapedToString(const S: string): string;
-  procedure HandleHexEscapeSeq(const S: string; var I: SizeInt; Len: SizeInt; var Dest: string);
-  const
+End;
+Function StrEscapedToString(Const S: string): string;
+  Procedure HandleHexEscapeSeq(Const S: string; Var I: SizeInt; Len: SizeInt; Var Dest: string);
+  Const
     HexDigits = string('0123456789abcdefABCDEF');
-  var
+  Var
     StartI, Val, N: SizeInt;
-  begin
+  Begin
     StartI := I;
     N := Pos(S[I + 1], HexDigits) - 1;
-    if N < 0 then
+    If N < 0 Then
       // '\x' without hex digit following is not escape sequence
       Dest := Dest + '\x'
-    else
-    begin
+    Else
+    Begin
       Inc(I); // Jump over x
-      if N >= 16 then
+      If N >= 16 Then
         N := N - 6;
       Val := N;
       // Same for second digit
-      if I < Len then
-      begin
+      If I < Len Then
+      Begin
         N := Pos(S[I + 1], HexDigits) - 1;
-        if N >= 0 then
-        begin
+        If N >= 0 Then
+        Begin
           Inc(I); // Jump over first digit
-          if N >= 16 then
+          If N >= 16 Then
             N := N - 6;
           Val := Val * 16 + N;
-        end;
-      end;
-      if Val > Ord(High(Char)) then
+        End;
+      End;
+      If Val > Ord(High(Char)) Then
         raise EJclStringError.CreateResFmt(@RsNumericConstantTooLarge, [Val, StartI]);
       Dest := Dest + Char(Val);
-    end;
-  end;
-  procedure HandleOctEscapeSeq(const S: string; var I: SizeInt; Len: SizeInt; var Dest: string);
-  const
+    End;
+  End;
+  Procedure HandleOctEscapeSeq(Const S: string; Var I: SizeInt; Len: SizeInt; Var Dest: string);
+  Const
     OctDigits = string('01234567');
-  var
+  Var
     StartI, Val, N: SizeInt;
-  begin
+  Begin
     StartI := I;
     // first digit
     Val := Pos(S[I], OctDigits) - 1;
-    if I < Len then
-    begin
+    If I < Len Then
+    Begin
       N := Pos(S[I + 1], OctDigits) - 1;
-      if N >= 0 then
-      begin
+      If N >= 0 Then
+      Begin
         Inc(I);
         Val := Val * 8 + N;
-      end;
-      if I < Len then
-      begin
+      End;
+      If I < Len Then
+      Begin
         N := Pos(S[I + 1], OctDigits) - 1;
-        if N >= 0 then
-        begin
+        If N >= 0 Then
+        Begin
           Inc(I);
           Val := Val * 8 + N;
-        end;
-      end;
-    end;
-    if Val > Ord(High(Char)) then
+        End;
+      End;
+    End;
+    If Val > Ord(High(Char)) Then
       raise EJclStringError.CreateResFmt(@RsNumericConstantTooLarge, [Val, StartI]);
     Dest := Dest + Char(Val);
-  end;
-var
+  End;
+Var
   I, Len: SizeInt;
-begin
+Begin
   Result := '';
   I := 1;
   Len := Length(S);
-  while I <= Len do
-  begin
-    if not ((S[I] = '\') and (I < Len)) then
+  While I <= Len Do
+  Begin
+    If not ((S[I] = '\') and (I < Len)) Then
       Result := Result + S[I]
-    else
-    begin
+    Else
+    Begin
       Inc(I); // Jump over escape character
-      case S[I] of
+      Case S[I] Of
         'a':
           Result := Result + NativeBell;
         'b':
@@ -1009,273 +1009,273 @@ begin
         '?':
           Result := Result + '?';  // Optionally escaped
         'x':
-          if I < Len then
+          If I < Len Then
             // Start of hex escape sequence
             HandleHexEscapeSeq(S, I, Len, Result)
-          else
+          Else
             // '\x' at end of string is not escape sequence
             Result := Result + '\x';
         '0'..'7':
           // start of octal escape sequence
           HandleOctEscapeSeq(S, I, Len, Result);
-      else
+      Else
         // no escape sequence
         Result := Result + '\' + S[I];
-      end;
-    end;
+      End;
+    End;
     Inc(I);
-  end;
-end;
-function StrLower(const S: string): string;
-begin
+  End;
+End;
+Function StrLower(Const S: string): string;
+Begin
   Result := S;
   StrLowerInPlace(Result);
-end;
-procedure StrLowerInPlace(var S: string);
+End;
+Procedure StrLowerInPlace(Var S: string);
 {$IFDEF UNICODE_RTL_DATABASE}
-var
+Var
   P: PChar;
   I, L: SizeInt;
-begin
+Begin
   L := Length(S);
-  if L > 0 then
-  begin
+  If L > 0 Then
+  Begin
     UniqueString(S);
     P := PChar(S);
-    for I := 1 to L do
-    begin
+    For I := 1 To L Do
+    Begin
       P^ := TCharacter.ToLower(P^);
       Inc(P);
-    end;
-  end;
-end;
+    End;
+  End;
+End;
 {$ELSE ~UNICODE_RTL_DATABASE}
-begin
+Begin
   StrCase(S, StrLoOffset);
-end;
+End;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-procedure StrLowerBuff(S: PChar);
-begin
+Procedure StrLowerBuff(S: PChar);
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
-  if S <> nil then
-  begin
-    repeat
+  If S <> nil Then
+  Begin
+    Repeat
       S^ := TCharacter.ToLower(S^);
       Inc(S);
-    until S^ = #0;
-  end;
+    Until S^ = #0;
+  End;
   {$ELSE ~UNICODE_RTL_DATABASE}
   StrCaseBuff(S, StrLoOffset);
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-procedure StrMove(var Dest: string; const Source: string;
-  const ToIndex, FromIndex, Count: SizeInt);
-begin
+End;
+Procedure StrMove(Var Dest: string; Const Source: string;
+  Const ToIndex, FromIndex, Count: SizeInt);
+Begin
   // Check strings
-  if (Source = '') or (Length(Dest) = 0) then
+  If (Source = '') or (Length(Dest) = 0) Then
     Exit;
   // Check FromIndex
-  if (FromIndex <= 0) or (FromIndex > Length(Source)) or
+  If (FromIndex <= 0) or (FromIndex > Length(Source)) or
     (ToIndex <= 0) or (ToIndex > Length(Dest)) or
-    ((FromIndex + Count - 1) > Length(Source)) or ((ToIndex + Count - 1) > Length(Dest)) then
+    ((FromIndex + Count - 1) > Length(Source)) or ((ToIndex + Count - 1) > Length(Dest)) Then
      { TODO : Is failure without notice the proper thing to do here? }
     Exit;
   // Move
   Move(Source[FromIndex], Dest[ToIndex], Count * SizeOf(Char));
-end;
-function StrPadLeft(const S: string; Len: SizeInt; C: Char): string;
-var
+End;
+Function StrPadLeft(Const S: string; Len: SizeInt; C: Char): string;
+Var
   L: SizeInt;
-begin
+Begin
   L := Length(S);
-  if L < Len then
+  If L < Len Then
     Result := StringOfChar(C, Len - L) + S
-  else
+  Else
     Result := S;
-end;
-function StrPadRight(const S: string; Len: SizeInt; C: Char): string;
-var
+End;
+Function StrPadRight(Const S: string; Len: SizeInt; C: Char): string;
+Var
   L: SizeInt;
-begin
+Begin
   L := Length(S);
-  if L < Len then
+  If L < Len Then
     Result := S + StringOfChar(C, Len - L)
-  else
+  Else
     Result := S;
-end;
-function StrProper(const S: string): string;
-begin
+End;
+Function StrProper(Const S: string): string;
+Begin
   Result := StrLower(S);
-  if Result <> '' then
+  If Result <> '' Then
     Result[1] := UpCase(Result[1]);
-end;
-procedure StrProperBuff(S: PChar);
-begin
-  if (S <> nil) and (S^ <> #0) then
-  begin
+End;
+Procedure StrProperBuff(S: PChar);
+Begin
+  If (S <> nil) and (S^ <> #0) Then
+  Begin
     StrLowerBuff(S);
     S^ := CharUpper(S^);
-  end;
-end;
-function StrQuote(const S: string; C: Char): string;
-var
+  End;
+End;
+Function StrQuote(Const S: string; C: Char): string;
+Var
   L: SizeInt;
-begin
+Begin
   L := Length(S);
   Result := S;
-  if L > 0 then
-  begin
-    if Result[1] <> C then
-    begin
+  If L > 0 Then
+  Begin
+    If Result[1] <> C Then
+    Begin
       Result := C + Result;
       Inc(L);
-    end;
-    if Result[L] <> C then
+    End;
+    If Result[L] <> C Then
       Result := Result + C;
-  end;
-end;
-function StrRemoveChars(const S: string; const Chars: TCharValidator): string;
-var
+  End;
+End;
+Function StrRemoveChars(Const S: string; Const Chars: TCharValidator): string;
+Var
   Source, Dest: PChar;
   Len, Index:   SizeInt;
-begin
+Begin
   Len := Length(S);
   SetLength(Result, Len);
   UniqueString(Result);
   Source := PChar(S);
   Dest := PChar(Result);
-  for Index := 0 to Len - 1 do
-  begin
-    if not Chars(Source^) then
-    begin
+  For Index := 0 To Len - 1 Do
+  Begin
+    If not Chars(Source^) Then
+    Begin
       Dest^ := Source^;
       Inc(Dest);
-    end;
+    End;
     Inc(Source);
-  end;
+  End;
   SetLength(Result, Dest - PChar(Result));
-end;
-function StrRemoveChars(const S: string; const Chars: array of Char): string;
-var
+End;
+Function StrRemoveChars(Const S: string; Const Chars: array Of Char): string;
+Var
   Source, Dest: PChar;
   Len, Index:   SizeInt;
-begin
+Begin
   Len := Length(S);
   SetLength(Result, Len);
   UniqueString(Result);
   Source := PChar(S);
   Dest := PChar(Result);
-  for Index := 0 to Len - 1 do
-  begin
-    if not ArrayContainsChar(Chars, Source^) then
-    begin
+  For Index := 0 To Len - 1 Do
+  Begin
+    If not ArrayContainsChar(Chars, Source^) Then
+    Begin
       Dest^ := Source^;
       Inc(Dest);
-    end;
+    End;
     Inc(Source);
-  end;
+  End;
   SetLength(Result, Dest - PChar(Result));
-end;
-function StrRemoveLeadingChars(const S: string; const Chars: TCharValidator): string;
-var
+End;
+Function StrRemoveLeadingChars(Const S: string; Const Chars: TCharValidator): string;
+Var
   Len : SizeInt;
   I: SizeInt;
-begin
+Begin
   Len := Length(S);
   I := 1;
-  while (I <= Len) and Chars(s[I]) do
+  While (I <= Len) and Chars(s[I]) Do
     Inc(I);
   Result := Copy (s, I, Len-I+1);
-end;
-function StrRemoveLeadingChars(const S: string; const Chars: array of Char): string;
-var
+End;
+Function StrRemoveLeadingChars(Const S: string; Const Chars: array Of Char): string;
+Var
   Len : SizeInt;
   I: SizeInt;
-begin
+Begin
   Len := Length(S);
   I := 1;
-  while (I <= Len) and ArrayContainsChar(Chars, s[I]) do
+  While (I <= Len) and ArrayContainsChar(Chars, s[I]) Do
     Inc(I);
   Result := Copy (s, I, Len-I+1);
-end;
-function StrRemoveEndChars(const S: string; const Chars: TCharValidator): string;
-var
+End;
+Function StrRemoveEndChars(Const S: string; Const Chars: TCharValidator): string;
+Var
   Len :   SizeInt;
-begin
+Begin
   Len := Length(S);
-  while (Len > 0) and Chars(s[Len]) do
+  While (Len > 0) and Chars(s[Len]) Do
     Dec(Len);
   Result := Copy (s, 1, Len);
-end;
-function StrRemoveEndChars(const S: string; const Chars: array of Char): string;
-var
+End;
+Function StrRemoveEndChars(Const S: string; Const Chars: array Of Char): string;
+Var
   Len :   SizeInt;
-begin
+Begin
   Len := Length(S);
-  while (Len > 0) and ArrayContainsChar(Chars, s[Len]) do
+  While (Len > 0) and ArrayContainsChar(Chars, s[Len]) Do
     Dec(Len);
   Result := Copy (s, 1, Len);
-end;
-function StrKeepChars(const S: string; const Chars: TCharValidator): string;
-var
+End;
+Function StrKeepChars(Const S: string; Const Chars: TCharValidator): string;
+Var
   Source, Dest: PChar;
   Len, Index:   SizeInt;
-begin
+Begin
   Len := Length(S);
   SetLength(Result, Len);
   UniqueString(Result);
   Source := PChar(S);
   Dest := PChar(Result);
-  for Index := 0 to Len - 1 do
-  begin
-    if Chars(Source^) then
-    begin
+  For Index := 0 To Len - 1 Do
+  Begin
+    If Chars(Source^) Then
+    Begin
       Dest^ := Source^;
       Inc(Dest);
-    end;
+    End;
     Inc(Source);
-  end;
+  End;
   SetLength(Result, Dest - PChar(Result));
-end;
-function StrKeepChars(const S: string; const Chars: array of Char): string;
-var
+End;
+Function StrKeepChars(Const S: string; Const Chars: array Of Char): string;
+Var
   Source, Dest: PChar;
   Len, Index:   SizeInt;
-begin
+Begin
   Len := Length(S);
   SetLength(Result, Len);
   UniqueString(Result);
   Source := PChar(S);
   Dest := PChar(Result);
-  for Index := 0 to Len - 1 do
-  begin
-    if ArrayContainsChar(Chars, Source^) then
-    begin
+  For Index := 0 To Len - 1 Do
+  Begin
+    If ArrayContainsChar(Chars, Source^) Then
+    Begin
       Dest^ := Source^;
       Inc(Dest);
-    end;
+    End;
     Inc(Source);
-  end;
+  End;
   SetLength(Result, Dest - PChar(Result));
-end;
-function StrRepeat(const S: string; Count: SizeInt): string;
-var
+End;
+Function StrRepeat(Const S: string; Count: SizeInt): string;
+Var
   Len, Index: SizeInt;
   Dest, Source: PChar;
-begin
+Begin
   Len := Length(S);
   SetLength(Result, Count * Len);
   Dest := PChar(Result);
   Source := PChar(S);
-  if Dest <> nil then
-    for Index := 0 to Count - 1 do
-    begin
+  If Dest <> nil Then
+    For Index := 0 To Count - 1 Do
+    Begin
       Move(Source^, Dest^, Len * SizeOf(Char));
       Inc(Dest, Len);
-    end;
-end;
-procedure StrReplace(var S: string; const Search, Replace: string; Flags: TReplaceFlags);
-var
+    End;
+End;
+Procedure StrReplace(Var S: string; Const Search, Replace: string; Flags: TReplaceFlags);
+Var
   SearchStr: string;
   ResultStr: string; { result string }
   SourcePtr: PChar;      { pointer into S of character under examination }
@@ -1289,23 +1289,23 @@ var
   ResultLength: SizeInt; { length of result string }
   C: Char;               { first character of search string }
   IgnoreCase: Boolean;
-begin
-  if Search = '' then
-  begin
-    if S = '' then
-    begin
+Begin
+  If Search = '' Then
+  Begin
+    If S = '' Then
+    Begin
       S := Replace;
       Exit;
-    end
-    else
+    End
+    Else
       raise EJclStringError.CreateRes(@RsBlankSearchString);
-  end;
-  if S <> '' then
-  begin
+  End;
+  If S <> '' Then
+  Begin
     IgnoreCase := rfIgnoreCase in Flags;
-    if IgnoreCase then
+    If IgnoreCase Then
       SearchStr := StrUpper(Search)
-    else
+    Else
       SearchStr := Search;
     { avoid having to call Length() within the loop }
     SearchLength := Length(Search);
@@ -1318,244 +1318,244 @@ begin
     SourcePtr := PChar(S);
     C := SearchStr[1];
     { while we haven't reached the end of the string }
-    while True do
-    begin
+    While True Do
+    Begin
       { copy characters until we find the first character of the search string }
-      if IgnoreCase then
-        while (CharUpper(SourcePtr^) <> C) and (SourcePtr^ <> #0) do
-        begin
+      If IgnoreCase Then
+        While (CharUpper(SourcePtr^) <> C) and (SourcePtr^ <> #0) Do
+        Begin
           ResultPtr^ := SourcePtr^;
           Inc(ResultPtr);
           Inc(SourcePtr);
-        end
-      else
-        while (SourcePtr^ <> C) and (SourcePtr^ <> #0) do
-        begin
+        End
+      Else
+        While (SourcePtr^ <> C) and (SourcePtr^ <> #0) Do
+        Begin
           ResultPtr^ := SourcePtr^;
           Inc(ResultPtr);
           Inc(SourcePtr);
-        end;
+        End;
       { did we find that first character or did we hit the end of the string? }
-      if SourcePtr^ = #0 then
+      If SourcePtr^ = #0 Then
         Break
-      else
-      begin
+      Else
+      Begin
         { continue comparing, +1 because first character was matched already }
         SourceMatchPtr := SourcePtr + 1;
         SearchMatchPtr := PChar(SearchStr) + 1;
-        if IgnoreCase then
-          while (CharUpper(SourceMatchPtr^) = SearchMatchPtr^) and (SearchMatchPtr^ <> #0) do
-          begin
+        If IgnoreCase Then
+          While (CharUpper(SourceMatchPtr^) = SearchMatchPtr^) and (SearchMatchPtr^ <> #0) Do
+          Begin
             Inc(SourceMatchPtr);
             Inc(SearchMatchPtr);
-          end
-        else
-          while (SourceMatchPtr^ = SearchMatchPtr^) and (SearchMatchPtr^ <> #0) do
-          begin
+          End
+        Else
+          While (SourceMatchPtr^ = SearchMatchPtr^) and (SearchMatchPtr^ <> #0) Do
+          Begin
             Inc(SourceMatchPtr);
             Inc(SearchMatchPtr);
-          end;
+          End;
         { did we find a complete match? }
-        if SearchMatchPtr^ = #0 then
-        begin
+        If SearchMatchPtr^ = #0 Then
+        Begin
           // keep track of result length
           Inc(ResultLength, ReplaceLength - SearchLength);
-          if ReplaceLength > 0 then
-          begin
+          If ReplaceLength > 0 Then
+          Begin
             // increase buffer size if required
-            if ResultLength > BufferLength then
-            begin
+            If ResultLength > BufferLength Then
+            Begin
               BufferLength := ResultLength * 2;
               ResultIndex := ResultPtr - PChar(ResultStr) + 1;
               SetLength(ResultStr, BufferLength);
               ResultPtr := @ResultStr[ResultIndex];
-            end;
+            End;
             { append replace to result and move past the search string in source }
             Move((@Replace[1])^, ResultPtr^, ReplaceLength * SizeOf(Char));
-          end;
+          End;
           Inc(SourcePtr, SearchLength);
           Inc(ResultPtr, ReplaceLength);
           { replace all instances or just one? }
-          if not (rfReplaceAll in Flags) then
-          begin
+          If not (rfReplaceAll in Flags) Then
+          Begin
             { just one, copy until end of source and break out of loop }
-            while SourcePtr^ <> #0 do
-            begin
+            While SourcePtr^ <> #0 Do
+            Begin
               ResultPtr^ := SourcePtr^;
               Inc(ResultPtr);
               Inc(SourcePtr);
-            end;
+            End;
             Break;
-          end;
-        end
-        else
-        begin
+          End;
+        End
+        Else
+        Begin
           { copy current character and start over with the next }
           ResultPtr^ := SourcePtr^;
           Inc(ResultPtr);
           Inc(SourcePtr);
-        end;
-      end;
-    end;
+        End;
+      End;
+    End;
     { set result length and copy result into S }
     SetLength(ResultStr, ResultLength);
     S := ResultStr;
-  end;
-end;
-function StrReplaceChar(const S: string; const Source, Replace: Char): string;
-var
+  End;
+End;
+Function StrReplaceChar(Const S: string; Const Source, Replace: Char): string;
+Var
   I: SizeInt;
-begin
+Begin
   Result := S;
-  for I := 1 to Length(S) do
-    if Result[I] = Source then
+  For I := 1 To Length(S) Do
+    If Result[I] = Source Then
       Result[I] := Replace;
-end;
-function StrReplaceChars(const S: string; const Chars: TCharValidator; Replace: Char): string;
-var
+End;
+Function StrReplaceChars(Const S: string; Const Chars: TCharValidator; Replace: Char): string;
+Var
   I: SizeInt;
-begin
+Begin
   Result := S;
-  for I := 1 to Length(S) do
-    if Chars(Result[I]) then
+  For I := 1 To Length(S) Do
+    If Chars(Result[I]) Then
       Result[I] := Replace;
-end;
-function StrReplaceChars(const S: string; const Chars: array of Char; Replace: Char): string;
-var
+End;
+Function StrReplaceChars(Const S: string; Const Chars: array Of Char; Replace: Char): string;
+Var
   I: SizeInt;
-begin
+Begin
   Result := S;
-  for I := 1 to Length(S) do
-    if ArrayContainsChar(Chars, Result[I]) then
+  For I := 1 To Length(S) Do
+    If ArrayContainsChar(Chars, Result[I]) Then
       Result[I] := Replace;
-end;
-function StrReplaceButChars(const S: string; const Chars: TCharValidator;
+End;
+Function StrReplaceButChars(Const S: string; Const Chars: TCharValidator;
   Replace: Char): string;
-var
+Var
   I: SizeInt;
-begin
+Begin
   Result := S;
-  for I := 1 to Length(S) do
-    if not Chars(Result[I]) then
+  For I := 1 To Length(S) Do
+    If not Chars(Result[I]) Then
       Result[I] := Replace;
-end;
-function StrReplaceButChars(const S: string; const Chars: array of Char; Replace: Char): string;
-var
+End;
+Function StrReplaceButChars(Const S: string; Const Chars: array Of Char; Replace: Char): string;
+Var
   I: SizeInt;
-begin
+Begin
   Result := S;
-  for I := 1 to Length(S) do
-    if not ArrayContainsChar(Chars, Result[I]) then
+  For I := 1 To Length(S) Do
+    If not ArrayContainsChar(Chars, Result[I]) Then
       Result[I] := Replace;
-end;
-function StrReverse(const S: string): string;
-begin
+End;
+Function StrReverse(Const S: string): string;
+Begin
   Result := S;
   StrReverseInplace(Result);
-end;
-procedure StrReverseInPlace(var S: string);
+End;
+Procedure StrReverseInPlace(Var S: string);
 { TODO -oahuser : Warning: This is dangerous for unicode surrogates }
-var
+Var
   P1, P2: PChar;
   C: Char;
-begin
+Begin
   UniqueString(S);
   P1 := PChar(S);
   P2 := P1 + (Length(S) - 1);
-  while P1 < P2 do
-  begin
+  While P1 < P2 Do
+  Begin
     C := P1^;
     P1^ := P2^;
     P2^ := C;
     Inc(P1);
     Dec(P2);
-  end;
-end;
-function StrSingleQuote(const S: string): string;
-begin
+  End;
+End;
+Function StrSingleQuote(Const S: string): string;
+Begin
   Result := NativeSingleQuote + S + NativeSingleQuote;
-end;
-procedure StrSkipChars(var S: PChar; const Chars: TCharValidator);
-begin
-  while Chars(S^) do
+End;
+Procedure StrSkipChars(Var S: PChar; Const Chars: TCharValidator);
+Begin
+  While Chars(S^) Do
     Inc(S);
-end;
-procedure StrSkipChars(var S: PChar; const Chars: array of Char);
-begin
-  while ArrayContainsChar(Chars, S^) do
+End;
+Procedure StrSkipChars(Var S: PChar; Const Chars: array Of Char);
+Begin
+  While ArrayContainsChar(Chars, S^) Do
     Inc(S);
-end;
-procedure StrSkipChars(const S: string; var Index: SizeInt; const Chars: TCharValidator);
-begin
-  while Chars(S[Index]) do
+End;
+Procedure StrSkipChars(Const S: string; Var Index: SizeInt; Const Chars: TCharValidator);
+Begin
+  While Chars(S[Index]) Do
     Inc(Index);
-end;
-procedure StrSkipChars(const S: string; var Index: SizeInt; const Chars: array of Char);
-begin
-  while ArrayContainsChar(Chars, S[Index]) do
+End;
+Procedure StrSkipChars(Const S: string; Var Index: SizeInt; Const Chars: array Of Char);
+Begin
+  While ArrayContainsChar(Chars, S[Index]) Do
     Inc(Index);
-end;
-function StrSmartCase(const S: string; const Delimiters: TCharValidator): string;
-var
+End;
+Function StrSmartCase(Const S: string; Const Delimiters: TCharValidator): string;
+Var
   Source, Dest: PChar;
   Index, Len:   SizeInt;
   InternalDelimiters: TCharValidator;
-begin
+Begin
   Result := '';
-  if Assigned(Delimiters) then
+  If Assigned(Delimiters) Then
     InternalDelimiters := Delimiters
-  else
+  Else
     InternalDelimiters := CharIsSpace;
-  if S <> '' then
-  begin
+  If S <> '' Then
+  Begin
     Result := S;
     UniqueString(Result);
     Len := Length(S);
     Source := PChar(S);
     Dest := PChar(Result);
     Inc(Dest);
-    for Index := 2 to Len do
-    begin
-      if InternalDelimiters(Source^) and not InternalDelimiters(Dest^) then
+    For Index := 2 To Len Do
+    Begin
+      If InternalDelimiters(Source^) and not InternalDelimiters(Dest^) Then
         Dest^ := CharUpper(Dest^);
       Inc(Dest);
       Inc(Source);
-    end;
+    End;
     Result[1] := CharUpper(Result[1]);
-  end;
-end;
-function StrSmartCase(const S: string; const Delimiters: array of Char): string;
-var
+  End;
+End;
+Function StrSmartCase(Const S: string; Const Delimiters: array Of Char): string;
+Var
   Source, Dest: PChar;
   Index, Len:   SizeInt;
-begin
+Begin
   Result := '';
-  if S <> '' then
-  begin
+  If S <> '' Then
+  Begin
     Result := S;
     UniqueString(Result);
     Len := Length(S);
     Source := PChar(S);
     Dest := PChar(Result);
     Inc(Dest);
-    for Index := 2 to Len do
-    begin
-      if ArrayContainsChar(Delimiters, Source^) and not ArrayContainsChar(Delimiters, Dest^) then
+    For Index := 2 To Len Do
+    Begin
+      If ArrayContainsChar(Delimiters, Source^) and not ArrayContainsChar(Delimiters, Dest^) Then
         Dest^ := CharUpper(Dest^);
       Inc(Dest);
       Inc(Source);
-    end;
+    End;
     Result[1] := CharUpper(Result[1]);
-  end;
-end;
-function StrStringToEscaped(const S: string): string;
-var
+  End;
+End;
+Function StrStringToEscaped(Const S: string): string;
+Var
   I: SizeInt;
-begin
+Begin
   Result := '';
-  for I := 1 to Length(S) do
-  begin
-    case S[I] of
+  For I := 1 To Length(S) Do
+  Begin
+    Case S[I] Of
       NativeBackspace:
         Result := Result + '\b';
       NativeBell:
@@ -1574,299 +1574,299 @@ begin
         Result := Result + '\\';
       NativeDoubleQuote:
         Result := Result + '\"';
-    else
+    Else
       // Characters < ' ' are escaped with hex sequence
-      if S[I] < #32 then
+      If S[I] < #32 Then
         Result := Result + Format('\x%.2x', [SizeInt(S[I])])
-      else
+      Else
         Result := Result + S[I];
-    end;
-  end;
-end;
-function StrStripNonNumberChars(const S: string): string;
-var
+    End;
+  End;
+End;
+Function StrStripNonNumberChars(Const S: string): string;
+Var
   I: SizeInt;
   C: Char;
-begin
+Begin
   Result := '';
-  for I := 1 to Length(S) do
-  begin
+  For I := 1 To Length(S) Do
+  Begin
     C := S[I];
-    if CharIsNumberChar(C) then
+    If CharIsNumberChar(C) Then
       Result := Result + C;
-  end;
-end;
-function StrToHex(const Source: string): string;
-var
+  End;
+End;
+Function StrToHex(Const Source: string): string;
+Var
   Index: SizeInt;
   C, L, N: SizeInt;
   BL, BH: Byte;
   S:     string;
-begin
+Begin
   Result := '';
-  if Source <> '' then
-  begin
+  If Source <> '' Then
+  Begin
     S := Source;
     L := Length(S);
-    if Odd(L) then
-    begin
+    If Odd(L) Then
+    Begin
       S := '0' + S;
       Inc(L);
-    end;
+    End;
     Index := 1;
     SetLength(Result, L div 2);
     C := 1;
     N := 1;
-    while C <= L do
-    begin
+    While C <= L Do
+    Begin
       BH := CharHex(S[Index]);
       Inc(Index);
       BL := CharHex(S[Index]);
       Inc(Index);
       Inc(C, 2);
-      if (BH = $FF) or (BL = $FF) then
-      begin
+      If (BH = $FF) or (BL = $FF) Then
+      Begin
         Result := '';
         Exit;
-      end;
+      End;
       Result[N] := Char((BH shl 4) or BL);
       Inc(N);
-    end;
-  end;
-end;
-function StrTrimCharLeft(const S: string; C: Char): string;
-var
+    End;
+  End;
+End;
+Function StrTrimCharLeft(Const S: string; C: Char): string;
+Var
   I, L: SizeInt;
-begin
+Begin
   I := 1;
   L := Length(S);
-  while (I <= L) and (S[I] = C) do
+  While (I <= L) and (S[I] = C) Do
     Inc(I);
   Result := Copy(S, I, L - I + 1);
-end;
-function StrTrimCharsLeft(const S: string; const Chars: TCharValidator): string;
-var
+End;
+Function StrTrimCharsLeft(Const S: string; Const Chars: TCharValidator): string;
+Var
   I, L: SizeInt;
-begin
+Begin
   I := 1;
   L := Length(S);
-  while (I <= L) and Chars(S[I]) do
+  While (I <= L) and Chars(S[I]) Do
     Inc(I);
   Result := Copy(S, I, L - I + 1);
-end;
-function StrTrimCharsLeft(const S: string; const Chars: array of Char): string;
-var
+End;
+Function StrTrimCharsLeft(Const S: string; Const Chars: array Of Char): string;
+Var
   I, L: SizeInt;
-begin
+Begin
   I := 1;
   L := Length(S);
-  while (I <= L) and ArrayContainsChar(Chars, S[I]) do
+  While (I <= L) and ArrayContainsChar(Chars, S[I]) Do
     Inc(I);
   Result := Copy(S, I, L - I + 1);
-end;
-function StrTrimCharRight(const S: string; C: Char): string;
-var
+End;
+Function StrTrimCharRight(Const S: string; C: Char): string;
+Var
   I: SizeInt;
-begin
+Begin
   I := Length(S);
-  while (I >= 1) and (S[I] = C) do
+  While (I >= 1) and (S[I] = C) Do
     Dec(I);
   Result := Copy(S, 1, I);
-end;
-function StrTrimCharsRight(const S: string; const Chars: TCharValidator): string;
-var
+End;
+Function StrTrimCharsRight(Const S: string; Const Chars: TCharValidator): string;
+Var
   I: SizeInt;
-begin
+Begin
   I := Length(S);
-  while (I >= 1) and Chars(S[I]) do
+  While (I >= 1) and Chars(S[I]) Do
     Dec(I);
   Result := Copy(S, 1, I);
-end;
-function StrTrimCharsRight(const S: string; const Chars: array of Char): string;
-var
+End;
+Function StrTrimCharsRight(Const S: string; Const Chars: array Of Char): string;
+Var
   I: SizeInt;
-begin
+Begin
   I := Length(S);
-  while (I >= 1) and ArrayContainsChar(Chars, S[I]) do
+  While (I >= 1) and ArrayContainsChar(Chars, S[I]) Do
     Dec(I);
   Result := Copy(S, 1, I);
-end;
-function StrTrimQuotes(const S: string): string;
-var
+End;
+Function StrTrimQuotes(Const S: string): string;
+Var
   First, Last: Char;
   L: SizeInt;
-begin
+Begin
   L := Length(S);
-  if L > 1 then
-  begin
+  If L > 1 Then
+  Begin
     First := S[1];
     Last := S[L];
-    if (First = Last) and ((First = NativeSingleQuote) or (First = NativeDoubleQuote)) then
+    If (First = Last) and ((First = NativeSingleQuote) or (First = NativeDoubleQuote)) Then
       Result := Copy(S, 2, L - 2)
-    else
+    Else
       Result := S;
-  end
-  else
+  End
+  Else
     Result := S;
-end;
-function StrUpper(const S: string): string;
-begin
+End;
+Function StrUpper(Const S: string): string;
+Begin
   Result := S;
   StrUpperInPlace(Result);
-end;
-procedure StrUpperInPlace(var S: string);
+End;
+Procedure StrUpperInPlace(Var S: string);
 {$IFDEF UNICODE_RTL_DATABASE}
-var
+Var
   P: PChar;
   I, L: SizeInt;
-begin
+Begin
   L := Length(S);
-  if L > 0 then
-  begin
+  If L > 0 Then
+  Begin
     UniqueString(S);
     P := PChar(S);
-    for I := 1 to L do
-    begin
+    For I := 1 To L Do
+    Begin
       P^ := TCharacter.ToUpper(P^);
       Inc(P);
-    end;
-  end;
-end;
+    End;
+  End;
+End;
 {$ELSE ~UNICODE_RTL_DATABASE}
-begin
+Begin
   StrCase(S, StrUpOffset);
-end;
+End;
 {$ENDIF ~UNICODE_RTL_DATABASE}
-procedure StrUpperBuff(S: PChar);
-begin
+Procedure StrUpperBuff(S: PChar);
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
-  if S <> nil then
-  begin
-    repeat
+  If S <> nil Then
+  Begin
+    Repeat
       S^ := TCharacter.ToUpper(S^);
       Inc(S);
-    until S^ = #0;
-  end;
+    Until S^ = #0;
+  End;
   {$ELSE ~UNICODE_RTL_DATABASE}
   StrCaseBuff(S, StrUpOffset);
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
+End;
 //=== String Management ======================================================
-procedure StrAddRef(var S: string);
-var
+Procedure StrAddRef(Var S: string);
+Var
   P: PStrRec;
-begin
+Begin
   P := Pointer(S);
-  if P <> nil then
-  begin
+  If P <> nil Then
+  Begin
     Dec(P);
-    if P^.RefCount = -1 then
+    If P^.RefCount = -1 Then
       UniqueString(S);
-  end;
-end;
-procedure StrDecRef(var S: string);
-var
+  End;
+End;
+Procedure StrDecRef(Var S: string);
+Var
   P: PStrRec;
-begin
+Begin
   P := Pointer(S);
-  if P <> nil then
-  begin
+  If P <> nil Then
+  Begin
     Dec(P);
-    case P^.RefCount of
+    Case P^.RefCount Of
       -1, 0: { nothing } ;
       1:
-        begin
+        Begin
           Finalize(S);
           Pointer(S) := nil;
-        end;
-    end;
-  end;
-end;
-function StrLength(const S: string): SizeInt;
-var
+        End;
+    End;
+  End;
+End;
+Function StrLength(Const S: string): SizeInt;
+Var
   P: PStrRec;
-begin
+Begin
   Result := 0;
   P := Pointer(S);
-  if P <> nil then
-  begin
+  If P <> nil Then
+  Begin
     Dec(P);
     Result := P^.Length and (not $80000000 shr 1);
-  end;
-end;
-function StrRefCount(const S: string): SizeInt;
-var
+  End;
+End;
+Function StrRefCount(Const S: string): SizeInt;
+Var
   P: PStrRec;
-begin
+Begin
   Result := 0;
   P := Pointer(S);
-  if P <> nil then
-  begin
+  If P <> nil Then
+  Begin
     Dec(P);
     Result := P^.RefCount;
-  end;
-end;
-procedure StrResetLength(var S: DWString);
-var
+  End;
+End;
+Procedure StrResetLength(Var S: DWString);
+Var
   I: SizeInt;
-begin
-  for I := 0 to Length(S) - 1 do
-    if S[I + 1] = #0 then
-    begin
+Begin
+  For I := 0 To Length(S) - 1 Do
+    If S[I + 1] = #0 Then
+    Begin
       SetLength(S, I);
       Exit;
-    end;
-end;
+    End;
+End;
 //=== String Search and Replace Routines =====================================
-function StrCharCount(const S: string; C: Char): SizeInt;
-var
+Function StrCharCount(Const S: string; C: Char): SizeInt;
+Var
   I: SizeInt;
-begin
+Begin
   Result := 0;
-  for I := 1 to Length(S) do
-    if S[I] = C then
+  For I := 1 To Length(S) Do
+    If S[I] = C Then
       Inc(Result);
-end;
-function StrCharsCount(const S: string; const Chars: TCharValidator): SizeInt;
-var
+End;
+Function StrCharsCount(Const S: string; Const Chars: TCharValidator): SizeInt;
+Var
   I: SizeInt;
-begin
+Begin
   Result := 0;
-  for I := 1 to Length(S) do
-    if Chars(S[I]) then
+  For I := 1 To Length(S) Do
+    If Chars(S[I]) Then
       Inc(Result);
-end;
-function StrCharsCount(const S: string; const Chars: array of Char): SizeInt;
-var
+End;
+Function StrCharsCount(Const S: string; Const Chars: array Of Char): SizeInt;
+Var
   I: SizeInt;
-begin
+Begin
   Result := 0;
-  for I := 1 to Length(S) do
-    if ArrayContainsChar(Chars, S[I]) then
+  For I := 1 To Length(S) Do
+    If ArrayContainsChar(Chars, S[I]) Then
       Inc(Result);
-end;
-function StrStrCount(const S, SubS: string): SizeInt;
-var
+End;
+Function StrStrCount(Const S, SubS: string): SizeInt;
+Var
   I: SizeInt;
-begin
+Begin
   Result := 0;
-  if (Length(SubS) > Length(S)) or (Length(SubS) = 0) or (Length(S) = 0) then
+  If (Length(SubS) > Length(S)) or (Length(SubS) = 0) or (Length(S) = 0) Then
     Exit;
-  if Length(SubS) = 1 then
-  begin
+  If Length(SubS) = 1 Then
+  Begin
     Result := StrCharCount(S, SubS[1]);
     Exit;
-  end;
+  End;
   I := StrSearch(SubS, S, 1);
-  if I > 0 then
+  If I > 0 Then
     Inc(Result);
-  while (I > 0) and (Length(S) > I + Length(SubS)) do
-  begin
+  While (I > 0) and (Length(S) > I + Length(SubS)) Do
+  Begin
     I := StrSearch(SubS, S, I + 1);
-    if I > 0 then
+    If I > 0 Then
       Inc(Result);
-  end;
-end;
+  End;
+End;
 (*
 { 1}  Test(StrCompareRange('', '', 1, 5), 0);
 { 2}  Test(StrCompareRange('A', '', 1, 5), -1);
@@ -1889,641 +1889,641 @@ end;
 {19}  Test(StrCompareRange('Aa', 'A', 1, 2), 0);
 {20}  Test(StrCompareRange('Ba', 'A', 1, 2), 1);
 *)
-function StrCompareRangeEx(const S1, S2: string; Index, Count: SizeInt; CaseSensitive: Boolean): SizeInt;
-var
+Function StrCompareRangeEx(Const S1, S2: string; Index, Count: SizeInt; CaseSensitive: Boolean): SizeInt;
+Var
   Len1, Len2: SizeInt;
   I: SizeInt;
   C1, C2: Char;
-begin
-  if Pointer(S1) = Pointer(S2) then
-  begin
-    if (Count <= 0) and (S1 <> '') then
+Begin
+  If Pointer(S1) = Pointer(S2) Then
+  Begin
+    If (Count <= 0) and (S1 <> '') Then
       Result := -2 // no work
-    else
+    Else
       Result := 0;
-  end
-  else
-  if (S1 = '') or (S2 = '') then
+  End
+  Else
+  If (S1 = '') or (S2 = '') Then
     Result := -1 // null string
-  else
-  if Count <= 0 then
+  Else
+  If Count <= 0 Then
     Result := -2 // no work
-  else
-  begin
+  Else
+  Begin
     Len1 := Length(S1);
     Len2 := Length(S2);
-    if (Index - 1) + Count > Len1 then
+    If (Index - 1) + Count > Len1 Then
       Result := -2
-    else
-    begin
-      if (Index - 1) + Count > Len2 then // strange behaviour, but the assembler code does it
+    Else
+    Begin
+      If (Index - 1) + Count > Len2 Then // strange behaviour, but the assembler code does it
         Count := Len2 - (Index - 1);
-      if CaseSensitive then
-      begin
-        for I := 0 to Count - 1 do
-        begin
+      If CaseSensitive Then
+      Begin
+        For I := 0 To Count - 1 Do
+        Begin
           C1 := S1[Index + I];
           C2 := S2[Index + I];
-          if C1 <> C2 then
-          begin
+          If C1 <> C2 Then
+          Begin
             Result := Ord(C1) - Ord(C2);
             Exit;
-          end;
-        end;
-      end
-      else
-      begin
-        for I := 0 to Count - 1 do
-        begin
+          End;
+        End;
+      End
+      Else
+      Begin
+        For I := 0 To Count - 1 Do
+        Begin
           C1 := S1[Index + I];
           C2 := S2[Index + I];
-          if C1 <> C2 then
-          begin
+          If C1 <> C2 Then
+          Begin
             C1 := CharLower(C1);
             C2 := CharLower(C2);
-            if C1 <> C2 then
-            begin
+            If C1 <> C2 Then
+            Begin
               Result := Ord(C1) - Ord(C2);
               Exit;
-            end;
-          end;
-        end;
-      end;
+            End;
+          End;
+        End;
+      End;
       Result := 0;
-    end;
-  end;
-end;
-function StrCompare(const S1, S2: string; CaseSensitive: Boolean): SizeInt;
-var
+    End;
+  End;
+End;
+Function StrCompare(Const S1, S2: string; CaseSensitive: Boolean): SizeInt;
+Var
   Len1, Len2: SizeInt;
-begin
-  if Pointer(S1) = Pointer(S2) then
+Begin
+  If Pointer(S1) = Pointer(S2) Then
     Result := 0
-  else
-  begin
+  Else
+  Begin
     Len1 := Length(S1);
     Len2 := Length(S2);
     Result := Len1 - Len2;
-    if Result = 0 then
+    If Result = 0 Then
       Result := StrCompareRangeEx(S1, S2, 1, Len1, CaseSensitive);
-  end;
-end;
-function StrCompareRange(const S1, S2: string; Index, Count: SizeInt; CaseSensitive: Boolean): SizeInt;
-begin
+  End;
+End;
+Function StrCompareRange(Const S1, S2: string; Index, Count: SizeInt; CaseSensitive: Boolean): SizeInt;
+Begin
   Result := StrCompareRangeEx(S1, S2, Index, Count, CaseSensitive);
-end;
-procedure StrFillChar(var S; Count: SizeInt; C: Char);
-begin
-  if Count > 0 then
+End;
+Procedure StrFillChar(Var S; Count: SizeInt; C: Char);
+Begin
+  If Count > 0 Then
     FillChar(S, Count, C);
-end;
-function StrRepeatChar(C: Char; Count: SizeInt): string;
-begin
+End;
+Function StrRepeatChar(C: Char; Count: SizeInt): string;
+Begin
   SetLength(Result, Count);
-  if Count > 0 then
+  If Count > 0 Then
     StrFillChar(Result[1], Count, C);
-end;
-function StrFind(const Substr, S: string; const Index: SizeInt): SizeInt;
-var
+End;
+Function StrFind(Const Substr, S: string; Const Index: SizeInt): SizeInt;
+Var
   pos: SizeInt;
-begin
-  if (SubStr <> '') and (S <> '') then
-  begin
+Begin
+  If (SubStr <> '') and (S <> '') Then
+  Begin
     pos := StrIPos(Substr, Copy(S, Index, Length(S) - Index + 1));
-    if pos = 0 then
+    If pos = 0 Then
       Result := 0
-    else
+    Else
       Result := Index + Pos - 1;
-  end
-  else
+  End
+  Else
     Result := 0;
-end;
-function StrHasPrefix(const S: string; const Prefixes: array of string): Boolean;
-begin
+End;
+Function StrHasPrefix(Const S: string; Const Prefixes: array Of string): Boolean;
+Begin
   Result := StrPrefixIndex(S, Prefixes) > -1;
-end;
-function StrHasSuffix(const S: string; const Suffixes: array of string): Boolean;
-begin
+End;
+Function StrHasSuffix(Const S: string; Const Suffixes: array Of string): Boolean;
+Begin
   Result := StrSuffixIndex(S, Suffixes) > -1;
-end;
-function StrIndex(const S: string; const List: array of string; CaseSensitive: Boolean): SizeInt;
-var
+End;
+Function StrIndex(Const S: string; Const List: array Of string; CaseSensitive: Boolean): SizeInt;
+Var
   I: SizeInt;
-begin
+Begin
   Result := -1;
-  for I := Low(List) to High(List) do
-  begin
-    if StrCompare(S, List[I], CaseSensitive) = 0 then
-    begin
+  For I := Low(List) To High(List) Do
+  Begin
+    If StrCompare(S, List[I], CaseSensitive) = 0 Then
+    Begin
       Result := I;
       Break;
-    end;
-  end;
-end;
-function StrIHasPrefix(const S: string; const Prefixes: array of string): Boolean;
-begin
+    End;
+  End;
+End;
+Function StrIHasPrefix(Const S: string; Const Prefixes: array Of string): Boolean;
+Begin
   Result := StrIPrefixIndex(S, Prefixes) > -1;
-end;
-function StrIHasSuffix(const S: string; const Suffixes: array of string): Boolean;
-begin
+End;
+Function StrIHasSuffix(Const S: string; Const Suffixes: array Of string): Boolean;
+Begin
   Result := StrISuffixIndex(S, Suffixes) > -1;
-end;
-function StrILastPos(const SubStr, S: string): SizeInt;
-begin
+End;
+Function StrILastPos(Const SubStr, S: string): SizeInt;
+Begin
   Result := StrLastPos(StrUpper(SubStr), StrUpper(S));
-end;
-function StrIPos(const SubStr, S: string): SizeInt;
-begin
+End;
+Function StrIPos(Const SubStr, S: string): SizeInt;
+Begin
   Result := Pos(StrUpper(SubStr), StrUpper(S));
-end;
-function StrIPrefixIndex(const S: string; const Prefixes: array of string): SizeInt;
-var
+End;
+Function StrIPrefixIndex(Const S: string; Const Prefixes: array Of string): SizeInt;
+Var
   I: SizeInt;
   Test: string;
-begin
+Begin
   Result := -1;
-  for I := Low(Prefixes) to High(Prefixes) do
-  begin
+  For I := Low(Prefixes) To High(Prefixes) Do
+  Begin
     Test := StrLeft(S, Length(Prefixes[I]));
-    if CompareText(Test, Prefixes[I]) = 0 then
-    begin
+    If CompareText(Test, Prefixes[I]) = 0 Then
+    Begin
       Result := I;
       Break;
-    end;
-  end;
-end;
-function StrIsOneOf(const S: string; const List: array of string): Boolean;
-begin
+    End;
+  End;
+End;
+Function StrIsOneOf(Const S: string; Const List: array Of string): Boolean;
+Begin
   Result := StrIndex(S, List) > -1;
-end;
-function StrISuffixIndex(const S: string; const Suffixes: array of string): SizeInt;
-var
+End;
+Function StrISuffixIndex(Const S: string; Const Suffixes: array Of string): SizeInt;
+Var
   I: SizeInt;
   Test: string;
-begin
+Begin
   Result := -1;
-  for I := Low(Suffixes) to High(Suffixes) do
-  begin
+  For I := Low(Suffixes) To High(Suffixes) Do
+  Begin
     Test := StrRight(S, Length(Suffixes[I]));
-    if CompareText(Test, Suffixes[I]) = 0 then
-    begin
+    If CompareText(Test, Suffixes[I]) = 0 Then
+    Begin
       Result := I;
       Break;
-    end;
-  end;
-end;
-function StrLastPos(const SubStr, S: string): SizeInt;
-var
+    End;
+  End;
+End;
+Function StrLastPos(Const SubStr, S: string): SizeInt;
+Var
   Last, Current: PChar;
-begin
+Begin
   Result := 0;
   Last := nil;
   Current := PChar(S);
-  while (Current <> nil) and (Current^ <> #0) do
-  begin
+  While (Current <> nil) and (Current^ <> #0) Do
+  Begin
     Current := StrPos(PChar(Current), PChar(SubStr));
-    if Current <> nil then
-    begin
+    If Current <> nil Then
+    Begin
       Last := Current;
       Inc(Current);
-    end;
-  end;
-  if Last <> nil then
+    End;
+  End;
+  If Last <> nil Then
     Result := Abs(PChar(S) - Last) + 1;
-end;
+End;
 // IMPORTANT NOTE: The StrMatch function does currently not work with the Asterix (*)
 // (*) acts like (?)
-function StrMatch(const Substr, S: string; Index: SizeInt): SizeInt;
-var
+Function StrMatch(Const Substr, S: string; Index: SizeInt): SizeInt;
+Var
   SI, SubI, SLen, SubLen: SizeInt;
   SubC: Char;
-begin
+Begin
   SLen := Length(S);
   SubLen := Length(Substr);
   Result := 0;
-  if (Index > SLen) or (SubLen = 0) then
+  If (Index > SLen) or (SubLen = 0) Then
     Exit;
-  while Index <= SLen do
-  begin
+  While Index <= SLen Do
+  Begin
     SubI := 1;
     SI := Index;
-    while (SI <= SLen) and (SubI <= SubLen) do
-    begin
+    While (SI <= SLen) and (SubI <= SubLen) Do
+    Begin
       SubC := Substr[SubI];
-      if (SubC = '*') or (SubC = '?') or (SubC = S[SI]) then
-      begin
+      If (SubC = '*') or (SubC = '?') or (SubC = S[SI]) Then
+      Begin
         Inc(SI);
         Inc(SubI);
-      end
-      else
+      End
+      Else
         Break;
-    end;
-    if SubI > SubLen then
-    begin
+    End;
+    If SubI > SubLen Then
+    Begin
       Result := Index;
       Break;
-    end;
+    End;
     Inc(Index);
-  end;
-end;
+  End;
+End;
 // Derived from "Like" by Michael Winter
-function StrMatches(const Substr, S: string; const Index: SizeInt): Boolean;
-var
+Function StrMatches(Const Substr, S: string; Const Index: SizeInt): Boolean;
+Var
   StringPtr: PChar;
   PatternPtr: PChar;
   StringRes: PChar;
   PatternRes: PChar;
-begin
-  if SubStr = '' then
+Begin
+  If SubStr = '' Then
     raise EJclStringError.CreateRes(@RsBlankSearchString);
   Result := SubStr = '*';
-  if Result or (S = '') then
+  If Result or (S = '') Then
     Exit;
-  if (Index <= 0) or (Index > Length(S)) then
+  If (Index <= 0) or (Index > Length(S)) Then
     raise EJclStringError.CreateRes(@RsArgumentOutOfRange);
   StringPtr := PChar(@S[Index]);
   PatternPtr := PChar(SubStr);
   StringRes := nil;
   PatternRes := nil;
-  repeat
-    repeat
-      case PatternPtr^ of
+  Repeat
+    Repeat
+      Case PatternPtr^ Of
         #0:
-        begin
+        Begin
           Result := StringPtr^ = #0;
-          if Result or (StringRes = nil) or (PatternRes = nil) then
+          If Result or (StringRes = nil) or (PatternRes = nil) Then
             Exit;
           StringPtr := StringRes;
           PatternPtr := PatternRes;
           Break;
-        end;
+        End;
         '*':
-        begin
+        Begin
           Inc(PatternPtr);
           PatternRes := PatternPtr;
           Break;
-        end;
+        End;
         '?':
-        begin
-          if StringPtr^ = #0 then
+        Begin
+          If StringPtr^ = #0 Then
             Exit;
           Inc(StringPtr);
           Inc(PatternPtr);
-        end;
-      else
-      begin
-        if StringPtr^ = #0 then
+        End;
+      Else
+      Begin
+        If StringPtr^ = #0 Then
           Exit;
-        if StringPtr^ <> PatternPtr^ then
-        begin
-          if (StringRes = nil) or (PatternRes = nil) then
+        If StringPtr^ <> PatternPtr^ Then
+        Begin
+          If (StringRes = nil) or (PatternRes = nil) Then
             Exit;
           StringPtr := StringRes;
           PatternPtr := PatternRes;
           Break;
-        end
-        else
-        begin
+        End
+        Else
+        Begin
           Inc(StringPtr);
           Inc(PatternPtr);
-        end;
-      end;
-      end;
-    until False;
-    repeat
-      case PatternPtr^ of
+        End;
+      End;
+      End;
+    Until False;
+    Repeat
+      Case PatternPtr^ Of
         #0:
-        begin
+        Begin
           Result := True;
           Exit;
-        end;
+        End;
         '*':
-        begin
+        Begin
           Inc(PatternPtr);
           PatternRes := PatternPtr;
-        end;
+        End;
         '?':
-        begin
-          if StringPtr^ = #0 then
+        Begin
+          If StringPtr^ = #0 Then
             Exit;
           Inc(StringPtr);
           Inc(PatternPtr);
-        end;
-      else
-      begin
-        repeat
-          if StringPtr^ = #0 then
+        End;
+      Else
+      Begin
+        Repeat
+          If StringPtr^ = #0 Then
             Exit;
-          if StringPtr^ = PatternPtr^ then
+          If StringPtr^ = PatternPtr^ Then
             Break;
           Inc(StringPtr);
-        until False;
+        Until False;
         Inc(StringPtr);
         StringRes := StringPtr;
         Inc(PatternPtr);
         Break;
-      end;
-      end;
-    until False;
-  until False;
-end;
-function StrNPos(const S, SubStr: string; N: SizeInt): SizeInt;
-var
+      End;
+      End;
+    Until False;
+  Until False;
+End;
+Function StrNPos(Const S, SubStr: string; N: SizeInt): SizeInt;
+Var
   I, P: SizeInt;
-begin
-  if N < 1 then
-  begin
+Begin
+  If N < 1 Then
+  Begin
     Result := 0;
     Exit;
-  end;
+  End;
   Result := StrSearch(SubStr, S, 1);
   I := 1;
-  while I < N do
-  begin
+  While I < N Do
+  Begin
     P := StrSearch(SubStr, S, Result + 1);
-    if P = 0 then
-    begin
+    If P = 0 Then
+    Begin
       Result := 0;
       Break;
-    end
-    else
-    begin
+    End
+    Else
+    Begin
       Result := P;
       Inc(I);
-    end;
-  end;
-end;
-function StrNIPos(const S, SubStr: string; N: SizeInt): SizeInt;
-var
+    End;
+  End;
+End;
+Function StrNIPos(Const S, SubStr: string; N: SizeInt): SizeInt;
+Var
   I, P: SizeInt;
-begin
-  if N < 1 then
-  begin
+Begin
+  If N < 1 Then
+  Begin
     Result := 0;
     Exit;
-  end;
+  End;
   Result := StrFind(SubStr, S, 1);
   I := 1;
-  while I < N do
-  begin
+  While I < N Do
+  Begin
     P := StrFind(SubStr, S, Result + 1);
-    if P = 0 then
-    begin
+    If P = 0 Then
+    Begin
       Result := 0;
       Break;
-    end
-    else
-    begin
+    End
+    Else
+    Begin
       Result := P;
       Inc(I);
-    end;
-  end;
-end;
-function StrPrefixIndex(const S: string; const Prefixes: array of string): SizeInt;
-var
+    End;
+  End;
+End;
+Function StrPrefixIndex(Const S: string; Const Prefixes: array Of string): SizeInt;
+Var
   I: SizeInt;
   Test: string;
-begin
+Begin
   Result := -1;
-  for I := Low(Prefixes) to High(Prefixes) do
-  begin
+  For I := Low(Prefixes) To High(Prefixes) Do
+  Begin
     Test := StrLeft(S, Length(Prefixes[I]));
-    if CompareStr(Test, Prefixes[I]) = 0 then
-    begin
+    If CompareStr(Test, Prefixes[I]) = 0 Then
+    Begin
       Result := I;
       Break;
-    end;
-  end;
-end;
-function StrSearch(const Substr, S: string; const Index: SizeInt): SizeInt;
-var
+    End;
+  End;
+End;
+Function StrSearch(Const Substr, S: string; Const Index: SizeInt): SizeInt;
+Var
   SP, SPI, SubP: PChar;
   SLen: SizeInt;
-begin
+Begin
   SLen := Length(S);
-  if Index <= SLen then
-  begin
+  If Index <= SLen Then
+  Begin
     SP := PChar(S);
     SubP := PChar(Substr);
     SPI := SP;
     Inc(SPI, Index);
     Dec(SPI);
     SPI := StrPos(SPI, SubP);
-    if SPI <> nil then
+    If SPI <> nil Then
       Result := SPI - SP + 1
-    else
+    Else
       Result := 0;
-  end
-  else
+  End
+  Else
     Result := 0;
-end;
-function StrSuffixIndex(const S: string; const Suffixes: array of string): SizeInt;
-var
+End;
+Function StrSuffixIndex(Const S: string; Const Suffixes: array Of string): SizeInt;
+Var
   I: SizeInt;
   Test: string;
-begin
+Begin
   Result := -1;
-  for I := Low(Suffixes) to High(Suffixes) do
-  begin
+  For I := Low(Suffixes) To High(Suffixes) Do
+  Begin
     Test := StrRight(S, Length(Suffixes[I]));
-    if CompareStr(Test, Suffixes[I]) = 0 then
-    begin
+    If CompareStr(Test, Suffixes[I]) = 0 Then
+    Begin
       Result := I;
       Break;
-    end;
-  end;
-end;
+    End;
+  End;
+End;
 //=== String Extraction ======================================================
-function StrAfter(const SubStr, S: string): string;
-var
+Function StrAfter(Const SubStr, S: string): string;
+Var
   P: SizeInt;
-begin
+Begin
   P := StrFind(SubStr, S, 1); // StrFind is case-insensitive pos
-  if P <= 0 then
+  If P <= 0 Then
     Result := ''           // substr not found -> nothing after it
-  else
+  Else
     Result := StrRestOf(S, P + Length(SubStr));
-end;
-function StrBefore(const SubStr, S: string): string;
-var
+End;
+Function StrBefore(Const SubStr, S: string): string;
+Var
   P: SizeInt;
-begin
+Begin
   P := StrFind(SubStr, S, 1);
-  if P <= 0 then
+  If P <= 0 Then
     Result := S
-  else
+  Else
     Result := StrLeft(S, P - 1);
-end;
-function StrSplit(const SubStr, S: string;var Left, Right : string): boolean;
-var
+End;
+Function StrSplit(Const SubStr, S: string;Var Left, Right : string): boolean;
+Var
   P: SizeInt;
-begin
+Begin
   P := StrFind(SubStr, S, 1);
   Result:= p > 0;
-  if Result then
-  begin
+  If Result Then
+  Begin
     Left := StrLeft(S, P - 1);
     Right := StrRestOf(S, P + Length(SubStr));
-  end
-  else
-  begin
+  End
+  Else
+  Begin
     Left := '';
     Right := '';
-  end;
-end;
-function StrBetween(const S: string; const Start, Stop: Char): string;
-var
+  End;
+End;
+Function StrBetween(Const S: string; Const Start, Stop: Char): string;
+Var
   PosStart, PosEnd: SizeInt;
   L: SizeInt;
-begin
+Begin
   PosStart := Pos(Start, S);
   PosEnd := StrSearch(Stop, S, PosStart + 1);  // PosEnd has to be after PosStart.
-  if (PosStart > 0) and (PosEnd > PosStart) then
-  begin
+  If (PosStart > 0) and (PosEnd > PosStart) Then
+  Begin
     L := PosEnd - PosStart;
     Result := Copy(S, PosStart + 1, L - 1);
-  end
-  else
+  End
+  Else
     Result := '';
-end;
-function StrChopRight(const S: string; N: SizeInt): string;
-begin
+End;
+Function StrChopRight(Const S: string; N: SizeInt): string;
+Begin
   Result := Copy(S, 1, Length(S) - N);
-end;
-function StrLeft(const S: string; Count: SizeInt): string;
-begin
+End;
+Function StrLeft(Const S: string; Count: SizeInt): string;
+Begin
   Result := Copy(S, 1, Count);
-end;
-function StrMid(const S: string; Start, Count: SizeInt): string;
-begin
+End;
+Function StrMid(Const S: string; Start, Count: SizeInt): string;
+Begin
   Result := Copy(S, Start, Count);
-end;
-function StrRestOf(const S: string; N: SizeInt): string;
-begin
+End;
+Function StrRestOf(Const S: string; N: SizeInt): string;
+Begin
   Result := Copy(S, N, (Length(S) - N + 1));
-end;
-function StrRight(const S: string; Count: SizeInt): string;
-begin
+End;
+Function StrRight(Const S: string; Count: SizeInt): string;
+Begin
   Result := Copy(S, Length(S) - Count + 1, Count);
-end;
+End;
 //=== Character (do we have it ;) ============================================
-function CharEqualNoCase(const C1, C2: Char): Boolean;
-begin
+Function CharEqualNoCase(Const C1, C2: Char): Boolean;
+Begin
   //if they are not equal chars, may be same letter different case
   Result := (C1 = C2) or
     (CharIsAlpha(C1) and CharIsAlpha(C2) and (CharLower(C1) = CharLower(C2)));
-end;
+End;
 
-function CharIsAlpha(const C: Char): Boolean;
-begin
+Function CharIsAlpha(Const C: Char): Boolean;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   Result := TCharacter.IsLetter(C);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := (StrCharTypes[C] and C1_ALPHA) <> 0;
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function CharIsAlphaNum(const C: Char): Boolean;
-begin
+End;
+Function CharIsAlphaNum(Const C: Char): Boolean;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   Result := TCharacter.IsLetterOrDigit(C);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := ((StrCharTypes[C] and C1_ALPHA) <> 0) or ((StrCharTypes[C] and C1_DIGIT) <> 0);
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function CharIsBlank(const C: Char): Boolean;
-begin
+End;
+Function CharIsBlank(Const C: Char): Boolean;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   //http://blogs.msdn.com/b/michkap/archive/2007/06/11/3230072.aspx
   Result := (C = ' ') or (C = #$0009) or (C = #$00A0) or (C = #$3000);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := ((StrCharTypes[C] and C1_BLANK) <> 0);
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function CharIsControl(const C: Char): Boolean;
-begin
+End;
+Function CharIsControl(Const C: Char): Boolean;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   Result := TCharacter.IsControl(C);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := (StrCharTypes[C] and C1_CNTRL) <> 0;
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function CharIsDelete(const C: Char): Boolean;
-begin
+End;
+Function CharIsDelete(Const C: Char): Boolean;
+Begin
   Result := (C = #8);
-end;
-function CharIsDigit(const C: Char): Boolean;
-begin
+End;
+Function CharIsDigit(Const C: Char): Boolean;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   Result := TCharacter.IsDigit(C);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := (StrCharTypes[C] and C1_DIGIT) <> 0;
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function CharIsFracDigit(const C: Char): Boolean;
-begin
+End;
+Function CharIsFracDigit(Const C: Char): Boolean;
+Begin
   Result := (C = '.') or CharIsDigit(C);
-end;
-function CharIsHexDigit(const C: Char): Boolean;
-begin
-  case C of
+End;
+Function CharIsHexDigit(Const C: Char): Boolean;
+Begin
+  Case C Of
     'A'..'F',
     'a'..'f':
       Result := True;
-  else
+  Else
     Result := CharIsDigit(C);
-  end;
-end;
-function CharIsLower(const C: Char): Boolean;
-begin
+  End;
+End;
+Function CharIsLower(Const C: Char): Boolean;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   Result := TCharacter.IsLower(C);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := (StrCharTypes[C] and C1_LOWER) <> 0;
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function CharIsNumberChar(const C: Char): Boolean;
-begin
+End;
+Function CharIsNumberChar(Const C: Char): Boolean;
+Begin
   Result := CharIsDigit(C) or (C = '+') or (C = '-') or (C = RESTDWDecimalSeparator);
-end;
-function CharIsNumber(const C: Char): Boolean;
-begin
+End;
+Function CharIsNumber(Const C: Char): Boolean;
+Begin
   Result := CharIsDigit(C) or (C = RESTDWDecimalSeparator);
-end;
-function CharIsPrintable(const C: Char): Boolean;
-begin
+End;
+Function CharIsPrintable(Const C: Char): Boolean;
+Begin
   Result := not CharIsControl(C);
-end;
-function CharIsPunctuation(const C: Char): Boolean;
-begin
+End;
+Function CharIsPunctuation(Const C: Char): Boolean;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   Result := TCharacter.IsPunctuation(C);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := ((StrCharTypes[C] and C1_PUNCT) <> 0);
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function CharIsReturn(const C: Char): Boolean;
-begin
+End;
+Function CharIsReturn(Const C: Char): Boolean;
+Begin
   Result := (C = NativeLineFeed) or (C = NativeCarriageReturn);
-end;
-function CharIsSpace(const C: Char): Boolean;
-begin
+End;
+Function CharIsSpace(Const C: Char): Boolean;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   Result := TCharacter.IsWhiteSpace(C);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := (StrCharTypes[C] and C1_SPACE) <> 0;
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function CharIsUpper(const C: Char): Boolean;
-begin
+End;
+Function CharIsUpper(Const C: Char): Boolean;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   Result := TCharacter.IsUpper(C);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := (StrCharTypes[C] and C1_UPPER) <> 0;
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function CharIsValidIdentifierLetter(const C: Char): Boolean;
-begin
-  case C of
+End;
+Function CharIsValidIdentifierLetter(Const C: Char): Boolean;
+Begin
+  Case C Of
     {$IFDEF SUPPORTS_UNICODE}
     // from XML specifications
     #$00C0..#$00D6, #$00D8..#$00F6, #$00F8..#$02FF, #$0370..#$037D,
@@ -2533,13 +2533,13 @@ begin
     {$ENDIF SUPPORTS_UNICODE}
     '0'..'9', 'A'..'Z', 'a'..'z', '_':
       Result := True;
-  else
+  Else
     Result := False;
-  end;
-end;
-function CharIsWhiteSpace(const C: Char): Boolean;
-begin
-  case C of
+  End;
+End;
+Function CharIsWhiteSpace(Const C: Char): Boolean;
+Begin
+  Case C Of
     NativeTab,
     NativeLineFeed,
     NativeVerticalTab,
@@ -2547,746 +2547,746 @@ begin
     NativeCarriageReturn,
     NativeSpace:
       Result := True;
-  else
+  Else
     Result := False;
-  end;
-end;
-function CharIsWildcard(const C: Char): Boolean;
-begin
-  case C of
+  End;
+End;
+Function CharIsWildcard(Const C: Char): Boolean;
+Begin
+  Case C Of
     '*', '?':
       Result := True;
-  else
+  Else
     Result := False;
-  end;
-end;
-function CharType(const C: Char): Word;
-begin
+  End;
+End;
+Function CharType(Const C: Char): Word;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   GetStringTypeEx(LOCALE_USER_DEFAULT, CT_CTYPE1, @C, 1, Result);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := StrCharTypes[C];
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
+End;
 //=== PCharVector ============================================================
-function StringsToPCharVector(var Dest: PCharVector; const Source: TStrings): PCharVector;
-var
+Function StringsToPCharVector(Var Dest: PCharVector; Const Source: TStrings): PCharVector;
+Var
   I: SizeInt;
   S: string;
-  List: array of PChar;
-begin
+  List: array Of PChar;
+Begin
   Assert(Source <> nil);
   Dest := AllocMem((Source.Count + SizeOf(Char)) * SizeOf(PChar));
   SetLength(List, Source.Count + SizeOf(Char));
-  for I := 0 to Source.Count - 1 do
-  begin
+  For I := 0 To Source.Count - 1 Do
+  Begin
     S := Source[I];
     List[I] := StrAlloc(Length(S) + SizeOf(Char));
     StrPCopy(List[I], S);
-  end;
+  End;
   List[Source.Count] := nil;
   Move(List[0], Dest^, (Source.Count + 1) * SizeOf(PChar));
   Result := Dest;
-end;
-function PCharVectorCount(Source: PCharVector): SizeInt;
-begin
+End;
+Function PCharVectorCount(Source: PCharVector): SizeInt;
+Begin
   Result := 0;
-  if Source <> nil then
-  begin
-    while Source^ <> nil do
-    begin
+  If Source <> nil Then
+  Begin
+    While Source^ <> nil Do
+    Begin
       Inc(Source);
       Inc(Result);
-    end;
-  end;
-end;
-procedure PCharVectorToStrings(const Dest: TStrings; Source: PCharVector);
-var
+    End;
+  End;
+End;
+Procedure PCharVectorToStrings(Const Dest: TStrings; Source: PCharVector);
+Var
   I, Count: SizeInt;
-  List:     array of PChar;
-begin
+  List:     array Of PChar;
+Begin
   Assert(Dest <> nil);
-  if Source <> nil then
-  begin
+  If Source <> nil Then
+  Begin
     Count := PCharVectorCount(Source);
     SetLength(List, Count);
     Move(Source^, List[0], Count * SizeOf(PChar));
     Dest.BeginUpdate;
-    try
+    Try
       Dest.Clear;
-      for I := 0 to Count - 1 do
+      For I := 0 To Count - 1 Do
         Dest.Add(List[I]);
-    finally
+    Finally
       Dest.EndUpdate;
-    end;
-  end;
-end;
-procedure FreePCharVector(var Dest: PCharVector);
-var
+    End;
+  End;
+End;
+Procedure FreePCharVector(Var Dest: PCharVector);
+Var
   I, Count: SizeInt;
-  List:     array of PChar;
-begin
-  if Dest <> nil then
-  begin
+  List:     array Of PChar;
+Begin
+  If Dest <> nil Then
+  Begin
     Count := PCharVectorCount(Dest);
     SetLength(List, Count);
     Move(Dest^, List[0], Count * SizeOf(PChar));
-    for I := 0 to Count - 1 do
+    For I := 0 To Count - 1 Do
       StrDispose(List[I]);
     FreeMem(Dest, (Count + 1) * SizeOf(PChar));
     Dest := nil;
-  end;
-end;
+  End;
+End;
 //=== Character Transformation Routines ======================================
-function CharHex(const C: Char): Byte;
-begin
-  case C of
+Function CharHex(Const C: Char): Byte;
+Begin
+  Case C Of
     '0'..'9':
       Result := Ord(C) - Ord('0');
     'a'..'f':
       Result := Ord(C) - Ord('a') + 10;
     'A'..'F':
       Result := Ord(C) - Ord('A') + 10;
-  else
+  Else
     Result := $FF;
-  end;
-end;
-function CharLower(const C: Char): Char;
-begin
+  End;
+End;
+Function CharLower(Const C: Char): Char;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   Result := TCharacter.ToLower(C);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := StrCaseMap[Ord(C) + StrLoOffset];
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function CharToggleCase(const C: Char): Char;
-begin
+End;
+Function CharToggleCase(Const C: Char): Char;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
-  if CharIsLower(C) then
+  If CharIsLower(C) Then
     Result := CharUpper(C)
-  else if CharIsUpper(C) then
+  Else If CharIsUpper(C) Then
     Result := CharLower(C)
-  else
+  Else
     Result := C;
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := StrCaseMap[Ord(C) + StrReOffset];
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
-function CharUpper(const C: Char): Char;
-begin
+End;
+Function CharUpper(Const C: Char): Char;
+Begin
   {$IFDEF UNICODE_RTL_DATABASE}
   Result := TCharacter.ToUpper(C);
   {$ELSE ~UNICODE_RTL_DATABASE}
   Result := StrCaseMap[Ord(C) + StrUpOffset];
   {$ENDIF ~UNICODE_RTL_DATABASE}
-end;
+End;
 //=== Character Search and Replace ===========================================
-function CharLastPos(const S: string; const C: Char; const Index: SizeInt): SizeInt;
-begin
-  if (Index > 0) and (Index <= Length(S)) then
-  begin
-    for Result := Length(S) downto Index do
-      if S[Result] = C then
+Function CharLastPos(Const S: string; Const C: Char; Const Index: SizeInt): SizeInt;
+Begin
+  If (Index > 0) and (Index <= Length(S)) Then
+  Begin
+    For Result := Length(S) Downto Index Do
+      If S[Result] = C Then
         Exit;
-  end;
+  End;
   Result := 0;
-end;
-function CharPos(const S: string; const C: Char; const Index: SizeInt): SizeInt;
-begin
-  if (Index > 0) and (Index <= Length(S)) then
-  begin
-    for Result := Index to Length(S) do
-      if S[Result] = C then
+End;
+Function CharPos(Const S: string; Const C: Char; Const Index: SizeInt): SizeInt;
+Begin
+  If (Index > 0) and (Index <= Length(S)) Then
+  Begin
+    For Result := Index To Length(S) Do
+      If S[Result] = C Then
         Exit;
-  end;
+  End;
   Result := 0;
-end;
-function CharIPos(const S: string; C: Char; const Index: SizeInt): SizeInt;
-begin
-  if (Index > 0) and (Index <= Length(S)) then
-  begin
+End;
+Function CharIPos(Const S: string; C: Char; Const Index: SizeInt): SizeInt;
+Begin
+  If (Index > 0) and (Index <= Length(S)) Then
+  Begin
     C := CharUpper(C);
-    for Result := Index to Length(S) do
-      if CharUpper(S[Result]) = C then
+    For Result := Index To Length(S) Do
+      If CharUpper(S[Result]) = C Then
         Exit;
-  end;
+  End;
   Result := 0;
-end;
-function CharReplace(var S: string; const Search, Replace: Char): SizeInt;
-var
+End;
+Function CharReplace(Var S: string; Const Search, Replace: Char): SizeInt;
+Var
   P: PChar;
   Index, Len: SizeInt;
-begin
+Begin
   Result := 0;
-  if Search <> Replace then
-  begin
+  If Search <> Replace Then
+  Begin
     UniqueString(S);
     P := PChar(S);
     Len := Length(S);
-    for Index := 0 to Len - 1 do
-    begin
-      if P^ = Search then
-      begin
+    For Index := 0 To Len - 1 Do
+    Begin
+      If P^ = Search Then
+      Begin
         P^ := Replace;
         Inc(Result);
-      end;
+      End;
       Inc(P);
-    end;
-  end;
-end;
+    End;
+  End;
+End;
 //=== MultiSz ================================================================
-function StringsToMultiSz(var Dest: PMultiSz; const Source: TStrings): PMultiSz;
-var
+Function StringsToMultiSz(Var Dest: PMultiSz; Const Source: TStrings): PMultiSz;
+Var
   I, TotalLength: SizeInt;
   P: PMultiSz;
-begin
+Begin
   Assert(Source <> nil);
   TotalLength := 1;
-  for I := 0 to Source.Count - 1 do
-    if Source[I] = '' then
+  For I := 0 To Source.Count - 1 Do
+    If Source[I] = '' Then
       raise EJclStringError.CreateRes(@RsInvalidEmptyStringItem)
-    else
+    Else
       Inc(TotalLength, StrLen(PChar(Source[I])) + 1);
   AllocateMultiSz(Dest, TotalLength);
   P := Dest;
-  for I := 0 to Source.Count - 1 do
-  begin
+  For I := 0 To Source.Count - 1 Do
+  Begin
     P := StrECopy(P, PChar(Source[I]));
     Inc(P);
-  end;
+  End;
   P^ := #0;
   Result := Dest;
-end;
-procedure MultiSzToStrings(const Dest: TStrings; const Source: PMultiSz);
-var
+End;
+Procedure MultiSzToStrings(Const Dest: TStrings; Const Source: PMultiSz);
+Var
   P: PMultiSz;
-begin
+Begin
   Assert(Dest <> nil);
   Dest.BeginUpdate;
-  try
+  Try
     Dest.Clear;
-    if Source <> nil then
-    begin
+    If Source <> nil Then
+    Begin
       P := Source;
-      while P^ <> #0 do
-      begin
+      While P^ <> #0 Do
+      Begin
         Dest.Add(P);
         P := StrEnd(P);
         Inc(P);
-      end;
-    end;
-  finally
+      End;
+    End;
+  Finally
     Dest.EndUpdate;
-  end;
-end;
-function MultiSzLength(const Source: PMultiSz): SizeInt;
-var
+  End;
+End;
+Function MultiSzLength(Const Source: PMultiSz): SizeInt;
+Var
   P: PMultiSz;
-begin
+Begin
   Result := 0;
-  if Source <> nil then
-  begin
+  If Source <> nil Then
+  Begin
     P := Source;
-    repeat
+    Repeat
       Inc(Result, StrLen(P) + 1);
       P := StrEnd(P);
       Inc(P);
-    until P^ = #0;
+    Until P^ = #0;
     Inc(Result);
-  end;
-end;
-procedure AllocateMultiSz(var Dest: PMultiSz; Len: SizeInt);
-begin
-  if Len > 0 then
+  End;
+End;
+Procedure AllocateMultiSz(Var Dest: PMultiSz; Len: SizeInt);
+Begin
+  If Len > 0 Then
     GetMem(Dest, Len * SizeOf(Char))
-  else
+  Else
     Dest := nil;
-end;
-procedure FreeMultiSz(var Dest: PMultiSz);
-begin
-  if Dest <> nil then
+End;
+Procedure FreeMultiSz(Var Dest: PMultiSz);
+Begin
+  If Dest <> nil Then
     FreeMem(Dest);
   Dest := nil;
-end;
-function MultiSzDup(const Source: PMultiSz): PMultiSz;
-var
+End;
+Function MultiSzDup(Const Source: PMultiSz): PMultiSz;
+Var
   Len: SizeInt;
-begin
-  if Source <> nil then
-  begin
+Begin
+  If Source <> nil Then
+  Begin
     Len := MultiSzLength(Source);
     Result := nil;
     AllocateMultiSz(Result, Len);
     Move(Source^, Result^, Len * SizeOf(Char));
-  end
-  else
+  End
+  Else
     Result := nil;
-end;
-procedure AllocateAnsiMultiSz(var Dest: PAnsiMultiSz; Len: SizeInt);
-begin
+End;
+Procedure AllocateAnsiMultiSz(Var Dest: PAnsiMultiSz; Len: SizeInt);
+Begin
   uRESTDWMemAnsiStrings.AllocateMultiSz(Dest, Len);
-end;
-procedure FreeAnsiMultiSz(var Dest: PAnsiMultiSz);
-begin
+End;
+Procedure FreeAnsiMultiSz(Var Dest: PAnsiMultiSz);
+Begin
   uRESTDWMemAnsiStrings.FreeMultiSz(Dest);
-end;
-procedure AllocateWideMultiSz(var Dest: PWideMultiSz; Len: SizeInt);
-begin
+End;
+Procedure AllocateWideMultiSz(Var Dest: PWideMultiSz; Len: SizeInt);
+Begin
   uRESTDWMemWideStrings.AllocateMultiSz(Dest, Len);
-end;
-procedure FreeWideMultiSz(var Dest: PWideMultiSz);
-begin
+End;
+Procedure FreeWideMultiSz(Var Dest: PWideMultiSz);
+Begin
   uRESTDWMemWideStrings.FreeMultiSz(Dest);
-end;
+End;
 //=== TStrings Manipulation ==================================================
-procedure StrToStrings(S, Sep: string; const List: TStrings; const AllowEmptyString: Boolean = True);
-var
+Procedure StrToStrings(S, Sep: string; Const List: TStrings; Const AllowEmptyString: Boolean = True);
+Var
   I, L: SizeInt;
   Left: string;
-begin
+Begin
   Assert(List <> nil);
   List.BeginUpdate;
-  try
+  Try
     List.Clear;
     L := Length(Sep);
     I := Pos(Sep, S);
-    while I > 0 do
-    begin
+    While I > 0 Do
+    Begin
       Left := StrLeft(S, I - 1);
-      if (Left <> '') or AllowEmptyString then
+      If (Left <> '') or AllowEmptyString Then
         List.Add(Left);
       Delete(S, 1, I + L - 1);
       I := Pos(Sep, S);
-    end;
-    if (S <> '') or AllowEmptyString then
+    End;
+    If (S <> '') or AllowEmptyString Then
       List.Add(S);  // Ignore empty strings at the end (only if AllowEmptyString = False).
-  finally
+  Finally
     List.EndUpdate;
-  end;
-end;
-procedure StrIToStrings(S, Sep: string; const List: TStrings; const AllowEmptyString: Boolean = True);
-var
+  End;
+End;
+Procedure StrIToStrings(S, Sep: string; Const List: TStrings; Const AllowEmptyString: Boolean = True);
+Var
   I, L: SizeInt;
   LowerCaseStr: string;
   Left: string;
-begin
+Begin
   Assert(List <> nil);
   LowerCaseStr := StrLower(S);
   Sep := StrLower(Sep);
   L := Length(Sep);
   I := Pos(Sep, LowerCaseStr);
   List.BeginUpdate;
-  try
+  Try
     List.Clear;
-    while I > 0 do
-    begin
+    While I > 0 Do
+    Begin
       Left := StrLeft(S, I - 1);
-      if (Left <> '') or AllowEmptyString then
+      If (Left <> '') or AllowEmptyString Then
         List.Add(Left);
       Delete(S, 1, I + L - 1);
       Delete(LowerCaseStr, 1, I + L - 1);
       I := Pos(Sep, LowerCaseStr);
-    end;
-    if (S <> '') or AllowEmptyString then
+    End;
+    If (S <> '') or AllowEmptyString Then
       List.Add(S);  // Ignore empty strings at the end (only if AllowEmptyString = False).
-  finally
+  Finally
     List.EndUpdate;
-  end;
-end;
-function StringsToStr(const List: TStrings; const Sep: string; const AllowEmptyString: Boolean = True): string;
-var
+  End;
+End;
+Function StringsToStr(Const List: TStrings; Const Sep: string; Const AllowEmptyString: Boolean = True): string;
+Var
   I, L: SizeInt;
-begin
+Begin
   Result := '';
-  for I := 0 to List.Count - 1 do
-  begin
-    if (List[I] <> '') or AllowEmptyString then
-    begin
+  For I := 0 To List.Count - 1 Do
+  Begin
+    If (List[I] <> '') or AllowEmptyString Then
+    Begin
       // don't combine these into one addition, somehow it hurts performance
       Result := Result + List[I];
       Result := Result + Sep;
-    end;
-  end;
+    End;
+  End;
   // remove terminating separator
-  if List.Count > 0 then
-  begin
+  If List.Count > 0 Then
+  Begin
     L := Length(Sep);
     Delete(Result, Length(Result) - L + 1, L);
-  end;
-end;
-function StringsToStr(const List: TStrings; const Sep: string; const NumberOfItems: SizeInt; const AllowEmptyString:
+  End;
+End;
+Function StringsToStr(Const List: TStrings; Const Sep: string; Const NumberOfItems: SizeInt; Const AllowEmptyString:
     Boolean = True): string;
-var
+Var
   I, L, N: SizeInt;
-begin
+Begin
   Result := '';
-  if List.Count > NumberOfItems then
+  If List.Count > NumberOfItems Then
     N := NumberOfItems
-  else
+  Else
     N := List.Count;
-  for I := 0 to N - 1 do
-  begin
-    if (List[I] <> '') or AllowEmptyString then
-    begin
+  For I := 0 To N - 1 Do
+  Begin
+    If (List[I] <> '') or AllowEmptyString Then
+    Begin
       // don't combine these into one addition, somehow it hurts performance
       Result := Result + List[I];
       Result := Result + Sep;
-    end;
-  end;
+    End;
+  End;
   // remove terminating separator
-  if N > 0 then
-  begin
+  If N > 0 Then
+  Begin
     L := Length(Sep);
     Delete(Result, Length(Result) - L + 1, L);
-  end;
-end;
-procedure TrimStrings(const List: TStrings; DeleteIfEmpty: Boolean);
-var
+  End;
+End;
+Procedure TrimStrings(Const List: TStrings; DeleteIfEmpty: Boolean);
+Var
   I: SizeInt;
-begin
+Begin
   Assert(List <> nil);
   List.BeginUpdate;
-  try
-    for I := List.Count - 1 downto 0 do
-    begin
+  Try
+    For I := List.Count - 1 Downto 0 Do
+    Begin
       List[I] := Trim(List[I]);
-      if (List[I] = '') and DeleteIfEmpty then
+      If (List[I] = '') and DeleteIfEmpty Then
         List.Delete(I);
-    end;
-  finally
+    End;
+  Finally
     List.EndUpdate;
-  end;
-end;
-procedure TrimStringsRight(const List: TStrings; DeleteIfEmpty: Boolean);
-var
+  End;
+End;
+Procedure TrimStringsRight(Const List: TStrings; DeleteIfEmpty: Boolean);
+Var
   I: SizeInt;
-begin
+Begin
   Assert(List <> nil);
   List.BeginUpdate;
-  try
-    for I := List.Count - 1 downto 0 do
-    begin
+  Try
+    For I := List.Count - 1 Downto 0 Do
+    Begin
       List[I] := TrimRight(List[I]);
-      if (List[I] = '') and DeleteIfEmpty then
+      If (List[I] = '') and DeleteIfEmpty Then
         List.Delete(I);
-    end;
-  finally
+    End;
+  Finally
     List.EndUpdate;
-  end;
-end;
-procedure TrimStringsLeft(const List: TStrings; DeleteIfEmpty: Boolean);
-var
+  End;
+End;
+Procedure TrimStringsLeft(Const List: TStrings; DeleteIfEmpty: Boolean);
+Var
   I: SizeInt;
-begin
+Begin
   Assert(List <> nil);
   List.BeginUpdate;
-  try
-    for I := List.Count - 1 downto 0 do
-    begin
+  Try
+    For I := List.Count - 1 Downto 0 Do
+    Begin
       List[I] := TrimLeft(List[I]);
-      if (List[I] = '') and DeleteIfEmpty then
+      If (List[I] = '') and DeleteIfEmpty Then
         List.Delete(I);
-    end;
-  finally
+    End;
+  Finally
     List.EndUpdate;
-  end;
-end;
-function AddStringToStrings(const S: string; Strings: TStrings; const Unique: Boolean): Boolean;
-begin
+  End;
+End;
+Function AddStringToStrings(Const S: string; Strings: TStrings; Const Unique: Boolean): Boolean;
+Begin
   Assert(Strings <> nil);
   Result := Unique and (Strings.IndexOf(S) <> -1);
-  if not Result then
+  If not Result Then
     Result := Strings.Add(S) > -1;
-end;
+End;
 //=== Miscellaneous ==========================================================
-function FileToString(const FileName: string): {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
-var
+Function FileToString(Const FileName: string): {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
+Var
   fs: TFileStream;
   Len: SizeInt;
-begin
+Begin
   fs := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
-  try
+  Try
     Len := fs.Size;
     SetLength(Result, Len);
-    if Len > 0 then
+    If Len > 0 Then
       fs.ReadBuffer(Result[1], Len);
-  finally
+  Finally
     fs.Free;
-  end;
-end;
-procedure StringToFile(const FileName: string; const Contents: {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
+  End;
+End;
+Procedure StringToFile(Const FileName: string; Const Contents: {$IFDEF COMPILER12_UP}RawByteString{$ELSE}DWString{$ENDIF};
   Append: Boolean);
-var
+Var
   FS: TFileStream;
   Len: SizeInt;
-begin
-  if Append and FileExists(filename) then
+Begin
+  If Append and FileExists(filename) Then
     FS := TFileStream.Create(FileName, fmOpenReadWrite or fmShareDenyWrite)
-  else
+  Else
     FS := TFileStream.Create(FileName, fmCreate);
-  try
-    if Append then
+  Try
+    If Append Then
       FS.Seek(0, soEnd);  // faster than .Position := .Size
     Len := Length(Contents);
-    if Len > 0 then
+    If Len > 0 Then
       FS.WriteBuffer(Contents[1], Len);
-  finally
+  Finally
     FS.Free;
-  end;
-end;
-function StrToken(var S: string; Separator: Char): string;
-var
+  End;
+End;
+Function StrToken(Var S: string; Separator: Char): string;
+Var
   I: SizeInt;
-begin
+Begin
   I := Pos(Separator, S);
-  if I <> 0 then
-  begin
+  If I <> 0 Then
+  Begin
     Result := Copy(S, 1, I - 1);
     Delete(S, 1, I);
-  end
-  else
-  begin
+  End
+  Else
+  Begin
     Result := S;
     S := '';
-  end;
-end;
-procedure StrTokens(const S: string; const List: TStrings);
-var
+  End;
+End;
+Procedure StrTokens(Const S: string; Const List: TStrings);
+Var
   Start: PChar;
   Token: string;
   Done:  Boolean;
-begin
+Begin
   Assert(List <> nil);
-  if List = nil then
+  If List = nil Then
     Exit;
   List.BeginUpdate;
-  try
+  Try
     List.Clear;
     Start := Pointer(S);
-    repeat
+    Repeat
       Done := StrWord(Start, Token);
-      if Token <> '' then
+      If Token <> '' Then
         List.Add(Token);
-    until Done;
-  finally
+    Until Done;
+  Finally
     List.EndUpdate;
-  end;
-end;
-function StrWord(const S: string; var Index: SizeInt; out Word: string): Boolean;
-var
+  End;
+End;
+Function StrWord(Const S: string; Var Index: SizeInt; out Word: string): Boolean;
+Var
   Start: SizeInt;
   C: Char;
-begin
+Begin
   Word := '';
-  if (S = '') then
-  begin
+  If (S = '') Then
+  Begin
     Result := True;
     Exit;
-  end;
+  End;
   Start := Index;
   Result := False;
-  while True do
-  begin
+  While True Do
+  Begin
     C := S[Index];
-    case C of
+    Case C Of
       #0:
-        begin
-          if Start <> 0 then
+        Begin
+          If Start <> 0 Then
             Word := Copy(S, Start, Index - Start);
           Result := True;
           Exit;
-        end;
+        End;
       NativeSpace, NativeLineFeed, NativeCarriageReturn:
-        begin
-          if Start <> 0 then
-          begin
+        Begin
+          If Start <> 0 Then
+          Begin
             Word := Copy(S, Start, Index - Start);
             Exit;
-          end
-          else
-          begin
-            while CharIsWhiteSpace(C) do
-            begin
+          End
+          Else
+          Begin
+            While CharIsWhiteSpace(C) Do
+            Begin
               Inc(Index);
               C := S[Index];
-            end;
-          end;
-        end;
-    else
-      if Start = 0 then
+            End;
+          End;
+        End;
+    Else
+      If Start = 0 Then
         Start := Index;
       Inc(Index);
-    end;
-  end;
-end;
-function StrWord(var S: PChar; out Word: string): Boolean;
-var
+    End;
+  End;
+End;
+Function StrWord(Var S: PChar; out Word: string): Boolean;
+Var
   Start: PChar;
-begin
+Begin
   Word := '';
-  if S = nil then
-  begin
+  If S = nil Then
+  Begin
     Result := True;
     Exit;
-  end;
+  End;
   Start := nil;
   Result := False;
-  while True do
-  begin
-    case S^ of
+  While True Do
+  Begin
+    Case S^ Of
       #0:
-      begin
-        if Start <> nil then
+      Begin
+        If Start <> nil Then
           SetString(Word, Start, S - Start);
         Result := True;
         Exit;
-      end;
+      End;
       NativeSpace, NativeLineFeed, NativeCarriageReturn:
-      begin
-        if Start <> nil then
-        begin
+      Begin
+        If Start <> nil Then
+        Begin
           SetString(Word, Start, S - Start);
           Exit;
-        end
-        else
-          while CharIsWhiteSpace(S^) do
+        End
+        Else
+          While CharIsWhiteSpace(S^) Do
             Inc(S);
-      end;
-    else
-      if Start = nil then
+      End;
+    Else
+      If Start = nil Then
         Start := S;
       Inc(S);
-    end;
-  end;
-end;
-function StrIdent(const S: string; var Index: SizeInt; out Ident: string): Boolean;
-var
+    End;
+  End;
+End;
+Function StrIdent(Const S: string; Var Index: SizeInt; out Ident: string): Boolean;
+Var
   Start: SizeInt;
   C: Char;
-begin
+Begin
   Ident := '';
-  if (S = '') then
-  begin
+  If (S = '') Then
+  Begin
     Result := True;
     Exit;
-  end;
+  End;
   Start := Index;
   Result := False;
-  while True do
-  begin
+  While True Do
+  Begin
     C := S[Index];
-    if CharIsValidIdentifierLetter(C) then
-    begin
-      if Start = 0 then
+    If CharIsValidIdentifierLetter(C) Then
+    Begin
+      If Start = 0 Then
         Start := Index;
-    end
-    else
-    if C = #0 then
-    begin
-      if Start <> 0 then
+    End
+    Else
+    If C = #0 Then
+    Begin
+      If Start <> 0 Then
         Ident := Copy(S, Start, Index - Start);
       Result := True;
       Exit;
-    end
-    else
-    begin
-      if Start <> 0 then
-      begin
+    End
+    Else
+    Begin
+      If Start <> 0 Then
+      Begin
         Ident := Copy(S, Start, Index - Start);
         Exit;
-      end;
-    end;
+      End;
+    End;
     Inc(Index);
-  end;
-end;
-function StrIdent(var S: PChar; out Ident: string): Boolean;
-var
+  End;
+End;
+Function StrIdent(Var S: PChar; out Ident: string): Boolean;
+Var
   Start: PChar;
   C: Char;
-begin
+Begin
   Ident := '';
-  if S = nil then
-  begin
+  If S = nil Then
+  Begin
     Result := True;
     Exit;
-  end;
+  End;
   Start := nil;
   Result := False;
-  while True do
-  begin
+  While True Do
+  Begin
     C := S^;
-    if CharIsValidIdentifierLetter(C) then
-    begin
-      if Start = nil then
+    If CharIsValidIdentifierLetter(C) Then
+    Begin
+      If Start = nil Then
         Start := S;
-    end
-    else
-    if C = #0 then
-    begin
-      if Start <> nil then
+    End
+    Else
+    If C = #0 Then
+    Begin
+      If Start <> nil Then
         SetString(Ident, Start, S - Start);
       Result := True;
       Exit;
-    end
-    else
-    begin
-      if Start <> nil then
-      begin
+    End
+    Else
+    Begin
+      If Start <> nil Then
+      Begin
         SetString(Ident, Start, S - Start);
         Exit;
-      end
-    end;
+      End
+    End;
     Inc(S);
-  end;
-end;
-procedure StrTokenToStrings(S: string; Separator: Char; const List: TStrings);
-var
+  End;
+End;
+Procedure StrTokenToStrings(S: string; Separator: Char; Const List: TStrings);
+Var
   Token: string;
-begin
+Begin
   Assert(List <> nil);
-  if List = nil then
+  If List = nil Then
     Exit;
   List.BeginUpdate;
-  try
+  Try
     List.Clear;
-    while S <> '' do
-    begin
+    While S <> '' Do
+    Begin
       Token := StrToken(S, Separator);
       List.Add(Token);
-    end;
-  finally
+    End;
+  Finally
     List.EndUpdate;
-  end;
-end;
-function StrToFloatSafe(const S: string): Float;
-var
+  End;
+End;
+Function StrToFloatSafe(Const S: string): Float;
+Var
   Temp: string;
   I, J, K: SizeInt;
   SwapSeparators, IsNegative: Boolean;
   DecSep, ThouSep, C: Char;
-begin
+Begin
   DecSep := {$IFDEF RTL220_UP}FormatSettings.{$ENDIF}DecimalSeparator;
   ThouSep := {$IFDEF RTL220_UP}FormatSettings.{$ENDIF}ThousandSeparator;
   Temp := S;
   SwapSeparators := False;
   IsNegative := False;
   J := 0;
-  for I := 1 to Length(Temp) do
-  begin
+  For I := 1 To Length(Temp) Do
+  Begin
     C := Temp[I];
-    if C = '-' then
+    If C = '-' Then
       IsNegative := not IsNegative
-    else
-    if (C <> ' ') and (C <> '(') and (C <> '+') then
-    begin
+    Else
+    If (C <> ' ') and (C <> '(') and (C <> '+') Then
+    Begin
         // if it appears prior to any digit, it has to be a decimal separator
       SwapSeparators := Temp[I] = ThouSep;
       J := I;
       Break;
-    end;
-  end;
-  if not SwapSeparators then
-  begin
+    End;
+  End;
+  If not SwapSeparators Then
+  Begin
     K := CharPos(Temp, DecSep);
     SwapSeparators :=
       // if it appears prior to any digit, it has to be a decimal separator
@@ -3296,104 +3296,104 @@ begin
       // we assume (consistent with Windows Platform SDK documentation),
       // that thousand separators appear only to the left of the decimal
       (K < CharPos(Temp, ThouSep)));
-  end;
-  if SwapSeparators then
-  begin
+  End;
+  If SwapSeparators Then
+  Begin
     // assume a numerical string from a different locale,
     // where DecimalSeparator and ThousandSeparator are exchanged
-    for I := 1 to Length(Temp) do
-      if Temp[I] = DecSep then
+    For I := 1 To Length(Temp) Do
+      If Temp[I] = DecSep Then
         Temp[I] := ThouSep
-      else
-      if Temp[I] = ThouSep then
+      Else
+      If Temp[I] = ThouSep Then
         Temp[I] := DecSep;
-  end;
+  End;
   Temp := StrKeepChars(Temp, CharIsNumber);
-  if Length(Temp) > 0 then
-  begin
-    if Temp[1] = DecSep then
+  If Length(Temp) > 0 Then
+  Begin
+    If Temp[1] = DecSep Then
       Temp := '0' + Temp;
-    if Temp[Length(Temp)] = DecSep then
+    If Temp[Length(Temp)] = DecSep Then
       Temp := Temp + '0';
     Result := StrToFloat(Temp);
-    if IsNegative then
+    If IsNegative Then
       Result := -Result;
-  end
-  else
+  End
+  Else
     Result := 0.0;
-end;
-function StrToIntSafe(const S: string): Integer;
-begin
+End;
+Function StrToIntSafe(Const S: string): Integer;
+Begin
   Result := Trunc(StrToFloatSafe(S));
-end;
-procedure StrNormIndex(const StrLen: SizeInt; var Index: SizeInt; var Count: SizeInt); overload;
-begin
+End;
+Procedure StrNormIndex(Const StrLen: SizeInt; Var Index: SizeInt; Var Count: SizeInt); overload;
+Begin
   Index := Max(1, Min(Index, StrLen + 1));
   Count := Max(0, Min(Count, StrLen + 1 - Index));
-end;
-function ArrayOf(List: TStrings): TDynStringArray;
-var
+End;
+Function ArrayOf(List: TStrings): TDynStringArray;
+Var
   I: SizeInt;
-begin
-  if List <> nil then
-  begin
+Begin
+  If List <> nil Then
+  Begin
     SetLength(Result, List.Count);
-    for I := 0 to List.Count - 1 do
+    For I := 0 To List.Count - 1 Do
       Result[I] := List[I];
-  end
-  else
+  End
+  Else
     Result := nil;
-end;
-const
-  BoolToStr: array [Boolean] of string = ('false', 'true');
-type
-  TInterfacedObjectAccess = class(TInterfacedObject);
-procedure MoveChar(const Source; var Dest; Count: SizeInt);
-begin
-  if Count > 0 then
+End;
+Const
+  BoolToStr: array [Boolean] Of string = ('false', 'true');
+Type
+  TInterfacedObjectAccess = Class(TInterfacedObject);
+Procedure MoveChar(Const Source; Var Dest; Count: SizeInt);
+Begin
+  If Count > 0 Then
     Move(Source, Dest, Count * SizeOf(Char));
-end;
-function DotNetFormat(const Fmt: string; const Arg0: Variant): string;
-begin
+End;
+Function DotNetFormat(Const Fmt: string; Const Arg0: Variant): string;
+Begin
   Result := DotNetFormat(Fmt, [Arg0]);
-end;
-function DotNetFormat(const Fmt: string; const Arg0, Arg1: Variant): string;
-begin
+End;
+Function DotNetFormat(Const Fmt: string; Const Arg0, Arg1: Variant): string;
+Begin
   Result := DotNetFormat(Fmt, [Arg0, Arg1]);
-end;
-function DotNetFormat(const Fmt: string; const Arg0, Arg1, Arg2: Variant): string;
-begin
+End;
+Function DotNetFormat(Const Fmt: string; Const Arg0, Arg1, Arg2: Variant): string;
+Begin
   Result := DotNetFormat(Fmt, [Arg0, Arg1, Arg2]);
-end;
-function DotNetFormat(const Fmt: string; const Args: array of const): string;
-var
+End;
+Function DotNetFormat(Const Fmt: string; Const Args: array Of Const): string;
+Var
   F, P: PChar;
   Len, Capacity, Count: SizeInt;
   Index: SizeInt;
   ErrorCode: Integer;
   S: string;
-  procedure Grow(Count: SizeInt);
-  begin
-    if Len + Count > Capacity then
-    begin
+  Procedure Grow(Count: SizeInt);
+  Begin
+    If Len + Count > Capacity Then
+    Begin
       Capacity := Capacity * 5 div 3 + Count;
       SetLength(Result, Capacity);
-    end;
-  end;
-  function InheritsFrom(AClass: TClass; const ClassName: string): Boolean;
-  begin
+    End;
+  End;
+  Function InheritsFrom(AClass: TClass; Const ClassName: string): Boolean;
+  Begin
     Result := True;
-    while AClass <> nil do
-    begin
-      if CompareText(AClass.ClassName, ClassName) = 0 then
+    While AClass <> nil Do
+    Begin
+      If CompareText(AClass.ClassName, ClassName) = 0 Then
         Exit;
       AClass := AClass.ClassParent;
-    end;
+    End;
     Result := False;
-  end;
-  function GetStringOf(const V: TVarData; Index: SizeInt): string; overload;
-  begin
-    case V.VType of
+  End;
+  Function GetStringOf(Const V: TVarData; Index: SizeInt): string; overload;
+  Begin
+    Case V.VType Of
       varEmpty, varNull:
         raise ArgumentNullException.CreateRes(@RsArgumentIsNull);
       varSmallInt:
@@ -3434,21 +3434,21 @@ var
       varUnknown,
       varAny,
       varByRef:}
-    else
+    Else
       raise ArgumentNullException.CreateResFmt(@RsDotNetFormatArgumentNotSupported, [Index]);
-    end;
-  end;
-  function GetStringOf(Index: SizeInt): string; overload;
-  var
+    End;
+  End;
+  Function GetStringOf(Index: SizeInt): string; overload;
+  Var
     V: TVarRec;
     Intf: IToString;
-  begin
+  Begin
     V := Args[Index];
-    if (V.VInteger = 0) and
+    If (V.VInteger = 0) and
       (V.VType in [vtExtended, vtString, vtObject, vtClass, vtCurrency,
-      vtInterface, vtInt64]) then
+      vtInterface, vtInt64]) Then
       raise ArgumentNullException.CreateResFmt(@RsArgumentIsNull, [Index]);
-    case V.VType of
+    Case V.VType Of
       vtInteger:
         Result := IntToStr(V.VInteger);
       vtBoolean:
@@ -3479,9 +3479,9 @@ var
       vtVariant:
         Result := GetStringOf(TVarData(V.VVariant^), Index);
       vtInterface:
-        if IInterface(V.VInterface).QueryInterface(IToString, Intf) = 0 then
+        If IInterface(V.VInterface).QueryInterface(IToString, Intf) = 0 Then
           Result := IToString(Intf).ToString
-        else
+        Else
           raise ArgumentNullException.CreateResFmt(@RsDotNetFormatArgumentNotSupported, [Index]);
       vtWideString:
         Result := DWWideString(V.VWideString);
@@ -3491,867 +3491,867 @@ var
       vtUnicodeString:
         Result := UnicodeString(V.VUnicodeString);
       {$ENDIF SUPPORTS_UNICODE_STRING}
-    else
+    Else
       raise ArgumentNullException.CreateResFmt(@RsDotNetFormatArgumentNotSupported, [Index]);
-    end;
-  end;
-begin
-  if Length(Args) = 0 then
-  begin
+    End;
+  End;
+Begin
+  If Length(Args) = 0 Then
+  Begin
     Result := Fmt;
     Exit;
-  end;
+  End;
   Len := 0;
   Capacity := Length(Fmt);
   SetLength(Result, Capacity);
-  if Capacity = 0 then
+  If Capacity = 0 Then
     raise ArgumentNullException.CreateRes(@RsDotNetFormatNullFormat);
   P := Pointer(Fmt);
   F := P;
-  while True do
-  begin
-    if (P[0] = #0) or (P[0] = '{') then
-    begin
+  While True Do
+  Begin
+    If (P[0] = #0) or (P[0] = '{') Then
+    Begin
       Count := P - F;
       Inc(P);
-      if (P[-1] <> #0) and (P[0] = '{') then
+      If (P[-1] <> #0) and (P[0] = '{') Then
         Inc(Count); // include '{'
-      if Count > 0 then
-      begin
+      If Count > 0 Then
+      Begin
         Grow(Count);
         MoveChar(F[0], Result[Len + 1], Count);
         Inc(Len, Count);
-      end;
-      if P[-1] = #0 then
+      End;
+      If P[-1] = #0 Then
         Break;
-      if P[0] <> '{' then
-      begin
+      If P[0] <> '{' Then
+      Begin
         F := P;
         Inc(P);
-        while (P[0] <> #0) and (P[0] <> '}') do
+        While (P[0] <> #0) and (P[0] <> '}') Do
           Inc(P);
         SetString(S, F, P - F);
         Val(S, Index, ErrorCode);
-        if ErrorCode <> 0 then
+        If ErrorCode <> 0 Then
           raise FormatException.CreateRes(@RsFormatException);
-        if (Index < 0) or (Index > High(Args)) then
+        If (Index < 0) or (Index > High(Args)) Then
           raise FormatException.CreateRes(@RsFormatException);
         S := GetStringOf(Index);
-        if S <> '' then
-        begin
+        If S <> '' Then
+        Begin
           Grow(Length(S));
           MoveChar(S[1], Result[Len + 1], Length(S));
           Inc(Len, Length(S));
-        end;
-        if P[0] = #0 then
+        End;
+        If P[0] = #0 Then
           Break;
-      end;
+      End;
       F := P + 1;
-    end
-    else
-    if (P[0] = '}') and (P[1] = '}') then
-    begin
+    End
+    Else
+    If (P[0] = '}') and (P[1] = '}') Then
+    Begin
       Count := P - F + 1;
       Inc(P); // skip next '}'
       Grow(Count);
       MoveChar(F[0], Result[Len + 1], Count);
       Inc(Len, Count);
       F := P + 1;
-    end;
+    End;
     Inc(P);
-  end;
+  End;
   SetLength(Result, Len);
-end;
+End;
 //=== { TJclStringBuilder } =====================================================
-constructor TJclStringBuilder.Create(Capacity: SizeInt; MaxCapacity: SizeInt);
-begin
-  inherited Create;
+Constructor TJclStringBuilder.Create(Capacity: SizeInt; MaxCapacity: SizeInt);
+Begin
+  Inherited Create;
   SetLength(FChars, Capacity);
   FMaxCapacity := MaxCapacity;
-end;
-constructor TJclStringBuilder.Create(const Value: string; Capacity: SizeInt);
-begin
+End;
+Constructor TJclStringBuilder.Create(Const Value: string; Capacity: SizeInt);
+Begin
   Create(Capacity);
   Append(Value);
-end;
-constructor TJclStringBuilder.Create(const Value: string; StartIndex, Length, Capacity: SizeInt);
-begin
+End;
+Constructor TJclStringBuilder.Create(Const Value: string; StartIndex, Length, Capacity: SizeInt);
+Begin
   Create(Capacity);
   Append(Value, StartIndex + 1, Length);
-end;
-function TJclStringBuilder.ToString: string;
-begin
-  if FLength > 0 then
+End;
+Function TJclStringBuilder.ToString: string;
+Begin
+  If FLength > 0 Then
     SetString(Result, PChar(@FChars[0]), FLength)
-  else
+  Else
     Result := '';
-end;
-function TJclStringBuilder.EnsureCapacity(Capacity: SizeInt): SizeInt;
-begin
-  if System.Length(FChars) < Capacity then
+End;
+Function TJclStringBuilder.EnsureCapacity(Capacity: SizeInt): SizeInt;
+Begin
+  If System.Length(FChars) < Capacity Then
     SetCapacity(Capacity);
   Result := System.Length(FChars);
-end;
-procedure TJclStringBuilder.Clear;
-begin
+End;
+Procedure TJclStringBuilder.Clear;
+Begin
   Length := 0;
-end;
-procedure TJclStringBuilder.SetCapacity(const Value: SizeInt);
-begin
-  if Value <> System.Length(FChars) then
-  begin
+End;
+Procedure TJclStringBuilder.SetCapacity(Const Value: SizeInt);
+Begin
+  If Value <> System.Length(FChars) Then
+  Begin
     SetLength(FChars, Value);
-    if Value < FLength then
+    If Value < FLength Then
       FLength := Value;
-  end;
-end;
-function TJclStringBuilder.GetChars(Index: SizeInt): Char;
-begin
+  End;
+End;
+Function TJclStringBuilder.GetChars(Index: SizeInt): Char;
+Begin
   Result := FChars[Index];
-end;
-procedure TJclStringBuilder.SetChars(Index: SizeInt; const Value: Char);
-begin
+End;
+Procedure TJclStringBuilder.SetChars(Index: SizeInt; Const Value: Char);
+Begin
   FChars[Index] := Value;
-end;
-procedure TJclStringBuilder.Set_Length(const Value: SizeInt);
-begin
+End;
+Procedure TJclStringBuilder.Set_Length(Const Value: SizeInt);
+Begin
   FLength := Value;
-end;
-function TJclStringBuilder.GetCapacity: SizeInt;
-begin
+End;
+Function TJclStringBuilder.GetCapacity: SizeInt;
+Begin
   Result := System.Length(FChars);
-end;
-function TJclStringBuilder.AppendPChar(Value: PChar; Count: SizeInt; RepeatCount: SizeInt): TJclStringBuilder;
-var
+End;
+Function TJclStringBuilder.AppendPChar(Value: PChar; Count: SizeInt; RepeatCount: SizeInt): TJclStringBuilder;
+Var
   Capacity: SizeInt;
-begin
-  if (Count > 0) and (RepeatCount > 0) then
-  begin
-    repeat
+Begin
+  If (Count > 0) and (RepeatCount > 0) Then
+  Begin
+    Repeat
       Capacity := System.Length(FChars);
-      if Capacity + Count > MaxCapacity then
+      If Capacity + Count > MaxCapacity Then
         raise ArgumentOutOfRangeException.CreateRes(@RsArgumentOutOfRange);
-      if Capacity < FLength + Count then
+      If Capacity < FLength + Count Then
         SetLength(FChars, Capacity * 5 div 3 + Count);
-      if Count = 1 then
+      If Count = 1 Then
         FChars[FLength] := Value[0]
-      else
+      Else
         MoveChar(Value[0], FChars[FLength], Count);
       Inc(FLength, Count);
       Dec(RepeatCount);
-    until RepeatCount <= 0;
-  end;
+    Until RepeatCount <= 0;
+  End;
   Result := Self;
-end;
-function TJclStringBuilder.InsertPChar(Index: SizeInt; Value: PChar; Count,
+End;
+Function TJclStringBuilder.InsertPChar(Index: SizeInt; Value: PChar; Count,
   RepeatCount: SizeInt): TJclStringBuilder;
-var
+Var
   Capacity: SizeInt;
-begin
-  if (Index < 0) or (Index > FLength) then
+Begin
+  If (Index < 0) or (Index > FLength) Then
     raise ArgumentOutOfRangeException.CreateRes(@RsArgumentOutOfRange);
-  if Index = FLength then
+  If Index = FLength Then
     AppendPChar(Value, Count, RepeatCount)
-  else
-  if (Count > 0) and (RepeatCount > 0) then
-  begin
-    repeat
+  Else
+  If (Count > 0) and (RepeatCount > 0) Then
+  Begin
+    Repeat
       Capacity := System.Length(FChars);
-      if Capacity + Count > MaxCapacity then
+      If Capacity + Count > MaxCapacity Then
         raise ArgumentOutOfRangeException.CreateRes(@RsArgumentOutOfRange);
-      if Capacity < FLength + Count then
+      If Capacity < FLength + Count Then
         SetLength(FChars, Capacity * 5 div 3 + Count);
       MoveChar(FChars[Index], FChars[Index + Count], FLength - Index);
-      if Count = 1 then
+      If Count = 1 Then
         FChars[Index] := Value[0]
-      else
+      Else
         MoveChar(Value[0], FChars[Index], Count);
       Inc(FLength, Count);
       Dec(RepeatCount);
       Inc(Index, Count); // little optimization
-    until RepeatCount <= 0;
-  end;
+    Until RepeatCount <= 0;
+  End;
   Result := Self;
-end;
-function TJclStringBuilder.Append(const Value: array of Char): TJclStringBuilder;
-var
+End;
+Function TJclStringBuilder.Append(Const Value: array Of Char): TJclStringBuilder;
+Var
   Len: SizeInt;
-begin
+Begin
   Len := System.Length(Value);
-  if Len > 0 then
+  If Len > 0 Then
     AppendPChar(@Value[0], Len);
   Result := Self;
-end;
-function TJclStringBuilder.Append(const Value: array of Char; StartIndex, Length: SizeInt): TJclStringBuilder;
-var
+End;
+Function TJclStringBuilder.Append(Const Value: array Of Char; StartIndex, Length: SizeInt): TJclStringBuilder;
+Var
   Len: SizeInt;
-begin
+Begin
   Len := System.Length(Value);
-  if (Length > 0) and (StartIndex < Len) then
-  begin
-    if StartIndex + Length > Len then
+  If (Length > 0) and (StartIndex < Len) Then
+  Begin
+    If StartIndex + Length > Len Then
       Length := Len - StartIndex;
     AppendPChar(PChar(@Value[0]) + StartIndex, Length);
-  end;
+  End;
   Result := Self;
-end;
-function TJclStringBuilder.Append(Value: Char; RepeatCount: SizeInt = 1): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Append(Value: Char; RepeatCount: SizeInt = 1): TJclStringBuilder;
+Begin
   Result := AppendPChar(@Value, 1, RepeatCount);
-end;
-function TJclStringBuilder.Append(const Value: string): TJclStringBuilder;
-var
+End;
+Function TJclStringBuilder.Append(Const Value: string): TJclStringBuilder;
+Var
   Len: SizeInt;
-begin
+Begin
   Len := System.Length(Value);
-  if Len > 0 then
+  If Len > 0 Then
     AppendPChar(Pointer(Value), Len);
   Result := Self;
-end;
-function TJclStringBuilder.Append(const Value: string; StartIndex, Length: SizeInt): TJclStringBuilder;
-var
+End;
+Function TJclStringBuilder.Append(Const Value: string; StartIndex, Length: SizeInt): TJclStringBuilder;
+Var
   Len: SizeInt;
-begin
+Begin
   Len := System.Length(Value);
-  if (Length > 0) and (StartIndex < Len) then
-  begin
-    if StartIndex + Length > Len then
+  If (Length > 0) and (StartIndex < Len) Then
+  Begin
+    If StartIndex + Length > Len Then
       Length := Len - StartIndex;
     AppendPChar(PChar(Pointer(Value)) + StartIndex, Length);
-  end;
+  End;
   Result := Self;
-end;
-function TJclStringBuilder.Append(Value: Boolean): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Append(Value: Boolean): TJclStringBuilder;
+Begin
   Result := Append(BoolToStr[Value]);
-end;
-function TJclStringBuilder.Append(Value: Cardinal): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Append(Value: Cardinal): TJclStringBuilder;
+Begin
   Result := Append(IntToStr(Value));
-end;
-function TJclStringBuilder.Append(Value: Integer): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Append(Value: Integer): TJclStringBuilder;
+Begin
   Result := Append(IntToStr(Value));
-end;
-function TJclStringBuilder.Append(Value: Double): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Append(Value: Double): TJclStringBuilder;
+Begin
   Result := Append(FloatToStr(Value));
-end;
-function TJclStringBuilder.Append(Value: Int64): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Append(Value: Int64): TJclStringBuilder;
+Begin
   Result := Append(IntToStr(Value));
-end;
-function TJclStringBuilder.Append(Obj: TObject): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Append(Obj: TObject): TJclStringBuilder;
+Begin
   Result := Append(DotNetFormat('{0}', [Obj]));
-end;
-function TJclStringBuilder.AppendFormat(const Fmt: string; Arg0: Variant): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.AppendFormat(Const Fmt: string; Arg0: Variant): TJclStringBuilder;
+Begin
   Result := Append(DotNetFormat(Fmt, [Arg0]));
-end;
-function TJclStringBuilder.AppendFormat(const Fmt: string; Arg0, Arg1: Variant): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.AppendFormat(Const Fmt: string; Arg0, Arg1: Variant): TJclStringBuilder;
+Begin
   Result := Append(DotNetFormat(Fmt, [Arg0, Arg1]));
-end;
-function TJclStringBuilder.AppendFormat(const Fmt: string; Arg0, Arg1, Arg2: Variant): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.AppendFormat(Const Fmt: string; Arg0, Arg1, Arg2: Variant): TJclStringBuilder;
+Begin
   Result := Append(DotNetFormat(Fmt, [Arg0, Arg1, Arg2]));
-end;
-function TJclStringBuilder.AppendFormat(const Fmt: string; const Args: array of const): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.AppendFormat(Const Fmt: string; Const Args: array Of Const): TJclStringBuilder;
+Begin
   Result := Append(DotNetFormat(Fmt, Args));
-end;
-function TJclStringBuilder.Insert(Index: SizeInt; const Value: array of Char): TJclStringBuilder;
-var
+End;
+Function TJclStringBuilder.Insert(Index: SizeInt; Const Value: array Of Char): TJclStringBuilder;
+Var
   Len: SizeInt;
-begin
+Begin
   Len := System.Length(Value);
-  if Len > 0 then
+  If Len > 0 Then
     InsertPChar(Index, @Value[0], Len);
   Result := Self;
-end;
-function TJclStringBuilder.Insert(Index: SizeInt; const Value: string; Count: SizeInt): TJclStringBuilder;
-var
+End;
+Function TJclStringBuilder.Insert(Index: SizeInt; Const Value: string; Count: SizeInt): TJclStringBuilder;
+Var
   Len: SizeInt;
-begin
+Begin
   Len := System.Length(Value);
-  if Len > 0 then
+  If Len > 0 Then
     InsertPChar(Index, Pointer(Value), Len, Count);
   Result := Self;
-end;
-function TJclStringBuilder.Insert(Index: SizeInt; Value: Boolean): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Insert(Index: SizeInt; Value: Boolean): TJclStringBuilder;
+Begin
   Result := Insert(Index, BoolToStr[Value]);
-end;
-function TJclStringBuilder.Insert(Index: SizeInt; const Value: array of Char;
+End;
+Function TJclStringBuilder.Insert(Index: SizeInt; Const Value: array Of Char;
   StartIndex, Length: SizeInt): TJclStringBuilder;
-var
+Var
   Len: SizeInt;
-begin
+Begin
   Len := System.Length(Value);
-  if (Length > 0) and (StartIndex < Len) then
-  begin
-    if StartIndex + Length > Len then
+  If (Length > 0) and (StartIndex < Len) Then
+  Begin
+    If StartIndex + Length > Len Then
       Length := Len - StartIndex;
     InsertPChar(Index, PChar(@Value[0]) + StartIndex, Length);
-  end;
+  End;
   Result := Self;
-end;
-function TJclStringBuilder.Insert(Index: SizeInt; Value: Double): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Insert(Index: SizeInt; Value: Double): TJclStringBuilder;
+Begin
   Result := Insert(Index, FloatToStr(Value));
-end;
-function TJclStringBuilder.Insert(Index: SizeInt; Value: Int64): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Insert(Index: SizeInt; Value: Int64): TJclStringBuilder;
+Begin
   Result := Insert(Index, IntToStr(Value));
-end;
-function TJclStringBuilder.Insert(Index: SizeInt; Value: Cardinal): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Insert(Index: SizeInt; Value: Cardinal): TJclStringBuilder;
+Begin
   Result := Insert(Index, IntToStr(Value));
-end;
-function TJclStringBuilder.Insert(Index: SizeInt; Value: Integer): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Insert(Index: SizeInt; Value: Integer): TJclStringBuilder;
+Begin
   Result := Insert(Index, IntToStr(Value));
-end;
-function TJclStringBuilder.Insert(Index: SizeInt; Obj: TObject): TJclStringBuilder;
-begin
+End;
+Function TJclStringBuilder.Insert(Index: SizeInt; Obj: TObject): TJclStringBuilder;
+Begin
   Result := Insert(Index, DotNetFormat('{0}', [Obj]));
-end;
-function TJclStringBuilder.Remove(StartIndex, Length: SizeInt): TJclStringBuilder;
-begin
-  if (StartIndex < 0) or (Length < 0) or (StartIndex + Length >= FLength) then
+End;
+Function TJclStringBuilder.Remove(StartIndex, Length: SizeInt): TJclStringBuilder;
+Begin
+  If (StartIndex < 0) or (Length < 0) or (StartIndex + Length >= FLength) Then
     raise ArgumentOutOfRangeException.CreateRes(@RsArgumentOutOfRange);
-  if Length > 0 then
-  begin
+  If Length > 0 Then
+  Begin
     MoveChar(FChars[StartIndex + Length], FChars[StartIndex], FLength - (StartIndex + Length));
     Dec(FLength, Length);
-  end;
+  End;
   Result := Self;
-end;
-function TJclStringBuilder.Replace(OldChar, NewChar: Char; StartIndex,
+End;
+Function TJclStringBuilder.Replace(OldChar, NewChar: Char; StartIndex,
   Count: SizeInt): TJclStringBuilder;
-var
+Var
   I: SizeInt;
-begin
-  if Count = -1 then
+Begin
+  If Count = -1 Then
     Count := FLength;
-  if (StartIndex < 0) or (Count < 0) or (StartIndex + Count > FLength) then
+  If (StartIndex < 0) or (Count < 0) or (StartIndex + Count > FLength) Then
     raise ArgumentOutOfRangeException.CreateRes(@RsArgumentOutOfRange);
-  if (Count > 0) and (OldChar <> NewChar) then
-  begin
-    for I := StartIndex to StartIndex + Length - 1 do
-      if FChars[I] = OldChar then
+  If (Count > 0) and (OldChar <> NewChar) Then
+  Begin
+    For I := StartIndex To StartIndex + Length - 1 Do
+      If FChars[I] = OldChar Then
         FChars[I] := NewChar;
-  end;
+  End;
   Result := Self;
-end;
-function TJclStringBuilder.Replace(OldValue, NewValue: string; StartIndex, Count: SizeInt): TJclStringBuilder;
-var
+End;
+Function TJclStringBuilder.Replace(OldValue, NewValue: string; StartIndex, Count: SizeInt): TJclStringBuilder;
+Var
   I: SizeInt;
   Offset: SizeInt;
   NewLen, OldLen, Capacity: SizeInt;
-begin
-  if Count = -1 then
+Begin
+  If Count = -1 Then
     Count := FLength;
-  if (StartIndex < 0) or (Count < 0) or (StartIndex + Count > FLength) then
+  If (StartIndex < 0) or (Count < 0) or (StartIndex + Count > FLength) Then
     raise ArgumentOutOfRangeException.CreateRes(@RsArgumentOutOfRange);
-  if OldValue = '' then
+  If OldValue = '' Then
     raise ArgumentException.CreateResFmt(@RsArgumentIsNull, [0]);
-  if (Count > 0) and (OldValue <> NewValue) then
-  begin
+  If (Count > 0) and (OldValue <> NewValue) Then
+  Begin
     OldLen := System.Length(OldValue);
     NewLen := System.Length(NewValue);
     Offset := NewLen - OldLen;
     Capacity := System.Length(FChars);
-    for I := StartIndex to StartIndex + Length - 1 do
-      if FChars[I] = OldValue[1] then
-      begin
-        if OldLen > 1 then
-          if StrLComp(@FChars[I + 1], PChar(OldValue) + 1, OldLen - 1) <> 0 then
+    For I := StartIndex To StartIndex + Length - 1 Do
+      If FChars[I] = OldValue[1] Then
+      Begin
+        If OldLen > 1 Then
+          If StrLComp(@FChars[I + 1], PChar(OldValue) + 1, OldLen - 1) <> 0 Then
             Continue;
-        if Offset <> 0 then
-        begin
-          if FLength - OldLen + NewLen > MaxCurrency then
+        If Offset <> 0 Then
+        Begin
+          If FLength - OldLen + NewLen > MaxCurrency Then
             raise ArgumentOutOfRangeException.CreateRes(@RsArgumentOutOfRange);
-          if Capacity < FLength + Offset then
-          begin
+          If Capacity < FLength + Offset Then
+          Begin
             Capacity := Capacity * 5 div 3 + Offset;
             SetLength(FChars, Capacity);
-          end;
-          if Offset < 0 then
+          End;
+          If Offset < 0 Then
             MoveChar(FChars[I - Offset], FChars[I], FLength - I)
-          else
+          Else
             MoveChar(FChars[I + OldLen], FChars[I + OldLen + Offset], FLength - OldLen - I);
           Inc(FLength, Offset);
-        end;
-        if NewLen > 0 then
-        begin
-          if (OldLen = 1) and (NewLen = 1) then
+        End;
+        If NewLen > 0 Then
+        Begin
+          If (OldLen = 1) and (NewLen = 1) Then
             FChars[I] := NewValue[1]
-          else
+          Else
             MoveChar(NewValue[1], FChars[I], NewLen);
-        end;
-      end;
-  end;
+        End;
+      End;
+  End;
   Result := Self;
-end;
-function StrExpandTabs(S: string): string;
-begin
+End;
+Function StrExpandTabs(S: string): string;
+Begin
   // use an empty tab set, which will default to a tab width of 2
   Result := TJclTabSet(nil).Expand(s);
-end;
-function StrExpandTabs(S: string; TabWidth: SizeInt): string;
-var
+End;
+Function StrExpandTabs(S: string; TabWidth: SizeInt): string;
+Var
   TabSet: TJclTabSet;
-begin
+Begin
   // create a tab set with no tab stops and the given tab width
   TabSet := TJclTabSet.Create(TabWidth);
-  try
+  Try
     Result := TabSet.Expand(S);
-  finally
+  Finally
     TabSet.Free;
-  end;
-end;
-function StrExpandTabs(S: string; TabSet: TJclTabSet): string;
-begin
+  End;
+End;
+Function StrExpandTabs(S: string; TabSet: TJclTabSet): string;
+Begin
   // use the provided tab set to perform the expansion
   Result := TabSet.Expand(S);
-end;
-function StrOptimizeTabs(S: string): string;
-begin
+End;
+Function StrOptimizeTabs(S: string): string;
+Begin
   // use an empty tab set, which will default to a tab width of 2
   Result := TJclTabSet(nil).Optimize(s);
-end;
-function StrOptimizeTabs(S: string; TabWidth: SizeInt): string;
-var
+End;
+Function StrOptimizeTabs(S: string; TabWidth: SizeInt): string;
+Var
   TabSet: TJclTabSet;
-begin
+Begin
   // create a tab set with no tab stops and the given tab width
   TabSet := TJclTabSet.Create(TabWidth);
-  try
+  Try
     Result := TabSet.Optimize(S);
-  finally
+  Finally
     TabSet.Free;
-  end;
-end;
-function StrOptimizeTabs(S: string; TabSet: TJclTabSet): string;
-begin
+  End;
+End;
+Function StrOptimizeTabs(S: string; TabSet: TJclTabSet): string;
+Begin
   // use the provided tab set to perform the optimization
   Result := TabSet.Optimize(S);
-end;
+End;
 // === { TTabSetData } ===================================================
-type
-  TTabSetData = class
-  public
+Type
+  TTabSetData = Class
+  Public
     FStops: TDynSizeIntArray;
     FRealWidth: SizeInt;
     FRefCount: SizeInt;
     FWidth: SizeInt;
     FZeroBased: Boolean;
-    constructor Create(TabStops: array of SizeInt; ZeroBased: Boolean; TabWidth: SizeInt);
-    function Add(Column: SizeInt): SizeInt;
-    function AddRef: SizeInt;
-    procedure CalcRealWidth;
-    function FindStop(Column: SizeInt): SizeInt;
-    function ReleaseRef: SizeInt;
-    procedure RemoveAt(Index: SizeInt);
-    procedure SetStops(Index, Value: SizeInt);
-  end;
-constructor TTabSetData.Create(TabStops: array of SizeInt; ZeroBased: Boolean; TabWidth: SizeInt);
-var
+    Constructor Create(TabStops: array Of SizeInt; ZeroBased: Boolean; TabWidth: SizeInt);
+    Function Add(Column: SizeInt): SizeInt;
+    Function AddRef: SizeInt;
+    Procedure CalcRealWidth;
+    Function FindStop(Column: SizeInt): SizeInt;
+    Function ReleaseRef: SizeInt;
+    Procedure RemoveAt(Index: SizeInt);
+    Procedure SetStops(Index, Value: SizeInt);
+  End;
+Constructor TTabSetData.Create(TabStops: array Of SizeInt; ZeroBased: Boolean; TabWidth: SizeInt);
+Var
   idx: SizeInt;
-begin
-  inherited Create;
+Begin
+  Inherited Create;
   FRefCount := 1;
-  for idx := 0 to High(Tabstops) do
+  For idx := 0 To High(Tabstops) Do
     Add(Tabstops[idx]);
   FWidth := TabWidth;
   FZeroBased := ZeroBased;
   CalcRealWidth;
-end;
-function TTabSetData.Add(Column: SizeInt): SizeInt;
-var
+End;
+Function TTabSetData.Add(Column: SizeInt): SizeInt;
+Var
   I: SizeInt;
-begin
-  if Column < Ord(FZeroBased) then
+Begin
+  If Column < Ord(FZeroBased) Then
     raise ArgumentOutOfRangeException.Create('Column');
   Result := FindStop(Column);
-  if Result < 0 then
-  begin
+  If Result < 0 Then
+  Begin
     // the column doesn't exist; invert the result of FindStop to get the correct index position
     Result := not Result;
     // increase the tab stop array
     SetLength(FStops, Length(FStops) + 1);
     // shift rooms after the insert position
-    for I := High(FStops) - 1 downto Result do
+    For I := High(FStops) - 1 Downto Result Do
       FStops[I + 1] := FStops[I];
     // add the tab stop at the correct location
     FStops[Result] := Column;
     CalcRealWidth;
-  end
-  else
-  begin
+  End
+  Else
+  Begin
     raise EJclStringError.CreateRes(@RsTabs_DuplicatesNotAllowed);
-  end;
-end;
-function TTabSetData.AddRef: SizeInt;
-begin
-end;
-procedure TTabSetData.CalcRealWidth;
-begin
-  if FWidth < 1 then
-  begin
-    if Length(FStops) > 1 then
+  End;
+End;
+Function TTabSetData.AddRef: SizeInt;
+Begin
+End;
+Procedure TTabSetData.CalcRealWidth;
+Begin
+  If FWidth < 1 Then
+  Begin
+    If Length(FStops) > 1 Then
       FRealWidth := FStops[High(FStops)] - FStops[Pred(High(FStops))]
-    else
-    if Length(FStops) = 1 then
+    Else
+    If Length(FStops) = 1 Then
       FRealWidth := FStops[0]
-    else
+    Else
       FRealWidth := 2;
-  end
-  else
+  End
+  Else
     FRealWidth := FWidth;
-end;
-function TTabSetData.FindStop(Column: SizeInt): SizeInt;
-begin
+End;
+Function TTabSetData.FindStop(Column: SizeInt): SizeInt;
+Begin
   Result := High(FStops);
-  while (Result >= 0) and (FStops[Result] > Column) do
+  While (Result >= 0) and (FStops[Result] > Column) Do
     Dec(Result);
-  if (Result >= 0) and (FStops[Result] <> Column) then
+  If (Result >= 0) and (FStops[Result] <> Column) Then
     Result := not Succ(Result);
-end;
-function TTabSetData.ReleaseRef: SizeInt;
-begin
-end;
-procedure TTabSetData.RemoveAt(Index: SizeInt);
-var
+End;
+Function TTabSetData.ReleaseRef: SizeInt;
+Begin
+End;
+Procedure TTabSetData.RemoveAt(Index: SizeInt);
+Var
   I: SizeInt;
-begin
-  for I := Index to High(FStops) - 1 do
+Begin
+  For I := Index To High(FStops) - 1 Do
     FStops[I] := FStops[I + 1];
   SetLength(FStops, High(FStops));
   CalcRealWidth;
-end;
-procedure TTabSetData.SetStops(Index, Value: SizeInt);
-var
+End;
+Procedure TTabSetData.SetStops(Index, Value: SizeInt);
+Var
   temp: SizeInt;
-begin
-  if (Index < 0) or (Index >= Length(FStops)) then
-  begin
+Begin
+  If (Index < 0) or (Index >= Length(FStops)) Then
+  Begin
     raise ArgumentOutOfRangeException.CreateRes(@RsArgumentOutOfRange);
-  end
-  else
-  begin
+  End
+  Else
+  Begin
     temp := FindStop(Value);
-    if temp < 0 then
-    begin
+    If temp < 0 Then
+    Begin
       // remove existing tab stop...
       RemoveAt(Index);
       // now add the new tab stop
       Add(Value);
-    end
-    else
-    if temp <> Index then
-    begin
+    End
+    Else
+    If temp <> Index Then
+    Begin
       // new tab stop already present at another index
       raise EJclStringError.CreateRes(@RsTabs_DuplicatesNotAllowed);
-    end;
-  end;
-end;
+    End;
+  End;
+End;
 //=== { TJclTabSet } =====================================================
-constructor TJclTabSet.Create;
-begin
+Constructor TJclTabSet.Create;
+Begin
   // no tab stops, tab width set to auto
   Create([], True, 0);
-end;
-constructor TJclTabSet.Create(TabWidth: SizeInt);
-begin
+End;
+Constructor TJclTabSet.Create(TabWidth: SizeInt);
+Begin
   // no tab stops, specified tab width
   Create([], True, TabWidth);
-end;
-constructor TJclTabSet.Create(const Tabstops: array of SizeInt; ZeroBased: Boolean);
-begin
+End;
+Constructor TJclTabSet.Create(Const Tabstops: array Of SizeInt; ZeroBased: Boolean);
+Begin
   // specified tab stops, tab width equal to distance between last two tab stops
   Create(Tabstops, ZeroBased, 0);
-end;
-constructor TJclTabSet.Create(const Tabstops: array of SizeInt; ZeroBased: Boolean; TabWidth: SizeInt);
-begin
-  inherited Create;
+End;
+Constructor TJclTabSet.Create(Const Tabstops: array Of SizeInt; ZeroBased: Boolean; TabWidth: SizeInt);
+Begin
+  Inherited Create;
   FData := TTabSetData.Create(Tabstops, ZeroBased, TabWidth);
-end;
-constructor TJclTabSet.Create(Data: TObject);
-begin
-  inherited Create;
+End;
+Constructor TJclTabSet.Create(Data: TObject);
+Begin
+  Inherited Create;
   // add a reference to the data
   TTabSetData(Data).AddRef;
   // assign the data to this instance
   FData := TTabSetData(Data);
-end;
-destructor TJclTabSet.Destroy;
-begin
+End;
+Destructor TJclTabSet.Destroy;
+Begin
   // release the reference to the tab set data
   TTabSetData(FData).ReleaseRef;
   // make sure we won't accidentally refer to it later, just in case something goes wrong during destruction
   FData := nil;
   // really destroy the instance
-  inherited Destroy;
-end;
-function TJclTabSet.Add(Column: SizeInt): SizeInt;
-begin
-  if Self = nil then
+  Inherited Destroy;
+End;
+Function TJclTabSet.Add(Column: SizeInt): SizeInt;
+Begin
+  If Self = nil Then
     raise NullReferenceException.Create;
   Result := TTabSetData(FData).Add(Column);
-end;
-function TJclTabSet.Clone: TJclTabSet;
-begin
-  if Self <> nil then
+End;
+Function TJclTabSet.Clone: TJclTabSet;
+Begin
+  If Self <> nil Then
     Result := TJclTabSet.Create(TTabSetData(FData).FStops, TTabSetData(FData).FZeroBased, TTabSetData(FData).FWidth)
-  else
+  Else
     Result := nil;
-end;
-function TJclTabSet.Delete(Column: SizeInt): SizeInt;
-begin
+End;
+Function TJclTabSet.Delete(Column: SizeInt): SizeInt;
+Begin
   Result := TTabSetData(FData).FindStop(Column);
-  if Result >= 0 then
+  If Result >= 0 Then
     TTabSetData(FData).RemoveAt(Result);
-end;
-function TJclTabSet.Expand(const S: string): string;
-begin
+End;
+Function TJclTabSet.Expand(Const S: string): string;
+Begin
   Result := Expand(s, StartColumn);
-end;
-function TJclTabSet.Expand(const S: string; Column: SizeInt): string;
-var
+End;
+Function TJclTabSet.Expand(Const S: string; Column: SizeInt): string;
+Var
   sb: TJclStringBuilder;
   head: PChar;
   cur: PChar;
-begin
-  if Column < StartColumn then
+Begin
+  If Column < StartColumn Then
     raise ArgumentOutOfRangeException.Create('Column');
   sb := TJclStringBuilder.Create(Length(S));
-  try
+  Try
     cur := PChar(S);
-    while cur^ <> #0 do
-    begin
+    While cur^ <> #0 Do
+    Begin
       head := cur;
-      while (cur^ <> #0) and (cur^ <> #9) do
-      begin
-        if CharIsReturn(cur^) then
+      While (cur^ <> #0) and (cur^ <> #9) Do
+      Begin
+        If CharIsReturn(cur^) Then
           Column := StartColumn
-        else
+        Else
           Inc(Column);
         Inc(cur);
-      end;
-      if cur > head then
+      End;
+      If cur > head Then
         sb.Append(head, 0, cur - head);
-      if cur^ = #9 then
-      begin
+      If cur^ = #9 Then
+      Begin
         sb.Append(' ', TabFrom(Column) - Column);
         Column := TabFrom(Column);
         Inc(cur);
-      end;
-    end;
+      End;
+    End;
     Result := sb.ToString;
-  finally
+  Finally
     sb.Free;
-  end;
-end;
-function TJclTabSet.FindStop(Column: SizeInt): SizeInt;
-begin
-  if Self <> nil then
+  End;
+End;
+Function TJclTabSet.FindStop(Column: SizeInt): SizeInt;
+Begin
+  If Self <> nil Then
     Result := TTabSetData(FData).FindStop(Column)
-  else
+  Else
     Result := -1;
-end;
-class function TJclTabSet.FromString(const S: string): TJclTabSet;
-var
+End;
+Class Function TJclTabSet.FromString(Const S: string): TJclTabSet;
+Var
   cur: PChar;
-  function ParseNumber: Integer;
-  var
+  Function ParseNumber: Integer;
+  Var
     head: PChar;
-  begin
+  Begin
     StrSkipChars(cur, CharIsWhiteSpace);
     head := cur;
-    while CharIsDigit(cur^) do
+    While CharIsDigit(cur^) Do
       Inc(cur);
     Result := -1;
-    if (cur <= head) or not TryStrToInt(Copy(head, 1, cur - head), Result) then
+    If (cur <= head) or not TryStrToInt(Copy(head, 1, cur - head), Result) Then
       Result := -1;
-  end;
-  procedure ParseStops;
-  var
+  End;
+  Procedure ParseStops;
+  Var
     openBracket, hadComma: Boolean;
     num: SizeInt;
-  begin
+  Begin
     StrSkipChars(cur, CharIsWhiteSpace);
     openBracket := cur^ = '[';
     hadComma := False;
-    if openBracket then
+    If openBracket Then
       Inc(cur);
-    repeat
+    Repeat
       num := ParseNumber;
-      if (num < 0) and hadComma then
+      If (num < 0) and hadComma Then
         raise EJclStringError.CreateRes(@RsTabs_StopExpected)
-      else
-      if num >= 0 then
+      Else
+      If num >= 0 Then
         Result.Add(num);
       StrSkipChars(cur, CharIsWhiteSpace);
       hadComma := cur^ = ',';
-      if hadComma then
+      If hadComma Then
         Inc(cur);
-    until (cur^ = #0) or (cur^ = '+') or (cur^ = ']');
-    if hadComma then
+    Until (cur^ = #0) or (cur^ = '+') or (cur^ = ']');
+    If hadComma Then
       raise EJclStringError.CreateRes(@RsTabs_StopExpected)
-    else
-    if openBracket and (cur^ <> ']') then
+    Else
+    If openBracket and (cur^ <> ']') Then
       raise EJclStringError.CreateRes(@RsTabs_CloseBracketExpected);
-  end;
-  procedure ParseTabWidth;
-  var
+  End;
+  Procedure ParseTabWidth;
+  Var
     num: SizeInt;
-  begin
+  Begin
     StrSkipChars(cur, CharIsWhiteSpace);
-    if cur^ = '+' then
-    begin
+    If cur^ = '+' Then
+    Begin
       Inc(cur);
       StrSkipChars(cur, CharIsWhiteSpace);
       num := ParseNumber;
-      if (num < 0) then
+      If (num < 0) Then
         raise EJclStringError.CreateRes(@RsTabs_TabWidthExpected)
-      else
+      Else
         Result.TabWidth := num;
-    end;
-  end;
-  procedure ParseZeroBasedFlag;
-  begin
+    End;
+  End;
+  Procedure ParseZeroBasedFlag;
+  Begin
     StrSkipChars(cur, CharIsWhiteSpace);
-    if cur^ = '0' then
-    begin
+    If cur^ = '0' Then
+    Begin
       Inc(cur);
-      if CharIsWhiteSpace(cur^) or (cur^ = #0) or (cur^ = '[') then
-      begin
+      If CharIsWhiteSpace(cur^) or (cur^ = #0) or (cur^ = '[') Then
+      Begin
         Result.ZeroBased := True;
         StrSkipChars(cur, CharIsWhiteSpace);
-      end
-      else
+      End
+      Else
         Dec(cur);
-    end;
-  end;
-begin
+    End;
+  End;
+Begin
   Result := TJclTabSet.Create;
-  try
+  Try
     Result.ZeroBased := False;
     cur := PChar(S);
     ParseZeroBasedFlag;
     ParseStops;
     ParseTabWidth;
-  except
+  Except
     // clean up the partially complete instance (to avoid memory leaks)...
     Result.Free;
     // ... and re-raise the exception
     raise;
-  end;
-end;
-function TJclTabSet.GetCount: SizeInt;
-begin
-  if Self <> nil then
+  End;
+End;
+Function TJclTabSet.GetCount: SizeInt;
+Begin
+  If Self <> nil Then
     Result := Length(TTabSetData(FData).FStops)
-  else
+  Else
     Result := 0;
-end;
-function TJclTabSet.GetStops(Index: SizeInt): SizeInt;
-begin
-  if Self <> nil then
-  begin
-    if (Index < 0) or (Index >= Length(TTabSetData(FData).FStops)) then
-    begin
+End;
+Function TJclTabSet.GetStops(Index: SizeInt): SizeInt;
+Begin
+  If Self <> nil Then
+  Begin
+    If (Index < 0) or (Index >= Length(TTabSetData(FData).FStops)) Then
+    Begin
       raise EJclStringError.CreateRes(@RsArgumentOutOfRange);
-    end
-    else
+    End
+    Else
       Result := TTabSetData(FData).FStops[Index];
-  end
-  else
-  begin
+  End
+  Else
+  Begin
     raise EJclStringError.CreateRes(@RsArgumentOutOfRange);
-  end;
-end;
-function TJclTabSet.GetTabWidth: SizeInt;
-begin
-  if Self <> nil then
+  End;
+End;
+Function TJclTabSet.GetTabWidth: SizeInt;
+Begin
+  If Self <> nil Then
     Result := TTabSetData(FData).FWidth
-  else
+  Else
     Result := 0;
-end;
-function TJclTabSet.GetZeroBased: Boolean;
-begin
+End;
+Function TJclTabSet.GetZeroBased: Boolean;
+Begin
   Result := (Self = nil) or TTabSetData(FData).FZeroBased;
-end;
-procedure TJclTabSet.OptimalFillInfo(StartColumn, TargetColumn: SizeInt; out TabsNeeded, SpacesNeeded: SizeInt);
-var
+End;
+Procedure TJclTabSet.OptimalFillInfo(StartColumn, TargetColumn: SizeInt; out TabsNeeded, SpacesNeeded: SizeInt);
+Var
   nextTab: SizeInt;
-begin
-  if StartColumn < Self.StartColumn then  // starting column less than 1 or 0 (depending on ZeroBased state)
+Begin
+  If StartColumn < Self.StartColumn Then  // starting column less than 1 or 0 (depending on ZeroBased state)
     raise ArgumentOutOfRangeException.Create('StartColumn');
-  if (TargetColumn < StartColumn) then    // target lies before the starting column
+  If (TargetColumn < StartColumn) Then    // target lies before the starting column
     raise ArgumentOutOfRangeException.Create('TargetColumn');
   TabsNeeded := 0;
-  repeat
+  Repeat
     nextTab := TabFrom(StartColumn);
-    if nextTab <= TargetColumn then
-    begin
+    If nextTab <= TargetColumn Then
+    Begin
       Inc(TabsNeeded);
       StartColumn := nextTab;
-    end;
-  until nextTab > TargetColumn;
+    End;
+  Until nextTab > TargetColumn;
   SpacesNeeded := TargetColumn - StartColumn;
-end;
-function TJclTabSet.Optimize(const S: string): string;
-begin
+End;
+Function TJclTabSet.Optimize(Const S: string): string;
+Begin
   Result := Optimize(S, StartColumn);
-end;
-function TJclTabSet.Optimize(const S: string; Column: SizeInt): string;
-var
+End;
+Function TJclTabSet.Optimize(Const S: string; Column: SizeInt): string;
+Var
   sb: TJclStringBuilder;
   head: PChar;
   cur: PChar;
   tgt: SizeInt;
-  procedure AppendOptimalWhiteSpace(Target: SizeInt);
-  var
+  Procedure AppendOptimalWhiteSpace(Target: SizeInt);
+  Var
     tabCount: SizeInt;
     spaceCount: SizeInt;
-  begin
-    if cur > head then
-    begin
+  Begin
+    If cur > head Then
+    Begin
       OptimalFillInfo(Column, Target, tabCount, spaceCount);
-      if tabCount > 0 then
+      If tabCount > 0 Then
         sb.Append(#9, tabCount);
-      if spaceCount > 0 then
+      If spaceCount > 0 Then
         sb.Append(' ', spaceCount);
-    end;
-  end;
-begin
-  if Column < StartColumn then
+    End;
+  End;
+Begin
+  If Column < StartColumn Then
     raise ArgumentOutOfRangeException.Create('Column');
   sb := TJclStringBuilder.Create(Length(S));
-  try
+  Try
     cur := PChar(s);
-    while cur^ <> #0 do
-    begin
+    While cur^ <> #0 Do
+    Begin
       // locate first whitespace character
       head := cur;
-      while (cur^ <> #0) and not CharIsWhiteSpace(cur^) do
+      While (cur^ <> #0) and not CharIsWhiteSpace(cur^) Do
         Inc(cur);
       // output non whitespace characters
-      if cur > head then
+      If cur > head Then
         sb.Append(head, 0, cur - head);
       // advance column
       Inc(Column, cur - head);
       // initialize target column indexer
       tgt := Column;
       // locate end of whitespace sequence
-      while CharIsWhiteSpace(cur^) do
-      begin
-        if CharIsReturn(cur^) then
-        begin
+      While CharIsWhiteSpace(cur^) Do
+      Begin
+        If CharIsReturn(cur^) Then
+        Begin
           // append optimized whitespace sequence...
           AppendOptimalWhiteSpace(tgt);
           // ...set the column back to the start of the line...
@@ -4360,218 +4360,218 @@ begin
           tgt := Column;
           // ...add the line break character...
           sb.Append(cur^);
-        end
-        else
-        if cur^ = #9 then
+        End
+        Else
+        If cur^ = #9 Then
           tgt := TabFrom(tgt)       // expand the tab
-        else
+        Else
           Inc(tgt);                 // a normal whitespace; taking up 1 column
         Inc(cur);
-      end;
+      End;
       AppendOptimalWhiteSpace(tgt); // append optimized whitespace sequence...
       Column := tgt;                // ...and memorize the column for the next iteration
-    end;
+    End;
     Result := sb.ToString;          // convert result to a string
-  finally
+  Finally
     sb.Free;
-  end;
-end;
-procedure TJclTabSet.RemoveAt(Index: SizeInt);
-begin
-  if Self <> nil then
+  End;
+End;
+Procedure TJclTabSet.RemoveAt(Index: SizeInt);
+Begin
+  If Self <> nil Then
     TTabSetData(FData).RemoveAt(Index)
-  else
+  Else
     raise NullReferenceException.Create;
-end;
-procedure TJclTabSet.SetStops(Index, Value: SizeInt);
-begin
-  if Self <> nil then
+End;
+Procedure TJclTabSet.SetStops(Index, Value: SizeInt);
+Begin
+  If Self <> nil Then
     TTabSetData(FData).SetStops(Index, Value)
-  else
+  Else
     raise NullReferenceException.Create;
-end;
-procedure TJclTabSet.SetTabWidth(Value: SizeInt);
-begin
-  if Self <> nil then
-  begin
+End;
+Procedure TJclTabSet.SetTabWidth(Value: SizeInt);
+Begin
+  If Self <> nil Then
+  Begin
     TTabSetData(FData).FWidth := Value;
     TTabSetData(FData).CalcRealWidth;
-  end
-  else
+  End
+  Else
     raise NullReferenceException.Create;
-end;
-procedure TJclTabSet.SetZeroBased(Value: Boolean);
-var
+End;
+Procedure TJclTabSet.SetZeroBased(Value: Boolean);
+Var
   shift: SizeInt;
   idx:   SizeInt;
-begin
-  if Self <> nil then
-  begin
-    if Value <> TTabSetData(FData).FZeroBased then
-    begin
+Begin
+  If Self <> nil Then
+  Begin
+    If Value <> TTabSetData(FData).FZeroBased Then
+    Begin
       TTabSetData(FData).FZeroBased := Value;
-      if Value then
+      If Value Then
         shift := -1
-      else
+      Else
         shift := 1;
-      for idx := 0 to High(TTabSetData(FData).FStops) do
+      For idx := 0 To High(TTabSetData(FData).FStops) Do
         TTabSetData(FData).FStops[idx] := TTabSetData(FData).FStops[idx] + shift;
-    end;
-  end
-  else
+    End;
+  End
+  Else
     raise NullReferenceException.Create;
-end;
-function TJclTabSet.InternalTabStops: TDynSizeIntArray;
-begin
-  if Self <> nil then
+End;
+Function TJclTabSet.InternalTabStops: TDynSizeIntArray;
+Begin
+  If Self <> nil Then
     Result := TTabSetData(FData).FStops
-  else
+  Else
     Result := nil;
-end;
-function TJclTabSet.InternalTabWidth: SizeInt;
-begin
-  if Self <> nil then
+End;
+Function TJclTabSet.InternalTabWidth: SizeInt;
+Begin
+  If Self <> nil Then
     Result := TTabSetData(FData).FRealWidth
-  else
+  Else
     Result := 2;
-end;
-function TJclTabSet.NewReference: TJclTabSet;
-begin
-  if Self <> nil then
+End;
+Function TJclTabSet.NewReference: TJclTabSet;
+Begin
+  If Self <> nil Then
     Result := TJclTabSet.Create(FData)
-  else
+  Else
     Result := nil;
-end;
-function TJclTabSet.StartColumn: SizeInt;
-begin
-  if GetZeroBased then
+End;
+Function TJclTabSet.StartColumn: SizeInt;
+Begin
+  If GetZeroBased Then
     Result := 0
-  else
+  Else
     Result := 1;
-end;
-function TJclTabSet.TabFrom(Column: SizeInt): SizeInt;
-begin
-  if Column < StartColumn then
+End;
+Function TJclTabSet.TabFrom(Column: SizeInt): SizeInt;
+Begin
+  If Column < StartColumn Then
     raise ArgumentOutOfRangeException.Create('Column');
   Result := FindStop(Column);
-  if Result < 0 then
+  If Result < 0 Then
     Result := not Result
-  else
+  Else
     Inc(Result);
-  if Result >= GetCount then
-  begin
-    if GetCount > 0 then
+  If Result >= GetCount Then
+  Begin
+    If GetCount > 0 Then
       Result := TTabSetData(FData).FStops[High(TTabSetData(FData).FStops)]
-    else
+    Else
       Result := StartColumn;
-    while Result <= Column do
+    While Result <= Column Do
       Inc(Result, ActualTabWidth);
-  end
-  else
+  End
+  Else
     Result := TTabSetData(FData).FStops[Result];
-end;
-function TJclTabSet.ToString: string;
-begin
+End;
+Function TJclTabSet.ToString: string;
+Begin
   Result := ToString(TabSetFormatting_Full);
-end;
-function TJclTabSet.ToString(FormattingOptions: SizeInt): string;
-var
+End;
+Function TJclTabSet.ToString(FormattingOptions: SizeInt): string;
+Var
   sb: TJclStringBuilder;
   idx: SizeInt;
-  function WantBrackets: Boolean;
-  begin
+  Function WantBrackets: Boolean;
+  Begin
     Result := (TabSetFormatting_SurroundStopsWithBrackets and FormattingOptions) <> 0;
-  end;
-  function EmptyBrackets: Boolean;
-  begin
+  End;
+  Function EmptyBrackets: Boolean;
+  Begin
     Result := (TabSetFormatting_EmptyBracketsIfNoStops and FormattingOptions) <> 0;
-  end;
-  function IncludeAutoWidth: Boolean;
-  begin
+  End;
+  Function IncludeAutoWidth: Boolean;
+  Begin
     Result := (TabSetFormatting_AutoTabWidth and FormattingOptions) <> 0;
-  end;
-  function IncludeTabWidth: Boolean;
-  begin
+  End;
+  Function IncludeTabWidth: Boolean;
+  Begin
     Result := (TabSetFormatting_NoTabWidth and FormattingOptions) = 0;
-  end;
-  function IncludeStops: Boolean;
-  begin
+  End;
+  Function IncludeStops: Boolean;
+  Begin
     Result := (TabSetFormatting_NoTabStops and FormattingOptions) = 0;
-  end;
-begin
+  End;
+Begin
   sb := TJclStringBuilder.Create;
-  try
+  Try
     // output the fixed tabulation positions if requested...
-    if IncludeStops then
-    begin
+    If IncludeStops Then
+    Begin
       // output each individual tabulation position
-      for idx := 0 to GetCount - 1 do
-      begin
+      For idx := 0 To GetCount - 1 Do
+      Begin
         sb.Append(TabStops[idx]);
         sb.Append(',');
-      end;
+      End;
       // remove the final comma if any tabulation positions where outputted
-      if sb.Length <> 0 then
+      If sb.Length <> 0 Then
         sb.Remove(sb.Length - 1, 1);
       // bracket the tabulation positions if requested
-      if WantBrackets and (EmptyBrackets or (sb.Length > 0)) then
-      begin
+      If WantBrackets and (EmptyBrackets or (sb.Length > 0)) Then
+      Begin
         sb.Insert(0, '[');
         sb.Append(']');
-      end;
-    end;
+      End;
+    End;
     // output the tab width if requested....
-    if IncludeTabWidth and (IncludeAutoWidth or (TabWidth > 0)) then
-    begin
+    If IncludeTabWidth and (IncludeAutoWidth or (TabWidth > 0)) Then
+    Begin
       // separate the tab width from any outputted tabulation positions with a whitespace
-      if sb.Length > 0 then
+      If sb.Length > 0 Then
         sb.Append(' ');
       // flag tab width
       sb.Append('+');
       // finally, output the tab width
       sb.Append(ActualTabWidth);
-    end;
+    End;
     // flag zero-based tabset by outputting a 0 (zero) as the first character.
-    if ZeroBased then
+    If ZeroBased Then
       sb.Insert(0, string('0 '));
     Result := StrTrimCharRight(sb.ToString, ' ');
-  finally
+  Finally
     sb.Free;
-  end;
-end;
-function TJclTabSet.UpdatePosition(const S: string): SizeInt;
-var
+  End;
+End;
+Function TJclTabSet.UpdatePosition(Const S: string): SizeInt;
+Var
   Line: SizeInt;
-begin
+Begin
   Result := StartColumn;
   Line := -1;
   UpdatePosition(S, Result, Line);
-end;
-function TJclTabSet.UpdatePosition(const S: string; Column: SizeInt): SizeInt;
-var
+End;
+Function TJclTabSet.UpdatePosition(Const S: string; Column: SizeInt): SizeInt;
+Var
   Line: SizeInt;
-begin
-  if Column < StartColumn then
+Begin
+  If Column < StartColumn Then
     raise ArgumentOutOfRangeException.Create('Column');
   Result := Column;
   Line := -1;
   UpdatePosition(S, Result, Line);
-end;
-function TJclTabSet.UpdatePosition(const S: string; var Column, Line: SizeInt): SizeInt;
-var
+End;
+Function TJclTabSet.UpdatePosition(Const S: string; Var Column, Line: SizeInt): SizeInt;
+Var
   prevChar: Char;
   cur:      PChar;
-begin
-  if Column < StartColumn then
+Begin
+  If Column < StartColumn Then
     raise ArgumentOutOfRangeException.Create('Column');
   // initialize loop
   cur := PChar(S);
   // iterate until end of string (the Null-character)
-  while cur^ <> #0 do
-  begin
+  While cur^ <> #0 Do
+  Begin
     // check for line-breaking characters
-    if CharIsReturn(cur^) then
-    begin
+    If CharIsReturn(cur^) Then
+    Begin
       // Column moves back all the way to the left
       Column := StartColumn;
       // If this is the first line-break character or the same line-break character, increment the Line parameter
@@ -4580,156 +4580,156 @@ begin
       prevChar := cur^;
       Inc(cur);
       // if it isn't a two-character line-break, undo the previous advancement
-      if (cur^ = prevChar) or not CharIsReturn(cur^) then
+      If (cur^ = prevChar) or not CharIsReturn(cur^) Then
         Dec(cur);
-    end
-    else // check for tab character and expand it
-    if cur^ = #9 then
+    End
+    Else // check for tab character and expand it
+    If cur^ = #9 Then
       Column := TabFrom(Column)
-    else // a normal character; increment column
+    Else // a normal character; increment column
       Inc(Column);
     // advance pointer
     Inc(cur);
-  end;
+  End;
   // set the result to the newly calculated column
   Result := Column;
-end;
+End;
 //=== { NullReferenceException } =============================================
-constructor NullReferenceException.Create;
-begin
+Constructor NullReferenceException.Create;
+Begin
   CreateRes(@RsArg_NullReferenceException);
-end;
-function CompareNatural(const S1, S2: string; CaseInsensitive: Boolean): SizeInt;
-var
+End;
+Function CompareNatural(Const S1, S2: string; CaseInsensitive: Boolean): SizeInt;
+Var
   Cur1, Len1,
   Cur2, Len2: SizeInt;
-  function IsRealNumberChar(ch: Char): Boolean;
-  begin
+  Function IsRealNumberChar(ch: Char): Boolean;
+  Begin
     Result := ((ch >= '0') and (ch <= '9')) or (ch = '-') or (ch = '+');
-  end;
-  procedure NumberCompare;
-  var
+  End;
+  Procedure NumberCompare;
+  Var
     IsReallyNumber: Boolean;
     FirstDiffBreaks: Boolean;
     Val1, Val2:     SizeInt;
-  begin
+  Begin
     Result := 0;
     IsReallyNumber := False;
     // count leading spaces in S1
-    while (Cur1 <= Len1) and CharIsWhiteSpace(S1[Cur1]) do
-    begin
+    While (Cur1 <= Len1) and CharIsWhiteSpace(S1[Cur1]) Do
+    Begin
       Dec(Result);
       Inc(Cur1);
-    end;
+    End;
     // count leading spaces in S2 (canceling them out against the ones in S1)
-    while (Cur2 <= Len2) and CharIsWhiteSpace(S2[Cur2]) do
-    begin
+    While (Cur2 <= Len2) and CharIsWhiteSpace(S2[Cur2]) Do
+    Begin
       Inc(Result);
       Inc(Cur2);
-    end;
+    End;
     // if spaces match, or both strings are actually followed by a numeric character, continue the checks
-    if (Result = 0) or ((Cur1 <= Len1) and CharIsNumberChar(S1[Cur1]) and (Cur2 <= Len2) and CharIsNumberChar(S2[Cur2])) then
-    begin
+    If (Result = 0) or ((Cur1 <= Len1) and CharIsNumberChar(S1[Cur1]) and (Cur2 <= Len2) and CharIsNumberChar(S2[Cur2])) Then
+    Begin
       // Check signed number
-      if (Cur1 <= Len1) and (S1[Cur1] = '-') and ((Cur2 > Len2) or (S2[Cur2] <> '-')) then
+      If (Cur1 <= Len1) and (S1[Cur1] = '-') and ((Cur2 > Len2) or (S2[Cur2] <> '-')) Then
         Result := 1
-      else
-      if (Cur2 <= Len2) and (S2[Cur2] = '-') and ((Cur1 > Len1) or (S1[Cur1] <> '-')) then
+      Else
+      If (Cur2 <= Len2) and (S2[Cur2] = '-') and ((Cur1 > Len1) or (S1[Cur1] <> '-')) Then
         Result := -1
-      else
+      Else
         Result := 0;
-      if (Cur1 <= Len1) and ((S1[Cur1] = '-') or (S1[Cur1] = '+')) then
+      If (Cur1 <= Len1) and ((S1[Cur1] = '-') or (S1[Cur1] = '+')) Then
         Inc(Cur1);
-      if (Cur2 <= Len2) and ((S2[Cur2] = '-') or (S2[Cur2] = '+')) then
+      If (Cur2 <= Len2) and ((S2[Cur2] = '-') or (S2[Cur2] = '+')) Then
         Inc(Cur2);
       FirstDiffBreaks := (Cur1 <= Len1) and (S1[Cur1] = '0') or (Cur2 <= Len2) and (S2[Cur2] = '0');
-      while (Cur1 <= Len1) and CharIsDigit(S1[Cur1]) and (Cur2 <= Len2) and CharIsDigit(S2[Cur2]) do
-      begin
+      While (Cur1 <= Len1) and CharIsDigit(S1[Cur1]) and (Cur2 <= Len2) and CharIsDigit(S2[Cur2]) Do
+      Begin
         IsReallyNumber := True;
         Val1 := StrToInt(S1[Cur1]);
         Val2 := StrToInt(S2[Cur2]);
-        if (Result = 0) and (Val1 < Val2) then
+        If (Result = 0) and (Val1 < Val2) Then
           Result := -1
-        else
-        if (Result = 0) and (Val1 > Val2) then
+        Else
+        If (Result = 0) and (Val1 > Val2) Then
           Result := 1;
-        if FirstDiffBreaks and (Result <> 0) then
+        If FirstDiffBreaks and (Result <> 0) Then
           Break;
         Inc(Cur1);
         Inc(Cur2);
-      end;
-      if IsReallyNumber then
-      begin
-        if not FirstDiffBreaks then
-        begin
-          if (Cur1 <= Len1) and CharIsDigit(S1[Cur1]) then
+      End;
+      If IsReallyNumber Then
+      Begin
+        If not FirstDiffBreaks Then
+        Begin
+          If (Cur1 <= Len1) and CharIsDigit(S1[Cur1]) Then
             Result := 1
-          else
-          if (Cur2 <= Len2) and CharIsDigit(S2[Cur2]) then
+          Else
+          If (Cur2 <= Len2) and CharIsDigit(S2[Cur2]) Then
             Result := -1;
-        end;
-      end;
-    end;
-  end;
-  procedure SetByCompareLength;
-  var
+        End;
+      End;
+    End;
+  End;
+  Procedure SetByCompareLength;
+  Var
     Remain1: SizeInt;
     Remain2: SizeInt;
-  begin
+  Begin
     // base result on relative compare length (spaces could be ignored, so even if S1 is longer than S2, they could be
     // completely equal, or S2 could be longer)
     Remain1 := Len1 - Cur1 + 1;
     Remain2 := Len2 - Cur2 + 1;
-    if Remain1 < 0 then
+    If Remain1 < 0 Then
       Remain1 := 0;
-    if Remain2 < 0 then
+    If Remain2 < 0 Then
       Remain2 := 0;
-    if Remain1 < Remain2 then
+    If Remain1 < Remain2 Then
       Result := -1
-    else
-    if Remain1 > Remain2 then
+    Else
+    If Remain1 > Remain2 Then
       Result := 1;
-  end;
-begin
+  End;
+Begin
   Cur1 := 1;
   Len1 := Length(S1);
   Cur2 := 1;
   Len2 := Length(S2);
   Result := 0;
-  while (Result = 0) do
-  begin
-    if (Cur1 > Len1) or (Cur2 > Len2) then
-    begin
+  While (Result = 0) Do
+  Begin
+    If (Cur1 > Len1) or (Cur2 > Len2) Then
+    Begin
       SetByCompareLength;
       Break;
-    end
-    else
-    if (Cur1 <= Len1) and (Cur2 > Len2) then
+    End
+    Else
+    If (Cur1 <= Len1) and (Cur2 > Len2) Then
       Result := 1
-    else
-    if (S1[Cur1] = '-') and IsRealNumberChar(S2[Cur2]) and (S2[Cur2] <> '-') then
+    Else
+    If (S1[Cur1] = '-') and IsRealNumberChar(S2[Cur2]) and (S2[Cur2] <> '-') Then
       Result := -1
-    else
-    if (S2[Cur2] = '-') and IsRealNumberChar(S1[Cur1]) and (S1[Cur1] <> '-') then
+    Else
+    If (S2[Cur2] = '-') and IsRealNumberChar(S1[Cur1]) and (S1[Cur1] <> '-') Then
       Result := 1
-    else
-    if (IsRealNumberChar(S1[Cur1]) or CharIsWhiteSpace(S1[Cur1])) and (IsRealNumberChar(S2[Cur2]) or CharIsWhiteSpace(S2[Cur2])) then
+    Else
+    If (IsRealNumberChar(S1[Cur1]) or CharIsWhiteSpace(S1[Cur1])) and (IsRealNumberChar(S2[Cur2]) or CharIsWhiteSpace(S2[Cur2])) Then
       NumberCompare
-    else
-    begin
-      if CaseInsensitive then
+    Else
+    Begin
+      If CaseInsensitive Then
         Result := StrLIComp(PChar(@S1[Cur1]), PChar(@S2[Cur2]), 1)
-      else
+      Else
         Result := StrLComp(PChar(@S1[Cur1]), PChar(@S2[Cur2]), 1);
       Inc(Cur1);
       Inc(Cur2);
-    end;
-  end;
-end;
+    End;
+  End;
+End;
 
-initialization
-  {$IFNDEF UNICODE_RTL_DATABASE}
-  LoadCharTypes;  // this table first
-  LoadCaseMap;    // or this function does not work
-  {$ENDIF ~UNICODE_RTL_DATABASE}
-end.
+Initialization
+{$IFNDEF UNICODE_RTL_DATABASE}
+ LoadCharTypes;  // this table first
+ LoadCaseMap;    // or this function does not work
+{$ENDIF ~UNICODE_RTL_DATABASE}
+End.

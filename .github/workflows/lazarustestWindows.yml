@@ -29,6 +29,20 @@ jobs:
           include-packages: "Indy10, ZeosDBO"
           with-cache: false
 
+      - name: Enable ZMemTable stream import/export in Zeos
+        shell: pwsh
+        run: |
+          $incFile = Get-ChildItem -Path $env:RUNNER_TEMP -Recurse -Filter "Zeos.inc" -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match "zeosdbo" } | Select-Object -First 1
+          if (-not $incFile) { throw "Zeos.inc not found under $env:RUNNER_TEMP" }
+          (Get-Content $incFile.FullName) -replace '\{\.\$DEFINE ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT\}', '{$DEFINE ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}' |
+            Set-Content $incFile.FullName
+          Select-String -Path $incFile.FullName -Pattern "ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT"
+          # zcomponent.lpk was already compiled by the OPM install step before this edit;
+          # force a rebuild so ZMemTable.pas picks up the newly enabled define.
+          $zcomponentLpk = Join-Path $incFile.Directory.Parent.FullName "packages\lazarus\zcomponent.lpk"
+          lazbuild -B $zcomponentLpk
+
       - name: Build the Main package on Windows
         run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
 

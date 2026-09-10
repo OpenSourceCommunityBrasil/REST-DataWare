@@ -1,0 +1,11 @@
+REST Dataware FCM - Win32 / Delphi antigo
+
+A unit OpenSSL.Api_11 espera:
+  libcrypto-1_1.dll
+  libssl-1_1.dll
+
+Esses binarios OpenSSL 1.1 Win32 nao estavam presentes no material fornecido.
+Nao foram substituidos por libeay32/ssleay32 1.0.2 porque a ABI nao e a mesma.
+
+Para homologacao Win32, disponibilizar exatamente a familia OpenSSL 1.1
+compatível com OpenSSL.Api_11 na pasta do executavel.

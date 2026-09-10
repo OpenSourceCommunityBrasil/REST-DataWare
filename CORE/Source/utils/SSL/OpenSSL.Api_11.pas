@@ -28,27 +28,27 @@ const
   LIB_CRYPTO = 'libcrypto-1_1-x64.dll';
   LIB_SSL = 'libssl-1_1-x64.dll';
   _PU = '';
-  {$ELSEIF Defined(ANDROID64)}
+  {$ELSEIF Defined(ANDROID64) or (Defined(CPUAARCH64) and Defined(ANDROID))}
   LIB_CRYPTO = 'libcrypto-android64.a';
   LIB_SSL = 'libssl-android64.a';
   _PU = '';
-  {$ELSEIF Defined(ANDROID32)}
+  {$ELSEIF Defined(ANDROID32) or (Defined(CPUARM) and Defined(ANDROID))}
   LIB_CRYPTO = 'libcrypto-android32.a';
   LIB_SSL = 'libssl-android32.a';
   _PU = '';
-  {$ELSEIF Defined(IOS)}
+  {$ELSEIF Defined(IOS) or Defined(IOS64) or Defined(DCCIOS32) or Defined(DCCIOS64)}
   LIB_CRYPTO = 'libcrypto-ios.a';
   LIB_SSL = 'libssl-ios.a';
   _PU = '';
-  {$ELSEIF Defined(MACOS32)}
+  {$ELSEIF Defined(MACOS32) or (Defined(CPUI386) and Defined(DARWIN))}
   LIB_CRYPTO = 'libssl-merged-osx32.dylib'; { We unify LibSsl and LibCrypto into a common shared library on macOS }
   LIB_SSL = 'libssl-merged-osx32.dylib';
   _PU = '_';
-  {$ELSEIF Defined(MACOS64)}
+  {$ELSEIF Defined(MACOS64) or (Defined(CPUX86_64) and Defined(DARWIN)) or (Defined(CPUAARCH64) and Defined(DARWIN))}
   LIB_CRYPTO = 'libcrypto-osx64.a';
   LIB_SSL = 'libssl-osx64.a';
   _PU = '';
-  {$ELSEIF Defined(LINUX)}
+  {$ELSEIF Defined(LINUX) or Defined(FREEBSD)}
   LIB_CRYPTO = 'libcrypto.so';
   LIB_SSL = 'libssl.so';
   _PU = '';
@@ -19023,7 +19023,7 @@ function X509_VERIFY_PARAM_set_inh_flags(param: PX509_VERIFY_PARAM; flags: {$IFN
 function X509_VERIFY_PARAM_get_inh_flags(param: PX509_VERIFY_PARAM): {$IFNDEF FPC}{$IF CompilerVersion > 21}UInt32{$ELSE}LongInt{$IFEND}{$ELSE}UInt32{$ENDIF}; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_get_inh_flags';
 
-function X509_VERIFY_PARAM_set1_host(param: PX509_VERIFY_PARAM; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; namelen: NativeUInt): Integer; cdecl;
+function X509_VERIFY_PARAM_set1_host(param: PX509_VERIFY_PARAM; name: PAnsiChar; namelen: NativeUInt): Integer; cdecl;
   external LIB_CRYPTO name _PU + 'X509_VERIFY_PARAM_set1_host';
 
 function X509_VERIFY_PARAM_add1_host(param: PX509_VERIFY_PARAM; name: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; namelen: NativeUInt): Integer; cdecl;
@@ -26354,10 +26354,10 @@ function SSL_CTX_set_trust(ctx: PSSL_CTX; trust: Integer): Integer; cdecl;
 function SSL_set_trust(ssl: PSSL; trust: Integer): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set_trust';
 
-function SSL_set1_host(s: PSSL; hostname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
+function SSL_set1_host(s: PSSL; hostname: PAnsiChar): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_set1_host';
 
-function SSL_add1_host(s: PSSL; hostname: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
+function SSL_add1_host(s: PSSL; hostname: PAnsiChar): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_add1_host';
 
 function SSL_get0_peername(s: PSSL): {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; cdecl;
@@ -26720,7 +26720,7 @@ function SSL_CTX_set_default_verify_dir(ctx: PSSL_CTX): Integer; cdecl;
 function SSL_CTX_set_default_verify_file(ctx: PSSL_CTX): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_set_default_verify_file';
 
-function SSL_CTX_load_verify_locations(ctx: PSSL_CTX; CAfile: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}; CApath: {$IFNDEF FPC}{$IF CompilerVersion > 21}PUTF8Char{$ELSE}PWideChar{$IFEND}{$ELSE}PUTF8Char{$ENDIF}): Integer; cdecl;
+function SSL_CTX_load_verify_locations(ctx: PSSL_CTX; CAfile: PAnsiChar; CApath: PAnsiChar): Integer; cdecl;
   external LIB_SSL name _PU + 'SSL_CTX_load_verify_locations';
 
 function SSL_get_session(ssl: PSSL): PSSL_SESSION; cdecl;

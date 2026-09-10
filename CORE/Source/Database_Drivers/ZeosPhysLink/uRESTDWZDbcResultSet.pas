@@ -1,6 +1,12 @@
 unit uRESTDWZDbcResultSet;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
+
+{$IFDEF FPC}
+ {$DEFINE GENERIC_INDEX}
+{$ENDIF}
+
+{$DEFINE ZEOS80UP}
 
 {$IFNDEF FPC}
   {$I ZDbc.inc}
@@ -17,444 +23,446 @@ unit uRESTDWZDbcResultSet;
   Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
 
- Membros do Grupo :
+ Membros Do Grupo :
 
- XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
- Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Flávio Motta               - Member Tester and DEMO Developer.
- Mobius One                 - Devel, Tester and Admin.
- Gustavo                    - Criptografia and Devel.
+ XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  Do pacote.
+ Alexandre Abbade           - Admin - Administrador Do desenvolvimento de DEMOS, coordenador Do Grupo.
+ Flávio Motta               - Member Tester And DEMO Developer.
+ Mobius One                 - Devel, Tester And Admin.
+ Gustavo                    - Criptografia And Devel.
  Eloy                       - Devel.
  Roniery                    - Devel.
  Fernando Banhos            - Refactor Drivers REST Dataware.
 }
 
-interface
+Interface
 
 {$IFNDEF ZEOS_DISABLE_RESTDW} //if set we have an empty unit
-uses
+Uses
   Classes, SysUtils, Types, Contnrs, FmtBCD, ZSysUtils, ZDbcIntfs, ZDbcResultSet,
   ZDbcResultSetMetadata, ZCompatibility, ZDbcCache, ZDbcCachedResultSet,
   ZDbcGenericResolver, Variants, ZDbcMetadata, ZSelectSchema, ZDatasetUtils,
-  uRESTDWZDbc, uRESTDWZPlainDriver, DB, uRESTDWConsts, uRESTDWTools;
+  uRESTDWZDbc, uRESTDWZPlainDriver, DB, uRESTDWConsts, uRESTDWTools,
+  ZDataset, ZMemTable;
 
-type
-  TZRESTDWResultSetMetadata = class(TZAbstractResultSetMetadata)
-  protected
-    procedure ClearColumn(ColumnInfo: TZColumnInfo); override;
-  end;
+Type
+ TZRESTDWResultSetMetadata = Class(TZAbstractResultSetMetadata)
+ Protected
+  Procedure ClearColumn(ColumnInfo : TZColumnInfo); Override;
+End;
 
   {** Implements RESTDW ResultSet. }
 
-  {$IFDEF ZEOS80UP}
-  TZRESTDWResultSet = class(TZAbstractReadOnlyResultSet, IZResultSet)
+{$IFDEF ZEOS80UP}
+ TZRESTDWResultSet = Class(TZAbstractReadOnlyResultSet, IZResultSet)
   {$ELSE}
-  TZRESTDWResultSet = class(TZAbstractResultSet)
+ TZRESTDWResultSet = Class(TZAbstractResultSet)
   {$ENDIF}
-  private
-    FRESTDWConnection : IZRESTDWConnection;
+ Private
+  FRESTDWConnection : IZRESTDWConnection;
 
-    FStream : TStream;
-    FEncodeStrs : boolean;
-    FFieldCount : integer;
-    FRecordPos : int64;
-    FRecordCount : int64;
-    FFieldTypes : array of byte;
-    FVariantTable : array of array of Variant;
+  FStream : TStream;
+  FEncodeStrs : Boolean;
+  FFieldCount : Integer;
+  FRecordPos : Int64;
+  FRecordCount : Int64;
+  FFieldTypes : Array Of Byte;
+  FVariantTable : Array Of Array Of Variant;
 
-    FFirstRow : boolean;
-  protected
-    procedure Open; override;
-    procedure streamToArray;
-  public
-    constructor Create(const Statement: IZStatement; const SQL: string; Stream : TStream);
+  FFirstRow : Boolean;
+ Protected
+  Procedure Open; Override;
+  Procedure streamToArray;
+ Public
+  Constructor Create(Const AStatement : IZStatement;
+                     Const SQL        : String;
+                     Stream           : TStream);
 
-    procedure ResetCursor; override;
+  Procedure ResetCursor; Override;
 
-    function IsNull(ColumnIndex: Integer): Boolean; {$IFNDEF ZEOS80UP} override; {$ENDIF}
-    function GetPAnsiChar(ColumnIndex: Integer; out Len: NativeUInt): PAnsiChar; {$IFDEF ZEOS80UP} overload {$ELSE} override {$ENDIF};
-    function GetPWideChar(ColumnIndex: Integer; out Len: NativeUInt): PWideChar; {$IFDEF ZEOS80UP} overload {$ELSE} override {$ENDIF};
-    {$IFNDEF NO_UTF8STRING}
-    function GetUTF8String(ColumnIndex: Integer): UTF8String; {$IFNDEF ZEOS80UP} override; {$ENDIF}
-    {$ENDIF}
-    {$IFNDEF NO_ANSISTRING}
-    function GetAnsiString(ColumnIndex: Integer): AnsiString; {$IFNDEF ZEOS80UP} override; {$ENDIF}
-    {$ENDIF}
-    function GetBoolean(ColumnIndex: Integer): Boolean; {$IFNDEF ZEOS80UP} override; {$ENDIF}
-    function GetInt(ColumnIndex: Integer): Integer; {$IFNDEF ZEOS80UP} override; {$ENDIF}
-    function GetUInt(ColumnIndex: Integer): Cardinal; {$IFNDEF ZEOS80UP} override; {$ENDIF}
-    function GetLong(ColumnIndex: Integer): Int64; {$IFNDEF ZEOS80UP} override; {$ENDIF}
-    function GetULong(ColumnIndex: Integer): UInt64; {$IFNDEF ZEOS80UP} override; {$ENDIF}
-    function GetFloat(ColumnIndex: Integer): Single; {$IFNDEF ZEOS80UP} override; {$ENDIF}
-    function GetDouble(ColumnIndex: Integer): Double; {$IFNDEF ZEOS80UP} override; {$ENDIF}
-    function GetCurrency(ColumnIndex: Integer): Currency; {$IFNDEF ZEOS80UP} override; {$ENDIF}
-    {$IFDEF ZEOS80UP}
-      procedure GetBigDecimal(ColumnIndex: Integer; var Result: TBCD);
-      function GetBytes(ColumnIndex: Integer; out Len: NativeUInt): PByte; overload;
-    {$ELSE}
-      function GetBigDecimal(ColumnIndex: Integer) : Extended; override;
-      function GetBytes(ColumnIndex: Integer): TBytes; override;
-    {$ENDIF}
-    procedure GetGUID(ColumnIndex: Integer; var Result: TGUID);
-    {$IFDEF ZEOS80UP}
-      procedure GetDate(ColumnIndex: Integer; Var Result: TZDate); reintroduce; overload;
-      procedure GetTime(ColumnIndex: Integer; var Result: TZTime); reintroduce; overload;
-      procedure GetTimestamp(ColumnIndex: Integer; Var Result: TZTimeStamp); reintroduce; overload;
-      function GetBlob(ColumnIndex: Integer; LobStreamMode: TZLobStreamMode = lsmRead): IZBlob;
-    {$ELSE}
-      function GetDate(ColumnIndex: Integer): TDateTime; override;
-      function GetTime(ColumnIndex: Integer): TDateTime; override;
-      function GetTimestamp(ColumnIndex: Integer): TDateTime; override;
-      function GetBlob(ColumnIndex: Integer): IZBlob; override;
-    {$ENDIF}
-
-
-    function Next: Boolean; {$IFDEF ZEOS80UP} reintroduce {$ELSE} override {$ENDIF};
-    {$IFDEF WITH_COLUMNS_TO_JSON}
-    procedure ColumnsToJSON(ResultsWriter: {$IFDEF MORMOT2}TResultsWriter{$ELSE}TJSONWriter{$ENDIF}; JSONComposeOptions: TZJSONComposeOptions);
-    {$ENDIF WITH_COLUMNS_TO_JSON}
-  end;
-
-  {** Implements a cached resolver with RESTDW specific functionality. }
+  Function IsNull(ColumnIndex : Integer) : Boolean; {$IFNDEF ZEOS80UP} Override; {$ENDIF}
+  Function GetPAnsiChar(ColumnIndex : Integer; Out Len : NativeUInt) : PAnsiChar; {$IFDEF ZEOS80UP} Overload {$ELSE} Override {$ENDIF};
+  Function GetPWideChar(ColumnIndex : Integer;
+                        Out Len     : NativeUInt) : PWideChar; {$IFDEF ZEOS80UP} Overload {$ELSE} Override {$ENDIF};
+  {$IFNDEF NO_UTF8STRING}
+  Function GetUTF8String(ColumnIndex : Integer) : UTF8String; {$IFNDEF ZEOS80UP} Override; {$ENDIF}
+  {$ENDIF}
+  {$IFNDEF NO_ANSISTRING}
+  Function GetAnsiString(ColumnIndex : Integer) : AnsiString; {$IFNDEF ZEOS80UP} Override; {$ENDIF}
+  {$ENDIF}
+  Function GetBoolean(ColumnIndex : Integer) : Boolean; {$IFNDEF ZEOS80UP} Override; {$ENDIF}
+  Function GetInt(ColumnIndex : Integer) : Integer; {$IFNDEF ZEOS80UP} Override; {$ENDIF}
+  Function GetUInt(ColumnIndex : Integer) : Cardinal; {$IFNDEF ZEOS80UP} Override; {$ENDIF}
+  Function GetLong(ColumnIndex : Integer) : Int64; {$IFNDEF ZEOS80UP} Override; {$ENDIF}
+  Function GetULong(ColumnIndex : Integer) : UInt64; {$IFNDEF ZEOS80UP} Override; {$ENDIF}
+  Function GetFloat(ColumnIndex : Integer) : Single; {$IFNDEF ZEOS80UP} Override; {$ENDIF}
+  Function GetDouble(ColumnIndex : Integer) : Double; {$IFNDEF ZEOS80UP} Override; {$ENDIF}
+  Function GetCurrency(ColumnIndex : Integer) : Currency; {$IFNDEF ZEOS80UP} Override; {$ENDIF}
   {$IFDEF ZEOS80UP}
-  TZRESTDWCachedResolver = class (TZGenerateSQLCachedResolver, IZCachedResolver)
+  Procedure GetBigDecimal(ColumnIndex : Integer; Var Result : TBCD);
+  Function GetBytes(ColumnIndex : Integer; Out Len : NativeUInt) : PByte; Overload;
   {$ELSE}
-  TZRESTDWCachedResolver = class (TZGenericCachedResolver, IZCachedResolver)
+  Function GetBigDecimal(ColumnIndex : Integer) : Extended; Override;
+  Function GetBytes(ColumnIndex : Integer) : TBytes; Override;
   {$ENDIF}
-  private
-    FPlainDriver: TZRESTDWPlainDriver;
-    FAutoColumnIndex: Integer;
-  public
-    constructor Create(const Statement: IZStatement; const Metadata: IZResultSetMetadata);
+  Procedure GetGUID(ColumnIndex : Integer; Var Result : TGUID);
+  {$IFDEF ZEOS80UP}
+  Procedure GetDate(ColumnIndex : Integer; Var Result : TZDate); Reintroduce; Overload;
+  Procedure GetTime(ColumnIndex : Integer; Var Result : TZTime); Reintroduce; Overload;
+  Procedure GetTimestamp(ColumnIndex : Integer; Var Result : TZTimeStamp); Reintroduce; Overload;
+  Function GetBlob(ColumnIndex : Integer; LobStreamMode : TZLobStreamMode = lsmRead) : IZBlob;
+  {$ELSE}
+  Function GetDate(ColumnIndex : Integer) : TDateTime; Override;
+  Function GetTime(ColumnIndex : Integer) : TDateTime; Override;
+  Function GetTimestamp(ColumnIndex : Integer) : TDateTime; Override;
+  Function GetBlob(ColumnIndex : Integer) : IZBlob; Override;
+  {$ENDIF}
 
-    {$IFDEF ZEOS80UP}
-    procedure PostUpdates(const Sender: IZCachedResultSet; UpdateType: TZRowUpdateType;
-      const OldRowAccessor, NewRowAccessor: TZRowAccessor); override;
-    {$ELSE}
-    procedure PostUpdates(Sender: IZCachedResultSet; UpdateType: TZRowUpdateType;
-      OldRowAccessor, NewRowAccessor: TZRowAccessor); override;
-    {$ENDIF}
 
-    function CheckKeyColumn(ColumnIndex: Integer): Boolean; override;
+  Function Next : Boolean; {$IFDEF ZEOS80UP} Reintroduce {$ELSE} Override {$ENDIF};
+  {$IFDEF WITH_COLUMNS_TO_JSON}
+  Procedure ColumnsToJSON(ResultsWriter      : {$IFDEF MORMOT2}TResultsWriter{$ELSE}TJSONWriter{$ENDIF};
+                          JSONComposeOptions : TZJSONComposeOptions);
+  {$ENDIF WITH_COLUMNS_TO_JSON}
+End;
 
-    {$IFDEF ZEOS80UP}
-      procedure UpdateAutoIncrementFields(const Sender: IZCachedResultSet;
-        UpdateType: TZRowUpdateType; const OldRowAccessor, NewRowAccessor: TZRowAccessor;
-        const Resolver: IZCachedResolver); override;
-    {$ELSE}
-      procedure UpdateAutoIncrementFields(Sender: IZCachedResultSet; UpdateType: TZRowUpdateType;
-        OldRowAccessor, NewRowAccessor: TZRowAccessor; Resolver: IZCachedResolver); override;
-    {$ENDIF}
-  end;
+  {** Implements a cached resolver With RESTDW specific functionality. }
+{$IFDEF ZEOS80UP}
+ TZRESTDWCachedResolver = Class (TZGenerateSQLCachedResolver, IZCachedResolver)
+  {$ELSE}
+ TZRESTDWCachedResolver = Class (TZGenericCachedResolver, IZCachedResolver)
+  {$ENDIF}
+ Private
+  FPlainDriver : TZRESTDWPlainDriver;
+  FAutoColumnIndex : Integer;
+ Public
+  Constructor Create(Const AStatement : IZStatement; Const AMetadata : IZResultSetMetadata);
 
   {$IFDEF ZEOS80UP}
+  Procedure PostUpdates(Const Sender : IZCachedResultSet; UpdateType : TZRowUpdateType;
+      Const OldRowAccessor, NewRowAccessor : TZRowAccessor); Override;
+  {$ELSE}
+  Procedure PostUpdates(Sender : IZCachedResultSet; UpdateType : TZRowUpdateType;
+      OldRowAccessor, NewRowAccessor : TZRowAccessor); Override;
+  {$ENDIF}
+
+  Function CheckKeyColumn(ColumnIndex : Integer) : Boolean; Override;
+
+  {$IFDEF ZEOS80UP}
+  Procedure UpdateAutoIncrementFields(Const Sender : IZCachedResultSet;
+  UpdateType : TZRowUpdateType; Const OldRowAccessor, NewRowAccessor : TZRowAccessor;
+        Const Resolver : IZCachedResolver); Override;
+  {$ELSE}
+  Procedure UpdateAutoIncrementFields(Sender : IZCachedResultSet; UpdateType : TZRowUpdateType;
+        OldRowAccessor, NewRowAccessor : TZRowAccessor; Resolver : IZCachedResolver); Override;
+  {$ENDIF}
+End;
+
+{$IFDEF ZEOS80UP}
   { TZRESTDWCachedResultSet }
 
-  TZRESTDWCachedResultSet = Class(TZCachedResultSet)
-  protected
-    class function GetRowAccessorClass: TZRowAccessorClass; override;
-  end;
+ TZRESTDWCachedResultSet = Class(TZCachedResultSet)
+ Protected
+    Class Function GetRowAccessorClass : TZRowAccessorClass; Override;
+End;
 
   { TZRESTDWRowAccessor }
 
-  TZRESTDWRowAccessor = class(TZRowAccessor)
-  protected
-    class function MetadataToAccessorType(ColumnInfo: TZColumnInfo;
-      ConSettings: PZConSettings; Var ColumnCodePage: Word): TZSQLType; override;
-  end;
-  {$ENDIF}
+ TZRESTDWRowAccessor = Class(TZRowAccessor)
+ Protected
+    Class Function MetadataToAccessorType(AColumnInfo : TZColumnInfo;
+  AConSettings : PZConSettings; Var AColumnCodePage : Word) : TZSQLType; Override;
+End;
+{$ENDIF}
 
 {$ENDIF ZEOS_DISABLE_RESTDW} //if set we have an empty unit
-implementation
+Implementation
 {$IFNDEF ZEOS_DISABLE_RESTDW} //if set we have an empty unit
 
-uses
+Uses
   ZMessages, ZTokenizer, ZVariant, ZEncoding, ZFastCode,
   ZGenericSqlAnalyser, uRESTDWProtoTypes {$IFNDEF FPC}, SqlTimSt {$ENDIF};
 
 { TZRESTDWCachedResultSet }
 
 {$IFDEF ZEOS80UP}
-  class function TZRESTDWCachedResultSet.GetRowAccessorClass: TZRowAccessorClass;
-  begin
-    Result := TZRESTDWRowAccessor;
-  end;
+Class Function TZRESTDWCachedResultSet.GetRowAccessorClass : TZRowAccessorClass;
+Begin
+  Result := TZRESTDWRowAccessor;
+End;
 {$ENDIF}
 
 { TZRESTDWRowAccessor }
 {$IFDEF ZEOS80UP}
-  {$IFDEF FPC} {$PUSH} {$WARN 5024 off : Parameter "ConSettings" not used} {$ENDIF}
-  class function TZRESTDWRowAccessor.MetadataToAccessorType(
-    ColumnInfo: TZColumnInfo; ConSettings: PZConSettings; Var ColumnCodePage: Word): TZSQLType;
-  begin
-    Result := ColumnInfo.ColumnType;
-    if Result in [stAsciiStream, stUnicodeStream, stBinaryStream] then begin
-      Result := TZSQLType(Byte(Result)-3); // no streams 4 RESTDW
-      ColumnInfo.Precision := 0;
-    end;
-    if Result = stUnicodeString then
-      Result := stString; // no national chars in RESTDW
-  end;
+  {$IFDEF FPC} {$PUSH} {$WARN 5024 off : Parameter "AConSettings" not used} {$ENDIF}
+Class Function TZRESTDWRowAccessor.MetadataToAccessorType(
+  AColumnInfo : TZColumnInfo; AConSettings : PZConSettings; Var AColumnCodePage : Word) : TZSQLType;
+Begin
+  Result := AColumnInfo.ColumnType;
+  If Result in [stAsciiStream, stUnicodeStream, stBinaryStream] Then
+   Begin
+    Result := TZSQLType(Byte(Result)-3); // no streams 4 RESTDW
+    AColumnInfo.Precision := 0;
+   End;
+   If Result = stUnicodeString Then
+    Result := stString; // no national chars in RESTDW
+End;
   {$IFDEF FPC} {$POP} {$ENDIF}
 {$ENDIF}
 
 { TZRESTDWResultSet }
 
 {$IFDEF WITH_COLUMNS_TO_JSON}
-procedure TZRESTDWResultSet.ColumnsToJSON(ResultsWriter: {$IFDEF MORMOT2}TResultsWriter{$ELSE}TJSONWriter{$ENDIF};
-  JSONComposeOptions: TZJSONComposeOptions);
-begin
+Procedure TZRESTDWResultSet.ColumnsToJSON(ResultsWriter      : {$IFDEF MORMOT2}TResultsWriter{$ELSE}TJSONWriter{$ENDIF};
+                                            JSONComposeOptions : TZJSONComposeOptions);
+Begin
 
-end;
+End;
 {$ENDIF WITH_COLUMNS_TO_JSON}
 
-constructor TZRESTDWResultSet.Create(const Statement: IZStatement;
-            const SQL: string; Stream : TStream);
-var
-  Metadata: TContainedObject;
-begin
-  FRESTDWConnection := TZRESTDWConnection(Statement.GetConnection);
+Constructor TZRESTDWResultSet.Create(Const AStatement : IZStatement;
+                                       Const SQL        : String;
+                                       Stream           : TStream);
+Var
+  Metadata : TContainedObject;
+Begin
+  FRESTDWConnection := AStatement.GetConnection As IZRESTDWConnection;
+  If FRESTDWConnection = Nil Then
+   Raise Exception.Create(cErrorDatabaseNotFound);
   Metadata := TZRESTDWResultSetMetadata.Create(FRESTDWConnection.GetMetadata,SQL,Self);
-  inherited Create(Statement, SQL, MetaData, Statement.GetConnection.GetConSettings);
+  Inherited Create(AStatement, SQL, MetaData, AStatement.GetConnection.GetConSettings);
   FFirstRow := True;
   FStream := Stream;
+  If FStream = Nil Then
+   Raise Exception.Create('Zeos PhysLink dataset stream not assigned');
+  If FStream.Size = 0 Then
+   Raise Exception.Create('Zeos PhysLink dataset stream is empty');
   FStream.Position := 0;
   FRecordPos := 0;
   ResultSetConcurrency := rcReadOnly;
   Open;
-end;
+End;
 
-procedure TZRESTDWResultSet.Open;
-var
-  ColumnInfo: TZColumnInfo;
-
-  i, j : int64;
-  vFieldKind : TFieldKind;
-
-  vBoolean : boolean;
-  vString : utf8string;
-  vInt : integer;
-  vInt64 : int64;
-  vDWFielType : Byte;
-  vFieldType : TFieldType;
-  vFieldSize : integer;
-  vFieldPrecision : integer;
-  vByte : Byte;
-begin
+Procedure TZRESTDWResultSet.Open;
+Var
+  MemTable   : TZMemTable;
+  ColumnInfo : TZColumnInfo;
+  Field      : TField;
+  I          : Integer;
+  J          : Integer;
+Begin
   LastRowNo := 0;
   ColumnsInfo.Clear;
+  MemTable := TZMemTable.Create(Nil);
+  Try
+   FStream.Position := 0;
+   MemTable.LoadFromStream(FStream);
+   FFieldCount := MemTable.FieldCount;
+   If FFieldCount < 1 Then
+    Raise Exception.Create('Zeos PhysLink native stream has no fields');
+   FRecordCount := MemTable.RecordCount;
+   SetLength(FVariantTable, FRecordCount);
+   SetLength(FFieldTypes, FFieldCount);
 
-  // field count
-  FStream.Read(FFieldCount,SizeOf(integer));
-  SetLength(FFieldTypes,FFieldCount);
+   For I := 0 To FFieldCount - 1 Do
+    Begin
+     Field := MemTable.Fields[I];
+     ColumnInfo := TZColumnInfo.Create;
+     ColumnInfo.ColumnName := Field.FieldName;
+     ColumnInfo.ColumnLabel := Field.DisplayName;
+     ColumnInfo.TableName := '';
+     ColumnInfo.CatalogName := '';
+     ColumnInfo.ReadOnly := Field.ReadOnly;
+     ColumnInfo.ColumnType := ConvertDatasetToDbcType(Field.DataType);
+     FFieldTypes[I] := FieldTypeToDWFieldType(Field.DataType);
+     ColumnInfo.Precision := Field.Size;
+     ColumnInfo.Scale := 0;
+     ColumnInfo.Writable := Not Field.ReadOnly;
+     ColumnInfo.DefinitelyWritable := Not Field.ReadOnly;
+     ColumnInfo.Signed := True;
+     ColumnInfo.Searchable := True;
+     If Field.Required Then
+      ColumnInfo.Nullable := ntNoNulls
+    Else
+     ColumnInfo.Nullable := ntNullable;
+     If ColumnInfo.ColumnType in [stString, stAsciiStream] Then
+      ColumnInfo.ColumnCodePage := zCP_UTF8;
+     ColumnsInfo.Add(ColumnInfo);
+    End;
 
-  // encodestrs
-  FStream.Read(vBoolean, Sizeof(vBoolean));
-  FEncodeStrs := vBoolean;
+    MemTable.First;
+    I := 0;
+    While Not MemTable.Eof Do
+     Begin
+      SetLength(FVariantTable[I], FFieldCount);
+      For J := 0 To FFieldCount - 1 Do
+       Begin
+        If MemTable.Fields[J].IsNull Then
+         FVariantTable[I, J] := Null
+       Else
+        FVariantTable[I, J] := MemTable.Fields[J].Value;
+       End;
+       Inc(I);
+       MemTable.Next;
+     End;
+  Finally
+   MemTable.Free;
+  End;
+   FStream.Size := 0;
+   Inherited Open;
+{$IFDEF ZEOS80UP}
+   FCursorLocation := rctServer;
+{$ENDIF}
+End;
 
-  i := 0;
-  while i < FFieldCount do begin
-    ColumnInfo := TZColumnInfo.Create;
-    with ColumnInfo do begin
-      // field kind
-      FStream.Read(vByte,SizeOf(vByte));
-      vFieldKind := TFieldKind(vByte);
+Procedure TZRESTDWResultSet.ResetCursor;
+Begin
+  FFirstRow := True;
+  RowNo := 0;
+  LastRowNo := 0;
+  If Not Closed Then
+   Inherited ResetCursor;
+End;
 
-      // field name
-      FStream.Read(vByte,SizeOf(vByte));
-      SetLength(vString,vByte);
-      FStream.Read(vString[InitStrPos],vByte);
-
-      ColumnName := vString;
-      ColumnLabel := vString;
-      TableName := '';
-      CatalogName := '';
-
-      ReadOnly := False;
-
-      // field type
-      FStream.Read(vDWFielType,SizeOf(vDWFielType));
-      vFieldType := DWFieldTypeToFieldType(vDWFielType);
-      FFieldTypes[i] := vDWFielType;
-
-      ColumnType := ConvertDatasetToDbcType(vFieldType);
-
-      // field size
-      FStream.Read(vFieldSize,SizeOf(Integer));
-
-      // field precision
-      FStream.Read(vFieldPrecision,SizeOf(Integer));
-
-      // required + provider flags
-      FStream.Read(vByte,SizeOf(Byte));
-
-      if ColumnType in [stString, stAsciiStream] then begin
-        ColumnCodePage := zCP_UTF8;
-        if ColumnType = stString then
-          CharOctedLength := vFieldPrecision shl 2;
-      end else if ColumnType = stBytes then
-        CharOctedLength := vFieldPrecision;
-      AutoIncrement := False;
-      Precision := vFieldSize;
-      Scale := vFieldPrecision;
-      Writable := True;
-      DefinitelyWritable := True;
-      Signed := True;
-      Searchable := True;
-
-      Nullable := ntNoNulls;
-      if vByte and 1 = 0 then
-        Nullable := ntNullable;
-    end;
-
-    ColumnsInfo.Add(ColumnInfo);
-    i := i + 1;
-  end;
-
-  FStream.Read(FRecordCount,SizeOf(FRecordCount));
-  FRecordPos := FStream.Position;
-
-  streamToArray;
-
-  FStream.Size := 0;
-
-  inherited Open;
-  {$IFDEF ZEOS80UP}
-    FCursorLocation := rctServer;
-  {$ENDIF}
-end;
-
-procedure TZRESTDWResultSet.ResetCursor;
-begin
-  FFirstRow := True; // zeos7
-  if not Closed then begin
-    FStream.Position := 0;
-    inherited ResetCursor;
-  end;
-end;
-
-procedure TZRESTDWResultSet.streamToArray;
-var
-  i             : int64;
-  j             : integer;
-  vString       : DWString;
-  vInt64        : Int64;
-  vInt          : Integer;
-  vByte         : Byte;
-  vBoolean      : Boolean;
-  vWord         : Word;
-  vSingle       : Single;
-  vDouble       : Double;
-  VTimeZone     : Double;
-  vCurrency     : Currency;
-  vStringStream : TStringStream;
+Procedure TZRESTDWResultSet.streamToArray;
+Var
+  i                : Int64;
+  j                : Integer;
+  vString          : DWString;
+  vInt64           : Int64;
+  vInt             : Integer;
+  vByte            : Byte;
+  vBoolean         : Boolean;
+  vWord            : Word;
+  vSingle          : Single;
+  vDouble          : Double;
+  VTimeZone        : Double;
+  vCurrency        : Currency;
+  vStringStream    : TStringStream;
   {$IFDEF DELPHIXEUP}
   vTimeStampOffset : TSQLTimeStampOffset;
   {$ENDIF}
-begin
+Begin
+  vBoolean := False;
+  vInt64 := 0;
+  vByte := 0;
+  vWord := 0;
+  vInt := 0;
+  vSingle := 0;
+  vDouble := 0;
+  vCurrency := 0;
   SetLength(FVariantTable,FRecordCount);
   i := 0;
-  while i <= FRecordCount-1 do begin
+  While i <= FRecordCount-1 Do
+   Begin
     SetLength(FVariantTable[i],FFieldCount);
-    for j := 0 to FFieldCount-1 do begin
+    For j := 0 To FFieldCount-1 Do
+     Begin
       FStream.Read(vBoolean,SizeOf(vBoolean));
-      if Not vBoolean then begin
+      If Not vBoolean Then
+       Begin
         FVariantTable[i,j] := variants.null;
         Continue;
-      end;
+      End;
 
       // N - Bytes
-      if (FFieldTypes[j] in [dwftFixedChar,dwftString]) then begin
+      If (FFieldTypes[j] In [dwftFixedChar,dwftString]) Then
+       Begin
         FStream.Read(vInt64, Sizeof(vInt64));
         vString := '';
-        if vInt64 > 0 then begin
+        If vInt64 > 0 Then
+         Begin
           SetLength(vString, vInt64);
           {$IFDEF FPC}
            FStream.Read(Pointer(vString)^, vInt64);
-           if FEncodeStrs then
+           If FEncodeStrs Then
              vString := DecodeStrings(vString, csUndefined);
            vString := GetStringEncode(vString, csUTF8);
           {$ELSE}
            FStream.Read(vString[InitStrPos], vInt64);
-           if FEncodeStrs then
+           If FEncodeStrs Then
              vString := DecodeStrings(vString);
           {$ENDIF}
-        end;
-        if System.Pos(#0,vString) > 0 then
+        End;
+        If System.Pos(#0,vString) > 0 Then
           vString := StringReplace(vString, #0, '', [rfReplaceAll]);
         FVariantTable[i,j] := vString;
-      end
+      End
       // N - Bytes Wide
-      else if (FFieldTypes[j] in [dwftWideString,dwftFixedWideChar]) then begin
+      Else If (FFieldTypes[j] In [dwftWideString,dwftFixedWideChar]) Then
+       Begin
         FStream.Read(vInt64, Sizeof(vInt64));
         vString := '';
-        if vInt64 > 0 then begin
+        If vInt64 > 0 Then
+         Begin
           SetLength(vString, vInt64);
           {$IFDEF FPC}
            FStream.Read(Pointer(vString)^, vInt64);
-           if FEncodeStrs then
+           If FEncodeStrs Then
              vString := DecodeStrings(vString, csUndefined);
            vString := GetStringEncode(vString, csUTF8);
           {$ELSE}
            FStream.Read(vString[InitStrPos], vInt64);
-           if FEncodeStrs then
+           If FEncodeStrs Then
              vString := DecodeStrings(vString);
           {$ENDIF}
-        end;
-        if System.Pos(#0,vString) > 0 then
+        End;
+        If System.Pos(#0,vString) > 0 Then
           vString := StringReplace(vString, #0, '', [rfReplaceAll]);
         FVariantTable[i,j] := vString;
-      end
+      End
       // 1 - Byte - Inteiros
-      else if (FFieldTypes[j] in [dwftByte,dwftShortint]) then
-      begin
+      Else If (FFieldTypes[j] In [dwftByte,dwftShortint]) Then
+      Begin
         FStream.Read(vByte, Sizeof(vByte));
         FVariantTable[i,j] := vByte;
-      end
+      End
       // 1 - Byte - Boolean
-      else if (FFieldTypes[j] in [dwftBoolean]) then
-      begin
+      Else If (FFieldTypes[j] In [dwftBoolean]) Then
+      Begin
         FStream.Read(vBoolean, Sizeof(vBoolean));
         FVariantTable[i,j] := vBoolean;
-      end
+      End
       // 2 - Bytes
-      else if (FFieldTypes[j] in [dwftSmallint,dwftWord]) then begin
+      Else If (FFieldTypes[j] In [dwftSmallint,dwftWord]) Then
+       Begin
         FStream.Read(vWord, Sizeof(vWord));
         FVariantTable[i,j] := vWord;
-      end
+      End
       // 4 - Bytes - Inteiros
-      else if (FFieldTypes[j] in [dwftInteger]) then
-      begin
+      Else If (FFieldTypes[j] In [dwftInteger]) Then
+      Begin
         FStream.Read(vInt, Sizeof(vInt));
         FVariantTable[i,j] := vInt;
-      end
+      End
       // 4 - Bytes - Flutuantes
-      else if (FFieldTypes[j] in [dwftSingle]) then
-      begin
+      Else If (FFieldTypes[j] In [dwftSingle]) Then
+      Begin
         FStream.Read(vSingle, Sizeof(vSingle));
         FVariantTable[i,j] := vSingle;
-      end
+      End
       // 8 - Bytes - Inteiros
-      else if (FFieldTypes[j] in [dwftLargeint,dwftAutoInc,dwftLongWord]) then
-      begin
+      Else If (FFieldTypes[j] In [dwftLargeint,dwftAutoInc,dwftLongWord]) Then
+      Begin
         FStream.Read(vInt64, Sizeof(vInt64));
         FVariantTable[i,j] := vInt64;
-      end
+      End
       // 8 - Bytes - Flutuantes
-      else if (FFieldTypes[j] in [dwftFloat,dwftExtended]) then
-      begin
+      Else If (FFieldTypes[j] In [dwftFloat,dwftExtended]) Then
+      Begin
         FStream.Read(vDouble, Sizeof(vDouble));
         FVariantTable[i,j] := vDouble;
-      end
+      End
       // 8 - Bytes - Date, Time, DateTime, TimeStamp
-      else if (FFieldTypes[j] in [dwftDate,dwftTime,dwftDateTime,dwftTimeStamp]) then
-      begin
+      Else If (FFieldTypes[j] In [dwftDate,dwftTime,dwftDateTime,dwftTimeStamp]) Then
+      Begin
         FStream.Read(vDouble, Sizeof(vDouble));
         FVariantTable[i,j] := vDouble;
-      end
+      End
       // TimeStampOffSet To Double - 8 Bytes
       // + TimeZone                - 2 Bytes
-      else if (FFieldTypes[j] in [dwftTimeStampOffset]) then begin
+      Else If (FFieldTypes[j] In [dwftTimeStampOffset]) Then
+       Begin
         {$IFDEF DELPHIXEUP}
           FStream.Read(vDouble, Sizeof(vDouble));
 
@@ -474,45 +482,49 @@ begin
           vTimeZone := (vByte - 12) / 24;
 
           FStream.Read(vByte, SizeOf(vByte));
-          if vTimeZone > 0 then
+          If vTimeZone > 0 Then
             vTimeZone := vTimeZone + (vByte / 60 / 24)
-          else
+          Else
             vTimeZone := vTimeZone - (vByte / 60 / 24);
 
           vDouble := vDouble - vTimeZone;
           FVariantTable[i,j] := vDouble;
         {$ENDIF}
-      end
+      End
       // 8 - Bytes - Currency
-      else if (FFieldTypes[j] in [dwftCurrency,dwftBCD,dwftFMTBcd]) then
-      begin
+      Else If (FFieldTypes[j] In [dwftCurrency,dwftBCD,dwftFMTBcd]) Then
+      Begin
         FStream.Read(vCurrency, Sizeof(vCurrency));
         FVariantTable[i,j] := vCurrency;
-      end
+      End
       // N Bytes - Wide Memos
-      else if (FFieldTypes[j] in [dwftMemo,dwftWideMemo,dwftFmtMemo]) then begin
+      Else If (FFieldTypes[j] In [dwftMemo,dwftWideMemo,dwftFmtMemo]) Then
+       Begin
         FStream.Read(vInt64, Sizeof(vInt64));
-        if vInt64 > 0 then Begin
+        If vInt64 > 0 Then
+         Begin
           vStringStream := TStringStream.Create('');
-          try
+          Try
             vStringStream.CopyFrom(FStream, vInt64);
             vStringStream.Position := 0;
     //        Result := TEncoding.Unicode.GetString(vStringStream.Bytes);
             vString := vStringStream.DataString;
-            if System.Pos(#0,vString) > 0 then
+            If System.Pos(#0,vString) > 0 Then
               vString := StringReplace(vString, #0, '', [rfReplaceAll]);
-          finally
+          Finally
             vStringStream.Free;
-          end;
+          End;
           FVariantTable[i,j] := vString;
-        end;
-      end
+        End;
+      End
       // N Bytes - Memos e Blobs
-      else if (FFieldTypes[j] in [dwftStream,dwftBlob,dwftBytes]) then begin
+      Else If (FFieldTypes[j] In [dwftStream,dwftBlob,dwftBytes]) Then
+       Begin
         FStream.Read(vInt64, Sizeof(vInt64));
-        if vInt64 > 0 then Begin
+        If vInt64 > 0 Then
+         Begin
           vStringStream := TStringStream.Create('');
-          try
+          Try
             vStringStream.CopyFrom(FStream, vInt64);
             vStringStream.Position := 0;
             {$IFNDEF FPC}
@@ -524,510 +536,587 @@ begin
             {$ELSE}
              FVariantTable[i,j] := vStringStream.Bytes;
             {$ENDIF}
-          finally
+          Finally
             vStringStream.Free;
-          end;
-        end;
-      end
-      else begin
+          End;
+        End;
+      End
+      Else
+       Begin
         FStream.Read(vInt64, Sizeof(vInt64));
         vString := '';
-        if vInt64 > 0 then begin
+        If vInt64 > 0 Then
+         Begin
           SetLength(vString, vInt64);
           {$IFDEF FPC}
            FStream.Read(Pointer(vString)^, vInt64);
-           if FEncodeStrs then
+           If FEncodeStrs Then
              vString := DecodeStrings(vString, csUndefined);
            vString := GetStringEncode(vString, csUTF8);
           {$ELSE}
            FStream.Read(vString[InitStrPos], vInt64);
-           if FEncodeStrs then
+           If FEncodeStrs Then
              vString := DecodeStrings(vString);
           {$ENDIF}
-        end;
-        if System.Pos(#0,vString) > 0 then
+        End;
+        If System.Pos(#0,vString) > 0 Then
           vString := StringReplace(vString, #0, '', [rfReplaceAll]);
         FVariantTable[i,j] := vString;
-      end;
-    end;
+      End;
+    End;
     Inc(i);
-  end;
-end;
+  End;
+End;
 
-function TZRESTDWResultSet.IsNull(ColumnIndex: Integer): Boolean;
-begin
+Function TZRESTDWResultSet.IsNull(ColumnIndex : Integer) : Boolean;
+Begin
   {$IFNDEF GENERIC_INDEX}
-  ColumnIndex := ColumnIndex -1;
+  ColumnIndex := ColumnIndex - 1;
   {$ENDIF}
-  Result := FVariantTable[RowNo-1,ColumnIndex] = Null;
-end;
+  If (ColumnIndex < 0) Or
+  (ColumnIndex >= FFieldCount) Then
+   Raise Exception.CreateFmt('Zeos PhysLink invalid column index %d. FieldCount=%d',
+  [ColumnIndex, FFieldCount]);
+  If (RowNo < 1) Or
+  (RowNo > FRecordCount) Then
+   Raise Exception.CreateFmt('Zeos PhysLink invalid row %d. RecordCount=%d',
+  [RowNo, FRecordCount]);
+  Result := VarIsNull(FVariantTable[RowNo-1,ColumnIndex]);
+End;
 
-function TZRESTDWResultSet.GetPAnsiChar(ColumnIndex: Integer; out Len: NativeUInt): PAnsiChar;
-var
-  vInt64 : int64;
-  vString : ansistring;
-begin
+Function TZRESTDWResultSet.GetPAnsiChar(ColumnIndex : Integer; Out Len : NativeUInt) : PAnsiChar;
+Var
+  vString : AnsiString;
+Begin
   Result := PAnsiChar('');
   LastWasNull := IsNull(ColumnIndex);
 
   {$IFNDEF GENERIC_INDEX}
-  ColumnIndex := ColumnIndex -1;
+  ColumnIndex := ColumnIndex - 1;
   {$ENDIF}
+  If (ColumnIndex < 0) Or
+  (ColumnIndex >= FFieldCount) Then
+   Raise Exception.CreateFmt('Zeos PhysLink invalid column index %d. FieldCount=%d',
+  [ColumnIndex, FFieldCount]);
 
-  if not LastWasNull then begin
+  If Not LastWasNull Then
+   Begin
     vString := FVariantTable[RowNo-1,ColumnIndex];
     Len := Length(vString)+1;
     Result := PAnsiChar(vString);
-  end;
-end;
+   End;
+End;
 
-function TZRESTDWResultSet.GetPWideChar(ColumnIndex: Integer;
-  out Len: NativeUInt): PWideChar;
-var
+Function TZRESTDWResultSet.GetPWideChar(ColumnIndex : Integer;
+                                         Out Len     : NativeUInt) : PWideChar;
+Var
   P : PAnsiChar;
   S : AnsiString;
   W : WideString;
-begin
+Begin
+  S := '';
   P := GetPAnsiChar(ColumnIndex, Len);
   SetLength(S,Len);
   S := P;
   W := S;
   Result := PWideChar(W);
   Len := Length(Result);
-end;
+End;
 
 {$IFNDEF NO_UTF8STRING}
-function TZRESTDWResultSet.GetUTF8String(ColumnIndex: Integer): UTF8String;
-var
-  P: PAnsiChar;
-  Len: NativeUint;
-begin
+Function TZRESTDWResultSet.GetUTF8String(ColumnIndex : Integer) : UTF8String;
+Var
+  P   : PAnsiChar;
+  Len : NativeUint;
+Begin
   P := GetPAnsiChar(ColumnIndex, Len);
   {$IFDEF RESTDWLAZARUS}
   Result := '';
   {$ENDIF}
-  if P <> nil
+  If P <> Nil
   {$IFDEF MISS_RBS_SETSTRING_OVERLOAD}
-  then ZSetString(P, Len, result)
+  Then ZSetString(P, Len, result)
   {$ELSE}
-  then System.SetString(Result, P, Len)
+  Then System.SetString(Result, P, Len)
   {$ENDIF}
   {$IFNDEF WITH_VAR_INIT_WARNING}
-  else Result := '';
+  Else
   {$ENDIF}
-end;
+End;
 {$ENDIF}
 
-function TZRESTDWResultSet.GetBoolean(ColumnIndex: Integer): Boolean;
-var
+Function TZRESTDWResultSet.GetBoolean(ColumnIndex : Integer) : Boolean;
+Var
   vBoolean : Boolean;
-begin
+Begin
   Result := False;
   LastWasNull := IsNull(ColumnIndex);
 
   {$IFNDEF GENERIC_INDEX}
-  ColumnIndex := ColumnIndex -1;
+  ColumnIndex := ColumnIndex - 1;
   {$ENDIF}
+  If (ColumnIndex < 0) Or
+  (ColumnIndex >= FFieldCount) Then
+   Raise Exception.CreateFmt('Zeos PhysLink invalid column index %d. FieldCount=%d',
+  [ColumnIndex, FFieldCount]);
 
-  if not LastWasNull then begin
+  If Not LastWasNull Then
+   Begin
     vBoolean := FVariantTable[RowNo-1,ColumnIndex];
     Result := vBoolean;
-  end;
-end;
+   End;
+End;
 
 {$IFDEF ZEOS80UP}
-  function TZRESTDWResultSet.GetBytes(ColumnIndex: Integer;
-    out Len: NativeUInt): PByte;
-  var
-    vBytes : TBytes;
-  begin
-    LastWasNull := IsNull(ColumnIndex);
-    if not LastWasNull then begin
-      vBytes := TBytes(FVariantTable[RowNo-1,ColumnIndex]);
-      Result := PByte(vBytes);
-      Len := Length(vBytes);
-    end;
-  end;
+Function TZRESTDWResultSet.GetBytes(ColumnIndex : Integer;
+                                    Out Len      : NativeUInt) : PByte;
+Var
+  vBytes : TBytes;
+Begin
+  Result := Nil;
+  Len := 0;
+  LastWasNull := IsNull(ColumnIndex);
+
+  {$IFNDEF GENERIC_INDEX}
+  ColumnIndex := ColumnIndex - 1;
+  {$ENDIF}
+
+  If (ColumnIndex < 0) Or
+     (ColumnIndex >= FFieldCount) Then
+   Raise Exception.CreateFmt('Zeos PhysLink invalid column index %d. FieldCount=%d',
+                             [ColumnIndex, FFieldCount]);
+
+  If Not LastWasNull Then
+   Begin
+    vBytes := TBytes(FVariantTable[RowNo-1,ColumnIndex]);
+    If Length(vBytes) > 0 Then
+     Result := @vBytes[0];
+    Len := Length(vBytes);
+   End;
+End;
 {$ELSE}
-  function TZRESTDWResultSet.GetBytes(ColumnIndex: Integer): TBytes;
-  var
-    vBytes : TBytes;
-  begin
-    LastWasNull := IsNull(ColumnIndex);
+Function TZRESTDWResultSet.GetBytes(ColumnIndex : Integer) : TBytes;
+Var
+  vBytes : TBytes;
+Begin
+  LastWasNull := IsNull(ColumnIndex);
 
     {$IFNDEF GENERIC_INDEX}
-    ColumnIndex := ColumnIndex -1;
+  ColumnIndex := ColumnIndex -1;
     {$ENDIF}
 
-    if not LastWasNull then begin
-      vBytes := TBytes(FVariantTable[RowNo-1,ColumnIndex]);
-      Result := vBytes;
-    end;
-  end;
+  If Not LastWasNull Then
+   Begin
+    vBytes := TBytes(FVariantTable[RowNo-1,ColumnIndex]);
+    Result := vBytes;
+   End;
+End;
 {$ENDIF}
 
-function TZRESTDWResultSet.GetInt(ColumnIndex: Integer): Integer;
-var
-  vInt : integer;
-begin
+Function TZRESTDWResultSet.GetInt(ColumnIndex : Integer) : Integer;
+Var
+  vInt : Integer;
+Begin
   Result := -1;
   LastWasNull := IsNull(ColumnIndex);
 
   {$IFNDEF GENERIC_INDEX}
-  ColumnIndex := ColumnIndex -1;
+  ColumnIndex := ColumnIndex - 1;
   {$ENDIF}
+  If (ColumnIndex < 0) Or
+  (ColumnIndex >= FFieldCount) Then
+   Raise Exception.CreateFmt('Zeos PhysLink invalid column index %d. FieldCount=%d',
+  [ColumnIndex, FFieldCount]);
 
-  if not LastWasNull then begin
+  If Not LastWasNull Then
+   Begin
     vInt := FVariantTable[RowNo-1,ColumnIndex];
     Result := vInt;
-  end;
-end;
+   End;
+End;
 
-function TZRESTDWResultSet.GetLong(ColumnIndex: Integer): Int64;
-var
+Function TZRESTDWResultSet.GetLong(ColumnIndex : Integer) : Int64;
+Var
   vInt64 : Int64;
-begin
+Begin
   Result := -1;
   LastWasNull := IsNull(ColumnIndex);
 
   {$IFNDEF GENERIC_INDEX}
-  ColumnIndex := ColumnIndex -1;
+  ColumnIndex := ColumnIndex - 1;
   {$ENDIF}
+  If (ColumnIndex < 0) Or
+  (ColumnIndex >= FFieldCount) Then
+   Raise Exception.CreateFmt('Zeos PhysLink invalid column index %d. FieldCount=%d',
+  [ColumnIndex, FFieldCount]);
 
-  if not LastWasNull then begin
+  If Not LastWasNull Then
+   Begin
     vInt64 := FVariantTable[RowNo-1,ColumnIndex];
     Result := vInt64;
-  end;
-end;
+   End;
+End;
 
-function TZRESTDWResultSet.GetUInt(ColumnIndex: Integer): Cardinal;
-begin
+Function TZRESTDWResultSet.GetUInt(ColumnIndex : Integer) : Cardinal;
+Begin
   Result := GetLong(ColumnIndex);
-end;
+End;
 
 {$IF Defined(RangeCheckEnabled) AND Defined(WITH_UINT64_C1118_ERROR)}{$R-}{$IFEND}
-function TZRESTDWResultSet.GetULong(ColumnIndex: Integer): System.UInt64;
-var
+Function TZRESTDWResultSet.GetULong(ColumnIndex : Integer) : System.UInt64;
+Var
   vInt64 : UInt64;
-begin
+Begin
   Result := 0;
   LastWasNull := IsNull(ColumnIndex);
 
   {$IFNDEF GENERIC_INDEX}
-  ColumnIndex := ColumnIndex -1;
+  ColumnIndex := ColumnIndex - 1;
   {$ENDIF}
+  If (ColumnIndex < 0) Or
+  (ColumnIndex >= FFieldCount) Then
+   Raise Exception.CreateFmt('Zeos PhysLink invalid column index %d. FieldCount=%d',
+  [ColumnIndex, FFieldCount]);
 
-  if not LastWasNull then begin
+  If Not LastWasNull Then
+   Begin
     vInt64 := FVariantTable[RowNo-1,ColumnIndex];
     Result := vInt64;
-  end;
-end;
+   End;
+End;
 {$IF Defined(RangeCheckEnabled) AND Defined(WITH_UINT64_C1118_ERROR)}{$R+}{$IFEND}
 
-function TZRESTDWResultSet.GetFloat(ColumnIndex: Integer): Single;
-begin
+Function TZRESTDWResultSet.GetFloat(ColumnIndex : Integer) : Single;
+Begin
   Result := GetDouble(ColumnIndex);
-end;
+End;
 
-procedure TZRESTDWResultSet.GetGUID(ColumnIndex: Integer; var Result: TGUID);
-var
-  vString : string;
-begin
+Procedure TZRESTDWResultSet.GetGUID(ColumnIndex : Integer; Var Result : TGUID);
+Var
+  vString : String;
+Begin
   vString := GetString(ColumnIndex);
-  if not LastWasNull then
-    Result := StringToGUID(vString);
-end;
+  If Not LastWasNull Then
+   Result := StringToGUID(vString);
+End;
 
-function TZRESTDWResultSet.GetDouble(ColumnIndex: Integer): Double;
-var
+Function TZRESTDWResultSet.GetDouble(ColumnIndex : Integer) : Double;
+Var
   vDouble : Double;
-begin
+Begin
   Result := -1;
   LastWasNull := IsNull(ColumnIndex);
 
   {$IFNDEF GENERIC_INDEX}
-  ColumnIndex := ColumnIndex -1;
+  ColumnIndex := ColumnIndex - 1;
   {$ENDIF}
+  If (ColumnIndex < 0) Or
+  (ColumnIndex >= FFieldCount) Then
+   Raise Exception.CreateFmt('Zeos PhysLink invalid column index %d. FieldCount=%d',
+  [ColumnIndex, FFieldCount]);
 
-  if not LastWasNull then begin
+  If Not LastWasNull Then
+   Begin
     vDouble := FVariantTable[RowNo-1,ColumnIndex];
     Result := vDouble;
-  end;
-end;
+   End;
+End;
 
 {$IFNDEF NO_ANSISTRING}
-function TZRESTDWResultSet.GetAnsiString(ColumnIndex: Integer): AnsiString;
-var
-  P: PAnsiChar;
-  L: NativeUInt;
-begin
+Function TZRESTDWResultSet.GetAnsiString(ColumnIndex : Integer) : AnsiString;
+Var
+  P : PAnsiChar;
+  L : NativeUInt;
+Begin
   P := GetPAnsiChar(ColumnIndex, L);
   Result := '';
-  if not LastWasNull then begin
+  If Not LastWasNull Then
+   Begin
     FUniTemp := PRawToUnicode(P, ZFastCode.StrLen(P), zCP_UTF8);
     Result := ZUnicodeToRaw(FUniTemp, ZOSCodePage);
-  end
-end;
+   End
+End;
 {$ENDIF}
 
 {$IFDEF ZEOS80UP}
-  procedure TZRESTDWResultSet.GetBigDecimal(ColumnIndex: Integer; var Result: TBCD);
-  var
-    vCurrency : Currency;
-  begin
-    vCurrency := GetCurrency(ColumnIndex);
+Procedure TZRESTDWResultSet.GetBigDecimal(ColumnIndex : Integer; Var Result : TBCD);
+Var
+  vCurrency : Currency;
+Begin
+  vCurrency := GetCurrency(ColumnIndex);
     {$IFNDEF FPC}
-      if not LastWasNull then
-        Result := CurrencyToBcd(vCurrency);
+  If Not LastWasNull Then
+   Result := CurrencyToBcd(vCurrency);
     {$ELSE}
-      if not LastWasNull then
-        Result := DoubleToBCD(vCurrency);
+  If Not LastWasNull Then
+   Result := DoubleToBCD(vCurrency);
     {$ENDIF}
-  end;
+End;
 {$ELSE}
-  function TZRESTDWResultSet.GetBigDecimal(ColumnIndex: Integer) : Extended;
-  var
-    vCurrency : Currency;
-  begin
-    vCurrency := GetCurrency(ColumnIndex);
+Function TZRESTDWResultSet.GetBigDecimal(ColumnIndex : Integer) : Extended;
+Var
+  vCurrency : Currency;
+Begin
+  vCurrency := GetCurrency(ColumnIndex);
 
     {$IFNDEF GENERIC_INDEX}
-    ColumnIndex := ColumnIndex -1;
+  ColumnIndex := ColumnIndex -1;
     {$ENDIF}
 
-    if not LastWasNull then
-      Result := vCurrency;
-  end;
+  If Not LastWasNull Then
+   Result := vCurrency;
+End;
 {$ENDIF}
 
-function TZRESTDWResultSet.GetCurrency(ColumnIndex: Integer): Currency;
-var
+Function TZRESTDWResultSet.GetCurrency(ColumnIndex : Integer) : Currency;
+Var
   vCurrency : Currency;
-begin
+Begin
   Result := -1;
   LastWasNull := IsNull(ColumnIndex);
 
   {$IFNDEF GENERIC_INDEX}
-  ColumnIndex := ColumnIndex -1;
+  ColumnIndex := ColumnIndex - 1;
   {$ENDIF}
+  If (ColumnIndex < 0) Or
+  (ColumnIndex >= FFieldCount) Then
+   Raise Exception.CreateFmt('Zeos PhysLink invalid column index %d. FieldCount=%d',
+  [ColumnIndex, FFieldCount]);
 
-  if not LastWasNull then begin
+  If Not LastWasNull Then
+   Begin
     vCurrency := FVariantTable[RowNo-1,ColumnIndex];
     Result := vCurrency;
-  end;
-end;
+   End;
+End;
 
 {$IFDEF ZEOS80UP}
-  procedure TZRESTDWResultSet.GetDate(ColumnIndex: Integer; var Result: TZDate);
-  var
-    vDouble : Double;
-  begin
-    vDouble := GetDouble(ColumnIndex);
-    if not LastWasNull then
-      Result := TZAnyValue.CreateWithDouble(vDouble).GetDate;
-  end;
+Procedure TZRESTDWResultSet.GetDate(ColumnIndex : Integer; Var Result : TZDate);
+Var
+  vDouble : Double;
+Begin
+  vDouble := GetDouble(ColumnIndex);
+  If Not LastWasNull Then
+   Result := TZAnyValue.CreateWithDouble(vDouble).GetDate;
+End;
 {$ELSE}
-  function TZRESTDWResultSet.GetDate(ColumnIndex: Integer) : TDateTime;
-  var
-    vDouble : Double;
-  begin
-    vDouble := GetDouble(ColumnIndex);
-    if not LastWasNull then
-      Result := TDateTime(vDouble);
-  end;
+Function TZRESTDWResultSet.GetDate(ColumnIndex : Integer) : TDateTime;
+Var
+  vDouble : Double;
+Begin
+  vDouble := GetDouble(ColumnIndex);
+  If Not LastWasNull Then
+   Result := TDateTime(vDouble);
+End;
 {$ENDIF}
 
 {$IFDEF ZEOS80UP}
-  procedure TZRESTDWResultSet.GetTime(ColumnIndex: Integer; var Result: TZTime);
-  var
-    vDouble : Double;
-  begin
-    vDouble := GetDouble(ColumnIndex);
-    if not LastWasNull then
-      Result := TZAnyValue.CreateWithDouble(vDouble).GetTime;
-  end;
+Procedure TZRESTDWResultSet.GetTime(ColumnIndex : Integer; Var Result : TZTime);
+Var
+  vDouble : Double;
+Begin
+  vDouble := GetDouble(ColumnIndex);
+  If Not LastWasNull Then
+   Result := TZAnyValue.CreateWithDouble(vDouble).GetTime;
+End;
 {$ELSE}
-  function TZRESTDWResultSet.GetTime(ColumnIndex: Integer) : TDateTime;
-  var
-    vDouble : Double;
-  begin
-    vDouble := GetDouble(ColumnIndex);
-    if not LastWasNull then
-      Result := TDateTime(vDouble);
-  end;
+Function TZRESTDWResultSet.GetTime(ColumnIndex : Integer) : TDateTime;
+Var
+  vDouble : Double;
+Begin
+  vDouble := GetDouble(ColumnIndex);
+  If Not LastWasNull Then
+   Result := TDateTime(vDouble);
+End;
 {$ENDIF}
 
 {$IFDEF ZEOS80UP}
-  procedure TZRESTDWResultSet.GetTimestamp(ColumnIndex: Integer; var Result: TZTimeStamp);
-  var
-    vDouble : Double;
-  begin
-    vDouble := GetDouble(ColumnIndex);
-    if not LastWasNull then
-      Result := TZAnyValue.CreateWithDouble(vDouble).GetTimeStamp;
-  end;
+Procedure TZRESTDWResultSet.GetTimestamp(ColumnIndex : Integer; Var Result : TZTimeStamp);
+Var
+  vDouble : Double;
+Begin
+  vDouble := GetDouble(ColumnIndex);
+  If Not LastWasNull Then
+   Result := TZAnyValue.CreateWithDouble(vDouble).GetTimeStamp;
+End;
 {$ELSE}
-  function TZRESTDWResultSet.GetTimestamp(ColumnIndex: Integer) : TDateTime;
-  var
-    vDouble : Double;
-  begin
-    vDouble := GetDouble(ColumnIndex);
-    if not LastWasNull then
-      Result := TDateTime(vDouble);
-  end;
+Function TZRESTDWResultSet.GetTimestamp(ColumnIndex : Integer) : TDateTime;
+Var
+  vDouble : Double;
+Begin
+  vDouble := GetDouble(ColumnIndex);
+  If Not LastWasNull Then
+   Result := TDateTime(vDouble);
+End;
 {$ENDIF}
 
 {$IFDEF ZEOS80UP}
-  function TZRESTDWResultSet.GetBlob(ColumnIndex: Integer;
-    LobStreamMode: TZLobStreamMode = lsmRead): IZBlob;
-  begin
-    LastWasNull := IsNull(ColumnIndex);
-    if not LastWasNull then
-      Result.SetBytes(TBytes(FVariantTable[RowNo-1,ColumnIndex]))
-  end;
-{$ELSE}
-  function TZRESTDWResultSet.GetBlob(ColumnIndex: Integer) : IZBlob;
-  var
-    sStr : TStringStream;
-  begin
-    LastWasNull := IsNull(ColumnIndex);
-    {$IFNDEF GENERIC_INDEX}
-    ColumnIndex := ColumnIndex -1;
-    {$ENDIF}
-    if not LastWasNull then begin
-      if FFieldTypes[ColumnIndex] in [dwftMemo,dwftWideMemo,dwftFmtMemo] then begin
-        sStr := TStringStream.Create(String(FVariantTable[RowNo-1,ColumnIndex]));
-        try
-          sStr.Position := 0;
-          Result := TZAbstractCLob.CreateWithStream(sStr,zCP_UTF8,ConSettings);
-        finally
-          sStr.Free;
-        end;
-      end
-      else begin
-            {$IFNDEF FPC}
-             {$IFDEF DELPHI2010UP}
-              sStr := TStringStream.Create(TBytes(FVariantTable[RowNo-1,ColumnIndex]));
-             {$ELSE}
-              sStr := TStringStream.Create(BytesToString(TRESTDWBytes(FVariantTable[RowNo-1,ColumnIndex])));
-             {$ENDIF}
-            {$ELSE}
-             sStr := TStringStream.Create(TBytes(FVariantTable[RowNo-1,ColumnIndex]));
-            {$ENDIF}
-        try
-          sStr.Position := 0;
-          Result := TZAbstractBlob.CreateWithStream(sStr);
-        finally
-          sStr.Free;
-        end;
-      end;
-    end;
-  end;
-{$ENDIF}
+Function TZRESTDWResultSet.GetBlob(ColumnIndex : Integer;
+                                   LobStreamMode : TZLobStreamMode = lsmRead) : IZBlob;
+Begin
+  LastWasNull := IsNull(ColumnIndex);
 
-
-function TZRESTDWResultSet.Next: Boolean;
-begin
-  Result := False;
-  if Closed then
-    Exit;
-
-  if ((MaxRows > 0) and (RowNo >= MaxRows)) or (RowNo > FRecordCount-1) then begin
-    if RowNo <= LastRowNo then
-      RowNo := LastRowNo + 1;
-    Exit;
-  end;
-
-  if FFirstRow then begin
-    FFirstRow := False;
-    Result := True;
-    RowNo := 1;
-    LastRowNo := 1;
-  end
-  else begin
-    RowNo := RowNo + 1;
-    LastRowNo := RowNo;
-    Result := True;
-  end;
-end;
-
-function TZRESTDWCachedResolver.CheckKeyColumn(ColumnIndex: Integer): Boolean;
-begin
-  Result := (Metadata.GetTableName(ColumnIndex) <> '')
-    and (Metadata.GetColumnName(ColumnIndex) <> '')
-    and Metadata.IsSearchable(ColumnIndex)
-    and not (Metadata.GetColumnType(ColumnIndex) in [stUnknown, stBinaryStream]);
-end;
-
-constructor TZRESTDWCachedResolver.Create(const Statement: IZStatement; const Metadata: IZResultSetMetadata);
-var
-  I: Integer;
-begin
-  inherited Create(Statement, Metadata);
-  {$IFDEF ZEOS80UP}
-    FPlainDriver := TZRESTDWPlainDriver(Statement.GetConnection.GetIZPlainDriver.GetInstance);
-  {$ELSE}
-    FPlainDriver := TZRESTDWPlainDriver(Statement.GetConnection.GetIZPlainDriver);
+  {$IFNDEF GENERIC_INDEX}
+  ColumnIndex := ColumnIndex - 1;
   {$ENDIF}
 
-  { Defines an index of autoincrement field. }
+  If (ColumnIndex < 0) Or
+     (ColumnIndex >= FFieldCount) Then
+   Raise Exception.CreateFmt('Zeos PhysLink invalid column index %d. FieldCount=%d',
+                             [ColumnIndex, FFieldCount]);
+
+  If Not LastWasNull Then
+   Result.SetBytes(TBytes(FVariantTable[RowNo-1,ColumnIndex]));
+End;
+{$ELSE}
+Function TZRESTDWResultSet.GetBlob(ColumnIndex : Integer) : IZBlob;
+Var
+  sStr : TStringStream;
+Begin
+  LastWasNull := IsNull(ColumnIndex);
+    {$IFNDEF GENERIC_INDEX}
+  ColumnIndex := ColumnIndex -1;
+    {$ENDIF}
+  If Not LastWasNull Then
+   Begin
+    If FFieldTypes[ColumnIndex] in [dwftMemo,dwftWideMemo,dwftFmtMemo] Then
+     Begin
+      sStr := TStringStream.Create(String(FVariantTable[RowNo-1,ColumnIndex]));
+      Try
+       sStr.Position := 0;
+       Result := TZAbstractCLob.CreateWithStream(sStr,zCP_UTF8,ConSettings);
+      Finally
+       sStr.Free;
+      End;
+     End
+    Else
+     Begin
+            {$IFNDEF FPC}
+             {$IFDEF DELPHI2010UP}
+      sStr := TStringStream.Create(TBytes(FVariantTable[RowNo-1,ColumnIndex]));
+             {$ELSE}
+      sStr := TStringStream.Create(BytesToString(TRESTDWBytes(FVariantTable[RowNo-1,ColumnIndex])));
+             {$ENDIF}
+            {$ELSE}
+      sStr := TStringStream.Create(TBytes(FVariantTable[RowNo-1,ColumnIndex]));
+            {$ENDIF}
+      Try
+       sStr.Position := 0;
+       Result := TZAbstractBlob.CreateWithStream(sStr);
+      Finally
+       sStr.Free;
+      End;
+     End;
+   End;
+End;
+{$ENDIF}
+
+
+Function TZRESTDWResultSet.Next : Boolean;
+Begin
+  Result := False;
+  If Closed Then
+   Exit;
+
+  If FRecordCount <= 0 Then
+   Exit;
+
+  If FFirstRow Then
+   Begin
+    FFirstRow := False;
+    RowNo := 1;
+   End
+  Else
+   RowNo := RowNo + 1;
+
+  If ((MaxRows > 0) And (RowNo > MaxRows)) Or
+     (RowNo > FRecordCount) Then
+   Begin
+    LastRowNo := RowNo;
+    Exit;
+   End;
+
+  LastRowNo := RowNo;
+  Result := True;
+End;
+
+Function TZRESTDWCachedResolver.CheckKeyColumn(ColumnIndex : Integer) : Boolean;
+Begin
+  Result := (Metadata.GetTableName(ColumnIndex) <> '')
+  And (Metadata.GetColumnName(ColumnIndex) <> '')
+  And Metadata.IsSearchable(ColumnIndex)
+  And Not (Metadata.GetColumnType(ColumnIndex) in [stUnknown, stBinaryStream]);
+End;
+
+Constructor TZRESTDWCachedResolver.Create(Const AStatement : IZStatement; Const AMetadata : IZResultSetMetadata);
+Var
+  I : Integer;
+Begin
+  Inherited Create(AStatement, AMetadata);
+  {$IFDEF ZEOS80UP}
+  FPlainDriver := TZRESTDWPlainDriver(AStatement.GetConnection.GetIZPlainDriver.GetInstance);
+  {$ELSE}
+  FPlainDriver := TZRESTDWPlainDriver(AStatement.GetConnection.GetIZPlainDriver);
+  {$ENDIF}
+
+  { Defines an index Of autoincrement field. }
   FAutoColumnIndex := 0;
-  for I := FirstDbcIndex to Metadata.GetColumnCount{$IFDEF GENERIC_INDEX} - 1{$ENDIF} do
-    if Metadata.IsAutoIncrement(I) and
-      (Metadata.GetColumnType(I) in [stByte, stShort, stSmall, stLongWord,
-        stInteger, stUlong, stLong]) then
-    begin
-      FAutoColumnIndex := I;
-      Break;
-    end;
-end;
+  For I := FirstDbcIndex To AMetadata.GetColumnCount{$IFDEF GENERIC_INDEX} - 1{$ENDIF} Do
+   If AMetadata.IsAutoIncrement(I) And
+  (AMetadata.GetColumnType(I) in [stByte, stShort, stSmall, stLongWord,
+  stInteger, stUlong, stLong]) Then
+   Begin
+    FAutoColumnIndex := I;
+    Break;
+   End;
+End;
 
 {$IFDEF ZEOS80UP}
-  procedure TZRESTDWCachedResolver.PostUpdates(const Sender: IZCachedResultSet;
-    UpdateType: TZRowUpdateType; const OldRowAccessor, NewRowAccessor: TZRowAccessor);
-  begin
-    inherited PostUpdates(Sender, UpdateType, OldRowAccessor, NewRowAccessor);
+Procedure TZRESTDWCachedResolver.PostUpdates(Const Sender : IZCachedResultSet;
+  UpdateType : TZRowUpdateType; Const OldRowAccessor, NewRowAccessor : TZRowAccessor);
+Begin
+  Inherited PostUpdates(Sender, UpdateType, OldRowAccessor, NewRowAccessor);
 
-    if (UpdateType = utInserted) then
-      UpdateAutoIncrementFields(Sender, UpdateType, OldRowAccessor, NewRowAccessor, Self);
-  end;
+  If (UpdateType = utInserted) Then
+   UpdateAutoIncrementFields(Sender, UpdateType, OldRowAccessor, NewRowAccessor, Self);
+End;
 {$ELSE}
-  procedure TZRESTDWCachedResolver.PostUpdates(Sender: IZCachedResultSet; UpdateType: TZRowUpdateType;
-    OldRowAccessor, NewRowAccessor: TZRowAccessor);
-  begin
-    inherited PostUpdates(Sender, UpdateType, OldRowAccessor, NewRowAccessor);
+Procedure TZRESTDWCachedResolver.PostUpdates(Sender : IZCachedResultSet; UpdateType : TZRowUpdateType;
+  OldRowAccessor, NewRowAccessor : TZRowAccessor);
+Begin
+  Inherited PostUpdates(Sender, UpdateType, OldRowAccessor, NewRowAccessor);
 
-    if (UpdateType = utInserted) then
-      UpdateAutoIncrementFields(Sender, UpdateType, OldRowAccessor, NewRowAccessor, Self);
-  end;
+  If (UpdateType = utInserted) Then
+   UpdateAutoIncrementFields(Sender, UpdateType, OldRowAccessor, NewRowAccessor, Self);
+End;
 {$ENDIF}
 
 {$IFDEF ZEOS80UP}
-  procedure TZRESTDWCachedResolver.UpdateAutoIncrementFields(
-    const Sender: IZCachedResultSet; UpdateType: TZRowUpdateType; const
-    OldRowAccessor, NewRowAccessor: TZRowAccessor; const Resolver: IZCachedResolver);
-  begin
-    inherited;
-  end;
+Procedure TZRESTDWCachedResolver.UpdateAutoIncrementFields(
+  Const Sender : IZCachedResultSet; UpdateType : TZRowUpdateType; Const
+  OldRowAccessor, NewRowAccessor : TZRowAccessor; Const Resolver : IZCachedResolver);
+Begin
+  Inherited;
+End;
 {$ELSE}
-  procedure TZRESTDWCachedResolver.UpdateAutoIncrementFields(Sender: IZCachedResultSet;
-     UpdateType: TZRowUpdateType; OldRowAccessor, NewRowAccessor: TZRowAccessor;
-     Resolver: IZCachedResolver);
-  begin
-    inherited;
-  end;
+Procedure TZRESTDWCachedResolver.UpdateAutoIncrementFields(Sender : IZCachedResultSet;
+  UpdateType : TZRowUpdateType; OldRowAccessor, NewRowAccessor : TZRowAccessor;
+  Resolver : IZCachedResolver);
+Begin
+  Inherited;
+End;
 {$ENDIF}
 
 { TZRESTDWResultSetMetadata }
 
-procedure TZRESTDWResultSetMetadata.ClearColumn(ColumnInfo: TZColumnInfo);
-begin
-  inherited;
+Procedure TZRESTDWResultSetMetadata.ClearColumn(ColumnInfo : TZColumnInfo);
+Begin
+  Inherited;
   ColumnInfo.ReadOnly := False;
   ColumnInfo.Writable := True;
   ColumnInfo.DefinitelyWritable := True;
-end;
+End;
 
 {$ENDIF ZEOS_DISABLE_RESTDW} //if set we have an empty unit
 
-end.
+End.

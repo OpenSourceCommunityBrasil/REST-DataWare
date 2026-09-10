@@ -1,41 +1,41 @@
-unit uRESTDWMemCharsets;
-{$I ..\..\Includes\uRESTDW.inc}
+Unit uRESTDWMemCharsets;
+{$I uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
  Roniery                    - Devel.
 }
 
-interface
-uses
+Interface
+Uses
   uRESTDWMemBase;
 
-type
-  EJclCharsetError = class(EJclError);
-const
+Type
+  EJclCharsetError = Class(EJclError);
+Const
   CP_UTF16LE = 1200;
-type
-  TJclCharsetInfo = record
+Type
+  TJclCharsetInfo = Record
     Name: string;
     CodePage: Word;
     FamilyCodePage: Word;
-  end;
-const JclCharsetInfos: array [0..285] of TJclCharsetInfo =
+  End;
+Const JclCharsetInfos: array [0..285] Of TJclCharsetInfo =
 (* Arabic (ASMO 708) ASMO-708 708 1256 *)
     ((Name: 'ASMO-708'; CodePage: 708; FamilyCodePage: 1256),
 (* Arabic (DOS) DOS-720 720 1256 *)
@@ -440,13 +440,13 @@ const JclCharsetInfos: array [0..285] of TJclCharsetInfo =
      (Name: 'us'; CodePage: 1252; FamilyCodePage: 1252),
      (Name: 'us-ascii'; CodePage: 1252; FamilyCodePage: 1252),
      (Name: 'x-ansi'; CodePage: 1252; FamilyCodePage: 1252) );
-function FamilyCodePageFromCharsetName(const CharsetName: string): Word;
-function FamilyCodePageFromCodePage(CodePage: Word): Word;
-function CodePageFromCharsetName(const CharsetName: string): Word;
-function CharsetInfoFromCharsetName(const CharsetName: string): TJclCharsetInfo;
-function CharsetNameFromCodePage(CodePage: Word): string;
+Function FamilyCodePageFromCharsetName(Const CharsetName: string): Word;
+Function FamilyCodePageFromCodePage(CodePage: Word): Word;
+Function CodePageFromCharsetName(Const CharsetName: string): Word;
+Function CharsetInfoFromCharsetName(Const CharsetName: string): TJclCharsetInfo;
+Function CharsetNameFromCodePage(CodePage: Word): string;
 {$IFDEF UNITVERSIONING}
-const
+Const
   UnitVersioning: TUnitVersionInfo = (
     RCSfile: '$URL$';
     Revision: '$Revision$';
@@ -456,8 +456,8 @@ const
     Data: nil
     );
 {$ENDIF UNITVERSIONING}
-implementation
-uses
+Implementation
+Uses
   {$IFDEF HAS_UNITSCOPE}
   System.SysUtils,
   {$ELSE ~HAS_UNITSCOPE}
@@ -465,76 +465,76 @@ uses
   {$ENDIF ~HAS_UNITSCOPE}
   uRESTDWMemResources;
 
-function FamilyCodePageFromCharsetName(const CharsetName: string): Word;
-var
+Function FamilyCodePageFromCharsetName(Const CharsetName: string): Word;
+Var
   Index: Integer;
   UpperCharsetName: string;
-begin
+Begin
   UpperCharsetName := UpperCase(CharsetName);
-  for Index := Low(JclCharsetInfos) to High(JclCharsetInfos) do
-    if CompareStr(UpperCharsetName, UpperCase(JclCharsetInfos[Index].Name)) = 0 then
-  begin
+  For Index := Low(JclCharsetInfos) To High(JclCharsetInfos) Do
+    If CompareStr(UpperCharsetName, UpperCase(JclCharsetInfos[Index].Name)) = 0 Then
+  Begin
     Result := JclCharsetInfos[Index].FamilyCodePage;
     Exit;
-  end;
+  End;
   raise EJclCharsetError.CreateRes(@RsENoCharset);
-end;
-function CodePageFromCharsetName(const CharsetName: string): Word;
-var
+End;
+Function CodePageFromCharsetName(Const CharsetName: string): Word;
+Var
   Index: Integer;
   UpperCharsetName: string;
-begin
+Begin
   UpperCharsetName := UpperCase(CharsetName);
-  for Index := Low(JclCharsetInfos) to High(JclCharsetInfos) do
-    if CompareStr(UpperCharsetName, UpperCase(JclCharsetInfos[Index].Name)) = 0 then
-  begin
+  For Index := Low(JclCharsetInfos) To High(JclCharsetInfos) Do
+    If CompareStr(UpperCharsetName, UpperCase(JclCharsetInfos[Index].Name)) = 0 Then
+  Begin
     Result := JclCharsetInfos[Index].CodePage;
     Exit;
-  end;
+  End;
   raise EJclCharsetError.CreateRes(@RsENoCharset);
-end;
-function CharsetInfoFromCharsetName(const CharsetName: string): TJclCharsetInfo;
-var
+End;
+Function CharsetInfoFromCharsetName(Const CharsetName: string): TJclCharsetInfo;
+Var
   Index: Integer;
   UpperCharsetName: string;
-begin
+Begin
   UpperCharsetName := UpperCase(CharsetName);
-  for Index := Low(JclCharsetInfos) to High(JclCharsetInfos) do
-    if CompareStr(UpperCharsetName, UpperCase(JclCharsetInfos[Index].Name)) = 0 then
-  begin
+  For Index := Low(JclCharsetInfos) To High(JclCharsetInfos) Do
+    If CompareStr(UpperCharsetName, UpperCase(JclCharsetInfos[Index].Name)) = 0 Then
+  Begin
     Result := JclCharsetInfos[Index];
     Exit;
-  end;
+  End;
   raise EJclCharsetError.CreateRes(@RsENoCharset);
-end;
-function FamilyCodePageFromCodePage(CodePage: Word): Word;
-var
+End;
+Function FamilyCodePageFromCodePage(CodePage: Word): Word;
+Var
   Index: Integer;
-begin
-  for Index := Low(JclCharsetInfos) to High(JclCharsetInfos) do
-    if JclCharsetInfos[Index].CodePage = CodePage then
-  begin
+Begin
+  For Index := Low(JclCharsetInfos) To High(JclCharsetInfos) Do
+    If JclCharsetInfos[Index].CodePage = CodePage Then
+  Begin
     Result := JclCharsetInfos[Index].FamilyCodePage;
     Exit;
-  end;
+  End;
   raise EJclCharsetError.CreateRes(@RsENoCharset);
-end;
-function CharsetNameFromCodePage(CodePage: Word): string;
-var
+End;
+Function CharsetNameFromCodePage(CodePage: Word): string;
+Var
   Index: Integer;
-begin
-  for Index := Low(JclCharsetInfos) to High(JclCharsetInfos) do
-    if JclCharsetInfos[Index].CodePage = CodePage then
-  begin
+Begin
+  For Index := Low(JclCharsetInfos) To High(JclCharsetInfos) Do
+    If JclCharsetInfos[Index].CodePage = CodePage Then
+  Begin
     Result := JclCharsetInfos[Index].Name;
     Exit;
-  end;
+  End;
   raise EJclCharsetError.CreateRes(@RsENoCharset);
-end;
+End;
 {$IFDEF UNITVERSIONING}
-initialization
-  RegisterUnitVersion(HInstance, UnitVersioning);
-finalization
-  UnregisterUnitVersion(HInstance);
+Initialization
+ RegisterUnitVersion(HInstance, UnitVersioning);
+Finalization
+ UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-end.
+End.

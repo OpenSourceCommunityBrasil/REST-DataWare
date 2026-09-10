@@ -1,0 +1,9 @@
+OpenSSL 1.0.2s - Android 64-bit ARM64 (arm64-v8a)
+
+Arquivos para Deployment do Delphi Android 64:
+  libssl.so
+  libcrypto.so
+
+ABI confirmada: AArch64 / ARM64.
+
+Adicione ambos no Deployment para a plataforma Android 64-bit como bibliotecas nativas.

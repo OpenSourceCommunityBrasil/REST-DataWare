@@ -8,13 +8,12 @@ unit RESTDWFphttpSockets;
 interface
 
 uses
-  uRESTDWFphttpBase, uRESTDWFphttpReg, LazarusPackageIntf;
+  uRESTDWFpHttpFirebaseCloudMessaging, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
-  RegisterUnit('uRESTDWFphttpReg', @uRESTDWFphttpReg.Register);
 end;
 
 initialization

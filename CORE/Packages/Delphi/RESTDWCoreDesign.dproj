@@ -2,12 +2,12 @@
     <PropertyGroup>
         <ProjectGuid>{B229AD56-6CAC-4419-8C33-A144BCAD1177}</ProjectGuid>
         <MainSource>RESTDWCoreDesign.dpk</MainSource>
-        <ProjectVersion>20.3</ProjectVersion>
+        <ProjectVersion>20.4</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
-        <TargetedPlatforms>558099</TargetedPlatforms>
+        <TargetedPlatforms>1606803</TargetedPlatforms>
         <AppType>Package</AppType>
         <ProjectName Condition="'$(ProjectName)'==''">RESTDWCoreDesign</ProjectName>
     </PropertyGroup>
@@ -82,12 +82,12 @@
         <DCC_K>false</DCC_K>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
-        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
         <BT_BuildType>Debug</BT_BuildType>
         <EnabledSysJars>activity-1.1.0.dex.jar;annotation-1.2.0.dex.jar;appcompat-1.2.0.dex.jar;appcompat-resources-1.2.0.dex.jar;asynclayoutinflater-1.0.0.dex.jar;billing-4.0.0.dex.jar;biometric-1.1.0.dex.jar;browser-1.0.0.dex.jar;cloud-messaging.dex.jar;collection-1.1.0.dex.jar;coordinatorlayout-1.0.0.dex.jar;core-1.5.0-rc02.dex.jar;core-common-2.1.0.dex.jar;core-runtime-2.1.0.dex.jar;cursoradapter-1.0.0.dex.jar;customview-1.0.0.dex.jar;documentfile-1.0.0.dex.jar;drawerlayout-1.0.0.dex.jar;firebase-annotations-16.0.0.dex.jar;firebase-common-20.0.0.dex.jar;firebase-components-17.0.0.dex.jar;firebase-datatransport-18.0.0.dex.jar;firebase-encoders-17.0.0.dex.jar;firebase-encoders-json-18.0.0.dex.jar;firebase-iid-interop-17.1.0.dex.jar;firebase-installations-17.0.0.dex.jar;firebase-installations-interop-17.0.0.dex.jar;firebase-measurement-connector-19.0.0.dex.jar;firebase-messaging-22.0.0.dex.jar;fmx.dex.jar;fragment-1.2.5.dex.jar;google-play-licensing.dex.jar;interpolator-1.0.0.dex.jar;javax.inject-1.dex.jar;legacy-support-core-ui-1.0.0.dex.jar;legacy-support-core-utils-1.0.0.dex.jar;lifecycle-common-2.2.0.dex.jar;lifecycle-livedata-2.0.0.dex.jar;lifecycle-livedata-core-2.2.0.dex.jar;lifecycle-runtime-2.2.0.dex.jar;lifecycle-service-2.0.0.dex.jar;lifecycle-viewmodel-2.2.0.dex.jar;lifecycle-viewmodel-savedstate-2.2.0.dex.jar;listenablefuture-1.0.dex.jar;loader-1.0.0.dex.jar;localbroadcastmanager-1.0.0.dex.jar;play-services-ads-20.1.0.dex.jar;play-services-ads-base-20.1.0.dex.jar;play-services-ads-identifier-17.0.0.dex.jar;play-services-ads-lite-20.1.0.dex.jar;play-services-base-17.5.0.dex.jar;play-services-basement-17.6.0.dex.jar;play-services-cloud-messaging-16.0.0.dex.jar;play-services-drive-17.0.0.dex.jar;play-services-games-21.0.0.dex.jar;play-services-location-18.0.0.dex.jar;play-services-maps-17.0.1.dex.jar;play-services-measurement-base-18.0.0.dex.jar;play-services-measurement-sdk-api-18.0.0.dex.jar;play-services-places-placereport-17.0.0.dex.jar;play-services-stats-17.0.0.dex.jar;play-services-tasks-17.2.0.dex.jar;print-1.0.0.dex.jar;room-common-2.1.0.dex.jar;room-runtime-2.1.0.dex.jar;savedstate-1.0.0.dex.jar;slidingpanelayout-1.0.0.dex.jar;sqlite-2.0.1.dex.jar;sqlite-framework-2.0.1.dex.jar;swiperefreshlayout-1.0.0.dex.jar;transport-api-3.0.0.dex.jar;transport-backend-cct-3.0.0.dex.jar;transport-runtime-3.0.0.dex.jar;user-messaging-platform-1.0.0.dex.jar;vectordrawable-1.1.0.dex.jar;vectordrawable-animated-1.1.0.dex.jar;versionedparcelable-1.1.1.dex.jar;viewpager-1.0.0.dex.jar;work-runtime-2.1.0.dex.jar</EnabledSysJars>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android64)'!=''">
-        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
         <BT_BuildType>Debug</BT_BuildType>
         <EnabledSysJars>activity-1.1.0.dex.jar;annotation-1.2.0.dex.jar;appcompat-1.2.0.dex.jar;appcompat-resources-1.2.0.dex.jar;asynclayoutinflater-1.0.0.dex.jar;billing-4.0.0.dex.jar;biometric-1.1.0.dex.jar;browser-1.0.0.dex.jar;cloud-messaging.dex.jar;collection-1.1.0.dex.jar;coordinatorlayout-1.0.0.dex.jar;core-1.5.0-rc02.dex.jar;core-common-2.1.0.dex.jar;core-runtime-2.1.0.dex.jar;cursoradapter-1.0.0.dex.jar;customview-1.0.0.dex.jar;documentfile-1.0.0.dex.jar;drawerlayout-1.0.0.dex.jar;firebase-annotations-16.0.0.dex.jar;firebase-common-20.0.0.dex.jar;firebase-components-17.0.0.dex.jar;firebase-datatransport-18.0.0.dex.jar;firebase-encoders-17.0.0.dex.jar;firebase-encoders-json-18.0.0.dex.jar;firebase-iid-interop-17.1.0.dex.jar;firebase-installations-17.0.0.dex.jar;firebase-installations-interop-17.0.0.dex.jar;firebase-measurement-connector-19.0.0.dex.jar;firebase-messaging-22.0.0.dex.jar;fmx.dex.jar;fragment-1.2.5.dex.jar;google-play-licensing.dex.jar;interpolator-1.0.0.dex.jar;javax.inject-1.dex.jar;legacy-support-core-ui-1.0.0.dex.jar;legacy-support-core-utils-1.0.0.dex.jar;lifecycle-common-2.2.0.dex.jar;lifecycle-livedata-2.0.0.dex.jar;lifecycle-livedata-core-2.2.0.dex.jar;lifecycle-runtime-2.2.0.dex.jar;lifecycle-service-2.0.0.dex.jar;lifecycle-viewmodel-2.2.0.dex.jar;lifecycle-viewmodel-savedstate-2.2.0.dex.jar;listenablefuture-1.0.dex.jar;loader-1.0.0.dex.jar;localbroadcastmanager-1.0.0.dex.jar;play-services-ads-20.1.0.dex.jar;play-services-ads-base-20.1.0.dex.jar;play-services-ads-identifier-17.0.0.dex.jar;play-services-ads-lite-20.1.0.dex.jar;play-services-base-17.5.0.dex.jar;play-services-basement-17.6.0.dex.jar;play-services-cloud-messaging-16.0.0.dex.jar;play-services-drive-17.0.0.dex.jar;play-services-games-21.0.0.dex.jar;play-services-location-18.0.0.dex.jar;play-services-maps-17.0.1.dex.jar;play-services-measurement-base-18.0.0.dex.jar;play-services-measurement-sdk-api-18.0.0.dex.jar;play-services-places-placereport-17.0.0.dex.jar;play-services-stats-17.0.0.dex.jar;play-services-tasks-17.2.0.dex.jar;print-1.0.0.dex.jar;room-common-2.1.0.dex.jar;room-runtime-2.1.0.dex.jar;savedstate-1.0.0.dex.jar;slidingpanelayout-1.0.0.dex.jar;sqlite-2.0.1.dex.jar;sqlite-framework-2.0.1.dex.jar;swiperefreshlayout-1.0.0.dex.jar;transport-api-3.0.0.dex.jar;transport-backend-cct-3.0.0.dex.jar;transport-runtime-3.0.0.dex.jar;user-messaging-platform-1.0.0.dex.jar;vectordrawable-1.1.0.dex.jar;vectordrawable-animated-1.1.0.dex.jar;versionedparcelable-1.1.1.dex.jar;viewpager-1.0.0.dex.jar;work-runtime-2.1.0.dex.jar</EnabledSysJars>
     </PropertyGroup>
@@ -157,8 +157,68 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="RESTDWCoreDesign.dcr"/>
+        <DCCReference Include="TRESTDWServerRoutes.dcr"/>
         <DCCReference Include="dcldb.dcp"/>
         <DCCReference Include="RESTDWCore.dcp"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLComponentManager.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLDesigner.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLDesignerIcons.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLWebAssets.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLDesignerAI.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLIDECompat.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLJSONCompat.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLPageProducerAdapter.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\uRESTDWHTMLWebView.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEdit.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditCodeFolding.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditHighlighter.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditHighlighterOptions.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditKbdHandler.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditKeyCmds.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditKeyConst.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditMiscClasses.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditMiscProcs.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditStrConst.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditTextBuffer.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditTypes.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynEditWordWrap.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynHighlighterCss.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynHighlighterHashEntries.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynHighlighterHtml.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynHighlighterJScript.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynHighlighterMulti.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynRegExpr.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynTextDrawer.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynUnicode.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\PrivateSynEdit\uRESTDWPrivSynUsp10.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVBrowser.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVBrowserBase.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVConstants.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Args.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2CompositionController.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Controller.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2ControllerOptions.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2CookieManager.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2CustomSchemeRegistration.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Delegates.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Environment.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2EnvironmentOptions.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Find.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2FindOptions.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2PrintSettings.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Profile.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVCoreWebView2Settings.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVEvents.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVInterfaces.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVLibFunctions.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVLoader.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVLoaderInternal.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVMiscFunctions.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVTypeLibrary.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVTypes.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVWinControl.pas"/>
+        <DCCReference Include="..\..\Source\Plugins\HTMLEditor\WebView\uRESTDWPrivWVWindowParent.pas"/>
         <DCCReference Include="..\..\Source\Basic\uRESTDWDesignReg.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -795,6 +855,9 @@
                     <Platform Name="Win64x">
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="WinARM64EC">
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectiOSDeviceDebug">
                     <Platform Name="iOSDevice32">
@@ -833,6 +896,10 @@
                         <RemoteDir>Assets</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="WinARM64EC">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="UWP_DelphiLogo44">
                     <Platform Name="Win32">
@@ -840,6 +907,10 @@
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="WinARM64EC">
                         <RemoteDir>Assets</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -1057,16 +1128,17 @@
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win64x" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="WinARM64EC" Name="$(PROJECTNAME)"/>
             </Deployment>
             <Platforms>
                 <Platform value="Android">True</Platform>
                 <Platform value="Android64">True</Platform>
                 <Platform value="iOSDevice64">True</Platform>
                 <Platform value="iOSSimARM64">True</Platform>
-                <Platform value="Linux64">False</Platform>
+                <Platform value="Linux64">True</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">True</Platform>
-                <Platform value="Win64x">False</Platform>
+                <Platform value="Win64x">True</Platform>
             </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

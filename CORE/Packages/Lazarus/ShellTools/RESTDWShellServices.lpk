@@ -9,7 +9,8 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <OtherUnitFiles Value="..\..\..\Source\ShellTools"/>
+        <IncludeFiles Value="..\..\..\Source\Includes"/>
+        <OtherUnitFiles Value="..\..\..\Source\ShellTools;..\..\..\Source\Includes"/>
         <UnitOutputDirectory Value="..\..\..\compiledlaz"/>
       </SearchPaths>
     </CompilerOptions>

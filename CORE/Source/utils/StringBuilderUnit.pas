@@ -1,6 +1,6 @@
 unit StringBuilderUnit;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .

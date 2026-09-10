@@ -1,0 +1,17 @@
+Package RESTDWNativeLinkDBExpress;
+
+{$R *.res}
+{$R 'RESTDWNativeLinkDBExpress.dcr'}
+{$DESCRIPTION 'REST Dataware NativeLink dbExpress'}
+{$IMPLICITBUILD ON}
+
+Requires
+ rtl,
+ vcl,
+ dbrtl,
+ dbexpress,
+ RESTDWNativeDriver;
+
+Contains
+ uRESTDWNativeLinkDBExpress In '..\..\..\..\..\Source\Database_Drivers\Native\NativeLinks\DBExpress\uRESTDWNativeLinkDBExpress.pas';
+End.

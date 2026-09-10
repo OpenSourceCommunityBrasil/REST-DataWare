@@ -166,11 +166,13 @@ begin
 end;
 
 function TRESTDWLazSQLQuery.ParamCount : Integer;
-var
-  qry : TSQLQuery;
 begin
-  qry := TSQLQuery(Self.Owner);
-  Result := qry.Params.Count;
+ Result:=TSQLQuery(Self.Owner).Params.Count;
+ If (Result=0) and (Pos(':',SQL.Text)>0) Then
+  Begin
+   Prepare;
+   Result:=TSQLQuery(Self.Owner).Params.Count;
+  End;
 end;
 
 function TRESTDWLazSQLQuery.getParamDataType(IParam : integer) : TFieldType;
@@ -266,15 +268,26 @@ begin
 end;
 
 function TRESTDWLazarusDriver.getQuery : TRESTDWDrvQuery;
-var
-  qry : TSQLQuery;
-begin
-  qry := TSQLQuery.Create(Self);
-  qry.SQLConnection := TSQLConnection(Connection);
-  qry.Transaction := FTransaction;
-
-  Result := TRESTDWLazSQLQuery.Create(qry);
-end;
+Var
+ Query        : TSQLQuery;
+ LConnection  : TSQLConnection;
+ LTransaction : TSQLTransaction;
+Begin
+ LConnection := TSQLConnection(Connection);
+ LTransaction := Nil;
+ If LConnection <> Nil Then
+  Begin
+   LTransaction := LConnection.Transaction;
+  End;
+ If LTransaction = Nil Then
+  Begin
+   LTransaction := FTransaction;
+  End;
+ Query := TSQLQuery.Create(Self);
+ Query.SQLConnection := LConnection;
+ Query.Transaction := LTransaction;
+ Result := TRESTDWLazSQLQuery.Create(Query);
+End;
 
 procedure TRESTDWLazarusDriver.Connect;
 begin
@@ -284,11 +297,27 @@ begin
 end;
 
 procedure TRESTDWLazarusDriver.Disconect;
-begin
-  if Assigned(Connection) then
-    TSQLConnection(Connection).Close;
-  inherited Disconect;
-end;
+Var
+ LTransaction : TSQLTransaction;
+Begin
+ LTransaction := Nil;
+ If Assigned(Connection) Then
+  Begin
+   LTransaction := TSQLConnection(Connection).Transaction;
+  End;
+ If LTransaction = Nil Then
+  Begin
+   LTransaction := FTransaction;
+  End;
+ If LTransaction <> Nil Then
+  Begin
+   If LTransaction.Active Then
+    Begin
+     LTransaction.Rollback;
+    End;
+  End;
+ Inherited Disconect;
+End;
 
  constructor TRESTDWLazarusDriver.Create(AOwner : TComponent);
 begin
@@ -311,19 +340,68 @@ begin
 end;
 
 function TRESTDWLazarusDriver.connInTransaction: boolean;
-begin
-  Result := FTransaction.Active;
-end;
+Var
+ LTransaction : TSQLTransaction;
+Begin
+ Result := False;
+ LTransaction := Nil;
+ If Assigned(Connection) Then
+  Begin
+   LTransaction := TSQLConnection(Connection).Transaction;
+  End;
+ If LTransaction = Nil Then
+  Begin
+   LTransaction := FTransaction;
+  End;
+ If LTransaction <> Nil Then
+  Begin
+   Result := LTransaction.Active;
+  End;
+End;
 
 procedure TRESTDWLazarusDriver.connStartTransaction;
-begin
-  FTransaction.StartTransaction;
-end;
+Var
+ LTransaction : TSQLTransaction;
+Begin
+ LTransaction := Nil;
+ If Assigned(Connection) Then
+  Begin
+   LTransaction := TSQLConnection(Connection).Transaction;
+  End;
+ If LTransaction = Nil Then
+  Begin
+   LTransaction := FTransaction;
+  End;
+ If LTransaction <> Nil Then
+  Begin
+   If Not LTransaction.Active Then
+    Begin
+     LTransaction.StartTransaction;
+    End;
+  End;
+End;
 
 procedure TRESTDWLazarusDriver.connRollback;
-begin
-  FTransaction.Rollback;
-end;
+Var
+ LTransaction : TSQLTransaction;
+Begin
+ LTransaction := Nil;
+ If Assigned(Connection) Then
+  Begin
+   LTransaction := TSQLConnection(Connection).Transaction;
+  End;
+ If LTransaction = Nil Then
+  Begin
+   LTransaction := FTransaction;
+  End;
+ If LTransaction <> Nil Then
+  Begin
+   If LTransaction.Active Then
+    Begin
+     LTransaction.Rollback;
+    End;
+  End;
+End;
 
 function TRESTDWLazarusDriver.compConnIsValid(comp: TComponent): boolean;
 begin
@@ -331,9 +409,26 @@ begin
 end;
 
 procedure TRESTDWLazarusDriver.connCommit;
-begin
-  FTransaction.Commit;
-end;
+Var
+ LTransaction : TSQLTransaction;
+Begin
+ LTransaction := Nil;
+ If Assigned(Connection) Then
+  Begin
+   LTransaction := TSQLConnection(Connection).Transaction;
+  End;
+ If LTransaction = Nil Then
+  Begin
+   LTransaction := FTransaction;
+  End;
+ If LTransaction <> Nil Then
+  Begin
+   If LTransaction.Active Then
+    Begin
+     LTransaction.Commit;
+    End;
+  End;
+End;
 
 class procedure TRESTDWLazarusDriver.CreateConnection(const AConnectionDefs: TConnectionDefs;
                                                      var AConnection: TComponent);
@@ -416,8 +511,14 @@ Begin
   end;
 end;
 
-initialization
-{$I ..\RESTDWLazarusDrivers.lrs}
+Initialization
+{$I ..\..\Packages\Lazarus\Drivers\RESTDWLazarusDrivers.lrs}
+ RegisterClass(TRESTDWLazarusDriver);
+ RegisterRESTDWDriverClass(TRESTDWLazarusDriver);
+
+Finalization
+ UnregisterRESTDWDriverClass(TRESTDWLazarusDriver);
+ UnRegisterClass(TRESTDWLazarusDriver);
 
 end.
 

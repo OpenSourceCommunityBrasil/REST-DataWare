@@ -34,6 +34,8 @@ requires
   vcl;
 
 contains
-  uRESTDWIcsBase in '..\..\..\..\Source\Sockets\Ics\uRESTDWIcsBase.pas';
+  uRESTDWIcsBase in '..\..\..\..\Source\Sockets\Ics\uRESTDWIcsBase.pas',
+  uRESTDWIcsFCMTransport in '..\..\..\..\Source\Sockets\Ics\uRESTDWIcsFCMTransport.pas',
+  uRESTDWIcsFirebaseCloudMessaging in '..\..\..\..\Source\Sockets\Ics\uRESTDWIcsFirebaseCloudMessaging.pas';
 
 end.

@@ -44,6 +44,6 @@ requires
   vcldb;
 
 contains
-  uDWSqlEditor in 'uDWSqlEditor.pas' {FrmDWSqlEditor};
+  uRESTDWSqlEditor in 'uRESTDWSqlEditor.pas' {FrmDWSqlEditor};
 
 end.

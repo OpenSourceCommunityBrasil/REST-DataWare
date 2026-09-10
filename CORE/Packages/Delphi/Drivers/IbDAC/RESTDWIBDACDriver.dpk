@@ -35,7 +35,6 @@ requires
   ibdac280;
 
 contains
-  uRESTDWIBDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWIBDACDriver.pas';
+  uRESTDWIBDACDriver in '..\..\..\..\Source\Database_Drivers\uRESTDWIbDACDriver.pas';
 
 end.
-

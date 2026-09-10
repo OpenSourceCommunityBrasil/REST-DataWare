@@ -1,6 +1,6 @@
 ﻿unit uRESTDWMyDACDriver;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -334,11 +334,13 @@ begin
 end;
 
 function TRESTDWMyDACQuery.ParamCount : Integer;
-var
-  qry : TMyQuery;
 begin
-  qry := TMyQuery(Self.Owner);
-  Result := qry.ParamCount;
+ Result:=TMyQuery(Self.Owner).ParamCount;
+ If (Result=0) and (Pos(':',SQL.Text)>0) Then
+  Begin
+   Prepare;
+   Result:=TMyQuery(Self.Owner).ParamCount;
+  End;
 end;
 
 function TRESTDWMyDACQuery.getParamDataType(IParam : integer) : TFieldType;
@@ -446,6 +448,14 @@ end;
 initialization
 {$I ..\RESTDWLazarusDrivers.lrs}
 {$ENDIF}
+
+Initialization
+ RegisterClass(TRESTDWMyDACDriver);
+ RegisterRESTDWDriverClass(TRESTDWMyDACDriver);
+
+Finalization
+ UnregisterRESTDWDriverClass(TRESTDWMyDACDriver);
+ UnRegisterClass(TRESTDWMyDACDriver);
 
 end.
 

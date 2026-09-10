@@ -1,6 +1,6 @@
-Unit uRESTDWJSONObject;
+﻿Unit uRESTDWJSONObject;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -4342,7 +4342,7 @@ Begin
       Else
        aValue := StringToBytes(Format(TJsonStringValue, [vTempString]));
      {$ELSE}
-      aValue := StringToBytes(Format(TJsonStringValue, [IntToStr(bValue)]));
+      aValue := StringToBytes(Format(TJsonStringValue, [string(bValue)]));
      {$ENDIF}
     End
    Else

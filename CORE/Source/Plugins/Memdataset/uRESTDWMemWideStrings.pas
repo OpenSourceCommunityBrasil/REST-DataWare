@@ -1,21 +1,21 @@
-unit uRESTDWMemWideStrings;
+Unit uRESTDWMemWideStrings;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -27,8 +27,8 @@ unit uRESTDWMemWideStrings;
  {$ASMMode Intel}
 {$ENDIF}
 
-interface
-uses
+Interface
+Uses
   {$IFDEF UNITVERSIONING}
   JclUnitVersioning,
   {$ENDIF UNITVERSIONING}
@@ -40,9 +40,9 @@ uses
   uRESTDWMemBase,
   uRESTDWProtoTypes;
 // Exceptions
-type
-  EJclWideStringError = class(EJclError);
-const
+Type
+  EJclWideStringError = Class(EJclError);
+Const
   // definitions of often used characters:
   // Note: Use them only for tests of a certain character not to determine character
   //       classes (like white spaces) as in Unicode are often many code points defined
@@ -69,7 +69,7 @@ const
   {$ENDIF UNIX}
   BOM_LSB_FIRST = DWChar($FEFF);
   BOM_MSB_FIRST = DWChar($FFFE);
-type
+Type
   {$IFDEF SUPPORTS_UNICODE}
   TJclWideStrings = {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}Classes.TStrings;
   TJclWideStringList = {$IFDEF HAS_UNITSCOPE}System.{$ENDIF}Classes.TStringList;
@@ -79,7 +79,7 @@ type
     foAnsiFile,  // loads/writes an ANSI file
     foUnicodeLB  // reads/writes BOM_LSB_FIRST/BOM_MSB_FIRST
    );
-  TWideFileOptions = set of TWideFileOptionsType;
+  TWideFileOptions = set Of TWideFileOptionsType;
   TSearchFlag = (
     sfCaseSensitive,    // match letter case
     sfIgnoreNonSpacing, // ignore non-spacing characters in search
@@ -87,61 +87,61 @@ type
                         // (this applies to the pattern as well as the search text)
     sfWholeWordOnly     // match only text at end/start and/or surrounded by white spaces
   );
-  TSearchFlags = set of TSearchFlag;
-  TJclWideStrings = class;
-  TJclWideStringList = class;
-  TJclWideStringListSortCompare = function(List: TJclWideStringList; Index1, Index2: Integer): Integer;
-  TJclWideStrings = class(TPersistent)
-  private
+  TSearchFlags = set Of TSearchFlag;
+  TJclWideStrings = Class;
+  TJclWideStringList = Class;
+  TJclWideStringListSortCompare = Function(List: TJclWideStringList; Index1, Index2: Integer): Integer;
+  TJclWideStrings = Class(TPersistent)
+  Private
     FDelimiter: Char;
     FQuoteChar: Char;
     FNameValueSeparator: Char;
     FLineSeparator: DWWideString;
     FUpdateCount: Integer;
-    procedure ReadData(Reader: TReader);
-    procedure WriteData(Writer: TWriter);
-  protected
-    procedure DefineProperties(Filer: TFiler); override;
-    function GetP(Index: Integer): PString; virtual; abstract;
-    function Get(Index: Integer): DWWideString;
-    function GetCapacity: Integer; virtual;
-    function GetCount: Integer; virtual; abstract;
-    function GetObject(Index: Integer): TObject; virtual;
-    function GetTextStr: DWWideString; virtual;
-    procedure Put(Index: Integer; const S: DWWideString); virtual; abstract;
-    procedure PutObject(Index: Integer; AObject: TObject); virtual; abstract;
-    procedure SetCapacity(NewCapacity: Integer); virtual;
-    procedure SetTextStr(const Value: DWWideString); virtual;
-    procedure SetUpdateState(Updating: Boolean); virtual;
+    Procedure ReadData(Reader: TReader);
+    Procedure WriteData(Writer: TWriter);
+  Protected
+    Procedure DefineProperties(Filer: TFiler); override;
+    Function GetP(Index: Integer): PString; virtual; abstract;
+    Function Get(Index: Integer): DWWideString;
+    Function GetCapacity: Integer; virtual;
+    Function GetCount: Integer; virtual; abstract;
+    Function GetObject(Index: Integer): TObject; virtual;
+    Function GetTextStr: DWWideString; virtual;
+    Procedure Put(Index: Integer; Const S: DWWideString); virtual; abstract;
+    Procedure PutObject(Index: Integer; AObject: TObject); virtual; abstract;
+    Procedure SetCapacity(NewCapacity: Integer); virtual;
+    Procedure SetTextStr(Const Value: DWWideString); virtual;
+    Procedure SetUpdateState(Updating: Boolean); virtual;
     property UpdateCount: Integer read FUpdateCount;
-    procedure AssignTo(Dest: TPersistent); override;
-  public
-    constructor Create;
-    function Add(const S: DWWideString): Integer; virtual;
-    function AddObject(const S: DWWideString; AObject: TObject): Integer; virtual;
-    procedure Append(const S: DWWideString);
-    procedure AddStrings(Strings: TJclWideStrings); overload; virtual;
-    procedure AddStrings(Strings: TStrings); overload; virtual;
-    procedure Assign(Source: TPersistent); override;
-    function CreateAnsiStringList: TStrings;
-    procedure AddStringsTo(Dest: TStrings); virtual;
-    procedure BeginUpdate;
-    procedure Clear; virtual; abstract;
-    procedure Delete(Index: Integer); virtual; abstract;
-    procedure EndUpdate;
-    function Equals(Strings: TJclWideStrings): Boolean; {$IFDEF RTL200_UP}reintroduce; {$ENDIF RTL200_UP}overload;
-    function Equals(Strings: TStrings): Boolean; {$IFDEF RTL200_UP}reintroduce; {$ENDIF RTL200_UP}overload;
-    procedure Exchange(Index1, Index2: Integer); virtual;
-    function IndexOfObject(AObject: TObject): Integer; virtual;
-    procedure Insert(Index: Integer; const S: DWWideString); virtual;
-    procedure InsertObject(Index: Integer; const S: DWWideString;
+    Procedure AssignTo(Dest: TPersistent); override;
+  Public
+    Constructor Create;
+    Function Add(Const S: DWWideString): Integer; virtual;
+    Function AddObject(Const S: DWWideString; AObject: TObject): Integer; virtual;
+    Procedure Append(Const S: DWWideString);
+    Procedure AddStrings(Strings: TJclWideStrings); overload; virtual;
+    Procedure AddStrings(Strings: TStrings); overload; virtual;
+    Procedure Assign(Source: TPersistent); override;
+    Function CreateAnsiStringList: TStrings;
+    Procedure AddStringsTo(Dest: TStrings); virtual;
+    Procedure BeginUpdate;
+    Procedure Clear; virtual; abstract;
+    Procedure Delete(Index: Integer); virtual; abstract;
+    Procedure EndUpdate;
+    Function Equals(Strings: TJclWideStrings): Boolean; {$IFDEF RTL200_UP}reintroduce; {$ENDIF RTL200_UP}overload;
+    Function Equals(Strings: TStrings): Boolean; {$IFDEF RTL200_UP}reintroduce; {$ENDIF RTL200_UP}overload;
+    Procedure Exchange(Index1, Index2: Integer); virtual;
+    Function IndexOfObject(AObject: TObject): Integer; virtual;
+    Procedure Insert(Index: Integer; Const S: DWWideString); virtual;
+    Procedure InsertObject(Index: Integer; Const S: DWWideString;
       AObject: TObject); virtual;
-    procedure Move(CurIndex, NewIndex: Integer); virtual;
-    procedure SaveToFile(const FileName: TFileName;
+    Procedure Move(CurIndex, NewIndex: Integer); virtual;
+    Procedure SaveToFile(Const FileName: TFileName;
       WideFileOptions: TWideFileOptions = []); virtual;
-    procedure SaveToStream(Stream: TStream;
+    Procedure SaveToStream(Stream: TStream;
       WideFileOptions: TWideFileOptions = []); virtual;
-    procedure SetText(Text: PDWChar); virtual;
+    Procedure SetText(Text: PDWChar); virtual;
     property Capacity: Integer read GetCapacity write SetCapacity;
     property Count: Integer read GetCount;
     property Delimiter: Char read FDelimiter write FDelimiter;
@@ -152,47 +152,47 @@ type
     property PStrings[Index: Integer]: PString read GetP;
     property Strings[Index: Integer]: DWWideString read Get write Put; default;
     property Text: DWWideString read GetTextStr write SetTextStr;
-  end;
+  End;
   // do not replace by JclUnicode.TWideStringList (speed and size issue)
   PWStringItem = ^TWStringItem;
-  TWStringItem = record
+  TWStringItem = Record
     FString: DWWideString;
     FObject: TObject;
-  end;
-  TJclWideStringList = class(TJclWideStrings)
-  private
+  End;
+  TJclWideStringList = Class(TJclWideStrings)
+  Private
     FList: TList;
     FSorted: Boolean;
     FDuplicates: TDuplicates;
     FCaseSensitive: Boolean;
     FOnChange: TNotifyEvent;
     FOnChanging: TNotifyEvent;
-  protected
-    function GetItem(Index: Integer): PWStringItem;
-    procedure Changed; virtual;
-    procedure Changing; virtual;
-    function GetP(Index: Integer): PString; override;
-    function GetCapacity: Integer; override;
-    function GetCount: Integer; override;
-    function GetObject(Index: Integer): TObject; override;
-    procedure Put(Index: Integer; const Value: DWWideString); override;
-    procedure PutObject(Index: Integer; AObject: TObject); override;
-    procedure SetCapacity(NewCapacity: Integer); override;
-    procedure SetUpdateState(Updating: Boolean); override;
-  public
-    constructor Create;
-    destructor Destroy; override;
-    procedure Clear; override;
-    procedure Delete(Index: Integer); override;
-    procedure Exchange(Index1, Index2: Integer); override;
+  Protected
+    Function GetItem(Index: Integer): PWStringItem;
+    Procedure Changed; virtual;
+    Procedure Changing; virtual;
+    Function GetP(Index: Integer): PString; override;
+    Function GetCapacity: Integer; override;
+    Function GetCount: Integer; override;
+    Function GetObject(Index: Integer): TObject; override;
+    Procedure Put(Index: Integer; Const Value: DWWideString); override;
+    Procedure PutObject(Index: Integer; AObject: TObject); override;
+    Procedure SetCapacity(NewCapacity: Integer); override;
+    Procedure SetUpdateState(Updating: Boolean); override;
+  Public
+    Constructor Create;
+    Destructor Destroy; override;
+    Procedure Clear; override;
+    Procedure Delete(Index: Integer); override;
+    Procedure Exchange(Index1, Index2: Integer); override;
     // Find() also works with unsorted lists
-    procedure InsertObject(Index: Integer; const S: DWWideString;
+    Procedure InsertObject(Index: Integer; Const S: DWWideString;
       AObject: TObject); override;
-    procedure CustomSort(Compare: TJclWideStringListSortCompare); virtual;
+    Procedure CustomSort(Compare: TJclWideStringListSortCompare); virtual;
     property Duplicates: TDuplicates read FDuplicates write FDuplicates;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
-  end;
+  End;
   {$ENDIF ~SUPPORTS_UNICODE}
   TWideStringList = TJclWideStringList;
   TWideStrings = TJclWideStrings;
@@ -202,41 +202,41 @@ type
   TWStringList = TJclWideStringList;
   TWStrings = TJclWideStrings;
 // DWChar functions
-function CharToWideChar(Ch: DWChar): DWChar;
-function DWCharToChar(Ch: DWChar): DWChar;
+Function CharToWideChar(Ch: DWChar): DWChar;
+Function DWCharToChar(Ch: DWChar): DWChar;
 // PDWChar functions
-procedure MoveWideChar(const Source; var Dest; Count: SizeInt);
-function StrEndW(const Str: PDWChar): PDWChar;
-function StrMoveW(Dest: PDWChar; const Source: PDWChar; Count: SizeInt): PDWChar;
-function StrCopyW(Dest: PDWChar; const Source: PDWChar): PDWChar;
-function StrECopyW(Dest: PDWChar; const Source: PDWChar): PDWChar;
-function StrLCopyW(Dest: PDWChar; const Source: PDWChar; MaxLen: SizeInt): PDWChar;
-function StrPCopyWW(Dest: PDWChar; const Source: DWWideString): PDWChar;
-function StrPLCopyWW(Dest: PDWChar; const Source: DWWideString; MaxLen: SizeInt): PDWChar;
-function StrCatW(Dest: PDWChar; const Source: PDWChar): PDWChar;
-function StrLCatW(Dest: PDWChar; const Source: PDWChar; MaxLen: SizeInt): PDWChar;
-function StrScanW(const Str: PDWChar; Ch: DWChar): PDWChar; overload;
-function StrScanW(Str: PDWChar; Chr: DWChar; StrLen: SizeInt): PDWChar; overload;
-function StrRScanW(const Str: PDWChar; Chr: DWChar): PDWChar;
-function StrAllocW(WideSize: SizeInt): PDWChar;
-function StrBufSizeW(const Str: PDWChar): SizeInt;
-procedure StrDisposeW(Str: PDWChar);
-procedure StrDisposeAndNilW(var Str: PDWChar);
+Procedure MoveWideChar(Const Source; Var Dest; Count: SizeInt);
+Function StrEndW(Const Str: PDWChar): PDWChar;
+Function StrMoveW(Dest: PDWChar; Const Source: PDWChar; Count: SizeInt): PDWChar;
+Function StrCopyW(Dest: PDWChar; Const Source: PDWChar): PDWChar;
+Function StrECopyW(Dest: PDWChar; Const Source: PDWChar): PDWChar;
+Function StrLCopyW(Dest: PDWChar; Const Source: PDWChar; MaxLen: SizeInt): PDWChar;
+Function StrPCopyWW(Dest: PDWChar; Const Source: DWWideString): PDWChar;
+Function StrPLCopyWW(Dest: PDWChar; Const Source: DWWideString; MaxLen: SizeInt): PDWChar;
+Function StrCatW(Dest: PDWChar; Const Source: PDWChar): PDWChar;
+Function StrLCatW(Dest: PDWChar; Const Source: PDWChar; MaxLen: SizeInt): PDWChar;
+Function StrScanW(Const Str: PDWChar; Ch: DWChar): PDWChar; overload;
+Function StrScanW(Str: PDWChar; Chr: DWChar; StrLen: SizeInt): PDWChar; overload;
+Function StrRScanW(Const Str: PDWChar; Chr: DWChar): PDWChar;
+Function StrAllocW(WideSize: SizeInt): PDWChar;
+Function StrBufSizeW(Const Str: PDWChar): SizeInt;
+Procedure StrDisposeW(Str: PDWChar);
+Procedure StrDisposeAndNilW(Var Str: PDWChar);
 // DWWideString functions
-function WideUpperCase(const S: DWWideString): DWWideString;
-function WideLowerCase(const S: DWWideString): DWWideString;
-function TrimW(const S: DWWideString): DWWideString;
-function TrimLeftW(const S: DWWideString): DWWideString;
-function TrimRightW(const S: DWWideString): DWWideString;
-function TrimLeftLengthW(const S: DWWideString): SizeInt;
-function TrimRightLengthW(const S: DWWideString): SizeInt;
+Function WideUpperCase(Const S: DWWideString): DWWideString;
+Function WideLowerCase(Const S: DWWideString): DWWideString;
+Function TrimW(Const S: DWWideString): DWWideString;
+Function TrimLeftW(Const S: DWWideString): DWWideString;
+Function TrimRightW(Const S: DWWideString): DWWideString;
+Function TrimLeftLengthW(Const S: DWWideString): SizeInt;
+Function TrimRightLengthW(Const S: DWWideString): SizeInt;
 // MultiSz Routines
-type
+Type
   PWideMultiSz = PDWChar;
-procedure AllocateMultiSz(var Dest: PWideMultiSz; Len: SizeInt);
-procedure FreeMultiSz(var Dest: PWideMultiSz);
-implementation
-uses
+Procedure AllocateMultiSz(Var Dest: PWideMultiSz; Len: SizeInt);
+Procedure FreeMultiSz(Var Dest: PWideMultiSz);
+Implementation
+Uses
   {$IFDEF HAS_UNITSCOPE}
   {$IFDEF HAS_UNIT_RTLCONSTS}
   System.RTLConsts,
@@ -257,78 +257,78 @@ uses
   uRESTDWMemResources,
   uRESTDWConsts;
   
-procedure SwapWordByteOrder(P: PDWChar; Len: SizeInt);
-begin
-  while Len > 0 do
-  begin
+Procedure SwapWordByteOrder(P: PDWChar; Len: SizeInt);
+Begin
+  While Len > 0 Do
+  Begin
     Dec(Len);
     P^ := DWChar((Word(P^) shr 8) or (Word(P^) shl 8));
     Inc(P);
-  end;
-end;
+  End;
+End;
 //=== DWChar functions =====================================================
-function CharToWideChar(Ch: DWChar): DWChar;
-var
+Function CharToWideChar(Ch: DWChar): DWChar;
+Var
   WS: DWWideString;
-begin
+Begin
   WS := DWChar(Ch);
   Result := DWChar(WS[1]);
-end;
-function DWCharToChar(Ch: DWChar): DWChar;
-var
+End;
+Function DWCharToChar(Ch: DWChar): DWChar;
+Var
   S: DWWideString;
-begin
+Begin
   S := Ch;
   Result := DWChar(S[1]);
-end;
+End;
 //=== PDWChar functions ====================================================
-procedure MoveWideChar(const Source; var Dest; Count: SizeInt);
-begin
+Procedure MoveWideChar(Const Source; Var Dest; Count: SizeInt);
+Begin
   Move(Source, Dest, Count * SizeOf(WideChar));
-end;
-function StrAllocW(WideSize: SizeInt): PDWChar;
-begin
+End;
+Function StrAllocW(WideSize: SizeInt): PDWChar;
+Begin
   WideSize := SizeOf(WideChar) * WideSize + SizeOf(SizeInt);
   Result := AllocMem(WideSize);
   SizeInt(Pointer(Result)^) := WideSize;
   Inc(Result, SizeOf(SizeInt) div SizeOf(WideChar));
-end;
-procedure StrDisposeW(Str: PDWChar);
+End;
+Procedure StrDisposeW(Str: PDWChar);
 // releases a string allocated with StrNewW or StrAllocW
-begin
-  if Str <> nil then
-  begin
+Begin
+  If Str <> nil Then
+  Begin
     Dec(Str, SizeOf(SizeInt) div SizeOf(WideChar));
     FreeMem(Str);
-  end;
-end;
-procedure StrDisposeAndNilW(var Str: PDWChar);
-var
+  End;
+End;
+Procedure StrDisposeAndNilW(Var Str: PDWChar);
+Var
   Buff: PDWChar;
-begin
+Begin
   Buff := Str;
   Str := nil;
   StrDisposeW(Buff);
-end;
-const
+End;
+Const
   // data used to bring UTF-16 coded strings into correct UTF-32 order for correct comparation
-  UTF16Fixup: array [0..31] of Word = (
+  UTF16Fixup: array [0..31] Of Word = (
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     $2000, $F800, $F800, $F800, $F800
   );
-function StrLCompW(const Str1, Str2: PDWChar; MaxLen: SizeInt): SizeInt;
+Function StrLCompW(Const Str1, Str2: PDWChar; MaxLen: SizeInt): SizeInt;
 // compares strings up to MaxLen code points
 // see also StrCompW
-var
+Var
   S1, S2: PDWChar;
   C1, C2: Word;
-begin
-  if MaxLen > 0 then
-  begin
+Begin
+  If MaxLen > 0 Then
+  Begin
     S1 := Str1;
     S2 := Str2;
-    repeat
+    Repeat
       C1 := Word(S1^);
       C1 := Word(C1 or UTF16Fixup[C1 shr 11]);
       C2 := Word(S2^);
@@ -337,260 +337,260 @@ begin
       { TODO : surrogates take up 2 words and are counted twice here, count them only once }
       Result := SizeInt(C1) - SizeInt(C2);
       Dec(MaxLen);
-      if(Result <> 0) or (C1 = 0) or (C2 = 0) or (MaxLen = 0) then
+      If(Result <> 0) or (C1 = 0) or (C2 = 0) or (MaxLen = 0) Then
         Break;
       Inc(S1);
       Inc(S2);
-    until False;
-  end
-  else
+    Until False;
+  End
+  Else
     Result := 0;
-end;
-function StrScanW(const Str: PDWChar; Ch: DWChar): PDWChar;
-begin
+End;
+Function StrScanW(Const Str: PDWChar; Ch: DWChar): PDWChar;
+Begin
   Result := Str;
-  if Result <> nil then
-  begin
-    while (Result^ <> #0) and (Result^ <> Ch) do
+  If Result <> nil Then
+  Begin
+    While (Result^ <> #0) and (Result^ <> Ch) Do
       Inc(Result);
-    if (Result^ = #0) and (Ch <> #0) then
+    If (Result^ = #0) and (Ch <> #0) Then
       Result := nil;
-  end;
-end;
-function StrEndW(const Str: PDWChar): PDWChar;
-begin
+  End;
+End;
+Function StrEndW(Const Str: PDWChar): PDWChar;
+Begin
   Result := Str;
-  if Result <> nil then
-    while Result^ <> #0 do
+  If Result <> nil Then
+    While Result^ <> #0 Do
       Inc(Result);
-end;
-function StrCopyW(Dest: PDWChar; const Source: PDWChar): PDWChar;
-var
+End;
+Function StrCopyW(Dest: PDWChar; Const Source: PDWChar): PDWChar;
+Var
   Src: PDWChar;
-begin
+Begin
   Result := Dest;
-  if Dest <> nil then
-  begin
+  If Dest <> nil Then
+  Begin
     Src := Source;
-    if Src <> nil then
-      while Src^ <> #0 do
-      begin
+    If Src <> nil Then
+      While Src^ <> #0 Do
+      Begin
         Dest^ := Src^;
         Inc(Src);
         Inc(Dest);
-      end;
+      End;
     Dest^ := #0;
-  end;
-end;
-function StrECopyW(Dest: PDWChar; const Source: PDWChar): PDWChar;
-var
+  End;
+End;
+Function StrECopyW(Dest: PDWChar; Const Source: PDWChar): PDWChar;
+Var
   Src: PDWChar;
-begin
-  if Dest <> nil then
-  begin
+Begin
+  If Dest <> nil Then
+  Begin
     Src := Source;
-    if Src <> nil then
-      while Src^ <> #0 do
-      begin
+    If Src <> nil Then
+      While Src^ <> #0 Do
+      Begin
         Dest^ := Src^;
         Inc(Src);
         Inc(Dest);
-      end;
+      End;
     Dest^ := #0;
-  end;
+  End;
   Result := Dest;
-end;
-function StrLCopyW(Dest: PDWChar; const Source: PDWChar; MaxLen: SizeInt): PDWChar;
-var
+End;
+Function StrLCopyW(Dest: PDWChar; Const Source: PDWChar; MaxLen: SizeInt): PDWChar;
+Var
   Src: PDWChar;
-begin
+Begin
   Result := Dest;
-  if (Dest <> nil) and (MaxLen > 0) then
-  begin
+  If (Dest <> nil) and (MaxLen > 0) Then
+  Begin
     Src := Source;
-    if Src <> nil then
-      while (MaxLen > 0) and (Src^ <> #0) do
-      begin
+    If Src <> nil Then
+      While (MaxLen > 0) and (Src^ <> #0) Do
+      Begin
         Dest^ := Src^;
         Inc(Src);
         Inc(Dest);
         Dec(MaxLen);
-      end;
+      End;
     Dest^ := #0;
-  end;
-end;
-function StrCatW(Dest: PDWChar; const Source: PDWChar): PDWChar;
-begin
+  End;
+End;
+Function StrCatW(Dest: PDWChar; Const Source: PDWChar): PDWChar;
+Begin
   Result := Dest;
   StrCopyW(StrEndW(Dest), Source);
-end;
-function StrLCatW(Dest: PDWChar; const Source: PDWChar; MaxLen: SizeInt): PDWChar;
-begin
+End;
+Function StrLCatW(Dest: PDWChar; Const Source: PDWChar; MaxLen: SizeInt): PDWChar;
+Begin
   Result := Dest;
   StrLCopyW(StrEndW(Dest), Source, MaxLen);
-end;
-function StrMoveW(Dest: PDWChar; const Source: PDWChar; Count: SizeInt): PDWChar;
-begin
+End;
+Function StrMoveW(Dest: PDWChar; Const Source: PDWChar; Count: SizeInt): PDWChar;
+Begin
   Result := Dest;
-  if Count > 0 then
+  If Count > 0 Then
     Move(Source^, Dest^, Count * SizeOf(WideChar));
-end;
-function StrPCopyWW(Dest: PDWChar; const Source: DWWideString): PDWChar;
-begin
+End;
+Function StrPCopyWW(Dest: PDWChar; Const Source: DWWideString): PDWChar;
+Begin
   Result := StrLCopyW(Dest, PDWChar(Source), Length(Source));
-end;
-function StrPLCopyWW(Dest: PDWChar; const Source: DWWideString; MaxLen: SizeInt): PDWChar;
-begin
+End;
+Function StrPLCopyWW(Dest: PDWChar; Const Source: DWWideString; MaxLen: SizeInt): PDWChar;
+Begin
   Result := StrLCopyW(Dest, PDWChar(Source), MaxLen);
-end;
-function StrRScanW(const Str: PDWChar; Chr: DWChar): PDWChar;
-var
+End;
+Function StrRScanW(Const Str: PDWChar; Chr: DWChar): PDWChar;
+Var
   P: PDWChar;
-begin
+Begin
   Result := nil;
-  if Str <> nil then
-  begin
+  If Str <> nil Then
+  Begin
     P := Str;
-    repeat
-      if P^ = Chr then
+    Repeat
+      If P^ = Chr Then
         Result := P;
       Inc(P);
-    until P^ = #0;
-  end;
-end;
+    Until P^ = #0;
+  End;
+End;
 // Returns a pointer to first occurrence of a specified character in a string
 // or nil if not found.
 // Note: this is just a binary search for the specified character and there's no
 //       check for a terminating null. Instead at most StrLen characters are
 //       searched. This makes this function extremly fast.
 //
-function StrScanW(Str: PDWChar; Chr: DWChar; StrLen: SizeInt): PDWChar;
-begin
+Function StrScanW(Str: PDWChar; Chr: DWChar; StrLen: SizeInt): PDWChar;
+Begin
   Result := Str;
-  while StrLen > 0 do
-  begin
-    if Result^ = Chr then
+  While StrLen > 0 Do
+  Begin
+    If Result^ = Chr Then
       Exit;
     Inc(Result);
-  end;
+  End;
   Result := nil;
-end;
-function StrBufSizeW(const Str: PDWChar): SizeInt;
+End;
+Function StrBufSizeW(Const Str: PDWChar): SizeInt;
 // Returns max number of wide characters that can be stored in a buffer
 // allocated by StrAllocW.
-var
+Var
   P: PDWChar;
-begin
-  if Str <> nil then
-  begin
+Begin
+  If Str <> nil Then
+  Begin
     P := Str;
     Dec(P, SizeOf(SizeInt) div SizeOf(WideChar));
     Result := (PSizeInt(P)^ - SizeOf(SizeInt)) div SizeOf(WideChar);
-  end
-  else
+  End
+  Else
     Result := 0;
-end;
+End;
 
-function TrimW(const S: DWWideString): DWWideString;
+Function TrimW(Const S: DWWideString): DWWideString;
 // available from Delphi 7 up
 {$IFDEF RTL150_UP}
-begin
+Begin
   Result := Trim(S);
-end;
+End;
 {$ELSE ~RTL150_UP}
-var
+Var
   I, L: SizeInt;
-begin
+Begin
   L := Length(S);
   I := 1;
-  while (I <= L) and (S[I] <= ' ') do
+  While (I <= L) and (S[I] <= ' ') Do
     Inc(I);
-  if I > L then
+  If I > L Then
     Result := ''
-  else
-  begin
-    while S[L] <= ' ' do
+  Else
+  Begin
+    While S[L] <= ' ' Do
       Dec(L);
     Result := Copy(S, I, L - I + 1);
-  end;
-end;
+  End;
+End;
 {$ENDIF ~RTL150_UP}
-function TrimLeftW(const S: DWWideString): DWWideString;
+Function TrimLeftW(Const S: DWWideString): DWWideString;
 // available from Delphi 7 up
 {$IFDEF RTL150_UP}
-begin
+Begin
   Result := TrimLeft(S);
-end;
+End;
 {$ELSE ~RTL150_UP}
-var
+Var
   I, L: SizeInt;
-begin
+Begin
   L := Length(S);
   I := 1;
-  while (I <= L) and (S[I] <= ' ') do
+  While (I <= L) and (S[I] <= ' ') Do
     Inc(I);
   Result := Copy(S, I, Maxint);
-end;
+End;
 {$ENDIF ~RTL150_UP}
-function TrimRightW(const S: DWWideString): DWWideString;
+Function TrimRightW(Const S: DWWideString): DWWideString;
 // available from Delphi 7 up
 {$IFDEF RTL150_UP}
-begin
+Begin
   Result := TrimRight(S);
-end;
+End;
 {$ELSE ~RTL150_UP}
-var
+Var
   I: SizeInt;
-begin
+Begin
   I := Length(S);
-  while (I > 0) and (S[I] <= ' ') do
+  While (I > 0) and (S[I] <= ' ') Do
     Dec(I);
   Result := Copy(S, 1, I);
-end;
+End;
 {$ENDIF ~RTL150_UP}
-function WideUpperCase(const S: DWWideString): DWWideString;
-begin
+Function WideUpperCase(Const S: DWWideString): DWWideString;
+Begin
   Result := S;
-  if Result <> '' then
+  If Result <> '' Then
     {$IFDEF MSWINDOWS}
     CharUpperBuffW(Pointer(Result), Length(Result));
     {$ELSE ~MSWINDOWS}
     { TODO : Don't cheat here }
     Result := UpperCase(Result);
     {$ENDIF ~MSWINDOWS}
-end;
-function WideLowerCase(const S: DWWideString): DWWideString;
-begin
+End;
+Function WideLowerCase(Const S: DWWideString): DWWideString;
+Begin
   Result := S;
-  if Result <> '' then
+  If Result <> '' Then
     {$IFDEF MSWINDOWS}
     CharLowerBuffW(Pointer(Result), Length(Result));
     {$ELSE ~MSWINDOWS}
     { TODO : Don't cheat here }
     Result := LowerCase(Result);
     {$ENDIF ~MSWINDOWS}
-end;
-function TrimLeftLengthW(const S: DWWideString): SizeInt;
-var
+End;
+Function TrimLeftLengthW(Const S: DWWideString): SizeInt;
+Var
   Len: SizeInt;
-begin
+Begin
   Len := Length(S);
   Result := 1;
-  while (Result <= Len) and (S[Result] <= #32) do
+  While (Result <= Len) and (S[Result] <= #32) Do
     Inc(Result);
   Result := Len - Result + 1;
-end;
-function TrimRightLengthW(const S: DWWideString): SizeInt;
-begin
+End;
+Function TrimRightLengthW(Const S: DWWideString): SizeInt;
+Begin
   Result := Length(S);
-  while (Result > 0) and (S[Result] <= #32) do
+  While (Result > 0) and (S[Result] <= #32) Do
     Dec(Result);
-end;
+End;
 {$IFNDEF SUPPORTS_UNICODE}
 //=== { TJclWideStrings } ==========================================================
-constructor TJclWideStrings.Create;
-begin
-  inherited Create;
+Constructor TJclWideStrings.Create;
+Begin
+  Inherited Create;
   // FLineSeparator := DWChar($2028);
   {$IFDEF MSWINDOWS}
   FLineSeparator := DWChar(13) + '' + DWChar(10); // compiler wants it this way
@@ -601,61 +601,61 @@ begin
   FNameValueSeparator := '=';
   FDelimiter := ',';
   FQuoteChar := '"';
-end;
-function TJclWideStrings.Add(const S: DWWideString): Integer;
-begin
+End;
+Function TJclWideStrings.Add(Const S: DWWideString): Integer;
+Begin
   Result := AddObject(S, nil);
-end;
-function TJclWideStrings.AddObject(const S: DWWideString; AObject: TObject): Integer;
-begin
+End;
+Function TJclWideStrings.AddObject(Const S: DWWideString; AObject: TObject): Integer;
+Begin
   Result := Count;
   InsertObject(Result, S, AObject);
-end;
-procedure TJclWideStrings.AddStrings(Strings: TJclWideStrings);
-var
+End;
+Procedure TJclWideStrings.AddStrings(Strings: TJclWideStrings);
+Var
   I: Integer;
-begin
-  for I := 0 to Strings.Count - 1 do
+Begin
+  For I := 0 To Strings.Count - 1 Do
     AddObject(Strings.GetP(I)^, Strings.Objects[I]);
-end;
-procedure TJclWideStrings.AddStrings(Strings: TStrings);
-var
+End;
+Procedure TJclWideStrings.AddStrings(Strings: TStrings);
+Var
   I: Integer;
-begin
-  for I := 0 to Strings.Count - 1 do
+Begin
+  For I := 0 To Strings.Count - 1 Do
     AddObject(Strings.Strings[I], Strings.Objects[I]);
-end;
-procedure TJclWideStrings.AddStringsTo(Dest: TStrings);
-var
+End;
+Procedure TJclWideStrings.AddStringsTo(Dest: TStrings);
+Var
   I: Integer;
-begin
-  for I := 0 to Count - 1 do
+Begin
+  For I := 0 To Count - 1 Do
     Dest.AddObject(GetP(I)^, Objects[I]);
-end;
-procedure TJclWideStrings.Append(const S: DWWideString);
-begin
+End;
+Procedure TJclWideStrings.Append(Const S: DWWideString);
+Begin
   Add(S);
-end;
-procedure TJclWideStrings.Assign(Source: TPersistent);
-begin
-  if Source is TJclWideStrings then
-  begin
+End;
+Procedure TJclWideStrings.Assign(Source: TPersistent);
+Begin
+  If Source is TJclWideStrings Then
+  Begin
     BeginUpdate;
-    try
+    Try
       Clear;
       FDelimiter := TJclWideStrings(Source).FDelimiter;
       FNameValueSeparator := TJclWideStrings(Source).FNameValueSeparator;
       FQuoteChar := TJclWideStrings(Source).FQuoteChar;
       AddStrings(TJclWideStrings(Source));
-    finally
+    Finally
       EndUpdate;
-    end;
-  end
-  else
-  if Source is TStrings then
-  begin
+    End;
+  End
+  Else
+  If Source is TStrings Then
+  Begin
     BeginUpdate;
-    try
+    Try
       Clear;
       {$IFDEF RTL190_UP}
       FNameValueSeparator := TStrings(Source).NameValueSeparator;
@@ -669,21 +669,21 @@ begin
       FDelimiter := CharToWideChar(TStrings(Source).Delimiter);
       {$ENDIF ~RTL190_UP}
       AddStrings(TStrings(Source));
-    finally
+    Finally
       EndUpdate;
-    end;
-  end
-  else
-    inherited Assign(Source);
-end;
-procedure TJclWideStrings.AssignTo(Dest: TPersistent);
-var
+    End;
+  End
+  Else
+    Inherited Assign(Source);
+End;
+Procedure TJclWideStrings.AssignTo(Dest: TPersistent);
+Var
   I: Integer;
-begin
-  if Dest is TStrings then
-  begin
+Begin
+  If Dest is TStrings Then
+  Begin
     TStrings(Dest).BeginUpdate;
-    try
+    Try
       TStrings(Dest).Clear;
       {$IFDEF RTL190_UP}
       TStrings(Dest).NameValueSeparator := NameValueSeparator;
@@ -696,456 +696,456 @@ begin
       TStrings(Dest).QuoteChar := DWCharToChar(QuoteChar);
       TStrings(Dest).Delimiter := DWCharToChar(Delimiter);
       {$ENDIF ~RTL190_UP}
-      for I := 0 to Count - 1 do
+      For I := 0 To Count - 1 Do
         TStrings(Dest).AddObject(GetP(I)^, Objects[I]);
-    finally
+    Finally
       TStrings(Dest).EndUpdate;
-    end;
-  end
-  else
-    inherited AssignTo(Dest);
-end;
-procedure TJclWideStrings.BeginUpdate;
-begin
-  if FUpdateCount = 0 then
+    End;
+  End
+  Else
+    Inherited AssignTo(Dest);
+End;
+Procedure TJclWideStrings.BeginUpdate;
+Begin
+  If FUpdateCount = 0 Then
     SetUpdateState(True);
   Inc(FUpdateCount);
-end;
-function TJclWideStrings.CreateAnsiStringList: TStrings;
-var
+End;
+Function TJclWideStrings.CreateAnsiStringList: TStrings;
+Var
   I: Integer;
-begin
+Begin
   Result := TStringList.Create;
-  try
+  Try
     Result.BeginUpdate;
-    for I := 0 to Count - 1 do
+    For I := 0 To Count - 1 Do
       Result.AddObject(GetP(I)^, Objects[I]);
     Result.EndUpdate;
-  except
+  Except
     Result.Free;
     raise;
-  end;
-end;
-procedure TJclWideStrings.DefineProperties(Filer: TFiler);
-  function DoWrite: Boolean;
-  begin
-    if Filer.Ancestor <> nil then
-    begin
+  End;
+End;
+Procedure TJclWideStrings.DefineProperties(Filer: TFiler);
+  Function DoWrite: Boolean;
+  Begin
+    If Filer.Ancestor <> nil Then
+    Begin
       Result := True;
-      if Filer.Ancestor is TJclWideStrings then
+      If Filer.Ancestor is TJclWideStrings Then
         Result := not Equals(TJclWideStrings(Filer.Ancestor))
-    end
-    else
+    End
+    Else
       Result := Count > 0;
-  end;
-begin
+  End;
+Begin
   Filer.DefineProperty('Strings', ReadData, WriteData, DoWrite);
-end;
-procedure TJclWideStrings.EndUpdate;
-begin
+End;
+Procedure TJclWideStrings.EndUpdate;
+Begin
   Dec(FUpdateCount);
-  if FUpdateCount = 0 then
+  If FUpdateCount = 0 Then
     SetUpdateState(False);
-end;
-function TJclWideStrings.Equals(Strings: TStrings): Boolean;
-var
+End;
+Function TJclWideStrings.Equals(Strings: TStrings): Boolean;
+Var
   I: Integer;
-begin
+Begin
   Result := False;
-  if Strings.Count = Count then
-  begin
-    for I := 0 to Count - 1 do
-      if Strings[I] <> PStrings[I]^ then
+  If Strings.Count = Count Then
+  Begin
+    For I := 0 To Count - 1 Do
+      If Strings[I] <> PStrings[I]^ Then
         Exit;
     Result := True;
-  end;
-end;
-function TJclWideStrings.Equals(Strings: TJclWideStrings): Boolean;
-var
+  End;
+End;
+Function TJclWideStrings.Equals(Strings: TJclWideStrings): Boolean;
+Var
   I: Integer;
-begin
+Begin
   Result := False;
-  if Strings.Count = Count then
-  begin
-    for I := 0 to Count - 1 do
-      if Strings[I] <> PStrings[I]^ then
+  If Strings.Count = Count Then
+  Begin
+    For I := 0 To Count - 1 Do
+      If Strings[I] <> PStrings[I]^ Then
         Exit;
     Result := True;
-  end;
-end;
-procedure TJclWideStrings.Exchange(Index1, Index2: Integer);
-var
+  End;
+End;
+Procedure TJclWideStrings.Exchange(Index1, Index2: Integer);
+Var
   TempObject: TObject;
   TempString: DWWideString;
-begin
+Begin
   BeginUpdate;
-  try
+  Try
     TempString := PStrings[Index1]^;
     TempObject := Objects[Index1];
     PStrings[Index1]^ := PStrings[Index2]^;
     Objects[Index1] := Objects[Index2];
     PStrings[Index2]^ := TempString;
     Objects[Index2] := TempObject;
-  finally
+  Finally
     EndUpdate;
-  end;
-end;
-function TJclWideStrings.Get(Index: Integer): DWWideString;
-begin
+  End;
+End;
+Function TJclWideStrings.Get(Index: Integer): DWWideString;
+Begin
   Result := GetP(Index)^;
-end;
-function TJclWideStrings.GetCapacity: Integer;
-begin
+End;
+Function TJclWideStrings.GetCapacity: Integer;
+Begin
   Result := Count;
-end;
-function TJclWideStrings.GetObject(Index: Integer): TObject;
-begin
+End;
+Function TJclWideStrings.GetObject(Index: Integer): TObject;
+Begin
   Result := nil;
-end;
-function TJclWideStrings.GetTextStr: DWWideString;
-var
+End;
+Function TJclWideStrings.GetTextStr: DWWideString;
+Var
   I: Integer;
   Len, LL: Integer;
   P: PDWChar;
   W: PString;
-begin
+Begin
   Len := 0;
   LL := Length(LineSeparator);
-  for I := 0 to Count - 1 do
+  For I := 0 To Count - 1 Do
     Inc(Len, Length(GetP(I)^) + LL);
   SetLength(Result, Len);
   P := PDWChar(Result);
-  for I := 0 to Count - 1 do
-  begin
+  For I := 0 To Count - 1 Do
+  Begin
     W := GetP(I);
     Len := Length(W^);
-    if Len > 0 then
-    begin
+    If Len > 0 Then
+    Begin
       MoveWideChar(W^[1], P^, Len);
       Inc(P, Len);
-    end;
-    if LL > 0 then
-    begin
+    End;
+    If LL > 0 Then
+    Begin
       MoveWideChar(FLineSeparator[1], P^, LL);
       Inc(P, LL);
-    end;
-  end;
-end;
-function TJclWideStrings.IndexOfObject(AObject: TObject): Integer;
-begin
-  for Result := 0 to Count - 1 do
-    if Objects[Result] = AObject then
+    End;
+  End;
+End;
+Function TJclWideStrings.IndexOfObject(AObject: TObject): Integer;
+Begin
+  For Result := 0 To Count - 1 Do
+    If Objects[Result] = AObject Then
       Exit;
   Result := -1;
-end;
-procedure TJclWideStrings.Insert(Index: Integer; const S: DWWideString);
-begin
+End;
+Procedure TJclWideStrings.Insert(Index: Integer; Const S: DWWideString);
+Begin
   InsertObject(Index, S, nil);
-end;
-procedure TJclWideStrings.InsertObject(Index: Integer; const S: DWWideString; AObject: TObject);
-begin
-end;
-procedure TJclWideStrings.Move(CurIndex, NewIndex: Integer);
-var
+End;
+Procedure TJclWideStrings.InsertObject(Index: Integer; Const S: DWWideString; AObject: TObject);
+Begin
+End;
+Procedure TJclWideStrings.Move(CurIndex, NewIndex: Integer);
+Var
   TempObject: TObject;
   TempString: DWWideString;
-begin
-  if CurIndex <> NewIndex then
-  begin
+Begin
+  If CurIndex <> NewIndex Then
+  Begin
     BeginUpdate;
-    try
+    Try
       TempString := GetP(CurIndex)^;
       TempObject := GetObject(CurIndex);
       Delete(CurIndex);
       InsertObject(NewIndex, TempString, TempObject);
-    finally
+    Finally
       EndUpdate;
-    end;
-  end;
-end;
-procedure TJclWideStrings.ReadData(Reader: TReader);
-begin
+    End;
+  End;
+End;
+Procedure TJclWideStrings.ReadData(Reader: TReader);
+Begin
   BeginUpdate;
-  try
+  Try
     Clear;
     Reader.ReadListBegin;
-    while not Reader.EndOfList do
-      if Reader.NextValue in [vaLString, vaString] then
+    While not Reader.EndOfList Do
+      If Reader.NextValue in [vaLString, vaString] Then
         Add(Reader.ReadString)
-      else
+      Else
         Add(Reader.ReadString);
     Reader.ReadListEnd;
-  finally
+  Finally
     EndUpdate;
-  end;
-end;
-procedure TJclWideStrings.SaveToFile(const FileName: TFileName; WideFileOptions: TWideFileOptions = []);
-var
+  End;
+End;
+Procedure TJclWideStrings.SaveToFile(Const FileName: TFileName; WideFileOptions: TWideFileOptions = []);
+Var
   Stream: TFileStream;
-begin
+Begin
   Stream := TFileStream.Create(FileName, fmCreate);
-  try
+  Try
     SaveToStream(Stream, WideFileOptions);
-  finally
+  Finally
     Stream.Free;
-  end;
-end;
-procedure TJclWideStrings.SaveToStream(Stream: TStream; WideFileOptions: TWideFileOptions = []);
-var
+  End;
+End;
+Procedure TJclWideStrings.SaveToStream(Stream: TStream; WideFileOptions: TWideFileOptions = []);
+Var
   AnsiS: String;
   WideS: DWWideString;
   WC: DWChar;
-begin
-  if foAnsiFile in WideFileOptions then
-  begin
+Begin
+  If foAnsiFile in WideFileOptions Then
+  Begin
     AnsiS := String(GetTextStr); // explicit Unicode conversion
     Stream.Write(AnsiS[1], Length(AnsiS) * SizeOf(Char));
-  end
-  else
-  begin
-    if foUnicodeLB in WideFileOptions then
-    begin
+  End
+  Else
+  Begin
+    If foUnicodeLB in WideFileOptions Then
+    Begin
       WC := BOM_LSB_FIRST;
       Stream.Write(WC, SizeOf(WC));
-    end;
+    End;
     WideS := GetTextStr;
     Stream.Write(WideS[1], Length(WideS) * SizeOf(WideChar));
-  end;
-end;
-procedure TJclWideStrings.SetCapacity(NewCapacity: Integer);
-begin
-end;
-procedure TJclWideStrings.SetText(Text: PDWChar);
-begin
+  End;
+End;
+Procedure TJclWideStrings.SetCapacity(NewCapacity: Integer);
+Begin
+End;
+Procedure TJclWideStrings.SetText(Text: PDWChar);
+Begin
   SetTextStr(DWString(Text^));
-end;
-procedure TJclWideStrings.SetTextStr(const Value: DWWideString);
-var
+End;
+Procedure TJclWideStrings.SetTextStr(Const Value: DWWideString);
+Var
   P, Start: PDWWideString;
   S: String;
   Len: Integer;
-begin
+Begin
   BeginUpdate;
-  try
+  Try
     Clear;
-    if Value <> '' then
-    begin
+    If Value <> '' Then
+    Begin
       P := @Value;
-      if P <> nil then
-      begin
-        while P^[InitStrPos] <> DWChar(0) do
-        begin
+      If P <> nil Then
+      Begin
+        While P^[InitStrPos] <> DWChar(0) Do
+        Begin
           Start := P;
-          while True do
-          begin
-            case P^[InitStrPos] of
+          While True Do
+          Begin
+            Case P^[InitStrPos] Of
               DWChar(0), DWChar(10), DWChar(13):
                 Break;
-            end;
+            End;
             Inc(P);
-          end;
+          End;
           Len := Length(P^) - Length(Start^);
-          if Len > 0 then
-          begin
+          If Len > 0 Then
+          Begin
             SetString(S, PChar(@Start), Len);
             AddObject(S, nil); // consumes most time
-          end
-          else
+          End
+          Else
             AddObject('', nil);
-          if P^[InitStrPos] = DWChar(13) then
+          If P^[InitStrPos] = DWChar(13) Then
             Inc(P);
-          if P^[InitStrPos] = DWChar(10) then
+          If P^[InitStrPos] = DWChar(10) Then
             Inc(P);
-        end;
-      end;
-    end;
-  finally
+        End;
+      End;
+    End;
+  Finally
     EndUpdate;
-  end;
-end;
-procedure TJclWideStrings.SetUpdateState(Updating: Boolean);
-begin
-end;
-procedure TJclWideStrings.WriteData(Writer: TWriter);
-var
+  End;
+End;
+Procedure TJclWideStrings.SetUpdateState(Updating: Boolean);
+Begin
+End;
+Procedure TJclWideStrings.WriteData(Writer: TWriter);
+Var
   I: Integer;
-begin
+Begin
   Writer.WriteListBegin;
-  for I := 0 to Count - 1 do
+  For I := 0 To Count - 1 Do
      Writer.WriteString(GetP(I)^);
   Writer.WriteListEnd;
-end;
+End;
 //=== { TJclWideStringList } =======================================================
-constructor TJclWideStringList.Create;
-begin
-  inherited Create;
+Constructor TJclWideStringList.Create;
+Begin
+  Inherited Create;
   FList := TList.Create;
-end;
-destructor TJclWideStringList.Destroy;
-begin
+End;
+Destructor TJclWideStringList.Destroy;
+Begin
   FOnChange := nil;
   FOnChanging := nil;
   Inc(FUpdateCount); // do not call unnecessary functions
   Clear;
   FList.Free;
-  inherited Destroy;
-end;
-procedure TJclWideStringList.Changed;
-begin
-  if Assigned(FOnChange) then
+  Inherited Destroy;
+End;
+Procedure TJclWideStringList.Changed;
+Begin
+  If Assigned(FOnChange) Then
     FOnChange(Self);
-end;
-procedure TJclWideStringList.Changing;
-begin
-  if Assigned(FOnChanging) then
+End;
+Procedure TJclWideStringList.Changing;
+Begin
+  If Assigned(FOnChanging) Then
     FOnChanging(Self);
-end;
-procedure TJclWideStringList.Clear;
-var
+End;
+Procedure TJclWideStringList.Clear;
+Var
   I: Integer;
   Item: PWStringItem;
-begin
-  if FUpdateCount = 0 then
+Begin
+  If FUpdateCount = 0 Then
     Changing;
-  for I := 0 to Count - 1 do
-  begin
+  For I := 0 To Count - 1 Do
+  Begin
     Item := PWStringItem(FList[I]);
     Item.FString := '';
     FreeMem(Item);
-  end;
+  End;
   FList.Clear;
-  if FUpdateCount = 0 then
+  If FUpdateCount = 0 Then
     Changed;
-end;
+End;
 threadvar
   CustomSortList: TJclWideStringList;
   CustomSortCompare: TJclWideStringListSortCompare;
-function WStringListCustomSort(Item1, Item2: Pointer): Integer;
-begin
+Function WStringListCustomSort(Item1, Item2: Pointer): Integer;
+Begin
   Result := CustomSortCompare(CustomSortList,
     CustomSortList.FList.IndexOf(Item1),
     CustomSortList.FList.IndexOf(Item2));
-end;
-procedure TJclWideStringList.CustomSort(Compare: TJclWideStringListSortCompare);
-var
+End;
+Procedure TJclWideStringList.CustomSort(Compare: TJclWideStringListSortCompare);
+Var
   TempList: TJclWideStringList;
   TempCompare: TJclWideStringListSortCompare;
-begin
+Begin
   TempList := CustomSortList;
   TempCompare := CustomSortCompare;
   CustomSortList := Self;
   CustomSortCompare := Compare;
-  try
+  Try
     Changing;
     FList.Sort(WStringListCustomSort);
     Changed;
-  finally
+  Finally
     CustomSortList := TempList;
     CustomSortCompare := TempCompare;
-  end;
-end;
-procedure TJclWideStringList.Delete(Index: Integer);
-var
+  End;
+End;
+Procedure TJclWideStringList.Delete(Index: Integer);
+Var
   Item: PWStringItem;
-begin
-  if FUpdateCount = 0 then
+Begin
+  If FUpdateCount = 0 Then
     Changing;
   Item := PWStringItem(FList[Index]);
   FList.Delete(Index);
   Item.FString := '';
   FreeMem(Item);
-  if FUpdateCount = 0 then
+  If FUpdateCount = 0 Then
     Changed;
-end;
-procedure TJclWideStringList.Exchange(Index1, Index2: Integer);
-begin
-  if FUpdateCount = 0 then
+End;
+Procedure TJclWideStringList.Exchange(Index1, Index2: Integer);
+Begin
+  If FUpdateCount = 0 Then
     Changing;
   FList.Exchange(Index1, Index2);
-  if FUpdateCount = 0 then
+  If FUpdateCount = 0 Then
     Changed;
-end;
-function TJclWideStringList.GetCapacity: Integer;
-begin
+End;
+Function TJclWideStringList.GetCapacity: Integer;
+Begin
   Result := FList.Capacity;
-end;
-function TJclWideStringList.GetCount: Integer;
-begin
+End;
+Function TJclWideStringList.GetCount: Integer;
+Begin
   Result := FList.Count;
-end;
-function TJclWideStringList.GetItem(Index: Integer): PWStringItem;
-begin
+End;
+Function TJclWideStringList.GetItem(Index: Integer): PWStringItem;
+Begin
   Result := FList[Index];
-end;
-function TJclWideStringList.GetObject(Index: Integer): TObject;
-begin
+End;
+Function TJclWideStringList.GetObject(Index: Integer): TObject;
+Begin
   Result := GetItem(Index).FObject;
-end;
-function TJclWideStringList.GetP(Index: Integer): PString;
-begin
+End;
+Function TJclWideStringList.GetP(Index: Integer): PString;
+Begin
   Result := Addr(GetItem(Index).FString);
-end;
-procedure TJclWideStringList.InsertObject(Index: Integer; const S: DWWideString;
+End;
+Procedure TJclWideStringList.InsertObject(Index: Integer; Const S: DWWideString;
   AObject: TObject);
-var
+Var
   P: PWStringItem;
-begin
-  if FUpdateCount = 0 then
+Begin
+  If FUpdateCount = 0 Then
     Changing;
   FList.Insert(Index, nil); // error check
   P := AllocMem(SizeOf(TWStringItem));
   FList[Index] := P;
   Put(Index, S);
-  if AObject <> nil then
+  If AObject <> nil Then
     PutObject(Index, AObject);
-  if FUpdateCount = 0 then
+  If FUpdateCount = 0 Then
     Changed;
-end;
-procedure TJclWideStringList.Put(Index: Integer; const Value: DWWideString);
-begin
-  if FUpdateCount = 0 then
+End;
+Procedure TJclWideStringList.Put(Index: Integer; Const Value: DWWideString);
+Begin
+  If FUpdateCount = 0 Then
     Changing;
   GetItem(Index).FString := Value;
-  if FUpdateCount = 0 then
+  If FUpdateCount = 0 Then
     Changed;
-end;
-procedure TJclWideStringList.PutObject(Index: Integer; AObject: TObject);
-begin
-  if FUpdateCount = 0 then
+End;
+Procedure TJclWideStringList.PutObject(Index: Integer; AObject: TObject);
+Begin
+  If FUpdateCount = 0 Then
     Changing;
   GetItem(Index).FObject := AObject;
-  if FUpdateCount = 0 then
+  If FUpdateCount = 0 Then
     Changed;
-end;
-procedure TJclWideStringList.SetCapacity(NewCapacity: Integer);
-begin
+End;
+Procedure TJclWideStringList.SetCapacity(NewCapacity: Integer);
+Begin
   FList.Capacity := NewCapacity;
-end;
-procedure TJclWideStringList.SetUpdateState(Updating: Boolean);
-begin
-  if Updating then
+End;
+Procedure TJclWideStringList.SetUpdateState(Updating: Boolean);
+Begin
+  If Updating Then
     Changing
-  else
+  Else
     Changed;
-end;
+End;
 {$ENDIF ~SUPPORTS_UNICODE}
-procedure AllocateMultiSz(var Dest: PWideMultiSz; Len: SizeInt);
-begin
-  if Len > 0 then
+Procedure AllocateMultiSz(Var Dest: PWideMultiSz; Len: SizeInt);
+Begin
+  If Len > 0 Then
     GetMem(Dest, Len * SizeOf(WideChar))
-  else
+  Else
     Dest := nil;
-end;
-procedure FreeMultiSz(var Dest: PWideMultiSz);
-begin
-  if Dest <> nil then
+End;
+Procedure FreeMultiSz(Var Dest: PWideMultiSz);
+Begin
+  If Dest <> nil Then
     FreeMem(Dest);
   Dest := nil;
-end;
+End;
 {$IFDEF UNITVERSIONING}
-initialization
-  RegisterUnitVersion(HInstance, UnitVersioning);
-finalization
-  UnregisterUnitVersion(HInstance);
+Initialization
+ RegisterUnitVersion(HInstance, UnitVersioning);
+Finalization
+ UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-end.
+End.

@@ -10,7 +10,7 @@
 
 unit STLWizardreg;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 interface
 

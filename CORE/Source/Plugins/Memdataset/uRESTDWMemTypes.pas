@@ -1,22 +1,22 @@
-unit uRESTDWMemTypes;
+Unit uRESTDWMemTypes;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -29,10 +29,10 @@ Interface
  {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-uses
+Uses
   SysUtils, Classes,
   uRESTDWMemResources;
-const
+Const
   MaxPixelCount = 32767;
 {$IFNDEF COMPILER12_UP}
 {$HPPEMIT '#ifndef TDate'}
@@ -40,10 +40,10 @@ const
 {$HPPEMIT '#define TTime Controls::TTime'}
 {$HPPEMIT '#endif'}
 {$ENDIF !COMPILER12_UP}
-type
+Type
   TRESTDWBytes = Pointer;
   IntPtr = Pointer;
-type
+Type
   {$IFNDEF FPC}
    {$IF (CompilerVersion >= 26) And (CompilerVersion <= 29)}
     {$IF Defined(HAS_FMX)}
@@ -80,92 +80,92 @@ type
   THintStringList = TStringList;
   { JvExVCL classes }
   TInputKey = (ikAll, ikArrows, ikChars, ikButton, ikTabs, ikEdit, ikNative{, ikNav, ikEsc});
-  TInputKeys = set of TInputKey;
-  TRESTDWRGBTriple = packed record
+  TInputKeys = set Of TInputKey;
+  TRESTDWRGBTriple = packed Record
     rgbBlue: Byte;
     rgbGreen: Byte;
     rgbRed: Byte;
-  end;
-const
+  End;
+Const
   NullHandle = 0;
   // (rom) deleted fbs constants. They are already in JvConsts.pas.
-type
-  TTimerProc = procedure(hwnd: THandle; Msg: Cardinal; idEvent: Cardinal; dwTime: Cardinal);
-type
+Type
+  TTimerProc = Procedure(hwnd: THandle; Msg: Cardinal; idEvent: Cardinal; dwTime: Cardinal);
+Type
   // Base class for persistent properties that can show events.
   // By default, Delphi and BCB don't show the events of a class
   // derived from TPersistent unless it also derives from
   // TComponent.
   // The design time editor associated with TRESTDWPersistent will display
   // the events, thus mimicking a Sub Component.
-  TRESTDWPersistent = class(TComponent)
-  private
+  TRESTDWPersistent = Class(TComponent)
+  Private
     FOwner: TPersistent;
-    function _GetOwner: TPersistent;
-  protected
-    function GetOwner: TPersistent; override;
-  public
-    constructor Create(AOwner: TPersistent); reintroduce; virtual;
-    function GetNamePath: string; {$IFNDEF FPC}override;{$ENDIF}
+    Function _GetOwner: TPersistent;
+  Protected
+    Function GetOwner: TPersistent; override;
+  Public
+    Constructor Create(AOwner: TPersistent); reintroduce; virtual;
+    Function GetNamePath: string; {$IFNDEF FPC}override;{$ENDIF}
     property Owner: TPersistent read _GetOwner;
-  end;
+  End;
   // Added by dejoy (2005-04-20)
   // A lot of TRESTDWxxx control persistent properties used TPersistent,
   // So and a TRESTDWPersistentProperty to do this job. make to support batch-update mode
   // and property change notify.
-  TRESTDWPropertyChangeEvent = procedure(Sender: TObject; const PropName: string) of object;
-  TRESTDWPersistentProperty = class(TRESTDWPersistent)//TPersistent => TRESTDWPersistent
-  private
+  TRESTDWPropertyChangeEvent = Procedure(Sender: TObject; Const PropName: string) Of object;
+  TRESTDWPersistentProperty = Class(TRESTDWPersistent)//TPersistent => TRESTDWPersistent
+  Private
     FUpdateCount: Integer;
     FOnChanging: TNotifyEvent;
     FOnChanged: TNotifyEvent;
     FOnChangingProperty: TRESTDWPropertyChangeEvent;
     FOnChangedProperty: TRESTDWPropertyChangeEvent;
-  protected
-    procedure Changed; virtual;
-    procedure Changing; virtual;
-    procedure ChangedProperty(const PropName: string); virtual;
-    procedure ChangingProperty(const PropName: string); virtual;
+  Protected
+    Procedure Changed; virtual;
+    Procedure Changing; virtual;
+    Procedure ChangedProperty(Const PropName: string); virtual;
+    Procedure ChangingProperty(Const PropName: string); virtual;
     property UpdateCount: Integer read FUpdateCount;
-  public
-    procedure BeginUpdate; virtual;
-    procedure EndUpdate; virtual;
+  Public
+    Procedure BeginUpdate; virtual;
+    Procedure EndUpdate; virtual;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
     property OnChangedProperty: TRESTDWPropertyChangeEvent read FOnChangedProperty write FOnChangedProperty;
     property OnChangingProperty: TRESTDWPropertyChangeEvent read FOnChangingProperty write FOnChangingProperty;
-  end;
+  End;
   TRESTDWRegKey = (hkClassesRoot, hkCurrentUser, hkLocalMachine, hkUsers,
     hkPerformanceData, hkCurrentConfig, hkDynData);
-  TRESTDWRegKeys = set of TRESTDWRegKey;
+  TRESTDWRegKeys = set Of TRESTDWRegKey;
   // base JVCL Exception class to derive from
-  EJVCLException = class(Exception);
-  TRESTDWLinkClickEvent = procedure(Sender: TObject; Link: string) of object;
+  EJVCLException = Class(Exception);
+  TRESTDWLinkClickEvent = Procedure(Sender: TObject; Link: string) Of object;
   //  TOnRegistryChangeKey = procedure(Sender: TObject; RootKey: HKEY; Path: string) of object;
   //  TAngle = 0..360;
   TRESTDWOutputMode = (omFile, omStream);
   //  TLabelDirection = (sdLeftToRight, sdRightToLeft); // JvScrollingLabel
-  TRESTDWDoneFileEvent = procedure(Sender: TObject; FileName: string; FileSize: Integer; Url: string) of object;
-  TRESTDWDoneStreamEvent = procedure(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string) of object;
-  TRESTDWHTTPProgressEvent = procedure(Sender: TObject; UserData, Position: Integer; TotalSize: Integer; Url: string; var Continue: Boolean) of object;
-  TRESTDWFTPProgressEvent = procedure(Sender: TObject; Position: Integer; Url: string) of object;
-  TRESTDWErrorEvent = procedure(Sender: TObject; ErrorMsg: string) of object;
+  TRESTDWDoneFileEvent = Procedure(Sender: TObject; FileName: string; FileSize: Integer; Url: string) Of object;
+  TRESTDWDoneStreamEvent = Procedure(Sender: TObject; Stream: TStream; StreamSize: Integer; Url: string) Of object;
+  TRESTDWHTTPProgressEvent = Procedure(Sender: TObject; UserData, Position: Integer; TotalSize: Integer; Url: string; Var Continue: Boolean) Of object;
+  TRESTDWFTPProgressEvent = Procedure(Sender: TObject; Position: Integer; Url: string) Of object;
+  TRESTDWErrorEvent = Procedure(Sender: TObject; ErrorMsg: string) Of object;
   TRESTDWWaveLocation = (frFile, frResource, frRAM);
   TRESTDWPopupPosition = (ppNone, ppForm, ppApplication);
-  TRESTDWProgressEvent = procedure(Sender: TObject; Current, Total: Integer) of object;
-  TRESTDWNextPageEvent = procedure(Sender: TObject; PageNumber: Integer) of object;
+  TRESTDWProgressEvent = Procedure(Sender: TObject; Current, Total: Integer) Of object;
+  TRESTDWNextPageEvent = Procedure(Sender: TObject; PageNumber: Integer) Of object;
   TRESTDWBitmapStyle = (bsNormal, bsCentered, bsStretched);
   TRESTDWGradientStyle = (grFilled, grEllipse, grHorizontal, grVertical, grPyramid, grMount);
-  TRESTDWParentEvent = procedure(Sender: TObject; ParentWindow: THandle) of object;
+  TRESTDWParentEvent = Procedure(Sender: TObject; ParentWindow: THandle) Of object;
   TRESTDWDiskRes = (dsSuccess, dsCancel, dsSkipfile, dsError);
   TRESTDWDiskStyle = (idfCheckFirst, idfNoBeep, idfNoBrowse, idfNoCompressed, idfNoDetails,
     idfNoForeground, idfNoSkip, idfOemDisk, idfWarnIfSkip);
-  TRESTDWDiskStyles = set of TRESTDWDiskStyle;
+  TRESTDWDiskStyles = set Of TRESTDWDiskStyle;
   TRESTDWDeleteStyle = (idNoBeep, idNoForeground);
-  TRESTDWDeleteStyles = set of TRESTDWDeleteStyle;
-  TRESTDWNotifyParamsEvent = procedure(Sender: TObject; Params: Pointer) of object;
+  TRESTDWDeleteStyles = set Of TRESTDWDeleteStyle;
+  TRESTDWNotifyParamsEvent = Procedure(Sender: TObject; Params: Pointer) Of object;
   TRESTDWAnimation = (anLeftRight, anRightLeft, anRightAndLeft, anLeftVumeter, anRightVumeter);
-  TRESTDWAnimations = set of TRESTDWAnimation;
+  TRESTDWAnimations = set Of TRESTDWAnimation;
   //   TOnFound = procedure(Sender: TObject; Path: string) of object; // JvSearchFile
   //  TOnChangedDir = procedure(Sender: TObject; Directory: string) of object; // JvSearchFile
   //  TOnAlarm = procedure(Sender: TObject; Keyword: string) of object; // JvAlarm
@@ -178,13 +178,13 @@ type
   TRESTDWTriggerKind =
     (tkOneShot, tkEachSecond, tkEachMinute, tkEachHour, tkEachDay, tkEachMonth, tkEachYear);
   // End of Bianconi
-  TRESTDWFourCC = array [0..3] of DWChar;
+  TRESTDWFourCC = array [0..3] Of DWChar;
   PJvAniTag = ^TRESTDWAniTag;
-  TRESTDWAniTag = packed record
+  TRESTDWAniTag = packed Record
     ckID: TRESTDWFourCC;
     ckSize: Longint;
-  end;
-  TRESTDWAniHeader = packed record
+  End;
+  TRESTDWAniHeader = packed Record
     dwSizeof: Longint;
     dwFrames: Longint;
     dwSteps: Longint;
@@ -194,7 +194,7 @@ type
     dwPlanes: Longint;
     dwJIFRate: Longint;
     dwFlags: Longint;
-  end;
+  End;
   TRESTDWLayout = (lTop, lCenter, lBottom);
   TRESTDWBevelStyle = (bsShape, bsLowered, bsRaised);
   // JvJCLUtils
@@ -204,17 +204,17 @@ type
   TCharSet = TSysCharSet;
   TDateOrder = (doMDY, doDMY, doYMD);
   TDayOfWeekName = (Sun, Mon, Tue, Wed, Thu, Fri, Sat);
-  TDaysOfWeek = set of TDayOfWeekName;
-const
+  TDaysOfWeek = set Of TDayOfWeekName;
+Const
   DefaultDateOrder = doDMY;
   CenturyOffset: Byte = 60;
   NullDate: TDateTime = 0; {-693594}
-type
+Type
   // JvDriveCtrls / JvLookOut
   TRESTDWImageSize = (isSmall, isLarge);
   TRESTDWImageAlign = (iaLeft, iaCentered);
   TRESTDWDriveType = (dtUnknown, dtRemovable, dtFixed, dtRemote, dtCDROM, dtRamDisk);
-  TRESTDWDriveTypes = set of TRESTDWDriveType;
+  TRESTDWDriveTypes = set Of TRESTDWDriveType;
   // Defines how a property (like a HotTrackFont) follows changes in the component's normal Font
   TRESTDWTrackFontOption = (
     hoFollowFont,  // makes HotTrackFont follow changes to the normal Font
@@ -231,21 +231,21 @@ type
     , hoPreserveQuality // don't change HotTrackFont.Quality
     {$ENDIF COMPILER15_UP}
   );
-  TRESTDWTrackFontOptions = set of TRESTDWTrackFontOption;
-const
+  TRESTDWTrackFontOptions = set Of TRESTDWTrackFontOption;
+Const
   DefaultTrackFontOptions = [hoFollowFont, hoPreserveColor, hoPreserveStyle];
   DefaultHotTrackColor = $00D2BDB6;
   DefaultHotTrackFrameColor = $006A240A;
-type
+Type
   // from JvListView.pas
   TRESTDWSortMethod = (smAutomatic, smAlphabetic, smNonCaseSensitive, smNumeric, smDate, smTime, smDateTime, smCurrency);
-  TRESTDWListViewColumnSortEvent = procedure(Sender: TObject; Column: Integer; var AMethod: TRESTDWSortMethod) of object;
+  TRESTDWListViewColumnSortEvent = Procedure(Sender: TObject; Column: Integer; Var AMethod: TRESTDWSortMethod) Of object;
   TRESTDWClickColorType =
     (cctColors, cctNoneColor, cctDefaultColor, cctCustomColor, cctAddInControl, cctNone);
   TRESTDWColorQuadLayOut = (cqlNone, cqlLeft, cqlRight, cqlClient);
   // from JvColorProvider.pas
   TColorType = (ctStandard, ctSystem, ctCustom);
-const
+Const
   ColCount = 20;
   StandardColCount = 40;
   SysColCount = 30;
@@ -254,19 +254,19 @@ const
     {$MESSAGE ERROR 'You do not have Delphi 6 Runtime Library Update 2 installed. Please install it before installing the JVCL. http://downloads.codegear.com/default.aspx?productid=300'}
    {$IFEND}
   {$ENDIF COMPILER6}
-type
-  TRESTDWCustomThread = class(TThread)
-  private
+Type
+  TRESTDWCustomThread = Class(TThread)
+  Private
     FThreadName: String;
-    function GetThreadName: String; virtual;
-    procedure SetThreadName(const Value: String); virtual;
-  public
+    Function GetThreadName: String; virtual;
+    Procedure SetThreadName(Const Value: String); virtual;
+  Public
     {$IFNDEF DELPHI2009UP}
-    procedure NameThreadForDebugging(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
+    Procedure NameThreadForDebugging(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
     {$ENDIF}
-    procedure NameThread(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF); {$IFDEF SUPPORTS_UNICODE_STRING} overload; {$ENDIF} virtual;
+    Procedure NameThread(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF); {$IFDEF SUPPORTS_UNICODE_STRING} overload; {$ENDIF} virtual;
     property ThreadName: String read GetThreadName write SetThreadName;
-  end;
+  End;
 // Using this variable you can enhance the NameThread procedure system wide by inserting a procedure
 // which executes for example a MadExcept TraceOut to enhance the MadExcept call stack results.
 // The procedure for MadExcept could look like:
@@ -281,10 +281,10 @@ type
 //     initialization
 //       JvTypes.JvCustomThreadNamingProc := NameThreadMadExcept;
 //
-var
-  JvCustomThreadNamingProc: procedure (AThreadName: DWString; AThreadID: LongWord);
+Var
+  JvCustomThreadNamingProc: Procedure (AThreadName: DWString; AThreadID: LongWord);
 {$IFDEF UNITVERSIONING}
-const
+Const
   UnitVersioning: TUnitVersionInfo = (
     RCSfile: '$URL$';
     Revision: '$Revision$';
@@ -292,88 +292,88 @@ const
     LogPath: 'JVCL\run'
   );
 {$ENDIF UNITVERSIONING}
-implementation
+Implementation
 { TRESTDWPersistent }
-constructor TRESTDWPersistent.Create(AOwner: TPersistent);
-begin
-  if AOwner is TComponent then
-    inherited Create(AOwner as TComponent)
-  else
-    inherited Create(nil);
+Constructor TRESTDWPersistent.Create(AOwner: TPersistent);
+Begin
+  If AOwner is TComponent Then
+    Inherited Create(AOwner as TComponent)
+  Else
+    Inherited Create(nil);
   SetSubComponent(True);
   FOwner := AOwner;
-end;
-type
-  TPersistentAccessProtected = class(TPersistent);
-function TRESTDWPersistent.GetNamePath: string;
-var
+End;
+Type
+  TPersistentAccessProtected = Class(TPersistent);
+Function TRESTDWPersistent.GetNamePath: string;
+Var
   S: string;
   lOwner: TPersistent;
-begin
-  Result := inherited GetNamePath;
+Begin
+  Result := Inherited GetNamePath;
   lOwner := GetOwner;   //Resturn Nested NamePath
-  if (lOwner <> nil)
+  If (lOwner <> nil)
     and ( (csSubComponent in TComponent(lOwner).ComponentStyle)
          or (TPersistentAccessProtected(lOwner).GetOwner <> nil)
         )
-   then
-  begin
+   Then
+  Begin
     S := lOwner.GetNamePath;
-    if S <> '' then
+    If S <> '' Then
       Result := S + '.' + Result;
-  end;
-end;
-function TRESTDWPersistent.GetOwner: TPersistent;
-begin
+  End;
+End;
+Function TRESTDWPersistent.GetOwner: TPersistent;
+Begin
   Result := FOwner;
-end;
-function TRESTDWPersistent._GetOwner: TPersistent;
-begin
+End;
+Function TRESTDWPersistent._GetOwner: TPersistent;
+Begin
   Result := GetOwner;
-end;
+End;
 { TRESTDWPersistentProperty }
-procedure TRESTDWPersistentProperty.BeginUpdate;
-begin
+Procedure TRESTDWPersistentProperty.BeginUpdate;
+Begin
   Inc(FUpdateCount);
-end;
-procedure TRESTDWPersistentProperty.Changed;
-begin
-  if (FUpdateCount = 0) and Assigned(FOnChanged) then
+End;
+Procedure TRESTDWPersistentProperty.Changed;
+Begin
+  If (FUpdateCount = 0) and Assigned(FOnChanged) Then
     FOnChanged(Self);
-end;
-procedure TRESTDWPersistentProperty.ChangedProperty(const PropName: string);
-begin
-  if Assigned(FOnChangedProperty) then
+End;
+Procedure TRESTDWPersistentProperty.ChangedProperty(Const PropName: string);
+Begin
+  If Assigned(FOnChangedProperty) Then
     FOnChangedProperty(Self, PropName);
-end;
-procedure TRESTDWPersistentProperty.Changing;
-begin
-  if (FUpdateCount = 0) and Assigned(FOnChanging) then
+End;
+Procedure TRESTDWPersistentProperty.Changing;
+Begin
+  If (FUpdateCount = 0) and Assigned(FOnChanging) Then
     FOnChanging(Self);
-end;
-procedure TRESTDWPersistentProperty.ChangingProperty(const PropName: string);
-begin
-  if Assigned(FOnChangingProperty) then
+End;
+Procedure TRESTDWPersistentProperty.ChangingProperty(Const PropName: string);
+Begin
+  If Assigned(FOnChangingProperty) Then
     FOnChangingProperty(Self, PropName);
-end;
-procedure TRESTDWPersistentProperty.EndUpdate;
-begin
+End;
+Procedure TRESTDWPersistentProperty.EndUpdate;
+Begin
   Dec(FUpdateCount);
-end;
+End;
 {$IFNDEF DELPHI2009UP}
-procedure TRESTDWCustomThread.NameThreadForDebugging(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
-type
-  TThreadNameInfo = record
+Procedure TRESTDWCustomThread.NameThreadForDebugging(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
+Type
+  TThreadNameInfo = Record
     FType: LongWord;     // must be 0x1000
     FName: PAnsiChar;    // pointer to name (in user address space)
     FThreadID: LongWord; // thread ID (-1 indicates caller thread)
     FFlags: LongWord;    // reserved for future use, must be zero
-  end;
-var
+  End;
+Var
   ThreadNameInfo: TThreadNameInfo;
-begin
+Begin
   //if IsDebuggerPresent then
-  begin
+  Begin
     ThreadNameInfo.FType := $1000;
     ThreadNameInfo.FName := PAnsiChar(AThreadName);
     ThreadNameInfo.FThreadID := AThreadID;
@@ -382,29 +382,28 @@ begin
     //  RaiseException($406D1388, 0, SizeOf(ThreadNameInfo) div SizeOf(LongWord), @ThreadNameInfo);
     //except
     //end;
-  end;
-end;
+  End;
+End;
 {$ENDIF DELPHI2009UP}
-function TRESTDWCustomThread.GetThreadName: String;
-begin
-  if FThreadName = '' then
+Function TRESTDWCustomThread.GetThreadName: String;
+Begin
+  If FThreadName = '' Then
     Result := ClassName
-  else
+  Else
     Result := FThreadName+' {'+ClassName+'}';
-end;
-procedure TRESTDWCustomThread.NameThread(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
-begin
-  if AThreadID = $FFFFFFFF then
+End;
+Procedure TRESTDWCustomThread.NameThread(AThreadName: DWString; AThreadID: LongWord = $FFFFFFFF);
+Begin
+  If AThreadID = $FFFFFFFF Then
     AThreadID := ThreadID;
   NameThreadForDebugging(aThreadName, AThreadID);
-  if Assigned(JvCustomThreadNamingProc) then
+  If Assigned(JvCustomThreadNamingProc) Then
     JvCustomThreadNamingProc(aThreadName, AThreadID);
-end;
+End;
 
-procedure TRESTDWCustomThread.SetThreadName(const Value: String);
-begin
+Procedure TRESTDWCustomThread.SetThreadName(Const Value: String);
+Begin
   FThreadName := Value;
-end;
+End;
 
-end.
-
+End.

@@ -1,22 +1,22 @@
 unit uRESTDWDesignReg;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -37,7 +37,7 @@ uses
    fpWeb, TypInfo,
   {$ELSE}
    {$IFNDEF RESTDWLAMW}
-    Windows,
+    Windows, Forms, Controls, StdCtrls, ExtCtrls, Dialogs,
     {$IFDEF DELPHIXE2UP}
      vcl.Graphics,
     {$ELSE}
@@ -58,7 +58,11 @@ uses
   uRESTDWBasicClass,     uRESTDWDatamodule,   uRESTDWServerEvents,  uRESTDWBasicDB,
   uRESTDWServerContext,  uRESTDWServerRoutes, uRESTDWMassiveBuffer,
   uRESTDWMemoryDataset,  uRESTDWBufferDb,     uRESTDWAbout,         uRESTDWDriverBase,
-  uRESTDWAuthenticators;
+  uRESTDWAuthenticators, uRESTDWHTMLEditor,
+  {$IFNDEF RESTDWLAZARUS}
+   uRESTDWFMXHTMLEditor,
+  {$ENDIF}
+  uRESTDWHTMLDesigner;
 
 {$IFNDEF RESTDWDELPHINET}
 Const
@@ -198,6 +202,23 @@ Public
  Function  GetVerb    (Index : Integer): String; Override;
  Procedure ExecuteVerb(Index : Integer); Override;
 End;
+
+Type
+ TRESTDWHTMLEditorComponentEditor = Class(TComponentEditor)
+ Public
+  Function  GetVerbCount      : Integer; Override;
+  Function  GetVerb    (Index : Integer): String; Override;
+  Procedure ExecuteVerb(Index : Integer); Override;
+ End;
+
+ {$IFNDEF RESTDWLAZARUS}
+ TRESTDWFMXHTMLEditorComponentEditor = Class(TComponentEditor)
+ Public
+  Function  GetVerbCount      : Integer; Override;
+  Function  GetVerb    (Index : Integer): String; Override;
+  Procedure ExecuteVerb(Index : Integer); Override;
+ End;
+ {$ENDIF}
 {$ENDIF}
 
 {$IFDEF RESTDWLAZARUS}
@@ -449,15 +470,15 @@ End;
 Procedure TRESTDWDesigner.EndUpdateFieldDefs;
 Begin
  Inherited;
- If TRESTDWClientSQL(DataSet).Active Then
-   TRESTDWClientSQL(DataSet).Close;
+ //If TRESTDWClientSQL(DataSet).Active Then  corrido addfields para novos campos
+ //  TRESTDWClientSQL(DataSet).Close;
 End;
 
 Procedure TRESTDWDesigner.InitializeMenu(Menu: TPopupMenu);
 Begin
  Inherited;
  // Ao clicar duas vezes no componente RESTDWClientSQL
- // ou ao selecionar no popup menu opção "Fields Editor".
+ // ou ao selecionar no popup menu opo "Fields Editor".
 End;
 
 Procedure TRESTDWDesigner.UpdateMenus(Menu: TPopupMenu; EditState: TEditState);
@@ -724,6 +745,7 @@ Begin
  End;
 end;
 
+
 procedure TRESTDWContextRulesEditor.ExecuteVerb(Index: Integer);
 Begin
  Case Index of
@@ -732,6 +754,10 @@ Begin
       {$ELSE}
        TCollectionPropertyEditor.ShowCollectionEditor(TRESTDWContextRules(Component).Items, Component, 'Items');
       {$ENDIF}
+  1 : Begin
+       If RESTDWExecuteContextRulesHTMLDesigner(TRESTDWContextRules(Component)) Then
+        Designer.Modified;
+      End;
  End;
 end;
 
@@ -746,6 +772,7 @@ Function TRESTDWContextRulesEditor.GetVerb(Index: Integer): string;
 Begin
  Case Index of
   0 : Result := '&ContextRules Editor';
+  1 : Result := 'Web Site Designer...';
  End;
 End;
 
@@ -756,7 +783,7 @@ End;
 
 Function TRESTDWContextRulesEditor.GetVerbCount: Integer;
 Begin
- Result := 1;
+ Result := 2;
 End;
 {$ENDIF}
 
@@ -786,20 +813,11 @@ End;
 Procedure Register;
 Begin
  {$IFDEF FPC}
-//  RegFields(DefaultFieldClasses);
-  RegField(TRESTDWNumericField);
-  RegField(TStringFieldRESTDW);
-  RegField(TStreamField);
-//  RegField(TRESTDWSQLTimeStampOffsetField);
- {$ELSE}
-  {$IFDEF RESTDWMEMTABLE}
-   RegisterFields([TStringFieldRESTDW]);
-   RegisterFields([TRESTDWNumericField]);
-   RegisterFields([TStreamField]);
+  {$IFDEF RESTDWLAMW}
+   {$I RESTDataWareComponents_LAMW.lrs}
+  {$ELSE}
+   {$I RESTDataWareComponents.lrs}
   {$ENDIF}
- {$ENDIF}
- {$IFDEF FPC}
-  {$I RESTDataWareComponents_LAMW.lrs}
  {$ENDIF}
  {$IFNDEF RESTDWLAZARUS}
   {$IFNDEF RESTDWLAMW}
@@ -824,7 +842,10 @@ Begin
                                                        TRESTDWServerRoutes,
                                                        TRESTDWContextRules]);
  {$IFNDEF RESTDWLAMW}
- RegisterComponents('REST Dataware - Tools',          [TRESTDWResponseTranslator, TRESTDWBufferDB]);
+ RegisterComponents('REST Dataware - Tools',          [TRESTDWResponseTranslator, TRESTDWBufferDB, TRESTDWHTMLEditor]);
+ {$IFNDEF RESTDWLAZARUS}
+ RegisterComponents('REST Dataware - FMX',              [TRESTDWFMXHTMLEditor]);
+ {$ENDIF}
  {$ENDIF}
  RegisterComponents('REST Dataware - DB',             [TRESTDWPoolerDB, TRESTDWMemTable, TRESTDWClientSQL,
                                                        TRESTDWTable,              TRESTDWUpdateSQL,     TRESTDWMassiveSQLCache,
@@ -856,15 +877,91 @@ Begin
   RegisterPropertyEditor (TypeInfo(TRESTDWComponent), TRESTDWResponseTranslator, 'ClientREST', TRESTDWClientRESTList);
   RegisterComponentEditor(TRESTDWServerContext,       TComponentEditorClass(TRESTDWServerContextEditor));
   RegisterComponentEditor(TRESTDWContextRules,        TComponentEditorClass(TRESTDWContextRulesEditor));
+   RegisterComponentEditor(TRESTDWHTMLEditor,        TComponentEditorClass(TRESTDWHTMLEditorComponentEditor));
+   {$IFNDEF RESTDWLAZARUS}
+   RegisterComponentEditor(TRESTDWFMXHTMLEditor,       TComponentEditorClass(TRESTDWFMXHTMLEditorComponentEditor));
+   {$ENDIF}
  {$ENDIF}
  {$IFNDEF RESTDWLAZARUS}
   {$IFNDEF RESTDWLAMW}
    RegisterComponentEditor(TRESTDWClientSQL,         TRESTDWClientSQLEditor);
    RegisterComponentEditor(TRESTDWServerContext,     TRESTDWServerContextEditor);
    RegisterComponentEditor(TRESTDWContextRules,      TRESTDWContextRulesEditor);
+    RegisterComponentEditor(TRESTDWHTMLEditor,      TRESTDWHTMLEditorComponentEditor);
+    RegisterComponentEditor(TRESTDWFMXHTMLEditor,   TRESTDWFMXHTMLEditorComponentEditor);
   {$ENDIF}
  {$ENDIF}
 End;
+
+
+Function TRESTDWHTMLEditorComponentEditor.GetVerbCount : Integer;
+Begin
+ Result := 1;
+End;
+
+Function TRESTDWHTMLEditorComponentEditor.GetVerb(Index : Integer) : String;
+Begin
+ Result := '&HTML Designer';
+End;
+
+Procedure TRESTDWHTMLEditorComponentEditor.ExecuteVerb(Index : Integer);
+Var
+ LContext : TRESTDWContextRules;
+Begin
+ If Index <> 0 Then
+  Exit;
+
+ LContext := TRESTDWContextRules.Create(Nil);
+ Try
+  LContext.MasterHtml.Assign(TRESTDWHTMLEditor(Component).HTML);
+  If RESTDWExecuteContextRulesHTMLDesigner(
+      LContext,
+      TRESTDWHTMLEditor(Component).EditorTitle
+     ) Then
+   Begin
+    TRESTDWHTMLEditor(Component).HTML.Assign(LContext.MasterHtml);
+    Designer.Modified;
+   End;
+ Finally
+  LContext.Free;
+ End;
+End;
+
+{$IFNDEF RESTDWLAZARUS}
+Function TRESTDWFMXHTMLEditorComponentEditor.GetVerbCount : Integer;
+Begin
+ Result := 1;
+End;
+
+Function TRESTDWFMXHTMLEditorComponentEditor.GetVerb(Index : Integer) : String;
+Begin
+ Result := '&HTML Designer';
+End;
+
+Procedure TRESTDWFMXHTMLEditorComponentEditor.ExecuteVerb(Index : Integer);
+Var
+ LContext : TRESTDWContextRules;
+Begin
+ If Index <> 0 Then
+  Exit;
+
+ LContext := TRESTDWContextRules.Create(Nil);
+ Try
+  LContext.MasterHtml.Assign(TRESTDWFMXHTMLEditor(Component).HTML);
+
+  If RESTDWExecuteContextRulesHTMLDesigner(
+      LContext,
+      TRESTDWFMXHTMLEditor(Component).EditorTitle
+     ) Then
+  Begin
+   TRESTDWFMXHTMLEditor(Component).HTML.Assign(LContext.MasterHtml);
+   Designer.Modified;
+  End;
+ Finally
+  LContext.Free;
+ End;
+End;
+{$ENDIF}
 
 { TRESTDWServerEventsEditor }
 {$IFNDEF RESTDWLAMW}
@@ -909,6 +1006,8 @@ Begin
    2 : (Component as TRESTDWClientEvents).ClearEvents;
  End;
 End;
+
+{$ENDIF}
 
 Function TRESTDWClientEventsEditor.GetVerb(Index: Integer): string;
 Begin
@@ -992,6 +1091,9 @@ Var
     vConnection.CriptOptions.Use          := vRESTClientPooler.CriptOptions.Use;
     vConnection.CriptOptions.Key          := vRESTClientPooler.CriptOptions.Key;
     vConnection.DataRoute                 := vRESTClientPooler.DataRoute;
+    vConnection.TypeRequest               := vRESTClientPooler.TypeRequest;
+    vConnection.SSLMethod                 := vRESTClientPooler.SSLMethod;
+    vConnection.SSLVersions               := vRESTClientPooler.SSLVersions;
     vConnection.AuthenticationOptions.Assign(vRESTClientPooler.AuthenticationOptions);
     Result := TStringList.Create;
     Try
@@ -1072,7 +1174,6 @@ Begin
    End;
   End;
 End;
-{$ENDIF}
 
 {$IFDEF RESTDWLAZARUS}
  Procedure UnlistPublishedProperty (ComponentClass:TPersistentClass; const PropertyName:String);

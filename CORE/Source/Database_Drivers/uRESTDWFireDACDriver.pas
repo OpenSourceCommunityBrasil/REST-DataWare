@@ -1,6 +1,6 @@
 ﻿unit uRESTDWFireDACDriver;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -469,12 +469,14 @@ begin
   qry.Params[IParam].LoadFromStream(stream,blobtype);
 end;
 
-function TRESTDWFireDACQuery.ParamCount: Integer;
-var
-  qry : TFDQuery;
+function TRESTDWFireDACQuery.ParamCount : Integer;
 begin
-  qry := TFDQuery(Self.Owner);
-  Result := qry.ParamCount;
+ Result:=TFDQuery(Self.Owner).ParamCount;
+ If (Result=0) and (Pos(':',SQL.Text)>0) Then
+  Begin
+   Prepare;
+   Result:=TFDQuery(Self.Owner).ParamCount;
+  End;
 end;
 
 procedure TRESTDWFireDACQuery.Prepare;
@@ -549,6 +551,14 @@ begin
 
   stream.Position := 0;
 end;
+
+Initialization
+ RegisterClass(TRESTDWFireDACDriver);
+ RegisterRESTDWDriverClass(TRESTDWFireDACDriver);
+
+Finalization
+ UnregisterRESTDWDriverClass(TRESTDWFireDACDriver);
+ UnRegisterClass(TRESTDWFireDACDriver);
 
 end.
 

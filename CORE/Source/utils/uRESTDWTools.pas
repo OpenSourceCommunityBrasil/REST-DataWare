@@ -1,19 +1,19 @@
 unit uRESTDWTools;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
  Membros do Grupo :
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Flávio Motta               - Member Tester and DEMO Developer.
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -552,8 +552,8 @@ Function DWFieldTypeToFieldType(DWFieldType : Byte) : TFieldType;
 Begin
  Result := ftUnknown;
  {$IFDEF FPC}
- If DWFieldType = 45 Then //Extended come from Delphi
-  Result := ftFMTBcd
+ If DWFieldType = dwftExtended Then
+  Result := ftFloat
  Else
   Begin
  {$ENDIF}
@@ -592,10 +592,8 @@ Begin
     dwftIDispatch       : Result := ftIDispatch;
     dwftGuid            : Result := ftGuid;
     dwftBCD             : Result := ftBCD;
-    dwftExtended        : Result := {$IFDEF FPC}ftFMTBcd{$ELSE}ftExtended{$ENDIF};
-    {$IFNDEF FPC}
-     dwftFMTBcd         : Result := ftFMTBcd;
-    {$ENDIF}
+    dwftExtended        : Result := {$IFDEF FPC}ftFloat{$ELSE}ftExtended{$ENDIF};
+    dwftFMTBcd          : Result := ftFMTBcd;
     {$IFDEF DELPHI2010UP}
      dwftTimeStamp       : Result := ftTimeStamp;
      dwftWideString      : Result := ftWideString;
@@ -678,7 +676,7 @@ Begin
   ftIDispatch       : Result := dwftIDispatch;
   ftGuid            : Result := dwftGuid;
   ftTimeStamp       : Result := dwftTimeStamp;
-  ftFMTBcd          : Result := {$IFDEF FPC}45{$ELSE}dwftExtended{$ENDIF};
+  ftFMTBcd          : Result := dwftFMTBcd;
   {$IFDEF DELPHI2010UP} // Delphi 2010 acima
    ftFixedWideChar   : Result := dwftFixedWideChar;
    ftWideMemo        : Result := dwftWideMemo;
@@ -2338,15 +2336,15 @@ Const
                                                 (TimeZone:'G';    Offset:'+0700'), // Golf Time Zone - Military                              {do not localize}
                                                 (TimeZone:'GMT';  Offset:'+0000'), // Greenwich Mean Time - Europe                           {do not localize}
                                                 (TimeZone:'H';    Offset:'+0800'), // Hotel Time Zone - Military                             {do not localize}
-                                                (TimeZone:'HAA';  Offset:'-0300'), // Heure Avancée de l'Atlantique - North America          {do not localize}
-                                                (TimeZone:'HAC';  Offset:'-0500'), // Heure Avancée du Centre - North America                {do not localize}
+                                                (TimeZone:'HAA';  Offset:'-0300'), // Heure Avance de l'Atlantique - North America          {do not localize}
+                                                (TimeZone:'HAC';  Offset:'-0500'), // Heure Avance du Centre - North America                {do not localize}
                                                 (TimeZone:'HADT'; Offset:'-0900'), // Hawaii-Aleutian Daylight Time - North America          {do not localize}
-                                                (TimeZone:'HAE';  Offset:'-0400'), // Heure Avancée de l'Est - North America                 {do not localize}
-                                                (TimeZone:'HAP';  Offset:'-0700'), // Heure Avancée du Pacifique - North America             {do not localize}
-                                                (TimeZone:'HAR';  Offset:'-0600'), // Heure Avancée des Rocheuses - North America            {do not localize}
+                                                (TimeZone:'HAE';  Offset:'-0400'), // Heure Avance de l'Est - North America                 {do not localize}
+                                                (TimeZone:'HAP';  Offset:'-0700'), // Heure Avance du Pacifique - North America             {do not localize}
+                                                (TimeZone:'HAR';  Offset:'-0600'), // Heure Avance des Rocheuses - North America            {do not localize}
                                                 (TimeZone:'HAST'; Offset:'-1000'), // Hawaii-Aleutian Standard Time - North America          {do not localize}
-                                                (TimeZone:'HAT';  Offset:'-0230'), // Heure Avancée de Terre-Neuve - North America           {do not localize}
-                                                (TimeZone:'HAY';  Offset:'-0800'), // Heure Avancée du Yukon - North America                 {do not localize}
+                                                (TimeZone:'HAT';  Offset:'-0230'), // Heure Avance de Terre-Neuve - North America           {do not localize}
+                                                (TimeZone:'HAY';  Offset:'-0800'), // Heure Avance du Yukon - North America                 {do not localize}
                                                 (TimeZone:'HNA';  Offset:'-0400'), // Heure Normale de l'Atlantique - North America          {do not localize}
                                                 (TimeZone:'HNC';  Offset:'-0600'), // Heure Normale du Centre - North America                {do not localize}
                                                 (TimeZone:'HNE';  Offset:'-0500'), // Heure Normale de l'Est - North America                 {do not localize}
@@ -2360,9 +2358,9 @@ Const
                                                 (TimeZone:'L';    Offset:'+1100'), // Lima Time Zone - Military                              {do not localize}
                                                 (TimeZone:'M';    Offset:'+1200'), // Mike Time Zone - Military                              {do not localize}
                                                 (TimeZone:'MDT';  Offset:'-0600'), // Mountain Daylight Time - North America                 {do not localize}
-                                                (TimeZone:'MEHSZ';Offset:'+0300'), // Mitteleuropäische Hochsommerzeit - Europe              {do not localize}
-                                                (TimeZone:'MESZ'; Offset:'+0200'), // Mitteleuroäische Sommerzeit - Europe                   {do not localize}
-                                                (TimeZone:'MEZ';  Offset:'+0100'), // Mitteleuropäische Zeit - Europe                        {do not localize}
+                                                (TimeZone:'MEHSZ';Offset:'+0300'), // Mitteleuropische Hochsommerzeit - Europe              {do not localize}
+                                                (TimeZone:'MESZ'; Offset:'+0200'), // Mitteleuroische Sommerzeit - Europe                   {do not localize}
+                                                (TimeZone:'MEZ';  Offset:'+0100'), // Mitteleuropische Zeit - Europe                        {do not localize}
                                                 (TimeZone:'MSD';  Offset:'+0400'), // Moscow Daylight Time - Europe                          {do not localize}
                                                 (TimeZone:'MSK';  Offset:'+0300'), // Moscow Standard Time - Europe                          {do not localize}
                                                 (TimeZone:'MST';  Offset:'-0700'), // Mountain Standard Time - North America                 {do not localize}
@@ -4261,9 +4259,9 @@ Var
  Const
   MaxBufSize = $F000;
 Begin
- { ** Criando a instância do objeto TMemoryStream para retorno do método ** }
+ { ** Criando a instncia do objeto TMemoryStream para retorno do mtodo ** }
  Dest := TMemoryStream.Create;
- { ** Reposicionando o stream para o seu início ** }
+ { ** Reposicionando o stream para o seu incio ** }
  source.Seek(0, soBeginning);
  source.Position := 0;
  GetMem(Buffer, MaxBufSize);
@@ -4273,7 +4271,7 @@ Begin
   If BytesRead > 0 then
    Dest.WriteBuffer(Buffer^, BytesRead);
  Until MaxBufSize > BytesRead;
- { ** Reposicionando o stream de retorno para o seu início ** }
+ { ** Reposicionando o stream de retorno para o seu incio ** }
  Dest.Seek(0, soBeginning);
 End;
 

@@ -1,21 +1,21 @@
 unit uRESTDWPoolermethod;
 
-{$I ..\..\Source\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Flávio Motta               - Member Tester and DEMO Developer.
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -85,8 +85,8 @@ Uses
    Function  RenewToken           (Var Params              : TRESTDWParams;
                                    Var Error               : Boolean;
                                    Var MessageError        : String) : String;
-{ TODO: Criar uma função base para executar todos os comandos e remover as
-  redundâncias dessa unit.
+{ TODO: Criar uma funo base para executar todos os comandos e remover as
+  redundncias dessa unit.
    Function ExecuteAction(aAction: string;
                           Method_Prefix: string;
                           Pooler: string = '';
@@ -370,7 +370,7 @@ Uses
    Property PoolerURL             : String                     Read vPoolerURL             Write vPoolerURL;
    Property Host                  : String                     Read vHost                  Write vHost;
    Property Port                  : Integer                    Read vPort                  Write vPort;
-   Property RequestTimeOut        : Integer                    Read vTimeOut               Write vTimeOut;           //Timeout da Requisição
+   Property RequestTimeOut        : Integer                    Read vTimeOut               Write vTimeOut;           //Timeout da Requisio
    Property ConnectTimeOut        : Integer                    Read vConnectTimeOut        Write vConnectTimeOut;
    Property WelcomeMessage        : String                     Read vWelcomeMessage        Write vWelcomeMessage;
    Property OnWork                : TOnWork                    Read vOnWork                Write SetOnWork;
@@ -824,7 +824,7 @@ Var
    FreeAndNil(RESTClientPoolerExec);
  End;
 Begin
- //Atualização de Token na autenticação
+ //Atualizao de Token na autenticao
  Result                       := '';
  RESTClientPoolerExec         := Nil;
  vConnection                  := TRESTDWPoolerMethodClient.Create(Nil);
@@ -3180,6 +3180,8 @@ Begin
 // RESTClientPoolerExec.CriptOptions.Key:= vCripto.Key;
  RESTClientPoolerExec.DataRoute        := DataRoute;
  RESTClientPoolerExec.UserAgent        := vUserAgent;
+ RESTClientPoolerExec.SSLMethod        := SSLMethod;
+ RESTClientPoolerExec.SSLVersions      := SSLVersions;
  RESTClientPoolerExec.SetAccessTag(vAccessTag);
  TokenValidade;
  {$IFDEF FPC}

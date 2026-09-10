@@ -1,6 +1,6 @@
 unit uRESTDWBasic;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -5788,7 +5788,8 @@ Begin
                                                                                                        vMessageError,
                                                                                                        BinaryBlob,
                                                                                                        vRowsAffected,
-                                                                                                       vExecute, BinaryEvent, Metadata);
+                                                                                                       vExecute, BinaryEvent, Metadata,
+                                                                                                       BinaryCompatibleMode);
             Except
              On E : Exception Do
               Begin
@@ -5898,7 +5899,8 @@ Begin
                                                                                                          vMessageError,
                                                                                                          BinaryBlob,
                                                                                                          vRowsAffected,
-                                                                                                         BinaryEvent, Metadata);
+                                                                                                         BinaryEvent, Metadata,
+                                                                                                         BinaryCompatibleMode);
             Except
              On E : Exception Do
               Begin

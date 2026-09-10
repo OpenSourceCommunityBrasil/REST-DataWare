@@ -1,31 +1,31 @@
-unit uRESTDWMemTranslateString;
-{$I ..\..\Source\Includes\uRESTDWPlataform.inc}
+Unit uRESTDWMemTranslateString;
+{$I uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
  Roniery                    - Devel.
 }
 
-interface
-uses
+Interface
+Uses
   Classes,
   uRESTDWBasic, uRESTDWMemResources;
-type
+Type
   /// This component is for string-replacement. All replacements are based on
   /// delimiter-encapsulated words. The delimiters can be freely defined. The default
   /// is : "%"
@@ -45,13 +45,13 @@ type
   /// PRODUCTVERSION : Product version of the application out of the File-Version-Information
   /// SCREENSIZE : Size of the screen in format widthxheight
   /// DESKTOPSIZE : Size of the desktop in format widthxheight
-  TProcessCommandEvent = procedure(Sender: TObject; const Command: string;
-    var CommandResult: string; var Changed: Boolean) of object;
+  TProcessCommandEvent = Procedure(Sender: TObject; Const Command: string;
+    Var CommandResult: string; Var Changed: Boolean) Of object;
   {$IFDEF RTL230_UP}
   [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32)]
   {$ENDIF RTL230_UP}
-  TJvTranslateString = class(TJvComponent)
-  private
+  TJvTranslateString = Class(TJvComponent)
+  Private
     FAppNameHandled: Boolean;
     FAppName: string;
     FCompanyNameHandled: Boolean;
@@ -68,14 +68,14 @@ type
     FRightDelimiter: string;
     FTimeFormat: string;
     FOnProcessCommand: TProcessCommandEvent;
-    procedure SetDateFormat(const Value: string);
-    procedure SetDateTimeFormat(const Value: string);
-    procedure SetTimeFormat(const Value: string);
-  public
-    constructor Create(AOwner: TComponent); override;
-    function TranslateString(InString: string; var Changed: Boolean): string; overload;
-    function TranslateString(InString: string): string; overload;
-  published
+    Procedure SetDateFormat(Const Value: string);
+    Procedure SetDateTimeFormat(Const Value: string);
+    Procedure SetTimeFormat(Const Value: string);
+  Public
+    Constructor Create(AOwner: TComponent); override;
+    Function TranslateString(InString: string; Var Changed: Boolean): string; overload;
+    Function TranslateString(InString: string): string; overload;
+  Published
     property DateFormat: string read FDateFormat write SetDateFormat;
     property DateSeparator: Char read FDateSeparator write FDateSeparator;
     property DateTimeFormat: string read FDateTimeFormat write SetDateTimeFormat;
@@ -84,15 +84,15 @@ type
     property TimeFormat: string read FTimeFormat write SetTimeFormat;
     property TimeSeparator: Char read FTimeSeparator write FTimeSeparator;
     property OnProcessCommand: TProcessCommandEvent read FOnProcessCommand write FOnProcessCommand;
-  end;
-implementation
-uses
+  End;
+Implementation
+Uses
   {$IFDEF HAS_UNIT_SYSTEM_UITYPES}
   System.UITypes,
   {$ENDIF}
   SysUtils, Types;
 
-const
+Const
   cAppNameMask = 'APPL_NAME';
   cCompanyNameMask = 'COMPANY_NAME';
   cDateMask = 'DATE';
@@ -110,9 +110,9 @@ const
   cDefaultAppName = 'MyJVCLApplication';
   cDefaultCompanyName = 'MyCompany';
   cDefaultVersion = '0.0.0.0';
-constructor TJvTranslateString.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
+Constructor TJvTranslateString.Create(AOwner: TComponent);
+Begin
+  Inherited Create(AOwner);
   FAppNameHandled := False;
   FCompanyNameHandled := False;
   FLeftDelimiter := '%';
@@ -124,57 +124,57 @@ begin
   FTimeSeparator := chr(255);
   FProductVersionHandled := False;
   FFileVersionHandled := False;
-end;
-procedure TJvTranslateString.SetDateFormat(const Value: string);
-var i : Integer;
-begin
+End;
+Procedure TJvTranslateString.SetDateFormat(Const Value: string);
+Var i : Integer;
+Begin
   FDateFormat := Value;
-  if DateSeparator = chr(255) then
-    for i := 1 to Length(Value) do
-      if not (Value[i] in ['0'..'9']) then
-      begin
+  If DateSeparator = chr(255) Then
+    For i := 1 To Length(Value) Do
+      If not (Value[i] in ['0'..'9']) Then
+      Begin
         DateSeparator:= Value[i];
         Exit;
-      end;
-end;
-procedure TJvTranslateString.SetDateTimeFormat(const Value: string);
-begin
+      End;
+End;
+Procedure TJvTranslateString.SetDateTimeFormat(Const Value: string);
+Begin
   FDateTimeFormat := Value;
-end;
-procedure TJvTranslateString.SetTimeFormat(const Value: string);
-var i : Integer;
-begin
+End;
+Procedure TJvTranslateString.SetTimeFormat(Const Value: string);
+Var i : Integer;
+Begin
   FTimeFormat := Value;
-  if TimeSeparator = chr(255) then
-    for i := 1 to Length(Value) do
-      if not (Value[i] in ['0'..'9']) then
-      begin
+  If TimeSeparator = chr(255) Then
+    For i := 1 To Length(Value) Do
+      If not (Value[i] in ['0'..'9']) Then
+      Begin
         TimeSeparator:= Value[i];
         Exit;
-      end;
-end;
-function TJvTranslateString.TranslateString(InString: string): string;
-var
+      End;
+End;
+Function TJvTranslateString.TranslateString(InString: string): string;
+Var
   I, J: Integer;
   Command: string;
   CommandResult: string;
-begin
+Begin
   Result := '';
-  while InString <> '' do
-  begin
+  While InString <> '' Do
+  Begin
     I := Pos(LeftDelimiter, InString);
-    if I = 0 then
-    begin
+    If I = 0 Then
+    Begin
       Result := Result + InString;
       InString := '';
-    end
-    else
-    begin
+    End
+    Else
+    Begin
       Result := Result + Copy(InString, 1, I-1);
       Delete(InString, 1, i);
       J := Pos(RightDelimiter, InString);
-      if J > 0 then
-      begin
+      If J > 0 Then
+      Begin
         Command := Copy(InString, 1, J-1);
         //TODO XyberX
 //        if ProcessCommand(Command, CommandResult) then
@@ -187,33 +187,33 @@ begin
           Result := Result + Copy(InString, 1, J-1);
           Delete(InString, 1, J-1);
 //        end;
-      end
-      else
-      begin
+      End
+      Else
+      Begin
         Result := Result + LeftDelimiter + InString;
         InString := '';
-      end
-    end;
-  end;
-end;
-function TJvTranslateString.TranslateString(InString: string; var Changed: Boolean): string;
-var
+      End
+    End;
+  End;
+End;
+Function TJvTranslateString.TranslateString(InString: string; Var Changed: Boolean): string;
+Var
   I, J: Integer;
   Command: string;
   CommandResult: string;
-begin
+Begin
   Result := '';
   Changed := False;
-  while InString <> '' do
-  begin
+  While InString <> '' Do
+  Begin
     I := Pos(LeftDelimiter, InString);
-    if I = 0 then
-    begin
+    If I = 0 Then
+    Begin
       Result := Result + InString;
       InString := '';
-    end
-    else
-    begin
+    End
+    Else
+    Begin
       Result := Result + Copy(InString, 1, I-1);
       Delete(InString, 1, I);
       J := Pos(RightDelimiter, InString);
@@ -230,13 +230,13 @@ begin
         Result := Result + Copy(InString, 1, J-1);
         Delete(InString, 1, J-1);
 //      end;
-    end;
-  end;
-end;
+    End;
+  End;
+End;
 {$IFDEF UNITVERSIONING}
-initialization
-  RegisterUnitVersion(HInstance, UnitVersioning);
-finalization
-  UnregisterUnitVersion(HInstance);
+Initialization
+ RegisterUnitVersion(HInstance, UnitVersioning);
+Finalization
+ UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
-end.
+End.

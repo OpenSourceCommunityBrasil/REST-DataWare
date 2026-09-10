@@ -1,6 +1,6 @@
 ﻿unit uRESTDWIBDACDriver;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -337,11 +337,13 @@ begin
 end;
 
 function TRESTDWIBDACQuery.ParamCount : Integer;
-var
-  qry : TIbcQuery;
 begin
-  qry := TIbcQuery(Self.Owner);
-  Result := qry.ParamCount;
+ Result:=TIbcQuery(Self.Owner).ParamCount;
+ If (Result=0) and (Pos(':',SQL.Text)>0) Then
+  Begin
+   Prepare;
+   Result:=TIbcQuery(Self.Owner).ParamCount;
+  End;
 end;
 
 function TRESTDWIBDACQuery.getParamDataType(IParam : integer) : TFieldType;
@@ -449,6 +451,14 @@ end;
 initialization
 {$I ..\RESTDWLazarusDrivers.lrs}
 {$ENDIF}
+
+Initialization
+ RegisterClass(TRESTDWIBDACDriver);
+ RegisterRESTDWDriverClass(TRESTDWIBDACDriver);
+
+Finalization
+ UnregisterRESTDWDriverClass(TRESTDWIBDACDriver);
+ UnRegisterClass(TRESTDWIBDACDriver);
 
 end.
 

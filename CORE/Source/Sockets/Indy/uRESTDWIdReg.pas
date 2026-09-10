@@ -1,21 +1,21 @@
 unit uRESTDWIdReg;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
   de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
   Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
-  de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+  de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
   Membros do Grupo :
 
   XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
   A. Brito                   - Admin - Administrador do desenvolvimento.
   Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
-  Flávio Motta               - Member Tester and DEMO Developer.
+  Flvio Motta               - Member Tester and DEMO Developer.
   Mobius One                 - Devel, Tester and Admin.
   Gustavo                    - Criptografia and Devel.
   Eloy                       - Devel.
@@ -40,7 +40,7 @@ uses
     {$ENDIF}
     DesignIntf, DesignEditors,
   {$ENDIF}
-  Classes, uRESTDWIdBase;
+  Classes, uRESTDWIdBase, uRESTDWIdFirebaseCloudMessaging;
 
 {$IFNDEF RESTDWLAMW}
 Type
@@ -55,6 +55,10 @@ Type
 Procedure Register;
 
 Implementation
+
+{$IFNDEF RESTDWLAZARUS}
+{$R 'uRESTDWIdReg.dcr'}
+{$ENDIF}
 
 {$IFNDEF RESTDWLAMW}
 Function TPoolersList.GetAttributes: TPropertyAttributes;
@@ -96,7 +100,7 @@ End;
 Procedure Register;
 Begin
  RegisterComponents    ('REST Dataware - Service', [TRESTDWIdServicePooler, TRESTDWIdProxyRequest, TRESTDWIdPoolerList]);
- RegisterComponents    ('REST Dataware - Client',  [TRESTDWIdClientREST,    TRESTDWIdClientPooler]);
+ RegisterComponents    ('REST Dataware - Client',  [TRESTDWIdClientREST,    TRESTDWIdClientPooler, TRESTDWIdFirebaseCloudMessaging]);
  RegisterComponents    ('REST Dataware - DB',      [TRESTDWIdDatabase]);
  {$IFNDEF RESTDWLAMW}
  RegisterPropertyEditor(TypeInfo(String),           TRESTDWIdDatabase,      'PoolerName',         TPoolersList);

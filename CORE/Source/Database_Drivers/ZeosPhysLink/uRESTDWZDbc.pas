@@ -1,6 +1,6 @@
-unit uRESTDWZDbc;
+﻿unit uRESTDWZDbc;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 {$IFNDEF FPC}
   {$I ZDbc.inc}
 {$ELSE}
@@ -33,10 +33,12 @@ interface
 {$IFNDEF ZEOS_DISABLE_RDW} //if set we have an empty unit
 uses
   {$IFNDEF ZEOS80UP}ZURL,{$ENDIF}
-  Classes, SysUtils,
+  Classes, SysUtils, DB,
   ZDbcIntfs, ZDbcLogging, ZTokenizer, ZPlainDriver, ZGenericSqlAnalyser,
   ZCompatibility, ZDbcConnection,
-  uRESTDWZPlainDriver, uRESTDWBasicDB, uRESTDWConsts;
+  uRESTDWZPlainDriver, uRESTDWBasicDB, uRESTDWConsts, uRESTDWMassiveBuffer;
+
+procedure SetRESTDWDriverDatabase(Value : TRESTDWDatabasebaseBase);
 
 type
   TZRESTDWDriver = class(TZAbstractDriver)
@@ -58,6 +60,8 @@ type
     ['{A4B797A9-7CF7-4DE9-A5BB-693DD32D07D3}']
     function GetPlainDriver : IZPlainDriver;
     function GetDatabase : TRESTDWDatabasebaseBase;
+    function GetInTransaction : Boolean;
+    procedure AddMassiveCommand(Const ASQL : String; AParams : TParams);
   end;
 
   { TZRESTDWConnection }
@@ -70,12 +74,17 @@ type
   private
     FCatalog: string;
     FPlainDriver: TZRESTDWPlainDriver;
+    FMassiveSQL : TRESTDWMassiveSQLCache;
+    FInTransaction : Boolean;
+    FDatabase : TRESTDWDatabasebaseBase;
   protected
     procedure InternalClose; override;
     {$IFNDEF ZEOS80UP}
       procedure InternalCreate; override;
     {$ENDIF}
   public
+    constructor Create(Const AUrl : TZURL; ADatabase : TRESTDWDatabasebaseBase);
+    destructor Destroy; override;
     function GetPlainDriver: IZPlainDriver;
 
     procedure Commit; {$IFNDEF ZEOS80UP} override; {$ENDIF}
@@ -98,6 +107,8 @@ type
     function GetTokenizer: IZTokenizer;
     function GetStatementAnalyser: IZStatementAnalyser;
     function GetDatabase : TRESTDWDatabasebaseBase;
+    function GetInTransaction : Boolean;
+    procedure AddMassiveCommand(Const ASQL : String; AParams : TParams);
   {$IFDEF ZEOS80UP}
     function GetServerProvider: TZServerProvider; override;
   {$ENDIF}
@@ -108,6 +119,7 @@ type
 
 var
   RDWDriver: IZDriver;
+  RDWDriverObject : TZRESTDWDriver;
 
 {$ENDIF ZEOS_DISABLE_RDW} //if set we have an empty unit
 implementation
@@ -151,7 +163,7 @@ end;
 
 function TZRESTDWDriver.Connect(const Url: TZURL): IZConnection;
 begin
-  Result := TZRESTDWConnection.Create(Url);
+  Result := TZRESTDWConnection.Create(Url, FDatabase);
 end;
 
 { TZRESTDWConnection }
@@ -165,10 +177,50 @@ begin
 end;
 {$ENDIF}
 
-procedure TZRESTDWConnection.Commit;
-begin
+constructor TZRESTDWConnection.Create(Const AUrl : TZURL; ADatabase : TRESTDWDatabasebaseBase);
+Begin
+ Inherited Create(AUrl);
+ FDatabase := ADatabase;
+ FMassiveSQL := TRESTDWMassiveSQLCache.Create(Nil);
+ FInTransaction := False;
+End;
 
-end;
+destructor TZRESTDWConnection.Destroy;
+Begin
+ FMassiveSQL.Free;
+ Inherited;
+End;
+
+procedure TZRESTDWConnection.AddMassiveCommand(Const ASQL : String; AParams : TParams);
+Var
+ VMassiveCache : TRESTDWMassiveCacheSQLValue;
+Begin
+ VMassiveCache := TRESTDWMassiveCacheSQLValue(FMassiveSQL.CachedList.Add);
+ VMassiveCache.SQL.Text := ASQL;
+ VMassiveCache.Params.Assign(AParams);
+End;
+
+function TZRESTDWConnection.GetInTransaction : Boolean;
+Begin
+ Result := FInTransaction;
+End;
+
+procedure TZRESTDWConnection.Commit;
+Var
+ VError : Boolean;
+ VMessageError : String;
+Begin
+ If Not FInTransaction Then
+  Exit;
+ VError := False;
+ VMessageError := '';
+ If FMassiveSQL.MassiveCount > 0 Then
+  GetDatabase.ProcessMassiveSQLCache(FMassiveSQL, VError, VMessageError);
+ If VError Then
+  Raise Exception.Create(VMessageError);
+ FMassiveSQL.Clear;
+ FInTransaction := False;
+End;
 
 {$IFNDEF ZEOS80UP}
   function TZRESTDWConnection.CreatePreparedStatement(const SQL: string;
@@ -224,9 +276,9 @@ begin
 end;
 
 function TZRESTDWConnection.GetDatabase : TRESTDWDatabasebaseBase;
-begin
-  Result := TZRESTDWDriver(GetDriver).Database;
-end;
+Begin
+ Result := FDatabase;
+End;
 
 function TZRESTDWConnection.GetTokenizer: IZTokenizer;
 begin
@@ -283,23 +335,37 @@ end;
 {$ENDIF}
 
 procedure TZRESTDWConnection.Rollback;
-begin
-
-end;
+Begin
+ FMassiveSQL.Clear;
+ FInTransaction := False;
+End;
 
 function TZRESTDWConnection.StartTransaction: Integer;
-begin
+Begin
+ If Not FInTransaction Then
+  Begin
+   FMassiveSQL.Clear;
+   FInTransaction := True;
+  End;
+ Result := 1;
+End;
 
-end;
+procedure SetRESTDWDriverDatabase(Value : TRESTDWDatabasebaseBase);
+Begin
+ If RDWDriverObject <> Nil Then
+  RDWDriverObject.Database := Value;
+End;
 
 initialization
-  RDWDriver := TZRESTDWDriver.Create;
+  RDWDriverObject := TZRESTDWDriver.Create;
+  RDWDriver := RDWDriverObject;
   DriverManager.RegisterDriver(RDWDriver);
 
 finalization
   if DriverManager <> nil then
     DriverManager.DeregisterDriver(RDWDriver);
   RDWDriver := nil;
+  RDWDriverObject := Nil;
 
 {$ENDIF ZEOS_DISABLE_RDW} //if set we have an empty unit
 

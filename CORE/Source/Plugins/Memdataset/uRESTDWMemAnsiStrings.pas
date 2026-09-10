@@ -1,21 +1,21 @@
-unit uRESTDWMemAnsiStrings;
+Unit uRESTDWMemAnsiStrings;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
  XyberX (Gilberto Rocha)    - Admin - Criador e Administrador  do pacote.
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
@@ -27,8 +27,8 @@ unit uRESTDWMemAnsiStrings;
  {$ASMMode Intel}
 {$ENDIF}
 
-interface
-uses
+Interface
+Uses
   {$IFDEF HAS_UNITSCOPE}
   {$IFDEF MSWINDOWS}
   Winapi.Windows,
@@ -42,62 +42,62 @@ uses
   {$ENDIF ~HAS_UNITSCOPE}
   uRESTDWMemBase, Math, uRESTDWPrototypes;
 // Ansi types
-type
+Type
   {$IFDEF SUPPORTS_UNICODE}
-  TJclAnsiStringList = class;
+  TJclAnsiStringList = Class;
   // Codegear should be the one providing this class, in the DWStrings unit.
   // It has been requested in QC 65630 but this was closed as "won't do".
   // So we are providing here a very light implementation that is designed
   // to provide the basics, and in no way be a "copy/paste" of what is in the RTL.
-  TJclAnsiStrings = class(TPersistent)
-  private
+  TJclAnsiStrings = Class(TPersistent)
+  Private
     FDelimiter: DWChar;
     FNameValueSeparator: DWChar;
     FStrictDelimiter: Boolean;
     FQuoteChar: DWChar;
     FUpdateCount: Integer;
-    function GetText: DWString;
-    procedure SetText(const Value: DWString);
-    function ExtractName(const S: DWString): DWString;
-    function GetName(Index: Integer): DWString;
-    function GetValue(const Name: DWString): DWString;
-    procedure SetValue(const Name, Value: DWString);
-    function GetValueFromIndex(Index: Integer): DWString;
-    procedure SetValueFromIndex(Index: Integer; const Value: DWString);
-  protected
-    procedure AssignTo(Dest: TPersistent); override;
-    procedure Error(const Msg: string; Data: Integer); overload;
-    procedure Error(Msg: PResStringRec; Data: Integer); overload;
-    function GetString(Index: Integer): DWString; virtual; abstract;
-    procedure SetString(Index: Integer; const Value: DWString); virtual; abstract;
-    function GetObject(Index: Integer): TObject; virtual; abstract;
-    procedure SetObject(Index: Integer; AObject: TObject); virtual; abstract;
-    function GetCapacity: Integer; virtual;
-    procedure SetCapacity(const Value: Integer); virtual;
-    function GetCount: Integer; virtual; abstract;
-    function CompareStrings(const S1, S2: DWString): Integer; virtual;
-    procedure SetUpdateState(Updating: Boolean); virtual;
+    Function GetText: DWString;
+    Procedure SetText(Const Value: DWString);
+    Function ExtractName(Const S: DWString): DWString;
+    Function GetName(Index: Integer): DWString;
+    Function GetValue(Const Name: DWString): DWString;
+    Procedure SetValue(Const Name, Value: DWString);
+    Function GetValueFromIndex(Index: Integer): DWString;
+    Procedure SetValueFromIndex(Index: Integer; Const Value: DWString);
+  Protected
+    Procedure AssignTo(Dest: TPersistent); override;
+    Procedure Error(Const Msg: string; Data: Integer); overload;
+    Procedure Error(Msg: PResStringRec; Data: Integer); overload;
+    Function GetString(Index: Integer): DWString; virtual; abstract;
+    Procedure SetString(Index: Integer; Const Value: DWString); virtual; abstract;
+    Function GetObject(Index: Integer): TObject; virtual; abstract;
+    Procedure SetObject(Index: Integer; AObject: TObject); virtual; abstract;
+    Function GetCapacity: Integer; virtual;
+    Procedure SetCapacity(Const Value: Integer); virtual;
+    Function GetCount: Integer; virtual; abstract;
+    Function CompareStrings(Const S1, S2: DWString): Integer; virtual;
+    Procedure SetUpdateState(Updating: Boolean); virtual;
     property UpdateCount: Integer read FUpdateCount;
-  public
-    constructor Create;
-    procedure Assign(Source: TPersistent); override;
-    function Add(const S: DWString): Integer; virtual;
-    function AddObject(const S: DWString; AObject: TObject): Integer; virtual; abstract;
-    procedure AddStrings(Strings: TJclAnsiStrings); virtual;
-    procedure Insert(Index: Integer; const S: DWString); virtual;
-    procedure InsertObject(Index: Integer; const S: DWString; AObject: TObject); virtual; abstract;
-    procedure Delete(Index: Integer); virtual; abstract;
-    procedure Clear; virtual; abstract;
-    procedure LoadFromFile(const FileName: TFileName); virtual;
-    procedure LoadFromStream(Stream: TStream); virtual;
-    procedure SaveToFile(const FileName: TFileName); virtual;
-    procedure SaveToStream(Stream: TStream); virtual;
-    procedure BeginUpdate;
-    procedure EndUpdate;
-    function IndexOf(const S: DWString): Integer; virtual;
-    function IndexOfName(const Name: DWString): Integer; virtual;
-    function IndexOfObject(AObject: TObject): Integer; virtual;
-    procedure Exchange(Index1, Index2: Integer); virtual;
+  Public
+    Constructor Create;
+    Procedure Assign(Source: TPersistent); override;
+    Function Add(Const S: DWString): Integer; virtual;
+    Function AddObject(Const S: DWString; AObject: TObject): Integer; virtual; abstract;
+    Procedure AddStrings(Strings: TJclAnsiStrings); virtual;
+    Procedure Insert(Index: Integer; Const S: DWString); virtual;
+    Procedure InsertObject(Index: Integer; Const S: DWString; AObject: TObject); virtual; abstract;
+    Procedure Delete(Index: Integer); virtual; abstract;
+    Procedure Clear; virtual; abstract;
+    Procedure LoadFromFile(Const FileName: TFileName); virtual;
+    Procedure LoadFromStream(Stream: TStream); virtual;
+    Procedure SaveToFile(Const FileName: TFileName); virtual;
+    Procedure SaveToStream(Stream: TStream); virtual;
+    Procedure BeginUpdate;
+    Procedure EndUpdate;
+    Function IndexOf(Const S: DWString): Integer; virtual;
+    Function IndexOfName(Const Name: DWString): Integer; virtual;
+    Function IndexOfObject(AObject: TObject): Integer; virtual;
+    Procedure Exchange(Index1, Index2: Integer); virtual;
     property Delimiter: DWChar read FDelimiter write FDelimiter;
     property StrictDelimiter: Boolean read FStrictDelimiter write FStrictDelimiter;
     property QuoteChar: DWChar read FQuoteChar write FQuoteChar;
@@ -107,51 +107,51 @@ type
     property Count: Integer read GetCount;
     property Capacity: Integer read GetCapacity write SetCapacity;
     property Names[Index: Integer]: DWString read GetName;
-    property Values[const Name: DWString]: DWString read GetValue write SetValue;
+    property Values[Const Name: DWString]: DWString read GetValue write SetValue;
     property ValueFromIndex[Index: Integer]: DWString read GetValueFromIndex write SetValueFromIndex;
     property NameValueSeparator: DWChar read FNameValueSeparator write FNameValueSeparator;
-  end;
-  TJclAnsiStringListSortCompare = function(List: TJclAnsiStringList; Index1, Index2: Integer): Integer;
-  TJclAnsiStringObjectHolder = record
+  End;
+  TJclAnsiStringListSortCompare = Function(List: TJclAnsiStringList; Index1, Index2: Integer): Integer;
+  TJclAnsiStringObjectHolder = Record
     Str: DWString;
     Obj: TObject;
-  end;
-  TJclAnsiStringList = class(TJclAnsiStrings)
-  private
-    FStrings: array of TJclAnsiStringObjectHolder;
+  End;
+  TJclAnsiStringList = Class(TJclAnsiStrings)
+  Private
+    FStrings: array Of TJclAnsiStringObjectHolder;
     FCount: Integer;
     FDuplicates: TDuplicates;
     FSorted: Boolean;
     FCaseSensitive: Boolean;
     FOnChange: TNotifyEvent;
     FOnChanging: TNotifyEvent;
-    procedure Grow;
-    procedure QuickSort(L, R: Integer; SCompare: TJclAnsiStringListSortCompare);
-  protected
-    procedure AssignTo(Dest: TPersistent); override;
-    function GetString(Index: Integer): DWString; override;
-    function GetObject(Index: Integer): TObject; override;
-    procedure SetObject(Index: Integer; AObject: TObject); override;
-    function GetCapacity: Integer; override;
-    procedure SetCapacity(const Value: Integer); override;
-    function GetCount: Integer; override;
-    function CompareStrings(const S1, S2: DWString): Integer; override;
-    procedure SetUpdateState(Updating: Boolean); override;
-    procedure Changed; virtual;
-    procedure Changing; virtual;
-  public
-    constructor Create;
-    destructor Destroy; override;
-    procedure Assign(Source: TPersistent); override;
-    procedure InsertObject(Index: Integer; const S: DWString; AObject: TObject); override;
-    procedure Delete(Index: Integer); override;
-    function Find(const S: DWString; var Index: Integer): Boolean; virtual;
-    procedure Clear; override;
+    Procedure Grow;
+    Procedure QuickSort(L, R: Integer; SCompare: TJclAnsiStringListSortCompare);
+  Protected
+    Procedure AssignTo(Dest: TPersistent); override;
+    Function GetString(Index: Integer): DWString; override;
+    Function GetObject(Index: Integer): TObject; override;
+    Procedure SetObject(Index: Integer; AObject: TObject); override;
+    Function GetCapacity: Integer; override;
+    Procedure SetCapacity(Const Value: Integer); override;
+    Function GetCount: Integer; override;
+    Function CompareStrings(Const S1, S2: DWString): Integer; override;
+    Procedure SetUpdateState(Updating: Boolean); override;
+    Procedure Changed; virtual;
+    Procedure Changing; virtual;
+  Public
+    Constructor Create;
+    Destructor Destroy; override;
+    Procedure Assign(Source: TPersistent); override;
+    Procedure InsertObject(Index: Integer; Const S: DWString; AObject: TObject); override;
+    Procedure Delete(Index: Integer); override;
+    Function Find(Const S: DWString; Var Index: Integer): Boolean; virtual;
+    Procedure Clear; override;
     property CaseSensitive: Boolean read FCaseSensitive write FCaseSensitive;
     property Duplicates: TDuplicates read FDuplicates write FDuplicates;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
-  end;
+  End;
   {$ELSE ~SUPPORTS_UNICODE}
   TJclAnsiStrings = Classes.TStrings;
   TJclAnsiStringList = Classes.TStringList;
@@ -159,11 +159,11 @@ type
   TAnsiStrings = TJclAnsiStrings;
   TAnsiStringList = TJclAnsiStringList;
 // Exceptions
-type
-  EJclAnsiStringError = class(EJclError);
-  EJclAnsiStringListError = class(EJclAnsiStringError);
+Type
+  EJclAnsiStringError = Class(EJclError);
+  EJclAnsiStringListError = Class(EJclAnsiStringError);
 // Character constants and sets
-const
+Const
   // Misc. often used character definitions
   AnsiNull           = DWChar(#0);
   AnsiSoh            = DWChar(#1);
@@ -223,7 +223,7 @@ const
   AnsiOctDigits              = ['0'..'7'];
   AnsiHexDigits              = ['0'..'9', 'A'..'F', 'a'..'f'];
   AnsiValidIdentifierLetters = ['0'..'9', 'A'..'Z', 'a'..'z', '_'];
-const
+Const
   // CharType return values
   C1_UPPER  = $0001; // Uppercase
   C1_LOWER  = $0002; // Lowercase
@@ -248,141 +248,141 @@ const
   {$ENDIF SUPPORTS_EXTSYM}
   {$ENDIF MSWINDOWS}
 // String Test Routines
-function StrContainsChars(const S: DWString; Chars: TSysCharSet; CheckAll: Boolean): Boolean;
-function StrIsSubset(const S: DWString; const ValidChars: TSysCharSet): Boolean;
-function StrSame(const S1, S2: DWString): Boolean;
+Function StrContainsChars(Const S: DWString; Chars: TSysCharSet; CheckAll: Boolean): Boolean;
+Function StrIsSubset(Const S: DWString; Const ValidChars: TSysCharSet): Boolean;
+Function StrSame(Const S1, S2: DWString): Boolean;
 // String Transformation Routines
-function StrCenter(const S: DWString; L: SizeInt; C: DWChar = ' '): DWString;
-function StrCharPosLower(const S: DWString; CharPos: SizeInt): DWString;
-function StrCharPosUpper(const S: DWString; CharPos: SizeInt): DWString;
-function StrDoubleQuote(const S: DWString): DWString;
-function StrEnsureNoPrefix(const Prefix, Text: DWString): DWString;
-function StrEnsureNoSuffix(const Suffix, Text: DWString): DWString;
-function StrEnsurePrefix(const Prefix, Text: DWString): DWString;
-function StrEnsureSuffix(const Suffix, Text: DWString): DWString;
-function StrEscapedToString(const S: DWString): DWString;
-procedure StrMove(var Dest: DWString; const Source: DWString; const ToIndex,
+Function StrCenter(Const S: DWString; L: SizeInt; C: DWChar = ' '): DWString;
+Function StrCharPosLower(Const S: DWString; CharPos: SizeInt): DWString;
+Function StrCharPosUpper(Const S: DWString; CharPos: SizeInt): DWString;
+Function StrDoubleQuote(Const S: DWString): DWString;
+Function StrEnsureNoPrefix(Const Prefix, Text: DWString): DWString;
+Function StrEnsureNoSuffix(Const Suffix, Text: DWString): DWString;
+Function StrEnsurePrefix(Const Prefix, Text: DWString): DWString;
+Function StrEnsureSuffix(Const Suffix, Text: DWString): DWString;
+Function StrEscapedToString(Const S: DWString): DWString;
+Procedure StrMove(Var Dest: DWString; Const Source: DWString; Const ToIndex,
   FromIndex, Count: SizeInt);
-function StrPadLeft(const S: DWString; Len: SizeInt; C: DWChar = AnsiSpace): DWString;
-function StrPadRight(const S: DWString; Len: SizeInt; C: DWChar = AnsiSpace): DWString;
-function StrProper(const S: DWString): DWString;
-function StrQuote(const S: DWString; C: DWChar): DWString;
-function StrReplaceChar(const S: DWString; const Source, Replace: DWChar): DWString;
-function StrReplaceChars(const S: DWString; const Chars: TSysCharSet; Replace: DWChar): DWString;
-function StrReplaceButChars(const S: DWString; const Chars: TSysCharSet; Replace: DWChar): DWString;
-function StrSingleQuote(const S: DWString): DWString;
-procedure StrSkipChars(const S: DWString; var Index: SizeInt; const Chars: TSysCharSet); overload;
-function StrStringToEscaped(const S: DWString): DWString;
-function StrToHex(const Source: DWString): DWString;
-function StrTrimCharLeft(const S: DWString; C: DWChar): DWString;
-function StrTrimCharsLeft(const S: DWString; const Chars: TSysCharSet): DWString;
-function StrTrimCharRight(const S: DWString; C: DWChar): DWString;
-function StrTrimCharsRight(const S: DWString; const Chars: TSysCharSet): DWString;
-function StrTrimQuotes(const S: DWString): DWString; overload;
-function StrTrimQuotes(const S: DWString; QuoteChar: DWChar): DWString; overload;
+Function StrPadLeft(Const S: DWString; Len: SizeInt; C: DWChar = AnsiSpace): DWString;
+Function StrPadRight(Const S: DWString; Len: SizeInt; C: DWChar = AnsiSpace): DWString;
+Function StrProper(Const S: DWString): DWString;
+Function StrQuote(Const S: DWString; C: DWChar): DWString;
+Function StrReplaceChar(Const S: DWString; Const Source, Replace: DWChar): DWString;
+Function StrReplaceChars(Const S: DWString; Const Chars: TSysCharSet; Replace: DWChar): DWString;
+Function StrReplaceButChars(Const S: DWString; Const Chars: TSysCharSet; Replace: DWChar): DWString;
+Function StrSingleQuote(Const S: DWString): DWString;
+Procedure StrSkipChars(Const S: DWString; Var Index: SizeInt; Const Chars: TSysCharSet); overload;
+Function StrStringToEscaped(Const S: DWString): DWString;
+Function StrToHex(Const Source: DWString): DWString;
+Function StrTrimCharLeft(Const S: DWString; C: DWChar): DWString;
+Function StrTrimCharsLeft(Const S: DWString; Const Chars: TSysCharSet): DWString;
+Function StrTrimCharRight(Const S: DWString; C: DWChar): DWString;
+Function StrTrimCharsRight(Const S: DWString; Const Chars: TSysCharSet): DWString;
+Function StrTrimQuotes(Const S: DWString): DWString; overload;
+Function StrTrimQuotes(Const S: DWString; QuoteChar: DWChar): DWString; overload;
 // String Management
-procedure StrDecRef(var S: DWString);
-function StrLength(const S: DWString): Longint;
-function StrRefCount(const S: DWString): Longint;
-procedure StrResetLength(var S: DWString);
+Procedure StrDecRef(Var S: DWString);
+Function StrLength(Const S: DWString): Longint;
+Function StrRefCount(Const S: DWString): Longint;
+Procedure StrResetLength(Var S: DWString);
 // String Search and Replace Routines
-function StrCharCount(const S: DWString; C: DWChar): SizeInt;
-function StrCharsCount(const S: DWString; Chars: TSysCharSet): SizeInt;
-function StrStrCount(const S, SubS: DWString): SizeInt;
-function StrCompare(const S1, S2: DWString; CaseSensitive: Boolean = False): SizeInt;
-function StrCompareRangeEx(const S1, S2: DWString; Index, Count: SizeInt; CaseSensitive: Boolean = False): SizeInt;
-function StrCompareRange(const S1, S2: DWString; Index, Count: SizeInt; CaseSensitive: Boolean = True): SizeInt;
-function StrRepeatChar(C: DWChar; Count: SizeInt): DWString;
-function StrFind(const Substr, S: DWString; const Index: SizeInt = 1): SizeInt;
-function StrHasPrefix(const S: DWString; const Prefixes: array of DWString): Boolean;
-function StrHasSuffix(const S: DWString; const Suffixes: array of DWString): Boolean;
-function StrIHasPrefix(const S: DWString; const Prefixes: array of DWString): Boolean;
-function StrIHasSuffix(const S: DWString; const Suffixes: array of DWString): Boolean;
-function StrIndex(const S: DWString; const List: array of DWString; CaseSensitive: Boolean = False): SizeInt;
-function StrILastPos(const SubStr, S: DWString): SizeInt;
-function StrIPos(const SubStr, S: DWString): SizeInt;
-function StrIPrefixIndex(const S: DWString; const Prefixes: array of DWString): SizeInt;
-function StrIsOneOf(const S: DWString; const List: array of DWString): Boolean;
-function StrISuffixIndex(const S: DWString; const Suffixes: array of DWString): SizeInt;
-function StrMatch(const Substr, S: DWString; Index: SizeInt = 1): SizeInt;
-function StrNIPos(const S, SubStr: DWString; N: SizeInt): SizeInt;
-function StrNPos(const S, SubStr: DWString; N: SizeInt): SizeInt;
-function StrPrefixIndex(const S: DWString; const Prefixes: array of DWString): SizeInt;
-function StrSuffixIndex(const S: DWString; const Suffixes: array of DWString): SizeInt;
+Function StrCharCount(Const S: DWString; C: DWChar): SizeInt;
+Function StrCharsCount(Const S: DWString; Chars: TSysCharSet): SizeInt;
+Function StrStrCount(Const S, SubS: DWString): SizeInt;
+Function StrCompare(Const S1, S2: DWString; CaseSensitive: Boolean = False): SizeInt;
+Function StrCompareRangeEx(Const S1, S2: DWString; Index, Count: SizeInt; CaseSensitive: Boolean = False): SizeInt;
+Function StrCompareRange(Const S1, S2: DWString; Index, Count: SizeInt; CaseSensitive: Boolean = True): SizeInt;
+Function StrRepeatChar(C: DWChar; Count: SizeInt): DWString;
+Function StrFind(Const Substr, S: DWString; Const Index: SizeInt = 1): SizeInt;
+Function StrHasPrefix(Const S: DWString; Const Prefixes: array Of DWString): Boolean;
+Function StrHasSuffix(Const S: DWString; Const Suffixes: array Of DWString): Boolean;
+Function StrIHasPrefix(Const S: DWString; Const Prefixes: array Of DWString): Boolean;
+Function StrIHasSuffix(Const S: DWString; Const Suffixes: array Of DWString): Boolean;
+Function StrIndex(Const S: DWString; Const List: array Of DWString; CaseSensitive: Boolean = False): SizeInt;
+Function StrILastPos(Const SubStr, S: DWString): SizeInt;
+Function StrIPos(Const SubStr, S: DWString): SizeInt;
+Function StrIPrefixIndex(Const S: DWString; Const Prefixes: array Of DWString): SizeInt;
+Function StrIsOneOf(Const S: DWString; Const List: array Of DWString): Boolean;
+Function StrISuffixIndex(Const S: DWString; Const Suffixes: array Of DWString): SizeInt;
+Function StrMatch(Const Substr, S: DWString; Index: SizeInt = 1): SizeInt;
+Function StrNIPos(Const S, SubStr: DWString; N: SizeInt): SizeInt;
+Function StrNPos(Const S, SubStr: DWString; N: SizeInt): SizeInt;
+Function StrPrefixIndex(Const S: DWString; Const Prefixes: array Of DWString): SizeInt;
+Function StrSuffixIndex(Const S: DWString; Const Suffixes: array Of DWString): SizeInt;
 // String Extraction
 // String Extraction
 // Returns the String before SubStr
-function StrAfter(const SubStr, S: DWString): DWString;
+Function StrAfter(Const SubStr, S: DWString): DWString;
 /// Returns the DWString after SubStr
-function StrBefore(const SubStr, S: DWString): DWString;
+Function StrBefore(Const SubStr, S: DWString): DWString;
 /// Splits a DWString at SubStr, returns true when SubStr is found, Left contains the
 /// DWString before the SubStr and Rigth the DWString behind SubStr
-function StrSplit(const SubStr, S: DWString;var Left, Right : DWString): boolean;
+Function StrSplit(Const SubStr, S: DWString;Var Left, Right : DWString): boolean;
 /// Returns the DWString between Start and Stop
-function StrBetween(const S: DWString; const Start, Stop: DWChar): DWString;
+Function StrBetween(Const S: DWString; Const Start, Stop: DWChar): DWString;
 /// Returns the left N characters of the DWString
-function StrChopRight(const S: DWString; N: SizeInt): DWString;
+Function StrChopRight(Const S: DWString; N: SizeInt): DWString;
 /// Returns the left Count characters of the DWString
-function StrLeft(const S: DWString; Count: SizeInt): DWString;
+Function StrLeft(Const S: DWString; Count: SizeInt): DWString;
 /// Returns the DWString starting from position Start for the Count Characters
-function StrMid(const S: DWString; Start, Count: SizeInt): DWString;
+Function StrMid(Const S: DWString; Start, Count: SizeInt): DWString;
 /// Returns the DWString starting from position N to the end
-function StrRestOf(const S: DWString; N: SizeInt): DWString;
+Function StrRestOf(Const S: DWString; N: SizeInt): DWString;
 /// Returns the right Count characters of the DWString
-function StrRight(const S: DWString; Count: SizeInt): DWString;
+Function StrRight(Const S: DWString; Count: SizeInt): DWString;
 // Character Test Routines
-function CharIsDelete(const C: DWChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsReturn(const C: DWChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsValidIdentifierLetter(const C: DWChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharIsWildcard(const C: DWChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
-function CharType(const C: DWChar): Word;
+Function CharIsDelete(Const C: DWChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsReturn(Const C: DWChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsValidIdentifierLetter(Const C: DWChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharIsWildcard(Const C: DWChar): Boolean; {$IFDEF SUPPORTS_INLINE} inline; {$ENDIF}
+Function CharType(Const C: DWChar): Word;
 // Character Transformation Routines
-function CharHex(const C: DWChar): Byte;
-function CharLower(const C: DWChar): DWChar;
-function CharUpper(const C: DWChar): DWChar;
-function CharToggleCase(const C: DWChar): DWChar;
+Function CharHex(Const C: DWChar): Byte;
+Function CharLower(Const C: DWChar): DWChar;
+Function CharUpper(Const C: DWChar): DWChar;
+Function CharToggleCase(Const C: DWChar): DWChar;
 // Character Search and Replace
-function CharPos(const S: DWString; const C: DWChar; const Index: SizeInt = 1): SizeInt;
-function CharLastPos(const S: DWString; const C: DWChar; const Index: SizeInt = 1): SizeInt;
-function CharIPos(const S: DWString; C: DWChar; const Index: SizeInt = 1): SizeInt;
+Function CharPos(Const S: DWString; Const C: DWChar; Const Index: SizeInt = 1): SizeInt;
+Function CharLastPos(Const S: DWString; Const C: DWChar; Const Index: SizeInt = 1): SizeInt;
+Function CharIPos(Const S: DWString; C: DWChar; Const Index: SizeInt = 1): SizeInt;
 // PCharVector
-type
+Type
   PAnsiCharVector = ^PAnsiChar;
 // MultiSz Routines
-type
+Type
   PAnsiMultiSz = PAnsiChar;
-procedure AllocateMultiSz(var Dest: PAnsiMultiSz; Len: SizeInt);
-procedure FreeMultiSz(var Dest: PAnsiMultiSz);
-procedure StrIToStrings(S, Sep: DWString; const List: TJclAnsiStrings; const AllowEmptyString: Boolean = True);
-procedure StrToStrings(S, Sep: DWString; const List: TJclAnsiStrings; const AllowEmptyString: Boolean = True);
-function StringsToStr(const List: TJclAnsiStrings; const Sep: DWString; const AllowEmptyString: Boolean = True): DWString;
-procedure TrimStrings(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean = True);
-procedure TrimStringsRight(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean = True);
-procedure TrimStringsLeft(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean = True);
-function AddStringToStrings(const S: DWString; Strings: TJclAnsiStrings; const Unique: Boolean): Boolean;
+Procedure AllocateMultiSz(Var Dest: PAnsiMultiSz; Len: SizeInt);
+Procedure FreeMultiSz(Var Dest: PAnsiMultiSz);
+Procedure StrIToStrings(S, Sep: DWString; Const List: TJclAnsiStrings; Const AllowEmptyString: Boolean = True);
+Procedure StrToStrings(S, Sep: DWString; Const List: TJclAnsiStrings; Const AllowEmptyString: Boolean = True);
+Function StringsToStr(Const List: TJclAnsiStrings; Const Sep: DWString; Const AllowEmptyString: Boolean = True): DWString;
+Procedure TrimStrings(Const List: TJclAnsiStrings; DeleteIfEmpty: Boolean = True);
+Procedure TrimStringsRight(Const List: TJclAnsiStrings; DeleteIfEmpty: Boolean = True);
+Procedure TrimStringsLeft(Const List: TJclAnsiStrings; DeleteIfEmpty: Boolean = True);
+Function AddStringToStrings(Const S: DWString; Strings: TJclAnsiStrings; Const Unique: Boolean): Boolean;
 // Miscellaneous
 // (OF) moved to JclSysUtils
 //function BooleanToStr(B: Boolean): DWString;
-function FileToString(const FileName: TFileName): DWString;
-procedure StringToFile(const FileName: TFileName; const Contents: DWString; Append: Boolean = False);
-function StrToken(var S: DWString; Separator: DWChar): DWString;
+Function FileToString(Const FileName: TFileName): DWString;
+Procedure StringToFile(Const FileName: TFileName; Const Contents: DWString; Append: Boolean = False);
+Function StrToken(Var S: DWString; Separator: DWChar): DWString;
 //procedure StrTokenToStrings(S: DWString; Separator: DWChar; const List: TJclAnsiStrings);Overload;
 //procedure StrTokenToStrings(S: string; Separator: Char; const List: TStrings);Overload;
-procedure StrNormIndex(const StrLen: SizeInt; var Index: SizeInt; var Count: SizeInt); overload;
-function ArrayOf(List: TJclAnsiStrings): TDynStringArray; overload;
+Procedure StrNormIndex(Const StrLen: SizeInt; Var Index: SizeInt; Var Count: SizeInt); overload;
+Function ArrayOf(List: TJclAnsiStrings): TDynStringArray; overload;
 // internal structures published to make function inlining working
-const
+Const
   DWCharCount   = Ord(High(Char)) + 1; // # of chars in one set
   AnsiLoOffset    = DWCharCount * 0;       // offset to lower case chars
   AnsiUpOffset    = DWCharCount * 1;       // offset to upper case chars
   AnsiReOffset    = DWCharCount * 2;       // offset to reverse case chars
   AnsiCaseMapSize = DWCharCount * 3;       // # of chars is a table
-var
-  AnsiCaseMap: array [0..AnsiCaseMapSize - 1] of DWChar; // case mappings
+Var
+  AnsiCaseMap: array [0..AnsiCaseMapSize - 1] Of DWChar; // case mappings
   AnsiCaseMapReady: Boolean = False;         // true if case map exists
-  DWCharTypes: array [Char] of Word;
-implementation
-uses
+  DWCharTypes: array [Char] Of Word;
+Implementation
+Uses
   {$IFDEF HAS_UNIT_LIBC}
   Libc,
   {$ENDIF HAS_UNIT_LIBC}
@@ -398,21 +398,21 @@ uses
   uRESTDWMemResources, uRESTDWMemStreams,
   uRESTDWMemStringsB;
 //=== Internal ===============================================================
-type
-  TAnsiStrRec = packed record
+Type
+  TAnsiStrRec = packed Record
     RefCount: Integer;
     Length: Integer;
-  end;
+  End;
   PAnsiStrRec = ^TAnsiStrRec;
-const
+Const
   AnsiStrRecSize  = SizeOf(TAnsiStrRec);     // size of the DWString header rec
-procedure LoadCharTypes;
-var
+Procedure LoadCharTypes;
+Var
   CurrChar: DWChar;
   CurrType: Word;
-begin
-  for CurrChar := Low(DWChar) to High(DWChar) do
-  begin
+Begin
+  For CurrChar := Low(DWChar) To High(DWChar) Do
+  Begin
     {$IFDEF MSWINDOWS}
     CurrType := 0;
     GetStringTypeExA(LOCALE_USER_DEFAULT, CT_CTYPE1, @CurrChar, SizeOf(DWChar), CurrType);
@@ -420,754 +420,754 @@ begin
     {$ENDIF MSWINDOWS}
     {$IFDEF LINUX}
     CurrType := 0;
-    if isupper(Byte(CurrChar)) <> 0 then
+    If isupper(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_UPPER;
-    if islower(Byte(CurrChar)) <> 0 then
+    If islower(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_LOWER;
-    if isdigit(Byte(CurrChar)) <> 0 then
+    If isdigit(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_DIGIT;
-    if isspace(Byte(CurrChar)) <> 0 then
+    If isspace(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_SPACE;
-    if ispunct(Byte(CurrChar)) <> 0 then
+    If ispunct(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_PUNCT;
-    if iscntrl(Byte(CurrChar)) <> 0 then
+    If iscntrl(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_CNTRL;
-    if isblank(Byte(CurrChar)) <> 0 then
+    If isblank(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_BLANK;
-    if isxdigit(Byte(CurrChar)) <> 0 then
+    If isxdigit(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_XDIGIT;
-    if isalpha(Byte(CurrChar)) <> 0 then
+    If isalpha(Byte(CurrChar)) <> 0 Then
       CurrType := CurrType or C1_ALPHA;
     {$DEFINE CHAR_TYPES_INITIALIZED}
     {$ENDIF LINUX}
     DWCharTypes[CurrChar] := CurrType;
-  end;
-end;
+  End;
+End;
 {$IFDEF SUPPORTS_UNICODE}
 //=== { TJclAnsiStrings } ====================================================
-constructor TJclAnsiStrings.Create;
-begin
-  inherited Create;
+Constructor TJclAnsiStrings.Create;
+Begin
+  Inherited Create;
   FDelimiter := ',';
   FNameValueSeparator := '=';
   FQuoteChar := '"';
   FStrictDelimiter := False;
-end;
-procedure TJclAnsiStrings.Assign(Source: TPersistent);
-var
+End;
+Procedure TJclAnsiStrings.Assign(Source: TPersistent);
+Var
   StringsSource: TStrings;
   I: Integer;
-begin
-  if Source is TStrings then
-  begin
+Begin
+  If Source is TStrings Then
+  Begin
     StringsSource := TStrings(Source);
     BeginUpdate;
-    try
+    Try
       Clear;
       FDelimiter := DWChar(StringsSource.Delimiter);
       FNameValueSeparator := DWChar(StringsSource.NameValueSeparator);
-      for I := 0 to StringsSource.Count - 1 do
+      For I := 0 To StringsSource.Count - 1 Do
         AddObject(DWString(StringsSource.Strings[I]), StringsSource.Objects[I]);
-    finally
+    Finally
       EndUpdate;
-    end;
-  end
-  else
-    inherited Assign(Source);
-end;
-procedure TJclAnsiStrings.AssignTo(Dest: TPersistent);
-var
+    End;
+  End
+  Else
+    Inherited Assign(Source);
+End;
+Procedure TJclAnsiStrings.AssignTo(Dest: TPersistent);
+Var
   StringsDest: TStrings;
   DWStringsDest: TJclAnsiStrings;
   I: Integer;
-begin
-  if Dest is TStrings then
-  begin
+Begin
+  If Dest is TStrings Then
+  Begin
     StringsDest := TStrings(Dest);
     StringsDest.BeginUpdate;
-    try
+    Try
       StringsDest.Clear;
       StringsDest.Delimiter := Char(Delimiter);
       StringsDest.NameValueSeparator := Char(NameValueSeparator);
-      for I := 0 to Count - 1 do
+      For I := 0 To Count - 1 Do
         StringsDest.AddObject(string(Strings[I]), Objects[I]);
-    finally
+    Finally
       StringsDest.EndUpdate;
-    end;
-  end
-  else
-  if Dest is TJclAnsiStrings then
-  begin
+    End;
+  End
+  Else
+  If Dest is TJclAnsiStrings Then
+  Begin
     DWStringsDest := TJclAnsiStrings(Dest);
     BeginUpdate;
-    try
+    Try
       DWStringsDest.Clear;
       DWStringsDest.FNameValueSeparator := FNameValueSeparator;
       DWStringsDest.FDelimiter := FDelimiter;
-      for I := 0 to Count - 1 do
+      For I := 0 To Count - 1 Do
         DWStringsDest.AddObject(Strings[I], Objects[I]);
-    finally
+    Finally
       EndUpdate;
-    end;
-  end
-  else
-    inherited AssignTo(Dest);
-end;
-function TJclAnsiStrings.Add(const S: DWString): Integer;
-begin
+    End;
+  End
+  Else
+    Inherited AssignTo(Dest);
+End;
+Function TJclAnsiStrings.Add(Const S: DWString): Integer;
+Begin
   Result := AddObject(S, nil);
-end;
-procedure TJclAnsiStrings.AddStrings(Strings: TJclAnsiStrings);
-var
+End;
+Procedure TJclAnsiStrings.AddStrings(Strings: TJclAnsiStrings);
+Var
   I: Integer;
-begin
-  for I := 0 to Strings.Count - 1 do
+Begin
+  For I := 0 To Strings.Count - 1 Do
     Add(Strings.Strings[I]);
-end;
-procedure TJclAnsiStrings.Error(const Msg: string; Data: Integer);
-begin
+End;
+Procedure TJclAnsiStrings.Error(Const Msg: string; Data: Integer);
+Begin
   raise EJclAnsiStringListError.CreateFmt(Msg, [Data]);
-end;
-procedure TJclAnsiStrings.Error(Msg: PResStringRec; Data: Integer);
-begin
+End;
+Procedure TJclAnsiStrings.Error(Msg: PResStringRec; Data: Integer);
+Begin
   Error(LoadResString(Msg), Data);
-end;
-function TJclAnsiStrings.CompareStrings(const S1, S2: DWString): Integer;
-begin
+End;
+Function TJclAnsiStrings.CompareStrings(Const S1, S2: DWString): Integer;
+Begin
   Result := CompareStr(S1, S2);
-end;
-procedure TJclAnsiStrings.SetUpdateState(Updating: Boolean);
-begin
-end;
-function TJclAnsiStrings.IndexOf(const S: DWString): Integer;
-begin
-  for Result := 0 to Count - 1 do
-    if CompareStrings(Strings[Result], S) = 0 then
+End;
+Procedure TJclAnsiStrings.SetUpdateState(Updating: Boolean);
+Begin
+End;
+Function TJclAnsiStrings.IndexOf(Const S: DWString): Integer;
+Begin
+  For Result := 0 To Count - 1 Do
+    If CompareStrings(Strings[Result], S) = 0 Then
       Exit;
   Result := -1;
-end;
-function TJclAnsiStrings.IndexOfName(const Name: DWString): Integer;
-var
+End;
+Function TJclAnsiStrings.IndexOfName(Const Name: DWString): Integer;
+Var
   P: Integer;
   S: DWString;
-begin
-  for Result := 0 to Count - 1 do
-  begin
+Begin
+  For Result := 0 To Count - 1 Do
+  Begin
     S := Strings[Result];
     P := AnsiPos(NameValueSeparator, S);
-    if (P > 0) and (CompareStrings(Copy(S, 1, P - 1), Name) = 0) then
+    If (P > 0) and (CompareStrings(Copy(S, 1, P - 1), Name) = 0) Then
       Exit;
-  end;
+  End;
   Result := -1;
-end;
-function TJclAnsiStrings.IndexOfObject(AObject: TObject): Integer;
-begin
-  for Result := 0 to Count - 1 do
-    if Objects[Result] = AObject then
+End;
+Function TJclAnsiStrings.IndexOfObject(AObject: TObject): Integer;
+Begin
+  For Result := 0 To Count - 1 Do
+    If Objects[Result] = AObject Then
       Exit;
   Result := -1;
-end;
-procedure TJclAnsiStrings.Exchange(Index1, Index2: Integer);
-var
+End;
+Procedure TJclAnsiStrings.Exchange(Index1, Index2: Integer);
+Var
   TempString: DWString;
   TempObject: TObject;
-begin
+Begin
   BeginUpdate;
-  try
+  Try
     TempString := Strings[Index1];
     TempObject := Objects[Index1];
     Strings[Index1] := Strings[Index2];
     Objects[Index1] := Objects[Index2];
     Strings[Index2] := TempString;
     Objects[Index2] := TempObject;
-  finally
+  Finally
     EndUpdate;
-  end;
-end;
-procedure TJclAnsiStrings.Insert(Index: Integer; const S: DWString);
-begin
+  End;
+End;
+Procedure TJclAnsiStrings.Insert(Index: Integer; Const S: DWString);
+Begin
   InsertObject(Index, S, nil);
-end;
-function TJclAnsiStrings.GetText: DWString;
-var
+End;
+Function TJclAnsiStrings.GetText: DWString;
+Var
   I: Integer;
-begin
+Begin
   Result := '';
-  for I := 0 to Count - 2 do
+  For I := 0 To Count - 2 Do
     Result := Result + Strings[I] + sLineBreak;
-  if Count > 0 then
+  If Count > 0 Then
     Result := Result + Strings[Count - 1] + sLineBreak;
-end;
-procedure TJclAnsiStrings.SetText(const Value: DWString);
-var
+End;
+Procedure TJclAnsiStrings.SetText(Const Value: DWString);
+Var
   Index, Start, Len: Integer;
   S: DWString;
-begin
+Begin
   Clear;
   Len := Length(Value);
   Index := 1;
-  while Index <= Len do
-  begin
+  While Index <= Len Do
+  Begin
     Start := Index;
-    while (Index <= Len) and not CharIsReturn(Value[Index]) do
+    While (Index <= Len) and not CharIsReturn(Value[Index]) Do
       Inc(Index);
     S := Copy(Value, Start, Index - Start);
     Add(S);
-    if (Index <= Len) and (Value[Index] = AnsiCarriageReturn) then
+    If (Index <= Len) and (Value[Index] = AnsiCarriageReturn) Then
       Inc(Index);
-    if (Index <= Len) and (Value[Index] = AnsiLineFeed) then
+    If (Index <= Len) and (Value[Index] = AnsiLineFeed) Then
       Inc(Index);
-  end;
-end;
-function TJclAnsiStrings.GetCapacity: Integer;
-begin
+  End;
+End;
+Function TJclAnsiStrings.GetCapacity: Integer;
+Begin
   Result := Count; // Might be overridden in derived classes
-end;
-procedure TJclAnsiStrings.SetCapacity(const Value: Integer);
-begin
+End;
+Procedure TJclAnsiStrings.SetCapacity(Const Value: Integer);
+Begin
   // Nothing at this level
-end;
-procedure TJclAnsiStrings.BeginUpdate;
-begin
-  if FUpdateCount = 0 then SetUpdateState(True);
+End;
+Procedure TJclAnsiStrings.BeginUpdate;
+Begin
+  If FUpdateCount = 0 Then SetUpdateState(True);
   Inc(FUpdateCount);
-end;
-procedure TJclAnsiStrings.EndUpdate;
-begin
+End;
+Procedure TJclAnsiStrings.EndUpdate;
+Begin
   Dec(FUpdateCount);
-  if FUpdateCount = 0 then SetUpdateState(False);
-end;
-procedure TJclAnsiStrings.LoadFromFile(const FileName: TFileName);
-var
+  If FUpdateCount = 0 Then SetUpdateState(False);
+End;
+Procedure TJclAnsiStrings.LoadFromFile(Const FileName: TFileName);
+Var
   Stream: TStream;
-begin
+Begin
   Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
-  try
+  Try
     LoadFromStream(Stream);
-  finally
+  Finally
     Stream.Free;
-  end;
-end;
-procedure TJclAnsiStrings.LoadFromStream(Stream: TStream);
-var
+  End;
+End;
+Procedure TJclAnsiStrings.LoadFromStream(Stream: TStream);
+Var
   Size: Integer;
   S: DWString;
-begin
+Begin
   BeginUpdate;
-  try
+  Try
     Size := Stream.Size - Stream.Position;
     System.SetString(S, nil, Size);
     Stream.Read(PAnsiChar(S)^, Size);
     SetText(S);
-  finally
+  Finally
     EndUpdate;
-  end;
-end;
-procedure TJclAnsiStrings.SaveToFile(const FileName: TFileName);
-var
+  End;
+End;
+Procedure TJclAnsiStrings.SaveToFile(Const FileName: TFileName);
+Var
   Stream: TStream;
-begin
+Begin
   Stream := TFileStream.Create(FileName, fmCreate);
-  try
+  Try
     SaveToStream(Stream);
-  finally
+  Finally
     Stream.Free;
-  end;
-end;
-procedure TJclAnsiStrings.SaveToStream(Stream: TStream);
-var
+  End;
+End;
+Procedure TJclAnsiStrings.SaveToStream(Stream: TStream);
+Var
   S: DWString;
-begin
+Begin
   S := GetText;
   Stream.WriteBuffer(PAnsiChar(S)^, Length(S));
-end;
-function TJclAnsiStrings.ExtractName(const S: DWString): DWString;
-var
+End;
+Function TJclAnsiStrings.ExtractName(Const S: DWString): DWString;
+Var
   P: Integer;
-begin
+Begin
   Result := S;
   P := AnsiPos(NameValueSeparator, Result);
-  if P > 0 then
+  If P > 0 Then
     SetLength(Result, P - 1)
-  else
+  Else
     SetLength(Result, 0);
-end;
-function TJclAnsiStrings.GetName(Index: Integer): DWString;
-begin
+End;
+Function TJclAnsiStrings.GetName(Index: Integer): DWString;
+Begin
   Result := ExtractName(Strings[Index]);
-end;
-function TJclAnsiStrings.GetValue(const Name: DWString): DWString;
-var
+End;
+Function TJclAnsiStrings.GetValue(Const Name: DWString): DWString;
+Var
   I: Integer;
-begin
+Begin
   I := IndexOfName(Name);
-  if I >= 0 then
+  If I >= 0 Then
     Result := Copy(GetString(I), Length(Name) + 2, MaxInt)
-  else
+  Else
     Result := '';
-end;
-procedure TJclAnsiStrings.SetValue(const Name, Value: DWString);
-var
+End;
+Procedure TJclAnsiStrings.SetValue(Const Name, Value: DWString);
+Var
   I: Integer;
-begin
+Begin
   I := IndexOfName(Name);
-  if Value <> '' then
-  begin
-    if I < 0 then
+  If Value <> '' Then
+  Begin
+    If I < 0 Then
       I := Add('');
     SetString(I, Name + NameValueSeparator + Value);
-  end
-  else
-  begin
-    if I >= 0 then
+  End
+  Else
+  Begin
+    If I >= 0 Then
       Delete(I);
-  end;
-end;
-function TJclAnsiStrings.GetValueFromIndex(Index: Integer): DWString;
-var
+  End;
+End;
+Function TJclAnsiStrings.GetValueFromIndex(Index: Integer): DWString;
+Var
   S: DWString;
   P: Integer;
-begin
-  if Index >= 0 then
-  begin
+Begin
+  If Index >= 0 Then
+  Begin
     S := Strings[Index];
     P := AnsiPos(NameValueSeparator, S);
-    if P > 0 then
+    If P > 0 Then
       Result := Copy(S, P + 1, Length(S) - P)
-    else
+    Else
       Result := '';
-  end
-  else
+  End
+  Else
     Result := '';
-end;
-procedure TJclAnsiStrings.SetValueFromIndex(Index: Integer; const Value: DWString);
-begin
-  if Value <> '' then
-  begin
-    if Index < 0 then
+End;
+Procedure TJclAnsiStrings.SetValueFromIndex(Index: Integer; Const Value: DWString);
+Begin
+  If Value <> '' Then
+  Begin
+    If Index < 0 Then
       Index := Add('');
     SetString(Index, Names[Index] + NameValueSeparator + Value);
-  end
-  else
-  begin
-    if Index >= 0 then
+  End
+  Else
+  Begin
+    If Index >= 0 Then
       Delete(Index);
-  end;
-end;
+  End;
+End;
 //=== { TJclAnsiStringList } =================================================
-constructor TJclAnsiStringList.Create;
-begin
-  inherited Create;
+Constructor TJclAnsiStringList.Create;
+Begin
+  Inherited Create;
   FCaseSensitive := True;
-end;
-destructor TJclAnsiStringList.Destroy;
-begin
+End;
+Destructor TJclAnsiStringList.Destroy;
+Begin
   FOnChange := nil;
   FOnChanging := nil;
-  inherited Destroy;
-end;
-procedure TJclAnsiStringList.Assign(Source: TPersistent);
-var
+  Inherited Destroy;
+End;
+Procedure TJclAnsiStringList.Assign(Source: TPersistent);
+Var
   StringListSource: TStringList;
-begin
-  if Source is TStringList then
-  begin
+Begin
+  If Source is TStringList Then
+  Begin
     StringListSource := TStringList(Source);
     FDuplicates := StringListSource.Duplicates;
     FSorted := StringListSource.Sorted;
     FCaseSensitive := StringListSource.CaseSensitive;
-  end;
-  inherited Assign(Source);
-end;
-procedure TJclAnsiStringList.AssignTo(Dest: TPersistent);
-var
+  End;
+  Inherited Assign(Source);
+End;
+Procedure TJclAnsiStringList.AssignTo(Dest: TPersistent);
+Var
   StringListDest: TStringList;
   DWStringListDest: TJclAnsiStringList;
-begin
-  if Dest is TStringList then
-  begin
+Begin
+  If Dest is TStringList Then
+  Begin
     StringListDest := TStringList(Dest);
     StringListDest.Clear; // make following assignments a lot faster
     StringListDest.Duplicates := FDuplicates;
     StringListDest.Sorted := FSorted;
     StringListDest.CaseSensitive := FCaseSensitive;
-  end
-  else
-  if Dest is TJclAnsiStringList then
-  begin
+  End
+  Else
+  If Dest is TJclAnsiStringList Then
+  Begin
     DWStringListDest := TJclAnsiStringList(Dest);
     DWStringListDest.Clear;
     DWStringListDest.FDuplicates := FDuplicates;
     DWStringListDest.FSorted := FSorted;
     DWStringListDest.FCaseSensitive := FCaseSensitive;
-  end;
-  inherited AssignTo(Dest);
-end;
-function TJclAnsiStringList.CompareStrings(const S1: DWString; const S2: DWString): Integer;
-begin
-  if FCaseSensitive then
+  End;
+  Inherited AssignTo(Dest);
+End;
+Function TJclAnsiStringList.CompareStrings(Const S1: DWString; Const S2: DWString): Integer;
+Begin
+  If FCaseSensitive Then
     Result := CompareStr(S1, S2)
-  else
+  Else
     Result := CompareText(S1, S2);
-end;
-procedure TJclAnsiStringList.SetUpdateState(Updating: Boolean);
-begin
-  if Updating then Changing else Changed;
-end;
-procedure TJclAnsiStringList.Changed;
-begin
-  if (FUpdateCount = 0) and Assigned(FOnChange) then
+End;
+Procedure TJclAnsiStringList.SetUpdateState(Updating: Boolean);
+Begin
+  If Updating Then Changing Else Changed;
+End;
+Procedure TJclAnsiStringList.Changed;
+Begin
+  If (FUpdateCount = 0) and Assigned(FOnChange) Then
     FOnChange(Self);
-end;
-procedure TJclAnsiStringList.Changing;
-begin
-  if (FUpdateCount = 0) and Assigned(FOnChanging) then
+End;
+Procedure TJclAnsiStringList.Changing;
+Begin
+  If (FUpdateCount = 0) and Assigned(FOnChanging) Then
     FOnChanging(Self);
-end;
-procedure TJclAnsiStringList.Grow;
-var
+End;
+Procedure TJclAnsiStringList.Grow;
+Var
   Delta: Integer;
-begin
-  if Capacity > 64 then
+Begin
+  If Capacity > 64 Then
     Delta := Capacity div 4
-  else if Capacity > 8 then
+  Else If Capacity > 8 Then
     Delta := 16
-  else
+  Else
     Delta := 4;
   SetCapacity(Capacity + Delta);
-end;
-function TJclAnsiStringList.GetString(Index: Integer): DWString;
-begin
-  if (Index < 0) or (Index >= FCount) then
+End;
+Function TJclAnsiStringList.GetString(Index: Integer): DWString;
+Begin
+  If (Index < 0) or (Index >= FCount) Then
     Error(@SListIndexError, Index);
   Result := FStrings[Index].Str;
-end;
-function TJclAnsiStringList.GetObject(Index: Integer): TObject;
-begin
-  if (Index < 0) or (Index >= FCount) then
+End;
+Function TJclAnsiStringList.GetObject(Index: Integer): TObject;
+Begin
+  If (Index < 0) or (Index >= FCount) Then
     Error(@SListIndexError, Index);
   Result := FStrings[Index].Obj;
-end;
-procedure TJclAnsiStringList.SetObject(Index: Integer; AObject: TObject);
-begin
-  if (Index < 0) or (Index >= FCount) then
+End;
+Procedure TJclAnsiStringList.SetObject(Index: Integer; AObject: TObject);
+Begin
+  If (Index < 0) or (Index >= FCount) Then
     Error(@SListIndexError, Index);
   FStrings[Index].Obj := AObject;
-end;
-function TJclAnsiStringList.GetCapacity: Integer;
-begin
+End;
+Function TJclAnsiStringList.GetCapacity: Integer;
+Begin
   Result := Length(FStrings);
-end;
-procedure TJclAnsiStringList.SetCapacity(const Value: Integer);
-begin
-  if (Value < FCount) then
+End;
+Procedure TJclAnsiStringList.SetCapacity(Const Value: Integer);
+Begin
+  If (Value < FCount) Then
     Error(@SListCapacityError, Value);
-  if Value <> Capacity then
+  If Value <> Capacity Then
     SetLength(FStrings, Value);
-end;
-function TJclAnsiStringList.GetCount: Integer;
-begin
+End;
+Function TJclAnsiStringList.GetCount: Integer;
+Begin
   Result := FCount;
-end;
-procedure TJclAnsiStringList.InsertObject(Index: Integer; const S: DWString; AObject: TObject);
-var
+End;
+Procedure TJclAnsiStringList.InsertObject(Index: Integer; Const S: DWString; AObject: TObject);
+Var
   I: Integer;
-begin
-  if Count = Capacity then
+Begin
+  If Count = Capacity Then
     Grow;
-  for I := Count - 1 downto Index do
+  For I := Count - 1 Downto Index Do
     FStrings[I + 1] := FStrings[I];
   FStrings[Index].Str := S;
   FStrings[Index].Obj := AObject;
   Inc(FCount);
-end;
-procedure TJclAnsiStringList.Delete(Index: Integer);
-var
+End;
+Procedure TJclAnsiStringList.Delete(Index: Integer);
+Var
   I: Integer;
-begin
-  if (Index < 0) or (Index >= FCount) then
+Begin
+  If (Index < 0) or (Index >= FCount) Then
     Error(@SListIndexError, Index);
-  for I := Index to Count - 2 do
+  For I := Index To Count - 2 Do
     FStrings[I] := FStrings[I + 1];
     
   FStrings[FCount - 1].Str := '';  // the last string is no longer useful
     
   Dec(FCount);
-end;
-procedure TJclAnsiStringList.Clear;
-var
+End;
+Procedure TJclAnsiStringList.Clear;
+Var
   I: Integer;
-begin
+Begin
   FCount := 0;
-  for I := 0 to Length(FStrings) - 1 do
-  begin
+  For I := 0 To Length(FStrings) - 1 Do
+  Begin
     FStrings[I].Str := '';
     FStrings[I].Obj := nil;
-  end;
-end;
-function TJclAnsiStringList.Find(const S: DWString; var Index: Integer): Boolean;
-var
+  End;
+End;
+Function TJclAnsiStringList.Find(Const S: DWString; Var Index: Integer): Boolean;
+Var
   L, H, I, C: Integer;
-begin
+Begin
   Result := False;
   L := 0;
   H := FCount - 1;
-  while L <= H do
-  begin
+  While L <= H Do
+  Begin
     I := (L + H) shr 1;
     C := CompareStrings(FStrings[I].Str, S);
-    if C < 0 then
+    If C < 0 Then
       L := I + 1
-    else
-    begin
+    Else
+    Begin
       H := I - 1;
-      if C = 0 then
-      begin
+      If C = 0 Then
+      Begin
         Result := True;
-        if Duplicates <> dupAccept then
+        If Duplicates <> dupAccept Then
           L := I;
-      end;
-    end;
-  end;
+      End;
+    End;
+  End;
   Index := L;
-end;
-function DWStringListCompareStrings(List: TJclAnsiStringList; Index1, Index2: Integer): Integer;
-begin
+End;
+Function DWStringListCompareStrings(List: TJclAnsiStringList; Index1, Index2: Integer): Integer;
+Begin
   Result := List.CompareStrings(List.FStrings[Index1].Str,
                                 List.FStrings[Index2].Str);
-end;
-procedure TJclAnsiStringList.QuickSort(L, R: Integer; SCompare: TJclAnsiStringListSortCompare);
-var
+End;
+Procedure TJclAnsiStringList.QuickSort(L, R: Integer; SCompare: TJclAnsiStringListSortCompare);
+Var
   I, J, P: Integer;
-begin
-  repeat
+Begin
+  Repeat
     I := L;
     J := R;
     P := (L + R) shr 1;
-    repeat
-      while SCompare(Self, I, P) < 0 do
+    Repeat
+      While SCompare(Self, I, P) < 0 Do
         Inc(I);
-      while SCompare(Self, J, P) > 0 do
+      While SCompare(Self, J, P) > 0 Do
         Dec(J);
-      if I <= J then
-      begin
-        if I <> J then
+      If I <= J Then
+      Begin
+        If I <> J Then
           Exchange(I, J);
-        if P = I then
+        If P = I Then
           P := J
-        else
-        if P = J then
+        Else
+        If P = J Then
           P := I;
         Inc(I);
         Dec(J);
-      end;
-    until I > J;
-    if L < J then
+      End;
+    Until I > J;
+    If L < J Then
       QuickSort(L, J, SCompare);
     L := I;
-  until I >= R;
-end;
+  Until I >= R;
+End;
 {$ENDIF SUPPORTS_UNICODE}
-function StrContainsChars(const S: DWString; Chars: TSysCharSet; CheckAll: Boolean): Boolean;
-var
+Function StrContainsChars(Const S: DWString; Chars: TSysCharSet; CheckAll: Boolean): Boolean;
+Var
   I: SizeInt;
   C: DWChar;
-begin
+Begin
   Result := Chars = [];
-  if not Result then
-  begin
-    if CheckAll then
-    begin
-      for I := 1 to Length(S) do
-      begin
+  If not Result Then
+  Begin
+    If CheckAll Then
+    Begin
+      For I := 1 To Length(S) Do
+      Begin
         PDWString(@C)^ := Char(S[I]);
-        if C in Chars then
-        begin
+        If C in Chars Then
+        Begin
           Chars := Chars - [C];
-          if Chars = [] then
+          If Chars = [] Then
             Break;
-        end;
-      end;
+        End;
+      End;
       Result := (Chars = []);
-    end
-    else
-    begin
-      for I := 1 to Length(S) do
-        if S[I] in Chars then
-        begin
+    End
+    Else
+    Begin
+      For I := 1 To Length(S) Do
+        If S[I] in Chars Then
+        Begin
           Result := True;
           Break;
-        end;
-    end;
-  end;
-end;
-function StrIsSubset(const S: DWString; const ValidChars: TSysCharSet): Boolean;
-var
+        End;
+    End;
+  End;
+End;
+Function StrIsSubset(Const S: DWString; Const ValidChars: TSysCharSet): Boolean;
+Var
   I: SizeInt;
-begin
-  for I := 1 to Length(S) do
-  begin
-    if not (S[I] in ValidChars) then
-    begin
+Begin
+  For I := 1 To Length(S) Do
+  Begin
+    If not (S[I] in ValidChars) Then
+    Begin
       Result := False;
       Exit;
-    end;
-  end;
+    End;
+  End;
   Result := True and (Length(S) > 0);
-end;
-function StrSame(const S1, S2: DWString): Boolean;
-begin
+End;
+Function StrSame(Const S1, S2: DWString): Boolean;
+Begin
   Result := StrCompare(S1, S2) = 0;
-end;
+End;
 //=== String Transformation Routines =========================================
-function StrCenter(const S: DWString; L: SizeInt; C: DWChar = ' '): DWString;
-begin
-  if Length(S) < L then
-  begin
+Function StrCenter(Const S: DWString; L: SizeInt; C: DWChar = ' '): DWString;
+Begin
+  If Length(S) < L Then
+  Begin
     Result := StringOfChar(C, (L - Length(S)) div 2) + S;
     Result := Result + StringOfChar(C, L - Length(Result));
-  end
-  else
+  End
+  Else
     Result := S;
-end;
-function StrCharPosLower(const S: DWString; CharPos: SizeInt): DWString;
-begin
+End;
+Function StrCharPosLower(Const S: DWString; CharPos: SizeInt): DWString;
+Begin
   Result := S;
-  if (CharPos > 0) and (CharPos <= Length(S)) then
+  If (CharPos > 0) and (CharPos <= Length(S)) Then
     PDWString(@Result[CharPos])^ := CharLower(Result[CharPos]);
-end;
-function StrCharPosUpper(const S: DWString; CharPos: SizeInt): DWString;
-begin
+End;
+Function StrCharPosUpper(Const S: DWString; CharPos: SizeInt): DWString;
+Begin
   Result := S;
-  if (CharPos > 0) and (CharPos <= Length(S)) then
+  If (CharPos > 0) and (CharPos <= Length(S)) Then
     PDWString(@Result[CharPos])^ := CharUpper(Result[CharPos]);
-end;
-function StrDoubleQuote(const S: DWString): DWString;
-begin
+End;
+Function StrDoubleQuote(Const S: DWString): DWString;
+Begin
   Result := AnsiDoubleQuote + S + AnsiDoubleQuote;
-end;
-function StrEnsureNoPrefix(const Prefix, Text: DWString): DWString;
-var
+End;
+Function StrEnsureNoPrefix(Const Prefix, Text: DWString): DWString;
+Var
   PrefixLen: SizeInt;
-begin
+Begin
   PrefixLen := Length(Prefix);
-  if Copy(Text, 1, PrefixLen) = Prefix then
+  If Copy(Text, 1, PrefixLen) = Prefix Then
     Result := Copy(Text, PrefixLen + 1, Length(Text))
-  else
+  Else
     Result := Text;
-end;
-function StrEnsureNoSuffix(const Suffix, Text: DWString): DWString;
-var
+End;
+Function StrEnsureNoSuffix(Const Suffix, Text: DWString): DWString;
+Var
   SuffixLen: SizeInt;
   StrLength: SizeInt;
-begin
+Begin
   SuffixLen := Length(Suffix);
   StrLength := Length(Text);
-  if Copy(Text, StrLength - SuffixLen + 1, SuffixLen) = Suffix then
+  If Copy(Text, StrLength - SuffixLen + 1, SuffixLen) = Suffix Then
     Result := Copy(Text, 1, StrLength - SuffixLen)
-  else
+  Else
     Result := Text;
-end;
-function StrEnsurePrefix(const Prefix, Text: DWString): DWString;
-var
+End;
+Function StrEnsurePrefix(Const Prefix, Text: DWString): DWString;
+Var
   PrefixLen: SizeInt;
-begin
+Begin
   PrefixLen := Length(Prefix);
-  if Copy(Text, 1, PrefixLen) = Prefix then
+  If Copy(Text, 1, PrefixLen) = Prefix Then
     Result := Text
-  else
+  Else
     Result := Prefix + Text;
-end;
-function StrEnsureSuffix(const Suffix, Text: DWString): DWString;
-var
+End;
+Function StrEnsureSuffix(Const Suffix, Text: DWString): DWString;
+Var
   SuffixLen: SizeInt;
-begin
+Begin
   SuffixLen := Length(Suffix);
-  if Copy(Text, Length(Text) - SuffixLen + 1, SuffixLen) = Suffix then
+  If Copy(Text, Length(Text) - SuffixLen + 1, SuffixLen) = Suffix Then
     Result := Text
-  else
+  Else
     Result := Text + Suffix;
-end;
-function StrEscapedToString(const S: DWString): DWString;
-  procedure HandleHexEscapeSeq(const S: DWString; var I: SizeInt; Len: SizeInt; var Dest: DWString);
-  const
+End;
+Function StrEscapedToString(Const S: DWString): DWString;
+  Procedure HandleHexEscapeSeq(Const S: DWString; Var I: SizeInt; Len: SizeInt; Var Dest: DWString);
+  Const
     HexDigits = DWString('0123456789abcdefABCDEF');
-  var
+  Var
     StartI, Val, N: SizeInt;
-  begin
+  Begin
     StartI := I;
     N := Pos(S[I + 1], HexDigits) - 1;
-    if N < 0 then
+    If N < 0 Then
       // '\x' without hex digit following is not escape sequence
       Dest := Dest + '\x'
-    else
-    begin
+    Else
+    Begin
       Inc(I); // Jump over x
-      if N >= 16 then
+      If N >= 16 Then
         N := N - 6;
       Val := N;
       // Same for second digit
-      if I < Len then
-      begin
+      If I < Len Then
+      Begin
         N := Pos(S[I + 1], HexDigits) - 1;
-        if N >= 0 then
-        begin
+        If N >= 0 Then
+        Begin
           Inc(I); // Jump over first digit
-          if N >= 16 then
+          If N >= 16 Then
             N := N - 6;
           Val := Val * 16 + N;
-        end;
-      end;
-      if Val > Ord(High(DWChar)) then
+        End;
+      End;
+      If Val > Ord(High(DWChar)) Then
         raise EJclAnsiStringError.CreateResFmt(@RsNumericConstantTooLarge, [Val, StartI]);
       Dest := Dest + DWChar(Val);
-    end;
-  end;
-  procedure HandleOctEscapeSeq(const S: DWString; var I: SizeInt; Len: SizeInt; var Dest: DWString);
-  const
+    End;
+  End;
+  Procedure HandleOctEscapeSeq(Const S: DWString; Var I: SizeInt; Len: SizeInt; Var Dest: DWString);
+  Const
     OctDigits = DWString('01234567');
-  var
+  Var
     StartI, Val, N: SizeInt;
-  begin
+  Begin
     StartI := I;
     // first digit
     Val := Pos(S[I], OctDigits) - 1;
-    if I < Len then
-    begin
+    If I < Len Then
+    Begin
       N := Pos(S[I + 1], OctDigits) - 1;
-      if N >= 0 then
-      begin
+      If N >= 0 Then
+      Begin
         Inc(I);
         Val := Val * 8 + N;
-      end;
-      if I < Len then
-      begin
+      End;
+      If I < Len Then
+      Begin
         N := Pos(S[I + 1], OctDigits) - 1;
-        if N >= 0 then
-        begin
+        If N >= 0 Then
+        Begin
           Inc(I);
           Val := Val * 8 + N;
-        end;
-      end;
-    end;
-    if Val > Ord(High(DWChar)) then
+        End;
+      End;
+    End;
+    If Val > Ord(High(DWChar)) Then
       raise EJclAnsiStringError.CreateResFmt(@RsNumericConstantTooLarge, [Val, StartI]);
     Dest := Dest + DWChar(Val);
-  end;
-var
+  End;
+Var
   I, Len: SizeInt;
-begin
+Begin
   Result := '';
   I := 1;
   Len := Length(S);
-  while I <= Len do
-  begin
-    if not ((S[I] = '\') and (I < Len)) then
+  While I <= Len Do
+  Begin
+    If not ((S[I] = '\') and (I < Len)) Then
       Result := Result + S[I]
-    else
-    begin
+    Else
+    Begin
       Inc(I); // Jump over escape character
-      case S[I] of
+      Case S[I] Of
         'a':
           Result := Result + AnsiBell;
         'b':
@@ -1191,126 +1191,126 @@ begin
         '?':
           Result := Result + '?';  // Optionally escaped
         'x':
-          if I < Len then
+          If I < Len Then
             // Start of hex escape sequence
             HandleHexEscapeSeq(S, I, Len, Result)
-          else
+          Else
             // '\x' at end of DWString is not escape sequence
             Result := Result + '\x';
         '0'..'7':
           // start of octal escape sequence
           HandleOctEscapeSeq(S, I, Len, Result);
-      else
+      Else
         // no escape sequence
         Result := Result + '\' + S[I];
-      end;
-    end;
+      End;
+    End;
     Inc(I);
-  end;
-end;
-procedure StrMove(var Dest: DWString; const Source: DWString;
-  const ToIndex, FromIndex, Count: SizeInt);
-begin
+  End;
+End;
+Procedure StrMove(Var Dest: DWString; Const Source: DWString;
+  Const ToIndex, FromIndex, Count: SizeInt);
+Begin
   // Check strings
-  if (Source = '') or (Length(Dest) = 0) then
+  If (Source = '') or (Length(Dest) = 0) Then
     Exit;
   // Check FromIndex
-  if (FromIndex <= 0) or (FromIndex > Length(Source)) or
+  If (FromIndex <= 0) or (FromIndex > Length(Source)) or
     (ToIndex <= 0) or (ToIndex > Length(Dest)) or
-    ((FromIndex + Count - 1) > Length(Source)) or ((ToIndex + Count - 1) > Length(Dest)) then
+    ((FromIndex + Count - 1) > Length(Source)) or ((ToIndex + Count - 1) > Length(Dest)) Then
     { TODO : Is failure without notice the proper thing to do here? }
     Exit;
   // Move
   Move(Source[FromIndex], Dest[ToIndex], Count);
-end;
-function StrPadLeft(const S: DWString; Len: SizeInt; C: DWChar): DWString;
-var
+End;
+Function StrPadLeft(Const S: DWString; Len: SizeInt; C: DWChar): DWString;
+Var
   L: SizeInt;
-begin
+Begin
   L := Length(S);
-  if L < Len then
+  If L < Len Then
     Result := StringOfChar(C, Len - L) + S
-  else
+  Else
     Result := S;
-end;
-function StrPadRight(const S: DWString; Len: SizeInt; C: DWChar): DWString;
-var
+End;
+Function StrPadRight(Const S: DWString; Len: SizeInt; C: DWChar): DWString;
+Var
   L: SizeInt;
-begin
+Begin
   L := Length(S);
-  if L < Len then
+  If L < Len Then
     Result := S + StringOfChar(C, Len - L)
-  else
+  Else
     Result := S;
-end;
-function StrProper(const S: DWString): DWString;
-begin
+End;
+Function StrProper(Const S: DWString): DWString;
+Begin
   Result := StrLower(S);
-  if Result <> '' then
+  If Result <> '' Then
     Result[1] := UpCase(Result[1]);
-end;
-function StrQuote(const S: DWString; C: DWChar): DWString;
-var
+End;
+Function StrQuote(Const S: DWString; C: DWChar): DWString;
+Var
   L: SizeInt;
-begin
+Begin
   L := Length(S);
   Result := S;
-  if L > 0 then
-  begin
-    if PDWString(@Result[1])^ <> C then
-    begin
+  If L > 0 Then
+  Begin
+    If PDWString(@Result[1])^ <> C Then
+    Begin
       Result := C + Result;
       Inc(L);
-    end;
-    if PDWString(@Result[L])^ <> C then
+    End;
+    If PDWString(@Result[L])^ <> C Then
       Result := Result + C;
-  end;
-end;
-function StrReplaceChar(const S: DWString; const Source, Replace: DWChar): DWString;
-var
+  End;
+End;
+Function StrReplaceChar(Const S: DWString; Const Source, Replace: DWChar): DWString;
+Var
   I: SizeInt;
-begin
+Begin
   Result := S;
-  for I := 1 to Length(S) do
-    if PDWString(@Result[I])^ = Source then
+  For I := 1 To Length(S) Do
+    If PDWString(@Result[I])^ = Source Then
       PDWString(@Result[I])^ := Replace;
-end;
-function StrReplaceChars(const S: DWString; const Chars: TSysCharSet; Replace: DWChar): DWString;
-var
+End;
+Function StrReplaceChars(Const S: DWString; Const Chars: TSysCharSet; Replace: DWChar): DWString;
+Var
   I: SizeInt;
-begin
+Begin
   Result := S;
-  for I := 1 to Length(S) do
-    if Result[I] in Chars then
+  For I := 1 To Length(S) Do
+    If Result[I] in Chars Then
       PDWString(@Result[I])^ := Replace;
-end;
-function StrReplaceButChars(const S: DWString; const Chars: TSysCharSet;
+End;
+Function StrReplaceButChars(Const S: DWString; Const Chars: TSysCharSet;
   Replace: DWChar): DWString;
-var
+Var
   I: SizeInt;
-begin
+Begin
   Result := S;
-  for I := 1 to Length(S) do
-    if not (Result[I] in Chars) then
+  For I := 1 To Length(S) Do
+    If not (Result[I] in Chars) Then
       PDWString(@Result[I])^ := Replace;
-end;
-function StrSingleQuote(const S: DWString): DWString;
-begin
+End;
+Function StrSingleQuote(Const S: DWString): DWString;
+Begin
   Result := AnsiSingleQuote + S + AnsiSingleQuote;
-end;
-procedure StrSkipChars(const S: DWString; var Index: SizeInt; const Chars: TSysCharSet);
-begin
-  while S[Index] in Chars do
+End;
+Procedure StrSkipChars(Const S: DWString; Var Index: SizeInt; Const Chars: TSysCharSet);
+Begin
+  While S[Index] in Chars Do
     Inc(Index);
-end;
-function StrStringToEscaped(const S: DWString): DWString;
-var
+End;
+Function StrStringToEscaped(Const S: DWString): DWString;
+Var
   I: SizeInt;
-begin
+Begin
   Result := '';
-  for I := 1 to Length(S) do
-  begin
-    case S[I] of
+  For I := 1 To Length(S) Do
+  Begin
+    Case S[I] Of
       AnsiBackspace:
         Result := Result + '\b';
       AnsiBell:
@@ -1329,224 +1329,224 @@ begin
         Result := Result + '\\';
       '"':
         Result := Result + '\"';
-    else
+    Else
       // Characters < ' ' are escaped with hex sequence
-      if S[I] < #32 then
+      If S[I] < #32 Then
         Result := Result + DWString(Format('\x%.2x', [SizeInt(S[I])]))
-      else
+      Else
         Result := Result + S[I];
-    end;
-  end;
-end;
-function StrToHex(const Source: DWString): DWString;
-var
+    End;
+  End;
+End;
+Function StrToHex(Const Source: DWString): DWString;
+Var
   Index: SizeInt;
   C, L, N: SizeInt;
   BL, BH: Byte;
   S: DWString;
-begin
+Begin
   Result := '';
-  if Source <> '' then
-  begin
+  If Source <> '' Then
+  Begin
     S := Source;
     L := Length(S);
-    if Odd(L) then
-    begin
+    If Odd(L) Then
+    Begin
       S := '0' + S;
       Inc(L);
-    end;
+    End;
     Index := 1;
     SetLength(Result, L div 2);
     C := 1;
     N := 1;
-    while C <= L do
-    begin
+    While C <= L Do
+    Begin
       BH := CharHex(S[Index]);
       Inc(Index);
       BL := CharHex(S[Index]);
       Inc(Index);
       Inc(C, 2);
-      if (BH = $FF) or (BL = $FF) then
-      begin
+      If (BH = $FF) or (BL = $FF) Then
+      Begin
         Result := '';
         Exit;
-      end;
+      End;
       PDWString(@Result[N])^ := DWChar((Cardinal(BH) shl 4) or Cardinal(BL));
       Inc(N);
-    end;
-  end;
-end;
-function StrTrimCharLeft(const S: DWString; C: DWChar): DWString;
-var
+    End;
+  End;
+End;
+Function StrTrimCharLeft(Const S: DWString; C: DWChar): DWString;
+Var
   I, L: SizeInt;
-begin
+Begin
   I := 1;
   L := Length(S);
-  while (I <= L) and (PDWString(@S[I])^ = C) do
+  While (I <= L) and (PDWString(@S[I])^ = C) Do
     Inc(I);
   Result := Copy(S, I, L - I + 1);
-end;
-function StrTrimCharsLeft(const S: DWString; const Chars: TSysCharSet): DWString;
-var
+End;
+Function StrTrimCharsLeft(Const S: DWString; Const Chars: TSysCharSet): DWString;
+Var
   I, L: SizeInt;
-begin
+Begin
   I := 1;
   L := Length(S);
-  while (I <= L) and (S[I] in Chars) do
+  While (I <= L) and (S[I] in Chars) Do
     Inc(I);
   Result := Copy(S, I, L - I + 1);
-end;
-function StrTrimCharsRight(const S: DWString; const Chars: TSysCharSet): DWString;
-var
+End;
+Function StrTrimCharsRight(Const S: DWString; Const Chars: TSysCharSet): DWString;
+Var
   I: SizeInt;
-begin
+Begin
   I := Length(S);
-  while (I >= 1) and (S[I] in Chars) do
+  While (I >= 1) and (S[I] in Chars) Do
     Dec(I);
   Result := Copy(S, 1, I);
-end;
-function StrTrimCharRight(const S: DWString; C: DWChar): DWString;
-var
+End;
+Function StrTrimCharRight(Const S: DWString; C: DWChar): DWString;
+Var
   I: SizeInt;
-begin
+Begin
   I := Length(S);
-  while (I >= 1) and (PDWString(@S[I])^ = C) do
+  While (I >= 1) and (PDWString(@S[I])^ = C) Do
     Dec(I);
   Result := Copy(S, 1, I);
-end;
-function StrTrimQuotes(const S: DWString): DWString;
-var
+End;
+Function StrTrimQuotes(Const S: DWString): DWString;
+Var
   First, Last: DWChar;
   L: SizeInt;
-begin
+Begin
   L := Length(S);
-  if L > 1 then
-  begin
+  If L > 1 Then
+  Begin
     PDWString(@First)^ := S[1];
     PDWString(@Last)^ := S[L];
-    if (First = Last) and ((First = AnsiSingleQuote) or (First = AnsiDoubleQuote)) then
+    If (First = Last) and ((First = AnsiSingleQuote) or (First = AnsiDoubleQuote)) Then
       Result := Copy(S, 2, L - 2)
-    else
+    Else
       Result := S;
-  end
-  else
+  End
+  Else
     Result := S;
-end;
-function StrTrimQuotes(const S: DWString; QuoteChar: DWChar): DWString;
-var
+End;
+Function StrTrimQuotes(Const S: DWString; QuoteChar: DWChar): DWString;
+Var
   First, Last: DWChar;
   L: SizeInt;
-begin
+Begin
   L := Length(S);
-  if L > 1 then
-  begin
+  If L > 1 Then
+  Begin
     PDWString(@First)^ := S[1];
     PDWString(@Last)^ := S[L];
-    if (First = Last) and (First = QuoteChar) then
+    If (First = Last) and (First = QuoteChar) Then
       Result := Copy(S, 2, L - 2)
-    else
+    Else
       Result := S;
-  end
-  else
+  End
+  Else
     Result := S;
-end;
-procedure StrDecRef(var S: DWString);
-var
+End;
+Procedure StrDecRef(Var S: DWString);
+Var
   P: PAnsiStrRec;
-begin
+Begin
   P := Pointer(S);
-  if P <> nil then
-  begin
+  If P <> nil Then
+  Begin
     Dec(P);
-    case P^.RefCount of
+    Case P^.RefCount Of
       -1, 0:
         { nothing } ;
       1:
-        begin
+        Begin
           Finalize(S);
           Pointer(S) := nil;
-        end;
+        End;
 //    else
 //      LockedDec(P^.RefCount);
-    end;
-  end;
-end;
-function StrLength(const S: DWString): Longint;
-var
+    End;
+  End;
+End;
+Function StrLength(Const S: DWString): Longint;
+Var
   P: PAnsiStrRec;
-begin
+Begin
   Result := 0;
   P := Pointer(S);
-  if P <> nil then
-  begin
+  If P <> nil Then
+  Begin
     Dec(P);
     Result := P^.Length and (not $80000000 shr 1);
-  end;
-end;
-function StrRefCount(const S: DWString): Longint;
-var
+  End;
+End;
+Function StrRefCount(Const S: DWString): Longint;
+Var
   P: PAnsiStrRec;
-begin
+Begin
   Result := 0;
   P := Pointer(S);
-  if P <> nil then
-  begin
+  If P <> nil Then
+  Begin
     Dec(P);
     Result := P^.RefCount;
-  end;
-end;
-procedure StrResetLength(var S: DWString);
-var
+  End;
+End;
+Procedure StrResetLength(Var S: DWString);
+Var
   I: SizeInt;
-begin
-  for I := 0 to Length(S) - 1 do
-    if S[I + 1] = #0 then
-    begin
+Begin
+  For I := 0 To Length(S) - 1 Do
+    If S[I + 1] = #0 Then
+    Begin
       SetLength(S, I);
       Exit;
-    end;
-end;
+    End;
+End;
 //=== String Search and Replace Routines =====================================
-function StrCharCount(const S: DWString; C: DWChar): SizeInt;
-var
+Function StrCharCount(Const S: DWString; C: DWChar): SizeInt;
+Var
   I: SizeInt;
-begin
+Begin
   Result := 0;
-  for I := 1 to Length(S) do
-    if PDWString(@S[I])^ = C then
+  For I := 1 To Length(S) Do
+    If PDWString(@S[I])^ = C Then
       Inc(Result);
-end;
-function StrCharsCount(const S: DWString; Chars: TSysCharSet): SizeInt;
-var
+End;
+Function StrCharsCount(Const S: DWString; Chars: TSysCharSet): SizeInt;
+Var
   I: SizeInt;
-begin
+Begin
   Result := 0;
-  for I := 1 to Length(S) do
-    if S[I] in Chars then
+  For I := 1 To Length(S) Do
+    If S[I] in Chars Then
       Inc(Result);
-end;
-function StrStrCount(const S, SubS: DWString): SizeInt;
-var
+End;
+Function StrStrCount(Const S, SubS: DWString): SizeInt;
+Var
   I: SizeInt;
-begin
+Begin
   Result := 0;
-  if (Length(SubS) > Length(S)) or (Length(SubS) = 0) or (Length(S) = 0) then
+  If (Length(SubS) > Length(S)) or (Length(SubS) = 0) or (Length(S) = 0) Then
     Exit;
-  if Length(SubS) = 1 then
-  begin
+  If Length(SubS) = 1 Then
+  Begin
     Result := StrCharCount(S, SubS[1]);
     Exit;
-  end;
+  End;
   I := StrSearch(SubS, S, 1);
-  if I > 0 then
+  If I > 0 Then
     Inc(Result);
-  while (I > 0) and (Length(S) > I + Length(SubS)) do
-  begin
+  While (I > 0) and (Length(S) > I + Length(SubS)) Do
+  Begin
     I := StrSearch(SubS, S, I + 1);
-    if I > 0 then
+    If I > 0 Then
       Inc(Result);
-  end;
-end;
+  End;
+End;
 (*
 { 1}  Test(StrCompareRange('', '', 1, 5), 0);
 { 2}  Test(StrCompareRange('A', '', 1, 5), -1);
@@ -1569,672 +1569,672 @@ end;
 {19}  Test(StrCompareRange('Aa', 'A', 1, 2), 0);
 {20}  Test(StrCompareRange('Ba', 'A', 1, 2), 1);
 *)
-function StrCompareRangeEx(const S1, S2: DWString; Index, Count: SizeInt; CaseSensitive: Boolean): SizeInt;
-var
+Function StrCompareRangeEx(Const S1, S2: DWString; Index, Count: SizeInt; CaseSensitive: Boolean): SizeInt;
+Var
   Len1, Len2: SizeInt;
   I: SizeInt;
   C1, C2: DWChar;
-begin
-  if Pointer(S1) = Pointer(S2) then
-  begin
-    if (Count <= 0) and (S1 <> '') then
+Begin
+  If Pointer(S1) = Pointer(S2) Then
+  Begin
+    If (Count <= 0) and (S1 <> '') Then
       Result := -2 // no work
-    else
+    Else
       Result := 0;
-  end
-  else
-  if (S1 = '') or (S2 = '') then
+  End
+  Else
+  If (S1 = '') or (S2 = '') Then
     Result := -1 // null string
-  else
-  if Count <= 0 then
+  Else
+  If Count <= 0 Then
     Result := -2 // no work
-  else
-  begin
+  Else
+  Begin
     Len1 := Length(S1);
     Len2 := Length(S2);
-    if (Index - 1) + Count > Len1 then
+    If (Index - 1) + Count > Len1 Then
       Result := -2
-    else
-    begin
-      if (Index - 1) + Count > Len2 then // strange behaviour, but the assembler code does it
+    Else
+    Begin
+      If (Index - 1) + Count > Len2 Then // strange behaviour, but the assembler code does it
         Count := Len2 - (Index - 1);
-      if CaseSensitive then
-      begin
-        for I := 0 to Count - 1 do
-        begin
+      If CaseSensitive Then
+      Begin
+        For I := 0 To Count - 1 Do
+        Begin
           PDWString(@C1)^ := S1[Index + I];
           PDWString(@C2)^ := S2[Index + I];
-          if C1 <> C2 then
-          begin
+          If C1 <> C2 Then
+          Begin
             Result := Ord(C1) - Ord(C2);
             Exit;
-          end;
-        end;
-      end
-      else
-      begin
-        for I := 0 to Count - 1 do
-        begin
+          End;
+        End;
+      End
+      Else
+      Begin
+        For I := 0 To Count - 1 Do
+        Begin
           PDWString(@C1)^ := S1[Index + I];
           PDWString(@C2)^ := S2[Index + I];
-          if C1 <> C2 then
-          begin
+          If C1 <> C2 Then
+          Begin
             C1 := CharLower(C1);
             C2 := CharLower(C2);
-            if C1 <> C2 then
-            begin
+            If C1 <> C2 Then
+            Begin
               Result := Ord(C1) - Ord(C2);
               Exit;
-            end;
-          end;
-        end;
-      end;
+            End;
+          End;
+        End;
+      End;
       Result := 0;
-    end;
-  end;
-end;
-function StrCompare(const S1, S2: DWString; CaseSensitive: Boolean): SizeInt;
-var
+    End;
+  End;
+End;
+Function StrCompare(Const S1, S2: DWString; CaseSensitive: Boolean): SizeInt;
+Var
   Len1, Len2: SizeInt;
-begin
-  if Pointer(S1) = Pointer(S2) then
+Begin
+  If Pointer(S1) = Pointer(S2) Then
     Result := 0
-  else
-  begin
+  Else
+  Begin
     Len1 := Length(S1);
     Len2 := Length(S2);
     Result := Len1 - Len2;
-    if Result = 0 then
+    If Result = 0 Then
       Result := StrCompareRangeEx(S1, S2, 1, Len1, CaseSensitive);
-  end;
-end;
-function StrCompareRange(const S1, S2: DWString; Index, Count: SizeInt; CaseSensitive: Boolean): SizeInt;
-begin
+  End;
+End;
+Function StrCompareRange(Const S1, S2: DWString; Index, Count: SizeInt; CaseSensitive: Boolean): SizeInt;
+Begin
   Result := StrCompareRangeEx(S1, S2, Index, Count, CaseSensitive);
-end;
-function StrRepeatChar(C: DWChar; Count: SizeInt): DWString;
-begin
+End;
+Function StrRepeatChar(C: DWChar; Count: SizeInt): DWString;
+Begin
   SetLength(Result, Count);
-  if Count > 0 then
+  If Count > 0 Then
     FillChar(Result[1], Count, C);
-end;
-function StrFind(const Substr, S: DWString; const Index: SizeInt): SizeInt;
-var
+End;
+Function StrFind(Const Substr, S: DWString; Const Index: SizeInt): SizeInt;
+Var
   pos: SizeInt;
-begin
-  if (SubStr <> '') and (S <> '') then
-  begin
+Begin
+  If (SubStr <> '') and (S <> '') Then
+  Begin
     pos := StrIPos(Substr, Copy(S, Index, Length(S) - Index + 1));
-    if pos = 0 then
+    If pos = 0 Then
       Result := 0
-    else
+    Else
       Result := Index + Pos - 1;
-  end
-  else
+  End
+  Else
     Result := 0;
-end;
-function StrHasPrefix(const S: DWString; const Prefixes: array of DWString): Boolean;
-begin
+End;
+Function StrHasPrefix(Const S: DWString; Const Prefixes: array Of DWString): Boolean;
+Begin
   Result := StrPrefixIndex(S, Prefixes) > -1;
-end;
-function StrHasSuffix(const S: DWString; const Suffixes: array of DWString): Boolean;
-begin
+End;
+Function StrHasSuffix(Const S: DWString; Const Suffixes: array Of DWString): Boolean;
+Begin
   Result := StrSuffixIndex(S, Suffixes) > -1;
-end;
-function StrIHasPrefix(const S: DWString; const Prefixes: array of DWString): Boolean;
-begin
+End;
+Function StrIHasPrefix(Const S: DWString; Const Prefixes: array Of DWString): Boolean;
+Begin
   Result := StrIPrefixIndex(S, Prefixes) > -1;
-end;
-function StrIHasSuffix(const S: DWString; const Suffixes: array of DWString): Boolean;
-begin
+End;
+Function StrIHasSuffix(Const S: DWString; Const Suffixes: array Of DWString): Boolean;
+Begin
   Result := StrISuffixIndex(S, Suffixes) > -1;
-end;
-function StrIndex(const S: DWString; const List: array of DWString; CaseSensitive: Boolean): SizeInt;
-var
+End;
+Function StrIndex(Const S: DWString; Const List: array Of DWString; CaseSensitive: Boolean): SizeInt;
+Var
   I: SizeInt;
-begin
+Begin
   Result := -1;
-  for I := Low(List) to High(List) do
-  begin
-    if StrCompare(S, List[I], CaseSensitive) = 0 then
-    begin
+  For I := Low(List) To High(List) Do
+  Begin
+    If StrCompare(S, List[I], CaseSensitive) = 0 Then
+    Begin
       Result := I;
       Break;
-    end;
-  end;
-end;
-function StrILastPos(const SubStr, S: DWString): SizeInt;
-begin
+    End;
+  End;
+End;
+Function StrILastPos(Const SubStr, S: DWString): SizeInt;
+Begin
   Result := StrLastPos(StrUpper(SubStr), StrUpper(S));
-end;
-function StrIPos(const SubStr, S: DWString): SizeInt;
-begin
+End;
+Function StrIPos(Const SubStr, S: DWString): SizeInt;
+Begin
   Result := Pos(StrUpper(SubStr), StrUpper(S));
-end;
-function StrIPrefixIndex(const S: DWString; const Prefixes: array of DWString): SizeInt;
-var
+End;
+Function StrIPrefixIndex(Const S: DWString; Const Prefixes: array Of DWString): SizeInt;
+Var
   I: SizeInt;
   Test: DWString;
-begin
+Begin
   Result := -1;
-  for I := Low(Prefixes) to High(Prefixes) do
-  begin
+  For I := Low(Prefixes) To High(Prefixes) Do
+  Begin
     Test := StrLeft(S, Length(Prefixes[I]));
-    if CompareText(Test, Prefixes[I]) = 0 then
-    begin
+    If CompareText(Test, Prefixes[I]) = 0 Then
+    Begin
       Result := I;
       Break;
-    end;
-  end;
-end;
-function StrIsOneOf(const S: DWString; const List: array of DWString): Boolean;
-begin
+    End;
+  End;
+End;
+Function StrIsOneOf(Const S: DWString; Const List: array Of DWString): Boolean;
+Begin
   Result := StrIndex(S, List) > -1;
-end;
-function StrISuffixIndex(const S: DWString; const Suffixes: array of DWString): SizeInt;
-var
+End;
+Function StrISuffixIndex(Const S: DWString; Const Suffixes: array Of DWString): SizeInt;
+Var
   I: SizeInt;
   Test: DWString;
-begin
+Begin
   Result := -1;
-  for I := Low(Suffixes) to High(Suffixes) do
-  begin
+  For I := Low(Suffixes) To High(Suffixes) Do
+  Begin
     Test := StrRight(S, Length(Suffixes[I]));
-    if CompareText(Test, Suffixes[I]) = 0 then
-    begin
+    If CompareText(Test, Suffixes[I]) = 0 Then
+    Begin
       Result := I;
       Break;
-    end;
-  end;
-end;
+    End;
+  End;
+End;
 // IMPORTANT NOTE: The StrMatch function does currently not work with the Asterix (*)
 // (*) acts like (?)
-function StrMatch(const Substr, S: DWString; Index: SizeInt): SizeInt;
-var
+Function StrMatch(Const Substr, S: DWString; Index: SizeInt): SizeInt;
+Var
   SI, SubI, SLen, SubLen: SizeInt;
   SubC: DWChar;
-begin
+Begin
   SLen := Length(S);
   SubLen := Length(Substr);
   Result := 0;
-  if (Index > SLen) or (SubLen = 0) then
+  If (Index > SLen) or (SubLen = 0) Then
     Exit;
-  while Index <= SLen do
-  begin
+  While Index <= SLen Do
+  Begin
     SubI := 1;
     SI := Index;
-    while (SI <= SLen) and (SubI <= SubLen) do
-    begin
+    While (SI <= SLen) and (SubI <= SubLen) Do
+    Begin
       PDWString(@SubC)^ := Substr[SubI];
-      if (SubC = '*') or (SubC = '?') or (PDWString(@SubC)^ = S[SI]) then
-      begin
+      If (SubC = '*') or (SubC = '?') or (PDWString(@SubC)^ = S[SI]) Then
+      Begin
         Inc(SI);
         Inc(SubI);
-      end
-      else
+      End
+      Else
         Break;
-    end;
-    if SubI > SubLen then
-    begin
+    End;
+    If SubI > SubLen Then
+    Begin
       Result := Index;
       Break;
-    end;
+    End;
     Inc(Index);
-  end;
-end;
+  End;
+End;
 
-function StrNPos(const S, SubStr: DWString; N: SizeInt): SizeInt;
-var
+Function StrNPos(Const S, SubStr: DWString; N: SizeInt): SizeInt;
+Var
   I, P: SizeInt;
-begin
-  if N < 1 then
-  begin
+Begin
+  If N < 1 Then
+  Begin
     Result := 0;
     Exit;
-  end;
+  End;
   Result := StrSearch(SubStr, S, 1);
   I := 1;
-  while I < N do
-  begin
+  While I < N Do
+  Begin
     P := StrSearch(SubStr, S, Result + 1);
-    if P = 0 then
-    begin
+    If P = 0 Then
+    Begin
       Result := 0;
       Break;
-    end
-    else
-    begin
+    End
+    Else
+    Begin
       Result := P;
       Inc(I);
-    end;
-  end;
-end;
-function StrNIPos(const S, SubStr: DWString; N: SizeInt): SizeInt;
-var
+    End;
+  End;
+End;
+Function StrNIPos(Const S, SubStr: DWString; N: SizeInt): SizeInt;
+Var
   I, P: SizeInt;
-begin
-  if N < 1 then
-  begin
+Begin
+  If N < 1 Then
+  Begin
     Result := 0;
     Exit;
-  end;
+  End;
   Result := StrFind(SubStr, S, 1);
   I := 1;
-  while I < N do
-  begin
+  While I < N Do
+  Begin
     P := StrFind(SubStr, S, Result + 1);
-    if P = 0 then
-    begin
+    If P = 0 Then
+    Begin
       Result := 0;
       Break;
-    end
-    else
-    begin
+    End
+    Else
+    Begin
       Result := P;
       Inc(I);
-    end;
-  end;
-end;
-function StrPrefixIndex(const S: DWString; const Prefixes: array of DWString): SizeInt;
-var
+    End;
+  End;
+End;
+Function StrPrefixIndex(Const S: DWString; Const Prefixes: array Of DWString): SizeInt;
+Var
   I: SizeInt;
   Test: DWString;
-begin
+Begin
   Result := -1;
-  for I := Low(Prefixes) to High(Prefixes) do
-  begin
+  For I := Low(Prefixes) To High(Prefixes) Do
+  Begin
     Test := StrLeft(S, Length(Prefixes[I]));
-    if CompareStr(Test, Prefixes[I]) = 0 then
-    begin
+    If CompareStr(Test, Prefixes[I]) = 0 Then
+    Begin
       Result := I;
       Break;
-    end;
-  end;
-end;
-function StrSuffixIndex(const S: DWString; const Suffixes: array of DWString): SizeInt;
-var
+    End;
+  End;
+End;
+Function StrSuffixIndex(Const S: DWString; Const Suffixes: array Of DWString): SizeInt;
+Var
   I: SizeInt;
   Test: DWString;
-begin
+Begin
   Result := -1;
-  for I := Low(Suffixes) to High(Suffixes) do
-  begin
+  For I := Low(Suffixes) To High(Suffixes) Do
+  Begin
     Test := StrRight(S, Length(Suffixes[I]));
-    if CompareStr(Test, Suffixes[I]) = 0 then
-    begin
+    If CompareStr(Test, Suffixes[I]) = 0 Then
+    Begin
       Result := I;
       Break;
-    end;
-  end;
-end;
+    End;
+  End;
+End;
 //=== String Extraction ======================================================
-function StrAfter(const SubStr, S: DWString): DWString;
-var
+Function StrAfter(Const SubStr, S: DWString): DWString;
+Var
   P: SizeInt;
-begin
+Begin
   P := StrFind(SubStr, S, 1); // StrFind is case-insensitive pos
-  if P <= 0 then
+  If P <= 0 Then
     Result := ''           // substr not found -> nothing after it
-  else
+  Else
     Result := StrRestOf(S, P + Length(SubStr));
-end;
-function StrBefore(const SubStr, S: DWString): DWString;
-var
+End;
+Function StrBefore(Const SubStr, S: DWString): DWString;
+Var
   P: SizeInt;
-begin
+Begin
   P := StrFind(SubStr, S, 1);
-  if P <= 0 then
+  If P <= 0 Then
     Result := S
-  else
+  Else
     Result := StrLeft(S, P - 1);
-end;
-function StrSplit(const SubStr, S: DWString;var Left, Right : DWString): boolean;
-var
+End;
+Function StrSplit(Const SubStr, S: DWString;Var Left, Right : DWString): boolean;
+Var
   P: SizeInt;
-begin
+Begin
   P := StrFind(SubStr, S, 1);
   Result:= p > 0;
-  if Result then
-  begin
+  If Result Then
+  Begin
     Left := StrLeft(S, P - 1);
     Right := StrRestOf(S, P + Length(SubStr));
-  end
-  else
-  begin
+  End
+  Else
+  Begin
     Left := '';
     Right := '';
-  end;
-end;
-function StrBetween(const S: DWString; const Start, Stop: DWChar): DWString;
-var
+  End;
+End;
+Function StrBetween(Const S: DWString; Const Start, Stop: DWChar): DWString;
+Var
   PosStart, PosEnd: SizeInt;
   L: SizeInt;
-begin
+Begin
   PosStart := Pos(Start, S);
   PosEnd := StrSearch(Stop, S, PosStart + 1);  // PosEnd has to be after PosStart.
-  if (PosStart > 0) and (PosEnd > PosStart) then
-  begin
+  If (PosStart > 0) and (PosEnd > PosStart) Then
+  Begin
     L := PosEnd - PosStart;
     Result := Copy(S, PosStart + 1, L - 1);
-  end
-  else
+  End
+  Else
     Result := '';
-end;
-function StrChopRight(const S: DWString; N: SizeInt): DWString;
-begin
+End;
+Function StrChopRight(Const S: DWString; N: SizeInt): DWString;
+Begin
   Result := Copy(S, 1, Length(S) - N);
-end;
-function StrLeft(const S: DWString; Count: SizeInt): DWString;
-begin
+End;
+Function StrLeft(Const S: DWString; Count: SizeInt): DWString;
+Begin
   Result := Copy(S, 1, Count);
-end;
-function StrMid(const S: DWString; Start, Count: SizeInt): DWString;
-begin
+End;
+Function StrMid(Const S: DWString; Start, Count: SizeInt): DWString;
+Begin
   Result := Copy(S, Start, Count);
-end;
-function StrRestOf(const S: DWString; N: SizeInt): DWString;
-begin
+End;
+Function StrRestOf(Const S: DWString; N: SizeInt): DWString;
+Begin
   Result := Copy(S, N, (Length(S) - N + 1));
-end;
-function StrRight(const S: DWString; Count: SizeInt): DWString;
-begin
+End;
+Function StrRight(Const S: DWString; Count: SizeInt): DWString;
+Begin
   Result := Copy(S, Length(S) - Count + 1, Count);
-end;
+End;
 
-function CharIsDelete(const C: DWChar): Boolean;
-begin
+Function CharIsDelete(Const C: DWChar): Boolean;
+Begin
   Result := (C = #8);
-end;
+End;
 
-function CharIsReturn(const C: DWChar): Boolean;
-begin
+Function CharIsReturn(Const C: DWChar): Boolean;
+Begin
   Result := (C = AnsiLineFeed) or (C = AnsiCarriageReturn);
-end;
-function CharIsValidIdentifierLetter(const C: DWChar): Boolean;
-begin
-  case C of
+End;
+Function CharIsValidIdentifierLetter(Const C: DWChar): Boolean;
+Begin
+  Case C Of
     '0'..'9', 'A'..'Z', 'a'..'z', '_':
       Result := True;
-  else
+  Else
     Result := False;
-  end;
-end;
-function CharIsWildcard(const C: DWChar): Boolean;
-begin
-  case C of
+  End;
+End;
+Function CharIsWildcard(Const C: DWChar): Boolean;
+Begin
+  Case C Of
     '*', '?':
       Result := True;
-  else
+  Else
     Result := False;
-  end;
-end;
-function CharType(const C: DWChar): Word;
-begin
+  End;
+End;
+Function CharType(Const C: DWChar): Word;
+Begin
   Result := DWCharTypes[C];
-end;
-function PCharVectorCount(Source: PAnsiCharVector): SizeInt;
-begin
+End;
+Function PCharVectorCount(Source: PAnsiCharVector): SizeInt;
+Begin
   Result := 0;
-  if Source <> nil then
-    while Source^ <> nil do
-  begin
+  If Source <> nil Then
+    While Source^ <> nil Do
+  Begin
     Inc(Source);
     Inc(Result);
-  end;
-end;
+  End;
+End;
 //=== Character Transformation Routines ======================================
-function CharHex(const C: DWChar): Byte;
-begin
-  case C of
+Function CharHex(Const C: DWChar): Byte;
+Begin
+  Case C Of
     '0'..'9':
       Result := Ord(C) - Ord('0');
     'a'..'f':
       Result := Ord(C) - Ord('a') + 10;
     'A'..'F':
       Result := Ord(C) - Ord('A') + 10;
-  else
+  Else
     Result := $FF;
-  end;
-end;
-function CharLower(const C: DWChar): DWChar;
-begin
+  End;
+End;
+Function CharLower(Const C: DWChar): DWChar;
+Begin
   Result := AnsiCaseMap[Ord(C) + AnsiLoOffset];
-end;
-function CharToggleCase(const C: DWChar): DWChar;
-begin
+End;
+Function CharToggleCase(Const C: DWChar): DWChar;
+Begin
   Result := AnsiCaseMap[Ord(C) + AnsiReOffset];
-end;
-function CharUpper(const C: DWChar): DWChar;
-begin
+End;
+Function CharUpper(Const C: DWChar): DWChar;
+Begin
   Result := AnsiCaseMap[Ord(C) + AnsiUpOffset];
-end;
+End;
 //=== Character Search and Replace ===========================================
-function CharLastPos(const S: DWString; const C: DWChar; const Index: SizeInt): SizeInt;
-begin
-  if (Index > 0) and (Index <= Length(S)) then
-    for Result := Length(S) downto Index do
-      if PDWString(@S[Result])^ = C then
+Function CharLastPos(Const S: DWString; Const C: DWChar; Const Index: SizeInt): SizeInt;
+Begin
+  If (Index > 0) and (Index <= Length(S)) Then
+    For Result := Length(S) Downto Index Do
+      If PDWString(@S[Result])^ = C Then
         Exit;
   Result := 0;
-end;
-function CharPos(const S: DWString; const C: DWChar; const Index: SizeInt): SizeInt;
-begin
-  if (Index > 0) and (Index <= Length(S)) then
-    for Result := Index to Length(S) do
-      if PDWString(@S[Result])^ = C then
+End;
+Function CharPos(Const S: DWString; Const C: DWChar; Const Index: SizeInt): SizeInt;
+Begin
+  If (Index > 0) and (Index <= Length(S)) Then
+    For Result := Index To Length(S) Do
+      If PDWString(@S[Result])^ = C Then
         Exit;
   Result := 0;
-end;
-function CharIPos(const S: DWString; C: DWChar; const Index: SizeInt): SizeInt;
-begin
-  if (Index > 0) and (Index <= Length(S)) then
-  begin
+End;
+Function CharIPos(Const S: DWString; C: DWChar; Const Index: SizeInt): SizeInt;
+Begin
+  If (Index > 0) and (Index <= Length(S)) Then
+  Begin
     C := CharUpper(C);
-    for Result := Index to Length(S) do
-      if AnsiCaseMap[Ord(S[Result]) + AnsiUpOffset] = C then
+    For Result := Index To Length(S) Do
+      If AnsiCaseMap[Ord(S[Result]) + AnsiUpOffset] = C Then
         Exit;
-  end;
+  End;
   Result := 0;
-end;
-procedure AllocateMultiSz(var Dest: PAnsiMultiSz; Len: SizeInt);
-begin
-  if Len > 0 then
+End;
+Procedure AllocateMultiSz(Var Dest: PAnsiMultiSz; Len: SizeInt);
+Begin
+  If Len > 0 Then
     GetMem(Dest, Len * SizeOf(DWChar))
-  else
+  Else
     Dest := nil;
-end;
-procedure FreeMultiSz(var Dest: PAnsiMultiSz);
-begin
-  if Dest <> nil then
+End;
+Procedure FreeMultiSz(Var Dest: PAnsiMultiSz);
+Begin
+  If Dest <> nil Then
     FreeMem(Dest);
   Dest := nil;
-end;
+End;
 //=== TJclAnsiStrings Manipulation ===============================================
-procedure StrToStrings(S, Sep: DWString; const List: TJclAnsiStrings; const AllowEmptyString: Boolean = True);
-var
+Procedure StrToStrings(S, Sep: DWString; Const List: TJclAnsiStrings; Const AllowEmptyString: Boolean = True);
+Var
   I, L: SizeInt;
   Left: DWString;
-begin
+Begin
   Assert(List <> nil);
   List.BeginUpdate;
-  try
+  Try
     List.Clear;
     L := Length(Sep);
     I := Pos(Sep, S);
-    while I > 0 do
-    begin
+    While I > 0 Do
+    Begin
       Left := StrLeft(S, I - 1);
-      if (Left <> '') or AllowEmptyString then
+      If (Left <> '') or AllowEmptyString Then
         List.Add(Left);
       Delete(S, 1, I + L - 1);
       I := Pos(Sep, S);
-    end;
-    if (S <> '') or AllowEmptyString then
+    End;
+    If (S <> '') or AllowEmptyString Then
       List.Add(S);  // Ignore empty strings at the end (only if AllowEmptyString = False).
-  finally
+  Finally
     List.EndUpdate;
-  end;
-end;
-procedure StrIToStrings(S, Sep: DWString; const List: TJclAnsiStrings; const AllowEmptyString: Boolean = True);
-var
+  End;
+End;
+Procedure StrIToStrings(S, Sep: DWString; Const List: TJclAnsiStrings; Const AllowEmptyString: Boolean = True);
+Var
   I, L: SizeInt;
   LowerCaseStr: DWString;
   Left: DWString;
-begin
+Begin
   Assert(List <> nil);
   LowerCaseStr := StrLower(S);
   Sep := StrLower(Sep);
   L := Length(Sep);
   I := Pos(Sep, LowerCaseStr);
   List.BeginUpdate;
-  try
+  Try
     List.Clear;
-    while I > 0 do
-    begin
+    While I > 0 Do
+    Begin
       Left := StrLeft(S, I - 1);
-      if (Left <> '') or AllowEmptyString then
+      If (Left <> '') or AllowEmptyString Then
         List.Add(Left);
       Delete(S, 1, I + L - 1);
       Delete(LowerCaseStr, 1, I + L - 1);
       I := Pos(Sep, LowerCaseStr);
-    end;
-    if (S <> '') or AllowEmptyString then
+    End;
+    If (S <> '') or AllowEmptyString Then
       List.Add(S);  // Ignore empty strings at the end (only if AllowEmptyString = False).
-  finally
+  Finally
     List.EndUpdate;
-  end;
-end;
-function StringsToStr(const List: TJclAnsiStrings; const Sep: DWString;
-  const AllowEmptyString: Boolean): DWString;
-var
+  End;
+End;
+Function StringsToStr(Const List: TJclAnsiStrings; Const Sep: DWString;
+  Const AllowEmptyString: Boolean): DWString;
+Var
   I, L: SizeInt;
-begin
+Begin
   Result := '';
-  for I := 0 to List.Count - 1 do
-  begin
-    if (List[I] <> '') or AllowEmptyString then
-    begin
+  For I := 0 To List.Count - 1 Do
+  Begin
+    If (List[I] <> '') or AllowEmptyString Then
+    Begin
       // don't combine these into one addition, somehow it hurts performance
       Result := Result + List[I];
       Result := Result + Sep;
-    end;
-  end;
+    End;
+  End;
   // remove terminating separator
-  if List.Count <> 0 then
-  begin
+  If List.Count <> 0 Then
+  Begin
     L := Length(Sep);
     Delete(Result, Length(Result) - L + 1, L);
-  end;
-end;
-procedure TrimStrings(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean);
-var
+  End;
+End;
+Procedure TrimStrings(Const List: TJclAnsiStrings; DeleteIfEmpty: Boolean);
+Var
   I: SizeInt;
-begin
+Begin
   Assert(List <> nil);
   List.BeginUpdate;
-  try
-    for I := List.Count - 1 downto 0 do
-    begin
+  Try
+    For I := List.Count - 1 Downto 0 Do
+    Begin
       List[I] := Trim(List[I]);
-      if (List[I] = '') and DeleteIfEmpty then
+      If (List[I] = '') and DeleteIfEmpty Then
         List.Delete(I);
-    end;
-  finally
+    End;
+  Finally
     List.EndUpdate;
-  end;
-end;
-procedure TrimStringsRight(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean);
-var
+  End;
+End;
+Procedure TrimStringsRight(Const List: TJclAnsiStrings; DeleteIfEmpty: Boolean);
+Var
   I: SizeInt;
-begin
+Begin
   Assert(List <> nil);
   List.BeginUpdate;
-  try
-    for I := List.Count - 1 downto 0 do
-    begin
+  Try
+    For I := List.Count - 1 Downto 0 Do
+    Begin
       List[I] := TrimRight(List[I]);
-      if (List[I] = '') and DeleteIfEmpty then
+      If (List[I] = '') and DeleteIfEmpty Then
         List.Delete(I);
-    end;
-  finally
+    End;
+  Finally
     List.EndUpdate;
-  end;
-end;
-procedure TrimStringsLeft(const List: TJclAnsiStrings; DeleteIfEmpty: Boolean);
-var
+  End;
+End;
+Procedure TrimStringsLeft(Const List: TJclAnsiStrings; DeleteIfEmpty: Boolean);
+Var
   I: SizeInt;
-begin
+Begin
   Assert(List <> nil);
   List.BeginUpdate;
-  try
-    for I := List.Count - 1 downto 0 do
-    begin
+  Try
+    For I := List.Count - 1 Downto 0 Do
+    Begin
       List[I] := TrimLeft(List[I]);
-      if (List[I] = '') and DeleteIfEmpty then
+      If (List[I] = '') and DeleteIfEmpty Then
         List.Delete(I);
-    end;
-  finally
+    End;
+  Finally
     List.EndUpdate;
-  end;
-end;
-function AddStringToStrings(const S: DWString; Strings: TJclAnsiStrings; const Unique: Boolean): Boolean;
-begin
+  End;
+End;
+Function AddStringToStrings(Const S: DWString; Strings: TJclAnsiStrings; Const Unique: Boolean): Boolean;
+Begin
   Assert(Strings <> nil);
   Result := Unique and (Strings.IndexOf(S) <> -1);
-  if not Result then
+  If not Result Then
     Result := Strings.Add(S) > -1;
-end;
+End;
 //=== Miscellaneous ==========================================================
-function FileToString(const FileName: TFileName): DWString;
-var
+Function FileToString(Const FileName: TFileName): DWString;
+Var
   FS: TFileStream;
   Len: SizeInt;
-begin
+Begin
   FS := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
-  try
+  Try
     Len := FS.Size;
     SetLength(Result, Len);
-    if Len > 0 then
+    If Len > 0 Then
     FS.ReadBuffer(Result[1], Len);
-  finally
+  Finally
     FS.Free;
-  end;
-end;
-procedure StringToFile(const FileName: TFileName; const Contents: DWString; Append: Boolean);
-var
+  End;
+End;
+Procedure StringToFile(Const FileName: TFileName; Const Contents: DWString; Append: Boolean);
+Var
   FS: TFileStream;
   Len: SizeInt;
-begin
-  if Append and FileExists(FileName) then
+Begin
+  If Append and FileExists(FileName) Then
     FS := TFileStream.Create(FileName, fmOpenReadWrite or fmShareDenyWrite)
-  else
+  Else
     FS := TFileStream.Create(FileName, fmCreate);
-  try
-    if Append then
+  Try
+    If Append Then
       FS.Seek(0, soEnd);  // faster than .Position := .Size
     Len := Length(Contents);
-    if Len > 0 then
+    If Len > 0 Then
     FS.WriteBuffer(Contents[1], Len);
-  finally
+  Finally
     FS.Free;
-  end;
-end;
-function StrToken(var S: DWString; Separator: DWChar): DWString;
-var
+  End;
+End;
+Function StrToken(Var S: DWString; Separator: DWChar): DWString;
+Var
   I: SizeInt;
-begin
+Begin
   I := Pos(Separator, S);
-  if I <> 0 then
-  begin
+  If I <> 0 Then
+  Begin
     Result := Copy(S, 1, I - 1);
     Delete(S, 1, I);
-  end
-  else
-  begin
+  End
+  Else
+  Begin
     Result := S;
     S := '';
-  end;
-end;
+  End;
+End;
 
 //procedure StrTokenToStrings(S: string; Separator: Char; const List: TStrings);
 //var
@@ -2256,25 +2256,25 @@ end;
 //  end;
 //end;
 
-procedure StrNormIndex(const StrLen: SizeInt; var Index: SizeInt; var Count: SizeInt); overload;
-begin
+Procedure StrNormIndex(Const StrLen: SizeInt; Var Index: SizeInt; Var Count: SizeInt); overload;
+Begin
   Index := Max(1, Min(Index, StrLen + 1));
   Count := Max(0, Min(Count, StrLen + 1 - Index));
-end;
-function ArrayOf(List: TJclAnsiStrings): TDynStringArray;
-var
+End;
+Function ArrayOf(List: TJclAnsiStrings): TDynStringArray;
+Var
   I: SizeInt;
-begin
-  if List <> nil then
-  begin
+Begin
+  If List <> nil Then
+  Begin
     SetLength(Result, List.Count);
-    for I := 0 to List.Count - 1 do
+    For I := 0 To List.Count - 1 Do
       Result[I] := string(List[I]);
-  end
-  else
+  End
+  Else
     Result := nil;
-end;
+End;
 
-initialization
-  LoadCharTypes;  // this table first
+Initialization
+ LoadCharTypes;  // this table first
 End.

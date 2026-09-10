@@ -1,15 +1,15 @@
-unit uRESTDWABMemDBFilterExpr;
+Unit uRESTDWABMemDBFilterExpr;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
   Criado por XyberX (Gilbero Rocha da Silva), o REST Dataware tem como objetivo o uso de REST/JSON
  de maneira simples, em qualquer Compilador Pascal (Delphi, Lazarus e outros...).
-  O REST Dataware também tem por objetivo levar componentes compatíveis entre o Delphi e outros Compiladores
+  O REST Dataware tambm tem por objetivo levar componentes compatveis entre o Delphi e outros Compiladores
  Pascal e com compatibilidade entre sistemas operacionais.
-  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal você usuário que precisa
- de produtividade e flexibilidade para produção de Serviços REST/JSON, simplificando o processo para você programador.
+  Desenvolvido para ser usado de Maneira RAD, o REST Dataware tem como objetivo principal voc usurio que precisa
+ de produtividade e flexibilidade para produo de Servios REST/JSON, simplificando o processo para voc programador.
 
  Membros do Grupo :
 
@@ -17,32 +17,32 @@ unit uRESTDWABMemDBFilterExpr;
  Alberto Brito              - Admin - Criador e Administrador do pacote.
 
  Alexandre Abbade           - Admin - Administrador do desenvolvimento de DEMOS, coordenador do Grupo.
- Anderson Fiori             - Admin - Gerencia de Organização dos Projetos
- Flávio Motta               - Member Tester and DEMO Developer.
+ Anderson Fiori             - Admin - Gerencia de Organizao dos Projetos
+ Flvio Motta               - Member Tester and DEMO Developer.
  Mobius One                 - Devel, Tester and Admin.
  Gustavo                    - Criptografia and Devel.
  Eloy                       - Devel.
  Roniery                    - Devel.
 }
 
-interface
-uses
+Interface
+Uses
   SysUtils, Classes, Variants, DB{$IFNDEF FPC}, DBCommon, SqlTimSt, Masks {$ENDIF}, FmtBcd;
-type
-  TRDWABExprParser = class(TExprParser)
-  private
+Type
+  TRDWABExprParser = Class(TExprParser)
+  Private
      FDataset:TDataSet;
-  public
-     constructor Create(DataSet: TDataSet; const Text: string;
+  Public
+     Constructor Create(DataSet: TDataSet; Const Text: string;
                         Options: TFilterOptions);
-     function Evaluate:boolean;
-  end;
+     Function Evaluate:boolean;
+  End;
 
 
 
-implementation
+Implementation
 
-const
+Const
   // Field mappings needed for filtering. (What field type should be compared with what internal type).
   FldTypeMap: TFieldMap = (
      ord(DB.ftUnknown)     // ftUnknown
@@ -133,41 +133,41 @@ const
 
 { TRDWABExprParser }
 
-constructor TRDWABExprParser.Create(DataSet: TDataSet;
-  const Text: string; Options: TFilterOptions);
-begin
-inherited Create(DataSet,Text,Options,[poExtSyntax],'',nil,FldTypeMap);
+Constructor TRDWABExprParser.Create(DataSet: TDataSet;
+  Const Text: string; Options: TFilterOptions);
+Begin
+Inherited Create(DataSet,Text,Options,[poExtSyntax],'',nil,FldTypeMap);
      FDataset:=DataSet;
-end;
+End;
 
-function TRDWABExprParser.Evaluate: boolean;
-  function VIsNull(AVariant:Variant):Boolean;
-  begin
+Function TRDWABExprParser.Evaluate: boolean;
+  Function VIsNull(AVariant:Variant):Boolean;
+  Begin
        Result:=VarIsNull(AVariant) or VarIsEmpty(AVariant);
-  end;
-var
+  End;
+Var
 
    iLiteralStart:Word;
    format:TFormatSettings;
 
 
-   function GetUnicodeString(pft:PByte) : Utf8String;
-   var
+   Function GetUnicodeString(pft:PByte) : Utf8String;
+   Var
       len:word;
       pWords:PWord;
       pR:Pointer;
-   begin
+   Begin
         pWords:=PWord(pft);
         len:=pWords^ div 2;
         inc(pWords);
         SetLength(Result,len);
         pR:=pointer(@Result[1]); //Substituir Stringindex 1 pela variavel para android e ARms compiles
         Move(pWords^,pR^,len * 2);
-   end;
+   End;
 
 
-   function ParseNode(pfdStart,pfd:PByte):variant;
-   var
+   Function ParseNode(pfdStart,pfd:PByte):variant;
+   Var
       b:WordBool;
       i : Integer;
       z:nativeint;
@@ -197,13 +197,13 @@ var
       PartLength:word;
       IgnoreCase:word;
       S1,S2:string;
-   type
+   Type
       PDouble=^Double;
       PTimeStamp=^TTimeStamp;
       PComp=^Comp;
       PWordBool=^WordBool;
       PBCD=^TBCD;
-   begin
+   Begin
 
         // Get node class.
      {$IFNDEF FPC}
@@ -221,12 +221,12 @@ var
         //ShowMessage(Format('Class=%d, Operator=%d',[ord(iClass),ord(iOperator)]));
 
         // Check class.
-        case iClass of
+        Case iClass Of
             nodeFIELD:
-               begin
-                    case iOperator of
+               Begin
+                    Case iOperator Of
                          coFIELD2:
-                           begin
+                           Begin
 //                                FieldNo:=PWord(@pfd[0])^ - 1;
                                {$IFNDEF FPC}
                                 {$IFDEF DELPHI2010UP}
@@ -244,17 +244,17 @@ var
                                 FieldName:=string(PAnsiChar(pArg1));
 {$ENDIF}
                                 Result:=FDataset.FieldByName(FieldName).Value;
-                           end;
-                         else
+                           End;
+                         Else
                              raise exception.create('Error %s'+inttostr(ord(iOperator)));
-                    end;
-               end;
+                    End;
+               End;
 
             nodeCONST:
-               begin
-                    case iOperator of
+               Begin
+                    Case iOperator Of
                          coCONST2:
-                           begin
+                           Begin
                                {$IFNDEF FPC}
                                 {$IFDEF DELPHI2010UP}
                                  DataType:=PWord(@pfd[0])^;
@@ -268,7 +268,7 @@ var
                                 inc(pArg1,DataOfs);
 
                                 // Check type.
-                                case DataType of
+                                Case DataType Of
                                      ord(DB.ftSmallInt): Result:=PSmallInt(pArg1)^;
                                      ord(DB.ftWord): Result:=PWord(pArg1)^;
                                      {$IFNDEF FPC}
@@ -335,49 +335,49 @@ var
                                         Result:=String(AnsiString(PAnsiChar(pArg1)));
 {$ENDIF}
                                      ord(DB.ftDate):
-                                       begin
+                                       Begin
                                             ts.Date:=PInteger(pArg1)^;
                                             ts.Time:=0;
                                             dt:=TimeStampToDateTime(ts);
                                             Result:=dt;
-                                       end;
+                                       End;
                                      ord(DB.ftTime):
-                                       begin
+                                       Begin
                                             ts.Date:=0;
                                             ts.Time:=PInteger(pArg1)^;;
                                             dt:=TimeStampToDateTime(ts);
                                             Result:=dt;
-                                       end;
+                                       End;
                                      ord(DB.ftDateTime):
-                                       begin
+                                       Begin
                                             cdt:=PDouble(pArg1)^;
                                             ts:=MSecsToTimeStamp(cdt);
                                             dt:=TimeStampToDateTime(ts);
                                             Result:=dt;
-                                       end;
+                                       End;
                                      ord(DB.ftBoolean): Result:=PWordBool(pArg1)^;
 
                                      ord(DB.ftTimeStamp): Result:=VarSQLTimeStampCreate(PSQLTimeStamp(pArg1)^);
                                      ord(DB.ftBCD),
                                      ord(DB.ftFmtBCD):
-                                       begin
+                                       Begin
                                             bcd:=TBCD(PBCD(pArg1)^);
                                             BCDToCurr(bcd,Cur);
                                             Result:=Cur;
-                                       end;
+                                       End;
 
                                      $1007:                       // Midas Unicode.
                                           Result:=GetUnicodeString(PByte(pArg1));
 
-                                     else
+                                     Else
                                          raise exception.Create('Tipo Campo Desconhecido, '+inttostr(DataType));
-                                end;
-                           end;
-                    end;
-               end;
+                                End;
+                           End;
+                    End;
+               End;
 
             nodeUNARY:
-               begin
+               Begin
                     pArg1:=pfdStart;
                    {$IFNDEF FPC}
                     {$IFDEF DELPHI2010UP}
@@ -386,55 +386,55 @@ var
                    {$ELSE}
                     inc(pArg1,CANEXPRSIZE+PWord(@pfd[0])^);
                    {$ENDIF}
-                    case iOperator of
+                    Case iOperator Of
                          coISBLANK,coNOTBLANK:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 b:=VIsNull(Arg1);
-                                if iOperator=coNOTBLANK then b:=not b;
+                                If iOperator=coNOTBLANK Then b:=not b;
                                 Result:=Variant(b);
-                           end;
+                           End;
 
                          coNOT:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
-                                if VIsNull(Arg1) then
+                                If VIsNull(Arg1) Then
                                    Result:=Null
-                                else
+                                Else
                                    Result:=Variant(not Arg1);
-                           end;
+                           End;
 
                          coMINUS:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
-                                if not VIsNull(Arg1) then
+                                If not VIsNull(Arg1) Then
                                    Result:=-Arg1
-                                else
+                                Else
                                     Result:=Null;
-                           end;
+                           End;
 
                          coUPPER:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
-                                if not VIsNull(Arg1) then
+                                If not VIsNull(Arg1) Then
                                    Result:=UpperCase(Arg1)
-                                else
+                                Else
                                     Result:=Null;
-                           end;
+                           End;
 
                          coLOWER:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
-                                if not VIsNull(Arg1) then
+                                If not VIsNull(Arg1) Then
                                    Result:=LowerCase(Arg1)
-                                else
+                                Else
                                     Result:=Null;
-                           end;
-                    end;
-               end;
+                           End;
+                    End;
+               End;
 
             nodeBINARY:
-               begin
+               Begin
                     // Get Loper and Roper pointers to buffer.
                     pArg1:=pfdStart;
                    {$IFNDEF FPC}
@@ -449,182 +449,182 @@ var
                     inc(pArg2,CANEXPRSIZE+PWord(@pfd[2])^);
                    {$ENDIF}
                     // Check operator for what to do.
-                    case iOperator of
+                    Case iOperator Of
                          coEQ:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then b:=false
-                                else b:=(Arg1 = Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then b:=false
+                                Else b:=(Arg1 = Arg2);
                                 Result:=Variant(b);
                                 exit;
-                           end;
+                           End;
 
                          coNE:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then b:=false
-                                else b:=(Arg1 <> Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then b:=false
+                                Else b:=(Arg1 <> Arg2);
                                 Result:=Variant(b);
                                 exit;
-                           end;
+                           End;
 
                          coGT:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then b:=false
-                                else b:=(Arg1 > Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then b:=false
+                                Else b:=(Arg1 > Arg2);
                                 Result:=Variant(b);
                                 exit;
-                           end;
+                           End;
 
                          coGE:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then b:=false
-                                else b:=(Arg1 >= Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then b:=false
+                                Else b:=(Arg1 >= Arg2);
                                 Result:=Variant(b);
                                 exit;
-                           end;
+                           End;
 
                          coLT:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then b:=false
-                                else b:=(Arg1 < Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then b:=false
+                                Else b:=(Arg1 < Arg2);
                                 Result:=Variant(b);
                                 exit;
-                           end;
+                           End;
 
                          coLE:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then b:=false
-                                else b:=(Arg1 <= Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then b:=false
+                                Else b:=(Arg1 <= Arg2);
                                 Result:=Variant(b);
                                 exit;
-                           end;
+                           End;
 
                          coOR:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then b:=false
-                                else b:=(Arg1 or Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then b:=false
+                                Else b:=(Arg1 or Arg2);
                                 Result:=Variant(b);
                                 exit;
-                           end;
+                           End;
 
                          coAND:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then b:=false
-                                else b:=(Arg1 and Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then b:=false
+                                Else b:=(Arg1 and Arg2);
                                 Result:=Variant(b);
                                 exit;
-                           end;
+                           End;
 
                          coADD:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then Result:=Null
-                                else Result:=(Arg1 + Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then Result:=Null
+                                Else Result:=(Arg1 + Arg2);
                                 exit;
-                           end;
+                           End;
 
                          coSUB:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then Result:=Null
-                                else Result:=(Arg1 - Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then Result:=Null
+                                Else Result:=(Arg1 - Arg2);
                                 exit;
-                           end;
+                           End;
 
                          coMUL:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then Result:=Null
-                                else Result:=(Arg1 * Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then Result:=Null
+                                Else Result:=(Arg1 * Arg2);
                                 exit;
-                           end;
+                           End;
 
                          coDIV:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then Result:=Null
-                                else Result:=(Arg1 / Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then Result:=Null
+                                Else Result:=(Arg1 / Arg2);
                                 exit;
-                           end;
+                           End;
 
                          coMOD,coREM:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(pfdStart,pArg1);
                                 Arg2:=ParseNode(pfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then Result:=Null
-                                else Result:=(Arg1 mod Arg2);
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then Result:=Null
+                                Else Result:=(Arg1 mod Arg2);
                                 exit;
-                           end;
+                           End;
 
                          coIN:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(PfdStart,pArg1);
                                 Arg2:=ParseNode(PfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then
-                                begin
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then
+                                Begin
                                      Result:=false;
                                      exit;
-                                end;
+                                End;
 
-                                if VarIsArray(Arg2) then
-                                begin
+                                If VarIsArray(Arg2) Then
+                                Begin
                                      b:=false;
-                                     for i:=0 to VarArrayHighBound(Arg2,1) do
-                                     begin
-                                          if VarIsEmpty(Arg2[i]) then break;
+                                     For i:=0 To VarArrayHighBound(Arg2,1) Do
+                                     Begin
+                                          If VarIsEmpty(Arg2[i]) Then break;
                                           b:=(Arg1=Arg2[i]);
-                                          if b then break;
-                                     end;
-                                end
-                                else
+                                          If b Then break;
+                                     End;
+                                End
+                                Else
                                     b:=(Arg1=Arg2);
                                 Result:=Variant(b);
                                 exit;
-                           end;
+                           End;
 
                          coLike:
-                           begin
+                           Begin
                                 Arg1:=ParseNode(PfdStart,pArg1);
                                 Arg2:=ParseNode(PfdStart,pArg2);
-                                if VIsNull(Arg1) or VIsNull(Arg2) then
-                                begin
+                                If VIsNull(Arg1) or VIsNull(Arg2) Then
+                                Begin
                                      Result:=false;
                                      exit;
-                                end;
+                                End;
                                 pArg1:=PByte(PChar(VarToStr(ParseNode(pfdStart,pArg1))));
                                 pArg2:=PByte(PChar(VarToStr(ParseNode(pfdStart,pArg2))));
                                 sLike := StringReplace(string(PChar(pArg2)), '%', '*', [rfReplaceAll]);
                                 b:=MatchesMask(string(PChar(pArg1)), sLike);
                                 Result:=Variant(b);
                                 exit;
-                           end;
+                           End;
 
-                         else
-                             raise exception.Create('Operator não suportado '+inttostr(ord(iOperator)));
-                    end;
-               end;
+                         Else
+                             raise exception.Create('Operator no suportado '+inttostr(ord(iOperator)));
+                    End;
+               End;
 
             nodeCOMPARE:
-               begin
+               Begin
                    {$IFNDEF FPC}
                     {$IFDEF DELPHI2010UP}
                      IgnoreCase:=PWord(@pfd[0])^;
@@ -640,59 +640,59 @@ var
                    {$ENDIF}
                     Arg1:=ParseNode(pfdStart,pArg1);
                     Arg2:=ParseNode(pfdStart,pArg2);
-                    if VIsNull(Arg1) or VIsNull(Arg2) then
-                    begin
+                    If VIsNull(Arg1) or VIsNull(Arg2) Then
+                    Begin
                          Result:=false;
                          exit;
-                    end;
+                    End;
 
                     S1:=Arg1;
                     S2:=Arg2;
-                    if IgnoreCase=1 then
-                    begin
+                    If IgnoreCase=1 Then
+                    Begin
                          S1:=AnsiUpperCase(S1);
                          S2:=AnsiUpperCase(S2);
-                    end;
-                    if PartLength>0 then
-                    begin
+                    End;
+                    If PartLength>0 Then
+                    Begin
                          S1:=Copy(S1,1,PartLength);
                          S2:=Copy(S2,1,PartLength);
-                    end;
+                    End;
 
-                    case iOperator of
+                    Case iOperator Of
                          coEQ:
-                            begin
+                            Begin
                                  b:=(S1 = S2);
                                  Result:=Variant(b);
                                  exit;
-                            end;
+                            End;
 
                          coNE:
-                            begin
+                            Begin
                                  b:=(S1 <> S2);
                                  Result:=Variant(b);
                                  exit;
-                            end;
+                            End;
 
                          coLIKE:
-                            begin
+                            Begin
                                  pArg1:=PByte(PChar(VarToStr(ParseNode(pfdStart,pArg1))));
                                  pArg2:=PByte(PChar(VarToStr(ParseNode(pfdStart,pArg2))));
                                  b:=MatchesMask(string(PChar(pArg1)),string(PChar(pArg2)));
                                  Result:=Variant(b);
                                  exit;
-                            end;
+                            End;
 
-                         else
-                             raise exception.Create('Operator não suportado '+inttostr(ord(iOperator)));
-                    end;
-               end;
+                         Else
+                             raise exception.Create('Operator no suportado '+inttostr(ord(iOperator)));
+                    End;
+               End;
 
             nodeFUNC:
-               begin
-                    case iOperator of
+               Begin
+                    Case iOperator Of
                          coFUNC2:
-                            begin
+                            Begin
                                  pArg1:=pfdStart;
                                  {$IFNDEF FPC}
                                   {$IFDEF DELPHI2010UP}
@@ -714,197 +714,197 @@ var
                                  {$ELSE}
                                   inc(pArg2,CANEXPRSIZE+PWord(@pfd[2])^); // Pointer to Value or Const
                                  {$ENDIF}
-                                 if sFunc='UPPER' then
-                                 begin
+                                 If sFunc='UPPER' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then Result:=Null
-                                      else Result:=UpperCase(VarToStr(Arg2));
-                                 end
+                                      If VIsNull(Arg2) Then Result:=Null
+                                      Else Result:=UpperCase(VarToStr(Arg2));
+                                 End
 
-                                 else if sFunc='LOWER' then
-                                 begin
+                                 Else If sFunc='LOWER' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then Result:=Null
-                                      else Result:=LowerCase(VarToStr(Arg2));
-                                 end
+                                      If VIsNull(Arg2) Then Result:=Null
+                                      Else Result:=LowerCase(VarToStr(Arg2));
+                                 End
 
-                                 else if sFunc='SUBSTRING' then
-                                 begin
+                                 Else If sFunc='SUBSTRING' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then
-                                      begin
+                                      If VIsNull(Arg2) Then
+                                      Begin
                                            Result:=Null;
                                            exit;
-                                      end;
+                                      End;
 
                                       Result:=Arg2;
-                                      try
+                                      Try
 {$IFDEF NEXTGEN}
                                          pArg1:=PByte(VarToStr(Result[0]));
 {$ELSE}
                                          pArg1:=PByte(AnsiString(VarToStr(Result[0])));
 {$ENDIF}
-                                      except
-                                         on EVariantError do // no Params for "SubString"
+                                      Except
+                                         on EVariantError Do // no Params for "SubString"
                                             raise Exception.CreateFmt('Invalid or missing parameter for function %s',[pArg1]);
-                                      end;
+                                      End;
 
                                       i:=Result[1];
                                       z:=Result[2];
-                                      if (z=0) then
-                                      begin
-                                           if (Pos(',',Result[1])>0) then  // "From" and "To" entered without space!
+                                      If (z=0) Then
+                                      Begin
+                                           If (Pos(',',Result[1])>0) Then  // "From" and "To" entered without space!
                                               z:=StrToInt(Copy(Result[1],Pos(',',Result[1])+1,Length(Result[1])))
-                                           else                            // No "To" entered so use all
+                                           Else                            // No "To" entered so use all
                                               z:=Length(PChar(pArg1));
-                                      end;
+                                      End;
                                       Result:=Copy(PChar(pArg1),i,z);
-                                 end
+                                 End
 
-                                 else if sFunc='TRIM' then
-                                 begin
+                                 Else If sFunc='TRIM' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then Result:=Null
-                                      else Result:=Trim(VarToStr(Arg2));
-                                 end
+                                      If VIsNull(Arg2) Then Result:=Null
+                                      Else Result:=Trim(VarToStr(Arg2));
+                                 End
 
-                                 else if sFunc='TRIMLEFT' then
-                                 begin
+                                 Else If sFunc='TRIMLEFT' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then Result:=Null
-                                      else Result:=TrimLeft(VarToStr(Arg2));
-                                 end
+                                      If VIsNull(Arg2) Then Result:=Null
+                                      Else Result:=TrimLeft(VarToStr(Arg2));
+                                 End
 
-                                 else if sFunc='TRIMRIGHT' then
-                                 begin
+                                 Else If sFunc='TRIMRIGHT' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then Result:=Null
-                                      else Result:=TrimRight(VarToStr(Arg2));
-                                 end
+                                      If VIsNull(Arg2) Then Result:=Null
+                                      Else Result:=TrimRight(VarToStr(Arg2));
+                                 End
 
-                                 else if sFunc='GETDATE' then
+                                 Else If sFunc='GETDATE' Then
                                     Result:=Now
 
-                                 else if sFunc='YEAR' then
-                                 begin
+                                 Else If sFunc='YEAR' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then Result:=Null
-                                      else
-                                      begin
+                                      If VIsNull(Arg2) Then Result:=Null
+                                      Else
+                                      Begin
                                            DecodeDate(VarToDateTime(Arg2),year,mon,day);
                                            Result:=year;
-                                      end;
-                                 end
+                                      End;
+                                 End
 
 
-                                 else if sFunc='MONTH' then
-                                 begin
+                                 Else If sFunc='MONTH' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then Result:=Null
-                                      else
-                                      begin
+                                      If VIsNull(Arg2) Then Result:=Null
+                                      Else
+                                      Begin
                                            DecodeDate(VarToDateTime(Arg2),year,mon,day);
                                            Result:=mon;
-                                      end;
-                                 end
+                                      End;
+                                 End
 
-                                 else if sFunc='DAY' then
-                                 begin
+                                 Else If sFunc='DAY' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then Result:=Null
-                                      else
-                                      begin
+                                      If VIsNull(Arg2) Then Result:=Null
+                                      Else
+                                      Begin
                                            DecodeDate(VarToDateTime(Arg2),year,mon,day);
                                            Result:=day;
-                                      end;
-                                 end
+                                      End;
+                                 End
 
-                                 else if sFunc='HOUR' then
-                                 begin
+                                 Else If sFunc='HOUR' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then Result:=Null
-                                      else
-                                      begin
+                                      If VIsNull(Arg2) Then Result:=Null
+                                      Else
+                                      Begin
                                            DecodeTime(VarToDateTime(Arg2),hour,min,sec,msec);
                                            Result:=hour;
-                                      end;
-                                 end
+                                      End;
+                                 End
 
-                                 else if sFunc='MINUTE' then
-                                 begin
+                                 Else If sFunc='MINUTE' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then Result:=Null
-                                      else
-                                      begin
+                                      If VIsNull(Arg2) Then Result:=Null
+                                      Else
+                                      Begin
                                            DecodeTime(VarToDateTime(Arg2),hour,min,sec,msec);
                                            Result:=min;
-                                      end;
-                                 end
+                                      End;
+                                 End
 
-                                 else if sFunc='SECOND' then
-                                 begin
+                                 Else If sFunc='SECOND' Then
+                                 Begin
                                       Arg2:=ParseNode(pfdStart,pArg2);
-                                      if VIsNull(Arg2) then Result:=Null
-                                      else
-                                      begin
+                                      If VIsNull(Arg2) Then Result:=Null
+                                      Else
+                                      Begin
                                            DecodeTime(VarToDateTime(Arg2),hour,min,sec,msec);
                                            Result:=sec;
-                                      end;
-                                 end
+                                      End;
+                                 End
 
-                                 else if sFunc='DATE' then  // Format DATE('datestring','formatstring')
-                                 begin                      // or     DATE(datevalue)
+                                 Else If sFunc='DATE' Then  // Format DATE('datestring','formatstring')
+                                 Begin                      // or     DATE(datevalue)
                                       Result:=ParseNode(pfdStart,pArg2);
-                                      if VarIsArray(Result) then
-                                      begin
-                                           try
+                                      If VarIsArray(Result) Then
+                                      Begin
+                                           Try
                                               sArg1:=VarToStr(Result[0]);
                                               sArg2:=VarToStr(Result[1]);
-                                           except
-                                              on EVariantError do // no Params for DATE
+                                           Except
+                                              on EVariantError Do // no Params for DATE
                                                  raise Exception.CreateFmt('Invalid or missing parameter for function %s',[sArg1]);
-                                           end;
+                                           End;
 
                                            format.ShortDateFormat:=sArg2;
                                            Result:=StrToDate(sArg1,format);
-                                      end
-                                      else
+                                      End
+                                      Else
                                           Result:=longint(trunc(VarToDateTime(Result)));
-                                 end
+                                 End
 
-                                 else if sFunc='TIME' then  // Format TIME('timestring','formatstring')
-                                 begin                      // or     TIME(datetimevalue)
+                                 Else If sFunc='TIME' Then  // Format TIME('timestring','formatstring')
+                                 Begin                      // or     TIME(datetimevalue)
                                       Result:=ParseNode(pfdStart,pArg2);
-                                      if VarIsArray(Result) then
-                                      begin
-                                           try
+                                      If VarIsArray(Result) Then
+                                      Begin
+                                           Try
                                               sArg1:=VarToStr(Result[0]);
                                               sArg2:=VarToStr(Result[1]);
-                                           except
-                                              on EVariantError do // no Params for TIME
+                                           Except
+                                              on EVariantError Do // no Params for TIME
                                                  raise exception.CreateFmt('Invalid or missing parameter for function %s',[sArg1]);
-                                           end;
+                                           End;
 
                                            format.ShortTimeFormat:=sArg2;
                                            Result:=StrToTime(sArg1,format);
-                                      end
-                                      else
+                                      End
+                                      Else
                                           Result:=Frac(VarToDateTime(Result));
-                                 end
+                                 End
 
-                                 else
+                                 Else
                                     raise Exception.CreateFmt('Invalid function name %s',[pArg1]);
-                            end;
-                         else
-                            raise Exception.CreateFmt('Operador não suportado (%d).',[ord(iOperator)]);
-                    end;
-               end;
+                            End;
+                         Else
+                            raise Exception.CreateFmt('Operador no suportado (%d).',[ord(iOperator)]);
+                    End;
+               End;
 
             nodeLISTELEM:
-               begin
-                    case iOperator of
+               Begin
+                    Case iOperator Of
                          coLISTELEM2:
-                            begin
+                            Begin
                                  Result:=VarArrayCreate([0,50],VarVariant); // Create VarArray for ListElements Values
                                  i:=0;
                                  pArg1:=pfdStart;
@@ -955,27 +955,27 @@ var
                                   Until NODEClass(PInteger(@pArg1[0])^)<>NodeListElem;
                                  {$ENDIF}
                                  // Only one or no Value so don't return as VarArray
-                                 if i<2 then
-                                 begin
-                                      if VIsNull(Result[0]) then
+                                 If i<2 Then
+                                 Begin
+                                      If VIsNull(Result[0]) Then
                                          Result:=Null
-                                      else
+                                      Else
                                           Result:=VarAsType(Result[0],varString);
-                                 end;
-                            end;
-                         else
-                            raise exception.CreateFmt('Operador não suportado (%d).',[ord(iOperator)]);
-                    end;
-               end;
-        else
+                                 End;
+                            End;
+                         Else
+                            raise exception.CreateFmt('Operador no suportado (%d).',[ord(iOperator)]);
+                    End;
+               End;
+        Else
             raise exception.CreateFmt('Class '+'Fora de intervalo (%d)',[ord(iClass)]);
-        end;
-   end;
+        End;
+   End;
   {$WARNINGS ON}
 
-var
+Var
    pfdStart,pfd:PByte;
-begin
+Begin
  pfdStart:=@FilterData[0];
  pfd:=pfdStart;
  {$IFNDEF FPC}
@@ -991,6 +991,6 @@ begin
   format :=FormatSettings;
   Result :=WordBool(ParseNode(pfdStart,pfd));
  {$ENDIF}
-end;
+End;
 
-end.
+End.

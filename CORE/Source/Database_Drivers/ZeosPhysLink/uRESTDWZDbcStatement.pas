@@ -1,6 +1,10 @@
 ﻿unit uRESTDWZDbcStatement;
 
-{$I ..\..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
+
+{$IFDEF FPC}
+ {$DEFINE GENERIC_INDEX}
+{$ENDIF}
 
 {$IFNDEF FPC}
  {$I ZDbc.inc}
@@ -156,29 +160,32 @@ begin
   if Assigned(FOpenResultSet) then
     IZResultSet(FOpenResultSet).Close;
 
-  NativeResultSet := TZRESTDWResultSet.Create(Self,FDWSQL,FStream);
+  NativeResultSet := TZRESTDWResultSet.Create(Self, FDWSQL, FStream);
+  NativeResultSet.SetConcurrency(GetResultSetConcurrency);
 
-  NativeResultSet.SetConcurrency(rcReadOnly);
-
-  if (GetResultSetConcurrency = rcUpdatable) or
-     (GetResultSetType <> rtForwardOnly) then
-  begin
-    { Creates a cached result set. }
-    CachedResolver := TZRESTDWCachedResolver.Create(Self,NativeResultSet.GetMetaData);
+  If GetResultSetConcurrency = rcUpdatable Then
+   Begin
+    CachedResolver := TZRESTDWCachedResolver.Create(Self, NativeResultSet.GetMetaData);
     {$IFDEF ZEOS80UP}
-      CachedResultSet := TZRESTDWCachedResultSet.Create(NativeResultSet, FDWSQL,
-        CachedResolver,GetConnection.GetConSettings);
+    CachedResultSet := TZRESTDWCachedResultSet.Create(NativeResultSet,
+                                                     FDWSQL,
+                                                     CachedResolver,
+                                                     GetConnection.GetConSettings);
     {$ELSE}
-      CachedResultSet := TZCachedResultSet.Create(NativeResultSet, FDWSQL,
-        CachedResolver,GetConnection.GetConSettings);
+    CachedResultSet := TZCachedResultSet.Create(NativeResultSet,
+                                               FDWSQL,
+                                               CachedResolver,
+                                               GetConnection.GetConSettings);
     {$ENDIF}
     CachedResultSet.SetType(rtScrollInsensitive);
     CachedResultSet.SetConcurrency(GetResultSetConcurrency);
-
     Result := CachedResultSet;
-  end
-  else
+   End
+  Else
+   Begin
+    NativeResultSet.SetType(rtForwardOnly);
     Result := NativeResultSet;
+   End;
 
   FOpenResultSet := Pointer(Result);
 
@@ -196,6 +203,7 @@ function TZAbstractRESTDWPreparedStatement.RDWExecuteComand(
   exec: boolean): Integer;
 var
   vRESTDataBase : TRESTDWDatabasebaseBase;
+  vRESTDWConnection : IZRESTDWConnection;
   vParams : TParams;
   vError : boolean;
   vMessageError : string;
@@ -357,7 +365,12 @@ begin
     BindInParameters;
     Prepare;
 
-    vRESTDataBase := IZRESTDWConnection(Connection).GetDatabase;
+    vRESTDWConnection := Connection as IZRESTDWConnection;
+    If vRESTDWConnection = Nil Then
+     Raise Exception.Create(cErrorDatabaseNotFound);
+    vRESTDataBase := vRESTDWConnection.GetDatabase;
+    If vRESTDataBase = Nil Then
+     Raise Exception.Create(cErrorDatabaseNotFound);
     vSQL := TStringList.Create;
     FDWSQL := getSQLWithParams;
     vSQL.Text := FDWSQL;
@@ -370,11 +383,16 @@ begin
     try
       vRESTDataBase.ExecuteCommand(vPoolermethod, vSQL, vParams, vError,
                                    vMessageError, vDataSetList, vRowsAffected,
-                                   exec, (not exec), (not exec), False,
+                                   exec, (not exec), False, False,
                                    vRESTDataBase.RESTClientPooler);
       FStream.Size := 0;
-      if (vDataSetList <> nil) and (not vDataSetList.IsNull) then
+      If (vDataSetList <> Nil) And (Not vDataSetList.IsNull) Then
+       Begin
         vDataSetList.SaveToStream(FStream);
+        FStream.Position := 0;
+       End;
+      If (Not exec) And (FStream.Size = 0) Then
+       Raise Exception.Create('Zeos PhysLink returned an empty dataset stream');
     finally
       vDataSetList.Free;
     end;

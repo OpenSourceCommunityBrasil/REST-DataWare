@@ -57,6 +57,33 @@
         <Projects Include="Tools\RESTDWSelfSigned.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="Drivers\Native\RESTDWNativeDriver.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Drivers\Native\FireDAC\RESTDWNativeLinkFD.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Drivers\Native\Zeos\RESTDWNativeLinkZeos.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Drivers\ADOPhys\RESTDWADOPhysDriver.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Drivers\DBExpressPhys\RESTDWDBExpressPhysDriver.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Drivers\Native\ADO\RESTDWNativeLinkADO.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Drivers\Native\DBExpress\RESTDWNativeLinkDBExpress.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Drivers\ADO\RESTDWADODriver.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Drivers\DBExpress\RESTDWDBExpressDriver.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -227,14 +254,95 @@
     <Target Name="RESTDWSelfSigned:Make">
         <MSBuild Projects="Tools\RESTDWSelfSigned.dproj" Targets="Make"/>
     </Target>
+    <Target Name="RESTDWNativeDriver">
+        <MSBuild Projects="Drivers\Native\RESTDWNativeDriver.dproj"/>
+    </Target>
+    <Target Name="RESTDWNativeDriver:Clean">
+        <MSBuild Projects="Drivers\Native\RESTDWNativeDriver.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWNativeDriver:Make">
+        <MSBuild Projects="Drivers\Native\RESTDWNativeDriver.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkFD">
+        <MSBuild Projects="Drivers\Native\FireDAC\RESTDWNativeLinkFD.dproj"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkFD:Clean">
+        <MSBuild Projects="Drivers\Native\FireDAC\RESTDWNativeLinkFD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkFD:Make">
+        <MSBuild Projects="Drivers\Native\FireDAC\RESTDWNativeLinkFD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkZeos">
+        <MSBuild Projects="Drivers\Native\Zeos\RESTDWNativeLinkZeos.dproj"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkZeos:Clean">
+        <MSBuild Projects="Drivers\Native\Zeos\RESTDWNativeLinkZeos.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkZeos:Make">
+        <MSBuild Projects="Drivers\Native\Zeos\RESTDWNativeLinkZeos.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWADOPhysDriver">
+        <MSBuild Projects="Drivers\ADOPhys\RESTDWADOPhysDriver.dproj"/>
+    </Target>
+    <Target Name="RESTDWADOPhysDriver:Clean">
+        <MSBuild Projects="Drivers\ADOPhys\RESTDWADOPhysDriver.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWADOPhysDriver:Make">
+        <MSBuild Projects="Drivers\ADOPhys\RESTDWADOPhysDriver.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDBExpressPhysDriver">
+        <MSBuild Projects="Drivers\DBExpressPhys\RESTDWDBExpressPhysDriver.dproj"/>
+    </Target>
+    <Target Name="RESTDWDBExpressPhysDriver:Clean">
+        <MSBuild Projects="Drivers\DBExpressPhys\RESTDWDBExpressPhysDriver.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDBExpressPhysDriver:Make">
+        <MSBuild Projects="Drivers\DBExpressPhys\RESTDWDBExpressPhysDriver.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkADO">
+        <MSBuild Projects="Drivers\Native\ADO\RESTDWNativeLinkADO.dproj"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkADO:Clean">
+        <MSBuild Projects="Drivers\Native\ADO\RESTDWNativeLinkADO.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkADO:Make">
+        <MSBuild Projects="Drivers\Native\ADO\RESTDWNativeLinkADO.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkDBExpress">
+        <MSBuild Projects="Drivers\Native\DBExpress\RESTDWNativeLinkDBExpress.dproj"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkDBExpress:Clean">
+        <MSBuild Projects="Drivers\Native\DBExpress\RESTDWNativeLinkDBExpress.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWNativeLinkDBExpress:Make">
+        <MSBuild Projects="Drivers\Native\DBExpress\RESTDWNativeLinkDBExpress.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWADODriver">
+        <MSBuild Projects="Drivers\ADO\RESTDWADODriver.dproj"/>
+    </Target>
+    <Target Name="RESTDWADODriver:Clean">
+        <MSBuild Projects="Drivers\ADO\RESTDWADODriver.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWADODriver:Make">
+        <MSBuild Projects="Drivers\ADO\RESTDWADODriver.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RESTDWDBExpressDriver">
+        <MSBuild Projects="Drivers\DBExpress\RESTDWDBExpressDriver.dproj"/>
+    </Target>
+    <Target Name="RESTDWDBExpressDriver:Clean">
+        <MSBuild Projects="Drivers\DBExpress\RESTDWDBExpressDriver.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RESTDWDBExpressDriver:Make">
+        <MSBuild Projects="Drivers\DBExpress\RESTDWDBExpressDriver.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="RESTDWCore;RESTDWShellServices;RESTDWSocketIndy;RESTDWSocketIcs;RESTDWCoreDesign;RESTDWShellServicesDesign;RESTDWSocketIndyDesign;RESTDWSocketIcsDesign;RESTDWAnyDACDriver;RESTDWApolloDBDriver;RESTDWFireDACDriver;RESTDWIbDACDriver;RESTDWInterbaseDriver;RESTDWMyDACDriver;RESTDWUniDACDriver;RESTDWZEOSDriver;RESTDWWizards;RESTDWSelfSigned"/>
+        <CallTarget Targets="RESTDWCore;RESTDWShellServices;RESTDWSocketIndy;RESTDWSocketIcs;RESTDWCoreDesign;RESTDWShellServicesDesign;RESTDWSocketIndyDesign;RESTDWSocketIcsDesign;RESTDWAnyDACDriver;RESTDWApolloDBDriver;RESTDWFireDACDriver;RESTDWIbDACDriver;RESTDWInterbaseDriver;RESTDWMyDACDriver;RESTDWUniDACDriver;RESTDWZEOSDriver;RESTDWWizards;RESTDWSelfSigned;RESTDWNativeDriver;RESTDWNativeLinkFD;RESTDWNativeLinkZeos;RESTDWADOPhysDriver;RESTDWDBExpressPhysDriver;RESTDWNativeLinkADO;RESTDWNativeLinkDBExpress;RESTDWADODriver;RESTDWDBExpressDriver"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="RESTDWCore:Clean;RESTDWShellServices:Clean;RESTDWSocketIndy:Clean;RESTDWSocketIcs:Clean;RESTDWCoreDesign:Clean;RESTDWShellServicesDesign:Clean;RESTDWSocketIndyDesign:Clean;RESTDWSocketIcsDesign:Clean;RESTDWAnyDACDriver:Clean;RESTDWApolloDBDriver:Clean;RESTDWFireDACDriver:Clean;RESTDWIbDACDriver:Clean;RESTDWInterbaseDriver:Clean;RESTDWMyDACDriver:Clean;RESTDWUniDACDriver:Clean;RESTDWZEOSDriver:Clean;RESTDWWizards:Clean;RESTDWSelfSigned:Clean"/>
+        <CallTarget Targets="RESTDWCore:Clean;RESTDWShellServices:Clean;RESTDWSocketIndy:Clean;RESTDWSocketIcs:Clean;RESTDWCoreDesign:Clean;RESTDWShellServicesDesign:Clean;RESTDWSocketIndyDesign:Clean;RESTDWSocketIcsDesign:Clean;RESTDWAnyDACDriver:Clean;RESTDWApolloDBDriver:Clean;RESTDWFireDACDriver:Clean;RESTDWIbDACDriver:Clean;RESTDWInterbaseDriver:Clean;RESTDWMyDACDriver:Clean;RESTDWUniDACDriver:Clean;RESTDWZEOSDriver:Clean;RESTDWWizards:Clean;RESTDWSelfSigned:Clean;RESTDWNativeDriver:Clean;RESTDWNativeLinkFD:Clean;RESTDWNativeLinkZeos:Clean;RESTDWADOPhysDriver:Clean;RESTDWDBExpressPhysDriver:Clean;RESTDWNativeLinkADO:Clean;RESTDWNativeLinkDBExpress:Clean;RESTDWADODriver:Clean;RESTDWDBExpressDriver:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="RESTDWCore:Make;RESTDWShellServices:Make;RESTDWSocketIndy:Make;RESTDWSocketIcs:Make;RESTDWCoreDesign:Make;RESTDWShellServicesDesign:Make;RESTDWSocketIndyDesign:Make;RESTDWSocketIcsDesign:Make;RESTDWAnyDACDriver:Make;RESTDWApolloDBDriver:Make;RESTDWFireDACDriver:Make;RESTDWIbDACDriver:Make;RESTDWInterbaseDriver:Make;RESTDWMyDACDriver:Make;RESTDWUniDACDriver:Make;RESTDWZEOSDriver:Make;RESTDWWizards:Make;RESTDWSelfSigned:Make"/>
+        <CallTarget Targets="RESTDWCore:Make;RESTDWShellServices:Make;RESTDWSocketIndy:Make;RESTDWSocketIcs:Make;RESTDWCoreDesign:Make;RESTDWShellServicesDesign:Make;RESTDWSocketIndyDesign:Make;RESTDWSocketIcsDesign:Make;RESTDWAnyDACDriver:Make;RESTDWApolloDBDriver:Make;RESTDWFireDACDriver:Make;RESTDWIbDACDriver:Make;RESTDWInterbaseDriver:Make;RESTDWMyDACDriver:Make;RESTDWUniDACDriver:Make;RESTDWZEOSDriver:Make;RESTDWWizards:Make;RESTDWSelfSigned:Make;RESTDWNativeDriver:Make;RESTDWNativeLinkFD:Make;RESTDWNativeLinkZeos:Make;RESTDWADOPhysDriver:Make;RESTDWDBExpressPhysDriver:Make;RESTDWNativeLinkADO:Make;RESTDWNativeLinkDBExpress:Make;RESTDWADODriver:Make;RESTDWDBExpressDriver:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -1,0 +1,7 @@
+WebView2Loader.dll ARM64 is not present in the current RESTDataware source package.
+
+Do NOT copy the x64 DLL into this directory.
+For an ARM64 Windows build, place the official Microsoft ARM64 WebView2Loader.dll here.
+The project currently contains validated PE binaries only for:
+- windows/i386
+- windows/x86_64

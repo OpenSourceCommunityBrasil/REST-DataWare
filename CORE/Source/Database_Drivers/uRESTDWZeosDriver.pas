@@ -1,6 +1,6 @@
 ﻿unit uRESTDWZeosDriver;
 
-{$I ..\Includes\uRESTDW.inc}
+{$I uRESTDW.inc}
 
 {
   REST Dataware .
@@ -23,10 +23,9 @@
  Fernando Banhos            - Refactor Drivers REST Dataware.
 }
 
-{$IFNDEF RESTDWLAZARUS}
- {$IFDEF FPC}
-  {$MODE OBJFPC}{$H+}
- {$ENDIF}
+{$IFDEF FPC}
+  {$MODE DELPHI}
+  {$H+}
 {$ENDIF}
 
 interface
@@ -35,110 +34,320 @@ uses
   {$IFDEF RESTDWLAZARUS}
     LResources,
   {$ENDIF}
-
-  {$IFDEF ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}
-   ZMemTable,
-  {$ELSE}
-   uRESTDWMemoryDataset,
-  {$ENDIF}
-  Classes, SysUtils, DB, Variants,
+  ZMemTable,
+  Classes, SysUtils, DB, Variants, FmtBCD,
   ZConnection, ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset,
   ZAbstractDataset, ZStoredProcedure, ZEncoding, ZDatasetUtils,
-  uRESTDWDriverBase, uRESTDWBasicDbTypes, uRESTDWProtoTypes, uRESTDWZeosPhysLink
-  ;
+  {$IFDEF ZEOS80UP}
+    ZDatasetParam,
+  {$ENDIF}
+  uRESTDWDriverBase, uRESTDWBasicDbTypes, uRESTDWProtoTypes, uRESTDWZeosPhysLink,
+  uRESTDWMemoryDataset;
 
 const
-  rdwZeosProtocols : array[0..16] of string = (('ado'),('asa'),('asa_capi'),
-                    ('firebird'),('interbase'),('mssql'),('mysql'),('odbc_a'),
-                    ('odbc_w'),('oledb'),('oracle'),('pooled'),('postgresql'),
-                    ('sqlite'),('sybase'),('webserviceproxy'),('mariadb'));
+  rdwZeosProtocols: array[0..16] of string = ('ado','asa','asa_capi',
+                    'firebird','interbase','mssql','mysql','odbc_a',
+                    'odbc_w','oledb','oracle','pooled','postgresql',
+                    'sqlite','sybase','webserviceproxy','mariadb'
+  );
 
-  rdwZeosDbType : array[0..16] of TRESTDWDatabaseType = ((dbtAdo),(dbtUndefined),
-                 (dbtUndefined),(dbtFirebird),(dbtInterbase),(dbtMsSQL),(dbtMySQL),
-                 (dbtODBC),(dbtODBC),(dbtUndefined),(dbtOracle),(dbtUndefined),
-                 (dbtPostgreSQL),(dbtSQLLite),(dbtUndefined),(dbtUndefined),
-                 (dbtMySQL));
+  rdwZeosDbType: array[0..16] of TRESTDWDatabaseType = (dbtAdo,dbtUndefined, dbtUndefined, dbtFirebird, dbtInterbase, dbtMsSQL, dbtMySQL,
+                 dbtODBC,dbtODBC,dbtUndefined,dbtOracle,dbtUndefined,dbtPostgreSQL,
+                 dbtSQLLite,dbtUndefined,dbtUndefined,dbtMySQL
+  );
 
 type
   { TRESTDWZeosStoreProc }
-
   TRESTDWZeosStoreProc = class(TRESTDWDrvStoreProc)
   public
     procedure ExecProc; override;
     procedure Prepare; override;
   end;
 
+  { TRESTDWZeosTable }
   TRESTDWZeosTable = class(TRESTDWDrvTable)
   public
-    procedure SaveToStream(stream : TStream); override;
-    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
+    procedure SaveToStream(stream: TStream); override;
+    procedure SaveToStreamCompatibleMode(stream: TStream); override;
+    procedure LoadFromStreamParam(IParam: integer; stream: TStream; blobtype: TBlobType); override;
     procedure FetchAll; override;
   end;
 
   { TRESTDWZeosQuery }
-
   TRESTDWZeosQuery = class(TRESTDWDrvQuery)
   private
-    FSequence : TZSequence;
+    FSequence: TZSequence;
   protected
-    procedure createSequencedField(seqname, field : string); override;
+    procedure createSequencedField(seqname, field: string); override;
   public
-    procedure SaveToStream(stream : TStream); override;
+    procedure SaveToStream(stream: TStream); override;
+    procedure SaveToStreamCompatibleMode(stream: TStream); override;
     procedure ExecSQL; override;
     procedure Prepare; override;
     procedure FetchAll; override;
-
     destructor Destroy; override;
-
-    function  RowsAffected : Int64; override;
-    function  ParamCount : Integer; override;
-
-    function  getParamDataType(IParam : integer) : TFieldType; override;
-    function  getParamName(IParam : integer) : string; override;
-    function  getParamSize(IParam : integer) : integer; override;
-    function  getParamValue(IParam : integer) : variant; override;
-
-    procedure setParamDataType(IParam : integer; AValue : TFieldType); override;
-    procedure setParamValue(IParam : integer; AValue : variant); override;
-
-    procedure LoadFromStreamParam(IParam : integer; stream : TStream; blobtype : TBlobType); override;
+    function RowsAffected: Int64; override;
+    function ParamCount: Integer; override;
+    function getParamDataType(IParam: integer): TFieldType; override;
+    function getParamName(IParam: integer): string; override;
+    function getParamSize(IParam: integer): integer; override;
+    function getParamValue(IParam: integer): variant; override;
+    procedure setParamDataType(IParam: integer; AValue: TFieldType); override;
+    procedure setParamValue(IParam: integer; AValue: variant); override;
+    procedure LoadFromStreamParam(IParam: integer; stream: TStream; blobtype: TBlobType); override;
   end;
 
   { TRESTDWZeosDriver }
-
   TRESTDWZeosDriver = class(TRESTDWDriverBase)
-  private
   protected
     procedure setConnection(AValue: TComponent); override;
-
-    function getConnectionType : TRESTDWDatabaseType; override;
-    Function compConnIsValid(comp : TComponent) : boolean; override;
-    Procedure zAfterPost(DataSet: TDataSet);
+    function getConnectionType: TRESTDWDatabaseType; override;
+    function compConnIsValid(comp: TComponent): boolean; override;
+    procedure zAfterPost(DataSet: TDataSet);
+    procedure zAfterOpen(DataSet: TDataSet);
+    procedure zOnNewRecord(DataSet: TDataSet);
   public
-    constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
-
-    function getQuery : TRESTDWDrvQuery; override;
-    function getQuery(AUnidir : boolean) : TRESTDWDrvQuery; override;
-    function getTable : TRESTDWDrvTable; override;
-    function getStoreProc : TRESTDWDrvStoreProc; override;
-
+    function getQuery: TRESTDWDrvQuery; override;
+    function getQuery(AUnidir: boolean): TRESTDWDrvQuery; override;
+    function getTable: TRESTDWDrvTable; override;
+    function getStoreProc: TRESTDWDrvStoreProc; override;
     procedure Connect; override;
     procedure Disconect; override;
-
-    function isConnected : boolean; override;
-    function connInTransaction : boolean; override;
+    function isConnected: boolean; override;
+    function connInTransaction: boolean; override;
     procedure connStartTransaction; override;
     procedure connRollback; override;
     procedure connCommit; override;
-
-    class procedure CreateConnection(Const AConnectionDefs : TConnectionDefs;
-                                     var AConnection : TComponent); override;
+    class procedure CreateConnection(const AConnectionDefs: TConnectionDefs; var AConnection: TComponent); override;
   end;
 
 procedure Register;
 
 implementation
+
+Procedure SaveZeosDatasetToDWMEM(ADataset: TDataSet; AStream: TStream);
+Var
+  I            : Integer;
+  L            : Integer;
+  Field        : TField;
+  Writer       : TRESTDWBinaryPacketWriter;
+  Bookmark     : TBookmark;
+  HasBookmark  : Boolean;
+  S            : AnsiString;
+  Bytes        : TRESTDWMemBytes;
+{$IFDEF DELPHI2009UP}
+  FieldBytes   : TBytes;
+{$ENDIF}
+  BlobStream   : TStream;
+  VBool        : WordBool;
+  VSmall       : SmallInt;
+  VWord        : Word;
+  VInt         : Integer;
+  VInt64       : Int64;
+  VDouble      : Double;
+  VCurrency    : Currency;
+  VBcd         : TBcd;
+  VDateTime    : TDateTime;
+  VGuid        : TGUID;
+  Buffer       : Pointer;
+Begin
+  If Not Assigned(ADataset) Or Not Assigned(AStream) Then
+   Exit;
+  If Not ADataset.Active Then
+   ADataset.Open
+  Else
+   ADataset.CheckBrowseMode;
+  AStream.Size := 0;
+  AStream.Position := 0;
+  Writer := TRESTDWBinaryPacketWriter.Create(AStream);
+  Try
+   Writer.ClearFieldDefs;
+   For I := 0 To ADataset.FieldCount - 1 Do
+    Begin
+     Field := ADataset.Fields[I];
+     Writer.AddFieldDef(Field.FieldName,
+                        Field.DisplayName,
+                        Field.Size,
+                        Field.DataType,
+                        Field.ReadOnly);
+    End;
+   Writer.StoreFieldDefs(1);
+   HasBookmark := False;
+   If Not ADataset.IsUniDirectional Then
+    Begin
+     Bookmark := ADataset.GetBookmark;
+     HasBookmark := True;
+     ADataset.First;
+    End;
+   ADataset.DisableControls;
+   Try
+    While Not ADataset.Eof Do
+     Begin
+      Writer.BeginRecord;
+      For I := 0 To ADataset.FieldCount - 1 Do
+       Begin
+        Field := ADataset.Fields[I];
+        If Field.IsNull Then
+         Begin
+          Writer.StoreNull(I);
+          Continue;
+         End;
+        Case Field.DataType Of
+         ftString,
+         ftFixedChar,
+         ftWideString
+{$IFDEF DELPHI2010UP}
+         ,ftFixedWideChar
+{$ENDIF}
+          :
+           Begin
+            S := AnsiString(Field.AsString);
+            If Length(S) > 0 Then
+             Buffer := @S[1]
+            Else
+             Buffer := Nil;
+            Writer.StoreField(I, Buffer, Length(S));
+           End;
+         ftSmallint:
+          Begin
+           VSmall := SmallInt(Field.AsInteger);
+           Writer.StoreField(I, @VSmall, SizeOf(VSmall));
+          End;
+         ftInteger:
+          Begin
+           VInt := Field.AsInteger;
+           Writer.StoreField(I, @VInt, SizeOf(VInt));
+          End;
+         ftWord:
+          Begin
+           VWord := Word(Field.AsInteger);
+           Writer.StoreField(I, @VWord, SizeOf(VWord));
+          End;
+         ftBoolean:
+          Begin
+           VBool := Field.AsBoolean;
+           Writer.StoreField(I, @VBool, SizeOf(VBool));
+          End;
+         ftFloat:
+          Begin
+           VDouble := Field.AsFloat;
+           Writer.StoreField(I, @VDouble, SizeOf(VDouble));
+          End;
+         ftCurrency,
+         ftBCD:
+          Begin
+           VCurrency := Field.AsCurrency;
+           Writer.StoreField(I, @VCurrency, SizeOf(VCurrency));
+          End;
+         ftDate:
+          Begin
+           VDateTime := Field.AsDateTime;
+           VInt := DateTimeToTimeStamp(VDateTime).Date;
+           Writer.StoreField(I, @VInt, SizeOf(VInt));
+          End;
+         ftTime:
+          Begin
+           VDateTime := Field.AsDateTime;
+           VInt := DateTimeToTimeStamp(VDateTime).Time;
+           Writer.StoreField(I, @VInt, SizeOf(VInt));
+          End;
+         ftDateTime,
+         ftTimeStamp
+{$IFDEF DELPHI2010UP}
+         ,ftOraTimeStamp,
+         ftTimeStampOffset
+{$ENDIF}
+          :
+           Begin
+            VDateTime := Field.AsDateTime;
+            Writer.StoreField(I, @VDateTime, SizeOf(VDateTime));
+           End;
+         ftLargeint,
+         ftAutoInc:
+          Begin
+           VInt64 := Field.AsLargeInt;
+           Writer.StoreField(I, @VInt64, SizeOf(VInt64));
+          End;
+         ftFMTBcd:
+          Begin
+           FillChar(VBcd, SizeOf(VBcd), 0);
+           VBcd := StrToBcd(Field.AsString);
+           Writer.StoreField(I, @VBcd, SizeOf(VBcd));
+          End;
+         ftGuid:
+          Begin
+           FillChar(VGuid, SizeOf(VGuid), 0);
+           If Field.AsString <> '' Then
+            VGuid := StringToGUID(Field.AsString);
+           Writer.StoreField(I, @VGuid, SizeOf(VGuid));
+          End;
+         ftBlob,
+         ftMemo,
+         ftGraphic
+{$IFDEF DELPHI2010UP}
+         ,ftWideMemo
+{$ENDIF}
+          :
+           Begin
+            BlobStream := ADataset.CreateBlobStream(Field, bmRead);
+            Try
+             L := BlobStream.Size;
+             SetLength(Bytes, L);
+             BlobStream.Position := 0;
+             If L > 0 Then
+              Begin
+               BlobStream.ReadBuffer(Bytes[0], L);
+               Buffer := @Bytes[0];
+              End
+             Else
+              Buffer := Nil;
+             Writer.StoreField(I, Buffer, L);
+            Finally
+             BlobStream.Free;
+            End;
+           End;
+         ftBytes,
+         ftVarBytes:
+          Begin
+{$IFDEF DELPHI2009UP}
+           FieldBytes := Field.AsBytes;
+           L := Length(FieldBytes);
+           SetLength(Bytes, L);
+           If L > 0 Then
+            Move(FieldBytes[0], Bytes[0], L);
+{$ELSE}
+           Bytes := Field.AsBytes;
+           L := Length(Bytes);
+{$ENDIF}
+           If L > 0 Then
+            Buffer := @Bytes[0]
+           Else
+            Buffer := Nil;
+           Writer.StoreField(I, Buffer, L);
+          End;
+        Else
+         DatabaseError('Zeos field type is not representable by the RESTDW DataSet binary contract: ' +
+                       IntToStr(Ord(Field.DataType)));
+        End;
+        End;
+      Writer.EndRecord;
+      ADataset.Next;
+     End;
+   Finally
+    If HasBookmark Then
+     Begin
+      If ADataset.BookmarkValid(Bookmark) Then
+       ADataset.GotoBookmark(Bookmark);
+      ADataset.FreeBookmark(Bookmark);
+     End;
+    ADataset.EnableControls;
+   End;
+  Finally
+   Writer.Free;
+  End;
+  AStream.Position := 0;
+End;
 
 procedure Register;
 begin
@@ -149,19 +358,15 @@ end;
 { TRESTDWZeosStoreProc }
 
 procedure TRESTDWZeosStoreProc.ExecProc;
-var
-  qry : TZStoredProc;
 begin
-  qry := TZStoredProc(Self.Owner);
-  qry.ExecProc;
+  if Assigned(Owner) and (Owner is TZStoredProc) then
+    TZStoredProc(Owner).ExecProc;
 end;
 
 procedure TRESTDWZeosStoreProc.Prepare;
-var
-  qry : TZStoredProc;
 begin
-  qry := TZStoredProc(Self.Owner);
-  qry.Prepare;
+  if Assigned(Owner) and (Owner is TZStoredProc) then
+    TZStoredProc(Owner).Prepare;
 end;
 
 { TRESTDWZeosDriver }
@@ -171,41 +376,41 @@ begin
   inherited setConnection(AValue);
 end;
 
-Function TRESTDWZeosDriver.getConnectionType: TRESTDWDatabaseType;
-Var
-  prot : String;
-  i    : integer;
-Begin
- Result:=inherited getConnectionType;
- If Not Assigned(Connection) Then
-  Exit;
- If Result = dbtUndefined Then
-  Begin
-   prot := LowerCase(TZConnection(Connection).Protocol);
-   i := 0;
-   While i < Length(rdwZeosProtocols) Do
-    Begin
-     If Pos(rdwZeosProtocols[i],prot) > 0 Then
-      Begin
-       Result := rdwZeosDbType[i];
-       Break;
-      End;
-     i := i + 1;
-    End;
-  End;
-End;
+function TRESTDWZeosDriver.getConnectionType: TRESTDWDatabaseType;
+var 
+   LProtocol : string;
+   I         : integer;
+begin
+  Result := inherited getConnectionType;
+  if not Assigned(Connection) then
+    Exit;
+
+  if Result = dbtUndefined then
+  begin
+    LProtocol := LowerCase(TZConnection(Connection).Protocol);
+    
+    for  I := Low(rdwZeosProtocols) to High(rdwZeosProtocols) do
+      if Pos(rdwZeosProtocols[I], LProtocol) > 0 then
+      begin
+        Result := rdwZeosDbType[I];
+        Break;
+      end;
+  end;
+end;
 
 function TRESTDWZeosDriver.getQuery(AUnidir: boolean): TRESTDWDrvQuery;
 var
-  qry : TZReadOnlyQuery;
+  qry: TZReadOnlyQuery;
 begin
-  if AUnidir then begin
+  if AUnidir then 
+  begin
     qry := TZReadOnlyQuery.Create(Self);
     qry.IsUniDirectional := True;
     qry.Connection := TZConnection(Connection);
     Result := TRESTDWZeosQuery.Create(qry);
   end
-  else begin
+  else 
+  begin
     Result := inherited getQuery(AUnidir);
   end;
 end;
@@ -215,37 +420,68 @@ begin
   inherited Destroy;
 end;
 
-Procedure TRESTDWZeosDriver.zAfterPost(DataSet: TDataSet);
-Begin
-// TZQuery(DataSet).RefreshCurrentRow(True);
-End;
+procedure TRESTDWZeosDriver.zAfterPost(DataSet: TDataSet);
+begin
+  if DataSet is TZQuery then
+    TZQuery(DataSet).RefreshCurrentRow(True);
+end;
+
+procedure TRESTDWZeosDriver.zAfterOpen(DataSet: TDataSet);
+var 
+   I : integer;
+begin
+  for I := 0 to DataSet.FieldCount - 1 do
+  {$IFDEF FPC}
+      if DataSet.Fields[I].DataType in [ftInteger, ftLargeint, ftAutoInc] then
+    {$ELSE}
+      if (DataSet.Fields[I].DataType in [ftInteger, ftLargeint, ftAutoInc]) and
+         (DataSet.Fields[I].AutoGenerateValue = arAutoInc) then
+    {$ENDIF}
+    begin
+      DataSet.Fields[I].Required := False;
+      DataSet.Fields[I].ReadOnly := False;
+      DataSet.Fields[I].ProviderFlags := [pfInUpdate, pfInWhere, pfInKey];
+    end;
+end;
+
+procedure TRESTDWZeosDriver.zOnNewRecord(DataSet: TDataSet);
+var 
+   I : integer;
+begin
+  for I := 0 to DataSet.FieldCount - 1 do
+  {$IFDEF FPC}
+      if DataSet.Fields[I].DataType = ftAutoInc then
+  {$ELSE}
+      if (DataSet.Fields[I].DataType in [ftInteger, ftLargeint, ftAutoInc]) and
+         (DataSet.Fields[I].AutoGenerateValue = arAutoInc) then
+  {$ENDIF}
+        DataSet.Fields[I].Clear;
+end;
 
 function TRESTDWZeosDriver.getQuery: TRESTDWDrvQuery;
-var
-  qry : TZQuery;
+var 
+   qry : TZQuery;
 begin
   qry := TZQuery.Create(Self);
   qry.Connection := TZConnection(Connection);
-  {$IFNDEF FPC}
-   qry.AfterPost := zAfterPost;
-  {$ELSE}
-   qry.AfterPost := @zAfterPost;
-  {$ENDIF}
+  qry.AfterPost := zAfterPost;
+  qry.AfterOpen := zAfterOpen;
+  
   Result := TRESTDWZeosQuery.Create(qry);
 end;
 
-function TRESTDWZeosDriver.getTable : TRESTDWDrvTable;
-var
-  qry : TZTable;
+function TRESTDWZeosDriver.getTable: TRESTDWDrvTable;
+var 
+   qry : TZTable;
 begin
   qry := TZTable.Create(Self);
   qry.Connection := TZConnection(Connection);
   Result := TRESTDWZeosTable.Create(qry);
 end;
 
-function TRESTDWZeosDriver.getStoreProc : TRESTDWDrvStoreProc;
-var
-  qry : TZStoredProc;
+function TRESTDWZeosDriver.getStoreProc: TRESTDWDrvStoreProc;
+var 
+   qry : TZStoredProc;
 begin
   qry := TZStoredProc.Create(Self);
   qry.Connection := TZConnection(Connection);
@@ -255,12 +491,24 @@ end;
 procedure TRESTDWZeosDriver.Connect;
 begin
   if Assigned(Connection) and (not TZConnection(Connection).Connected) then
-   TZConnection(Connection).Connected := True;
+    TZConnection(Connection).Connected := True;
   inherited Connect;
 end;
 
 procedure TRESTDWZeosDriver.Disconect;
+var
+  I       : Integer;
+  DataSet : TZAbstractRODataset;
 begin
+  for I := ComponentCount - 1 downto 0 do
+  begin
+    if Components[I] is TZAbstractRODataset then
+    begin
+      DataSet := TZAbstractRODataset(Components[I]);
+      if DataSet.Active then
+        DataSet.Close;
+    end;
+  end;
   if Assigned(Connection) and (TZConnection(Connection).Connected) then
     TZConnection(Connection).Connected := False;
   inherited Disconect;
@@ -296,244 +544,355 @@ end;
 
 function TRESTDWZeosDriver.compConnIsValid(comp: TComponent): boolean;
 begin
-  Result := comp.InheritsFrom(TZConnection)
+  Result := comp.InheritsFrom(TZConnection);
 end;
 
 procedure TRESTDWZeosDriver.connCommit;
 begin
-  if TZConnection(Connection).AutoCommit then
+  inherited connCommit;
+  if Assigned(Connection) and (not TZConnection(Connection).AutoCommit) then
     TZConnection(Connection).Commit;
-end;
-
-constructor TRESTDWZeosDriver.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
 end;
 
 class procedure TRESTDWZeosDriver.CreateConnection(
   const AConnectionDefs: TConnectionDefs; var AConnection: TComponent);
+var 
+  LConn : TZConnection;
 begin
   inherited CreateConnection(AConnectionDefs, AConnection);
-  if Assigned(AConnectionDefs) then begin
-    case AConnectionDefs.DriverType Of
-      dbtUndefined  : TZConnection(AConnection).Protocol := '';
-      dbtAccess     : TZConnection(AConnection).Protocol := '';
-      dbtDbase      : TZConnection(AConnection).Protocol := '';
-      dbtParadox    : TZConnection(AConnection).Protocol := '';
-      dbtFirebird   : TZConnection(AConnection).Protocol := 'firebird';
-      dbtInterbase  : TZConnection(AConnection).Protocol := 'interbase';
-      dbtMySQL      : TZConnection(AConnection).Protocol := 'mysql';
-      dbtSQLLite    : TZConnection(AConnection).Protocol := 'sqlite';
-      dbtOracle     : TZConnection(AConnection).Protocol := 'oracle';
-      dbtMsSQL      : TZConnection(AConnection).Protocol := 'mssql';
-      dbtODBC       : TZConnection(AConnection).Protocol := 'odbc_a';
-      dbtPostgreSQL : TZConnection(AConnection).Protocol := 'postgresql';
-      dbtAdo        : TZConnection(AConnection).Protocol := 'ado';
-    end;
+  
+  if not (Assigned(AConnectionDefs) and Assigned(AConnection)) then
+    Exit;
+
+  LConn := TZConnection(AConnection);
+
+  case AConnectionDefs.DriverType of
+    dbtUndefined, dbtAccess, dbtDbase, dbtParadox: LConn.Protocol := '';
+    dbtFirebird:   LConn.Protocol := 'firebird';
+    dbtInterbase:  LConn.Protocol := 'interbase';
+    dbtMySQL:      LConn.Protocol := 'mysql';
+    dbtSQLLite:    LConn.Protocol := 'sqlite';
+    dbtOracle:     LConn.Protocol := 'oracle';
+    dbtMsSQL:      LConn.Protocol := 'mssql';
+    dbtODBC:       LConn.Protocol := 'odbc_a';
+    dbtPostgreSQL: LConn.Protocol := 'postgresql';
+    dbtAdo:        LConn.Protocol := 'ado';
   end;
 
-  with TZConnection(AConnection) do begin
-    HostName := AConnectionDefs.HostName;
-    Database := AConnectionDefs.DatabaseName;
-    User     := AConnectionDefs.Username;
-    Password := AConnectionDefs.Password;
-    Port     := AConnectionDefs.DBPort;
-  end;
+  LConn.HostName := AConnectionDefs.HostName;
+  LConn.Database := AConnectionDefs.DatabaseName;
+  LConn.User     := AConnectionDefs.Username;
+  LConn.Password := AConnectionDefs.Password;
+  LConn.Port     := AConnectionDefs.DBPort;
+
+  // AJUSTES ZEOS 8 + FIREBIRD 3.0+ (IDENTITY E DEFAULTS)
+  LConn.Properties.Add('AutoParamRefreshes=True');
+  LConn.Properties.Add('GetIdentityAfterInsert=True');
+  LConn.Properties.Add('SupportIdentityColumns=True');
+  LConn.Properties.Add('AutoRefresh=True');
+  LConn.Properties.Add('RefreshAfterPost=True');
+   
 end;
 
 { TRESTDWZeosQuery }
 
-procedure TRESTDWZeosQuery.createSequencedField(seqname, field : string);
-var
-  qry : TZAbstractRODataset;
+procedure TRESTDWZeosQuery.createSequencedField(seqname, field: string);
+var 
+   LQuery : TZQuery;
+   LSequence : TZSequence;
+   varField : TField;
 begin
-  if Trim(seqname) = '' then
-    Exit;
+  if Assigned(Self.Owner) and (Self.Owner is TZQuery) then
+  begin
+    LQuery := TZQuery(Self.Owner);
+    varField := LQuery.FindField(field);
+    
+    if Assigned(varField) then 
+    begin
+      varField.Required          := False;      
+      {$IFDEF FPC}
+      // Lazarus não possui AutoGenerateValue
+      if varField.DataType in [ftInteger, ftLargeint] then
+        varField.ReadOnly := False;
+      {$ELSE}
+      varField.AutoGenerateValue := arAutoInc;
+      {$ENDIF}
 
-  if FSequence = nil then
-    FSequence := TZSequence.Create(Self);
-
-  qry := TZAbstractRODataset(Self.Owner);
-  if qry is TZQuery then begin
-    FSequence.SequenceName := seqname;
-
-    TZQuery(qry).Sequence := FSequence;
-    TZQuery(qry).SequenceField := field;
+      if LQuery.Sequence = nil then
+      begin
+        LSequence := TZSequence.Create(LQuery);
+        LSequence.Connection   := LQuery.Connection;
+        LSequence.SequenceName := ''; 
+        LQuery.Sequence      := LSequence;
+        LQuery.SequenceField := field;
+      end;
+    end;
   end;
 end;
 
 procedure TRESTDWZeosQuery.ExecSQL;
 var
-  qry : TZAbstractRODataset;
+  qry    : TZAbstractRODataset;
+  I      : Integer;
+  LParam : TZParam;
+  LField : TField;
 begin
-  qry := TZAbstractRODataset(Self.Owner);
-  qry.ExecSQL;
+  if Assigned(Self.Owner) and (Self.Owner is TZAbstractRODataset) then 
+  begin
+    qry := TZAbstractRODataset(Self.Owner);
+
+    if qry is TZQuery then
+    begin
+      for I := 0 to TZQuery(qry).Params.Count - 1 do
+      begin
+        LParam := TZQuery(qry).Params[I];
+        if (LParam.DataType in [ftInteger, ftLargeint, ftAutoInc]) and (LParam.Value = 0) then
+        begin
+          LField := TZQuery(qry).FindField(LParam.Name);
+          {$IFDEF FPC}
+           if (LField.DataType in [ftAutoInc, ftInteger, ftLargeint]) and
+              (pfInKey in LField.ProviderFlags) then
+               LParam.Clear;
+          {$ELSE}
+           if (LField.AutoGenerateValue = arAutoInc) and
+              (pfInKey in LField.ProviderFlags) then
+              LParam.Clear;
+          {$ENDIF}
+          begin
+            LParam.Clear; 
+          end;
+        end;
+      end;
+    end;
+
+    qry.ExecSQL;
+  end;
+  
 end;
 
 procedure TRESTDWZeosQuery.FetchAll;
-var
-  qry : TZTable;
 begin
-  qry := TZTable(Self.Owner);
-  qry.FetchAll;
+  if Assigned(Self.Owner) and (Self.Owner is TZTable) then
+    TZTable(Self.Owner).FetchAll;
 end;
 
-procedure TRESTDWZeosQuery.LoadFromStreamParam(IParam: integer; stream: TStream;
-  blobtype: TBlobType);
+procedure TRESTDWZeosQuery.LoadFromStreamParam(
+  IParam: Integer;
+  Stream: TStream;
+  BlobType: TBlobType);
 var
-  qry : TZAbstractRODataset;
-  {$IFDEF ZEOS80UP}
-    cp : Word;
-  {$ENDIF}
+  qry: TZAbstractRODataset;
+
+{$IFDEF ZEOS80UP}
+  cp: Word;
+  LParams: TZParams;
+{$ENDIF}
+
 begin
+  if not Assigned(Self.Owner) then
+    Exit;
+
   qry := TZAbstractRODataset(Self.Owner);
-  {$IFDEF ZEOS80UP}
-    if qry is TZQuery then begin
-      if BlobType in [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
-        TZQuery(qry).Params[IParam].LoadTextFromStream(Stream, zCP_UTF16)
-      else if BlobType in [ftBlob, ftGraphic, ftTypedBinary, ftOraBlob] then
-        TZQuery(qry).Params[IParam].LoadBinaryFromStream(Stream)
-      else if BlobType in [ftMemo, ftParadoxOle, ftDBaseOle, ftOraClob] then begin
-        cp := qry.Connection.RawCharacterTransliterateOptions.GetRawTransliterateCodePage(ttParam);
-        TZQuery(qry).Params[IParam].LoadTextFromStream(Stream, cp);
-      end;
-    end
-    else if qry is TZReadOnlyQuery then begin
-      if BlobType in [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
-        TZReadOnlyQuery(qry).Params[IParam].LoadTextFromStream(Stream, zCP_UTF16)
-      else if BlobType in [ftBlob, ftGraphic, ftTypedBinary, ftOraBlob] then
-        TZReadOnlyQuery(qry).Params[IParam].LoadBinaryFromStream(Stream)
-      else if BlobType in [ftMemo, ftParadoxOle, ftDBaseOle, ftOraClob] then begin
-        cp := qry.Connection.RawCharacterTransliterateOptions.GetRawTransliterateCodePage(ttParam);
-        TZReadOnlyQuery(qry).Params[IParam].LoadTextFromStream(Stream, cp);
-      end;
+
+{$IFDEF ZEOS80UP}
+
+  LParams := nil;
+
+  if qry is TZQuery then
+    LParams := TZQuery(qry).Params
+  else if qry is TZReadOnlyQuery then
+    LParams := TZReadOnlyQuery(qry).Params;
+
+  if Assigned(LParams) then
+  begin
+  {$IFNDEF FPC}
+    // Delphi + Zeos 8
+    if BlobType in
+      [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
+      LParams[IParam].LoadTextFromStream(Stream, zCP_UTF16)
+    else if BlobType in
+      [ftBlob, ftGraphic, ftTypedBinary, ftOraBlob] then
+      LParams[IParam].LoadBinaryFromStream(Stream)
+    else if BlobType in
+      [ftMemo, ftParadoxOle, ftDBaseOle, ftOraClob] then
+    begin
+      cp := qry.Connection.RawCharacterTransliterateOptions
+               .GetRawTransliterateCodePage(ttParam);
+      LParams[IParam].LoadTextFromStream(Stream, cp);
     end;
   {$ELSE}
-    if qry is TZQuery then
-      TZQuery(qry).Params[IParam].LoadFromStream(stream,blobtype)
-    else if qry is TZReadOnlyQuery then
-      TZReadOnlyQuery(qry).Params[IParam].LoadFromStream(stream,blobtype)
+    // Lazarus + Zeos 8
+    LParams[IParam].LoadFromStream(Stream, BlobType);
   {$ENDIF}
+  end;
+  {$ELSE}
+  if qry is TZQuery then
+    TZQuery(qry).Params[IParam].LoadFromStream(Stream, BlobType)
+  else if qry is TZReadOnlyQuery then
+    TZReadOnlyQuery(qry).Params[IParam].LoadFromStream(Stream, BlobType);
+  {$ENDIF}
+
 end;
 
 procedure TRESTDWZeosQuery.Prepare;
-var
-  qry : TZAbstractRODataset;
+var 
+   qry        : TZAbstractRODataset;
+   I          : integer;
+   LParam     : TZParam;
+   LParamName : string;
 begin
   inherited Prepare;
-  qry := TZAbstractRODataset(Self.Owner);
-  qry.Prepare;
+  if Assigned(Self.Owner) and (Self.Owner is TZAbstractRODataset) then 
+  begin
+    qry := TZAbstractRODataset(Self.Owner);
+    
+    if qry is TZQuery then
+    begin
+      for I := 0 to TZQuery(qry).Params.Count - 1 do
+      begin
+        LParam := TZQuery(qry).Params[I];
+        if (LParam.DataType in [ftInteger, ftLargeint, ftAutoInc]) and (LParam.Value = 0) then
+        begin
+          LParamName := LowerCase(LParam.Name);
+          if (LParamName = 'id') or (LParamName.StartsWith('cod')) or (LParamName.EndsWith('id')) then
+            LParam.Clear;
+        end;
+      end;
+    end;
+    
+    qry.Prepare;
+  end;
 end;
 
 destructor TRESTDWZeosQuery.Destroy;
 begin
-  if FSequence <> nil then
+  if Assigned(FSequence) then
     FreeAndNil(FSequence);
   inherited Destroy;
 end;
 
 function TRESTDWZeosQuery.RowsAffected: Int64;
-var
-  qry : TZAbstractRODataset;
-begin
-  qry := TZAbstractRODataset(Self.Owner);
-  Result := qry.RowsAffected;
-end;
-
-function TRESTDWZeosQuery.ParamCount : Integer;
-var
-  qry : TZAbstractRODataset;
 begin
   Result := 0;
-  qry := TZAbstractRODataset(Self.Owner);
-  if qry is TZQuery then
-    Result := TZQuery(qry).Params.Count
-  else if qry is TZReadOnlyQuery then
-    Result := TZReadOnlyQuery(qry).Params.Count;
+  if Assigned(Self.Owner) and (Self.Owner is TZAbstractRODataset) then
+    Result := TZAbstractRODataset(Self.Owner).RowsAffected;
 end;
 
-function TRESTDWZeosQuery.getParamDataType(IParam : integer) : TFieldType;
+// REFATORAÇÃO: Otimização drástica e unificação no acesso aos parâmetros do Zeos
+function TRESTDWZeosQuery.ParamCount: Integer;
 var
-  qry : TZAbstractRODataset;
+ qry : TZAbstractRODataset;
+
+begin
+ Result:=0;
+ If not Assigned(Self.Owner) Then
+  Exit;
+ qry:=TZAbstractRODataset(Self.Owner);
+ If qry is TZQuery Then
+  Result:=TZQuery(qry).Params.Count
+ Else If qry is TZReadOnlyQuery Then
+  Result:=TZReadOnlyQuery(qry).Params.Count;
+ If (Result=0) and (Pos(':',SQL.Text)>0) Then
+  Begin
+   Prepare;
+   If qry is TZQuery Then
+    Result:=TZQuery(qry).Params.Count
+   Else If qry is TZReadOnlyQuery Then
+    Result:=TZReadOnlyQuery(qry).Params.Count;
+  End;
+end;
+
+
+function TRESTDWZeosQuery.getParamDataType(IParam: integer): TFieldType;
+var 
+   qry        : TZAbstractRODataset;
 begin
   Result := ftUnknown;
+  if not Assigned(Self.Owner) then Exit;
+
   qry := TZAbstractRODataset(Self.Owner);
-  if qry is TZQuery then
-    Result := TZQuery(qry).Params[IParam].DataType
-  else if qry is TZReadOnlyQuery then
-    Result := TZReadOnlyQuery(qry).Params[IParam].DataType;
+  if qry is TZQuery then Result := TZQuery(qry).Params[IParam].DataType
+  else if qry is TZReadOnlyQuery then Result := TZReadOnlyQuery(qry).Params[IParam].DataType;
 end;
 
-function TRESTDWZeosQuery.getParamName(IParam : integer) : string;
-var
-  qry : TZAbstractRODataset;
+function TRESTDWZeosQuery.getParamName(IParam: integer): string;
+var 
+   qry        : TZAbstractRODataset;
 begin
   Result := '';
+  if not Assigned(Self.Owner) then Exit;
+
   qry := TZAbstractRODataset(Self.Owner);
-  if qry is TZQuery then
-    Result := TZQuery(qry).Params[IParam].Name
-  else if qry is TZReadOnlyQuery then
-    Result := TZReadOnlyQuery(qry).Params[IParam].Name;
+  if qry is TZQuery then Result := TZQuery(qry).Params[IParam].Name
+  else if qry is TZReadOnlyQuery then Result := TZReadOnlyQuery(qry).Params[IParam].Name;
 end;
 
-function TRESTDWZeosQuery.getParamSize(IParam : integer) : integer;
-var
-  qry : TZAbstractRODataset;
+function TRESTDWZeosQuery.getParamSize(IParam: integer): integer;
+var 
+   qry        : TZAbstractRODataset;
 begin
   Result := 0;
+  if not Assigned(Self.Owner) then Exit;
+
   qry := TZAbstractRODataset(Self.Owner);
-  if qry is TZQuery then
-    Result := TZQuery(qry).Params[IParam].Size
-  else if qry is TZReadOnlyQuery then
-    Result := TZReadOnlyQuery(qry).Params[IParam].Size;
+  if qry is TZQuery then Result := TZQuery(qry).Params[IParam].Size
+  else if qry is TZReadOnlyQuery then Result := TZReadOnlyQuery(qry).Params[IParam].Size;
 end;
 
-function TRESTDWZeosQuery.getParamValue(IParam : integer) : variant;
+function TRESTDWZeosQuery.getParamValue(IParam: integer): variant;
+var 
+   qry        : TZAbstractRODataset;
+begin
+  Result := Null;
+  if not Assigned(Self.Owner) then Exit;
+
+  qry := TZAbstractRODataset(Self.Owner);
+  if qry is TZQuery then Result := TZQuery(qry).Params[IParam].Value
+  else if qry is TZReadOnlyQuery then Result := TZReadOnlyQuery(qry).Params[IParam].Value;
+end;
+
+procedure TRESTDWZeosQuery.setParamDataType(IParam: integer; AValue: TFieldType);
+var 
+   qry        : TZAbstractRODataset;
+begin
+  if not Assigned(Self.Owner) then Exit;
+
+  qry := TZAbstractRODataset(Self.Owner);
+  if qry is TZQuery then TZQuery(qry).Params[IParam].DataType := AValue
+  else if qry is TZReadOnlyQuery then TZReadOnlyQuery(qry).Params[IParam].DataType := AValue;
+end;
+
+procedure TRESTDWZeosQuery.setParamValue(IParam: integer; AValue: variant);
 var
   qry : TZAbstractRODataset;
 begin
-  Result := null;
-  qry := TZAbstractRODataset(Self.Owner);
-  if qry is TZQuery then
-    Result := TZQuery(qry).Params[IParam].Value
-  else if qry is TZReadOnlyQuery then
-    Result := TZReadOnlyQuery(qry).Params[IParam].Value;
-end;
-
-procedure TRESTDWZeosQuery.setParamDataType(IParam : integer; AValue : TFieldType);
-var
-  qry : TZAbstractRODataset;
-begin
-  qry := TZAbstractRODataset(Self.Owner);
-  if qry is TZQuery then
-    TZQuery(qry).Params[IParam].DataType := AValue
-  else if qry is TZReadOnlyQuery then
-    TZReadOnlyQuery(qry).Params[IParam].DataType := AValue;
-end;
-
-procedure TRESTDWZeosQuery.setParamValue(IParam : integer; AValue : variant);
-var
-  qry : TZAbstractRODataset;
-begin
-  qry := TZAbstractRODataset(Self.Owner);
+  if not Assigned(Self.Owner) then Exit;
+    qry := TZAbstractRODataset(Self.Owner);
   if qry is TZQuery then
     TZQuery(qry).Params[IParam].Value := AValue
   else if qry is TZReadOnlyQuery then
     TZReadOnlyQuery(qry).Params[IParam].Value := AValue;
 end;
 
+procedure TRESTDWZeosQuery.SaveToStreamCompatibleMode(stream: TStream);
+Begin
+  If Assigned(Self.Owner) And (Self.Owner Is TDataSet) Then
+   SaveZeosDatasetToDWMEM(TDataSet(Self.Owner), stream);
+End;
+
 procedure TRESTDWZeosQuery.SaveToStream(stream: TStream);
-var
-  qry      : TZAbstractRODataset;
-  memtable : TZMemTable;
+var 
+   qry      : TZQuery;
+   memtable : TZMemTable;
 begin
+  if not (Assigned(Self.Owner) and Assigned(stream)) then Exit;
+
   qry := TZQuery(Self.Owner);
   memtable := TZMemTable.Create(nil);
   try
-   memtable.AssignDataFrom(qry);
-   //TODO SaveTostream
-   memtable.SaveToStream(stream);
-   stream.Position := 0;
+    memtable.AssignDataFrom(qry);
+    memtable.SaveToStream(stream);
+    stream.Position := 0;
   finally
     FreeAndNil(memtable);
   end;
@@ -542,51 +901,84 @@ end;
 { TRESTDWZeosTable }
 
 procedure TRESTDWZeosTable.FetchAll;
-var
-  qry : TZTable;
 begin
-  qry := TZTable(Self.Owner);
-  qry.FetchAll;
+  if Assigned(Self.Owner) and (Self.Owner is TZTable) then
+    TZTable(Self.Owner).FetchAll;
 end;
 
-procedure TRESTDWZeosTable.LoadFromStreamParam(IParam: integer; stream: TStream;
-  blobtype: TBlobType);
+procedure TRESTDWZeosTable.LoadFromStreamParam(IParam: integer; stream: TStream; blobtype: TBlobType);
 var
-  qry : TZTable;
-  pname : string;
-  cp : Word;
+  qry     : TZAbstractRODataset;
+  LParams : TZParams;
+  cp      : word;
 begin
-  pname := Self.Params[IParam].Name;
-  qry := TZTable(Self.Owner);
+  if not Assigned(Self.Owner) then Exit;
+  
+  qry := TZAbstractRODataset(Self.Owner);
+
   {$IFDEF ZEOS80UP}
-    if BlobType in [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
-      qry.ParamByName(pname).LoadTextFromStream(Stream, zCP_UTF16)
-    else if BlobType in [ftBlob, ftGraphic, ftTypedBinary, ftOraBlob] then
-      qry.ParamByName(pname).LoadBinaryFromStream(Stream)
-    else if BlobType in [ftMemo, ftParadoxOle, ftDBaseOle, ftOraClob] then begin
-      cp := qry.Connection.RawCharacterTransliterateOptions.GetRawTransliterateCodePage(ttParam);
-      qry.ParamByName(pname).LoadTextFromStream(Stream, cp);
+    // Deixando a variável estritamente dentro da diretiva
+    LParams := nil; 
+    
+    if qry is TZQuery then 
+      LParams := TZQuery(qry).Params
+    else if qry is TZReadOnlyQuery then 
+      LParams := TZReadOnlyQuery(qry).Params;
+
+    if Assigned(LParams) then 
+    begin
+      if BlobType in [ftWideString{$IFDEF WITH_WIDEMEMO}, ftFixedWideChar, ftWideMemo{$ENDIF}] then
+        LParams[IParam].LoadTextFromStream(Stream, zCP_UTF16)
+      else if BlobType in [ftBlob, ftGraphic, ftTypedBinary, ftOraBlob] then
+        LParams[IParam].LoadBinaryFromStream(Stream)
+      else if BlobType in [ftMemo, ftParadoxOle, ftDBaseOle, ftOraClob] then 
+      begin
+        cp := qry.Connection.RawCharacterTransliterateOptions.GetRawTransliterateCodePage(ttParam);
+        LParams[IParam].LoadTextFromStream(Stream, cp);
+      end;
     end;
   {$ELSE}
-    qry.ParamByName(pname).LoadFromStream(stream,blobtype);
+    if qry is TZQuery then
+      TZQuery(qry).Params[IParam].LoadFromStream(stream, blobtype)
+    else if qry is TZReadOnlyQuery then
+      TZReadOnlyQuery(qry).Params[IParam].LoadFromStream(stream, blobtype);
   {$ENDIF}
 end;
 
+procedure TRESTDWZeosTable.SaveToStreamCompatibleMode(stream: TStream);
+Begin
+  If Assigned(Self.Owner) And (Self.Owner Is TDataSet) Then
+   SaveZeosDatasetToDWMEM(TDataSet(Self.Owner), stream);
+End;
+
 procedure TRESTDWZeosTable.SaveToStream(stream: TStream);
 var
-  qry : TZTable;
+  qry      : TZAbstractRODataset;
   memtable : TZMemTable;
 begin
+  if not (Assigned(Self.Owner) and Assigned(stream)) then 
+    Exit;
+
+  // REFATORAÇÃO: Instanciação com escopo inline seguro
   qry := TZTable.Create(Self.Owner);
   memtable := TZMemTable.Create(nil);
   try
     memtable.Assign(qry);
-    memtable .SaveToStream(stream);
+    memtable.SaveToStream(stream);
     stream.Position := 0;
   finally
+    // CORREÇÃO: qry adicionado ao bloco de liberação para eliminar o Memory Leak
+    FreeAndNil(qry);
     FreeAndNil(memtable);
   end;
 end;
 
-end.
+Initialization
+ RegisterClass(TRESTDWZeosDriver);
+ RegisterRESTDWDriverClass(TRESTDWZeosDriver);
 
+Finalization
+ UnregisterRESTDWDriverClass(TRESTDWZeosDriver);
+ UnRegisterClass(TRESTDWZeosDriver);
+
+end.
