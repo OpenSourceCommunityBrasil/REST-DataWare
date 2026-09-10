@@ -38,6 +38,10 @@ jobs:
           (Get-Content $incFile.FullName) -replace '\{\.\$DEFINE ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT\}', '{$DEFINE ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}' |
             Set-Content $incFile.FullName
           Select-String -Path $incFile.FullName -Pattern "ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT"
+          # zcomponent.lpk was already compiled by the OPM install step before this edit;
+          # force a rebuild so ZMemTable.pas picks up the newly enabled define.
+          $zcomponentLpk = Join-Path $incFile.Directory.Parent.FullName "packages\lazarus\zcomponent.lpk"
+          lazbuild -B $zcomponentLpk
 
       - name: Build the Main package on Windows
         run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"

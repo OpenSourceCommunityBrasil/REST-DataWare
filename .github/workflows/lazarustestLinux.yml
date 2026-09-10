@@ -38,6 +38,10 @@ jobs:
           fi
           sed -i 's/{\.\$DEFINE ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}/{\$DEFINE ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT}/' "$incFile"
           grep -n "ZMEMTABLE_ENABLE_STREAM_EXPORT_IMPORT" "$incFile"
+          # zcomponent.lpk was already compiled by the OPM install step before this edit;
+          # force a rebuild so ZMemTable.pas picks up the newly enabled define.
+          zeosRoot=$(dirname "$(dirname "$incFile")")
+          lazbuild -B "$zeosRoot/packages/lazarus/zcomponent.lpk"
 
       - name: Build the Main package on Linux
         run: lazbuild -B "CORE/Packages/Lazarus/RESTDataWareComponents.lpk"
